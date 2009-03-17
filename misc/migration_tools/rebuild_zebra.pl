@@ -193,6 +193,7 @@ sub index_records {
                                                                   $entries, "$directory/upd_$record_type", $as_xml, $noxml);
             mark_zebraqueue_batch_done($entries);
         } else {
+			print "selecting records : $record_type\n" if $verbose_logging;
             my $sth = select_all_records($record_type);
             $num_records_exported = export_marc_records_from_sth($record_type, $sth, "$directory/$record_type", $as_xml, $noxml, $nosanitize);
             unless ($do_not_clear_zebraqueue) {
@@ -209,7 +210,7 @@ sub index_records {
         print "REINDEXING zebra\n";
         print "====================\n";
     }
-	my $record_fmt = ($as_xml) ? 'marcxml' : 'iso2709' ;
+	my $record_fmt = lc(C4::Context->preference('marcflavour'));
     if ($process_zebraqueue) {
         do_indexing($record_type, 'delete', "$directory/del_$record_type", $reset, $noshadow, $record_fmt, $zebraidx_log_opt) 
             if $num_records_deleted;
@@ -262,12 +263,16 @@ sub mark_zebraqueue_batch_done {
 
 sub select_all_records {
     my $record_type = shift;
+    warn "selecting $record_type";
     return ($record_type eq 'biblio') ? select_all_biblios() : select_all_authorities();
 }
 
 sub select_all_authorities {
+    warn "selecting  selectall_authorities";
     my $sth = $dbh->prepare("SELECT authid FROM auth_header");
+    warn "selecting  after prepare";
     $sth->execute();
+    warn "selecting  after execute";
     return $sth;
 }
 
@@ -357,7 +362,7 @@ sub generate_deleted_marc_records {
             fix_authority_id($marc, $record_number);
         }
         if (C4::Context->preference("marcflavour") eq "UNIMARC") {
-            fix_unimarc_100($marc);
+            fix_unimarc_100($record_type,$marc);
         }
 
         print OUT ($as_xml) ? $marc->as_xml_record() : $marc->as_usmarc();
@@ -384,7 +389,7 @@ sub get_corrected_marc_record {
             fix_authority_id($marc, $record_number);
         }
         if (C4::Context->preference("marcflavour") eq "UNIMARC") {
-            fix_unimarc_100($marc);
+            fix_unimarc_100($record_type,$marc);
         }
     }
 
@@ -490,10 +495,12 @@ sub fix_authority_id {
 
 sub fix_unimarc_100 {
     # FIXME - again, if this is necessary, it belongs in C4::AuthoritiesMarc.
+    my $record_type = shift;
     my $marc = shift;
 
     my $string;
-    if ( length($marc->subfield( 100, "a" )) == 35 ) {
+	my $field_length=($record_type eq "biblio"?35:22);
+    if ( length($marc->subfield( 100, "a" )) == $field_length ) {
         $string = $marc->subfield( 100, "a" );
         my $f100 = $marc->field(100);
         $marc->delete_field($f100);
@@ -501,11 +508,12 @@ sub fix_unimarc_100 {
     else {
         $string = POSIX::strftime( "%Y%m%d", localtime );
         $string =~ s/\-//g;
-        $string = sprintf( "%-*s", 35, $string );
+        $string = sprintf( "%-*s", $field_length, $string );
     }
-    substr( $string, 22, 6, "frey50" );
-    unless ( length($marc->subfield( 100, "a" )) == 35 ) {
-        $marc->delete_field($marc->field(100));
+    my $encoding_position= $field_length - 13;
+    substr( $string, $encoding_position , 6, "frey50" );
+    unless ( length($marc->subfield( 100, "a" )) == $field_length ) {
+        $marc->delete_field($marc->field(100)) if ($marc->field(100));
         $marc->insert_grouped_field(MARC::Field->new( 100, "", "", "a" => $string ));
     }
 }
@@ -515,16 +523,17 @@ sub do_indexing {
 
     my $zebra_server  = ($record_type eq 'biblio') ? 'biblioserver' : 'authorityserver';
     my $zebra_db_name = ($record_type eq 'biblio') ? 'biblios' : 'authorities';
+    $record_format .= ($record_type eq 'biblio') ? '' : 'a';
     my $zebra_config  = C4::Context->zebraconfig($zebra_server)->{'config'};
     my $zebra_db_dir  = C4::Context->zebraconfig($zebra_server)->{'directory'};
 
     if ( $reset_index ) {
-	die "$!" if -1 == system("zebraidx -c $zebra_config $zebraidx_log_opt -g $record_format -d $zebra_db_name init")
+	die "$!" if -1 == system("zebraidx -c $zebra_config $zebraidx_log_opt -d $zebra_db_name init") 
     }
 
-    die "$!" if -1 == system("zebraidx -c $zebra_config $zebraidx_log_opt $noshadow -g $record_format -d $zebra_db_name $op $record_dir");
+    die "$!" if -1 == system("zebraidx -c $zebra_config $zebraidx_log_opt $noshadow -t dom.dom-config-$record_format.xml -d $zebra_db_name $op $record_dir");
     unless ($noshadow) {
-	die "$!" if -1 == system("zebraidx -c $zebra_config $zebraidx_log_opt -g $record_format -d $zebra_db_name commit");
+	die "$!" if -1 == system("zebraidx -c $zebra_config $zebraidx_log_opt -d $zebra_db_name commit") 
     }
 
 }
