@@ -227,6 +227,14 @@ table {
 	border-right : 1px solid #BCBCBC;
 }
 
+table.invis{
+	border : white;
+}
+table.invis tr,table.invis td {
+	border : white;
+}
+
+
 td, th {
 	border-bottom : 1px solid #BCBCBC;
 	border-left : 1px solid #BCBCBC;
