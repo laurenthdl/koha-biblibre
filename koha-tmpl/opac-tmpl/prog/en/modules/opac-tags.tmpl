@@ -102,29 +102,55 @@
 		<div class="dialog message"><!-- TMPL_VAR NAME="deleted_count" --><!-- TMPL_IF EXPR="deleted_count ==1" --> tag<!-- TMPL_ELSE -->tags<!-- /TMPL_IF --> successfully deleted.</div>
 	  <!-- /TMPL_IF -->
 	<!-- /TMPL_IF -->
-
-	<!-- TMPL_UNLESS NAME="hidemytags" -->
-	<!-- TMPL_IF NAME="MY_TAGS" -->
-		<form method="post" action="opac-tags.pl">
-		<h2>My Tags</h2>
-		<table id="mytagst">
-		<thead><tr><th>Term</th><th>Title</th><th>Date Added</th><th>Delete</th>
-		</tr></thead>
-	<tbody><!-- TMPL_LOOP NAME="MY_TAGS" -->
-		<tr><td><a href="/cgi-bin/koha/opac-search.pl?tag=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->&amp;q=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->">
-				<!-- TMPL_VAR NAME="term" ESCAPE="HTML" --></a>
-			</td>
-			<td><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->">
-				<!-- TMPL_VAR NAME="bib_summary" ESCAPE="HTML" --></a></td>
-			<td><!-- TMPL_VAR NAME="date_created_display" --></td>
-			<td><input type="submit" name="del<!-- TMPL_VAR NAME="tag_id" -->" value="Delete" /></td>
-		</tr>
-	<!-- /TMPL_LOOP --></tbody>
-		</table>
+    <!-- TMPL_IF name="mine" -->
+        <h1>My cloud</h1>
+    <!-- TMPL_ELSE -->
+        <h1>Everyone cloud</h1>
+    <!-- /TMPL_IF -->
+	
+		<form method="get" action="opac-tags.pl">
+		<fieldset>Show up to <input name="limit" style="text-align: right;" maxlength="4" size="4" value="<!-- TMPL_VAR NAME="limit" DEFAULT="100" -->" /> tags. 
+            <!-- TMPL_IF name="mine" -->
+                (<input type="checkbox" name="mine" value="1" checked="1"/>Mine only)
+            <!-- TMPL_ELSE -->
+                (<input type="checkbox" name="mine" value="1" />Mine only)
+            <!-- /TMPL_IF -->
+			<input type="submit" value="OK" /> <!-- TMPL_UNLESS NAME="MY_TAGS" --><a href="/cgi-bin/koha/opac-user.pl">Log in</a> to see your own saved tags.<!-- /TMPL_UNLESS --></fieldset>
 		</form>
+	
+	<!-- TMPL_IF NAME="TAGLOOP" -->
+	<div id="tagcloud">
+	<!-- TMPL_LOOP NAME="TAGLOOP" -->
+	<span class="tag" id="tag<!-- TMPL_VAR NAME="__counter__" -->" title="<!-- TMPL_VAR NAME="cloudweight" -->">
+		<a href="/cgi-bin/koha/opac-search.pl?tag=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->&amp;q=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->">
+		<!-- TMPL_VAR NAME="term" ESCAPE="HTML" --></a>
+			<span class="tagweight"><!-- TMPL_VAR NAME="weight_total" --></span>
+	</span>
+	<!-- /TMPL_LOOP -->
+	</div>
 	<!-- /TMPL_IF -->
-	<!-- /TMPL_UNLESS -->
-
+    
+    <!-- TMPL_IF NAME="mine" -->
+        <!-- TMPL_IF NAME="MY_TAGS" -->
+            <form method="post" action="opac-tags.pl">
+            <h1>My Tags</h1>
+            <table id="mytagst">
+            <thead><tr><th>Term</th><th>Title</th><th>Date Added</th><th>Delete</th>
+            </tr></thead>
+        <tbody><!-- TMPL_LOOP NAME="MY_TAGS" -->
+            <tr><td><a href="/cgi-bin/koha/opac-search.pl?tag=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->&amp;q=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->">
+                    <!-- TMPL_VAR NAME="term" ESCAPE="HTML" --></a>
+                </td>
+                <td><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->">
+                    <!-- TMPL_VAR NAME="bib_summary" ESCAPE="HTML" --></a></td>
+                <td><!-- TMPL_VAR NAME="date_created_display" --></td>
+                <td><input type="submit" name="del<!-- TMPL_VAR NAME="tag_id" -->" value="Delete" /></td>
+            </tr>
+        <!-- /TMPL_LOOP --></tbody>
+            </table>
+            </form>
+        <!-- /TMPL_IF -->
+    <!-- /TMPL_IF -->
 
 </div>
 </div>
