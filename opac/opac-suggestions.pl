@@ -24,6 +24,8 @@ use C4::Branch;
 use C4::Koha;
 use C4::Output;
 use C4::Suggestions;
+use C4::Koha;
+use C4::Dates;
 
 my $input           = new CGI;
 my $suggestedbyme   = (defined $input->param('suggestedby')? $input->param('suggestedby'):1);
@@ -88,7 +90,6 @@ if ( $op eq "delete_confirm" ) {
     }
     $op = 'else';
 }
-
 map{ $_->{'branchcodesuggestedby'}=GetBranchInfo($_->{'branchcodesuggestedby'})->[0]->{'branchname'}} @$suggestions_loop;  
 my $supportlist=GetSupportList();				
 foreach my $support(@$supportlist){
@@ -103,8 +104,11 @@ $template->param(
 	%$suggestion,
 	itemtypeloop=> $supportlist,
     suggestions_loop => $suggestions_loop,
+    %suggestion,  
     suggestedbyme    => $suggestedbyme,
     "op_$op"         => 1,
-	suggestionsview => 1
+	  suggestionsview => 1
 );
+
+
 output_html_with_http_headers $input, $cookie, $template->output;
