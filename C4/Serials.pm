@@ -351,7 +351,6 @@ sub GetSubscription {
     my $query            = qq(
         SELECT  subscription.*,
                 subscriptionhistory.*,
-                aqbudget.bookfundid,
                 aqbooksellers.name AS aqbooksellername,
                 biblio.title AS bibliotitle,
                 subscription.biblionumber as bibnum);
@@ -364,7 +363,6 @@ sub GetSubscription {
             $query .= qq(             
        FROM subscription
        LEFT JOIN subscriptionhistory ON subscription.subscriptionid=subscriptionhistory.subscriptionid
-       LEFT JOIN aqbudget ON subscription.aqbudgetid=aqbudget.aqbudgetid
        LEFT JOIN aqbooksellers ON subscription.aqbooksellerid=aqbooksellers.id
        LEFT JOIN biblio ON biblio.biblionumber=subscription.biblionumber
        WHERE subscription.subscriptionid = ?
@@ -403,7 +401,7 @@ sub GetFullSubscription {
             serial.status, 
             serial.notes as notes,
             year(IF(serial.publisheddate="00-00-0000",serial.planneddate,serial.publisheddate)) as year,
-            aqbudget.bookfundid,aqbooksellers.name as aqbooksellername,
+            aqbooksellers.name as aqbooksellername,
             biblio.title as bibliotitle,
             subscription.branchcode AS branchcode,
             subscription.subscriptionid AS subscriptionid |;
@@ -417,7 +415,6 @@ sub GetFullSubscription {
   FROM      serial 
   LEFT JOIN subscription ON 
           (serial.subscriptionid=subscription.subscriptionid )
-  LEFT JOIN aqbudget ON subscription.aqbudgetid=aqbudget.aqbudgetid 
   LEFT JOIN aqbooksellers on subscription.aqbooksellerid=aqbooksellers.id 
   LEFT JOIN biblio on biblio.biblionumber=subscription.biblionumber 
   WHERE     serial.subscriptionid = ? 
@@ -514,12 +511,10 @@ sub GetSubscriptionsFromBiblionumber {
         SELECT subscription.*,
                branches.branchname,
                subscriptionhistory.*,
-               aqbudget.bookfundid,
                aqbooksellers.name AS aqbooksellername,
                biblio.title AS bibliotitle
        FROM subscription
        LEFT JOIN subscriptionhistory ON subscription.subscriptionid=subscriptionhistory.subscriptionid
-       LEFT JOIN aqbudget ON subscription.aqbudgetid=aqbudget.aqbudgetid
        LEFT JOIN aqbooksellers ON subscription.aqbooksellerid=aqbooksellers.id
        LEFT JOIN biblio ON biblio.biblionumber=subscription.biblionumber
        LEFT JOIN branches ON branches.branchcode=subscription.branchcode
@@ -583,7 +578,6 @@ sub GetFullSubscriptionsFromBiblionumber {
             serial.status, 
             serial.notes as notes,
             year(IF(serial.publisheddate="00-00-0000",serial.planneddate,serial.publisheddate)) as year,
-            aqbudget.bookfundid,aqbooksellers.name as aqbooksellername,
             biblio.title as bibliotitle,
             subscription.branchcode AS branchcode,
             subscription.subscriptionid AS subscriptionid|;
@@ -598,7 +592,6 @@ sub GetFullSubscriptionsFromBiblionumber {
   FROM      serial 
   LEFT JOIN subscription ON 
           (serial.subscriptionid=subscription.subscriptionid)
-  LEFT JOIN aqbudget ON subscription.aqbudgetid=aqbudget.aqbudgetid 
   LEFT JOIN aqbooksellers on subscription.aqbooksellerid=aqbooksellers.id 
   LEFT JOIN biblio on biblio.biblionumber=subscription.biblionumber 
   WHERE     subscription.biblionumber = ? 
