@@ -1045,13 +1045,13 @@ sub buildQuery {
 
     # pass nested queries directly
     # FIXME: need better handling of some of these variables in this case
-    if ( $query =~ /(\(|\))/ ) {
-        return (
-            undef,              $query, $simple_query, $query_cgi,
-            $query,             $limit, $limit_cgi,    $limit_desc,
-            $stopwords_removed, 'ccl'
-        );
-    }
+    #if ( $query =~ /(\(|\))/ ) {
+    #    return (
+    #        undef,              $query, $simple_query, $query_cgi,
+    #        $query,             $limit, $limit_cgi,    $limit_desc,
+    #        $stopwords_removed, 'ccl'
+    #    );
+    #}
 
 # Form-based queries are non-nested and fixed depth, so we can easily modify the incoming
 # query operands and indexes and add stemming, truncation, field weighting, etc.
