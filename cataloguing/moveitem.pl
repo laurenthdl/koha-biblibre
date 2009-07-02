@@ -29,6 +29,7 @@ use C4::Context;
 use C4::Koha;
 use C4::Branch;
 use C4::ClassSource;
+use C4::Acquisition qw/GetOrderFromItemnumber ModOrder GetOrder ModOrderItem/;
 
 use Date::Calc qw(Today);
 
@@ -73,20 +74,34 @@ if ($barcode && $biblionumber) {
 	    my $results = GetBiblioFromItemNumber($itemnumber, $barcode);
             my $frombiblionumber = $results->{'biblionumber'};
 
+            my $order = GetOrderFromItemnumber($itemnumber);
+            if ($order){
+                $order->{'biblionumber'} = $biblionumber;
+                ModOrder($order);
+            }
+            
             if ($frombiblionumber) {
-	       	DelItem(C4::Context->dbh, $frombiblionumber, $itemnumber);
+                DelItem(C4::Context->dbh, $frombiblionumber, $itemnumber);
             }
 
     	    # We add the item to the requested record
     	    my ($biblionumber, $biblioitemnumber, $newitemnumber) = AddItem($item, $biblionumber);
-		
-    	    if ($newitemnumber) { 
-		$template->param(success => 1);
-	    } else {
-		$template->param(error => 1,
-				 errornonewitem => 1); 
-	    }
 
+            if ($order){
+                my $orderitem = {
+                    ordernumber => $order->{'ordernumber'},
+                    itemnumber => $itemnumber,
+                    newitemnumber => $newitemnumber,
+                };
+                ModOrderItem($orderitem);
+            }
+		
+        if ($newitemnumber) { 
+            $template->param(success => 1);
+	    } else {
+            $template->param(error => 1,
+                             errornonewitem => 1); 
+	    }
 	} else {
 	    $template->param(error => 1,
 			     errornoitem => 1);
