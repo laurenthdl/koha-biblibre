@@ -147,6 +147,10 @@ $(document).ready(function(){
 
 	<!-- TMPL_IF NAME="TagsEnabled" -->
         $(".tagbutton").click(KOHA.Tags.add_tag_button);
+        $(".tagbutton").click(function() {
+	    $("#newtag" + $(this).attr("title")).attr('value' , '');
+	});
+
 	    <!-- TMPL_IF NAME="TagsInputOnList" -->
 	    <!-- TMPL_IF NAME="loggedinusername" -->
             $("#tagsel_tag").click(function(){

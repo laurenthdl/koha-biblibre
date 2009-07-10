@@ -12,11 +12,14 @@ use C4::Context;
 use C4::Output;
 use C4::Auth qw(:DEFAULT get_session);
 use C4::Search;
+use C4::Dates;
 use C4::Biblio;  # GetBiblioData
 use C4::Koha;
 use C4::Tags qw(get_tags);
 use POSIX qw(ceil floor strftime);
 use C4::Branch; # GetBranches
+use Storable qw(freeze thaw);
+use URI::Escape;
 
 # create a new CGI object
 # FIXME: no_undef_params needs to be tested
@@ -61,6 +64,7 @@ else {
     }
 );
 
+my $session = get_session($cgi->cookie("CGISESSID"));
 if ($format eq 'rss2' or $format eq 'opensearchdescription' or $format eq 'atom') {
 	$template->param($format => 1);
     $template->param(timestamp => strftime("%Y-%m-%dT%H:%M:%S-00:00", gmtime)) if ($format eq 'atom'); 
@@ -328,7 +332,8 @@ my ($error,$query,$simple_query,$query_cgi,$query_desc,$limit,$limit_cgi,$limit_
 my @results;
 
 ## I. BUILD THE QUERY
-( $error,$query,$simple_query,$query_cgi,$query_desc,$limit,$limit_cgi,$limit_desc,$stopwords_removed,$query_type) = buildQuery(\@operators,\@operands,\@indexes,\@limits,\@sort_by);
+my $lang = C4::Output::getlanguagecookie($cgi);
+( $error,$query,$simple_query,$query_cgi,$query_desc,$limit,$limit_cgi,$limit_desc,$stopwords_removed,$query_type) = buildQuery(\@operators,\@operands,\@indexes,\@limits,\@sort_by, 0, $lang);
 
 sub _input_cgi_parse ($) { 
     my @elements;
@@ -397,6 +402,7 @@ if ($@ || $error) {
     exit;
 }
 
+
 # At this point, each server has given us a result set
 # now we build that set for template display
 my @sup_results_array;
@@ -434,15 +440,73 @@ for (my $i=0;$i<=@servers;$i++) {
 	if ($results_hashref->{$server}->{"hits"}){
 	    $total = $total + $results_hashref->{$server}->{"hits"};
 	}
+
+	# Opac search history
+	my $newsearchcookie;
+	if (C4::Context->preference('EnableOpacSearchHistory')) {
+	    my @recentSearches; 
+
+	    # Getting the (maybe) already sent cookie
+	    my $searchcookie = $cgi->cookie('KohaOpacRecentSearches');
+	    if ($searchcookie){
+		$searchcookie = uri_unescape($searchcookie);
+		if (thaw($searchcookie)) {
+		    @recentSearches = @{thaw($searchcookie)};
+		}
+	    }
+
+	    # Adding the new search if needed
+	    if ($borrowernumber eq '') {
+	    # To a cookie (the user is not logged in)
+
+    		if ($params->{'offset'} eq '') {
+
+    		    push @recentSearches, {
+    					    "query_desc" => $query_desc || "unknown", 
+    					    "query_cgi"  => $query_cgi  || "unknown", 
+    					    "time"       => time(),
+    					    "total"      => $total
+    					  };
+    		    $template->param(ShowOpacRecentSearchLink => 1);
+    		}
+
+    		# Pushing the cookie back 
+    		$newsearchcookie = $cgi->cookie(
+					    -name => 'KohaOpacRecentSearches',
+					    # We uri_escape the whole freezed structure so we're sure we won't have any encoding problems
+					    -value => uri_escape(freeze(\@recentSearches)),
+					    -expires => ''
+		);
+		$cookie = [$cookie, $newsearchcookie];
+	 
+	    } else {
+	    # To the session (the user is logged in)
+		if ($params->{'offset'} eq '') {
+
+		    my $dbh = C4::Context->dbh;
+
+		    # Add the request the user just made
+		    my $query = "INSERT INTO search_history(userid, sessionid, query_desc, query_cgi, total, time) VALUES(?, ?, ?, ?, ?, NOW())";
+		    my $sth   = $dbh->prepare($query);
+		    $sth->execute($borrowernumber, $cgi->cookie("CGISESSID"), $query_desc, $query_cgi, $total);
+		    $sth->finish;
+
+    		    $template->param(ShowOpacRecentSearchLink => 1);
+
+    		}
+
+	    }
+	}
+
         ## If there's just one result, redirect to the detail page
         if ($total == 1) {         
             my $biblionumber=$newresults[0]->{biblionumber};
             if (C4::Context->preference('BiblioDefaultView') eq 'isbd') {
-                print $cgi->redirect("/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=$biblionumber");
+		    print $cgi->redirect(-uri => "/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=$biblionumber", -cookie => $newsearchcookie);
             } elsif  (C4::Context->preference('BiblioDefaultView') eq 'marc') {
-                print $cgi->redirect("/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=$biblionumber");
+		    print $cgi->redirect(-uri => "/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=$biblionumber", -cookie => $newsearchcookie);
             } else {
-                print $cgi->redirect("/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber");
+		    print $cgi->redirect(-uri => "/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber", -cookie => $newsearchcookie);
             } 
             exit;
         }
@@ -549,7 +613,6 @@ if ($query_desc || $limit_desc) {
 
 # VI. BUILD THE TEMPLATE
 # Build drop-down list for 'Add To:' menu...
-my $session = get_session($cgi->cookie("CGISESSID"));
 my @addpubshelves;
 my $pubshelves = $session->param('pubshelves');
 my $barshelves = $session->param('barshelves');
