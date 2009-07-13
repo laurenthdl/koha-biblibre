@@ -25,6 +25,7 @@ use Mail::Sendmail;
 use C4::Context;
 use C4::Output;
 use C4::Dates qw<format_date>;
+use List::MoreUtils;
 use base 'Exporter';  # parent would be better there
 our $VERSION = 3.01;
 our @EXPORT  = qw<
@@ -39,7 +40,6 @@ our @EXPORT  = qw<
     &NewSuggestion
     &SearchSuggestion
 >;
-use C4::Dates qw(format_date_in_iso);
 use vars qw($VERSION @ISA @EXPORT);
 
 BEGIN {
@@ -59,7 +59,6 @@ BEGIN {
 		&GetSuggestionFromBiblionumber
 	);
 }
->>>>>>> Suggestions.pm, probably useless & not working (check with hdl):C4/Suggestions.pm
 
 =head1 NAME
 
@@ -150,7 +149,7 @@ sub SearchSuggestion  {
 			} 
 	    } 
 	} 
-    foreach my $field (grep {qw<
+    foreach my $field (grep {my $fieldname=$_; any {$fieldname eq $_ }qw<
 	STATUS branchcode itemtype suggestedby managedby acceptedby
 	bookfundid biblionumber
 	>} keys %$suggestion
@@ -471,7 +470,7 @@ connect a suggestion to an existing biblio
 =cut
 
 sub ConnectSuggestionAndBiblio {
-    my ($ordernumber,$biblionumber) = @_;
+    my ($suggestionid,$biblionumber) = @_;
     my $dbh=C4::Context->dbh;
     my $query = q{
         UPDATE suggestions
@@ -491,7 +490,7 @@ Delete a suggestion. A borrower can delete a suggestion only if he is its owner.
 =cut
 
 sub DelSuggestion {
-    my ($borrowernumber,$ordernumber,$type) = @_;
+    my ($borrowernumber,$suggestionid,$type) = @_;
     my $dbh = C4::Context->dbh;
     # check that the suggestion comes from the suggestor
     my $query = q{
@@ -500,7 +499,7 @@ sub DelSuggestion {
         WHERE  suggestionid=?
 	};
     my $sth = $dbh->prepare($query);
-    $sth->execute($ordernumber);
+    $sth->execute($suggestionid);
     my ($suggestedby) = $sth->fetchrow;
     if ($type eq 'intranet' || $suggestedby eq $borrowernumber ) {
         my $queryDelete = qq{ 
