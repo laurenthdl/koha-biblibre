@@ -60,6 +60,7 @@ our %column_map = (
     aqorders => 'ORDERS',
     serial => 'SERIALS',
     reserves => 'HOLDS',
+    suggestions => 'SUGGESTIONS',
 );
 
 sub column_picks ($) {
@@ -153,7 +154,14 @@ if ( $op eq 'add_form' ) {
     push @SQLfieldname, column_picks('branches');
 
     # add acquisition specific tables
-    if ( $module eq "reserves" ) {
+    if ( $module eq "suggestions" ) {
+        push @SQLfieldname, column_picks('borrowers'),
+                            column_picks('suggestions'),
+                            column_picks('aqbooksellers'),
+                            column_picks('biblio'),
+                            column_picks('items');
+	}
+    elsif ( $module eq "reserves" ) {
         push @SQLfieldname, column_picks('borrowers'),
                             column_picks('reserves'),
                             column_picks('biblio'),

@@ -25,6 +25,7 @@ use Mail::Sendmail;
 use C4::Context;
 use C4::Output;
 use C4::Dates qw<format_date>;
+use C4::Letters;
 use List::MoreUtils;
 use base 'Exporter';  # parent would be better there
 our $VERSION = 3.01;
@@ -48,15 +49,15 @@ BEGIN {
 	require Exporter;
 	@ISA = qw(Exporter);
 	@EXPORT = qw(
-		&NewSuggestion
-		&SearchSuggestion
-		&GetSuggestion
-		&GetSuggestionByStatus
-		&DelSuggestion
-		&CountSuggestion
-		&ModStatus
-		&ConnectSuggestionAndBiblio
-		&GetSuggestionFromBiblionumber
+    &ConnectSuggestionAndBiblio
+    &CountSuggestion
+    &DelSuggestion
+    &GetSuggestion
+    &GetSuggestionByStatus
+    &GetSuggestionFromBiblionumber
+    &ModStatus
+    &ModSuggestion
+    &NewSuggestion
 	);
 }
 
@@ -427,36 +428,16 @@ sub ModSuggestion {
     my $result = $sth->execute(@values, $suggestionid);
     # check mail sending.
     if ($$suggestion{STATUS}){
-	my $queryMail = q{
-	SELECT suggestions.*,
-	    boby.surname AS bysurname,
-	    boby.firstname AS byfirstname,
-	    boby.email AS byemail,
-	    lib.surname AS libsurname,
-	    lib.firstname AS libfirstname,
-	    lib.email AS libemail
-	FROM suggestions
-	LEFT JOIN borrowers AS boby ON boby.borrowernumber=suggestedby
-	LEFT JOIN borrowers AS lib ON lib.borrowernumber=managedby
-	WHERE suggestionid=?
-	};
-	$sth = $dbh->prepare($queryMail);
-	$sth->execute($suggestionid);
-	my $emailinfo = $sth->fetchrow_hashref;
-	my $template = gettemplate(
-	    "suggestion/mail_suggestion_$$suggestion{STATUS}.tmpl"
-	    , "intranet"
-	    , CGI->new
-	);
-
-	$template->param( %$emailinfo);
-	sendmail(
-	    To             => $emailinfo->{byemail}, 
-	    From           => $emailinfo->{libemail}, 
-	    Subject        => 'Koha suggestion',
-	    Message        => ''.$template->output, 
-	    'Content-Type' => 'text/plain; charset="utf8"',
-	);
+		my $letter=C4::Letters::getletter('suggestions',$$suggestion{STATUS});
+		if ($letter){
+        my $enqueued = C4::Letters::EnqueueLetter({
+			letter=>$letter,
+			borrowernumber=>$$suggestion{suggestedby},
+			suggestionid=>$$suggestion{suggestionid},
+			msg_transport_type=>'email'
+			});
+		if (!$enqueued){warn "can't enqueue letter $letter";}
+		}
     }
     return $result;
 }
