@@ -117,6 +117,50 @@ if ( $count == 1 ) {
         push @itemloop,$cell;
         
         $template->param(items => \@itemloop);
+	}
+
+    my (@itemtypesloop,@locationloop,@ccodeloop);
+    my $itemtypes = GetItemTypes;
+    foreach my $thisitemtype (sort {$itemtypes->{$a}->{'description'} cmp $itemtypes->{$b}->{'description'}} keys %$itemtypes) {
+        push @itemtypesloop, {
+                  value => $thisitemtype,
+            description => $itemtypes->{$thisitemtype}->{'description'},
+               selected => ($thisitemtype eq $results[0]->{itemtype}),  # ifdef itemtype @ bibliolevel, use it as default for item level. 
+        };
+    }
+    my $locs = GetKohaAuthorisedValues( 'items.location' );
+    foreach my $thisloc (sort {$locs->{$a} cmp $locs->{$b}} keys %$locs) {
+	    push @locationloop, {
+                  value => $thisloc,
+            description => $locs->{$thisloc},
+        };
+    }
+    my $ccodes = GetKohaAuthorisedValues( 'items.ccode' );
+	foreach my $thisccode (sort {$ccodes->{$a} cmp $ccodes->{$b}} keys %$ccodes) {
+        push @ccodeloop, {
+                  value => $thisccode,
+            description => $ccodes->{$thisccode},
+        };
+    }
+    $template->param(
+        itemtypeloop => \@itemtypesloop,
+        locationloop => \@locationloop,
+           ccodeloop => \@ccodeloop,
+          branchloop => GetBranchesLoop($order->{branchcode}),
+               itype => C4::Context->preference('item-level_itypes'),
+    );
+    
+    my $barcode;
+    # See whether barcodes should be automatically allocated.
+	# FIXME : only incremental is implemented here, and it creates a race condition.
+	# FIXME : Same problems as other autoBarcode: breaks if any unexpected data is encountered (like alphanumerical barcode)
+    # FIXME : Fails when >1 items are added (via js).  
+	# FIXME : Use C4::barcodes
+    if ( C4::Context->preference('autoBarcode') eq 'incremental' ) {
+        my $sth = $dbh->prepare("Select max(barcode) from items");
+        $sth->execute;
+        my $data = $sth->fetchrow_hashref;
+        $barcode = $results[0]->{'barcode'} + 1;
     }
 
     if ( @$results[0]->{'quantityreceived'} == 0 ) {

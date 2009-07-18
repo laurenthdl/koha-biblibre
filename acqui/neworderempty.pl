@@ -204,11 +204,28 @@ for ( my $i = 0 ; $i < $count ; $i++ ) {
 my $itemtypes = GetItemTypes;
 
 my @itemtypesloop;
-foreach my $thisitemtype (sort keys %$itemtypes) {
+foreach my $thisitemtype (sort {$itemtypes->{$a}->{'description'} cmp $itemtypes->{$b}->{'description'}} keys %$itemtypes) {
     push @itemtypesloop, { itemtype => $itemtypes->{$thisitemtype}->{'itemtype'} , desc =>  $itemtypes->{$thisitemtype}->{'description'} } ;
 }
 
 $template->param( itypeloop => \@itemtypesloop );
+
+# build branches list
+my $onlymine=C4::Context->preference('IndependantBranches') && 
+             C4::Context->userenv && 
+             C4::Context->userenv->{flags}!=1 && 
+             C4::Context->userenv->{branch};
+my $branches = GetBranches($onlymine);
+my @branchloop;
+foreach my $thisbranch ( sort {$branches->{$a}->{'branchname'} cmp $branches->{$b}->{'branchname'}} keys %$branches ) {
+     my %row = (
+        value      => $thisbranch,
+        branchname => $branches->{$thisbranch}->{'branchname'},
+    );
+	$row{'selected'} = 1 if( $thisbranch eq $data->{branchcode}) ;
+    push @branchloop, \%row;
+}
+$template->param( branchloop => \@branchloop );
 
 # build bookfund list
 my $borrower= GetMember(borrowernumber=>$loggedinuser);
