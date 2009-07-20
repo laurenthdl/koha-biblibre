@@ -6,7 +6,7 @@ my $dbh=C4::Context->dbh;
 
 $dbh->do("INSERT INTO `systempreferences` (`variable`, `value`, `options`, `explanation`, `type`) VALUES ('EnableOpacSearchHistory', '1', '', 'Enable or disable opac search history', 'YesNo')");
 
-my $create = << END;
+my $create = <<SEARCHHISTORY;
 CREATE TABLE IF NOT EXISTS `search_history` (
   `userid` int(11) NOT NULL,
   `sessionid` varchar(32) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `search_history` (
   KEY `userid` (`userid`),
   KEY `sessionid` (`sessionid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Opac search history results';
-END
+SEARCHHISTORY
 
 $dbh->do($create);
 
