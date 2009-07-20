@@ -843,9 +843,7 @@ be run from the current directory.
 
 Configuration directory:);
         # FIXME - home directory portability consideration apply
-        $install_base_default = (exists $ENV{'HOME'}) ? "$ENV{'HOME'}/koha-dev" : "$defaults->{'INSTALL_BASE'}-dev";
-    } elsif ($config{'INSTALL_MODE'} eq 'single') {
-        $msg = "\nPlease specify the directory in which to install Koha";
+	$install_base_default =$defaults->{'INSTALL_BASE'} or die;
         # FIXME -- we're assuming under a 'single' mode install
         # that user will likely want to install under the home
         # directory.  This is OK in and of itself, but we should
