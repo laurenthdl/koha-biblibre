@@ -17,7 +17,7 @@ __PAZPAR2_TOGGLE_XML_PRE__
 <listen id="mergeserver">tcp:@:__MERGE_SERVER_PORT__</listen>
 <server id="mergeserver"  listenref="mergeserver"> 
     <directory>__ZEBRA_DATA_DIR__/biblios</directory>
-    <config>__ZEBRA_CONF_DIR__/zebra-biblios.cfg</config>
+    <config>__ZEBRA_CONF_DIR__/zebra-koha.cfg</config>
     <cql2rpn>__ZEBRA_CONF_DIR__/pqf.properties</cql2rpn>
 </server>
 __PAZPAR2_TOGGLE_XML_POST__
@@ -25,53 +25,85 @@ __PAZPAR2_TOGGLE_XML_POST__
 <!-- BIBLIOGRAPHIC RECORDS -->
 <server id="biblioserver"  listenref="biblioserver"> 
     <directory>__ZEBRA_DATA_DIR__/biblios</directory>
-    <config>__ZEBRA_CONF_DIR__/zebra-biblios.cfg</config>
+    <config>__ZEBRA_CONF_DIR__/zebra-koha.cfg</config>
     <cql2rpn>__ZEBRA_CONF_DIR__/pqf.properties</cql2rpn>
      <!-- <docpath>xsl</docpath> -->
      <!-- <stylesheet>xsl/default.xsl</stylesheet> -->
      <!-- <maximumrecordsize>2000000</maximumrecordsize> -->
      <retrievalinfo>
-       <retrieval syntax="usmarc" name="F"/>
-       <retrieval syntax="usmarc" name="B"/>
        <retrieval syntax="xml" name="F"/>
+       <retrieval syntax="xml" name="marc21"/>                              
+       <retrieval syntax="xml" name="unimarc"/>                             
+       <retrieval syntax="SUTRS" />                                         
+                                                                            
+       <retrieval syntax="iso2709" name="F">                                
+         <backend syntax="xml" name="F">                                    
+           <marc inputformat="xml" outputformat="marc"                      
+               inputcharset="utf-8" outputcharset="utf-8"/>               
+  </backend>                                                         
+  </retrieval>                                                         
+  <retrieval syntax="marc21" name="F">                                 
+  <backend syntax="xml" name="marc21">                               
+  <marc inputformat="xml" outputformat="marc"                      
+  inputcharset="utf-8" outputcharset="utf-8"/>               
+  </backend>                                                         
+  </retrieval>                                                         
+  <retrieval syntax="marc21" name="B">                                 
+  <backend syntax="xml" name="marc21">                               
+  <marc inputformat="xml" outputformat="marc"                      
+  inputcharset="utf-8" outputcharset="utf-8"/>               
+  </backend>                                                         
+  </retrieval>                                                         
+  <retrieval syntax="unimarc" name="F">                               
+  <backend syntax="xml" name="unimarc">                              
+  <marc inputformat="xml" outputformat="marc"                      
+  inputcharset="utf-8" outputcharset="utf-8"/>               
+  </backend>                                                         
+  </retrieval>                                                         
+  <retrieval syntax="unimarc" name="B">                                
+  <backend syntax="xml" name="unimarc">                              
+  <marc inputformat="xml" outputformat="marc"                      
+  inputcharset="utf-8" outputcharset="utf-8"/>               
+  </backend>                                                         
+  </retrieval>                      
        <retrieval syntax="xml" name="B"/>
        <retrieval syntax="xml" name="marcxml"
                   identifier="info:srw/schema/1/marcxml-v1.1">
-         <backend syntax="usmarc" name="F">
+         <backend syntax="marc" name="F">
            <marc inputformat="marc" outputformat="marcxml"
                  inputcharset="utf-8"/>
          </backend>
        </retrieval>
        <retrieval syntax="xml" name="dc">
-         <backend syntax="usmarc" name="F">
+         <backend syntax="marc" name="F">
            <marc inputformat="marc" outputformat="marcxml"
                  inputcharset="utf-8"/>
            <xslt stylesheet="__INTRANET_TMPL_DIR__/prog/en/xslt/MARC21slim2DC.xsl"/>
          </backend>
        </retrieval>
        <retrieval syntax="xml" name="mods">
-         <backend syntax="usmarc" name="F">
+         <backend syntax="marc" name="F">
            <marc inputformat="marc" outputformat="marcxml"
                  inputcharset="utf-8"/>
            <xslt stylesheet="__INTRANET_TMPL_DIR__/prog/en/xslt/MARC21slim2MODS.xsl"/>
          </backend>
        </retrieval>
        <retrieval syntax="xml" name="rdfdc">
-         <backend syntax="usmarc" name="F">
+         <backend syntax="marc" name="F">
            <marc inputformat="marc" outputformat="marcxml"
                  inputcharset="utf-8"/>
            <xslt stylesheet="__INTRANET_TMPL_DIR__/prog/en/xslt/MARC21slim2RDFDC.xsl"/>
          </backend>
        </retrieval>
        <retrieval syntax="xml" name="rss2">
-         <backend syntax="usmarc" name="F">
+         <backend syntax="marc" name="F">
            <marc inputformat="marc" outputformat="marcxml"
                  inputcharset="utf-8"/>
            <xslt stylesheet="__INTRANET_TMPL_DIR__/prog/en/xslt/MARC21slim2RSS2.xsl"/>
          </backend>
        </retrieval>
        <retrieval syntax="xml" name="utils">
-         <backend syntax="usmarc" name="F">
+         <backend syntax="marc" name="F">
            <marc inputformat="marc" outputformat="marcxml"
                  inputcharset="utf-8"/>
            <xslt stylesheet="__INTRANET_TMPL_DIR__/prog/en/xslt/MARC21slimUtils.xsl"/>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dom>
+  <extract name="index">
+    <xslt stylesheet="marc21.xsl"/>
+  </extract>
+  <retrieve name="usmarc">
+    <xslt stylesheet="identity.xsl"/>
+  </retrieve>
+  <retrieve name="marc21">
+    <xslt stylesheet="identity.xsl"/>
+  </retrieve>
+  <input syntax="xml">
+    <marc inputcharset="marc-8"/>
+  </input>
+</dom>

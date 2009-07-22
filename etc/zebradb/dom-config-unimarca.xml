@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dom>
+  <extract name="index">
+    <xslt stylesheet="unimarca.xsl"/>
+  </extract>
+  <retrieve name="unimarca">
+    <xslt stylesheet="identity.xsl"/>
+  </retrieve>
+  <!--- examples if you have a unimarc to dc -->
+  <retrieve name="dc">
+    <xslt stylesheet="unimarca2dc.xsl"/>
+  </retrieve> 
+  <!-- example if there was a way to convert from unimarc to marc21/usmarc via xsl  -->
+
+  <retrieve name="marc21a">
+    <xslt stylesheet="unimarca2marc21a.xsl"/>
+  </retrieve>
+  <input syntax="xml">
+    <marc inputcharset="utf-8"/>
+  </input>
+</dom>
