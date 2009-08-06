@@ -252,7 +252,8 @@ foreach my $biblionumber (@biblionumbers) {
             $count--;
         }
 
-        if ( defined $borrowerinfo && ($borrowerinfo->{borrowernumber} eq $res->{borrowernumber}) ) {
+        if ( defined $borrowerinfo && ($borrowerinfo->{borrowernumber} eq $res->{borrowernumber}) && !CanHoldMultipleItems($res->{itemtype}) ) {
+        if ( $borrowerinfo->{borrowernumber} eq $res->{borrowernumber} && !CanHoldMultipleItems($res->{itemtype}) ) {
             $warnings = 1;
             $alreadyreserved = 1;
             $biblioloopiter{warn} = 1;
@@ -437,6 +438,12 @@ foreach my $biblionumber (@biblionumbers) {
             while (my $wait_hashref = $sth2->fetchrow_hashref) {
                 $item->{waitingdate} = format_date($wait_hashref->{waitingdate});
             }
+            
+            if ( BorrowerHasReserve( $borrowerinfo->{'borrowernumber'}, '', $itemnumber ) ) {
+              $item->{available} = 0;
+              $item->{override} = 0;
+            }
+            
             push @{ $biblioitem->{itemloop} }, $item;
         }
         if ( $num_override > 0) { 
@@ -460,6 +467,9 @@ foreach my $biblionumber (@biblionumbers) {
             $a_found cmp $b_found; 
         } @$reserves ) {
         my %reserve;
+
+        $reserve{'reservenumber'}   = $res->{'reservenumber'};
+
         my @optionloop;
         for ( my $i = 1 ; $i <= $totalcount ; $i++ ) {
             push(

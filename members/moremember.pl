@@ -409,6 +409,7 @@ if ($borrowernumber) {
             $getreserv{biblionumber}  = $num_res->{'biblionumber'};	
         }
         $getreserv{waitingposition} = $num_res->{'priority'};
+        $getreserv{reservenumber}    = $num_res->{'reservenumber'};	
 
         push( @reservloop, \%getreserv );
     }
