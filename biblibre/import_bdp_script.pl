@@ -121,7 +121,15 @@ while ( my $record = $batch->next() ) {
     print "================\n";
     print "title : ". $record->subfield('200','a');
     print "\ncote : $cote\n";
-    $itemtype = "CD" if $cote =~ /^\d{3} \w{3}$/;
+    my @subjectfields=$record->field('606');
+    foreach my $field (@subjectfields) {
+	$itemtype="CD" if $field->subfield('x')=~/Disques compacts/;
+	last if $itemtype eq "CD";
+    }
+    $itemtype = "CD" if (
+			($itemtype eq "CD") 
+			and $cote =~ /^\d{3}(\.\d{1,3})? \w{2,4}$|^\d\s+\w{2,4}/
+			);
     $itemtype = "CDR" if $cote =~ /^C /;
     $itemtype = "DVD" if $cote =~ /^D/;
     
