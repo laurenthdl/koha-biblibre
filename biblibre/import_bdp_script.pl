@@ -228,7 +228,7 @@ while ( my $record = $batch->next() ) {
         my $public = "a"; #adulte
         $public = "j" if $field->subfield("k") =~ /^(VJ|DJ|E|A|C|J)/;
 
-        my $newField=MARC::Field->new('995','','','b' => "$annexe",
+        my $newField=MARC::Field->new('995','','','b' => "BDP",
                                 'c' => "$annexe",
                                 'e' => "$localisation",
                                 'f' => $field->subfield('f')."",
