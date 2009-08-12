@@ -209,14 +209,14 @@ while ( my $record = $batch->next() ) {
         my $item = MARC::Record->new();
         # on calcule la localisation...
         my $localisation='';
+        $localisation = "Doc adultes"       if $cote =~ /^(\d{3}|B )/;
         $localisation = "BDA"               if $cote =~ /^BDA \w{3}/; # BD Ado
         $localisation = "BDX"               if $cote =~ /^X \w{3}/; # BD Adulte
         $localisation = "BD"                if $cote =~ /^BD \w{3}/; # BD enfant
-        $localisation = "Doc adultes"       if $cote =~ /^(\d{3}|B)/;
         $localisation = "Doc jeunesse"      if $cote =~ /^J/;
         $localisation = "Espace enfant"     if $cote =~ /^(I|A|LEJ) /;
         $localisation = "Espace multimédia" if $cote =~ /^(C|E) /;
-        $localisation = "Fiction jeunesse"     if $cote =~ /^(E|Ra) /;
+        $localisation = "Fiction jeunesse"     if $cote =~ /^(Ea|Ra) /;
         $localisation = "Espace local"     if $cote =~ /^FL /;
         $localisation = "Littérature adulte"     if $cote =~ /^(R|RP|Rt|LEA) /;
         
