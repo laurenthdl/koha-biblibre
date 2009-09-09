@@ -1027,9 +1027,9 @@ sub buildQuery {
     my $stopwords_removed;    # flag to determine if stopwords have been removed
 
     my $cclq;
-    my $indexes = getIndexes();
+    my $cclindexes = getIndexes();
     if( $query !~ /\s*ccl=/ ){
-        for my $index (@$indexes){
+        for my $index (@$cclindexes){
             if($query =~ /($index)(,?\w)*:/){
                 $cclq = 1;
             }
