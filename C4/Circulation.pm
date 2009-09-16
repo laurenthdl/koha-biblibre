@@ -97,6 +97,12 @@ BEGIN {
                 &CreateBranchTransferLimit
                 &DeleteBranchTransferLimits
 	);
+	
+	# subs to deal with offline circulation
+	push @EXPORT, qw(
+		&GetOfflineOperations
+		&AddOfflineOperation
+	);	
 }
 
 =head1 NAME
@@ -2751,6 +2757,21 @@ sub DeleteBranchTransferLimits {
    my $dbh = C4::Context->dbh;
    my $sth = $dbh->prepare("TRUNCATE TABLE branch_transfer_limits");
    $sth->execute();
+}
+
+sub GetOfflineOperations {
+	my $dbh = C4::Context->dbh;
+	my $sth = $dbh->prepare("SELECT * FROM pending_offline_operations");
+	$sth->execute();
+	my $results = $sth->fetchall_arrayref({});
+	$sth->finish;
+	return $results;
+}
+
+sub AddOfflineOperation {
+	my $dbh = C4::Context->dbh;
+	my $sth = $dbh->prepare("INSERT INTO pending_offline_operations VALUES(?,?,?,?,?)");
+	$sth->execute( @_ );
 }
 
 
