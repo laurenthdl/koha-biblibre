@@ -1066,7 +1066,7 @@ sub GetAuthValCode {
 
 =head2 GetAuthorisedValues
 
-$authvalues = GetAuthorisedValues([$category], [$selected]);
+$authvalues = GetAuthorisedValues([$category], [$selected], [$opac]);
 
 This function returns all authorised values from the'authorised_value' table in a reference to array of hashrefs.
 
