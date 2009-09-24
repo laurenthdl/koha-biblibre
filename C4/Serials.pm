@@ -260,9 +260,10 @@ sub GetSerialInformation {
             foreach my $itemnum (@$itemnumbers) {
                 #It is ASSUMED that GetMarcItem ALWAYS WORK...
                 #Maybe GetMarcItem should return values on failure
+				my $marcrecord=GetMarcItem($data->{'biblionumber'},$itemnum->[0]);
                 $debug and warn "itemnumber :$itemnum->[0], bibnum :".$data->{'biblionumber'};
                 my $itemprocessed =
-                  PrepareItemrecordDisplay( $data->{'biblionumber'}, $itemnum->[0] , $data );
+                  PrepareItemrecordInput( $marcrecord,$data->{'biblionumber'} , $data );
                 $itemprocessed->{'itemnumber'}   = $itemnum->[0];
                 $itemprocessed->{'itemid'}       = $itemnum->[0];
                 $itemprocessed->{'serialid'}     = $serialid;
@@ -272,7 +273,7 @@ sub GetSerialInformation {
         }
         else {
             my $itemprocessed =
-              PrepareItemrecordDisplay( $data->{'biblionumber'}, '', $data );
+              PrepareItemrecordInput( undef,$data->{'biblionumber'}, $data );
             $itemprocessed->{'itemid'}       = "N$serialid";
             $itemprocessed->{'serialid'}     = $serialid;
             $itemprocessed->{'biblionumber'} = $data->{'biblionumber'};
