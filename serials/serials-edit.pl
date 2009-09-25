@@ -20,7 +20,7 @@
 
 =head1 NAME
 
-serials-recieve.pl
+serials-edit.pl
 
 =head1 Parameters
 
@@ -65,27 +65,29 @@ op can be :
 use strict;
 use warnings;
 use CGI;
+use C4::Debug;
 use C4::Auth;
 use C4::Dates qw/format_date format_date_in_iso/;
 use C4::Biblio;
 use C4::Items;
 use C4::Koha;
 use C4::Output;
+use C4::Data::MARCRecord;
 use C4::Context;
 use C4::Serials;
-
+use List::MoreUtils qw(first_index);
 #use Smart::Comments;
 
-my $query = new CGI;
+my $cgi = new CGI;
 my $dbh = C4::Context->dbh;
-my @serialids = $query->param('serialid');
-my @serialseqs = $query->param('serialseq');
-my @planneddates = $query->param('planneddate');
-my @publisheddates = $query->param('publisheddate');
-my @status = $query->param('status');
-my @notes = $query->param('notes');
-my @subscriptionids = $query->param('subscriptionid');
-my $op = $query->param('op');
+my @serialids = $cgi->param('serialid');
+my @serialseqs = $cgi->param('serialseq');
+my @planneddates = $cgi->param('planneddate');
+my @publisheddates = $cgi->param('publisheddate');
+my @status = $cgi->param('status');
+my @notes = $cgi->param('notes');
+my @subscriptionids = $cgi->param('subscriptionid');
+my $op = $cgi->param('op');
 if (scalar(@subscriptionids)==1 && index($subscriptionids[0],",")>0){
   @subscriptionids =split (/,/,$subscriptionids[0]);
 }
@@ -94,7 +96,7 @@ my @errseq;
 # If user comes from subscription details
 unless (@serialids){
   foreach my $subscriptionid (@subscriptionids){
-    my $serstatus=$query->param('serstatus');
+    my $serstatus=$cgi->param('serstatus');
     if ($serstatus){
       my ($count,@tmpser)=GetSerials2($subscriptionid,$serstatus);
       foreach (@tmpser) {
@@ -108,11 +110,11 @@ unless (scalar(@serialids)){
   my $string="serials-collection.pl?subscriptionid=".join(",",@subscriptionids);
   $string=~s/,$//;
 #  warn $string;
-  print $query->redirect($string);
+  print $cgi->redirect($string);
 }
 my ($template, $loggedinuser, $cookie)
 = get_template_and_user({template_name => "serials/serials-edit.tmpl",
-                query => $query,
+                query => $cgi,
                 type => "intranet",
                 authnotrequired => 0,
                 flagsrequired => {serials => 1},
@@ -144,8 +146,11 @@ foreach my $subscriptionid (@subscriptionids){
     my $cell;
     if ($serialdatalist[0]->{'serialsadditems'}){
     #Create New empty item
+		my $subscription=GetSubscription($subscriptionid);
+		my $defaults;
+		$$defaults{"items.$_"}=$$subscription{$_} for qw(location branchcode callnumber);
         $cell =
-        PrepareItemrecordDisplay( $serialdatalist[0]->{'biblionumber'},'', GetSubscription($subscriptionid));
+        PrepareItemrecordInput( "", $serialdatalist[0]->{'biblionumber'}, $defaults);
         $cell->{serialsadditems} = 1;
     }
     $cell->{'subscriptionid'}=$subscriptionid;
@@ -165,6 +170,13 @@ $template->param(subscriptions=>\@subscriptionloop);
 if ($op and $op eq 'serialchangestatus') {
 #     my $sth = $dbh->prepare("select status from serial where serialid=?");
     my $newserial;
+	my @params=$cgi->param();
+	my @itemnumbers=$cgi->param("itemnumber");
+	my @biblionumbers=$cgi->param("biblionumber");
+	my @serials=$cgi->param("serial");
+	my $index_latestitemnumber;
+	my $index_serialid;
+	my $count;
     for (my $i=0;$i<=$#serialids;$i++) {
 #         $sth->execute($serialids[$i]);
 #         my ($oldstatus) = $sth->fetchrow;
@@ -186,87 +198,77 @@ if ($op and $op eq 'serialchangestatus') {
                             $status[$i],
                             $notes[$i]);
         }
-    }
-    my @moditems = $query->param('moditem');
-    if (scalar(@moditems)){
-      my @tags = $query->param('tag');
-      my @subfields = $query->param('subfield');
-      my @field_values = $query->param('field_value');
-      my @serials = $query->param('serial');
-      my @bibnums = $query->param('bibnum');
-      my @itemid = $query->param('itemid');
-      my @ind_tag = $query->param('ind_tag');
-      my @indicator = $query->param('indicator');
-      #Rebuilding ALL the data for items into a hash
-      # parting them on $itemid.
-      my %itemhash;
-      my $countdistinct;
-      my $range=scalar(@itemid);
-      for (my $i=0; $i<$range; $i++){
-        unless ($itemhash{$itemid[$i]}){
-          if ($serials[$countdistinct] && $serials[$countdistinct] ne "NEW"){
-            $itemhash{$itemid[$i]}->{'serial'}=$serials[$countdistinct];
-          } else {
-            $itemhash{$itemid[$i]}->{'serial'}=$newserial;
-          }
-          $itemhash{$itemid[$i]}->{'bibnum'}=$bibnums[$countdistinct];
-          $countdistinct++;
-        }
-        push @{$itemhash{$itemid[$i]}->{'tags'}},$tags[$i];
-        push @{$itemhash{$itemid[$i]}->{'subfields'}},$subfields[$i];
-        push @{$itemhash{$itemid[$i]}->{'field_values'}},$field_values[$i];
-        push @{$itemhash{$itemid[$i]}->{'ind_tag'}},$ind_tag[$i];
-        push @{$itemhash{$itemid[$i]}->{'indicator'}},$indicator[$i];
-      }
-      foreach my $item (keys %itemhash){
-        # Verify Itemization is "Valid", i.e. serial status is Arrived or Missing
-        my $index=-1;
-        for (my $i=0; $i<scalar(@serialids);$i++){
-          $index = $i if ($itemhash{$item}->{'serial'} eq $serialids[$i] || ($itemhash{$item}->{'serial'} == $newserial && $serialids[$i] eq "NEW"));
-        }
-        if ($index>=0 && $status[$index]==2){
-          my $xml = TransformHtmlToXml( $itemhash{$item}->{'tags'},
-                                  $itemhash{$item}->{'subfields'},
-                                  $itemhash{$item}->{'field_values'},
-                                  $itemhash{$item}->{'ind_tag'},
-                                  $itemhash{$item}->{'indicator'});
-  #           warn $xml;
-          my $record=MARC::Record::new_from_xml($xml, 'UTF-8');
-          if ($item=~/^N/){
-            #New Item
+
+		if ($status[$i]==2){
+			$index_serialid=($index_latestitemnumber>0?$index_latestitemnumber:first_index{ $_ eq "serialid"}@params[$index_serialid ..$#params]);
+			$index_latestitemnumber=first_index{ $_ eq "serialid"}@params[$index_serialid + 1 ..$#params];
+			$debug && warn "serial $index_serialid $index_latestitemnumber";
+			if ($index_latestitemnumber<0){$index_latestitemnumber=$#params};
+			my @localparams=@params[$index_serialid+1 .. $index_latestitemnumber];
+			while (my $indexsup=first_index{$_ eq "itemnumber"} @localparams){
+				my $indexmin=first_index{$_ =~/tag_/} @localparams;
 			
-            # if autoBarcode is set to 'incremental', calculate barcode...
-            my ($barcodetagfield,$barcodetagsubfield) = &GetMarcFromKohaField("items.barcode", GetFrameworkCode($serialdatalist[0]->{'biblionumber'}));
-            if (C4::Context->preference("autoBarcode") eq 'incremental'  ) {
-              if (!$record->field($barcodetagfield)->subfield($barcodetagsubfield)) {
-                my $sth_barcode = $dbh->prepare("select max(abs(barcode)) from items");
-                $sth_barcode->execute;
-                my ($newbarcode) = $sth_barcode->fetchrow;
-                # OK, we have the new barcode, add the entry in MARC record # FIXME -> should be  using barcode plugin here.
-                $record->field($barcodetagfield)->update( $barcodetagsubfield => ++$newbarcode );
-              }
-            }
-            # check for item barcode # being unique
-            my $exists;
-            if ($record->subfield($barcodetagfield,$barcodetagsubfield)) {
-                $exists = GetItemnumberFromBarcode($record->subfield($barcodetagfield,$barcodetagsubfield));
-            }
-            #           push @errors,"barcode_not_unique" if($exists);
-            # if barcode exists, don't create, but report The problem.
-            if ($exists){
-                push @errors,"barcode_not_unique" if($exists);
-                push @errseq,{"serialseq"=>$serialseqs[$index]};
-            } else {
-                my ($biblionumber,$bibitemnum,$itemnumber) = AddItemFromMarc($record,$itemhash{$item}->{'bibnum'});
-                AddItem2Serial($itemhash{$item}->{'serial'},$itemnumber);
-            }
-          } else {
-            #modify item
-            my ($oldbiblionumber,$oldbibnum,$itemnumber) = ModItemFromMarc($record,$itemhash{$item}->{'bibnum'},$item);
-          }
-        }
-      }
+				$debug && warn "item $indexmin $indexsup";
+				last if ($indexsup<0);
+				my @itemsparams=@localparams[$indexmin..$indexsup];
+				my $itemmarcrecord=TransformHtmlToMarc(\@itemsparams,$cgi);
+
+					if ($itemnumbers[$count]=~/^N/){
+						#New Item
+						
+						# if autoBarcode is set to 'incremental', calculate barcode...
+						my ($barcodetagfield,$barcodetagsubfield) = &GetMarcFromKohaField("items.barcode", GetFrameworkCode($biblionumbers[$i]));
+						if (C4::Context->preference("autoBarcode") eq 'incremental'  ) {
+						  if (!$itemmarcrecord->field($barcodetagfield)->subfield($barcodetagsubfield)) {
+							my $sth_barcode = $dbh->prepare("select max(abs(barcode)) from items");
+							$sth_barcode->execute;
+							my ($newbarcode) = $sth_barcode->fetchrow;
+							# OK, we have the new barcode, add the entry in MARC record # FIXME -> should be  using barcode plugin here.
+							$itemmarcrecord->field($barcodetagfield)->update( $barcodetagsubfield => ++$newbarcode );
+						  }
+						}
+						# check for item barcode # being unique
+						my $exists;
+						if ($itemmarcrecord->subfield($barcodetagfield,$barcodetagsubfield)) {
+							$exists = GetItemnumberFromBarcode($itemmarcrecord->subfield($barcodetagfield,$barcodetagsubfield));
+						}
+						#           push @errors,"barcode_not_unique" if($exists);
+						# if barcode exists, don't create, but report The problem.
+						if ($exists){
+							push @errors,"barcode_not_unique" if($exists);
+							push @errseq,{"serialseq"=>$serialseqs[$count]};
+						} else {
+			                my ($biblionumber,$bibitemnum,$itemnumber) = AddItemFromMarc($itemmarcrecord,$biblionumbers[$i]);
+			                AddItem2Serial($serialids[$i],$itemnumber);
+						}
+					  } else {
+						#modify item
+			            my ($oldbiblionumber,$oldbibnum,$itemnumber) = ModItemFromMarc($itemmarcrecord,$biblionumbers[$i],$itemnumbers[$count]);
+					  }
+				$count++;
+				@localparams=@localparams[$indexsup + 1 ..$#localparams];
+			}
+		}
     }
+#      #Rebuilding ALL the data for items into a hash
+#      # parting them on $itemid.
+#      foreach my $item (keys %itemhash){
+#        # Verify Itemization is "Valid", i.e. serial status is Arrived or Missing
+#        my $index=-1;
+#        for (my $i=0; $i<scalar(@serialids);$i++){
+#          $index = $i if ($itemhash{$item}->{'serial'} eq $serialids[$i] || ($itemhash{$item}->{'serial'} == $newserial && $serialids[$i] eq "NEW"));
+#        }
+#        if ($index>=0 && $status[$index]==2){
+#          my $xml = TransformHtmlToXml( $itemhash{$item}->{'tags'},
+#                                  $itemhash{$item}->{'subfields'},
+#                                  $itemhash{$item}->{'field_values'},
+#                                  $itemhash{$item}->{'ind_tag'},
+#                                  $itemhash{$item}->{'indicator'});
+#  #           warn $xml;
+#          my $record=MARC::Record::new_from_xml($xml, 'UTF-8');
+#        }
+#      }
+#    }
 #     ### FIXME this part of code is not very pretty. Nor is it very efficient... There MUST be a more perlish way to write it. But it works.
 #     my $redirect ="serials-home.pl?";
 #     $redirect.=join("&",map{"serialseq=".$_} @serialseqs);
@@ -288,7 +290,7 @@ if ($op and $op eq 'serialchangestatus') {
             $hashsubscription{$_}=1;
 	      }
         $redirect.=join("&",map{"subscriptionid=".$_} sort keys %hashsubscription);
-        print $query->redirect("$redirect");
+        print $cgi->redirect("$redirect");
    }
 }
 
@@ -298,4 +300,4 @@ $template->param(
 	biblionumber => $serialdatalist[0]->{'biblionumber'},
 	serialslist  => \@serialdatalist,
 );
-output_html_with_http_headers $query, $cookie, $template->output;
+output_html_with_http_headers $cgi, $cookie, $template->output;

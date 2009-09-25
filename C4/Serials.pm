@@ -22,6 +22,7 @@ use strict;
 use C4::Dates qw(format_date);
 use Date::Calc qw(:all);
 use POSIX qw(strftime);
+use C4::Debug;
 use C4::Suggestions;
 use C4::Koha;
 use C4::Biblio;
@@ -29,7 +30,6 @@ use C4::Items;
 use C4::Search;
 use C4::Letters;
 use C4::Log; # logaction
-use C4::Debug;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
@@ -260,12 +260,11 @@ sub GetSerialInformation {
             foreach my $itemnum (@$itemnumbers) {
                 #It is ASSUMED that GetMarcItem ALWAYS WORK...
                 #Maybe GetMarcItem should return values on failure
-				my $marcrecord=GetMarcItem($data->{'biblionumber'},$itemnum->[0]);
+				my $marcrecord=C4::Items::GetMarcItem($data->{'biblionumber'},$itemnum->[0]);
                 $debug and warn "itemnumber :$itemnum->[0], bibnum :".$data->{'biblionumber'};
                 my $itemprocessed =
                   PrepareItemrecordInput( $marcrecord,$data->{'biblionumber'} , $data );
                 $itemprocessed->{'itemnumber'}   = $itemnum->[0];
-                $itemprocessed->{'itemid'}       = $itemnum->[0];
                 $itemprocessed->{'serialid'}     = $serialid;
                 $itemprocessed->{'biblionumber'} = $data->{'biblionumber'};
                 push @{ $data->{'items'} }, $itemprocessed;
@@ -274,7 +273,7 @@ sub GetSerialInformation {
         else {
             my $itemprocessed =
               PrepareItemrecordInput( undef,$data->{'biblionumber'}, $data );
-            $itemprocessed->{'itemid'}       = "N$serialid";
+            $itemprocessed->{'itemnumber'}       = "N$serialid";
             $itemprocessed->{'serialid'}     = $serialid;
             $itemprocessed->{'biblionumber'} = $data->{'biblionumber'};
             $itemprocessed->{'countitems'}   = 0;
