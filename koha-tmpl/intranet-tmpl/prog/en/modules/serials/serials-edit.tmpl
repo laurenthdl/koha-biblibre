@@ -263,31 +263,18 @@ function CloneSubfield(index){
           <div class="cataloguing_additem_itemlist">
         <!-- TMPL_LOOP NAME="items" -->
         <div id="item<!-- TMPL_VAR NAME="serialid" --><!-- TMPL_VAR NAME="countitems" -->" class="items">
-        <ol><!-- TMPL_LOOP NAME="iteminformation" --><li>
-               <div class="subfield_line" style="<!-- TMPL_VAR NAME='hidden' -->;" id="subfield<!-- TMPL_VAR NAME='serialid' --><!-- TMPL_VAR NAME='countitems' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->">
-                              
-                <label><!-- TMPL_VAR NAME="subfield" --> - <!-- TMPL_IF name="mandatory" --><b><!-- /TMPL_IF --><!-- TMPL_VAR NAME="marc_lib" --><!-- TMPL_IF name="mandatory" --> *</b><!-- /TMPL_IF --></label>
-                <!-- TMPL_VAR NAME="marc_value" -->
-                <input type="hidden" name="itemid" value="<!-- TMPL_VAR NAME="itemid" -->" />
-                <input type="hidden" name="kohafield" value="<!-- TMPL_VAR NAME="kohafield" -->" />
-                <input type="hidden" name="tag" value="<!-- TMPL_VAR NAME="tag" -->" />
-                <input type="hidden" name="subfield" value="<!-- TMPL_VAR NAME="subfield" -->" />
-                <input type="hidden" name="mandatory" value="<!-- TMPL_VAR NAME="mandatory" -->" />
-                <!-- TMPL_IF NAME="ITEM_SUBFIELDS_ARE_NOT_REPEATABLE" -->
-                    <span class="buttonPlus" onclick="CloneSubfield('subfield<!-- TMPL_VAR NAME='serialid' --><!-- TMPL_VAR NAME='countitems' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->')">+</span>
-                <!-- /TMPL_IF -->
-        
-            </div></li>
-        <!-- /TMPL_LOOP--></ol></div><!-- /iteminformation -->
+        <ol><!-- TMPL_LOOP NAME="iteminformation" -->
+			<li><!--TMPL_INCLUDE Name="cataloguing/subfield.inc"--> </li> <!-- /TMPL_LOOP -->
+		</ol>
         
         <input type="hidden" name="moditem" value="" /> 
         <input type="hidden" name="tag" value="<!-- TMPL_VAR NAME="itemtagfield" -->" />
         <input type="hidden" name="subfield" value="<!-- TMPL_VAR NAME="itemtagsubfield" -->" />
         <input type="hidden" name="serial" value="<!-- TMPL_VAR NAME="serialid" -->" />
         <input type="hidden" name="bibnum" value="<!-- TMPL_VAR NAME="biblionumber" -->" />
-        <input type="hidden" name="itemid" value="<!-- TMPL_VAR NAME="itemid" -->" />
-        <input type="hidden" name="field_value" value="<!-- TMPL_VAR NAME="itemnumber" -->" />
-        <!--/TMPL_LOOP--> <!-- /items -->
+        <input type="hidden" name="itemnumber" value="<!-- TMPL_VAR NAME="itemid" -->" />
+        </div>
+		<!--/TMPL_LOOP--> <!-- /items -->
         </div>
         </fieldset>
     </td>
@@ -366,21 +353,8 @@ function CloneSubfield(index){
         </legend>
           <div class="cataloguing_additem_itemlist">
         <div id="item<!-- TMPL_VAR NAME="serialid" --><!-- TMPL_VAR NAME="countitems" -->" class="items">
-        <ol><!-- TMPL_LOOP NAME="iteminformation" --><li>
-               <div class="subfield_line" style="<!-- TMPL_VAR NAME='hidden' -->;" id="subfield<!-- TMPL_VAR NAME='serialid' --><!-- TMPL_VAR NAME='countitems' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->">
-   
-                <label><!-- TMPL_VAR NAME="subfield" --> - <!-- TMPL_IF name="mandatory" --><b><!-- /TMPL_IF --><!-- TMPL_VAR NAME="marc_lib" --><!-- TMPL_IF name="mandatory" --> *</b><!-- /TMPL_IF --></label>
-                <!-- TMPL_VAR NAME="marc_value" -->
-                <input type="hidden" name="itemid" value="<!-- TMPL_VAR NAME="itemid" -->" />
-                <input type="hidden" name="kohafield" value="<!-- TMPL_VAR NAME="kohafield" -->" />
-                <input type="hidden" name="tag" value="<!-- TMPL_VAR NAME="tag" -->" />
-                <input type="hidden" name="subfield" value="<!-- TMPL_VAR NAME="subfield" -->" />
-                <input type="hidden" name="mandatory" value="<!-- TMPL_VAR NAME="mandatory" -->" />
-                <!-- TMPL_IF NAME="ITEM_SUBFIELDS_ARE_NOT_REPEATABLE" -->
-                    <span class="buttonPlus" onclick="CloneSubfield('subfield<!-- TMPL_VAR NAME='serialid' --><!-- TMPL_VAR NAME='countitems' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->')">+</span>
-                <!-- /TMPL_IF -->
-        </div>
-       </li><!-- /TMPL_LOOP --></ol>
+        <ol><!-- TMPL_LOOP NAME="iteminformation" --><li><!--TMPL_INCLUDE Name="cataloguing/subfield.inc"--> </li>
+	   <!-- /TMPL_LOOP --></ol>
         
         <input type="hidden" name="moditem" value="" /> 
         <input type="hidden" name="tag" value="<!-- TMPL_VAR NAME="itemtagfield" -->" />

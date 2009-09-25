@@ -99,14 +99,9 @@ my @errors; # store errors found while checking data BEFORE saving item.
 if ($op eq "additem") {
 #-------------------------------------------------------------------------------
     # rebuild
-    my @tags      = $input->param('tag');
-    my @subfields = $input->param('subfield');
-    my @values    = $input->param('field_value');
+    my @params = $input->param();
     # build indicator hash.
-    my @ind_tag   = $input->param('ind_tag');
-    my @indicator = $input->param('indicator');
-    my $xml = TransformHtmlToXml(\@tags,\@subfields,\@values,\@indicator,\@ind_tag, 'ITEM');
-    my $record = MARC::Record::new_from_xml($xml, 'UTF-8');
+    my $record = TransformHtmlToMarc( \@params , $input );
 
     # type of add
     my $add_submit                 = $input->param('add_submit');
@@ -132,7 +127,7 @@ if ($op eq "additem") {
         }
     }
 
-    my $addedolditem = TransformMarcToKoha($dbh,$record);
+    my $addedolditem = TransformMarcToKoha($dbh,$record,'','items');
 
     # If we have to add or add & duplicate, we add the item
     if ($add_submit || $add_duplicate_submit) {
@@ -261,19 +256,19 @@ if ($op eq "additem") {
 } elsif ($op eq "saveitem") {
 #-------------------------------------------------------------------------------
     # rebuild
-    my @tags      = $input->param('tag');
-    my @subfields = $input->param('subfield');
-    my @values    = $input->param('field_value');
+    my @params = $input->param();
     # build indicator hash.
-    my @ind_tag   = $input->param('ind_tag');
-    my @indicator = $input->param('indicator');
     # my $itemnumber = $input->param('itemnumber');
-    my $xml = TransformHtmlToXml(\@tags,\@subfields,\@values,\@indicator,\@ind_tag,'ITEM');
-    my $itemtosave=MARC::Record::new_from_xml($xml, 'UTF-8');
+    my $itemtosave = TransformHtmlToMarc( \@params , $input );
+#    my $xml = TransformHtmlToXml(\@tags,\@subfields,\@values,\@indicator,\@ind_tag,'ITEM');
+#    my $itemtosave=MARC::Record::new_from_xml($xml, 'UTF-8');
     # MARC::Record builded => now, record in DB
     # warn "R: ".$record->as_formatted;
     # check that the barcode don't exist already
-    my $addedolditem = TransformMarcToKoha($dbh,$itemtosave);
+	my ($itemtag,$itemsubfield)=GetMarcFromKohaField('items.itemnumber','');
+    my $itemnumber = $input->param('itemnumber');
+	$itemtosave->field($itemtag)->update($itemsubfield=>$itemnumber);
+    my $addedolditem = TransformMarcToKoha($dbh,$itemtosave,'','items');
     my $exist_itemnumber = get_item_from_barcode($addedolditem->{'barcode'});
     if ($exist_itemnumber && $exist_itemnumber != $itemnumber) {
         push @errors,"barcode_not_unique";

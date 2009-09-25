@@ -28,6 +28,7 @@ use MARC::Record;
 use C4::ClassSource;
 use C4::Log;
 use C4::Branch;
+use C4::Data::MARCRecord;
 require C4::Reserves;
 use C4::Charset;
 
@@ -150,7 +151,6 @@ sub GetItem {
     my $ssth = $dbh->prepare("SELECT serialseq,publisheddate from serialitems left join serial on serialitems.serialid=serial.serialid where serialitems.itemnumber=?");
         $ssth->execute($data->{'itemnumber'}) ;
         ($data->{'serialseq'} , $data->{'publisheddate'}) = $ssth->fetchrow_array();
-		warn $data->{'serialseq'} , $data->{'publisheddate'};
     }
 	#if we don't have an items.itype, use biblioitems.itemtype.
 	if( ! $data->{'itype'} ) {
@@ -2158,168 +2158,46 @@ sub PrepareItemrecordInput {
 	my $branches = GetBranchesLoop();  # build once ahead of time, instead of multiple times later.
 	my $pref_itemcallnumber = C4::Context->preference('itemcallnumber');
 
-	foreach my $tag (sort keys %{$tagslib}) {
+#	foreach my $tag (sort keys %{$tagslib}) {
+	
 	# loop through each subfield
-	  next unless ($tag eq $itemtagfield);
+#	  next unless ($tag eq $itemtagfield);
+	  my $tag = $itemtagfield;
+	  my $index_tag=CreateKey();
 	  foreach my $subfield (sort keys %{$tagslib->{$tag}}) {
 		next if subfield_is_koha_internal_p($subfield);
 		next if ($tagslib->{$tag}->{$subfield}->{'tab'} ne "10");
-		my %subfield_data;
 	 
-		my $index_subfield = int(rand(1000000)); 
-		if ($subfield eq '@'){
-			$subfield_data{id} = "tag_".$tag."_subfield_00_".$index_subfield;
-		} else {
-			$subfield_data{id} = "tag_".$tag."_subfield_".$subfield."_".$index_subfield;
-		}
-		$subfield_data{tag}        = $tag;
-		$subfield_data{subfield}   = $subfield;
-		$subfield_data{random}     = int(rand(1000000));    # why do we need 2 different randoms?
-	#   $subfield_data{marc_lib}   = $tagslib->{$tag}->{$subfield}->{lib};
-		$subfield_data{marc_lib}   ="<span id=\"error$i\" title=\"".$tagslib->{$tag}->{$subfield}->{lib}."\">".$tagslib->{$tag}->{$subfield}->{lib}."</span>";
-		$subfield_data{mandatory}  = $tagslib->{$tag}->{$subfield}->{mandatory};
-		$subfield_data{repeatable} = $tagslib->{$tag}->{$subfield}->{repeatable};
-		my ($x,$value);
-		($x,$value) = _find_value($tag,$subfield,$marcitemrecord) if ($marcitemrecord);
-		$value =~ s/"/&quot;/g;
-		unless ($value) {
-			$value  =  $$defaultvalues{$tagslib->{$tag}->{$subfield}->{kohafield}} if ($defaultvalues);
-			$value ||= $tagslib->{$tag}->{$subfield}->{defaultvalue};
-			# get today date & replace YYYY, MM, DD if provided in the default value
-			my ( $year, $month, $day ) = split ',', $today_iso;     # FIXME: iso dates don't have commas!
-			$value =~ s/YYYY/$year/g;
-			$value =~ s/MM/$month/g;
-			$value =~ s/DD/$day/g;
-		}
-		$subfield_data{visibility} = "display:none;" if (($tagslib->{$tag}->{$subfield}->{hidden} > 4) || ($tagslib->{$tag}->{$subfield}->{hidden} < -4));
-		# testing branch value if IndependantBranches.
-		if (!$value && $tagslib->{$tag}->{$subfield}->{kohafield} eq 'items.itemcallnumber' && $pref_itemcallnumber) {
+		if ($pref_itemcallnumber){
 			my $CNtag       = substr($pref_itemcallnumber, 0, 3);
 			my $CNsubfield  = substr($pref_itemcallnumber, 3, 1);
 			my $CNsubfield2 = substr($pref_itemcallnumber, 4, 1);
 			my $temp2 = $temp->field($CNtag);
+			my $default_callnumber;
 			if ($temp2) {
-				$value = ($temp2->subfield($CNsubfield)).' '.($temp2->subfield($CNsubfield2));
+				$default_callnumber = ($temp2->subfield($CNsubfield)).' '.($temp2->subfield($CNsubfield2));
 				#remove any trailing space incase one subfield is used
-				$value =~ s/^\s+|\s+$//g;
+				$default_callnumber =~ s/^\s+|\s+$//g;
 			}
-		}
 
-		my $attributes_no_value = qq(tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255" );
-		my $attributes          = qq($attributes_no_value value="$value" );
-		if ( $tagslib->{$tag}->{$subfield}->{authorised_value} ) {
-		  my @authorised_values;
-		  my %authorised_lib;
-		  # builds list, depending on authorised value...
-	  
-		  if ( $tagslib->{$tag}->{$subfield}->{authorised_value} eq "branches" ) {
-			  foreach my $thisbranch (@$branches) {
-				  push @authorised_values, $thisbranch->{value};
-				  $authorised_lib{$thisbranch->{value}} = $thisbranch->{branchname};
-				  $value = $thisbranch->{value} if $thisbranch->{selected};
-			  }
-		  }
-		  elsif ( $tagslib->{$tag}->{$subfield}->{authorised_value} eq "itemtypes" ) {
-			  push @authorised_values, "" unless ( $tagslib->{$tag}->{$subfield}->{mandatory} );
-			  my $sth = $dbh->prepare("select itemtype,description from itemtypes order by description");
-			  $sth->execute;
-			  while ( my ( $itemtype, $description ) = $sth->fetchrow_array ) {
-				  push @authorised_values, $itemtype;
-				  $authorised_lib{$itemtype} = $description;
-			  }
-
-			  unless ( $value ) {
-				  my $itype_sth = $dbh->prepare("SELECT itemtype FROM biblioitems WHERE biblionumber = ?");
-				  $itype_sth->execute( $biblionumber );
-				  ( $value ) = $itype_sth->fetchrow_array;
-			  }
-	  
-			  #---- class_sources
-		  }
-		  elsif ( $tagslib->{$tag}->{$subfield}->{authorised_value} eq "cn_source" ) {
-			  push @authorised_values, "" unless ( $tagslib->{$tag}->{$subfield}->{mandatory} );
-				
-			  my $class_sources = GetClassSources();
-			  my $default_source = C4::Context->preference("DefaultClassificationSource");
-			  
-			  foreach my $class_source (sort keys %$class_sources) {
-				  next unless $class_sources->{$class_source}->{'used'} or
-							  ($value and $class_source eq $value)      or
-							  ($class_source eq $default_source);
-				  push @authorised_values, $class_source;
-				  $authorised_lib{$class_source} = $class_sources->{$class_source}->{'description'};
-			  }
-			  $value = $default_source unless ($value);
-
-			  #---- "true" authorised value
-		  }
-		  else {
-			  push @authorised_values, "" unless ( $tagslib->{$tag}->{$subfield}->{mandatory} );
-			  $authorised_values_sth->execute( $tagslib->{$tag}->{$subfield}->{authorised_value} );
-			  while ( my ( $value, $lib ) = $authorised_values_sth->fetchrow_array ) {
-				  push @authorised_values, $value;
-				  $authorised_lib{$value} = $lib;
-			  }
-		  }
-		  $subfield_data{marc_value} =CGI::scrolling_list(      # FIXME: factor out scrolling_list
-			  -name     => "field_value",
-			  -values   => \@authorised_values,
-			  -default  => $value,
-			  -labels   => \%authorised_lib,
-			  -override => 1,
-			  -size     => 1,
-			  -multiple => 0,
-			  -tabindex => 1,
-			  -id       => "tag_".$tag."_subfield_".$subfield."_".$index_subfield,
-			  -class    => "input_marceditor",
-		  );
-		# it's a thesaurus / authority field
+			$$defaultvalues{"items.itemcallnumber"}=$default_callnumber;
 		}
-		elsif ( $tagslib->{$tag}->{$subfield}->{authtypecode} ) {
-			$subfield_data{marc_value} = "<input type=\"text\" $attributes />
-				<a href=\"#\" class=\"buttonDot\"
-					onclick=\"Dopop('/cgi-bin/koha/authorities/auth_finder.pl?authtypecode=".$tagslib->{$tag}->{$subfield}->{authtypecode}."&index=$subfield_data{id}','$subfield_data{id}'); return false;\" title=\"Tag Editor\">...</a>
-		";
-		# it's a plugin field
+		my ($x,@values) = FindValues($tag,$subfield,$marcitemrecord) if ($marcitemrecord);
+		if (@values){
+			foreach my $value (@values){
+				my $subfield_data = BuildSubfieldInput( $tag, $subfield, $value, $index_tag, 0, $temp, $defaultvalues );
+				push (@loop_data, $subfield_data);
+			}	
 		}
-		elsif ( $tagslib->{$tag}->{$subfield}->{value_builder} ) {
-			# opening plugin
-			my $plugin = C4::Context->intranetdir . "/cataloguing/value_builder/" . $tagslib->{$tag}->{$subfield}->{'value_builder'};
-			if (do $plugin) {
-				my $extended_param = plugin_parameters( $dbh, $temp, $tagslib, $subfield_data{id}, \@loop_data );
-				my ( $function_name, $javascript ) = plugin_javascript( $dbh, $temp, $tagslib, $subfield_data{id}, \@loop_data );
-				$subfield_data{marc_value} = qq[<input $attributes
-					onfocus="Focus$function_name($subfield_data{random}, '$subfield_data{id}');"
-					 onblur=" Blur$function_name($subfield_data{random}, '$subfield_data{id}');" />
-					<a href="#" class="buttonDot" onclick="Clic$function_name('$subfield_data{id}'); return false;" title="Tag Editor">...</a>
-					$javascript];
-			} else {
-				warn "Plugin Failed: $plugin";
-				$subfield_data{marc_value} = "<input $attributes />"; # supply default input form
-			}
+		else {
+				my $subfield_data = BuildSubfieldInput( $tag, $subfield, '', $index_tag, 0, $temp, $defaultvalues );
+				push (@loop_data, $subfield_data);
 		}
-		elsif ( $tag eq '' ) {       # it's an hidden field
-			$subfield_data{marc_value} = qq(<input type="hidden" $attributes />);
-		}
-		elsif ( $tagslib->{$tag}->{$subfield}->{'hidden'} ) {   # FIXME: shouldn't input type be "hidden" ?
-			$subfield_data{marc_value} = qq(<input type="text" $attributes />);
-		}
-		elsif ( length($value) > 100
-				or (C4::Context->preference("marcflavour") eq "UNIMARC" and
-					  300 <= $tag && $tag < 400 && $subfield eq 'a' )
-				or (C4::Context->preference("marcflavour") eq "MARC21"  and
-					  500 <= $tag && $tag < 600                     )
-			  ) {
-			# oversize field (textarea)
-			$subfield_data{marc_value} = "<textarea $attributes_no_value>$value</textarea>\n";
-		} else {
-			# it's a standard field
-			 $subfield_data{marc_value} = "<input $attributes />";
-		}
-	#   $subfield_data{marc_value}="<input type=\"text\" name=\"field_value\">";
-		push (@loop_data, \%subfield_data);
-		$i++
-	  }
+#
+#		my $attributes_no_value = qq(tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255" );
+#		my $attributes          = qq($attributes_no_value value="$value" );
+## LAST DIFF
+	  #}
 	}
 
     my $itemnumber = $marcitemrecord->subfield( $itemtagfield, $itemtagsubfield )
@@ -2330,51 +2208,6 @@ sub PrepareItemrecordInput {
         'itemnumber'      => $itemnumber,
         'iteminformation' => \@loop_data
     };
-}
-
-=head2 _find_value
-
-=over 4
-
-($indicators, $value) = _find_value($tag, $subfield, $record,$encoding);
-
-Find the given $subfield in the given $tag in the given
-MARC::Record $record.  If the subfield is found, returns
-the (indicators, value) pair; otherwise, (undef, undef) is
-returned.
-
-PROPOSITION :
-Such a function is used in addbiblio AND additem and serial-edit and maybe could be used in Authorities.
-I suggest we export it from this module.
-
-=back
-
-=cut
-
-sub _find_value {
-    my ( $tagfield, $insubfield, $record, $encoding ) = @_;
-    my @result;
-    my $indicator;
-    if ( $tagfield < 10 ) {
-        if ( $record->field($tagfield) ) {
-            push @result, $record->field($tagfield)->data();
-        }
-        else {
-            push @result, "";
-        }
-    }
-    else {
-        foreach my $field ( $record->field($tagfield) ) {
-            my @subfields = $field->subfields();
-            foreach my $subfield (@subfields) {
-                if ( @$subfield[0] eq $insubfield ) {
-                    push @result, @$subfield[1];
-                    $indicator = $field->indicator(1) . $field->indicator(2);
-                }
-            }
-        }
-    }
-    return ( $indicator, @result );
 }
 
 =head2 _koha_modify_item
