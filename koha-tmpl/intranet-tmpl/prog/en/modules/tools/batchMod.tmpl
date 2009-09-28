@@ -35,10 +35,6 @@
                             <fieldset class="rows">
                                 <legend>Use a file</legend>
                 	              <ol>
-				      <li>
-					<label for="barcode_file">Barcodes file</label><input type="radio" name="filecontent" value="barcode_file" id="barcode_file" checked="checked" /><br />
-					<label for="itemid_file">Item Id's file</label><input type="radio" name="filecontent" value="itemid_file" id="itemid_file" />
-				      </li>
                                     <li><label for="uploadfile">File: </label> <input type="file" id="uploadfile" name="uploadfile"></input></li>
                                 </ol>
                             </fieldset>
@@ -46,12 +42,21 @@
                                 <legend>Or scan items one-by-one</legend>
                                 <ol>
                                     <li>
-                                      <label for="barcodelist">Barcodes list (one barcode per line): </label>
+                                      <label for="barcodelist">Barcodes or itemnumber list (one item per line): </label>
                                       <textarea rows="10" cols="30" id="barcodelist" name="barcodelist"></textarea>
                                     </li>
                                 </ol>
                             </fieldset>
                             <input type="hidden" name="op" value="show" />
+                            <fieldset class="rows">
+                                <legend>Content Type</legend>
+                                <ol>
+				      <li>
+					<label for="barcode_file">Barcodes </label><input type="radio" name="filecontent" value="barcode_file" id="barcode_file" checked="checked" /><br />
+					<label for="itemid_file">Item Id's </label><input type="radio" name="filecontent" value="itemid_file" id="itemid_file" />
+				      </li>
+					  </ol>
+					  </fieldset>
                             <!-- TMPL_IF name="del" --><input type="hidden" name="del" value="1" /><!-- /TMPL_IF -->
                             <fieldset class="action">
                                 <input type="submit" value="Continue" class="button" />
@@ -96,18 +101,8 @@
         <h2>Edit Items</h2>
 	<fieldset class="rows">
 	<ol>
-        <!-- TMPL_LOOP NAME="item" -->
-               <li><div class="subfield_line" style="<!-- TMPL_VAR NAME='visibility' -->" id="subfield<!-- TMPL_VAR NAME='tag' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->">
-               <label><!-- TMPL_VAR NAME="subfield" --> - <!-- TMPL_IF name="mandatory" --><b><!-- /TMPL_IF --><!-- TMPL_VAR NAME="marc_lib" --><!-- TMPL_IF name="mandatory" --> *</b><!-- /TMPL_IF --></label>
-                <!-- TMPL_VAR NAME="marc_value" -->
-                <input type="hidden" name="tag"       value="<!-- TMPL_VAR NAME="tag" -->" />
-                <input type="hidden" name="subfield"  value="<!-- TMPL_VAR NAME="subfield" -->" />
-                <input type="hidden" name="mandatory" value="<!-- TMPL_VAR NAME="mandatory" -->" />
-                <!-- TMPL_IF NAME="repeatable" -->
-                    <span class="buttonPlus" onclick="CloneSubfield('subfield<!-- TMPL_VAR NAME='tag' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->')">+</span>
-                <!-- /TMPL_IF -->
-   
-            </div></li>
+        <!-- TMPL_LOOP NAME="iteminformation" -->
+<!--TMPL_INCLUDE Name="cataloguing/subfield.inc"-->
         <!-- /TMPL_LOOP -->
     </ol>
     </fieldset>
