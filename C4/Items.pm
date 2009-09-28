@@ -2145,8 +2145,14 @@ sub PrepareItemrecordInput {
 
 	my $today_iso = C4::Dates->today('iso');
 	my $dbh = C4::Context->dbh;
-    $frameworkcode ||= GetFrameworkCode($biblionumber);
-	my $temp = GetMarcBiblio( $biblionumber );
+	my $temp;#marc record
+	if ($biblionumber){
+	    $frameworkcode ||= GetFrameworkCode($biblionumber);
+		$temp = GetMarcBiblio( $biblionumber );
+	}
+	else {
+		$frameworkcode||="";
+	}
     my ( $itemtagfield, $itemtagsubfield ) =
       &GetMarcFromKohaField( "items.itemnumber", $frameworkcode );
     my $tagslib = &GetMarcStructure( 1, $frameworkcode );
