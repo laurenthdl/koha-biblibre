@@ -467,7 +467,7 @@ END_SQL
                 my $i = 0;
                 my $exceededPrintNoticesMaxLines = 0;
                 while ( my $item_info = $sth2->fetchrow_hashref() ) {
-                    if ( $PrintNoticesMaxLines && $i >= $PrintNoticesMaxLines ) {
+                    if ( ( !$email || $nomail ) && $PrintNoticesMaxLines && $i >= $PrintNoticesMaxLines ) {
                       $exceededPrintNoticesMaxLines = 1;
                       last;
                     }
