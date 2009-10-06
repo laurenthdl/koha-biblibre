@@ -272,6 +272,8 @@ if ( defined $csvfilename && $csvfilename =~ /^-/ ) {
     warn qq(using "$csvfilename" as filename, that seems odd);
 }
 
+my $PrintNoticesMaxLines = C4::Context->preference('PrintNoticesMaxLines');
+
 my @overduebranches    = C4::Overdues::GetBranchcodesWithOverdueRules();	# Branches with overdue rules
 my @branches;									# Branches passed as parameter with overdue rules
 my $branchcount = scalar(@overduebranches);
@@ -443,6 +445,7 @@ END_SQL
                 $verbose and warn "borrower $firstname, $lastname ($borrowernumber) has $itemcount items triggering level $i.";
     
                 my $letter = C4::Letters::getletter( 'circulation', $overdue_rules->{"letter$i"} );
+
                 unless ($letter) {
                     $verbose and warn "Message '$overdue_rules->{letter$i}' content not found";
     
@@ -460,7 +463,15 @@ END_SQL
                 $sth2->execute( ($listall) ? ( $borrowernumber , 1 , $MAX ) : ( $borrowernumber, $mindays, $maxdays ) );
                 my $itemcount = 0;
                 my $titles = "";
+                
+                my $i = 0;
+                my $exceededPrintNoticesMaxLines = 0;
                 while ( my $item_info = $sth2->fetchrow_hashref() ) {
+                    if ( $PrintNoticesMaxLines && $i >= $PrintNoticesMaxLines ) {
+                      $exceededPrintNoticesMaxLines = 1;
+                      last;
+                    }
+                    $i++;
                     my @item_info = map { $_ =~ /^date|date$/ ? format_date( $item_info->{$_} ) : $item_info->{$_} || '' } @item_content_fields;
                     $titles .= join("\t", @item_info) . "\n";
                     $itemcount++;
@@ -477,7 +488,11 @@ END_SQL
                         }
                     }
                 );
-    
+                
+                if ( $exceededPrintNoticesMaxLines ) {
+                  $letter->{'content'} .= "List too long for form; please check your account online for a complete list of your overdue items.";
+                }
+
                 my @misses = grep { /./ } map { /^([^>]*)[>]+/; ( $1 || '' ); } split /\</, $letter->{'content'};
                 if (@misses) {
                     $verbose and warn "The following terms were not matched and replaced: \n\t" . join "\n\t", @misses;
@@ -613,6 +628,7 @@ sub parse_letter {
     foreach my $required (qw( letter borrowernumber )) {
         return unless exists $params->{$required};
     }
+
 
     if ( $params->{'substitute'} ) {
         while ( my ( $key, $replacedby ) = each %{ $params->{'substitute'} } ) {
