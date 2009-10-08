@@ -1030,7 +1030,7 @@ sub buildQuery {
     my $cclindexes = getIndexes();
     if( $query !~ /\s*ccl=/ ){
         for my $index (@$cclindexes){
-            if($query =~ /($index)(,?\w)*:/){
+            if($query =~ /($index)(,?\w)*[:=]/){
                 $cclq = 1;
             }
         }
