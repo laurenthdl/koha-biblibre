@@ -60,6 +60,7 @@ This module provides searching functions for Koha's bibliographic databases
   &FindDuplicate
   &SimpleSearch
   &searchResults
+  &SearchAcquisitions
   &getRecords
   &buildQuery
   &NZgetRecords
@@ -1467,6 +1468,87 @@ sub searchResults {
     }
     return @newresults;
 }
+
+=head2 SearchAcquisitions
+    Search for acquisitions 
+=cut
+
+sub SearchAcquisitions{
+    my ($datebegin, $dateend, $itemtypes,$criteria, $orderby) = @_;
+    
+    my $dbh=C4::Context->dbh;
+    # Variable initialization
+    my $str=qq|
+    SELECT marcxml 
+    FROM biblio 
+    LEFT JOIN biblioitems ON biblioitems.biblionumber=biblio.biblionumber
+    LEFT JOIN items ON items.biblionumber=biblio.biblionumber
+    WHERE dateaccessioned BETWEEN ? AND ? 
+    |;
+    
+    my (@params,@loopcriteria);
+    
+    push @params, $datebegin->output("iso");
+    push @params, $dateend->output("iso");
+
+    if (scalar(@$itemtypes)>0 and $criteria ne "itemtype" ){
+        if(C4::Context->preference("item-level_itypes")){
+            $str .= "AND items.itype IN (?".( ',?' x scalar @$itemtypes - 1 ).") ";
+        }else{
+            $str .= "AND biblioitems.itemtype IN (?".( ',?' x scalar @$itemtypes - 1 ).") ";
+        }    
+        push @params, @$itemtypes;
+    }
+        
+    if ($criteria =~/itemtype/){
+        if(C4::Context->preference("item-level_itypes")){
+            $str .= "AND items.itype=? ";
+        }else{
+            $str .= "AND biblioitems.itemtype=? ";
+        }
+        @loopcriteria= @$itemtypes;
+    }elsif ($criteria=~/itemcallnumber/){
+        $str .= "AND (items.itemcallnumber LIKE CONCAT(?,'%') 
+                 OR items.itemcallnumber is NULL
+                 OR items.itemcallnumber = '')";
+        @loopcriteria = ("AA".."zz", "") unless (scalar(@loopcriteria)>0);  
+    }else {
+        $str .= "AND biblio.title LIKE CONCAT(?,'%') ";
+        @loopcriteria = ("A".."z") unless (scalar(@loopcriteria)>0);  
+    }
+        
+    if ($orderby =~ /date_desc/){
+        $str.=" ORDER BY dateaccessioned DESC";
+    } else {
+        $str.=" ORDER BY title";
+    }
+    
+    my $qdataacquisitions=$dbh->prepare($str);
+        
+    my @loopacquisitions;
+    foreach my $value(@loopcriteria){
+        push @params,$value;
+        my %cell;
+        $cell{"title"}=$value;
+        $cell{"titlecode"}=$value;
+        
+        eval{$qdataacquisitions->execute(@params);};
+  
+        if ($@){ warn "recentacquisitions Error :$@";}
+        else {
+            my @loopdata;
+            while (my $data=$qdataacquisitions->fetchrow_hashref){
+                push @loopdata, {"summary"=>GetBiblioSummary( $data->{'marcxml'} ) };
+            }
+            $cell{"loopdata"}=\@loopdata;
+        }
+        push @loopacquisitions,\%cell if (scalar(@{$cell{loopdata}})>0);
+        pop @params;
+    }
+    $qdataacquisitions->finish;
+    return \@loopacquisitions;
+}
+
 
 #----------------------------------------------------------------------
 #

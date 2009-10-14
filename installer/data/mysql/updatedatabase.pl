@@ -3064,7 +3064,13 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-
+$DBversion = "3.01.00.116";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,explanation,type)
+         VALUES ('OpacRecentAcquisitions','1','If on, show OPAC link to recent acquisitions page.','YesNo');");
+    print "Upgrade to $DBversion done drop column budget_amount_sublevel from aqbudgets\n";
+    SetVersion ($DBversion);
+}
 
 =item DropAllForeignKeys($table)
 

@@ -404,6 +404,7 @@ sub get_template_and_user {
             OPACPatronDetails        => C4::Context->preference("OPACPatronDetails"),
             OPACFinesTab              => C4::Context->preference("OPACFinesTab"),
             OpacTopissue              => C4::Context->preference("OpacTopissue"),
+            OpacRecentAcquisitions    => C4::Context->preference("OpacRecentAcquisitions"),
             RequestOnOpac             => C4::Context->preference("RequestOnOpac"),
             TemplateEncoding          => "". C4::Context->preference("TemplateEncoding"),
             'Version'                 => C4::Context->preference('Version'),
