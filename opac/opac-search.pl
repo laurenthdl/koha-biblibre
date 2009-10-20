@@ -470,6 +470,7 @@ for (my $i=0;$i<=@servers;$i++) {
             }
             $template->param(stopwords_removed => "@$stopwords_removed") if $stopwords_removed;
             $template->param(results_per_page =>  $results_per_page);
+            $template->param(OPACRecordNotes =>  C4::Context->preference("OPACRecordNotes"));
             $template->param(SEARCH_RESULTS => \@newresults,
                                 OPACItemsResultsDisplay => (C4::Context->preference("OPACItemsResultsDisplay") eq "itemdetails"?1:0),
                             );

@@ -614,6 +614,13 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }  
 
+$DBversion = "3.00.04.020";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("
+	INSERT INTO `systempreferences` (`variable`, `value`, `options`, `explanation`, `type`) VALUES ('OPACRecordNotes','1','','If yes record\'s notes are shown in search results','YesNo');
+	");
+    SetVersion ($DBversion);
+}
 
 =item DropAllForeignKeys($table)
 
