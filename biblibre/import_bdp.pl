@@ -62,11 +62,12 @@ if ( $query->param("import") ) {
     my @command;
     push @command, "./import_bdp_script.pl";
     push @command, "-s";
-    push @command, $branchcode;
+    push @command, "$branchcode";
     push @command, "-file";
-    push @command, "$upload_dir/$filename";
+    push @command, "'$upload_dir/$filename'";
     
     push @command, "-t " if ($test);
+
     $log = qx(@command);
 
     $log =~ s/\n/<br \/>/g;
@@ -92,7 +93,7 @@ if ( $query->param("import") ) {
 	my @command;
 	push @command, "./retour_bdp_script.pl";
 	push @command, "-file";
-	push @command, "$upload_dir/$filename";
+	push @command, "'$upload_dir/$filename'";
 	
     push @command, "-t" if ($test);
     push @command, "-v";

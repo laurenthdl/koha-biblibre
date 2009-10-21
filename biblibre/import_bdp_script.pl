@@ -215,8 +215,8 @@ while ( my $record = $batch->next() ) {
         $localisation = "BD"                if $cote =~ /^BD \w{3}/; # BD enfant
         $localisation = "Doc jeunesse"      if $cote =~ /^J/;
         $localisation = "Espace enfant"     if $cote =~ /^(I|A|LEJ) /;
-        $localisation = "Espace multimédia" if $cote =~ /^(C|E) /;
-        $localisation = "Fiction jeunesse"     if $cote =~ /^(Ea|Ra) /;
+        $localisation = "Espace multimédia" if $cote =~ /^C /;
+        $localisation = "Fiction jeunesse"     if $cote =~ /^E /;
         $localisation = "Espace local"     if $cote =~ /^FL /;
         $localisation = "Littérature adulte"     if $cote =~ /^(R|RP|Rt|LEA) /;
         
