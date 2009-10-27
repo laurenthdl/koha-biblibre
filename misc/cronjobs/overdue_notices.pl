@@ -421,7 +421,7 @@ END_SQL
                 my $titles = "";
                 while ( my $item_info = $sth2->fetchrow_hashref() ) {
                     my @item_info = map { $_ =~ /^date|date$/ ? format_date( $item_info->{$_} ) : $item_info->{$_} || '' } @item_content_fields;
-                    $titles .= join("\t", @item_info) . "\n";
+                    $titles .= join("\t", @item_info) . "\r\n";
                     $itemcount++;
                 }
                 $sth2->finish;
