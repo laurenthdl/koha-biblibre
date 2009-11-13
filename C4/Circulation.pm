@@ -2762,6 +2762,16 @@ sub DeleteBranchTransferLimits {
    $sth->execute();
 }
 
+=head2 GetOfflineOperations
+
+my $operations = GetOfflineOperations;
+
+Returns the list of pending offline operations, filtered by logged in user branch.
+We choose to not let librarian see/process operation attached to other branches because AddIssue also uses C4::Context->userenv->{'branch'}.
+So if you need to change this behaviour, please modify AddIssue to support a branch argument, and AddIssue calls.
+
+=cut
+
 sub GetOfflineOperations {
 	my $dbh = C4::Context->dbh;
 	my $sth = $dbh->prepare("SELECT * FROM pending_offline_operations WHERE branchcode=? ORDER BY timestamp");
@@ -2770,6 +2780,15 @@ sub GetOfflineOperations {
 	$sth->finish;
 	return $results;
 }
+
+=head2 GetOfflineOperation
+
+my $operation = GetOfflineOperation( $id );
+print $operation->{'cardnumber'}
+
+Get a single pending offline operation by ID, and return a hashref.
+
+=cut
 
 sub GetOfflineOperation {
 	my $dbh = C4::Context->dbh;
@@ -2780,6 +2799,14 @@ sub GetOfflineOperation {
 	return $result;
 }
 
+=head2 AddOfflineOperation
+
+my $result = AddOfflineOperation( $userid, $branchcode, $timestamp, $action, $barcode, $cardnumber );
+
+Add a pending offline operation to the database.
+
+=cut
+
 sub AddOfflineOperation {
 	my $dbh = C4::Context->dbh;
 	warn Data::Dumper::Dumper(@_);
@@ -2788,12 +2815,35 @@ sub AddOfflineOperation {
 	return "Added.";
 }
 
+=head2 DeleteOfflineOperation
+
+my $result = DeleteOfflineOperation( $id );
+
+Delete the pending offline operation with the specified ID from the database.
+
+=cut
+
 sub DeleteOfflineOperation {
 	my $dbh = C4::Context->dbh;
 	my $sth = $dbh->prepare("DELETE FROM pending_offline_operations WHERE operationid=?");
 	$sth->execute( shift );
 	return "Deleted.";
 }
+
+=head2 ProcessOfflineOperation
+
+my $result = ProcessOfflineOperation( {
+    'userid'      => $userid,
+    'branchcode'  => $branchcode,
+    'timestamp'   => $timestamp,
+    'action'      => $action,
+    'barcode'     => $barcode,
+    'cardnumber'  => $cardnumber,
+} );
+
+Will check the type of operation, cast the correponding function, and delete the operation from the database if it was stored.
+
+=cut
 
 sub ProcessOfflineOperation {
 	my $operation = shift;
@@ -2810,58 +2860,71 @@ sub ProcessOfflineOperation {
 	return $report;
 }
 
+=head2 ProcessOfflineReturn
+
+my $result = ProcessOfflineReturn( {
+    'userid'      => $userid,
+    'branchcode'  => $branchcode,
+    'timestamp'   => $timestamp,
+    'action'      => $action,
+    'barcode'     => $barcode,
+    'cardnumber'  => $cardnumber,
+} );
+
+Process a pending offline operation of 'return' type. 
+Check operation informations and mark issue returned.
+
+=cut
+
 sub ProcessOfflineReturn {
     my $operation = shift;
 
+    # Get the item from the operation barcode, or return an error
     my $itemnumber = C4::Items::GetItemnumberFromBarcode( $operation->{barcode} );
+    return "Item not found." if not $itemnumber;
     
-    if ( $itemnumber ) {
-        my $issue = GetOpenIssue( $itemnumber );
-        if ( $issue ) {
-            MarkIssueReturned(
-                $issue->{borrowernumber},
-                $itemnumber,
-                undef,
-                $operation->{timestamp},
-            );
-            return "Success.";
-        } else {
-            return "Item not issued.";
-        }
-    } else {
-        return "Item not found.";
-    }
+    # Get the issue, or return an error
+    my $issue = GetOpenIssue( $itemnumber );
+    return "Item not issued." if not $issue;
+    
+    # Mark issue returned
+    # TODO safety checks
+    MarkIssueReturned( $issue->{borrowernumber}, $itemnumber, undef, $operation->{timestamp} );
+    return "Success.";
 }
+
+=head2 ProcessOfflineIssue
+
+my $result = ProcessOfflineIssue( {
+    'userid'      => $userid,
+    'branchcode'  => $branchcode,
+    'timestamp'   => $timestamp,
+    'action'      => $action,
+    'barcode'     => $barcode,
+    'cardnumber'  => $cardnumber,
+} );
+
+Process a pending offline operation of 'issue' type. 
+Check operation informations and add the issue. 
+AddIssue will handle most of the checking job.
+
+=cut
 
 sub ProcessOfflineIssue {
     my $operation = shift;
 
-    my $borrower = C4::Members::GetMemberDetails( undef, $operation->{cardnumber} ); # Get borrower from operation cardnumber
+    # Get the borrower from the operation cardnumber, or return an error
+    my $borrower = C4::Members::GetMemberDetails( undef, $operation->{cardnumber} ); 
+    return "Borrower not found." if not $borrower->{borrowernumber};
     
-    if ( $borrower->{borrowernumber} ) { 
-        my $itemnumber = C4::Items::GetItemnumberFromBarcode( $operation->{barcode} );
-        my $issue = GetOpenIssue( $itemnumber );
-        
-        if ( $issue and ( $issue->{borrowernumber} ne $borrower->{borrowernumber} ) ) { # Item already issued to another borrower, mark it returned
-            MarkIssueReturned(
-                $issue->{borrowernumber},
-                $itemnumber,
-                undef,
-                $operation->{timestamp},
-            );
-        }
-        AddIssue(
-            $borrower,
-            $operation->{'barcode'},
-            undef,
-            1,
-            $operation->{timestamp},
-            undef,
-        );
-        return "Success.";
-    } else {
-        return "Borrower not found.";
-    }
+    # Get the item from the operation barcode, or return an error
+    my $itemnumber = C4::Items::GetItemnumberFromBarcode( $operation->{barcode} );
+    return "Item not found." if not $itemnumber;
+    
+    # Issue the item to the borrower with the operation issue date, and return success message
+    # AddIssue handles various checks such as renewal, return, and reserve cancelation by itself
+    AddIssue( $borrower, $operation->{'barcode'}, undef, 1, $operation->{timestamp}, undef );
+    return "Success.";
 }
 
 
