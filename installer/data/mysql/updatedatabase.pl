@@ -3311,6 +3311,25 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.001";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(qq{
+	CREATE TABLE IF NOT EXISTS pending_offline_operations (
+	    operationid INT(11) NOT NULL AUTO_INCREMENT,
+	    userid VARCHAR(30) NOT NULL,
+	    branchcode VARCHAR(10) NOT NULL,
+	    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	    action VARCHAR(10) NOT NULL,
+	    barcode VARCHAR(20) NOT NULL,
+	    cardnumber VARCHAR(16) NULL,
+	    PRIMARY KEY (operationid)
+	);
+	});
+
+    print "Upgrade to $DBversion done (isbd updated)\n";
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
