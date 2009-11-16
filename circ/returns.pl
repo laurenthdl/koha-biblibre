@@ -512,7 +512,9 @@ foreach ( sort { $a <=> $b } keys %returneditems ) {
         }
 
         #        my %ri;
-        my $biblio = GetBiblioFromItemNumber(GetItemnumberFromBarcode($barcode));
+        my $item   = GetItem(undef, $barcode);
+        my $biblio = GetBiblioFromItemNumber($item->{itemnumber});
+        
         # fix up item type for display
         $biblio->{'itemtype'} = C4::Context->preference('item-level_itypes') ? $biblio->{'itype'} : $biblio->{'itemtype'};
         $ri{itembiblionumber} = $biblio->{'biblionumber'};
@@ -522,6 +524,8 @@ foreach ( sort { $a <=> $b } keys %returneditems ) {
         $ri{itemnote}         = $biblio->{'itemnotes'};
         $ri{ccode}            = $biblio->{'ccode'};
         $ri{itemnumber}       = $biblio->{'itemnumber'};
+        $ri{homebranch}       = $item->{'homebranch'};
+        $ri{holdingbranch}    = $item->{'holdingbranch'};
         $ri{barcode}          = $barcode;
     }
     else {
