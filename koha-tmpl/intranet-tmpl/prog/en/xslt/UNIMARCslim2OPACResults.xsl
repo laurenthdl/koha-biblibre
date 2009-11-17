@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE stylesheet [<!ENTITY nbsp "&#160;" >]>
-
+<!-- $Id: MARC21slim2DC.xsl,v 1.1 2003/01/06 08:20:27 adam Exp $ -->
 <xsl:stylesheet version="1.0"
   xmlns:marc="http://www.loc.gov/MARC21/slim"
   xmlns:items="http://www.koha.org/items"
@@ -187,13 +185,6 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='a']"/>
       <span class="unavailable">
         <xsl:text>In transit (</xsl:text>
         <xsl:value-of select="count(key('item-by-status', 'In transit'))"/>
-        <xsl:text>). </xsl:text>
-      </span>
-    </xsl:if>
-    <xsl:if test="count(key('item-by-status', 'Waiting'))>0">
-      <span class="unavailable">
-        <xsl:text>On hold (</xsl:text>
-        <xsl:value-of select="count(key('item-by-status', 'Waiting'))"/>
         <xsl:text>). </xsl:text>
       </span>
     </xsl:if>
