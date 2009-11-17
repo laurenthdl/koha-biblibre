@@ -2771,7 +2771,6 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	print "Upgrade done (Adding finedays renewalsallowed, and reservesallowed fields in issuingrules table)\n";
 }
 
-
 $DBversion = "3.01.00.069";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do("INSERT INTO `systempreferences` (`variable`, `value`, `options`, `explanation`, `type`) VALUES ('EnableOpacSearchHistory', '1', '', 'Enable or disable opac search history', 'YesNo')");
