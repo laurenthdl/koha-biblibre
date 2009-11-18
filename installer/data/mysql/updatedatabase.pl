@@ -3238,7 +3238,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 
 =cut
 
-my $DBversion = "3.01.00.0122";
+$DBversion = "3.01.00.0122";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     # update branches table
     # 
@@ -3304,6 +3304,16 @@ $DBversion = "3.01.00.127";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(qq{
 	ALTER TABLE aqbasketgroups ADD billingplace VARCHAR(10) NOT NULL AFTER deliverycomment;
+	});
+	
+    print "Upgrade to $DBversion done (isbd updated)\n";
+    SetVersion ($DBversion);
+}
+
+$DBversion = "3.01.00.128";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(qq{
+	ALTER TABLE items ADD statisticvalue VARCHAR(80);
 	});
 	
     print "Upgrade to $DBversion done (isbd updated)\n";
