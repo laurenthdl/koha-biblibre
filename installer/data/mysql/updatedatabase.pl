@@ -3325,7 +3325,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	);
 	});
 
-    print "Upgrade to $DBversion done (isbd updated)\n";
+    print "Upgrade to $DBversion done (adding one table : pending_offline_operations)\n";
     SetVersion ($DBversion);
 }
 
@@ -3335,7 +3335,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	ALTER TABLE items ADD statisticvalue VARCHAR(80);
 	});
 	
-    print "Upgrade to $DBversion done (isbd updated)\n";
+    print "Upgrade to $DBversion done (adding statisticvalue field to items)\n";
     SetVersion ($DBversion);
 }
 
@@ -3343,7 +3343,7 @@ $DBversion = "3.01.00.129";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do("INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('ILS-DI','0','Enable ILS-DI services. See http://your.opac.name/cgi-bin/koha/ilsdi.pl for online documentation.','','YesNo')");
 	
-    print "Upgrade to $DBversion done (isbd updated)\n";
+    print "Upgrade to $DBversion done (Adding ILS-DI updates)\n";
     SetVersion ($DBversion);
 }
 
@@ -3351,7 +3351,7 @@ $DBversion = "3.01.00.130";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do("INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('ILS-DI:AuthorizedIPs','127.0.0.1','A comma separated list of IP addresses authorized to access the web services.','','free')");
 	
-    print "Upgrade to $DBversion done (isbd updated)\n";
+    print "Upgrade to $DBversion done (Adding ILSDI:Authorised_IPs system preference)\n";
     SetVersion ($DBversion);
 }
 
