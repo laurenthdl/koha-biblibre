@@ -3208,7 +3208,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 
 =cut
 
-my $DBversion = "3.01.00.0122";
+$DBversion = "3.01.00.0122";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     # update branches table
     # 
@@ -3323,6 +3323,16 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	);
 	});
 
+    print "Upgrade to $DBversion done (isbd updated)\n";
+    SetVersion ($DBversion);
+}
+
+$DBversion = "3.02.00.002";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(qq{
+	ALTER TABLE items ADD statisticvalue VARCHAR(80);
+	});
+	
     print "Upgrade to $DBversion done (isbd updated)\n";
     SetVersion ($DBversion);
 }
