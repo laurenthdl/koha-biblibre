@@ -379,7 +379,9 @@ $tabsysprefs{'OAI-PMH:Set'}       = "OAI-PMH";
 $tabsysprefs{'OAI-PMH:Subset'}    = "OAI-PMH";
 
 # ILS-DI variables
-$tabsysprefs{'ILS-DI'} = "ILS-DI";
+$tabsysprefs{'ILS-DI'}               = "ILS-DI";
+$tabsysprefs{'ILS-DI:AuthorizedIPs'} = "ILS-DI";
+
 sub StringSearch {
     my ( $searchstring, $type ) = @_;
     my $dbh = C4::Context->dbh;
