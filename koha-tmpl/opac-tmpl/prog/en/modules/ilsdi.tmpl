@@ -41,7 +41,7 @@
                     ilsdi.pl?service=GetAvailability&id=1+2+99999&id_type=item
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;dlf:collection
   xmlns:dlf="http://diglib.org/ilsdi/1.1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -85,6 +85,19 @@
     &lt;/dlf:items&gt;
   &lt;/dlf:record&gt;
 &lt;/dlf:collection&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque GetAvailability and print some informations.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=GetAvailability';
+$url .= '&id=' . $itemnumber;
+$url .= '&id_type=item';
+
+$xml = @simplexml_load_file($url);
+$namespaces = $xml->getNameSpaces(true);
+$dlf = $xml->children($namespaces['dlf']);
+
+echo "Availability status: " . $dlf->record->items->item->simpleavailability->availabilitystatus;
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="GetRecords" -->
 
@@ -109,12 +122,19 @@
                         </ul>
                     </dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>UnsupportedSchema</strong></dt>
+                    <dd>The id_type provided is not supported.</dd>
+                    <dt><strong>RecordNotFound</strong></dt>
+                    <dd>The id provided does not match any bibliographic record in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=GetRecords&id=1+2+99999">
                     ilsdi.pl?service=GetRecords&id=1+2+99999
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;GetRecords&gt;
   &lt;record&gt;
     &lt;biblioitemnumber&gt;1&lt;/biblioitemnumber&gt;
@@ -293,6 +313,29 @@
   &lt;/record&gt;
   &lt;record&gt;RecordNotFound&lt;/record&gt;
 &lt;/GetRecords&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque GetRecords and print some informations.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=GetRecords';
+$url .= '&id=' . $biblionumber;
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->record->message) {
+    echo $xml->record->message;
+} else {
+    foreach ( $xml->record->datafield as $datafield ) {
+        if ( $datafield->attributes()->tag == "200" ) {
+            foreach ( $datafield->subfield as $subfield ) {
+                if ( $subfield->attributes()->code = "a" ) {
+                    echo "Cover title is " . $subfield;
+                }
+            }
+        }
+    }
+    echo "This biblio has " . count($xml->record->items->item) . " items.";
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="GetAuthorityRecords" -->
 
@@ -311,12 +354,19 @@
                         </ul>
                     </dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>UnsupportedSchema</strong></dt>
+                    <dd>The id_type provided is not supported.</dd>
+                    <dt><strong>RecordNotFound</strong></dt>
+                    <dd>The id provided does not match any bibliographic record in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=GetAuthorityRecords&id=1+2+99999">
                     ilsdi.pl?service=GetAuthorityRecords&id=1+2+99999
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;GetAuthorityRecords&gt;
   &lt;record
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -352,6 +402,28 @@
   &lt;/record&gt;
   &lt;record&gt;RecordNotFound&lt;/record&gt;
 &lt;/GetAuthorityRecords&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque GetAuthorityRecords and print the term.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=GetAuthorityRecords';
+$url .= '&id=' . $auth_id;
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} else {
+    foreach ( $xml->record->datafield as $datafield ) {
+        if ( $datafield->attributes()->tag == "250" ) {
+            foreach ( $datafield->subfield as $subfield ) {
+                if ( $subfield->attributes()->code = "a" ) {
+                    echo "Term is " . $subfield;
+                }
+            }
+        }
+    }
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="LookupPatron" -->
 
@@ -371,15 +443,36 @@
                         </ul>
                     </dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The id provided does not match any patron in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=LookupPatron&id=815&id_type=cardnumber">
                     ilsdi.pl?service=LookupPatron&id=815&id_type=cardnumber
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;LookupPatron&gt;
   &lt;id&gt;419&lt;/id&gt;
 &lt;/LookupPatron&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque LookupPatron and print the result.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=LookupPatron';
+$url .= '&id=' . $cardnumber;
+$url .= '&id_type=cardnumber';
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} else {
+    echo "Patron ID is " . $xml->id;
+}
+?&gt;</pre>
+
 
 <!-- TMPL_ELSIF NAME="AuthenticatePatron" -->
 
@@ -392,15 +485,35 @@
                     <dt><strong>password</strong> (Required)</dt>
                     <dd>user's password</dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The id provided does not match any patron in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=AuthenticatePatron&username=john9&password=soul">
                     ilsdi.pl?service=AuthenticatePatron&username=john9&password=soul
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;AuthenticatePatron&gt;
   &lt;id&gt;419&lt;/id&gt;
 &lt;/AuthenticatePatron&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque AuthenticatePatron and print the result.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=AuthenticatePatron';
+$url .= '&username=' . $username;
+$url .= '&password=' . $password;
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} else {
+    echo "Patron ID is " . $xml->id;
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="GetPatronInfo" -->
 
@@ -422,12 +535,17 @@
                     <dt><strong>show_loans</strong> (Optional, default 0)</dt>
                     <dd>whether or not to return loan information request information in the response</dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The id provided does not match any patron in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=GetPatronInfo&patron_id=1&show_contact=0&show_loans=1">
                     ilsdi.pl?service=GetPatronInfo&patron_id=1&show_contact=0&show_loans=1
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;GetPatronInfo&gt;
   &lt;category_type&gt;A&lt;/category_type&gt;
   &lt;categorycode&gt;ADUEXT&lt;/categorycode&gt;
@@ -531,6 +649,30 @@
     &lt;/loan&gt;
   &lt;/loans&gt;
 &lt;/GetPatronInfo&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque GetPatronInfo and print some informations.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=GetPatronStatus';
+$url .= '&patron_id=' . $patron_id;
+$url .= '&show_fines=1';
+$url .= '&show_holds=1';
+$url .= '&show_loans=1';
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} else {
+    echo "Hi, my name is " . $xml->firstname . ".";
+    echo "I live in " . $xml->city . ".";
+    echo "I currently have " . count($xml->loans->loan) . " item(s) checked out.";
+    echo "And reserved " . count($xml->holds->hold) . ".";
+    if ( count($xml->holds->hold) ) {
+        echo "I plan to read " . $xml->holds->hold[0]->item->title;
+        echo $xml->holds->hold[0]->item->author ? " by " . $xml->holds->hold[0]->item->author . "." : ".";
+    }
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="GetPatronStatus" -->
 
@@ -541,17 +683,36 @@
                     <dt><strong>patron_id</strong> (Required)</dt>
                     <dd>the unique patron identifier in the ILS; the same identifier returned by LookupPatron or AuthenticatePatron</dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The id provided does not match any patron in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=GetPatronStatus&patron_id=1">
                     ilsdi.pl?service=GetPatronStatus&patron_id=1
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;GetPatronStatus&gt;
   &lt;expiry&gt;2010-03-04&lt;/expiry&gt;
   &lt;status&gt;0&lt;/status&gt;
   &lt;type&gt;ADUEXT&lt;/type&gt;
 &lt;/GetPatronStatus&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque GetPatronStatus and print the result message.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=GetPatronStatus';
+$url .= '&patron_id=' . $patron_id;
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} else {
+    echo "This patron is a " . $xml->type . " and his/her card will expire on " . $xml->expiry;
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="GetServices" -->
 
@@ -564,16 +725,38 @@
                     <dt><strong>item_id</strong> (Required)</dt>
                     <dd>system item identifier</dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The patron_id provided does not match any patron in the ILS.</dd>
+                    <dt><strong>RecordNotFound</strong></dt>
+                    <dd>The item_id provided does not match any item in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=GetServices&patron_id=1&item_id=1">
                     ilsdi.pl?service=GetServices&patron_id=1&item_id=1
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;GetServices&gt;
   &lt;AvailableFor&gt;title level hold&lt;/AvailableFor&gt;
   &lt;AvailableFor&gt;item level hold&lt;/AvailableFor&gt;
 &lt;/GetServices&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque GetServices and print the result message.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=GetServices';
+$url .= '&patron_id=' . $patron_id;
+$url .= '&item_id=' . $inum;
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} else {
+    echo "This item is available for " . implode(', ', $xml->AvailableFor) . ";";
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="RenewLoan" -->
 
@@ -588,17 +771,44 @@
                     <dt><strong>desired_due_date</strong> (Required)</dt>
                     <dd>the date the patron would like the item returned by</dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The patron_id provided does not match any patron in the ILS.</dd>
+                    <dt><strong>RecordNotFound</strong></dt>
+                    <dd>The item_id provided does not match any item in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=RenewLoan&patron_id=1&item_id=1">
                     ilsdi.pl?service=RenewLoan&patron_id=1&item_id=1
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;RenewLoan&gt;
   &lt;success&gt;0&lt;/success&gt;
   &lt;renewals&gt;5&lt;/renewals&gt;
   &lt;date_due&gt;2009-05-11&lt;/date_due&gt;
 &lt;/RenewLoan&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque RenewLoan and print the result message.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=RenewLoan';
+$url .= '&patron_id=' . $patron_id;
+$url .= '&item_id=' . $inum;
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} elseif ($xml->success == 1) {
+    echo "You successfully renewed your hold on " . $xml->title . ".";
+    echo "The new due date is " . $xml->date_due . ".";
+    echo "This hold has been renewed " . $xml->renewals . " times.";
+} else {
+    echo "Sorry, we were unable to renew your hold on " . $xml->title;
+    echo $xml->error ? " for the following reason: " . $xml->error . "." : ".";
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="HoldTitle" -->
 
@@ -619,17 +829,47 @@
                     <dt><strong>pickup_expiry_date</strong> (Optional)</dt>
                     <dd>date after which item returned to shelf if item is not picked up</dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The patron_id provided does not match any patron in the ILS.</dd>
+                    <dt><strong>RecordNotFound</strong></dt>
+                    <dd>The bib_id provided does not match any bibliographic record in the ILS.</dd>
+                    <dt><strong>NotHoldable</strong></dt>
+                    <dd>This patron is not allowed to hold this title.</dd>
+                    <dt><strong>LocationNotFound</strong></dt>
+                    <dd>The pickup_location provided does not match any branchcode in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=HoldTitle&patron_id=1&bib_id=1&request_location=127.0.0.1">
                     ilsdi.pl?service=HoldTitle&patron_id=1&bib_id=1&request_location=127.0.0.1
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;HoldTitle&gt;
   &lt;title&gt;(les) galères de l'Orfèvre&lt;/title&gt;
   &lt;date_available&gt;2009-05-11&lt;/date_available&gt;
   &lt;pickup_location&gt;Bibliothèque Jean-Prunier&lt;/pickup_location&gt;
 &lt;/HoldTitle&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque HoldTitle and print the result message.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=HoldItem';
+$url .= '&patron_id=' . $patron_id;
+$url .= '&bib_id=' . $bnum;
+$url .= '&item_id=' . $inum;
+$url .= '&request_location=' . getenv("REMOTE_ADDR");
+$url .= '&pickup_location=' . $pickup_loc;
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} else {
+    echo "You successfully placed a hold on " . $xml->title . ".";
+    echo "This item is available on " . $xml->date_available . " at " . $xml->pickup_location . ".";
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="HoldItem" -->
 
@@ -650,17 +890,46 @@
                     <dt><strong>pickup_expiry_date</strong> (Optional)</dt>
                     <dd>date after which item returned to shelf if item is not picked up</dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The patron_id provided does not match any patron in the ILS.</dd>
+                    <dt><strong>RecordNotFound</strong></dt>
+                    <dd>The bib_id or item_id provided do not match any record in the ILS.</dd>
+                    <dt><strong>NotHoldable</strong></dt>
+                    <dd>This patron is not allowed to hold this title.</dd>
+                    <dt><strong>LocationNotFound</strong></dt>
+                    <dd>The pickup_location provided does not match any branchcode in the ILS.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=HoldItem&patron_id=1&bib_id=1&item_id=1">
                     ilsdi.pl?service=HoldItem&patron_id=1&bib_id=1&item_id=1
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
-&lt;HoldTitle&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;HoldItem&gt;
   &lt;title&gt;(les) galères de l'Orfèvre&lt;/title&gt;
   &lt;date_available&gt;2009-05-11&lt;/date_available&gt;
   &lt;pickup_location&gt;Bibliothèque Jean-Prunier&lt;/pickup_location&gt;
-&lt;/HoldTitle&gt;</pre>
+&lt;/HoldItem&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque HoldItem and print the result message.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=HoldItem';
+$url .= '&patron_id=' . $patron_id;
+$url .= '&bib_id=' . $bnum;
+$url .= '&item_id=' . $inum;
+$url .= '&pickup_location=' . $pickup_loc;
+
+$xml = @simplexml_load_file($url);
+
+if ($xml->message) {
+    echo $xml->message;
+} else {
+    echo "You successfully placed a hold on " . $xml->title . ".";
+    echo "This item is available on " . $xml->date_available . " at " . $xml->pickup_location . ".";
+}
+?&gt;</pre>
 
 <!-- TMPL_ELSIF NAME="CancelHold" -->
 
@@ -673,15 +942,37 @@
                     <dt><strong>item_id</strong> (Required)</dt>
                     <dd>system item identifier</dd>
                 </dl>
+                <h4>Message Codes</h4>
+                <dl>
+                    <dt><strong>PatronNotFound</strong></dt>
+                    <dd>The patron_id provided does not match any patron in the ILS.</dd>
+                    <dt><strong>RecordNotFound</strong></dt>
+                    <dd>The item_id provided do not match any item in the ILS.</dd>
+                    <dt><strong>NotCanceled</strong></dt>
+                    <dd>This item was not reserved by this patron.</dd>
+                    <dt><strong>Canceled</strong></dt>
+                    <dd>Hold successfully cancelled.</dd>
+                </dl>
                 <h4>Example Call</h4>
                 <a href="ilsdi.pl?service=CancelHold&patron_id=1&item_id=1">
                     ilsdi.pl?service=CancelHold&patron_id=1&item_id=1
                 </a>
                 <h4>Example Response</h4>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;CancelHold&gt;
   &lt;message&gt;Canceled&lt;/message&gt;
 &lt;/CancelHold&gt;</pre>
+                <h4>Exemple Usage</h4>
+                <p>The following PHP code will invoque CancelHold and print the result message.</p>
+<pre>&lt;?php
+$url = 'http://'.$server.':'.$port.'/cgi-bin/koha/ilsdi.pl?service=CancelHold';
+$url .= '&patron_id=' . $patron_id;
+$url .= '&item_id=' . $itemnumber;
+
+$xml = @simplexml_load_file($url);
+
+echo $xml->message;
+?&gt;</pre>
 
 <!-- TMPL_ELSE -->
 
