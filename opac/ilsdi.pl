@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2009 SARL Biblibre
+# Copyright 2009 SARL BibLibre
 #
 # This file is part of Koha.
 #
@@ -17,10 +17,14 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
+use utf8;
 use strict;
 use warnings;
+binmode(STDOUT, ":utf8");
 
-use C4::ILSDI::Services;
+use List::MoreUtils qw(any);
+
+use C4::ILSDI;
 use C4::Auth;
 use C4::Output;
 use C4::Context;
@@ -80,41 +84,46 @@ my @services = (
 
 # List of required arguments
 my %required = (
-    'Describe'            => ['verb'],
+    'Describe'            => [ 'verb' ],
     'GetAvailability'     => [ 'id', 'id_type' ],
-    'GetRecords'          => ['id'],
-    'GetAuthorityRecords' => ['id'],
-    'LookupPatron'        => ['id'],
+    'GetRecords'          => [ 'id' ],
+    'GetAuthorityRecords' => [ 'id' ],
+    'LookupPatron'        => [ 'id' ],
     'AuthenticatePatron'  => [ 'username', 'password' ],
-    'GetPatronInfo'       => ['patron_id'],
-    'GetPatronStatus'     => ['patron_id'],
+    'GetPatronInfo'       => [ 'patron_id' ],
+    'GetPatronStatus'     => [ 'patron_id' ],
     'GetServices'         => [ 'patron_id', 'item_id' ],
     'RenewLoan'           => [ 'patron_id', 'item_id' ],
     'HoldTitle'           => [ 'patron_id', 'bib_id', 'request_location' ],
     'HoldItem'            => [ 'patron_id', 'bib_id', 'item_id' ],
-    'CancelHold' => [ 'patron_id', 'item_id' ],
+    'CancelHold'          => [ 'patron_id', 'item_id' ],
 );
 
 # List of optional arguments
 my %optional = (
     'Describe'            => [],
     'GetAvailability'     => [ 'return_type', 'return_fmt' ],
-    'GetRecords'          => ['schema'],
-    'GetAuthorityRecords' => ['schema'],
-    'LookupPatron'        => ['id_type'],
+    'GetRecords'          => [ 'schema' ],
+    'GetAuthorityRecords' => [ 'schema' ],
+    'LookupPatron'        => [ 'id_type' ],
     'AuthenticatePatron'  => [],
     'GetPatronInfo'       => [ 'show_contact', 'show_fines', 'show_holds', 'show_loans' ],
     'GetPatronStatus'     => [],
     'GetServices'         => [],
-    'RenewLoan'           => ['desired_due_date'],
-    'HoldTitle'  => [ 'pickup_location', 'needed_before_date', 'pickup_expiry_date' ],
-    'HoldItem'   => [ 'pickup_location', 'needed_before_date', 'pickup_expiry_date' ],
-    'CancelHold' => [],
+    'RenewLoan'           => [ 'desired_due_date' ],
+    'HoldTitle'           => [ 'pickup_location', 'needed_before_date', 'pickup_expiry_date' ],
+    'HoldItem'            => [ 'pickup_location', 'needed_before_date', 'pickup_expiry_date' ],
+    'CancelHold'          => [],
 );
 
 # If ILS-DI module is disabled in System->Preferences, redirect to 404
 if ( not C4::Context->preference('ILS-DI') ) {
     print $cgi->redirect("/cgi-bin/koha/errors/404.pl");
+}
+
+# If the remote address is not allowed, redirect to 403
+if ( not any { $ENV{'REMOTE_ADDR'} eq $_ } split(/,/, C4::Context->preference('ILS-DI:AuthorizedIPs')) ) {
+    print $cgi->redirect("/cgi-bin/koha/errors/403.pl");
 }
 
 # If no service is requested, display the online documentation
@@ -202,7 +211,7 @@ if ( $service and grep { $service eq $_ } @services ) {
             # Variable functions
             my $sub = do {
                 no strict 'refs';
-                my $symbol = 'C4::ILSDI::Services::' . $service;
+                my $symbol = 'C4::ILSDI::' . $service;
                 \&{"$symbol"};
             };
 
