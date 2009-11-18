@@ -3595,6 +3595,15 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.03.00.001";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(qq{
+	ALTER TABLE items ADD statisticvalue VARCHAR(80);
+	});
+	
+    print "Upgrade to $DBversion done (isbd updated)\n";
+    SetVersion ($DBversion);
+}
 
 $DBversion = '3.01.00.131';
 if (C4::Context->preference('Version') < TransformToNum($DBversion)){
@@ -3607,13 +3616,6 @@ $DBversion = '3.01.00.132';
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do('ALTER TABLE `categories` ADD COLUMN `enrolmentperioddate` DATE NULL DEFAULT NULL AFTER `enrolmentperiod`');
     print "Upgrade done (Add enrolment period date support)\n";
-    SetVersion ($DBversion);
-}
-
-$DBversion = '3.01.00.127';
-if (C4::Context->preference('Version') < TransformToNum($DBversion)){
-    $dbh->do("INSERT INTO `permissions` (`module_bit` , `code` , `description`) VALUES ('9', 'edit_items', 'Edit items');");
-    print "Upgrade to $DBversion done (Added 'Edit Items' permission)\n";
     SetVersion ($DBversion);
 }
 
