@@ -237,8 +237,8 @@ if ($borrowernumber) {
 
     # Warningdate is the date that the warning starts appearing
     my (  $today_year,   $today_month,   $today_day) = Today();
-    my ($warning_year, $warning_month, $warning_day) = split /-/, $borrower->{'dateexpiry'};
-    my (  $enrol_year,   $enrol_month,   $enrol_day) = split /-/, $borrower->{'dateenrolled'};
+    my ($warning_year, $warning_month, $warning_day) = split (/-/, $borrower->{'dateexpiry'});
+    my (  $enrol_year,   $enrol_month,   $enrol_day) = split (/-/, $borrower->{'dateenrolled'});
     # Renew day is calculated by adding the enrolment period to today
     my (  $renew_year,   $renew_month,   $renew_day) =
       Add_Delta_YM( $enrol_year, $enrol_month, $enrol_day,
@@ -659,10 +659,6 @@ if($lib_messages_loop){ $template->param(flagged => 1 ); }
 my $bor_messages_loop = GetMessages( $borrowernumber, 'B', $branch );
 if($bor_messages_loop){ $template->param(flagged => 1 ); }
 
-# Computes full borrower address
-my (undef, $roadttype_hashref) = &GetRoadTypes();
-my $address = $borrower->{'streetnumber'}.' '.$roadttype_hashref->{$borrower->{'streettype'}}.' '.$borrower->{'address'};
-
 $template->param(
     issued_itemtypes_count_loop => \@issued_itemtypes_count_loop,
     lib_messages_loop		=> $lib_messages_loop,
@@ -670,43 +666,30 @@ $template->param(
     all_messages_del		=> C4::Context->preference('AllowAllMessageDeletion'),
     findborrower                => $findborrower,
     borrower                    => $borrower,
-    borrowernumber              => $borrowernumber,
     branch                      => $branch,
-    branchname                  => GetBranchName($borrower->{'branchcode'}),
     printer                     => $printer,
     printername                 => $printer,
-    firstname                   => $borrower->{'firstname'},
-    surname                     => $borrower->{'surname'},
     dateexpiry        => format_date($newexpiry),
     expiry            => format_date($borrower->{'dateexpiry'}),
-    categorycode      => $borrower->{'categorycode'},
     categoryname      => $borrower->{description},
-    address           => $address,
-    address2          => $borrower->{'address2'},
-    email             => $borrower->{'email'},
-    emailpro          => $borrower->{'emailpro'},
-    borrowernotes     => $borrower->{'borrowernotes'},
-    city              => $borrower->{'city'},
-    zipcode	          => $borrower->{'zipcode'},
-    country	          => $borrower->{'country'},
     phone             => $borrower->{'phone'} || $borrower->{'mobile'},
-    cardnumber        => $borrower->{'cardnumber'},
     amountold         => $amountold,
     barcode           => $barcode,
     stickyduedate     => $stickyduedate,
     duedatespec       => $duedatespec,
     message           => $message,
     CGIselectborrower => $CGIselectborrower,
-	totalprice => sprintf("%.2f", $totalprice),
-    totaldue        => sprintf("%.2f", $total),
+	totalprice        => sprintf("%.2f", $totalprice),
+    totaldue          => sprintf("%.2f", $total),
     todayissues       => \@todaysissues,
     previssues        => \@previousissues,
     inprocess         => $inprocess,
     memberofinstution => $member_of_institution,
     CGIorganisations  => $CGIorganisations,
-	is_child          => ($borrower->{'category_type'} eq 'C'),
     circview => 1,
 );
+
+SetMemberInfosInTemplate($borrowernumber, $template);
 
 # save stickyduedate to session
 if ($stickyduedate) {
