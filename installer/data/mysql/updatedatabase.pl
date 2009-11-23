@@ -3598,10 +3598,10 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 $DBversion = "3.03.00.001";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(qq{
-	ALTER TABLE items ADD statisticvalue VARCHAR(80);
+	ALTER TABLE items ADD authvalue VARCHAR(80);
 	});
 	
-    print "Upgrade to $DBversion done (adding statisticvalue field to items)\n";
+    print "Upgrade to $DBversion done (adding authvalue field to items)\n";
     SetVersion ($DBversion);
 }
 
