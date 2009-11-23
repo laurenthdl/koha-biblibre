@@ -3339,7 +3339,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.01.00.129";
+$DBversion = "3.02.00.003";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do("INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('ILS-DI','0','Enable ILS-DI services. See http://your.opac.name/cgi-bin/koha/ilsdi.pl for online documentation.','','YesNo')");
 	
@@ -3347,13 +3347,24 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.01.00.130";
+$DBversion = "3.02.00.004";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do("INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('ILS-DI:AuthorizedIPs','127.0.0.1','A comma separated list of IP addresses authorized to access the web services.','','free')");
 	
     print "Upgrade to $DBversion done (Adding ILSDI:Authorised_IPs system preference)\n";
     SetVersion ($DBversion);
 }
+
+$DBversion = "3.02.00.005";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(qq{
+	ALTER TABLE items CHANGE statisticvalue authvalue VARCHAR(80);
+	});
+	
+    print "Upgrade to $DBversion done (renaming statisticvalue to authvalue in items)\n";
+    SetVersion ($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 
