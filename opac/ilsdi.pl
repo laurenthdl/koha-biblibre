@@ -149,7 +149,8 @@ my $out;
 
 # If ILS-DI module is disabled in System->Preferences, redirect to 404
 unless ( C4::Context->preference('ILS-DI') ) {
-    $out->{'message'} = "NotAllowed";
+    $out->{'code'} = "NotAllowed";
+    $out->{'message'} = "ILS-DI is disabled.";
 }
 
 # If the remote address is not allowed, redirect to 403
@@ -157,7 +158,8 @@ my @AuthorizedIPs = split(/,/, C4::Context->preference('ILS-DI:AuthorizedIPs'));
 if ( @AuthorizedIPs # If no filter set, allow access to everybody
     and not any { $ENV{'REMOTE_ADDR'} eq $_ } @AuthorizedIPs # IP Check
     ) {
-    $out->{'message'} = "NotAllowed";
+    $out->{'code'} = "NotAllowed";
+    $out->{'message'} = "Unauthorized IP address: ".$ENV{'REMOTE_ADDR'}.".";
 }
 
 my $service = $cgi->param('service') || "ilsdi";
@@ -175,7 +177,8 @@ if ( $service and any { $service eq $_ } @services ) {
     # check for missing parameters
     for ( @parmsrequired ) {
         unless ( exists $paramhash{$_} ) {
-            $out->{'message'} = "MissingParameter";
+            $out->{'code'} = "MissingParameter";
+            $out->{'message'} = "The required parameter ".$_." is missing.";
         }
     }
 
@@ -188,7 +191,8 @@ if ( $service and any { $service eq $_ } @services ) {
             }
         }
         if ( $found == 0 && $name ne 'service' ) {
-            $out->{'message'} = "IllegalParameter";
+            $out->{'code'} = "IllegalParameter";
+            $out->{'message'} = "The parameter ".$name." is illegal.";
         }
     }
 
@@ -196,7 +200,8 @@ if ( $service and any { $service eq $_ } @services ) {
     for ( @names ) {
         my @values = $cgi->param($_);
         if ( $#values != 0 ) {
-            $out->{'message'} = "MultipleValuesNotAllowed";
+            $out->{'code'} = "MultipleValuesNotAllowed";
+            $out->{'message'} = "Multiple values not allowed for the parameter ".$_.".";
         }
     }
 
