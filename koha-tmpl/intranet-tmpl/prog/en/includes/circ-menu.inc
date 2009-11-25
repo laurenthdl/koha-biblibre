@@ -13,6 +13,7 @@ $(document).ready(function()
   $("#toggleaddress").click(function()
   {
     $("#collapsedaddress").slideToggle("normal");
+    $("#toggleaddress").toggleClass("toggleaddress2");
   });
 });
 </script>
@@ -74,7 +75,7 @@ $(document).ready(function()
 		    <!-- /TMPL_IF -->
 		    </p>
 		</div>
-		<a id="toggleaddress" style="cursor: pointer">View/Hide address</span>
+		<a id="toggleaddress" class="toggleaddress">View/Hide address</a>
     </li>
 </ul>
 </div>
