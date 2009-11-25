@@ -199,7 +199,7 @@ sub GetRecords {
 
     # Check if the schema is supported. For now, GetRecords only supports MARCXML
     if ( $cgi->param('schema') and $cgi->param('schema') ne "MARCXML" ) {
-        return { message => 'UnsupportedSchema' };
+        return { code => 'UnsupportedSchema' };
     }
 
     my @records;
@@ -245,7 +245,7 @@ sub GetRecords {
             push @records, $biblioitem;
             
         } else {
-            push @records, { message => 'RecordNotFound' };
+            push @records, { code => 'RecordNotFound' };
         }
     }
 
@@ -273,7 +273,7 @@ sub GetAuthorityRecords {
 
     # If the user asks for an unsupported schema, return an error code
     if ( $cgi->param('schema') and $cgi->param('schema') ne "MARCXML" ) {
-        return { message => 'UnsupportedSchema' };
+        return { code => 'UnsupportedSchema' };
     }
 
     my $records;
@@ -282,7 +282,7 @@ sub GetAuthorityRecords {
     for ( split( / /, $cgi->param('id') ) ) {
 
         # Get the record as XML string, or error code
-        my $record = GetAuthorityXML( $_ ) || "<record><message>RecordNotFound</message></record>";
+        my $record = GetAuthorityXML( $_ ) || "<record><code>RecordNotFound</code></record>";
         $record =~ s/<\?xml(.*)\?>//go;
         $records .= $record;
     }
@@ -312,7 +312,7 @@ sub LookupPatron {
 
     # Get the borrower...
     my $borrower = GetMember( $cgi->param('id'), $cgi->param('id_type') );
-    return { message => 'PatronNotFound' } unless $$borrower{borrowernumber};
+    return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # ...and return his ID
     return { id => $$borrower{borrowernumber} };
@@ -337,7 +337,7 @@ sub AuthenticatePatron {
 
     # Check if borrower exists, using a C4::Auth function...
     unless( checkpw( C4::Context->dbh, $cgi->param('username'), $cgi->param('password') ) ) {
-        return { message => 'PatronNotFound' };
+        return { code => 'PatronNotFound' };
     }
 
     # Get the borrower
@@ -374,7 +374,7 @@ sub GetPatronInfo {
     # Get Member details
     my $borrowernumber = $cgi->param('patron_id');
     my $borrower = GetMemberDetails( $borrowernumber );
-    return { message => 'PatronNotFound' } unless $$borrower{borrowernumber};
+    return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # Cleaning the borrower hashref
     $$borrower{charges}    = $$borrower{flags}{CHARGES}{amount};
@@ -456,7 +456,7 @@ sub GetPatronStatus {
     # Get Member details
     my $borrowernumber = $cgi->param('patron_id');
     my $borrower = GetMemberDetails( $borrowernumber );
-    return { message => 'PatronNotFound' } unless $$borrower{borrowernumber};
+    return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # Return the results
     return {
@@ -485,12 +485,12 @@ sub GetServices {
     # Get the member, or return an error code if not found
     my $borrowernumber = $cgi->param('patron_id');
     my $borrower = GetMemberDetails( $borrowernumber );
-    return { message => 'PatronNotFound' } unless $$borrower{borrowernumber};
+    return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # Get the item, or return an error code if not found
     my $itemnumber = $cgi->param('item_id');
     my $item = GetItem( $itemnumber );
-    return { message => 'RecordNotFound' } unless $$item{itemnumber};
+    return { code => 'RecordNotFound' } unless $$item{itemnumber};
 
     my @availablefor;
 
@@ -542,12 +542,12 @@ sub RenewLoan {
     # Get borrower infos or return an error code
     my $borrowernumber = $cgi->param('patron_id');
     my $borrower = GetMemberDetails( $borrowernumber );
-    return { message => 'PatronNotFound' } unless $$borrower{borrowernumber};
+    return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # Get the item infos, or return an error code
     my $itemnumber = $cgi->param('item_id');
     my $item = GetItem( $itemnumber );
-    return { message => 'RecordNotFound' } unless $$item{itemnumber};
+    return { code => 'RecordNotFound' } unless $$item{itemnumber};
 
     # Add renewal if possible
     my @renewal = CanBookBeRenewed( $borrowernumber, $itemnumber );
@@ -591,24 +591,24 @@ sub HoldTitle {
     # Get the borrower or return an error code
     my $borrowernumber = $cgi->param('patron_id');
     my $borrower = GetMemberDetails( $borrowernumber );
-    return { message => 'PatronNotFound' } unless $$borrower{borrowernumber};
+    return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # Get the biblio record, or return an error code
     my $biblionumber = $cgi->param('bib_id');
     my ( $count, $biblio ) = GetBiblio( $biblionumber );
-    return { message => 'RecordNotFound' } unless $$biblio{biblionumber};
+    return { code => 'RecordNotFound' } unless $$biblio{biblionumber};
     
     my $title = $$biblio{title};
 
     # Check if the biblio can be reserved
-    return { message => 'NotHoldable' } unless CanBookBeReserved( $borrowernumber, $biblionumber );
+    return { code => 'NotHoldable' } unless CanBookBeReserved( $borrowernumber, $biblionumber );
 
     # Pickup branch management
     my $branch;
     if ( $cgi->param('pickup_location') ) {
         $branch = $cgi->param('pickup_location');
         my $branches = GetBranches;
-        return { message => 'LocationNotFound' } unless $$branches{$branch};
+        return { code => 'LocationNotFound' } unless $$branches{$branch};
     } else { # if the request provide no branch, use the borrower's branch
         $branch = $$borrower{branchcode};
     }
@@ -653,34 +653,34 @@ sub HoldItem {
     # Get the borrower or return an error code
     my $borrowernumber = $cgi->param('patron_id');
     my $borrower = GetMemberDetails( $borrowernumber );
-    return { message => 'PatronNotFound' } unless $$borrower{borrowernumber};
+    return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # Get the biblio or return an error code
     my $biblionumber = $cgi->param('bib_id');
     my ( $count, $biblio ) = GetBiblio($biblionumber);
-    return { message => 'RecordNotFound' } unless $$biblio{biblionumber};
+    return { code => 'RecordNotFound' } unless $$biblio{biblionumber};
 
     my $title = $$biblio{title};
 
     # Get the item or return an error code
     my $itemnumber = $cgi->param('item_id');
     my $item = GetItem( $itemnumber );
-    return { message => 'RecordNotFound' } unless $$item{itemnumber};
+    return { code => 'RecordNotFound' } unless $$item{itemnumber};
 
     # If the biblio does not match the item, return an error code
-    return { message => 'RecordNotFound' } if $$item{biblionumber} ne $$biblio{biblionumber};
+    return { code => 'RecordNotFound' } if $$item{biblionumber} ne $$biblio{biblionumber};
 
     # Check for item disponibility
     my $canitembereserved = CanItemBeReserved( $borrowernumber, $itemnumber );
     my $canbookbereserved = CanBookBeReserved( $borrowernumber, $biblionumber );
-    return { message => 'NotHoldable' } unless $canbookbereserved and $canitembereserved;
+    return { code => 'NotHoldable' } unless $canbookbereserved and $canitembereserved;
 
     # Pickup branch management
     my $branch;
     if ( $cgi->param('pickup_location') ) {
         $branch = $cgi->param('pickup_location');
         my $branches = GetBranches();
-        return { message => 'LocationNotFound' } unless $$branches{$branch};
+        return { code => 'LocationNotFound' } unless $$branches{$branch};
     } else { # if the request provide no branch, use the borrower's branch
         $branch = $$borrower{branchcode};
     }
@@ -724,12 +724,12 @@ sub CancelHold {
     # Get the borrower or return an error code
     my $borrowernumber = $cgi->param('patron_id');
     my $borrower = GetMemberDetails( $borrowernumber );
-    return { message => 'PatronNotFound' } unless $$borrower{borrowernumber};
+    return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # Get the item or return an error code
     my $itemnumber = $cgi->param('item_id');
     my $item = GetItem( $itemnumber );
-    return { message => 'RecordNotFound' } unless $$item{itemnumber};
+    return { code => 'RecordNotFound' } unless $$item{itemnumber};
 
     # Get borrower's reserves
     my @reserves = GetReservesFromBorrowernumber( $borrowernumber );
@@ -739,12 +739,12 @@ sub CancelHold {
     my @reserveditemnumbers = map { $$_{itemnumber} || () } @reserves;
 
     # if the item was not reserved by the borrower, returns an error code
-    return { message => 'NotCanceled' } unless any { $itemnumber eq $_ } @reserveditemnumbers;
+    return { code => 'NotCanceled' } unless any { $itemnumber eq $_ } @reserveditemnumbers;
 
     # Cancel the reserve
     CancelReserve( $itemnumber, undef, $borrowernumber );
 
-    return { message => 'Canceled' };
+    return { code => 'Canceled' };
 }
 
 1;
