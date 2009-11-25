@@ -3344,8 +3344,15 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     print "Upgrade to $DBversion done (renaming statisticvalue to authvalue in items)\n";
     SetVersion ($DBversion);
 }
+$DBversion = '3.02.00.006';
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("INSERT INTO `systempreferences` ( `variable` , `value` , `options` , `explanation` , `type` ) VALUES ( 'PrintNoticesMaxLines', '0', '', 'If greater than 0, sets the maximum number of lines an overdue notice will print. If the number of items is greater than this number, the notice will end with a warning asking the borrower to check their online account for a full list of overdue items.', 'Integer' )");
+    $dbh->do("INSERT INTO message_transport_types (message_transport_type) values ('print')");
+	print "Upgrade to $DBversion done ( Added PrintNoticesMaxLines system preference and new message transport type )\n";
+    SetVersion ($DBversion);
+}
 
-$DBversion = "3.02.00.006";
+$DBversion = "3.02.00.007";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 
 	$dbh->do("ALTER TABLE `issuingrules` ADD COLUMN `holdspickupdelay` int(11) DEFAULT NULL;");
@@ -3355,7 +3362,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.02.00.007";
+$DBversion = "3.02.00.008";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do("ALTER TABLE borrowers MODIFY debarred DATE DEFAULT NULL;");
 	$dbh->do("ALTER TABLE borrowers ADD COLUMN debarredcomment VARCHAR(255) DEFAULT NULL AFTER debarred;");
