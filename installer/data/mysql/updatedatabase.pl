@@ -3364,6 +3364,25 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.006";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+
+	$dbh->do("ALTER TABLE `issuingrules` ADD COLUMN `holdspickupdelay` int(11) DEFAULT NULL;");
+	#TODO migrationdata
+
+	print "Upgrade done (Moved hold rules to issuing rules)\n";
+    SetVersion ($DBversion);
+}
+
+$DBversion = "3.02.00.007";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do("ALTER TABLE borrowers MODIFY debarred DATE DEFAULT NULL;");
+	$dbh->do("ALTER TABLE borrowers ADD COLUMN debarredcomment VARCHAR(255) DEFAULT NULL AFTER debarred;");
+	print "Upgrade done (Change fields for debar)\n";
+
+    SetVersion ($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 
