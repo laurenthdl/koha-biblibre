@@ -48,6 +48,7 @@ use C4::Biblio;
 use C4::Reserves;
 use C4::Branch; # GetBranchName
 use C4::Form::MessagingPreferences;
+use C4::Overdues qw/CheckBorrowerDebarred/;
 
 #use Smart::Comments;
 #use Data::Dumper;
@@ -127,9 +128,10 @@ foreach (qw(dateenrolled dateexpiry dateofbirth)) {
 		$template->param( $_ => $userdate );
 }
 
-for (qw(debarred gonenoaddress lost borrowernotes)) {
+for (qw(gonenoaddress lost borrowernotes)) {
 	 $data->{$_} and $template->param(flagged => 1) and last;
 }
+$template->param(flagged => 1) if (CheckBorrowerDebarred($borrowernumber));
 
 $data->{'ethnicity'} = fixEthnicity( $data->{'ethnicity'} );
 $data->{ "sex_".$data->{'sex'}."_p" } = 1;

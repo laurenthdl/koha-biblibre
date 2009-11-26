@@ -143,7 +143,7 @@ if (nodename =="barcodes[]"){
     <ul>
         <!-- TMPL_IF NAME="debarred" -->
             <li>Patron is restricted
-            <form class="inline compact" action="/cgi-bin/koha/members/setdebar.pl" method="post">
+            <form class="inline compact" action="/cgi-bin/koha/members/setstatus.pl" method="post">
                 <input type="hidden" name="borrowernumber" value="<!-- TMPL_VAR NAME="borrowernumber" -->" />
                 <input type="hidden" name="status" value="0" />
                 <input type="submit" value="Lift Debarment" />

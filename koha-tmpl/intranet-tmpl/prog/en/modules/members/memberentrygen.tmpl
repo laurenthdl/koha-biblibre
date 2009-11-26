@@ -896,7 +896,6 @@
 			<!-- TMPL_LOOP NAME="flagloop" -->
 				<li><label class="radio" for="yes<!-- TMPL_VAR name="name" -->">
 				<!-- TMPL_IF EXPR="key eq 'gonenoaddress'" -->Gone no Address:<!-- /TMPL_IF -->
-				<!-- TMPL_IF EXPR="key eq 'debarred'" -->Debarred:<!-- /TMPL_IF -->
 				<!-- TMPL_IF EXPR="key eq 'lost'" -->Lost Card:<!-- /TMPL_IF -->
                 </label>
 				
@@ -914,8 +913,32 @@
 				<input type="radio" id="no<!-- TMPL_VAR NAME="name" -->" name="<!-- TMPL_VAR NAME="name" -->" value="0" />
 				<!-- /TMPL_IF -->
 
-</li>
+				
+
+			</li>
 			<!-- /TMPL_LOOP -->
+		<li>
+			<label for="debarred">
+			Debarred: </label>
+			
+			<!-- TMPL_IF NAME="metric" -->			
+				<input type="text" id="debarred" name="debarred" size="20" onchange="CheckDate(document.form.debarred);" value="<!-- TMPL_VAR NAME="debarred" -->" />
+			<!-- TMPL_ELSE -->
+				<input type="text" id="debarred" name="debarred" size="20" value="<!-- TMPL_VAR NAME="debarred" -->" />
+			<!-- /TMPL_IF -->
+			
+			<img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="debarred_button" alt="Show Calendar" />
+	        <script language="JavaScript" type="text/javascript">
+	            Calendar.setup(
+	            {
+	                inputField : "debarred",
+	                ifFormat : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+	                button : "debarred_button"
+	            }
+	            );
+	        </script>
+	        <input type="text" name="debarredcomment" value="<!-- TMPL_VAR NAME="debarredcomment" -->" />
+        </li>
 			</ol>
 			</fieldset>
 		<!-- /TMPL_UNLESS -->	
