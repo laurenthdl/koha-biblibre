@@ -99,8 +99,13 @@ elsif ($op eq 'delete-branch-item') {
 # save the values entered
 elsif ($op eq 'add') {
     my $sth_search = $dbh->prepare("SELECT COUNT(*) AS total FROM issuingrules WHERE branchcode=? AND categorycode=? AND itemtype=?");
-    my $sth_insert = $dbh->prepare("INSERT INTO issuingrules (branchcode, categorycode, itemtype, maxissueqty, renewalsallowed, reservesallowed, issuelength, fine, finedays, firstremind, chargeperiod) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
-    my $sth_update=$dbh->prepare("UPDATE issuingrules SET fine=?, finedays=?, firstremind=?, chargeperiod=?, maxissueqty=?, renewalsallowed=?, reservesallowed=?, issuelength=? WHERE branchcode=? AND categorycode=? AND itemtype=?");
+    my $sth_insert = $dbh->prepare("INSERT INTO issuingrules 
+            (branchcode, categorycode, itemtype, maxissueqty, renewalsallowed, 
+            reservesallowed, issuelength, fine, finedays, firstremind, chargeperiod, holdspickupdelay) 
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
+    my $sth_update=$dbh->prepare("UPDATE issuingrules SET fine=?, finedays=?, firstremind=?, chargeperiod=?, 
+            maxissueqty=?, renewalsallowed=?, reservesallowed=?, issuelength=?, holdspickupdelay = ? 
+            WHERE branchcode=? AND categorycode=? AND itemtype=?");
     
     my $br = $branch; # branch
     my $bor  = $input->param('categorycode'); # borrower category
@@ -112,6 +117,7 @@ elsif ($op eq 'add') {
     my $maxissueqty  = $input->param('maxissueqty');
     my $renewalsallowed  = $input->param('renewalsallowed');
     my $reservesallowed  = $input->param('reservesallowed');
+    my $holdspickupdelay = $input->param('holdspickupdelay');
     $maxissueqty =~ s/\s//g;
     $maxissueqty = undef if $maxissueqty !~ /^\d+/;
     my $issuelength  = $input->param('issuelength');
@@ -120,9 +126,9 @@ elsif ($op eq 'add') {
     $sth_search->execute($br,$bor,$cat);
     my $res = $sth_search->fetchrow_hashref();
     if ($res->{total}) {
-        $sth_update->execute($fine, $finedays,$firstremind, $chargeperiod, $maxissueqty, $renewalsallowed,$reservesallowed, $issuelength,$br,$bor,$cat);
+        $sth_update->execute($fine, $finedays,$firstremind, $chargeperiod, $maxissueqty, $renewalsallowed,$reservesallowed, $issuelength,$holdspickupdelay,$br,$bor,$cat);
     } else {
-        $sth_insert->execute($br,$bor,$cat,$maxissueqty,$renewalsallowed,$reservesallowed,$issuelength,$fine,$finedays,$firstremind,$chargeperiod);
+        $sth_insert->execute($br,$bor,$cat,$maxissueqty,$renewalsallowed,$reservesallowed,$issuelength,$fine,$finedays,$firstremind,$chargeperiod,$holdspickupdelay);
     }
 } 
 elsif ($op eq "set-branch-defaults") {
