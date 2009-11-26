@@ -22,7 +22,7 @@ use strict;
 use C4::Context;
 use C4::Dates qw(format_date_in_iso);
 use Digest::MD5 qw(md5_base64);
-use Date::Calc qw/Today Add_Delta_YM/;
+use Date::Calc qw/Today Add_Delta_YM Date_to_Days check_date/;
 use C4::Log; # logaction
 use C4::Branch;
 use C4::Overdues;
@@ -473,13 +473,13 @@ sub patronflags {
         $flaginfo{'noissues'} = 1;
         $flags{'LOST'}        = \%flaginfo;
     }
-    if (   $patroninformation->{'debarred'}
-        && $patroninformation->{'debarred'} == 1 )
-    {
-        my %flaginfo;
-        $flaginfo{'message'}  = 'Borrower is Debarred.';
-        $flaginfo{'noissues'} = 1;
-        $flags{'DBARRED'}     = \%flaginfo;
+    if ( $patroninformation->{'debarred'} && check_date(split(/-/,$patroninformation->{'debarred'})) ){
+        if(Date_to_Days(Date::Calc::Today) < Date_to_Days(split(/-/,$patroninformation->{'debarred'}) )){
+            my %flaginfo;
+            $flaginfo{'message'}  = 'Borrower is Debarred.';
+            $flaginfo{'noissues'} = 1;
+            $flags{'DBARRED'}     = \%flaginfo;
+        }
     }
     if (   $patroninformation->{'borrowernotes'}
         && $patroninformation->{'borrowernotes'} )
@@ -2036,7 +2036,7 @@ sub GetBorrowersNamesAndLatestIssue {
 
 =over 4
 
-my $success = DebarMember( $borrowernumber );
+my $success = DebarMember( $borrowernumber, $todate );
 
 marks a Member as debarred, and therefore unable to checkout any more
 items.
@@ -2050,12 +2050,13 @@ true on success, false on failure
 
 sub DebarMember {
     my $borrowernumber = shift;
+    my $todate = shift;
 
     return unless defined $borrowernumber;
     return unless $borrowernumber =~ /^\d+$/;
 
     return ModMember( borrowernumber => $borrowernumber,
-                      debarred       => 1 );
+                      debarred       => $todate );
     
 }
 
