@@ -129,7 +129,7 @@ if ($op eq 'insert' || $op eq 'modify' || $op eq 'save') {
     my $dateobject = C4::Dates->new();
     my $syspref = $dateobject->regexp();		# same syspref format for all 3 dates
     my $iso     = $dateobject->regexp('iso');	#
-    foreach (qw(dateenrolled dateexpiry dateofbirth)) {
+    foreach (qw(dateenrolled dateexpiry dateofbirth debarred)) {
         my $userdate = $newdata{$_} or next;
         if ($userdate =~ /$syspref/) {
             $newdata{$_} = format_date_in_iso($userdate);	# if they match syspref format, then convert to ISO
@@ -468,7 +468,7 @@ my $borrotitlepopup = CGI::popup_menu(-name=>'title',
         -default=>$default_borrowertitle
         );    
 
-my @relationships = split /,|\|/, C4::Context->preference('BorrowerRelationship');
+my @relationships = split (/,|\|/, C4::Context->preference('BorrowerRelationship'));
 my @relshipdata;
 while (@relationships) {
   my $relship = shift @relationships || '';
@@ -482,10 +482,9 @@ while (@relationships) {
 }
 
 my %flags = ( 'gonenoaddress' => ['gonenoaddress' ],
-        'lost'          => ['lost'],
-        'debarred'      => ['debarred']);
+        'lost'          => ['lost']);
 
- 
+
 my @flagdata;
 foreach (keys(%flags)) {
 	my $key = $_;
@@ -586,7 +585,7 @@ if (C4::Context->preference('uppercasesurnames')) {
 	$data{'surname'}    =uc($data{'surname'}    );
 	$data{'contactname'}=uc($data{'contactname'});
 }
-foreach (qw(dateenrolled dateexpiry dateofbirth)) {
+foreach (qw(dateenrolled dateexpiry dateofbirth debarred)) {
 	$data{$_} = format_date($data{$_});	# back to syspref for display
 	$template->param( $_ => $data{$_});
 }

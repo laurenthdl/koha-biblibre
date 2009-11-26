@@ -31,6 +31,7 @@ use C4::Items;
 use C4::Dates qw/format_date/;
 use C4::Letters;
 use C4::Branch; # GetBranches
+use C4::Overdues qw/CheckBorrowerDebarred/;
 
 my $query = new CGI;
 
@@ -63,7 +64,7 @@ for (qw(dateenrolled dateexpiry dateofbirth)) {
 }
 $borr->{'ethnicity'} = fixEthnicity( $borr->{'ethnicity'} );
 
-if ( $borr->{'debarred'} || $borr->{'gonenoaddress'} || $borr->{'lost'} ) {
+if ( CheckBorrowerDebarred($borrowernumber) || $borr->{'gonenoaddress'} || $borr->{'lost'} ) {
     $borr->{'flagged'} = 1;
 }
 
