@@ -41,14 +41,11 @@ my $cgi = new CGI;
 # URL of the service we're requesting a Service Ticket for (typically this very same page)
 my $proxy_service = $cgi->url;
 
-# URL of the service we'd like to be proxy for (typically the Koha webservice we want to query)
-my $target_service = "https://.../koha_webservice.pl";
 
 # Callback URL (this is an URL the CAS Server will query, providing the Proxy Ticket we'll need 
 # to query the koha webservice). It can be this page or another. In this example, another page will be 
 # called back
 my $pgtUrl = "https://.../proxy_cas_callback.pl";
-
 
 print $cgi->header({-type  =>  'text/html'});
 print $cgi->start_html("proxy cas");
@@ -70,25 +67,12 @@ if ($cgi->param('ticket')) {
 
     # If we have a PGTIou ticket, the proxy validation was sucessful 
     if (defined $r->iou) {
-      print "Proxy granting ticket IOU: ", $r->iou, "\n";
+      print "Proxy granting ticket IOU: ", $r->iou, "<br />\n";
       my $pgtIou = $r->iou;
 
-      # At this point, we must retrieve the PgtId by matching the PgtIou we
-      # just received and the PgtIou given by the CAS Server to the callback URL
-      # These could be typically stored in the session
-      # my $pgtId = RetrievePgtIdFromPgtIou($pgtIou);
+      print '<a href="proxy_cas_data.pl?PGTIOU=', $r->iou, '">Next</a>';
 
-      # Now that we have a PgtId, we can ask the cas server for a proxy ticket...
-      my $rp = $cas->proxy( $pgtId, $target_service );
-      if( $rp->is_success ) {
-        warn "Proxy ticket issued: ", $rp->proxy_ticket, "\n";
-
-	# ...which we will provide to the target service (the koha webservice) for authentication !
-	# my $data = MyWebServiceCall($target_service, $rp->proxy_ticket);
-	
-	# And finally, we can display the data gathered from the koha webservice !
-
-      }
+      
      	    
     } else {
       print "Service validation for proxying failed\n";
