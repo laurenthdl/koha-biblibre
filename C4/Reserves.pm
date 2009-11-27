@@ -433,7 +433,7 @@ sub CanItemBeReserved{
     my $itype         = C4::Context->preference('item-level_itypes') ? "itype" : "itemtype";
 
     # we retrieve borrowers and items informations #
-    my $item     = GetItem($itemnumber);
+    my $item     = C4::Items::GetItem($itemnumber);
     my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber);     
     
     # we retrieve user rights on this itemtype and branchcode
@@ -524,7 +524,7 @@ sub GetMaxPickUpDelay {
     my $itype         = C4::Context->preference('item-level_itypes') ? "itype" : "itemtype";
 
     # we retrieve borrowers and items informations #
-    my $item     = GetItem($itemnumber);
+    my $item     = C4::Items::GetItem($itemnumber);
     my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber);     
     
     # we retrieve user rights on this itemtype and branchcode
@@ -629,7 +629,7 @@ sub GetOtherReserves {
     my $nextreservinfo;
     my ( $restype, $checkreserves ) = CheckReserves($itemnumber);
     if ($checkreserves) {
-        my $iteminfo = GetItem($itemnumber);
+        my $iteminfo = C4::Items::GetItem($itemnumber);
         if ( $iteminfo->{'holdingbranch'} ne $checkreserves->{'branchcode'} ) {
             $messages->{'transfert'} = $checkreserves->{'branchcode'};
             #minus priorities of others reservs
@@ -1384,7 +1384,7 @@ and canreservefromotherbranches.
 sub IsAvailableForItemLevelRequest {
     my $itemnumber = shift;
    
-    my $item = GetItem($itemnumber);
+    my $item = C4::Items::GetItem($itemnumber);
 
     # must check the notforloan setting of the itemtype
     # FIXME - a lot of places in the code do this
