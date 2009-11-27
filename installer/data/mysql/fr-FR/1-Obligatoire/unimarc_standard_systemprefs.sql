@@ -214,7 +214,6 @@ INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('XSLTDetailsDisplay','0','','Activer la feuille XSL pour l''affichage des notices détaillées','YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('XSLTResultsDisplay','0','','Activer la feuille XSL pour l''affichage des listes de résultat','YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AdvancedSearchTypes','itemtypes','itemtypes|ccode','Définit quel champ est utilisé pour la limitation par type de document dans la recherche avancée','Choice');
-INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AllowOnShelfHolds', '0', '', 'Autorise les réservations de documents en rayon.', 'YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AllowHoldsOnDamagedItems', '1', '', 'Autorise les réservations de documents déclarés endommagés', 'YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OpacSuppression', '0', '', 'Active la fonction de suppression à l''OPAC. Elle demande plus de paramétrage, demandez à votre administrateur', 'YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES ('SMSSendDriver','','','Détermine le pilote utilisé par SMS::Send pour envoyer des SMS.','free');
