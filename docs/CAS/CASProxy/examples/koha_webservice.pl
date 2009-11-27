@@ -19,7 +19,7 @@
 
 =head1 DESCRIPTION
 
-# Here is an exemple of a simple phony webservice, returning "Hello World" as an XML message if the user is authenticated
+# Here is an exemple of a simple phony webservice, returning "Hello World" if the user is authenticated
 # The purpose is to show how CAS Proxy can work with koha
 # In this configuration, this page acts as a CAS Client, instead of the user's browser.
 # This page is meant to be called from a foreign application
@@ -39,34 +39,20 @@ binmode(STDOUT, ":utf8");
 use C4::Auth qw(check_api_auth);
 use C4::Output;
 use C4::Context;
-use XML::Simple;
 use CGI;
 
 my $cgi = new CGI;
+
+print CGI::header('-type'=>'text/plain', '-charset'=>'utf-8');
 
 # The authentication : if $cgi contains a PT parameter, and CAS is enabled (casAuthentication syspref),
 # a CAS Proxy authentication will take place
 my ( $status, $cookie_, $sessionID ) = check_api_auth( $cgi, {circulate => 'override_renewals'});
 
 if ($status ne 'ok') {
-    print CGI::header('-type'=>'text/plain', '-charset'=>'utf-8');
     print "Authentication failed : $status";
 } else {
-
-    my $out;
-
-    $out->{'message'} = "Hello World";
-
-    print CGI::header('-type'=>'text/xml', '-charset'=>'utf-8');
-    print XMLout(
-	$out,
-	noattr        => 1,
-	noescape      => 1,
-	nosort        => 1,
-	xmldecl       => '<?xml version="1.0" encoding="UTF-8" ?>',
-	RootName      => "test_proxy_cas",
-	SuppressEmpty => 1
-    );
+    print "Hello World!";
 }
 exit 0;
 
