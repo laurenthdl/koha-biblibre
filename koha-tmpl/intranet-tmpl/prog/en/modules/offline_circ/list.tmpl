@@ -20,6 +20,9 @@
                             cb.replaceWith(data);
                         }});
                 });
+                if( $('#operations tbody :checkbox').size() == 0 ) {
+                    $('#actions').hide();
+                }
             });
         });
     </script>
@@ -41,39 +44,43 @@
 	        <form>
 
 	        <table id="operations">
-		        <tr>
-		            <th><input type="checkbox" name="checkall" id="checkall" /></th>
-			        <th>Date</th>
-			        <th>Action</th>
-			        <th>Barcode</th>
-			        <th>Cardnumber</th>
-		        </tr>
-		        <!-- TMPL_LOOP NAME="operations" -->
-		            <tr class="oc-<!-- TMPL_VAR NAME="action" -->">
-		                <td><input type="checkbox" name="operationid" value="<!-- TMPL_VAR NAME="operationid" -->" /></td>
-			            <td><!-- TMPL_VAR NAME="timestamp" --></td>
-			            <td><!-- TMPL_VAR NAME="action" --></td>
-			            <td>
-			                <!-- TMPL_IF NAME="biblionumber" -->
-			                    <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->" title="<!-- TMPL_VAR NAME="bibliotitle" -->"><!-- TMPL_VAR NAME="barcode" --></a>
-			                <!-- TMPL_ELSE -->
-			                    <span class="error"><!-- TMPL_VAR NAME="barcode" --></span>
-			                <!-- /TMPL_IF -->
-			            </td>
-			            <td>
-			            <!-- TMPL_IF NAME="actionissue" -->
-		                    <!-- TMPL_IF NAME="borrowernumber" -->
-		                        <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->" title="<!-- TMPL_VAR NAME="borrower" -->"><!-- TMPL_VAR NAME="cardnumber" --></a>
-		                    <!-- TMPL_ELSE -->
-		                        <span class="error"><!-- TMPL_VAR NAME="cardnumber" --></span>
-		                    <!-- /TMPL_IF -->
-			            <!-- /TMPL_IF -->
-			            </td>
+	            <thead>
+		            <tr>
+		                <th><input type="checkbox" name="checkall" id="checkall" /></th>
+			            <th>Date</th>
+			            <th>Action</th>
+			            <th>Barcode</th>
+			            <th>Cardnumber</th>
 		            </tr>
-		        <!-- /TMPL_LOOP -->
+		        </thead>
+		        <tbody>
+		            <!-- TMPL_LOOP NAME="operations" -->
+		                <tr class="oc-<!-- TMPL_VAR NAME="action" -->">
+		                    <td><input type="checkbox" name="operationid" value="<!-- TMPL_VAR NAME="operationid" -->" /></td>
+			                <td><!-- TMPL_VAR NAME="timestamp" --></td>
+			                <td><!-- TMPL_VAR NAME="action" --></td>
+			                <td>
+			                    <!-- TMPL_IF NAME="biblionumber" -->
+			                        <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->" title="<!-- TMPL_VAR NAME="bibliotitle" -->"><!-- TMPL_VAR NAME="barcode" --></a>
+			                    <!-- TMPL_ELSE -->
+			                        <span class="error"><!-- TMPL_VAR NAME="barcode" --></span>
+			                    <!-- /TMPL_IF -->
+			                </td>
+			                <td>
+			                <!-- TMPL_IF NAME="actionissue" -->
+		                        <!-- TMPL_IF NAME="borrowernumber" -->
+		                            <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->" title="<!-- TMPL_VAR NAME="borrower" -->"><!-- TMPL_VAR NAME="cardnumber" --></a>
+		                        <!-- TMPL_ELSE -->
+		                            <span class="error"><!-- TMPL_VAR NAME="cardnumber" --></span>
+		                        <!-- /TMPL_IF -->
+			                <!-- /TMPL_IF -->
+			                </td>
+		                </tr>
+		            <!-- /TMPL_LOOP -->
+		        </tbody>
 	        </table>
 
-            <p>For the selected operations:
+            <p id="actions">For the selected operations:
             <input type="button" id="process" value="Process" />
             <input type="button" id="delete" value="Delete" /></p>
             
