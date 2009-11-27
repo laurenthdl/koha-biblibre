@@ -36,6 +36,7 @@ use C4::XISBN qw(get_xisbns get_biblionumber_from_isbn);
 use C4::External::Amazon;
 use C4::External::Syndetics qw(get_syndetics_index get_syndetics_summary get_syndetics_toc get_syndetics_excerpt get_syndetics_reviews get_syndetics_anotes );
 use C4::Review;
+use C4::Reserves qw/CanHoldOnShelf/;
 use C4::Serials;
 use C4::Members;
 use C4::VirtualShelves;
@@ -62,8 +63,8 @@ my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
 
 my $biblionumber = $query->param('biblionumber') || $query->param('bib');
 
-$template->param( 'AllowOnShelfHolds' => C4::Context->preference('AllowOnShelfHolds') );
 $template->param( 'ItemsIssued' => CountItemsIssued( $biblionumber ) );
+
 
 my $record       = GetMarcBiblio($biblionumber);
 if ( ! $record ) {
@@ -89,6 +90,15 @@ if (C4::Context->preference('hidelostitems')) {
         push @items, $itm unless $itm->{itemlost};
     }
 }
+
+## Check if an item Can be holds on shelf
+
+my $allowonshelfholds = 0;
+for my $item (@all_items){
+    $allowonshelfholds = 1 if(CanHoldOnShelf($item->{itemnumber}) and not $allowonshelfholds);
+}
+$template->param( 'AllowOnShelfHolds' => $allowonshelfholds );
+
 my $dat = &GetBiblioData($biblionumber);
 
 my $itemtypes = GetItemTypes();

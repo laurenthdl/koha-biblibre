@@ -50,6 +50,8 @@ use C4::Output;
 use CGI;
 use MARC::Record;
 use C4::Biblio;
+use C4::Items qw/GetItemsInfo/;
+use C4::Reserves qw/CanHoldOnShelf/;
 use C4::Acquisition;
 use C4::Review;
 use C4::Serials;    # uses getsubscriptionfrom biblionumber
@@ -70,7 +72,6 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 
 my $biblionumber = $query->param('biblionumber');
 
-$template->param( 'AllowOnShelfHolds' => C4::Context->preference('AllowOnShelfHolds') );
 $template->param( 'ItemsIssued' => CountItemsIssued( $biblionumber ) );
 
 my $marcflavour      = C4::Context->preference("marcflavour");
@@ -119,6 +120,14 @@ $template->param(
     subscriptions       => \@subs,
     subscriptionsnumber => $subscriptionsnumber,
 );
+
+## Check if an item Can be holds on shelf
+my @all_items = &GetItemsInfo( $biblionumber, 'opac' );
+my $allowonshelfholds = 0;
+for my $item (@all_items){
+    $allowonshelfholds = 1 if(CanHoldOnShelf($item->{itemnumber}) and not $allowonshelfholds);
+}
+$template->param( 'AllowOnShelfHolds' => $allowonshelfholds );
 
 # my @blocs = split /\@/,$ISBD;
 # my @fields = $record->fields();
