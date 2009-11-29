@@ -33,6 +33,7 @@ use C4::Accounts;
 use C4::ItemCirculationAlertPreference;
 use C4::Message;
 use C4::Debug;
+use YAML;
 use Date::Calc qw(
   Today
   Today_and_Now
@@ -805,13 +806,21 @@ sub CanBookBeIssued {
         && $item->{'restricted'} == 1 ) {
         $issuingimpossible{RESTRICTED} = 1;
     }
+    my $userenv = C4::Context->userenv;
+    my $branch=$userenv->{branch};
+    my $hbr= $item->{ C4::Context->preference("HomeOrHoldingBranch") };
     if ( C4::Context->preference("IndependantBranches") ) {
-        my $userenv = C4::Context->userenv;
         if ( ($userenv) && ( $userenv->{flags} % 2 != 1 ) ) {
             $issuingimpossible{NOTSAMEBRANCH} = 1
-              if ( $item->{ C4::Context->preference("HomeOrHoldingBranch") } ne $userenv->{branch} );
+              if ( $hbr ne $branch );
         }
     }
+    my $branchtransferfield=C4::Context->preference("BranchTransferLimitsType") eq "ccode" ? "ccode" : "itype";
+    if  ( C4::Context->preference("UseBranchTransferLimits")
+                and !IsBranchTransferAllowed( $branch, $hbr, $item->{ $branchtransferfield } ) ) {
+        $needsconfirmation{BRANCH_TRANSFER_NOT_ALLOWED} = $hbr;
+    }
+
 
     #
     # CHECK IF BOOK ALREADY ISSUED TO THIS BORROWER
@@ -1449,12 +1458,15 @@ sub AddReturn {
         my $branches = GetBranches();                               # a potentially expensive call for a non-feature.
         $branches->{$hbr}->{PE} and $messages->{'IsPermanent'} = $hbr;
     }
-
+    my $branchtransferfield=C4::Context->preference("BranchTransferLimitsType") eq "ccode" ? "ccode" : "itype";
+    $debug && warn "$branch, $hbr, ",C4::Context->preference("BranchTransferLimitsType")," ,",$item->{ $branchtransferfield } ;
+    $debug && warn Dump($item);
+    $debug && warn IsBranchTransferAllowed( $branch, $hbr, $item->{ C4::Context->preference("BranchTransferLimitsType") } );
     # if indy branches and returning to different branch, refuse the return
     if ( !$force && ($hbr ne $branch)
 		&& (C4::Context->preference("IndependantBranches") 
 			or ( C4::Context->preference("UseBranchTransferLimits")
-                and !IsBranchTransferAllowed( $branch, $hbr, $item->{ C4::Context->preference("BranchTransferLimitsType") } ) )
+                and !IsBranchTransferAllowed( $branch, $hbr, $item->{$branchtransferfield } ) )
 		    )
 		){
         $messages->{'Wrongbranch'} = {
@@ -1491,14 +1503,14 @@ sub AddReturn {
         }
 
         ModItem( { onloan => undef }, $issue->{'biblionumber'}, $item->{'itemnumber'} );
+    	# the holdingbranch is updated if the document is returned to another location.
+    	# this is always done regardless of whether the item was on loan or not
+    	if ( $item->{'holdingbranch'} ne $branch ) {
+       	    UpdateHoldingbranch( $branch, $item->{'itemnumber'} );
+            $item->{'holdingbranch'} = $branch;    # update item data holdingbranch too
+	}	   
     }
 
-    # the holdingbranch is updated if the document is returned to another location.
-    # this is always done regardless of whether the item was on loan or not
-    if ( $item->{'holdingbranch'} ne $branch ) {
-        UpdateHoldingbranch( $branch, $item->{'itemnumber'} );
-        $item->{'holdingbranch'} = $branch;    # update item data holdingbranch too
-    }
     ModDateLastSeen( $item->{'itemnumber'} );
 
     # check if we have a transfer for this document
@@ -1571,7 +1583,7 @@ sub AddReturn {
     if ( $doreturn and ( $branch ne $hbr ) and not $messages->{'WrongTransfer'} and ( $validTransfert ne 1 ) ) {
         if (C4::Context->preference("AutomaticItemReturn")
             or ( C4::Context->preference("UseBranchTransferLimits")
-                and !IsBranchTransferAllowed( $branch, $hbr, $item->{ C4::Context->preference("BranchTransferLimitsType") } ) )
+                and !IsBranchTransferAllowed( $branch, $hbr, $item->{ $branchtransferfield } ) )
           ) {
             $debug and warn sprintf "about to call ModItemTransfer(%s, %s, %s)", $item->{'itemnumber'}, $branch, $hbr;
             $debug and warn "item: " . Dumper($item);
