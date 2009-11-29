@@ -354,6 +354,8 @@ sub TooMany {
     # given branch, patron category, and item type, determine
     # applicable issuing rule
     my $branchfield = C4::Context->Preference('HomeOrHoldingBranch') || "homebranch";
+	#FIXME in the case of undefined rules for * and default circulation rules, 
+	# This Kind of check can endup in too restrictive permissions : 0 checks allowed
     foreach my $branch ( $exactbranch, '*' ) {
         my $issuing_rule = GetIssuingRule( $cat_borrower, $type, $branch );
 
@@ -1398,7 +1400,7 @@ patron who last borrowed the book.
 =cut
 
 sub AddReturn {
-    my ( $barcode, $branch, $exemptfine, $dropbox ) = @_;
+    my ( $barcode, $branch, $exemptfine, $dropbox, $force) = @_;
     if ( $branch and not GetBranchDetail($branch) ) {
         warn "AddReturn error: branch '$branch' not found.  Reverting to " . C4::Context->userenv->{'branch'};
         undef $branch;
@@ -1449,7 +1451,12 @@ sub AddReturn {
     }
 
     # if indy branches and returning to different branch, refuse the return
-    if ( $hbr ne $branch && C4::Context->preference("IndependantBranches") ) {
+    if ( !$force && ($hbr ne $branch)
+		&& (C4::Context->preference("IndependantBranches") 
+			or ( C4::Context->preference("UseBranchTransferLimits")
+                and !IsBranchTransferAllowed( $branch, $hbr, $item->{ C4::Context->preference("BranchTransferLimitsType") } ) )
+		    )
+		){
         $messages->{'Wrongbranch'} = {
             Wrongbranch => $branch,
             Rightbranch => $hbr,
@@ -1461,7 +1468,6 @@ sub AddReturn {
         # FIXME - even in an indy branches situation, there should
         # still be an option for the library to accept the item
         # and transfer it to its owning library.
-        return ( $doreturn, $messages, $issue, $borrower );
     }
 
     if ( $item->{'wthdrawn'} ) {    # book has been cancelled
