@@ -347,116 +347,120 @@ sub TooMany {
 	my $item		= shift;
     my $cat_borrower    = $borrower->{'categorycode'};
     my $dbh             = C4::Context->dbh;
-	my $branch;
+	my $exactbranch;
 	# Get which branchcode we need
-	$branch = _GetCircControlBranch($item,$borrower);
+	$exactbranch = _GetCircControlBranch($item,$borrower);
 	my $type = (C4::Context->preference('item-level_itypes')) 
   			? $item->{'itype'}         # item-level
 			: $item->{'itemtype'};     # biblio-level
  
     # given branch, patron category, and item type, determine
     # applicable issuing rule
-    my $issuing_rule = GetIssuingRule($cat_borrower, $type, $branch);
+	my $branchfield=C4::Context->Preference('HomeOrHoldingBranch')||"homebranch";
+	foreach my $branch ($exactbranch,'*'){
+		my $issuing_rule = GetIssuingRule($cat_borrower, $type, $branch);
 
-    # if a rule is found and has a loan limit set, count
-    # how many loans the patron already has that meet that
-    # rule
-    if (defined($issuing_rule) and defined($issuing_rule->{'maxissueqty'})) {
-        my @bind_params;
-        my $count_query = "SELECT COUNT(*) FROM issues
-                           JOIN items USING (itemnumber) ";
+		# if a rule is found and has a loan limit set, count
+		# how many loans the patron already has that meet that
+		# rule
+		if (defined($issuing_rule) and defined($issuing_rule->{'maxissueqty'})) {
+			my @bind_params;
+			my $count_query = "SELECT COUNT(*) FROM issues
+							   JOIN items USING (itemnumber) ";
 
-        my $rule_itemtype = $issuing_rule->{itemtype};
-        if ($rule_itemtype eq "*") {
-            # matching rule has the default item type, so count only
-            # those existing loans that don't fall under a more
-            # specific rule
-            if (C4::Context->preference('item-level_itypes')) {
-                $count_query .= " WHERE items.itype NOT IN (
-                                    SELECT itemtype FROM issuingrules
-                                    WHERE branchcode = ?
-                                    AND   (categorycode = ? OR categorycode = ?)
-                                    AND   itemtype <> '*'
-                                  ) ";
-            } else { 
-                $count_query .= " JOIN  biblioitems USING (biblionumber) 
-                                  WHERE biblioitems.itemtype NOT IN (
-                                    SELECT itemtype FROM issuingrules
-                                    WHERE branchcode = ?
-                                    AND   (categorycode = ? OR categorycode = ?)
-                                    AND   itemtype <> '*'
-                                  ) ";
-            }
-            push @bind_params, $issuing_rule->{branchcode};
-            push @bind_params, $issuing_rule->{categorycode};
-            push @bind_params, $cat_borrower;
-        } else {
-            # rule has specific item type, so count loans of that
-            # specific item type
-            if (C4::Context->preference('item-level_itypes')) {
-                $count_query .= " WHERE items.itype = ? ";
-            } else { 
-                $count_query .= " JOIN  biblioitems USING (biblionumber) 
-                                  WHERE biblioitems.itemtype= ? ";
-            }
-            push @bind_params, $type;
-        }
+			my $rule_itemtype = $issuing_rule->{itemtype};
+			if ($rule_itemtype eq "*") {
+				# matching rule has the default item type, so count only
+				# those existing loans that don't fall under a more
+				# specific rule
+				if (C4::Context->preference('item-level_itypes')) {
+					$count_query .= " WHERE items.itype NOT IN (
+										SELECT itemtype FROM issuingrules
+										WHERE branchcode = ?
+										AND   (categorycode = ? OR categorycode = ?)
+										AND   itemtype <> '*'
+									  ) ";
+				} else { 
+					$count_query .= " JOIN  biblioitems USING (biblionumber) 
+									  WHERE biblioitems.itemtype NOT IN (
+										SELECT itemtype FROM issuingrules
+										WHERE branchcode = ?
+										AND   (categorycode = ? OR categorycode = ?)
+										AND   itemtype <> '*'
+									  ) ";
+				}
+				push @bind_params, $issuing_rule->{branchcode};
+				push @bind_params, $issuing_rule->{categorycode};
+				push @bind_params, $cat_borrower;
+			} else {
+				# rule has specific item type, so count loans of that
+				# specific item type
+				if (C4::Context->preference('item-level_itypes')) {
+					$count_query .= " WHERE items.itype = ? ";
+				} else { 
+					$count_query .= " JOIN  biblioitems USING (biblionumber) 
+								  WHERE biblioitems.itemtype= ? ";
+				}
+				push @bind_params, $type;
+			}
 
-        $count_query .= " AND borrowernumber = ? ";
-        push @bind_params, $borrower->{'borrowernumber'};
-        my $rule_branch = $issuing_rule->{branchcode};
-        if ($rule_branch ne "*") {
-            if (C4::Context->preference('CircControl') eq 'PickupLibrary') {
-                $count_query .= " AND issues.branchcode = ? ";
-                push @bind_params, $branch;
-            } elsif (C4::Context->preference('CircControl') eq 'PatronLibrary') {
-                ; # if branch is the patron's home branch, then count all loans by patron
-            } else {
-				my $branchfield=C4::Context->Preference('HomeOrHoldingBranch')||"homebranch";
-                $count_query .= " AND items.$branchfield = ? ";
-                push @bind_params, $branch;
-            }
-        }
+			$count_query .= " AND borrowernumber = ? ";
+			push @bind_params, $borrower->{'borrowernumber'};
+			my $rule_branch = $issuing_rule->{branchcode};
+			if ($rule_branch ne "*") {
+				if (C4::Context->preference('CircControl') eq 'PickupLibrary') {
+					$count_query .= " AND issues.branchcode = ? ";
+					push @bind_params, $branch;
+				} elsif (C4::Context->preference('CircControl') eq 'PatronLibrary') {
+					; # if branch is the patron's home branch, then count all loans by patron
+				} else {
+					$count_query .= " AND items.$branchfield = ? ";
+					push @bind_params, $branch;
+				}
+			}
 
-        my $count_sth = $dbh->prepare($count_query);
-        $count_sth->execute(@bind_params);
-        my ($current_loan_count) = $count_sth->fetchrow_array;
+			my $count_sth = $dbh->prepare($count_query);
+			$count_sth->execute(@bind_params);
+			my ($current_loan_count) = $count_sth->fetchrow_array;
 
-        my $max_loans_allowed = $issuing_rule->{'maxissueqty'};
-        if ($current_loan_count >= $max_loans_allowed) {
-            return "$current_loan_count / $max_loans_allowed";
-        }
-    }
+			my $max_loans_allowed = $issuing_rule->{'maxissueqty'};
+			if ($current_loan_count >= $max_loans_allowed) {
+				return "$current_loan_count / $max_loans_allowed";
+			}
+		}
 
-    # Now count total loans against the limit for the branch
-    my $branch_borrower_circ_rule = GetBranchBorrowerCircRule($branch, $cat_borrower);
-    if (defined($branch_borrower_circ_rule->{maxissueqty})) {
-        my @bind_params = ();
-        my $branch_count_query = "SELECT COUNT(*) FROM issues 
-                                  JOIN items USING (itemnumber)
-                                  WHERE borrowernumber = ? ";
-        push @bind_params, $borrower->{borrowernumber};
+		# Now count total loans against the limit for the branch
+		my $branch_borrower_circ_rule = GetBranchBorrowerCircRule($branch, $cat_borrower);
+		if (defined($branch_borrower_circ_rule->{maxissueqty})) {
+			my @bind_params = ();
+			my $branch_count_query = "SELECT COUNT(*) FROM issues 
+									  JOIN items USING (itemnumber)
+									  WHERE borrowernumber = ? ";
+			push @bind_params, $borrower->{borrowernumber};
 
-        if (C4::Context->preference('CircControl') eq 'PickupLibrary') {
-            $branch_count_query .= " AND issues.branchcode = ? ";
-            push @bind_params, $branch;
-        } elsif (C4::Context->preference('CircControl') eq 'PatronLibrary') {
-            ; # if branch is the patron's home branch, then count all loans by patron
-        } else {
-			my $branchfield=C4::Context->Preference('HomeOrHoldingBranch')||"homebranch";
-            $branch_count_query .= " AND items.$branchfield = ? ";
-            push @bind_params, $branch;
-        }
-        my $branch_count_sth = $dbh->prepare($branch_count_query);
-        $branch_count_sth->execute(@bind_params);
-        my ($current_loan_count) = $branch_count_sth->fetchrow_array;
+			if ($branch ne "*"){
+			    if (C4::Context->preference('CircControl') eq 'PickupLibrary') {
+				    $branch_count_query .= " AND issues.branchcode = ? ";
+				    push @bind_params, $branch;
+			    } elsif (C4::Context->preference('CircControl') eq 'PatronLibrary') {
+				    ; # if branch is the patron's home branch, then count all loans by patron
+			    } else {
+				    my $branchfield=C4::Context->Preference('HomeOrHoldingBranch')||"homebranch";
+				    $debug && warn "branch: $branchfield";
+				    $branch_count_query .= " AND items.$branchfield = ? ";
+				    push @bind_params, $branch;
+			    }
+		    	}
+			my $branch_count_sth = $dbh->prepare($branch_count_query);
+			$branch_count_sth->execute(@bind_params);
+			my ($current_loan_count) = $branch_count_sth->fetchrow_array;
 
-        my $max_loans_allowed = $branch_borrower_circ_rule->{maxissueqty};
-        if ($current_loan_count >= $max_loans_allowed) {
-            return "$current_loan_count / $max_loans_allowed";
-        }
-    }
-
+			my $max_loans_allowed = $branch_borrower_circ_rule->{maxissueqty};
+			if ($current_loan_count >= $max_loans_allowed) {
+				return "$current_loan_count / $max_loans_allowed";
+			}
+		}
+	}
     # OK, the patron can issue !!!
     return;
 }
@@ -751,7 +755,7 @@ sub CanBookBeIssued {
 #
     # JB34 CHECKS IF BORROWERS DONT HAVE ISSUE TOO MANY BOOKS
     #
-	my $toomany = TooMany( $borrower, $item->{biblionumber}, $item );
+    my $toomany = TooMany( $borrower, $item->{biblionumber}, $item );
     # if TooMany return / 0, then the user has no permission to check out this book
     if ($toomany =~ /\/ 0/) {
         $needsconfirmation{PATRON_CANT} = 1;
