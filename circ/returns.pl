@@ -163,6 +163,7 @@ my $barcode     = $query->param('barcode');
 my $exemptfine  = $query->param('exemptfine');
 my $dropboxmode = $query->param('dropboxmode');
 my $dotransfer  = $query->param('dotransfer');
+my $override    = $query->param('override');
 my $calendar    = C4::Calendar->new( branchcode => $userenv_branch );
 	#dropbox: get last open day (today - 1)
 my $today       = C4::Dates->new();
@@ -198,7 +199,7 @@ if ($barcode) {
 # save the return
 #
     ( $returned, $messages, $issueinformation, $borrower ) =
-      AddReturn( $barcode, $userenv_branch, $exemptfine, $dropboxmode);     # do the return
+      AddReturn( $barcode, $userenv_branch, $exemptfine, $dropboxmode,$override);     # do the return
 
     # get biblio description
     my $biblio = GetBiblioFromItemNumber($itemnumber);
