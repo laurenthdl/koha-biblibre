@@ -932,7 +932,7 @@ sub buildQuery {
                 }
 
                 if ($auto_truncation){
-					$operand=~join(" ",map{ "$_*" }split (/\s+/,$operand));
+					$operand=~join(" ",map{ index($_,"*") > 0 ? "$_" : "$_*" }split (/\s+/,$operand));
 				}
 
                 # Detect Truncation
