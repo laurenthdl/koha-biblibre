@@ -329,7 +329,7 @@ if ( $messages->{'ResFound'}) {
                 reserved     => 1,
             );
         }
-        my $debarred = CheckBorrowerDebarred($borrowernumber);
+        my $debarred = CheckBorrowerDebarred($reserve->{borrowernumber});
         # same params for Waiting or Reserved
         $template->param(
             found          => 1,
