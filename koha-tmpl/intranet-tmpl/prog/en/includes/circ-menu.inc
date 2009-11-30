@@ -28,7 +28,7 @@ $(document).ready(function()
     <li><!-- TMPL_VAR NAME="categoryname" --> (<!-- TMPL_VAR NAME="categorycode" -->)</li>
     <li><!-- TMPL_IF NAME="branchname" --><!-- TMPL_VAR NAME="branchname" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branch" --><!-- /TMPL_IF --></li>
     <!-- TMPL_LOOP NAME="extendedattributes" -->
-    	<!-- TMPL_VAR NAME="description" --> : <!-- TMPL_VAR NAME="value_description" -->
+        <li><!-- TMPL_VAR NAME="description" --> : <!-- TMPL_VAR NAME="value" --></li>
     <!-- /TMPL_LOOP -->
     <li>
 		<div id="collapsedaddress">
