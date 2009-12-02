@@ -245,7 +245,8 @@
     </tfoot>
 </table>
 
-<span><b>Currency = <!-- TMPL_VAR NAME="cur" --> <!-- TMPL_VAR NAME="cur_format" --></b></span><br>
+<p><!-- TMPL_IF name="cur" --><b>Currency = <!-- TMPL_VAR name="cur" --></b><!-- /TMPL_IF --></p>
+
 <div class="paginationBar"><!-- TMPL_VAR NAME="pagination_bar" --></div>
 <!-- /TMPL_IF --> <!-- else -->
 
