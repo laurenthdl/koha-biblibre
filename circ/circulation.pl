@@ -253,6 +253,7 @@ if ($borrowernumber) {
             flagged  => "1",
             noissues => "1",
             expired     => format_date($borrower->{dateexpiry}),
+            warning     => 1,
             renewaldate => format_date("$renew_year-$renew_month-$renew_day")
         );
     }
@@ -263,9 +264,9 @@ if ($borrowernumber) {
     {
         # borrower card soon to expire warn librarian
         $template->param("warndeparture" => format_date($borrower->{dateexpiry}),
-        flagged       => "1",);
+        flagged       => "1", "warning" => 1);
         if (C4::Context->preference('ReturnBeforeExpiry')){
-            $template->param("returnbeforeexpiry" => 1);
+            $template->param("returnbeforeexpiry" => 1, "warning => 1");
         }
     }
     $template->param(
@@ -554,26 +555,28 @@ foreach my $flag ( sort keys %$flags ) {
             noissues => 'true',
         );
         if ( $flag eq 'GNA' ) {
-            $template->param( gna => 'true' );
+            $template->param( gna => 'true', warning => 1 );
         }
         elsif ( $flag eq 'LOST' ) {
-            $template->param( lost => 'true' );
+            $template->param( lost => 'true', warning => 1 );
         }
         elsif ( $flag eq 'DBARRED' ) {
-            $template->param( dbarred => 'true' );
+            $template->param( dbarred => 'true', warning => 1 );
         }
         elsif ( $flag eq 'CHARGES' ) {
             $template->param(
                 charges    => 'true',
                 chargesmsg => $flags->{'CHARGES'}->{'message'},
                 chargesamount => $flags->{'CHARGES'}->{'amount'},
-                charges_is_blocker => 1
+                charges_is_blocker => 1,
+		warning => 1
             );
         }
         elsif ( $flag eq 'CREDITS' ) {
             $template->param(
                 credits    => 'true',
-                creditsmsg => $flags->{'CREDITS'}->{'message'}
+                creditsmsg => $flags->{'CREDITS'}->{'message'},
+		warning => 1
             );
         }
     }
@@ -584,19 +587,22 @@ foreach my $flag ( sort keys %$flags ) {
                 flagged    => 1,
                 chargesmsg => $flags->{'CHARGES'}->{'message'},
                 chargesamount => $flags->{'CHARGES'}->{'amount'},
+		warning => 1
             );
         }
         elsif ( $flag eq 'CREDITS' ) {
             $template->param(
                 credits    => 'true',
-                creditsmsg => $flags->{'CREDITS'}->{'message'}
+                creditsmsg => $flags->{'CREDITS'}->{'message'},
+		warning => 1
             );
         }
         elsif ( $flag eq 'ODUES' ) {
             $template->param(
                 odues    => 'true',
                 flagged  => 1,
-                oduesmsg => $flags->{'ODUES'}->{'message'}
+                oduesmsg => $flags->{'ODUES'}->{'message'},
+		warning => 1
             );
 
             my $items = $flags->{$flag}->{'itemlist'};
