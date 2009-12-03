@@ -305,10 +305,8 @@
     <span  id="budget_owner_name">
     <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="budget_owner_id" -->"><!-- TMPL_VAR NAME="budget_owner_name" --></a>
     </span>
-
-    <!-- FIXME: hardcoded button positions :/ -->
-    <input style="position:absolute; left:600px;" type="button" id="patron_search" value="Edit owner" onclick="ownerPopup(); return false;" />
-    <input style="position:absolute; left:680px;"  type="button" id="patron_search" value="Remove owner" onclick="ownerRemove(this.form); return false;" />
+    [<a style="cursor:pointer" id="patron_search" onclick="ownerPopup(); return false;">Select owner</a>]
+    [<a style="cursor:pointer" id="patron_search" onclick="ownerRemove(this.form); return false;">Remove owner</a>]
     </li>
     </td>
     </tr>
