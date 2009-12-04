@@ -3595,16 +3595,6 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.03.00.001";
-if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
-	$dbh->do(qq{
-	ALTER TABLE items ADD authvalue VARCHAR(80);
-	});
-	
-    print "Upgrade to $DBversion done (adding authvalue field to items)\n";
-    SetVersion ($DBversion);
-}
-
 $DBversion = '3.01.00.131';
 if (C4::Context->preference('Version') < TransformToNum($DBversion)){
     $dbh->do("INSERT INTO `permissions` (`module_bit` , `code` , `description`) VALUES ('9', 'edit_items', 'Edit items');");
@@ -3620,6 +3610,31 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 }
 
 
+$DBversion = "3.03.00.001";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(qq{
+	ALTER TABLE items ADD authvalue VARCHAR(80);
+	});
+	
+    print "Upgrade to $DBversion done (adding authvalue field to items)\n";
+    SetVersion ($DBversion);
+}
+
+$DBversion = "3.03.00.002";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("ALTER TABLE issuingrules ADD COLUMN `allowonshelfholds` TINYINT(1) NOT NULL DEFAULT '0';");
+
+    my $sth = $dbh->prepare( "SELECT value from systempreferences where variable = 'AllowOnShelfHolds';" ); 
+    $sth->execute();
+    my $data = $sth->fetchrow_hashref();
+
+    my $updsth = $dbh->prepare("UPDATE issuingrules SET allowonshelfholds = ?");
+    $updsth->execute($data->{value});
+
+    $dbh->do("DELETE FROM systempreferences where variable = 'AllowOnShelfHolds';");
+    print "Upgrade done (Migrating AllowOnShelfHold to smart-rules)\n";
+    SetVersion ($DBversion);
+}
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
