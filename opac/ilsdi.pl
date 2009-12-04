@@ -20,7 +20,6 @@
 use utf8;
 use strict;
 use warnings;
-binmode(STDOUT, ":utf8");
 
 use List::MoreUtils qw(any);
 
@@ -230,6 +229,7 @@ if ( $service and any { $service eq $_ } @services ) {
 }
 
 # Output XML by passing the hashref to XMLOut
+binmode(STDOUT, ":utf8");
 print CGI::header('-type'=>'text/xml', '-charset'=>'utf-8');
 print XMLout(
     $out,
