@@ -12,5 +12,5 @@ my $data = $sth->fetchrow_hashref();
 my $updsth = $dbh->prepare("UPDATE issuingrules SET allowonshelfholds = ?");
 $updsth->execute($data->{value});
 
-$dbh->do("DELETE FROM systempreferences WHERE from systempreferences where variable = 'AllowOnShelfHolds';");
+$dbh->do("DELETE FROM systempreferences where variable = 'AllowOnShelfHolds';");
 print "Upgrade done (Migrating AllowOnShelfHold to smart-rules)\n";
