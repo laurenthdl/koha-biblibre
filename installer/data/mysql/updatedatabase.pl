@@ -3635,6 +3635,17 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     print "Upgrade done (Migrating AllowOnShelfHold to smart-rules)\n";
     SetVersion ($DBversion);
 }
+
+$DBversion = "3.03.00.003";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do("UPDATE `permissions` SET `code` = 'items_batchdel' WHERE `permissions`.`module_bit` =13 AND `permissions`.`code` = 'batchdel' LIMIT 1 ;");
+	$dbh->do("UPDATE `permissions` SET `code` = 'items_batchmod' WHERE `permissions`.`module_bit` =13 AND `permissions`.`code` = 'batchmod' LIMIT 1 ;");
+	print "Upgrade done (Change permissions names for item batch modification / deletion)\n";
+
+    SetVersion ($DBversion);
+}
+
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
