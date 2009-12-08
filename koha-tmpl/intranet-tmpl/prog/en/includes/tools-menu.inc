@@ -38,10 +38,10 @@
     <!-- TMPL_IF NAME="CAN_user_tools_inventory" -->
 	<li><a href="/cgi-bin/koha/tools/inventory.pl">Inventory/stocktaking</a></li>
     <!-- /TMPL_IF -->
-    <!-- TMPL_IF NAME="CAN_user_tools_batchdel" -->
+    <!-- TMPL_IF NAME="CAN_user_tools_items_batchdel" -->
 	<li><a href="/cgi-bin/koha/tools/batchMod.pl?del=1">Batch deletion of items</a></li>
     <!--/TMPL_IF-->
-    <!-- TMPL_IF NAME="CAN_user_tools_batchmod" -->
+    <!-- TMPL_IF NAME="CAN_user_tools_items_batchmod" -->
 	<li><a href="/cgi-bin/koha/tools/batchMod.pl">Batch modification of items</a></li>
     <!--/TMPL_IF-->
     <!-- TMPL_IF NAME="CAN_user_tools_stage_marc_import" -->

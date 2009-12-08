@@ -3371,6 +3371,15 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.009";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do("UPDATE `koha_lyon3`.`permissions` SET `code` = 'items_batchdel' WHERE `permissions`.`module_bit` =13 AND `permissions`.`code` = 'batchdel' LIMIT 1 ;");
+	$dbh->do("UPDATE `koha_lyon3`.`permissions` SET `code` = 'items_batchmod' WHERE `permissions`.`module_bit` =13 AND `permissions`.`code` = 'batchmod' LIMIT 1 ;");
+	print "Upgrade done (Change permissions names for item batch modification / deletion)\n";
+
+    SetVersion ($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 
