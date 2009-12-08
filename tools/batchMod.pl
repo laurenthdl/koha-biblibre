@@ -48,7 +48,7 @@ if (!defined $op) {
     $template_flag = { tools => '*' };
 } else {
     $template_name = ($del) ? "tools/batchMod-del.tmpl" : "tools/batchMod-edit.tmpl";
-    $template_flag = ($del) ? { tools => 'batchdel' }   : { tools => 'batchmod' };
+    $template_flag = ($del) ? { tools => 'items_batchdel' }   : { tools => 'items_batchmod' };
 }
 
 
@@ -98,7 +98,7 @@ if ($op eq "action") {
 			$deleted_items++;
 		    } else {
 			$not_deleted_items++;
-			push @not_deleted, { itemnumber => $itemdata->{'itemnumber'}, barcode => $itemdata->{'barcode'}, title => $itemdata->{'title'}, $return => 1 };
+			push @not_deleted, { biblionumber => $itemdata->{'biblionumber'}, itemnumber => $itemdata->{'itemnumber'}, barcode => $itemdata->{'barcode'}, title => $itemdata->{'title'}, $return => 1 };
 		    }
 	    } else {
 		    my $localmarcitem=Item2Marc($itemdata);
