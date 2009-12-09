@@ -478,6 +478,7 @@ sub patronflags {
             my %flaginfo;
             $flaginfo{'message'}  = 'Borrower is Debarred.';
             $flaginfo{'noissues'} = 1;
+            $flaginfo{'dateend'} = $patroninformation->{'debarred'};
             $flags{'DBARRED'}     = \%flaginfo;
         }
     }
