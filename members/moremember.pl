@@ -131,7 +131,14 @@ foreach (qw(dateenrolled dateexpiry dateofbirth)) {
 for (qw(gonenoaddress lost borrowernotes)) {
 	 $data->{$_} and $template->param(flagged => 1) and last;
 }
-$template->param(flagged => 1) if (CheckBorrowerDebarred($borrowernumber));
+
+my $debar = CheckBorrowerDebarred($borrowernumber);
+if($debar){
+    $template->param(userdebarred => 1);
+    if( $debar ne "9999-12-31"){
+        $template->param(userdebarreddate => C4::Dates::format_date($debar));
+    }
+}
 
 $data->{'ethnicity'} = fixEthnicity( $data->{'ethnicity'} );
 $data->{ "sex_".$data->{'sex'}."_p" } = 1;
