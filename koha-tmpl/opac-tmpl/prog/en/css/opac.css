@@ -1958,3 +1958,10 @@ div.ft {
 	list-style:disc outside url("../../images/item-bullet.gif");
 	padding:0.2em 0;
 }
+select.advsearch {
+   margin-left:5em;
+}
+select.advsearchoperator {
+    position:absolute;
+}
+
