@@ -119,6 +119,7 @@ $category_type="A" unless $category_type; # FIXME we should display a error mess
 # initialize %newdata
 my %newdata;	# comes from $input->param()
 if ($op eq 'insert' || $op eq 'modify' || $op eq 'save') {
+
     my @names= ($borrower_data && $op ne 'save') ? keys %$borrower_data : $input->param();
     foreach my $key (@names) {
         if (defined $input->param($key)) {
@@ -126,6 +127,12 @@ if ($op eq 'insert' || $op eq 'modify' || $op eq 'save') {
             $newdata{$key} =~ s/\"/&quot;/g unless $key eq 'borrowernotes' or $key eq 'opacnote';
         }
     }
+        
+    ## Manipulate debarred
+    if($newdata{debarred}){
+        $newdata{debarred} = $newdata{datedebarred} ? $newdata{datedebarred} : "9999-12-31";
+    }
+    
     my $dateobject = C4::Dates->new();
     my $syspref = $dateobject->regexp();		# same syspref format for all 3 dates
     my $iso     = $dateobject->regexp('iso');	#
@@ -585,6 +592,9 @@ if (C4::Context->preference('uppercasesurnames')) {
 	$data{'surname'}    =uc($data{'surname'}    );
 	$data{'contactname'}=uc($data{'contactname'});
 }
+
+$data{debarred} = C4::Overdues::CheckBorrowerDebarred($borrowernumber);
+$data{datedebarred} = $data{debarred} if ($data{debarred} ne "9999-12-31");  
 foreach (qw(dateenrolled dateexpiry dateofbirth debarred)) {
 	$data{$_} = format_date($data{$_});	# back to syspref for display
 	$template->param( $_ => $data{$_});
