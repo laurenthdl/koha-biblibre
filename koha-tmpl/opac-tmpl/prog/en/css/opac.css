@@ -1879,3 +1879,11 @@ a.p1:active {
   direction: rtl;
   text-align: right;
 }
+
+select.advsearch {
+   margin-left:5em;
+}
+select.advsearchoperator {
+    position:absolute;
+}
+
