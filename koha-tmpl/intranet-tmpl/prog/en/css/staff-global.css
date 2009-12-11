@@ -1874,3 +1874,11 @@ h1#xml a {
     background: #eee url(../../img/more-up-arrow.gif) 0 50% no-repeat;
 }
 
+select.advsearch {
+   margin-left:5em;  
+}
+select.advsearchoperator {
+    position:absolute;
+}
+
+
