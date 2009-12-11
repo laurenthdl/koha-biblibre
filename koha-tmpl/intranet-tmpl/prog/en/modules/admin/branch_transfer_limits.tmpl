@@ -1,5 +1,5 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
-<title>Koha &rsaquo; Administration &rsaquo; Library Transfer Policy</title>
+<title>Koha &rsaquo; Administration &rsaquo; Library Checkin and Transfer Policy</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.checkboxes.min.js"></script>
 <script type="text/javascript">
@@ -9,11 +9,15 @@
 		$("#SwapAll").click(function(){ $("#transferlimit_tabs").toggleCheckboxes();});
 	    $('#transferlimit_tabs > ul').tabs();
 
+		 $('#branchselect').change(function() {
+		    $('#selectlibrary').submit();
+		 });
+
+
 		var checkcolumn = $(".checkcolumn");
 		var checkrow = $(".checkrow");
 		var checkall = $(".checkall");
 		var uncheckall = $(".uncheckall");
-		var swapall = $(".swapall");
 
 		$(checkcolumn).click(function(){
 			if(this.checked){ status = "checked" } else { status = "" }
@@ -44,12 +48,6 @@
 			return false;
 		});
 
-		$(swapall).click(function(){
-			var tid = $(this).attr("id");
-			tid = tid.replace("SwapAll","");
-			$("#"+tid).toggleCheckboxes();
-			return false;
-		});
 	});
 </script>
 <style type="text/css">td { text-align: center; }</style>
@@ -58,7 +56,7 @@
 <!-- TMPL_INCLUDE NAME="header.inc" -->
 <!-- TMPL_INCLUDE NAME="cat-search.inc" -->
 
-<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/admin/admin-home.pl">Administration</a> &rsaquo; Set Library Transfer Policy</div>
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/admin/admin-home.pl">Administration</a> &rsaquo; Set Library Checkin and Transfer Policy</div>
 
 <div id="doc3" class="yui-t1">
 
@@ -66,8 +64,7 @@
      <div id="yui-main">
     <div class="yui-b">
 
-<h1>Library <!-- TMPL_VAR NAME="branchname" --> Transfer Policy</h1>
-<!-- TMPL_UNLESS NAME="branchcode" -->
+<h1>Library <!-- TMPL_VAR NAME="branchcode" --> - <!-- TMPL_VAR NAME="branchname" --> Checkin and Transfer Policy</h1>
     <form method="get" action="/cgi-bin/koha/admin/branch_transfer_limits.pl" id="selectlibrary">
         <label for="branchselect">Select a library :</label>
             <select name="branchcode" id="branchselect">
@@ -77,9 +74,8 @@
             </select>
 	    <input type="submit" value="Choose" />	    
     </form>
-<!-- TMPL_ELSE -->
 
-<p class="help">Check the boxes for the items that should be transferable.</p>
+<p class="help">Check the boxes for the libraries you accept to checkin items from.</p>
 <fieldset>For <strong>all</strong> <!--TMPL_VAR NAME="limit_phrase" -->s: <a id="CheckAll" href="#">Check All</a> | <a id="UncheckAll" href="#">Uncheck All</a></fieldset>
 
 
