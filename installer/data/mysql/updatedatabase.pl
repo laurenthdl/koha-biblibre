@@ -3380,6 +3380,13 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.010";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do("UPDATE systempreferences SET options = 'Calendar|Days|Datedue' WHERE variable = 'useDaysMode'");
+	
+    print "Upgrade to $DBversion done (upgrade useDaysMode syspref)\n";
+    SetVersion ($DBversion);
+}
 
 =item DropAllForeignKeys($table)
 
