@@ -604,21 +604,19 @@ sub ReplacementCost {
 
 return the total of fine
 
-C<$itemnum> is item number
-
 C<$borrowernumber> is the borrowernumber
 
 =cut 
 
 
 sub GetFine {
-    my ( $itemnum, $borrowernumber ) = @_;
+    my ( $borrowernumber ) = @_;
     my $dbh   = C4::Context->dbh();
     my $query = "SELECT sum(amountoutstanding) FROM accountlines
     where accounttype like 'F%'  
-  AND amountoutstanding > 0 AND itemnumber = ? AND borrowernumber=?";
+  AND amountoutstanding > 0 AND borrowernumber=?";
     my $sth = $dbh->prepare($query);
-    $sth->execute( $itemnum, $borrowernumber );
+    $sth->execute( $borrowernumber );
     my $data = $sth->fetchrow_hashref();
     return ( $data->{'sum(amountoutstanding)'} );
 }
