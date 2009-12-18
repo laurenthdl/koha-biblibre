@@ -28,7 +28,11 @@ $(document).ready(function()
     <li><!-- TMPL_VAR NAME="categoryname" --> (<!-- TMPL_VAR NAME="categorycode" -->)</li>
     <li><!-- TMPL_IF NAME="branchname" --><!-- TMPL_VAR NAME="branchname" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branch" --><!-- /TMPL_IF --></li>
     <!-- TMPL_LOOP NAME="extendedattributes" -->
-        <li><!-- TMPL_VAR NAME="description" --> : <!-- TMPL_VAR NAME="value" --></li>
+    	<!-- TMPL_IF NAME="display_checkout" -->
+    		<!-- TMPL_IF NAME="value" -->
+    			<!-- TMPL_VAR NAME="description" --> : <!-- TMPL_IF NAME="value_description" --><!-- TMPL_VAR NAME="value_description" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="value" --><!-- /TMPL_IF -->
+    		<!-- /TMPL_IF -->
+    	<!-- /TMPL_IF -->
     <!-- /TMPL_LOOP -->
     <li>
 		<div id="collapsedaddress">
