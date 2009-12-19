@@ -42,6 +42,7 @@ use Date::Calc qw(
   Add_Delta_DHMS
   Date_to_Days
   Day_of_Week
+  Delta_Days
   Add_Delta_Days
 );
 use POSIX qw(strftime);
@@ -1670,6 +1671,63 @@ sub MarkIssueReturned {
     );
     $sth_del->execute( $borrowernumber, $itemnumber );
 }
+
+=head2 _FixFineDaysOnReturn
+
+    &_FixFineDaysOnReturn($borrowernumber, $itemnumber);
+
+C<$borrowernumber> borrowernumber
+
+C<$itemnumber> itemnumber
+
+C<$datedue> date due
+
+Internal function, called only by AddReturn that calculate and update the user fine days, and debarre him
+
+=cut
+
+sub _FixFineDaysOnReturn {
+    my ($borrowernumber, $itemnumber, $datedue) = @_;
+    
+    my @date_due;
+    if($datedue){
+        my ($ddy, $ddm, $ddd) = @date_due = split(/-/,$datedue);
+        return unless(check_date($ddy,$ddm,$ddd));
+    }else{
+        return;
+    }
+    
+    my $deltadays = Delta_Days(Today(), @date_due);
+    
+    if( $deltadays < 0){
+
+        my $item        = GetItem($itemnumber);
+        my $borrower    = C4::Members::GetMemberDetails($borrowernumber);
+        my $circcontrol = C4::Context::preference('CircControl');
+        my $branchcode  = "*";
+        
+        $branchcode=_GetCircControlBranch($item,$borrower);
+
+        my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{itype}, $branchcode);
+        my $finedays    = $issuingrule->{finedays};
+
+        my @newdate     = Add_Delta_Days(Today(), 0 - $deltadays );
+        my $isonewdate  = join('-',@newdate);
+        my ($deby, $debm, $debd) = split(/-/,$borrower->{debarred});
+        if(check_date($deby, $debm, $debd)){
+            my @olddate = split(/-/, $borrower->{debarred});
+
+            if(Delta_Days(@olddate,@newdate) > 0){
+                C4::Members::DebarMember($borrowernumber, $isonewdate);
+                return $isonewdate;
+            }
+        }else{
+            C4::Members::DebarMember($borrowernumber, $isonewdate);
+            return $isonewdate;
+        }
+    }
+}
+
 
 =head2 _FixOverduesOnReturn
 
