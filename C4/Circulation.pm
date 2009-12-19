@@ -43,6 +43,7 @@ use Date::Calc qw(
   Date_to_Days
   Day_of_Week
   Delta_Days
+  check_date
   Add_Delta_Days
 );
 use POSIX qw(strftime);
