@@ -198,9 +198,7 @@ sub GetItemsAvailableToFillHoldRequestsForBib {
     $sth->execute(@params);
 
     my $items = $sth->fetchall_arrayref({});
-    $items = [ grep { my @transfers = GetTransfers($_->{itemnumber}); $#transfers == -1; } @$items ]; 
-    map { my $rule = GetBranchItemRule($_->{homebranch}, $_->{itype}); $_->{holdallowed} = $rule->{holdallowed}; $rule->{holdallowed} != 0 } @$items;
-    return [ grep { $_->{holdallowed} != 0 } @$items ];
+    return $items;
 }
 
 =head2 MapItemsToHoldRequests
