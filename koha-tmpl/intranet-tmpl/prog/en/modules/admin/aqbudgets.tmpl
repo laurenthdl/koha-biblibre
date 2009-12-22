@@ -1,3 +1,5 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title><!--TMPL_IF NAME="budget_id" -->Modify<!-- TMPL_ELSE -->Add<!-- /TMPL_IF --> Budget</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/acq.js"></script>
@@ -153,8 +155,8 @@
     	<legend>Budget filters</legend>
     	<ul>
 		<li>
-      		<label for="filter_budgetbranch">Library: </label>
-       		<select name="filter_budgetbranch" id="filter_budgetbranch" style="width:10em;">
+      		<label for="filter_budgetbranch_id">Library: </label>
+       		<select name="filter_budgetbranch" id="filter_budgetbranch_id" style="width:10em;">
 	        	<option value=""></option>
 	            <!-- TMPL_LOOP name="branchloop" -->
 	                <option value="<!-- TMPL_VAR name="value" -->" <!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->><!-- TMPL_VAR name="branchname" --></option>
@@ -308,10 +310,8 @@
     </span>
     [<a style="cursor:pointer" id="patron_search" onclick="ownerPopup(); return false;">Select owner</a>]
     [<a style="cursor:pointer" id="patron_search" onclick="ownerRemove(this.form); return false;">Remove owner</a>]
+
     </li>
-    </td>
-    </tr>
-    </table>
 
     <li>
     <label for="branch">Library: </label>
@@ -388,7 +388,7 @@
 <div class="dialog alert"> <h3>Delete Budget <!-- TMPL_VAR NAME="budget_name" -->?</h3>
 <table>
     <tr>
-    <th scope="row">Budget Amount:</td>
+    <td scope="row">Budget Amount:</td>
     <td><!-- TMPL_VAR NAME="budget_amount" --></td>
     </tr>
 </table>
