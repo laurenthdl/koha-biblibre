@@ -20,7 +20,6 @@
 use utf8;
 use strict;
 use warnings;
-binmode(STDOUT, ":utf8");
 
 use List::MoreUtils qw(any);
 
