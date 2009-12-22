@@ -186,8 +186,13 @@ SWITCH: {
 				#$this_item->{imageurl} = $imgdir."/".$itemtypes->{ $this_item->{itemtype}  }->{'imageurl'};
 				#$this_item->{'description'} = $itemtypes->{ $this_item->{itemtype} }->{'description'};
 				$this_item->{'dateadded'} = format_date($this_item->{'dateadded'});
-                $this_item->{'imageurl'} = getitemtypeinfo($this_item->{'itemtype'})->{'imageurl'};
-                $this_item->{'coins'} = GetCOinSBiblio($this_item->{'biblionumber'});
+				$this_item->{'imageurl'} = getitemtypeinfo($this_item->{'itemtype'})->{'imageurl'};
+				$this_item->{'coins'} = GetCOinSBiblio($this_item->{'biblionumber'});
+				
+				# Getting items infos for location display
+				my @items_infos = &GetItemsInfo($this_item->{'biblionumber'}, $type);
+				$this_item->{'ITEM_RESULTS'} = \@items_infos;
+
 			}
 			push @paramsloop, {display => 'privateshelves'} if $category == 1;
 			$showadd = 1;
