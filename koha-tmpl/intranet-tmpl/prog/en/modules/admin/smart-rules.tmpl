@@ -80,20 +80,6 @@ $(document).ready(function() {
             Defining default issuing rules
         <!-- /TMPL_IF -->
     </h1>
-    <div class="help">
-        <p>The rules are applied from most specific to less specific, using the first found in this order:</p>
-        <ul>
-            <li>same library, same patron type, same item type</li>
-            <li>same library, same patron type, default item type</li>
-            <li>same library, default patron type, same item type</li>
-            <li>same library, default patron type, default item type</li>
-            <li>default library, same patron type, same item type</li>
-            <li>default library, same patron type, default item type</li>
-            <li>default library, default patron type, same item type</li>
-            <li>default library, default patron type, default item type</li>
-        </ul>
-        <p>To modify a rule, create a new one with the same patron type and item type.</p>
-    </div>
     <div id="bloc100">
         <form method="get" action="/cgi-bin/koha/admin/smart-rules.pl" id="selectlibrary">
         Select a library :
@@ -121,18 +107,18 @@ $(document).ready(function() {
                     <table id="smartrules" width="100%">
                         <thead>
                             <tr>
-                                <th>Patron Category</th>
-                                <th>Item Type</th>
-                                <th class="issues">Current Checkouts Allowed</th>
-                                <th class="issues">Loan Period (day)</th>
-                                <th class="fines">Fine Amount</th>
-                                <th class="fines">Fine Charging Interval</th>
-                                <th class="fines">Fine Grace period (day)</th>
-                                <th class="fines">Suspension in Days (day)</th>
-                                <th class="issues">Renewals Allowed (count)</th>
-                                <th class="reserves">Reserves Allowed (count)</th>
-                		<th class="reserves">Reserves Pickup delay (day)</th>
-                                <th class="reserves">Allow On Shelf Holds</th>
+                                <th>Patron category</th>
+                                <th>Item type</th>
+                                <th class="issues">Current checkouts allowed</th>
+                                <th class="issues">Loan period (day)</th>
+                                <th class="fines">Fine amount</th>
+                                <th class="fines">Fine charging interval</th>
+                                <th class="fines">Fine grace period (day)</th>
+                                <th class="fines">Suspension duration (day)</th>
+                                <th class="issues">Renewals allowed (count)</th>
+                                <th class="reserves">Reserves allowed (count)</th>
+                		<th class="reserves">Reserves pickup delay (day)</th>
+                                <th class="reserves">Allow on shelf holds</th>
                                 <th>&nbsp;</th>
                             </tr>
                         </thead>
