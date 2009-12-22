@@ -311,7 +311,7 @@ sub LookupPatron {
     my ($cgi) = @_;
 
     # Get the borrower...
-    my $borrower = GetMember( $cgi->param('id'), $cgi->param('id_type') );
+    my $borrower = GetMember( $cgi->param('id_type')||"borrowernumber",$cgi->param('id') );
     return { code => 'PatronNotFound' } unless $$borrower{borrowernumber};
 
     # ...and return his ID
