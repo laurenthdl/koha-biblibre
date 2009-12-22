@@ -2733,7 +2733,11 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 
 $DBversion = '3.01.00.066';
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
-    $dbh->do('ALTER TABLE issuingrules ADD COLUMN `reservesallowed` smallint(6) NOT NULL default "0" AFTER `renewalsallowed`;');
+	$dbh->do("ALTER TABLE issuingrules 
+			ADD COLUMN `finedays` int(11) default NULL AFTER `fine`,
+			ADD COLUMN `renewalsallowed` smallint(6) default NULL, 
+			ADD COLUMN `reservesallowed` smallint(6) default NULL;
+			");
     
     my $maxreserves = C4::Context->preference('maxreserves');
     $sth = $dbh->prepare('UPDATE issuingrules SET reservesallowed = ?;');
@@ -2756,11 +2760,6 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 
 $DBversion = "3.01.00.068";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
-	$dbh->do("ALTER TABLE issuingrules ADD 
-			COLUMN `finedays` int(11) default NULL AFTER `fine`,
-			COLUMN `renewalsallowed` smallint(6) default NULL, 
-			COLUMN `reservesallowed` smallint(6) default NULL,
-			");
 	my $sth = $dbh->prepare("SELECT itemtype, renewalsallowed FROM itemtypes");
     $sth->execute();
 	my $sthupd = $dbh->prepare("UPDATE issuingrules SET renewalsallowed = ? WHERE itemtype = ?");
@@ -2924,7 +2923,7 @@ ADDPERIODS
 
 
     $dbh->do(<<BUDGETNAME);
-ALTER TABLE aqbudget RENAME`aqbudgets` 
+ALTER TABLE aqbudget RENAME aqbudgets 
 BUDGETNAME
     my $maxbudgetid=$dbh->selectcol_arrayref(<<IDsBUDGET);
 SELECT MAX(aqbudgetid) from aqbudgets 
