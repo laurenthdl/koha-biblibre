@@ -9,7 +9,7 @@
 //<![CDATA[
 $(document).ready(function() {
         $('#selectlibrary').find("input:submit").hide();
-        $('#branch').change(function() {
+        $('#branchcode').change(function() {
                 $('#selectlibrary').submit();
         });
         $('#filter').keyup(function() {
@@ -77,14 +77,14 @@ $(document).ready(function() {
     <div id="bloc100">
         <form method="get" action="/cgi-bin/koha/admin/smart-rules.pl" id="selectlibrary">
         Select a library :
-            <select name="branch" id="branch" style="width:20em;">
+            <select name="branchcode" id="branchcode" style="width:20em;">
                 <option value="*">Default</option>
             <!-- TMPL_LOOP NAME="branchloop" -->
                 <!-- TMPL_IF NAME="selected" --><option value="<!-- TMPL_VAR NAME="value" -->" selected="selected"><!-- TMPL_VAR NAME="branchname" --></option><!-- TMPL_ELSE --><option value="<!-- TMPL_VAR NAME="value" -->"><!-- TMPL_VAR NAME="branchname" --></option><!-- /TMPL_IF -->
             <!-- /TMPL_LOOP -->
             </select>
         </form>
-     <!-- TMPL_IF Name="definedbranch" --><form action="/cgi-bin/koha/admin/clone-rules.pl" method="post"><input type="hidden" name="frombranch" value="<!-- TMPL_VAR NAME="branch" -->" /><input type="submit" value="Clone these rules" /></form><!-- /TMPL_IF -->
+     <!-- TMPL_IF Name="definedbranch" --><form action="/cgi-bin/koha/admin/clone-rules.pl" method="post"><input type="hidden" name="frombranch" value="<!-- TMPL_VAR NAME="branchcode" -->" /><input type="submit" value="Clone these rules" /></form><!-- /TMPL_IF -->
         <br />
         <br />
         <div class="toptabs">
@@ -219,7 +219,7 @@ $(document).ready(function() {
                                     <!--/TMPL_IF-->
                                     </td>
                                     <td>
-                                        <a class="button" href="/cgi-bin/koha/admin/smart-rules.pl?op=delete&amp;itemtype=<!-- TMPL_VAR NAME="itemtype" -->&amp;categorycode=<!-- TMPL_VAR NAME="categorycode" -->&amp;branch=<!-- TMPL_VAR NAME="branch" -->">Delete</a>
+                                        <a class="button" href="/cgi-bin/koha/admin/smart-rules.pl?op=delete&amp;itemtype=<!-- TMPL_VAR NAME="itemtype" -->&amp;categorycode=<!-- TMPL_VAR NAME="categorycode" -->&amp;branchcode=<!-- TMPL_VAR NAME="branchcode" -->">Delete</a>
                                     </td>
                                 </tr>
                             <!-- /TMPL_LOOP -->
@@ -252,7 +252,7 @@ $(document).ready(function() {
                                 <td class="reserves"><input name="reservesallowed" size="2" /></td>
                                 <td class="reserves"><input name="holdspickupdelay" size="2" /></td>
                                 <td class="reserves"><input type="checkbox" name="allowonshelfholds" id="allowonshelfholds" /></td>
-                                <td><input type="hidden" name="branch" value="<!-- TMPL_VAR NAME="branch" -->"/><input type="submit" value="Add" class="submit" /></td>
+                                <td><input type="hidden" name="branchcode" value="<!-- TMPL_VAR NAME="branchcode" -->"/><input type="submit" value="Add" class="submit" /></td>
                             </tr>
                         </tfoot>
                     </table>

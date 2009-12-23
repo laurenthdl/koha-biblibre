@@ -3418,6 +3418,8 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 }
 
 
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
