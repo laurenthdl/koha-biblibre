@@ -26,6 +26,7 @@ use C4::Koha;
 use C4::Debug;
 use C4::Branch;
 use C4::IssuingRules;
+use C4::Circulation;
 
 my $input = new CGI;
 my $dbh = C4::Context->dbh;
@@ -111,12 +112,22 @@ my @itemtypes = C4::ItemType->all;
 my @issuingrules = GetIssuingRulesByBranchCode($branch);
 
 # ...and refine its data, row by row.
-for ( @issuingrules ) {
-    $_->{'humanitemtype'}             ||= $_->{'itemtype'};
-    $_->{'default_humanitemtype'}       = $_->{'humanitemtype'} eq '*';
-    $_->{'humancategorycode'}         ||= $_->{'categorycode'};
-    $_->{'default_humancategorycode'}   = $_->{'humancategorycode'} eq '*';
-    $_->{'fine'}                        = sprintf('%.2f', $_->{'fine'});
+for my $rule ( @issuingrules ) {
+    $rule->{'humanitemtype'}             ||= $rule->{'itemtype'};
+    $rule->{'default_humanitemtype'}       = $rule->{'humanitemtype'} eq '*';
+    $rule->{'humancategorycode'}         ||= $rule->{'categorycode'};
+    $rule->{'default_humancategorycode'}   = $rule->{'humancategorycode'} eq '*';
+    $rule->{'fine'}                        = sprintf('%.2f', $rule->{'fine'});
+
+    # This block is to show herited values in grey.
+    # We juste compare keys from our raw rule, with keys from the computed rule.
+    my $computedrule = GetIssuingRule($rule->{'categorycode'}, $rule->{'itemtype'}, $rule->{'branchcode'});
+    for ( keys %$rule ) {
+        if ( not defined $rule->{$_} ) {
+            $rule->{$_} = $computedrule->{$_};
+            $rule->{"herited_$_"} = 1;
+        }
+    }
 }
 
 $template->param(

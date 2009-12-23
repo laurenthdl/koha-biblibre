@@ -129,33 +129,93 @@ $(document).ready(function() {
                                 <!-- TMPL_ELSE -->
                                 <tr>
                                 <!-- /TMPL_UNLESS -->
-                                    <td><!-- TMPL_IF NAME="default_humancategorycode" -->
+                                    <td>
+                                        <!-- TMPL_IF NAME="default_humancategorycode" -->
                                             <em>Default</em>
                                         <!-- TMPL_ELSE -->
                                             <!-- TMPL_VAR NAME="humancategorycode" -->
                                         <!-- /TMPL_IF -->
                                     </td>
-                                    <td><!-- TMPL_IF NAME="default_humanitemtype" -->
+                                    <td>
+                                        <!-- TMPL_IF NAME="default_humanitemtype" -->
                                             <em>Default</em>
                                         <!-- TMPL_ELSE -->
                                             <!-- TMPL_VAR NAME="humanitemtype" -->
                                         <!-- /TMPL_IF -->
                                     </td>
-                                    <td class="issues"><!-- TMPL_IF NAME="unlimited_maxissueqty" -->
+                                    <!-- TMPL_IF NAME="herited_maxissueqty" -->
+                                    <td class="issues herited">
+                                    <!-- TMPL_ELSE -->
+                                    <td class="issues">
+                                    <!-- /TMPL_IF -->
+                                        <!-- TMPL_IF NAME="unlimited_maxissueqty" -->
                                             Unlimited
                                         <!-- TMPL_ELSE -->
                                             <!-- TMPL_VAR NAME="maxissueqty" -->
                                         <!-- /TMPL_IF -->
                                     </td>
-                                    <td class="issues"><!-- TMPL_IF NAME="issuelength" --><!-- TMPL_VAR NAME="issuelength" --> <!-- /TMPL_IF --></td>
-                                    <td class="fines"><!-- TMPL_VAR NAME="fine" --></td>
-                                    <td class="fines"><!-- TMPL_IF NAME="chargeperiod" --><!-- TMPL_VAR NAME="chargeperiod" --> <!-- /TMPL_IF --></td>
-                                    <td class="fines"><!-- TMPL_IF NAME="firstremind" --><!-- TMPL_VAR NAME="firstremind" --> <!-- /TMPL_IF --></td>
-                                    <td class="fines"><!-- TMPL_IF NAME="finedays" --> <!-- TMPL_VAR NAME="finedays" --> <!-- /TMPL_IF --></td>
-                                    <td class="issues"><!-- TMPL_IF NAME="renewalsallowed" --><!-- TMPL_VAR NAME="renewalsallowed" --> <!-- /TMPL_IF --></td>
-                                    <td class="reserves"><!-- TMPL_IF NAME="reservesallowed" --><!-- TMPL_VAR NAME="reservesallowed" --> <!-- /TMPL_IF --></td>
-				    <td class="reserves"><!-- TMPL_IF NAME="holdspickupdelay" --><!-- TMPL_VAR NAME="holdspickupdelay" --> <!-- /TMPL_IF --></td>
-                                    <td class="reserves"><!-- TMPL_IF NAME="default_humancategorycode" --><input type="checkbox" disabled="disabled" checked="<!-- TMPL_VAR NAME="allowonshelfhold" -->" /><!-- /TMPL_IF --></td>
+                                    <!-- TMPL_IF NAME="herited_issuelength" -->
+                                    <td class="issues herited">
+                                    <!-- TMPL_ELSE -->
+                                    <td class="issues">
+                                    <!-- /TMPL_IF -->
+                                    <!-- TMPL_VAR NAME="issuelength" -->
+                                    </td>
+                                    <!-- TMPL_IF NAME="herited_fine" -->
+                                    <td class="fines herited">
+                                    <!-- TMPL_ELSE -->
+                                    <td class="fines">
+                                    <!-- /TMPL_IF -->
+                                    <!-- TMPL_VAR NAME="fine" -->
+                                    </td>
+                                    <!-- TMPL_IF NAME="herited_chargeperiod" -->
+                                    <td class="fines herited">
+                                    <!-- TMPL_ELSE -->
+                                    <td class="fines">
+                                    <!-- /TMPL_IF -->
+                                    <!-- TMPL_VAR NAME="chargeperiod" -->
+                                    </td>
+                                    <!-- TMPL_IF NAME="herited_firstremind" -->
+                                    <td class="fines herited">
+                                    <!-- TMPL_ELSE -->
+                                    <td class="fines">
+                                    <!-- /TMPL_IF -->
+                                    <!-- TMPL_VAR NAME="firstremind" -->
+                                    </td>
+                                    <!-- TMPL_IF NAME="herited_finedays" -->
+                                    <td class="fines herited">
+                                    <!-- TMPL_ELSE -->
+                                    <td class="fines">
+                                    <!-- /TMPL_IF -->
+                                    <!-- TMPL_VAR NAME="finedays" -->
+                                    </td>
+                                    <!-- TMPL_IF NAME="herited_renewalsallowed" -->
+                                    <td class="issues herited">
+                                    <!-- TMPL_ELSE -->
+                                    <td class="issues">
+                                    <!-- /TMPL_IF -->
+                                    <!-- TMPL_VAR NAME="renewalsallowed" -->
+                                    </td>
+                                    <!-- TMPL_IF NAME="herited_reservesallowed" -->
+                                    <td class="reserves herited">
+                                    <!-- TMPL_ELSE -->
+                                    <td class="reserves">
+                                    <!-- /TMPL_IF -->
+                                    <!-- TMPL_VAR NAME="reservesallowed" -->
+                                    </td>
+				    <!-- TMPL_IF NAME="herited_holdspickupdelay" -->
+                                    <td class="reserves herited">
+				    <!--TMPL_ELSE-->
+                                    <td class="reserves">
+				    <!--/TMPL_IF-->
+				    <!-- TMPL_VAR NAME="holdspickupdelay" -->
+				    </td>
+				    <!-- TMPL_IF NAME="herited_allowonshelfholds" -->
+                                    <td class="reserves herited">
+				    <!--TMPL_ELSE-->
+                                    <td class="reserves">
+				    <!--/TMPL_IF-->
+				    <input type="checkbox" checked="<!-- TMPL_VAR NAME="allowonshelfholds" -->" disabled="disabled"/> 
                                     <td>
                                         <a class="button" href="/cgi-bin/koha/admin/smart-rules.pl?op=delete&amp;itemtype=<!-- TMPL_VAR NAME="itemtype" -->&amp;categorycode=<!-- TMPL_VAR NAME="categorycode" -->&amp;branch=<!-- TMPL_VAR NAME="branch" -->">Delete</a>
                                     </td>
