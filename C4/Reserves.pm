@@ -35,7 +35,7 @@ use C4::Members qw();
 use C4::Letters;
 use C4::Branch qw( GetBranchDetail );
 use C4::Dates qw( format_date_in_iso );
-use C4::Circulation qw( GetIssuingRule );
+use C4::IssuingRules;
 use List::MoreUtils qw( firstidx );
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -369,12 +369,12 @@ sub CanBookBeReserved{
             $itypes{$item->{itype}} = 1;
         }
         for my $key (keys %itypes){
-            my $rightsquery = C4::Circulation::GetIssuingRule($borrower->{categorycode}, $key, $branchcode);
+            my $rightsquery = GetIssuingRule($borrower->{categorycode}, $key, $branchcode);
             $reservesrights += $rightsquery->{reservesallowed};
         }
         
     }else{
-        my $rightsquery = C4::Circulation::GetIssuingRule($borrower->{categorycode}, $biblio->{itemtype}, $branchcode);
+        my $rightsquery = GetIssuingRule($borrower->{categorycode}, $biblio->{itemtype}, $branchcode);
         $reservesrights = $rightsquery->{reservesallowed};
     }
     
@@ -458,7 +458,7 @@ sub CanItemBeReserved{
     }
     
     # we retrieve user rights on this itemtype and branchcode
-    my $issuingrule = C4::Circulation::GetIssuingRule($borrower->{categorycode}, $item->{$itype}, $branchcode);
+    my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{$itype}, $branchcode);
 
     if($issuingrule){
         $itemtype        = $issuingrule->{itemtype};
@@ -1419,7 +1419,7 @@ my $canhold = &CanHoldOnShelf($itemnumber);
 
  Check if a book can be hold on shelf.
 
-=cut 
+=cut
 
 sub CanHoldOnShelf {
     my ($itemnumber) = @_;
@@ -1429,7 +1429,7 @@ sub CanHoldOnShelf {
     $itemtype = $itemtype ? $item->{itype} : $item->{itemtype} ;
     my $branch = $item->{C4::Context->preference('homeorholdingbranch')};
     
-    my $issuingrule = C4::Circulation::GetIssuingRule('*', $itemtype, $branch);
+    my $issuingrule = GetIssuingRule('*', $itemtype, $branch);
     return $issuingrule->{allowonshelfholds};
     
 }
