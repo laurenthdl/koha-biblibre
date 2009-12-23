@@ -3418,6 +3418,17 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 }
 
 
+$DBversion = "3.02.00.012";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do("ALTER TABLE issuingrules MODIFY renewalsallowed SMALLINT(6) NULL DEFAULT NULL;");
+	$dbh->do("ALTER TABLE issuingrules MODIFY reservesallowed SMALLINT(6) NULL DEFAULT NULL;");
+	$dbh->do("ALTER TABLE issuingrules MODIFY allowonshelfholds TINYINT(1) NULL DEFAULT NULL;");
+
+	print "Upgrade done (Allow NULL in issuingrules)\n";
+
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

@@ -38,6 +38,7 @@ use C4::Biblio;
 use C4::Items;
 use C4::Koha;
 use C4::Circulation;
+use C4::IssuingRules;
 use C4::Dates qw/format_date/;
 use C4::Members;
 use C4::Search;		# enabled_staff_search_views
@@ -397,17 +398,9 @@ foreach my $biblionumber (@biblionumbers) {
                 }
             }
             
-            my $branch = C4::Circulation::_GetCircControlBranch($item, $borrowerinfo);
-
-            my $branchitemrule = GetBranchItemRule( $branch, $item->{'itype'} );
-            my $policy_holdallowed = 1;
-            
-            $item->{'holdallowed'} = $branchitemrule->{'holdallowed'};
-            
-            if ( $branchitemrule->{'holdallowed'} == 0 ||
-                 ( $branchitemrule->{'holdallowed'} == 1 && $borrowerinfo->{'branchcode'} ne $item->{'homebranch'} ) ) {
-                $policy_holdallowed = 0;
-            }
+            my $branchitemrule = GetIssuingRule( $borrowerinfo->{borrowernumber}, $item->{'itype'}, $item->{'homebranch'} );
+            my $policy_holdallowed = $branchitemrule->{'reservesallowed'};
+            $item->{'holdallowed'} = $branchitemrule->{'reservesallowed'};
             
             if (IsAvailableForItemLevelRequest($itemnumber) and not $item->{cantreserve} and CanItemBeReserved($borrowerinfo->{borrowernumber}, $itemnumber) ) {
                 if ( not $policy_holdallowed and C4::Context->preference( 'AllowHoldPolicyOverride' ) ) {
