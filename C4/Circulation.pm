@@ -1133,57 +1133,69 @@ sub GetLoanLength {
 
 =head2 GetIssuingRule
 
-FIXME - This is a copy-paste of GetLoanLength
-as a stop-gap.  Do not wish to change API for GetLoanLength 
-this close to release, however, Overdues::GetIssuingRules is broken.
-
-Get the issuing rule for an itemtype, a borrower type and a branch
+Compute the issuing rule for an itemtype, a borrower category and a branch.
 Returns a hashref from the issuingrules table.
 
-my $irule = &GetIssuingRule($borrowertype,$itemtype,branchcode)
+my $rule = &GetIssuingRule($categorycode, $itemtype, $branchcode);
+
+The rules are applied from most specific to less specific, using the first found in this order:
+    * same library, same patron type, same item type
+    * same library, same patron type, default item type
+    * same library, default patron type, same item type
+    * same library, default patron type, default item type
+    * default library, same patron type, same item type
+    * default library, same patron type, default item type
+    * default library, default patron type, same item type
+    * default library, default patron type, default item type
+
+The values in the returned hashref are inherited from a more generic rules if undef.
 
 =cut
 
 sub GetIssuingRule {
-    my ( $borrowertype, $itemtype, $branchcode ) = @_;
+    my ( $categorycode, $itemtype, $branchcode ) = @_;
+
+    # This configuration table defines the order of inheritance. We'll loop over it.
+    my @attempts = (
+        [ "*"          , "*"      , "*"         ],
+        [ "*"          , $itemtype, "*"         ],
+        [ $categorycode, "*"      , "*"         ],
+        [ $categorycode, $itemtype, "*"         ],
+        [ "*"          , "*"      , $branchcode ],
+        [ "*"          , $itemtype, $branchcode ],
+        [ $categorycode, "*"      , $branchcode ],
+        [ $categorycode, $itemtype, $branchcode ],
+    );
+
+    # This complex query returns a nested hashref, so we can access a rule using :
+    # my $rule = $$rules{$categorycode}{$itemtype}{$branchcode};
+    # this will be usefull in the inheritance computation code
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare("select * from issuingrules where categorycode=? and itemtype=? and branchcode=? and issuelength is not null");
-    my $irule;
+    my $rules = $dbh->selectall_hashref(
+        "SELECT * FROM issuingrules where branchcode IN ('*',?) and itemtype IN ('*', ?) and categorycode IN ('*',?)",
+        ["branchcode", "itemtype", "categorycode"],
+        undef,
+        ( $branchcode, $itemtype, $categorycode )
+    );
 
-    $sth->execute( $borrowertype, $itemtype, $branchcode );
-    $irule = $sth->fetchrow_hashref;
-    return $irule if defined($irule);
-
-    $sth->execute( $borrowertype, "*", $branchcode );
-    $irule = $sth->fetchrow_hashref;
-    return $irule if defined($irule);
-
-    $sth->execute( "*", $itemtype, $branchcode );
-    $irule = $sth->fetchrow_hashref;
-    return $irule if defined($irule);
-
-    $sth->execute( "*", "*", $branchcode );
-    $irule = $sth->fetchrow_hashref;
-    return $irule if defined($irule);
-
-    $sth->execute( $borrowertype, $itemtype, "*" );
-    $irule = $sth->fetchrow_hashref;
-    return $irule if defined($irule);
-
-    $sth->execute( $borrowertype, "*", "*" );
-    $irule = $sth->fetchrow_hashref;
-    return $irule if defined($irule);
-
-    $sth->execute( "*", $itemtype, "*" );
-    $irule = $sth->fetchrow_hashref;
-    return $irule if defined($irule);
-
-    $sth->execute( "*", "*", "*" );
-    $irule = $sth->fetchrow_hashref;
-    return $irule if defined($irule);
-
-    # if no rule matches,
-    return undef;
+    # This block is for inheritance. It loops over rules returned by the 
+    # previous query. If a value is found in a more specific rule, it replaces 
+    # the old value from the more generic rule.
+    my $oldrule;
+    for my $attempt ( @attempts ) {
+        if ( my $rule = $$rules{@$attempt[2]}{@$attempt[1]}{@$attempt[0]} ) {
+            if ( $oldrule ) {
+                for ( keys %$oldrule ) {
+                    if ( defined $rule->{$_} ) {
+                        $oldrule->{$_} = $rule->{$_};
+                    }
+                }
+            } else {
+                $oldrule = $rule;
+            }
+        }
+    }
+    return $oldrule;
 }
 
 =head2 AddReturn
