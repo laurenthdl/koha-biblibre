@@ -93,7 +93,10 @@ $(document).ready(function() {
                 <li><a id="issuesfilter">Issues</a></li>
                 <li><a id="finesfilter">Fines</a></li>
                 <li><a id="reservesfilter">Reserves</a></li>
-                <div style="text-align:right;"><label for="filter">Filter: </label><input type="text" name="filter" id="filter" /></div>
+                <div style="text-align:right;">
+                    <label for="filter" style="float:none;">Filter: </label>
+                    <input type="text" name="filter" id="filter" />
+                </div>
             </ul>
             <div class="tabs-container">
                 <form method="post" action="/cgi-bin/koha/admin/smart-rules.pl">
