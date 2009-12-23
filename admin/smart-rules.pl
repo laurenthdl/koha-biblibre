@@ -63,8 +63,6 @@ elsif ( $op eq 'add' ) {
 
     # We don't want op to be passed to the API
     delete $issuingrule->{'op'};
-    # Specific treatment for the checkbox, HTML doesn't help...
-    $issuingrule->{'allowonshelfholds'} = $issuingrule->{'allowonshelfholds'} eq "on" ? 1 : 0;
 
     # If the (branchcode,categorycode,itemtype) combination already exists...
     my @issuingrules = GetIssuingRules({

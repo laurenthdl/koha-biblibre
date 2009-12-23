@@ -213,9 +213,9 @@ $(document).ready(function() {
                                     <td class="reserves">
                                     <!--/TMPL_IF-->
                                     <!-- TMPL_IF NAME="allowonshelfholds" -->
-                                    ☑
+                                    Yes
                                     <!--TMPL_ELSE-->
-                                    ☐
+                                    No
                                     <!--/TMPL_IF-->
                                     </td>
                                     <td>
@@ -227,7 +227,7 @@ $(document).ready(function() {
                         <tfoot>
                             <tr>
                                 <td>
-                                    <select name="categorycode" id="categorycode">
+                                    <select name="categorycode" id="categorycode" style="width:12em;">
                                         <option value="*">Default</option>
                                     <!-- TMPL_LOOP NAME="categoryloop" -->
                                         <option value="<!-- TMPL_VAR NAME="categorycode" -->"><!-- TMPL_VAR NAME="description" --></option>
@@ -235,7 +235,7 @@ $(document).ready(function() {
                                     </select>
                                 </td>
                                 <td>
-                                    <select name="itemtype" style="width:13em;">
+                                    <select name="itemtype" style="width:12em;">
                                         <option value="*">Default</option>
                                     <!-- TMPL_LOOP NAME="itemtypeloop" -->
                                         <option value="<!-- TMPL_VAR NAME="itemtype" -->"><!-- TMPL_VAR NAME="description" --></option>
@@ -251,7 +251,13 @@ $(document).ready(function() {
                                 <td class="issues"><input name="renewalsallowed" size="2" /></td>
                                 <td class="reserves"><input name="reservesallowed" size="2" /></td>
                                 <td class="reserves"><input name="holdspickupdelay" size="2" /></td>
-                                <td class="reserves"><input type="checkbox" name="allowonshelfholds" id="allowonshelfholds" /></td>
+                                <td class="reserves">
+                                    <select name="allowonshelfholds">
+                                        <option value=""></option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </td>
                                 <td><input type="hidden" name="branchcode" value="<!-- TMPL_VAR NAME="branchcode" -->"/><input type="submit" value="Add" class="submit" /></td>
                             </tr>
                         </tfoot>
