@@ -59,19 +59,19 @@ elsif ( $op eq 'add' ) {
     $maxissueqty         = undef if $maxissueqty !~ /^\d+/;
 
     my $issuingrule = {
-        branchcode      => $branch,
-        categorycode    => $input->param('categorycode'),
-        itemtype        => $input->param('itemtype'),
-        maxissueqty     => $maxissueqty,
-        renewalsallowed => $input->param('renewalsallowed'),
-        reservesallowed => $input->param('reservesallowed'),
-        issuelength     => $input->param('issuelength'),
-        fine            => $input->param('fine'),
-        finedays        => $input->param('finedays'),
-        firstremind     => $input->param('firstremind'),
-        chargeperiod    => $input->param('chargeperiod'),
-        holdspickupdelay => $input->param('holdspickupdelay'),
-        allowonshelfholds=> ($input->param('allowonshelfholds') eq "on") ? 1 : 0 
+        branchcode        => $branch,
+        categorycode      => $input->param('categorycode'),
+        itemtype          => $input->param('itemtype'),
+        maxissueqty       => $maxissueqty,
+        renewalsallowed   => $input->param('renewalsallowed'),
+        reservesallowed   => $input->param('reservesallowed'),
+        issuelength       => $input->param('issuelength'),
+        fine              => $input->param('fine'),
+        finedays          => $input->param('finedays'),
+        firstremind       => $input->param('firstremind'),
+        chargeperiod      => $input->param('chargeperiod'),
+        holdspickupdelay  => $input->param('holdspickupdelay'),
+        allowonshelfholds => ($input->param('allowonshelfholds') eq "on") ? 1 : 0,
     };
 
     # If the (branchcode,categorycode,itemtype) combination already exists...

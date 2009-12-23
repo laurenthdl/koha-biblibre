@@ -51,12 +51,6 @@ $(document).ready(function() {
             $('#finesfilter').parent().attr('class',null);
             $('#nofilter').parent().attr('class',null);
         });
-        // Disable the checkbox on dom ready
-        $('#allowonshelfholds').attr("disabled", ($('#categorycode').val() != "*"));
-        // Enable/disable the checkbox depending on the categorycode select
-        $('#categorycode').change(function() {
-                $('#allowonshelfholds').attr("disabled", ($(this).val() != "*"));
-        });
 });
 //]]>
 </script>
@@ -117,7 +111,7 @@ $(document).ready(function() {
                                 <th class="fines">Suspension duration (day)</th>
                                 <th class="issues">Renewals allowed (count)</th>
                                 <th class="reserves">Reserves allowed (count)</th>
-                		<th class="reserves">Reserves pickup delay (day)</th>
+                                <th class="reserves">Reserves pickup delay (day)</th>
                                 <th class="reserves">Allow on shelf holds</th>
                                 <th>&nbsp;</th>
                             </tr>
@@ -203,19 +197,24 @@ $(document).ready(function() {
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="reservesallowed" -->
                                     </td>
-				    <!-- TMPL_IF NAME="herited_holdspickupdelay" -->
+                                     <!-- TMPL_IF NAME="herited_holdspickupdelay" -->
                                     <td class="reserves herited">
-				    <!--TMPL_ELSE-->
+                                    <!--TMPL_ELSE-->
                                     <td class="reserves">
-				    <!--/TMPL_IF-->
-				    <!-- TMPL_VAR NAME="holdspickupdelay" -->
-				    </td>
-				    <!-- TMPL_IF NAME="herited_allowonshelfholds" -->
+                                    <!--/TMPL_IF-->
+                                    <!-- TMPL_VAR NAME="holdspickupdelay" -->
+                                    </td>
+                                    <!-- TMPL_IF NAME="herited_allowonshelfholds" -->
                                     <td class="reserves herited">
-				    <!--TMPL_ELSE-->
+                                    <!--TMPL_ELSE-->
                                     <td class="reserves">
-				    <!--/TMPL_IF-->
-				    <input type="checkbox" checked="<!-- TMPL_VAR NAME="allowonshelfholds" -->" disabled="disabled"/> 
+                                    <!--/TMPL_IF-->
+                                    <!-- TMPL_IF NAME="allowonshelfholds" -->
+                                    ☑
+                                    <!--TMPL_ELSE-->
+                                    ☐
+                                    <!--/TMPL_IF-->
+                                    </td>
                                     <td>
                                         <a class="button" href="/cgi-bin/koha/admin/smart-rules.pl?op=delete&amp;itemtype=<!-- TMPL_VAR NAME="itemtype" -->&amp;categorycode=<!-- TMPL_VAR NAME="categorycode" -->&amp;branch=<!-- TMPL_VAR NAME="branch" -->">Delete</a>
                                     </td>
@@ -248,7 +247,7 @@ $(document).ready(function() {
                                 <td class="fines"><input name="finedays" size="3" /> </td>
                                 <td class="issues"><input name="renewalsallowed" size="2" /></td>
                                 <td class="reserves"><input name="reservesallowed" size="2" /></td>
-                    		<td class="reserves"><input name="holdspickupdelay" size="2" /></td>
+                                <td class="reserves"><input name="holdspickupdelay" size="2" /></td>
                                 <td class="reserves"><input type="checkbox" name="allowonshelfholds" id="allowonshelfholds" /></td>
                                 <td><input type="hidden" name="branch" value="<!-- TMPL_VAR NAME="branch" -->"/><input type="submit" value="Add" class="submit" /></td>
                             </tr>
