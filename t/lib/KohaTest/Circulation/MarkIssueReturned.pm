@@ -26,7 +26,7 @@ sub basic_usage : Test( 4 ) {
     is( $after_issues->{'borrowernumber'}, $self->{'memberid'}, 'Our item is checked out to our borrower' )
       or diag( Data::Dumper->Dump( [ $after_issues ], [ 'after_issues' ] ) );
 
-    C4::Circulation::MarkIssueReturned( $self->{'memberid'}, $self->{'items'}[0]{'itemnumber'} );
+    C4::Circulation::MarkIssueReturned( $self->{'items'}[0]{'itemnumber'} );
 
     my $after_return = C4::Circulation::GetItemIssue( $self->{'items'}[0]{'itemnumber'} );
     ok( ! defined $after_return->{'borrowernumber'}, 'The item is no longer checked out' )
@@ -63,8 +63,7 @@ sub set_retundate : Test( 7 ) {
     my $returndate = $self->random_date();
     ok( $returndate, "return this item on $returndate" );
 
-    C4::Circulation::MarkIssueReturned( $self->{'memberid'},
-                                        $self->{'items'}[0]{'itemnumber'},
+    C4::Circulation::MarkIssueReturned( $self->{'items'}[0]{'itemnumber'},
                                         undef,
                                         $returndate );
 

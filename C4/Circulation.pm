@@ -1433,7 +1433,7 @@ sub AddReturn {
 				# don't allow dropbox mode to create an invalid entry in issues (issuedate > returndate) FIXME: actually checks eq, not gt
 				undef($dropbox) if ( $iteminformation->{'issuedate'} eq C4::Dates->today('iso') );
 			}
-            MarkIssueReturned($borrower->{'borrowernumber'}, $iteminformation->{'itemnumber'},$circControlBranch);
+            MarkIssueReturned($iteminformation->{'itemnumber'},$circControlBranch);
             $messages->{'WasReturned'} = 1;    # FIXME is the "= 1" right?  
             # continue to deal with returns cases, but not only if we have an issue
             
@@ -1530,7 +1530,7 @@ sub AddReturn {
 
 =over 4
 
-MarkIssueReturned($borrowernumber, $itemnumber, $dropbox_branch, $returndate);
+MarkIssueReturned($itemnumber, $dropbox_branch, $returndate);
 
 =back
 
@@ -1551,7 +1551,7 @@ routine in C<C4::Accounts>.
 =cut
 
 sub MarkIssueReturned {
-    my ( $borrowernumber, $itemnumber, $dropbox_branch, $returndate ) = @_;
+    my ( $itemnumber, $dropbox_branch, $returndate ) = @_;
     my $dbh   = C4::Context->dbh;
     my $query = "UPDATE issues SET returndate=";
     my @bind;
@@ -1566,19 +1566,17 @@ sub MarkIssueReturned {
     } else {
         $query .= " now() ";
     }
-    $query .= " WHERE  borrowernumber = ?  AND itemnumber = ?";
-    push @bind, $borrowernumber, $itemnumber;
+    $query .= " WHERE itemnumber = ?";
+    push @bind, $itemnumber;
     # FIXME transaction
     my $sth_upd  = $dbh->prepare($query);
     $sth_upd->execute(@bind);
     my $sth_copy = $dbh->prepare("INSERT INTO old_issues SELECT * FROM issues 
-                                  WHERE borrowernumber = ?
-                                  AND itemnumber = ?");
-    $sth_copy->execute($borrowernumber, $itemnumber);
+                                  WHERE itemnumber = ?");
+    $sth_copy->execute($itemnumber);
     my $sth_del  = $dbh->prepare("DELETE FROM issues
-                                  WHERE borrowernumber = ?
-                                  AND itemnumber = ?");
-    $sth_del->execute($borrowernumber, $itemnumber);
+                                  WHERE itemnumber = ?");
+    $sth_del->execute($itemnumber);
 }
 
 =head2 FixOverduesOnReturn

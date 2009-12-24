@@ -264,7 +264,7 @@ EOT
 
 sub returnlost{
     my ( $borrowernumber, $itemnum ) = @_;
-    C4::Circulation::MarkIssueReturned( $borrowernumber, $itemnum );
+    C4::Circulation::MarkIssueReturned($itemnum );
     my $borrower = C4::Members::GetMember( $borrowernumber, 'borrowernumber' );
     my @datearr = localtime(time);
     my $date = ( 1900 + $datearr[5] ) . "-" . ( $datearr[4] + 1 ) . "-" . $datearr[3];
@@ -312,7 +312,7 @@ sub chargelostitem{
         }
         #FIXME : Should probably have a way to distinguish this from an item that really was returned.
         warn " $issues->{'borrowernumber'}  /  $itemnumber ";
-        C4::Circulation::MarkIssueReturned($issues->{borrowernumber},$itemnumber);
+        C4::Circulation::MarkIssueReturned($itemnumber);
 	#  Shouldn't MarkIssueReturned do this?
         ModItem({ onloan => undef }, undef, $itemnumber);
     }

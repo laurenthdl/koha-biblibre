@@ -328,8 +328,7 @@ sub kocReturnItem {
   my $borrowernumber = _get_borrowernumber_from_barcode( $circ->{'barcode'} );
   if ( $borrowernumber ) {
   my $borrower = GetMember( $borrowernumber, 'borrowernumber' );
-    C4::Circulation::MarkIssueReturned( $borrowernumber,
-                                      $item->{'itemnumber'},
+    C4::Circulation::MarkIssueReturned($item->{'itemnumber'},
                                       undef,
                                       $circ->{'date'} );
   
