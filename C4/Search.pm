@@ -1649,6 +1649,10 @@ sub searchResults {
         }
 
         # XSLT processing of some stuff
+	my $debug=1;
+	use C4::Charset;
+	SetUTF8Flag($marcrecord);
+	$debug && warn $marcrecord->as_formatted;
         if (C4::Context->preference("XSLTResultsDisplay") && !$scan) {
             $oldbiblio->{XSLTResultsRecord} = XSLTParse4Display(
                 $oldbiblio->{biblionumber}, $marcrecord, 'Results' );

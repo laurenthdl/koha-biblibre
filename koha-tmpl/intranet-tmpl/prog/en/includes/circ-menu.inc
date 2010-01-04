@@ -39,6 +39,9 @@ $(document).ready(function()
 			<p>
 		    <!-- TMPL_IF NAME="address"-->
 		            <!-- TMPL_VAR NAME="address" -->
+            <!--TMPL_IF NAME="roaddetails"-->
+                <!-- TMPL_VAR NAME="roaddetails" -->
+            <!-- /TMPL_IF -->
 		    <!-- TMPL_ELSE -->
 		            <span class="empty">No address stored.</span>
 		    <!-- /TMPL_IF -->

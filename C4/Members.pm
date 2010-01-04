@@ -1845,9 +1845,8 @@ this function get all borrowers who haven't borrowed since the date given on inp
 =cut
 
 sub GetBorrowersWhoHaveNotBorrowedSince {
-### TODO : It could be dangerous to delete Borrowers who have just been entered and who have not yet borrowed any book. May be good to add a dateexpiry or dateenrolled filter.      
-       
-                my $filterdate = shift||POSIX::strftime("%Y-%m-%d",localtime());
+    my $filterdate = shift||POSIX::strftime("%Y-%m-%d",localtime());
+    my $filterexpiry = shift;
     my $filterbranch = shift || 
                         ((C4::Context->preference('IndependantBranches') 
                              && C4::Context->userenv 
@@ -1857,20 +1856,29 @@ sub GetBorrowersWhoHaveNotBorrowedSince {
                          : "");  
     my $dbh   = C4::Context->dbh;
     my $query = "
-        SELECT borrowers.borrowernumber,max(issues.timestamp) as latestissue
+        SELECT borrowers.borrowernumber,
+               max(old_issues.timestamp) as latestissue,
+               max(issues.timestamp) as currentissue
         FROM   borrowers
         JOIN   categories USING (categorycode)
-        LEFT JOIN issues ON borrowers.borrowernumber = issues.borrowernumber
+        LEFT JOIN old_issues USING (borrowernumber)
+        LEFT JOIN issues USING (borrowernumber) 
         WHERE  category_type <> 'S'
+        AND borrowernumber NOT IN (SELECT guarantorid FROM borrowers WHERE guarantorid IS NOT NULL AND guarantorid <> 0) 
    ";
     my @query_params;
     if ($filterbranch && $filterbranch ne ""){ 
         $query.=" AND borrowers.branchcode= ?";
         push @query_params,$filterbranch;
-    }    
+    }
+    if($filterexpiry){
+        $query .= " AND dateexpiry < ? ";
+        push @query_params,$filterdate;
+    }
     $query.=" GROUP BY borrowers.borrowernumber";
     if ($filterdate){ 
-        $query.=" HAVING latestissue <? OR latestissue IS NULL";
+        $query.=" HAVING (latestissue < ? OR latestissue IS NULL) 
+                  AND currentissue IS NULL";
         push @query_params,$filterdate;
     }
     warn $query if $debug;
