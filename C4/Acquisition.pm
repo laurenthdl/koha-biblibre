@@ -1164,7 +1164,7 @@ sub ModReceiveOrder {
                 , unitprice=?
                 , freight=?
                 , rrp=?
-                , quantityreceived=?
+                , quantity=?
             WHERE biblionumber=? AND ordernumber=?");
 
         $sth->execute($quantrec,$datereceived,$invoiceno,$cost,$freight,$rrp,$quantrec,$biblionumber,$ordernumber);
@@ -1174,6 +1174,8 @@ sub ModReceiveOrder {
         foreach my $orderkey ( "linenumber", "allocation" ) {
             delete($order->{'$orderkey'});
         }
+        $order->{'quantity'} -= $quantrec;
+        $order->{'quantityreceived'} = 0;
         my $newOrder = NewOrder($order);
 } else {
         $sth=$dbh->prepare("update aqorders
