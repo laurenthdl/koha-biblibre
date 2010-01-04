@@ -312,6 +312,33 @@
     </li>
   </xsl:if>
 
+  <xsl:if test="marc:datafield[@tag=856]">
+    <li>
+      <strong> Online Resources: </strong>
+      <xsl:for-each select="marc:datafield[@tag=856]">
+        <a>
+          <xsl:attribute name="href">
+            <xsl:value-of select="marc:subfield[@code='u']"/>
+          </xsl:attribute>
+          <xsl:choose>
+            <xsl:when test="marc:subfield[@code='y' or @code='3' or @code='z']">
+              <xsl:call-template name="subfieldSelect">
+                <xsl:with-param name="codes">y3z</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="not(marc:subfield[@code='y']) and not(marc:subfield[@code='3']) and not(marc:subfield[@code='z'])">
+              Click here to access online
+            </xsl:when>
+          </xsl:choose>
+        </a>
+        <xsl:choose>
+          <xsl:when test="position()=last()"></xsl:when>
+          <xsl:otherwise> | </xsl:otherwise>
+        </xsl:choose>      
+      </xsl:for-each>
+    </li>
+  </xsl:if>
+
   <xsl:call-template name="tag_subject">
     <xsl:with-param name="tag">600</xsl:with-param>
     <xsl:with-param name="label">Sujet - Nom de personne</xsl:with-param>
@@ -361,33 +388,6 @@
     <xsl:with-param name="tag">616</xsl:with-param>
     <xsl:with-param name="label">Marque déposée</xsl:with-param>
   </xsl:call-template>
-
-  <xsl:if test="marc:datafield[@tag=856]">
-    <li>
-      <strong>Online Resources: </strong>
-      <xsl:for-each select="marc:datafield[@tag=856]">
-        <a>
-          <xsl:attribute name="href">
-            <xsl:value-of select="marc:subfield[@code='u']"/>
-          </xsl:attribute>
-          <xsl:choose>
-            <xsl:when test="marc:subfield[@code='y' or @code='3' or @code='z']">
-              <xsl:call-template name="subfieldSelect">
-                <xsl:with-param name="codes">y3z</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="not(marc:subfield[@code='y']) and not(marc:subfield[@code='3']) and not(marc:subfield[@code='z'])">
-              Click here to access online
-            </xsl:when>
-          </xsl:choose>
-        </a>
-        <xsl:choose>
-          <xsl:when test="position()=last()"></xsl:when>
-          <xsl:otherwise> | </xsl:otherwise>
-        </xsl:choose>      
-      </xsl:for-each>
-    </strong>
-  </xsl:if>
 
         <!-- 780 -->
         <xsl:if test="marc:datafield[@tag=780]">
