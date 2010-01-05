@@ -23,6 +23,7 @@ use C4::Biblio;
 use C4::Koha;
 use C4::Charset;
 use C4::Items;
+use YAML;
 use Unicode::Normalize;
 use Time::HiRes qw(gettimeofday);
 use Getopt::Long;
@@ -30,7 +31,7 @@ use IO::File;
 
 binmode(STDOUT, ":utf8");
 my ( $input_marc_file, $number, $offset) = ('',0,0);
-my ($version, $delete, $test_parameter, $skip_marc8_conversion, $char_encoding, $verbose, $commit, $fk_off,$format,$biblios,$authorities,$keepids,$match, $isbn_check, $logfile);
+my ($version, $delete, $test_parameter, $skip_marc8_conversion, $char_encoding, $verbose, $commit, $fk_off,$format,$biblios,$authorities,$keepids,$match, $isbn_check, $logfile,$yamlfile);
 my ($sourcetag,$sourcesubfield,$idmapfl);
 
 $|=1;
@@ -57,6 +58,7 @@ GetOptions(
     'x:s' => \$sourcetag,
     'y:s' => \$sourcesubfield,
     'idmap:s' => \$idmapfl,
+    'yaml:s' => \$yamlfile,
 );
 $biblios=!$authorities||$biblios;
 
@@ -81,6 +83,7 @@ Parameters:
   d      delete EVERYTHING related to biblio in koha-DB before import. Tables:
          biblio, biblioitems, titems
   m      format, MARCXML or ISO2709 (defaults to ISO2709)
+  yaml file  format a yaml file with ids
   keepids field store ids in field (usefull for authorities, where 001 contains the authid for Koha, that can contain a very valuable info for authorities coming from LOC or BNF. useless for biblios probably)
   b|biblios type of import : bibliographic records
   a|authorities type of import : authority records
@@ -185,7 +188,7 @@ $batch->warnings_off();
 $batch->strict_off();
 my $i=0;
 my $commitnum = $commit ? $commit : 50;
-
+my $yamlhash;
 
 # Skip file offset
 if ( $offset ) {
@@ -332,6 +335,7 @@ RECORD: while (  ) {
 					printlog({id=>$originalid||$id||$authid, op=>"insert",status=>"ok"}) if ($logfile);
 				}
  	        }
+            $yamlhash->{$originalid}=$authid if ($yamlfile);
         }
         else {
             my ( $biblionumber, $biblioitemnumber, $itemnumbers_ref, $errors_ref );
@@ -384,6 +388,7 @@ RECORD: while (  ) {
             if ($#{ $errors_ref } > -1) { 
                 report_item_errors($biblionumber, $errors_ref);
             }
+            $yamlhash->{$originalid}=$biblionumber if ($yamlfile);
         }
         $dbh->commit() if (0 == $i % $commitnum);
     }
@@ -406,6 +411,10 @@ if ($logfile){
   print $loghandle "file : $input_marc_file\n";
   print $loghandle "$i MARC records done in $timeneeded seconds\n";
   $loghandle->close;
+}
+if ($yamlfile){
+    open YAML, "> $yamlfile" or die "cannot open $yamlfile \n"; 
+    print YAML Dump($yamlhash);
 }
 exit 0;
 
