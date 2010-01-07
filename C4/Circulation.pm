@@ -31,7 +31,7 @@ use C4::IssuingRules;
 use C4::Dates;
 use C4::Calendar;
 use C4::Accounts;
-use C4::Overdues qw/GetFine/;
+use C4::Overdues ;
 use C4::ItemCirculationAlertPreference;
 use C4::Message;
 use C4::Debug;
