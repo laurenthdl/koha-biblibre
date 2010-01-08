@@ -3699,7 +3699,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 
 $DBversion = '3.03.00.008';
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
-    $dbh->do('ALTER TABLE issuingrules ADD COLUMN `renewalperiod` int(11) NOT NULL default "0" AFTER `renewalsallowed`;');
+    $dbh->do('ALTER TABLE issuingrules ADD COLUMN `renewalperiod` SMALLINT(6) NULL default NULL AFTER `renewalsallowed`;');
     print "Upgrade done (Add renewalperiod)\n";
     SetVersion ($DBversion);
 }
