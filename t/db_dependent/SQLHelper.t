@@ -10,7 +10,7 @@ use YAML;
 use C4::Debug;
 use C4::SQLHelper qw(:all);
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 #1
 BEGIN {
@@ -43,8 +43,13 @@ ok(uc($$borrowers[0]{surname}) lt uc($$borrowers[1]{surname}), "Search In Table 
 $borrowers=SearchInTable("borrowers","Jean");
 #9
 ok(@$borrowers>0, "Search In Table string");
-eval{$borrowers=SearchInTable("borrowers","Jean Valjean")};
 #10
+#FIXME : When searching on All the fields of the table, seems to return Junk
+eval{$borrowers=SearchInTable("borrowers","Jean Valjean",undef,undef,undef,[qw(firstname surname borrowernumber branchcode cardnumber)],"start_with")};
+#eval{$borrowers=SearchInTable("borrowers","Jean Valjean",undef,undef,undef,undef,"start_with")};
+# This would not be much efficient because of "numbers" special treatment : We return stuff if empty or '' as soon as search is NOT exact
+# This behaviour is implemented because of branchcode and numbers can be null
+$debug && warn Dump(@$borrowers);
 ok(scalar(@$borrowers)==1 && !($@), "Search In Table does an implicit AND of all the words in strings");
 $borrowers=SearchInTable("borrowers",["Valjean",{firstname=>"Jean"}]);
 #11
