@@ -479,7 +479,6 @@ sub patronflags {
             $flaginfo{'message'}  = 'Borrower is Debarred.';
             $flaginfo{'noissues'} = 1;
             $flaginfo{'dateend'} = $patroninformation->{'debarred'};
-            $flaginfo{'comment'} = $patroninformation->{'debarredcomment'};
             $flags{'DEBARRED'}     = \%flaginfo;
         }
     }
@@ -547,7 +546,7 @@ LEFT JOIN categories on borrowers.categorycode=categories.categorycode
     $sth->execute(map{$information{$_}} keys %information);
     my $data = $sth->fetchall_arrayref({});
     return undef if (scalar(@$data)==0);        
-    if (scalar(@$data)==1) {return $$data[0];}
+    if (scalar(@$data)==1) {return $data->[0];}
     ($data) and return $data;
 }
 
