@@ -989,7 +989,7 @@ sub GetOverduerules {
 
 Check if the borrowers is already debarred
 
-C<$debarredstatus> return 0 for not debarred and return end of debar date for debarred
+C<$debarredstatus> return undef for not debarred and return end of debar date for debarred
 
 C<$borrowernumber> contains the borrower number
 
@@ -1007,11 +1007,8 @@ sub CheckBorrowerDebarred {
     |;
     my $sth = $dbh->prepare($query);
     $sth->execute($borrowernumber);
-    if( my ($debarredstatus) = $sth->fetchrow ){
-        return $debarredstatus;
-    }else{
-        return 0;
-    }
+    my $debarredstatus= $sth->fetchrow;
+    return $debarredstatus;
     
 }
 
