@@ -1268,8 +1268,8 @@ sub buildQuery {
 #
         # group_OR_limits, prefixed by mc-
         # OR every member of the group
-#        elsif ( $this_limit =~ /mc/ ) {
-        if ( $this_limit =~ /mc/ ) {
+        elsif ( $this_limit =~ /mc/ ) {
+#        if ( $this_limit =~ /mc/ ) {
             $group_OR_limits .= " or " if $group_OR_limits;
             $limit_desc      .= " or " if $group_OR_limits;
             $group_OR_limits .= "$this_limit";
