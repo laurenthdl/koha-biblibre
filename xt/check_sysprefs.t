@@ -20,24 +20,33 @@
 use strict;
 use warnings;
 
-use Test::More qw(no_plan);
-
+use Getopt::Long;
 use C4::Context;
 
+
+# When this option is set, no tests are performed.
+# The missing sysprefs are displayed as sql inserts instead.
+our $showsql = 0;
+GetOptions ('showsql' => \$showsql);
+
+
+use Test::More qw(no_plan); 
 our $dbh     = C4::Context->dbh;
 my $root_dir = C4::Context->config( 'intranetdir' ) . '/installer/data/mysql';
 my $base_syspref_file = "en/mandatory/sysprefs.sql";
 
-ok(
-    open( my $ref_fh, "<$root_dir/$base_syspref_file" ),
-    "Open reference syspref file $root_dir/$base_syspref_file" );
+
+open( my $ref_fh, "<$root_dir/$base_syspref_file" );
 my $ref_syspref = get_syspref_from_file( $ref_fh );
 my @ref_sysprefs = sort { lc $a cmp lc $b } keys %$ref_syspref;
-cmp_ok(
-    $#ref_sysprefs, '>=', 0,
-    "Found " . ($#ref_sysprefs + 1) . " sysprefs" );
+if (!$showsql) {
+    cmp_ok(
+	$#ref_sysprefs, '>=', 0,
+	"Found " . ($#ref_sysprefs + 1) . " sysprefs"
+    );
+}
 
-    check_db($ref_syspref);
+check_db($ref_syspref);
 
 
 #
@@ -53,11 +62,13 @@ sub get_syspref_from_file {
     my %syspref;
     while ( <$fh> ) {
         next if /^--/; # Comment line
-        #/VALUES.*\(\'([\w\-:]+)\'/;
-        /\(\'([\w\-:]+)\'/;
-        my $variable = $1;
-        next unless $variable;
-        $syspref{$variable} = 1;
+        my $query = $_;
+        if ($_ =~ /\([\s]*\'([\w\-:]+)\'/) {
+            my $variable = $1;
+            if ($variable) {
+                $syspref{$variable} = $query;
+            }
+        }
     }
     return \%syspref;
 }
@@ -72,9 +83,11 @@ sub check_db {
     $sth->execute;
     my $res = $sth->fetchrow_arrayref;
     my $dbcount = $res->[0];
-    is (
-	scalar(keys %$sysprefs), $dbcount, "Numbers of sysprefs in sysprefs.sql equals number of sysprefs in the database"
-    );
+    if (!$showsql) {
+	cmp_ok (
+	    $dbcount, ">=", scalar(keys %$sysprefs), "There are at least as many sysprefs in the database as in the sysprefs.sql"
+	);
+    }
 
     # Checking for missing sysprefs in the database
     $query = "SELECT COUNT(*) FROM systempreferences WHERE variable=?";
@@ -83,9 +96,15 @@ sub check_db {
 	$sth->execute($_);
 	my $res = $sth->fetchrow_arrayref;
 	my $count = $res->[0];
-	is(
-	    $count, 1, "Syspref $_ exists in the database"
-	);
+	if (!$showsql) {
+	    is(
+		$count, 1, "Syspref $_ exists in the database"
+	    );
+	} else {
+	    if ($count != 1) {
+		print $sysprefs->{$_};
+	    }
+	}
     }
 }
 
@@ -104,6 +123,9 @@ then queried to check if all the sysprefs are in it.
 =head1 USAGE
 
 prove -v check_sysprefs.t
+
+If you want to display the missing sysprefs as sql inserts : 
+perl check_sysprefs.t --showsql
 
 =cut
 
