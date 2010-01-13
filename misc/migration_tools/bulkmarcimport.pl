@@ -24,6 +24,7 @@ use C4::Koha;
 use C4::Debug;
 use C4::Charset;
 use C4::Items;
+use C4::Debug;
 use YAML;
 use Unicode::Normalize;
 use Time::HiRes qw(gettimeofday);
@@ -86,14 +87,6 @@ Parameters:
   m      format, MARCXML or ISO2709 (defaults to ISO2709)
   yaml file  format a yaml file with ids
   keepids field store ids in field (usefull for authorities, where 001 contains the authid for Koha, that can contain a very valuable info for authorities coming from LOC or BNF. useless for biblios probably)
-  b|biblios type of import : bibliographic records
-  a|authorities type of import : authority records
-  match  matchindex,fieldtomatch matchpoint to use to deduplicate
-          fieldtomatch can be either 001 to 999 
-                       or field and list of subfields as such 100abcde
-  i|isbn if set, a search will be done on isbn, and, if the same isbn is found, the biblio is not added. It's another
-         method to deduplicate. 
-         match & i can be both set.
   x      source bib tag for reporting the source bib number
   y      source subfield for reporting the source bib number
   idmap  file for the koha bib and source id
@@ -246,6 +239,7 @@ RECORD: while (  ) {
             next RECORD;            
         }
     }
+    SetUTF8Flag($record);
     my $isbn;
     # remove trailing - in isbn (only for biblios, of course)
     if ($biblios) {
@@ -271,16 +265,17 @@ RECORD: while (  ) {
        my $server=($authorities?'authorityserver':'biblioserver');
        my ($error, $results,$totalhits)=C4::Search::SimpleSearch( $query, 0, 3, [$server] );
        die "unable to search the database for duplicates : $error" if (defined $error);
-       #warn "$query $server : $totalhits";
+       $debug && warn "$query $server : $totalhits";
        if ($results && scalar(@$results)==1){
            my $marcrecord = MARC::File::USMARC::decode($results->[0]);
+           SetUTF8Flag($marcrecord);
 	   	   $id=GetRecordId($marcrecord,$tagid,$subfieldid);
        } 
        elsif  ($results && scalar(@$results)>1){
-       $debug && warn "more than one match for $query";
+          $debug && warn "more than one match for $query";
        } 
        else {
-       $debug && warn "nomatch for $query";
+          $debug && warn "nomatch for $query";
        }
     }
 	my $originalid;
