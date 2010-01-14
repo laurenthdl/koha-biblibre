@@ -171,9 +171,9 @@ if ( $query->param('place_reserve') ) {
     # here we actually do the reserveration. Stage 3.
     if ($query->param('request') eq 'any'){
         # place a request on 1st available
-        AddReserve($branch,$borrowernumber,$biblionumber,'a',\@realbi,$rank,$notes,$bibdata->{'title'},$checkitem,$found);
+        AddReserve($branch,$borrowernumber,$biblionumber,'a',\@realbi,$rank,$notes,$bibdata->{'title'},$checkitem,$found, "opac");
     } else {
-        AddReserve($branch,$borrowernumber,$biblionumber,'a',\@realbi,$rank,$notes,$bibdata->{'title'},$checkitem, $found);
+        AddReserve($branch,$borrowernumber,$biblionumber,'a',\@realbi,$rank,$notes,$bibdata->{'title'},$checkitem, $found, "opac");
     }
     print $query->redirect("/cgi-bin/koha/opac-user.pl#opac-user-holds");
 }
