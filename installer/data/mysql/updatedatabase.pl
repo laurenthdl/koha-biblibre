@@ -3436,6 +3436,20 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = '3.02.00.014';
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do(qq{INSERT INTO `saved_sql` (
+    `id`, `borrowernumber`, `date_created`, `last_modified`, `savedsql`, `last_run`, `report_name`, `type`, `notes`)
+    VALUES 
+    (NULL , '0', NULL , NULL , 'select branchcode, count(*) from borrowers where dateexpiry >= <<start_date>> and dateexpiry <= <<end_date>> group by branchcode', NULL, 'ESGBU_Patrons', '1', ''),
+    (NULL , '0', NULL , NULL , 'select branchcode, count(borrowers.borrowernumber) from borrowers, statistics where borrowers.borrowernumber = statistics.borrowernumber AND statistics.datetime >= <<start_date>> AND  statistics.datetime <= <<end_date>> AND (type = "issue" or type = "renew") group by branchcode', NULL, 'ESGBU_Active_Patrons', '1', ''),
+    (NULL , '0', NULL , NULL , 'select branch, count(*) from statistics where (type="issue" or type="renew") and datetime >= <<start_date>> and datetime <= <<end_date>> group by branch', NULL, 'ESGBU_Number_of_issues', '1', ''),
+    (NULL , '0', NULL , NULL , 'SELECT substring(marcxml,LOCATE("<leader>",marcxml)+8+6,1) rtype , count(*) from biblioitems GROUP BY rtype', NULL, 'ESGBU_Item_Types', '1', '')
+    ;});
+    print "Upgrade done (Add ESGBU saved reports)\n";
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
