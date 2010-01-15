@@ -45,7 +45,7 @@ $borrowers=SearchInTable("borrowers","Jean");
 ok(@$borrowers>0, "Search In Table string");
 #10
 #FIXME : When searching on All the fields of the table, seems to return Junk
-eval{$borrowers=SearchInTable("borrowers","Jean Valjean",undef,undef,undef,[qw(firstname surname borrowernumber branchcode cardnumber)],"start_with")};
+eval{$borrowers=SearchInTable("borrowers","Jean Valjean",undef,undef,undef,[qw(firstname surname borrowernumber cardnumber)],"start_with")};
 #eval{$borrowers=SearchInTable("borrowers","Jean Valjean",undef,undef,undef,undef,"start_with")};
 # This would not be much efficient because of "numbers" special treatment : We return stuff if empty or '' as soon as search is NOT exact
 # This behaviour is implemented because of branchcode and numbers can be null
