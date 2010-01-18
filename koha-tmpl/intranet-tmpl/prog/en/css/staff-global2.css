@@ -1,4 +1,4 @@
-@import url( /intranet-tmpl/prog/en/lib/yui/reset-fonts-grids.css) all;
+@import url( /lib/js/yui/reset-fonts-grids.css) all;
 
 a, a:link, a:visited, a:active {
     text-decoration:none;

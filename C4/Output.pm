@@ -100,7 +100,7 @@ sub gettemplate {
           . "/$theme/$lang";
     $template->param(
         themelang => $themelang,
-        yuipath   => (C4::Context->preference("yuipath") eq "local"?"$themelang/lib/yui":C4::Context->preference("yuipath")),
+        yuipath   => (C4::Context->preference("yuipath") eq "local"?"/lib/js/yui":C4::Context->preference("yuipath")),
         interface => ( $interface ne 'intranet' ? '/opac-tmpl' : '/intranet-tmpl' ),
         theme     => $theme,
         lang      => $lang

@@ -1,5 +1,5 @@
-@import url("../lib/yui/reset-fonts-grids.css");
-@import url("../lib/yui/skin.css");
+@import url("/lib/js/yui/reset-fonts-grids.css");
+@import url("/lib/js/yui/skin.css");
 
 a, a:link, a:visited, a:active {
 	color : #0000CC;
