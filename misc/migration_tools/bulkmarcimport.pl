@@ -270,6 +270,10 @@ RECORD: while (  ) {
            my $marcrecord = MARC::File::USMARC::decode($results->[0]);
            SetUTF8Flag($marcrecord);
 	   	   $id=GetRecordId($marcrecord,$tagid,$subfieldid);
+           if ($authorities && $marcFlavour ) {
+                #Skip if authority in database is the same as the on in database
+                next if ($marcrecord->field('005')->data >= $record->field('005')->data);
+           }
        } 
        elsif  ($results && scalar(@$results)>1){
           $debug && warn "more than one match for $query";
