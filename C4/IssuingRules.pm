@@ -22,6 +22,7 @@ use warnings;
 use C4::Context;
 use C4::Koha;
 use C4::SQLHelper qw( SearchInTable InsertInTable UpdateInTable DeleteInTable );
+use Memoize;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
@@ -73,9 +74,14 @@ The rules are applied from most specific to less specific, using the first found
 The values in the returned hashref are inherited from a more generic rules if undef.
 
 =cut
+#Caching GetIssuingRule
+memoize('GetIssuingRule');
 
 sub GetIssuingRule {
     my ( $categorycode, $itemtype, $branchcode ) = @_;
+    $categorycode||="*";
+    $itemtype||="*";
+    $branchcode||="*";
 
     # This configuration table defines the order of inheritance. We'll loop over it.
     my @attempts = (
