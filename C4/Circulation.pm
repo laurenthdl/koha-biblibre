@@ -356,8 +356,6 @@ sub TooMany {
     # given branch, patron category, and item type, determine
     # applicable issuing rule
     my $branchfield = C4::Context->Preference('HomeOrHoldingBranch') || "homebranch";
-	#FIXME in the case of undefined rules for * and default circulation rules, 
-	# This Kind of check can endup in too restrictive permissions : 0 checks allowed
     foreach my $branch ( $exactbranch, '*' ) {
         my $issuing_rule = GetIssuingRule( $cat_borrower, $type, $branch );
 
