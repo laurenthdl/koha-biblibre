@@ -98,6 +98,7 @@ BEGIN {
         &GetReservesFromBorrowernumber
         &GetReservesForBranch
         &GetReservesToBranch
+        &GetReservesControlBranch
         &GetReserveCount
         &GetReserveFee
 		&GetReserveInfo
@@ -333,7 +334,7 @@ sub GetReservesFromBorrowernumber {
     my $data = $sth->fetchall_arrayref({});
     return @$data;
 }
-#-------------------------------------------------------------------------------------
+
 =item CanBookBeReserved
 
 $error = &CanBookBeReserved($borrowernumber, $biblionumber)
@@ -356,12 +357,7 @@ sub CanBookBeReserved{
     my $branchcode;
     
     
-    if($controlbranch eq "ItemHomeLibrary"){
-        $branchcode = '*';
-    }elsif($controlbranch eq "PatronLibrary"){
-        $branchcode = $borrower->{branchcode};
-    }
-
+    $branchcode=GetReservesControlBranch($borrower,$biblio);
     if($itype){
         my @all_items = C4::Items::GetItemsInfo($biblionumber);
         my %itypes;
@@ -467,6 +463,9 @@ sub CanItemBeReserved{
         $itemtype = '*';
     }
     
+    return 0 if ($issuingrule->{reservesallowed}==0 || 
+                ($issuingrule->{holdrestricted}== 1 && !($branchcode eq $borrower->{branchcode}))
+                );
     # we retrieve count
     
     $querycount .= "AND $branchfield = ?";
@@ -753,6 +752,27 @@ sub GetReserveFee {
         }
     }
     return $fee;
+}
+
+#-------------------------------------------------------------------------------------
+=item GetReservesControlBranch
+
+$branchcode = &GetReservesControlBranch($borrower, $item)
+
+Returns the branchcode to consider to check hold rules against
+
+=cut
+sub GetReservesControlBranch{
+    my ($borrower, $item) = @_;
+    my $controlbranch = C4::Context->preference('ReservesControlBranch');
+    my $hbr           = C4::Context->preference('HomeOrHoldingBranch');
+    my $branchcode="*";
+    if($controlbranch eq "ItemHomeLibrary"){
+        $branchcode = $item->{$hbr};
+    } elsif($controlbranch eq "PatronLibrary"){
+        $branchcode = $borrower->{'branchcode'};
+    }
+    return $branchcode;
 }
 
 =item GetReservesToBranch

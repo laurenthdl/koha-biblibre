@@ -398,15 +398,15 @@ foreach my $biblionumber (@biblionumbers) {
                 }
             }
             
-            my $branchitemrule = GetIssuingRule( $borrowerinfo->{borrowernumber}, $item->{'itype'}, $item->{'homebranch'} );
-            my $policy_holdallowed = $branchitemrule->{'reservesallowed'};
-            $item->{'holdallowed'} = $branchitemrule->{'reservesallowed'};
+            my $branchitemrule = GetIssuingRule( $borrowerinfo->{borrowernumber}, $item->{'itype'}, GetReservesControlBranch($borrower,$item) );
+            my $policy_holdrestricted = $branchitemrule->{'reservesallowed'};
+            $item->{'holdrestricted'} = $branchitemrule->{'holdrestricted'};
             
             if (IsAvailableForItemLevelRequest($itemnumber) and not $item->{cantreserve} and CanItemBeReserved($borrowerinfo->{borrowernumber}, $itemnumber) ) {
-                if ( not $policy_holdallowed and C4::Context->preference( 'AllowHoldPolicyOverride' ) ) {
+                if ( not $policy_holdrestricted and C4::Context->preference( 'AllowHoldPolicyOverride' ) ) {
                     $item->{override} = 1;
                     $num_override++;
-                } elsif ( $policy_holdallowed ) {
+                } elsif ( $policy_holdrestricted ) {
                     $item->{available} = 1;
                     $num_available++;
                 }

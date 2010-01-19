@@ -34,7 +34,6 @@ use C4::Debug;
 use C4::Items;
 # use Data::Dumper;
 
-my $MAXIMUM_NUMBER_OF_RESERVES = C4::Context->preference("maxreserves");
 
 my $query = new CGI;
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
@@ -266,11 +265,6 @@ if ( CheckBorrowerDebarred($borrowernumber) ) {
 
 my @reserves = GetReservesFromBorrowernumber( $borrowernumber );
 $template->param( RESERVES => \@reserves );
-if ( scalar(@reserves) >= $MAXIMUM_NUMBER_OF_RESERVES ) {
-    $template->param( message => 1 );
-    $noreserves = 1;
-    $template->param( too_many_reserves => scalar(@reserves));
-}
 foreach my $res (@reserves) {
     foreach my $biblionumber (@biblionumbers) {
         if ( $res->{'biblionumber'} == $biblionumber && $res->{'borrowernumber'} == $borrowernumber) {
@@ -460,7 +454,10 @@ foreach my $biblioNum (@biblionumbers) {
         $biblioLoopIter{holdable} = undef;
     }
     if(not CanBookBeReserved($borrowernumber,$biblioNum)){
-        $biblioLoopIter{holdable} = undef;
+       $template->param( message => 1 );
+       $noreserves = 1;
+       $template->param( too_many_reserves => scalar(@reserves));
+       $biblioLoopIter{holdable} = undef;
     }
 
     push @$biblioLoop, \%biblioLoopIter;
