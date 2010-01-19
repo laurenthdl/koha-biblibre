@@ -114,9 +114,10 @@ $(document).ready(function() {
                                 <th class="fines">Suspension duration (day)</th>
                                 <th class="issues">Renewals allowed (count)</th>
                                 <th class="issues">Renewals period (days)</th>
-                                <th class="reserves">Reserves allowed (count)</th>
-                                <th class="reserves">Reserves pickup delay (day)</th>
+                                <th class="reserves">Holds allowed (count)</th>
+                                <th class="reserves">Holds pickup delay (day)</th>
                                 <th class="reserves">Allow on shelf holds</th>
+                                <th class="reserves">Holds restricted to library</th>
                                 <th>&nbsp;</th>
                             </tr>
                         </thead>
@@ -226,6 +227,17 @@ $(document).ready(function() {
                                     No
                                     <!--/TMPL_IF-->
                                     </td>
+                                    <!-- TMPL_IF NAME="herited_holdrestricted" -->
+                                    <td class="reserves herited">
+                                    <!--TMPL_ELSE-->
+                                     <td class="reserves">
+                                    <!--/TMPL_IF-->
+                                    <!-- TMPL_IF NAME="holdrestricted" -->
+                                    Yes
+                                    <!--TMPL_ELSE-->
+                                    No
+                                    <!--/TMPL_IF-->
+                                    </td>
                                     <td>
                                         <a class="button" href="/cgi-bin/koha/admin/smart-rules.pl?op=delete&amp;itemtype=<!-- TMPL_VAR NAME="itemtype" -->&amp;categorycode=<!-- TMPL_VAR NAME="categorycode" -->&amp;branchcode=<!-- TMPL_VAR NAME="branchcode" -->">Delete</a>
                                     </td>
@@ -267,6 +279,7 @@ $(document).ready(function() {
                                         <option value="0">No</option>
                                     </select>
                                 </td>
+                                <td class="reserves"><input type="checkbox" name="holdrestricted" value="1"/> </td>
                                 <td><input type="hidden" name="branchcode" value="<!-- TMPL_VAR NAME="branchcode" -->"/><input type="submit" value="Add" class="submit" /></td>
                             </tr>
                         </tfoot>
