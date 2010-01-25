@@ -350,31 +350,29 @@ sub CanBookBeReserved{
     
     # we retrieve the user rights
     my @args;
-    my $rightsquery = "SELECT categorycode, itemtype, branchcode, reservesallowed 
-                       FROM issuingrules 
-                       WHERE categorycode IN (?, '*')";
-    push @args,$borrower->{categorycode};
-
+    my $branchcode;
+    
+    
     if($controlbranch eq "ItemHomeLibrary"){
-        $rightsquery .= " AND branchcode = '*'";
+        $branchcode = '*';
     }elsif($controlbranch eq "PatronLibrary"){
-        $rightsquery .= " AND branchcode IN (?,'*')";
-        push @args, $borrower->{branchcode};
+        $branchcode = $borrower->{branchcode};
     }
-    
-    if(not $itype){
-        $rightsquery .= " AND itemtype IN (?,'*')";
-        push @args, $biblio->{itemtype};
+
+    if($itype){
+        my @all_items = C4::Items::GetItemsInfo($biblionumber);
+        my %itypes;
+        for my $item (@all_items){
+            $itypes{$item->{itype}} = 1;
+        }
+        for my $key (keys %itypes){
+            my $rightsquery = GetIssuingRule($borrower->{categorycode}, $key, $branchcode);
+            $reservesrights += $rightsquery->{reservesallowed};
+        }
+        
     }else{
-        $rightsquery .= " AND itemtype = '*'";
-    }
-    
-    $rightsquery .= " ORDER BY categorycode DESC, itemtype DESC, branchcode DESC";
-    my $sthrights = $dbh->prepare($rightsquery);
-    $sthrights->execute(@args);
-    
-    if(my $row = $sthrights->fetchrow_hashref()){
-       $reservesrights = $row->{reservesallowed};
+        my $rightsquery = GetIssuingRule($borrower->{categorycode}, $biblio->{itemtype}, $branchcode);
+        $reservesrights = $rightsquery->{reservesallowed};
     }
     
     @args = ();
@@ -430,20 +428,8 @@ sub CanItemBeReserved{
     my $itype         = C4::Context->preference('item-level_itypes') ? "itype" : "itemtype";
 
     # we retrieve borrowers and items informations #
-    my $item     = GetItem($itemnumber);
+    my $item     = C4::Items::GetItem($itemnumber);
     my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber);     
-    
-    # we retrieve user rights on this itemtype and branchcode
-    my $sth = $dbh->prepare("SELECT categorycode, itemtype, branchcode, reservesallowed 
-                             FROM issuingrules 
-                             WHERE (categorycode in (?,'*') ) 
-                             AND (itemtype IN (?,'*')) 
-                             AND (branchcode IN (?,'*')) 
-                             ORDER BY 
-                               categorycode DESC, 
-                               itemtype     DESC, 
-                               branchcode   DESC;"
-                           );
                            
     my $querycount ="SELECT 
                             count(*) as count
@@ -468,11 +454,12 @@ sub CanItemBeReserved{
         $branchcode = $borrower->{branchcode};
     }
     
-    # we retrieve rights 
-    $sth->execute($categorycode, $itemtype, $branchcode);
-    if(my $rights = $sth->fetchrow_hashref()){
-        $itemtype        = $rights->{itemtype};
-        $allowedreserves = $rights->{reservesallowed}; 
+    # we retrieve user rights on this itemtype and branchcode
+    my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{$itype}, $branchcode);
+
+    if($issuingrule){
+        $itemtype        = $issuingrule->{itemtype};
+        $allowedreserves = $issuingrule->{reservesallowed}; 
     }else{
         $itemtype = '*';
     }
@@ -494,7 +481,7 @@ sub CanItemBeReserved{
     if(my $rowcount = $sthcount->fetchrow_hashref()){
         $reservecount = $rowcount->{count};
     }
-    
+
     # we check if it's ok or not
     if( $reservecount < $allowedreserves ){
         return 1;
