@@ -1737,7 +1737,7 @@ sub GetItemIssue {
     my ($itemnumber) = @_;
     return unless $itemnumber;
     my $sth = C4::Context->dbh->prepare(
-        "SELECT *
+        "SELECT *, issues.renewals as 'issues.renewals'
         FROM issues 
         LEFT JOIN items ON issues.itemnumber=items.itemnumber
         WHERE issues.itemnumber=?"
@@ -1937,7 +1937,7 @@ sub CanBookBeRenewed {
     
     my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{itype}, $branchcode);
     
-    if ( ( $issuingrule->{renewalsallowed} > $itemissue->{renewals} ) || $override_limit ) {
+    if ( ( $issuingrule->{renewalsallowed} > $itemissue->{'issues.renewals'} ) || $override_limit ) {
         $renewokay = 1;
     } else {
         $error = "too_many";
@@ -1983,7 +1983,7 @@ sub AddRenewal {
     my $datedue        = shift;
     my $lastreneweddate = shift || C4::Dates->new()->output('iso');
     my $item = GetItem($itemnumber) or return undef;
-    my $biblio = GetBiblioFromItemNumber($itemnumber) or return undef;
+#    my $biblio = GetBiblioFromItemNumber($itemnumber) or return undef;
 
     my $dbh = C4::Context->dbh;
 
@@ -2019,7 +2019,7 @@ sub AddRenewal {
 
     # Update the issues record to have the new due date, and a new count
     # of how many times it has been renewed.
-    my $renews = $issuedata->{'renewals'} + 1;
+    my $renews = $issuedata->{'issues.renewals'} + 1;
     $sth = $dbh->prepare(
         "UPDATE issues SET date_due = ?, renewals = ?, lastreneweddate = ?
                             WHERE borrowernumber=? 
@@ -2029,8 +2029,8 @@ sub AddRenewal {
     $sth->finish;
 
     # Update the renewal count on the item, and tell zebra to reindex
-    $renews = $biblio->{'renewals'} + 1;
-    ModItem( { renewals => $renews, onloan => $datedue->output('iso') }, $biblio->{'biblionumber'}, $itemnumber );
+    $renews = $item->{'renewals'} + 1;
+    ModItem( { renewals => $renews, onloan => $datedue->output('iso') }, undef, $itemnumber );
 
     # Charge a new rental fee, if applicable?
     my ( $charge, $type ) = GetIssuingCharges( $itemnumber, $borrowernumber );
