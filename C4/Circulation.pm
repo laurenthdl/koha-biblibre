@@ -1296,7 +1296,7 @@ sub AddReturn {
             $messages->{'WasReturned'} = 1;    # FIXME is the "= 1" right?  This could be the borrower hash.
         }
 
-        ModItem( { onloan => undef }, $issue->{'biblionumber'}, $item->{'itemnumber'} );
+        ModItem( { renewals=>0, onloan => undef }, $issue->{'biblionumber'}, $item->{'itemnumber'} );
     	# the holdingbranch is updated if the document is returned to another location.
     	# this is always done regardless of whether the item was on loan or not
     	if ( $item->{'holdingbranch'} ne $branch ) {
@@ -2055,42 +2055,39 @@ sub AddRenewal {
     return $datedue;
 }
 
-sub GetRenewCount {
+# Obsolete  ?????
 
-    # check renewal status
-    my ( $bornum, $itemno ) = @_;
-    my $dbh           = C4::Context->dbh;
-    my $renewcount    = 0;
-    my $renewsallowed = 0;
-    my $renewsleft    = 0;
-
-    # Look in the issues table for this item, lent to this borrower,
-    # and not yet returned.
-
-    # FIXME - I think this function could be redone to use only one SQL call.
-    my $sth = $dbh->prepare(
-        "select * from issues
-                                where (borrowernumber = ?)
-                                and (itemnumber = ?)"
-    );
-    $sth->execute( $bornum, $itemno );
-    my $data = $sth->fetchrow_hashref;
-    $renewcount = $data->{'renewals'} if $data->{'renewals'};
-    $sth->finish;
-    my $query = "SELECT renewalsallowed FROM items ";
-    $query .=
-      ( C4::Context->preference('item-level_itypes') )
-      ? "LEFT JOIN itemtypes ON items.itype = itemtypes.itemtype "
-      : "LEFT JOIN biblioitems on items.biblioitemnumber = biblioitems.biblioitemnumber
-                   LEFT JOIN itemtypes ON biblioitems.itemtype = itemtypes.itemtype ";
-    $query .= "WHERE items.itemnumber = ?";
-    my $sth2 = $dbh->prepare($query);
-    $sth2->execute($itemno);
-    my $data2 = $sth2->fetchrow_hashref();
-    $renewsallowed = $data2->{'renewalsallowed'};
-    $renewsleft    = $renewsallowed - $renewcount;
-    return ( $renewcount, $renewsallowed, $renewsleft );
-}
+#sub GetRenewCount {
+#
+#    # check renewal status
+#    my ( $bornum, $itemno ) = @_;
+#    my $dbh           = C4::Context->dbh;
+#    my $renewcount    = 0;
+#    my $renewsallowed = 0;
+#    my $renewsleft    = 0;
+#
+#    # Look in the issues table for this item, lent to this borrower,
+#    # and not yet returned.
+#
+#    # FIXME - I think this function could be redone to use only one SQL call.
+#    my $sth = $dbh->prepare(
+#        "select * from issues
+#                                where (borrowernumber = ?)
+#                                and (itemnumber = ?)"
+#    );
+#    $sth->execute( $bornum, $itemno );
+#    my $data = $sth->fetchrow_hashref;
+#    $renewcount = $data->{'renewals'} if $data->{'renewals'};
+#    $sth->finish;
+#    $item and $borrower should be calculated
+#    my $branchcode = _GetCircControlBranch($item, $borrower);
+#    
+#    my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{itype}, $branchcode);
+#    
+#    $renewsallowed = $issuingrule->{'renewalsallowed'};
+#    $renewsleft    = $renewsallowed - $renewcount;
+#    return ( $renewcount, $renewsallowed, $renewsleft );
+#}
 
 =head2 GetIssuingCharges
 
