@@ -418,7 +418,11 @@ sub get_raw_marc_record {
             return;
         }
     }
-    return $marc;
+    if ($marc->fields()){
+        return $marc;
+    } else {
+        return undef;
+    }
 }
 
 sub fix_leader {
