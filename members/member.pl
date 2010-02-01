@@ -74,7 +74,7 @@ if (C4::Context->preference("AddPatronLists")=~/code/){
 my $member=$input->param('member');
 my $orderbyparams=$input->param('orderby');
 my @orderby;
-if ($orderbyparams){
+if ($orderbyparams and not $quicksearch){
 	my @orderbyelt=split(/,/,$orderbyparams);
 	push @orderby, {$orderbyelt[0]=>$orderbyelt[1]||0};
 }
@@ -106,6 +106,7 @@ if($count == 1){
 my @resultsdata;
 $to=($count>$to?$to:$count);
 my $index=$from;
+
 foreach my $borrower(@$results[$from..$to-1]){
   #find out stats
   my ($od,$issue,$fines)=GetMemberIssuesAndFines($$borrower{'borrowernumber'});
