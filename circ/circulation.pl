@@ -461,7 +461,7 @@ if ($borrower) {
 		$it->{'can_renew'} = $can_renew;
 		$it->{'can_confirm'} = !$can_renew && !$restype;
 		$it->{'renew_error'} = $restype;
-	    $it->{'checkoutdate'} = C4::Dates->new($it->{'issuedate'},'iso');
+	    $it->{'checkoutdate'} = $it->{'issuedate'};
 
 	    $totalprice += $it->{'replacementprice'};
 		$it->{'itemtype'} = $itemtypeinfo->{'description'};
