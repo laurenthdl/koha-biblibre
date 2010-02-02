@@ -7,10 +7,12 @@
             <a href="/cgi-bin/koha/suggestion/suggestion.pl">No suggestions waiting</a>
         <!-- /TMPL_IF -->
     </li>
-    <li><a href="/cgi-bin/koha/admin/aqbudgetperiods.pl">Root budgets</a></li>
-    <li>Manage</li>
-    <ul>
-        <li><a href="/cgi-bin/koha/admin/aqbudgets.pl">Budgets</a></li>
-        <li><a href="/cgi-bin/koha/admin/currency.pl" class="button">Currencies</a></li>
+    <!-- TMPL_IF name="CAN_user_acquisition_budget_manage" -->
+        <li><a href="/cgi-bin/koha/admin/aqbudgetperiods.pl">Root budgets</a></li>
+        <li><a href="/cgi-bin/koha/admin/aqbudgets.pl">Manage budgets</a></li>
+    <!-- /TMPL_IF -->
+    <!-- TMPL_IF name="CAN_user_parameters" -->
+        <li><a href="/cgi-bin/koha/admin/currency.pl" class="button">Manage currencies</a></li>
+    <!-- /TMPL_IF -->
     </ul>
 </ul>
