@@ -93,7 +93,7 @@ $dbh->{AutoCommit} = 0;
 	while ( my $record = $batch->next() ) {
 	    #$debug && warn $record->as_formatted;
 	    next unless $record;
-	    if ($record){
+	    if ($record && $record->fields()){
 		my ($guessed_charset, $charset_errors);
          	($record, $guessed_charset, $charset_errors) = MarcToUTF8Record($record, C4::Context->preference('marcflavour'));
 		SetUTF8Flag($record);
