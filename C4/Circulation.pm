@@ -2019,7 +2019,7 @@ sub AddRenewal {
 
     # Update the issues record to have the new due date, and a new count
     # of how many times it has been renewed.
-    my $renews = $issuedata->{'issues.renewals'} + 1;
+    my $renews = $issuedata->{'renewals'} + 1;
     $sth = $dbh->prepare(
         "UPDATE issues SET date_due = ?, renewals = ?, lastreneweddate = ?
                             WHERE borrowernumber=? 
