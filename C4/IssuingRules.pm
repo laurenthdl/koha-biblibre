@@ -123,7 +123,32 @@ sub GetIssuingRule {
             }
         }
     }
-    return $oldrule;
+    if($oldrule){
+        return $oldrule;
+    }else{
+        return {
+            'itemtype'          => $itemtype,
+            'categorycode'      => $categorycode,
+            'branchcode'        => $branchcode,
+            'holdspickupdelay'  => 0,
+            'maxissueqty'       => 0,
+            'renewalsallowed'   => 0,
+            'firstremind'       => 0,
+            'accountsent'       => 0,
+            'reservecharge'     => 0,
+            'fine'              => 0,
+            'restrictedtype'    => 0,
+            'rentaldiscount'    => 0,
+            'chargename'        => 0,
+            'finedays'          => 0,
+            'holdrestricted'    => 0,
+            'allowonshelfholds' => 0,
+            'reservesallowed'   => 0,
+            'chargeperiod'      => 0,
+            'issuelength'       => 0,
+            'renewalperiod'     => 0,
+        };
+    }
 }
 
 =head2 GetIssuingRulesByBranchCode
