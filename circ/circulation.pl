@@ -176,7 +176,7 @@ if($duedatespec_allow){
     $datedue = $globalduedate if ($globalduedate);
 }
 
-my $todaysdate = C4::Dates->new->output(C4::Context->preference('dateformat'));
+my $todaysdate = C4::Dates->new->output('iso');
 
 # check and see if we should print
 if ( $barcode eq '' && $print eq 'maybe' ) {

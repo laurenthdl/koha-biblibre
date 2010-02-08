@@ -356,6 +356,8 @@ sub TooMany {
     # given branch, patron category, and item type, determine
     # applicable issuing rule
     my $branchfield = C4::Context->Preference('HomeOrHoldingBranch') || "homebranch";
+    my $toomany = 1;
+
     foreach my $branch ( $exactbranch, '*' ) {
         my $issuing_rule = GetIssuingRule( $cat_borrower, $type, $branch );
 
@@ -426,7 +428,10 @@ sub TooMany {
 
             my $max_loans_allowed = $issuing_rule->{'maxissueqty'};
             if ( $current_loan_count >= $max_loans_allowed ) {
-                return "$current_loan_count / $max_loans_allowed";
+                return 1,$current_loan_count,$max_loans_allowed;
+            }
+            else {
+                $toomany=0;
             }
         }
 
@@ -454,13 +459,16 @@ sub TooMany {
 
             my $max_loans_allowed = $branch_borrower_circ_rule->{maxissueqty};
             if ( $current_loan_count >= $max_loans_allowed ) {
-                return "$current_loan_count / $max_loans_allowed";
+                return 1,$current_loan_count,$max_loans_allowed;
+            }
+            else {
+                $toomany=0;
             }
         }
     }
 
     # OK, the patron can issue !!!
-    return;
+    return $toomany;
 }
 
 =head2 itemissues
@@ -682,7 +690,10 @@ sub CanBookBeIssued {
         my $branch = _GetCircControlBranch( $item, $borrower );
         my $itype = ( C4::Context->preference('item-level_itypes') ) ? $item->{'itype'} : $biblioitem->{'itemtype'};
         my $loanlength = GetLoanLength( $borrower->{'categorycode'}, $itype, $branch );
-        $duedate = CalcDateDue( C4::Dates->new( $issuedate, 'iso' ), $loanlength, $branch, $borrower );
+        unless ( $loanlength ) {
+             $issuingimpossible{LOAN_LENGTH_UNDEFINED} = "$borrower->{'categorycode'}, $itype, $branch";
+        }
+        $duedate = CalcDateDue( C4::Dates->new( $issuedate, 'iso' ), $loanlength, $branch, $borrower ) ;
 
         # Offline circ calls AddIssue directly, doesn't run through here
         #  So issuingimpossible should be ok.
@@ -755,14 +766,14 @@ sub CanBookBeIssued {
     #
     # JB34 CHECKS IF BORROWERS DONT HAVE ISSUE TOO MANY BOOKS
     #
-    my $toomany = TooMany( $borrower, $item->{biblionumber}, $item );
+    my @toomany = TooMany( $borrower, $item->{biblionumber}, $item );
 
-    # if TooMany return / 0, then the user has no permission to check out this book
-    if ( $toomany =~ /\/ 0/ ) {
+    if ( $toomany[0] == 1 && scalar(@toomany)<3) {
         $needsconfirmation{PATRON_CANT} = 1;
-    } else {
-        $needsconfirmation{TOO_MANY} = $toomany if $toomany;
+    } elsif (scalar(@toomany)==3) {
+        $needsconfirmation{TOO_MANY} = "$toomany[1] / $toomany[2]";
     }
+
 
     #
     # ITEM CHECKING
@@ -1078,54 +1089,8 @@ my $loanlength = &GetLoanLength($borrowertype,$itemtype,branchcode)
 
 sub GetLoanLength {
     my ( $borrowertype, $itemtype, $branchcode ) = @_;
-    my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare( "select issuelength from issuingrules where categorycode=? and itemtype=? and branchcode=? and issuelength is not null" );
-
-    # warn "in get loan lenght $borrowertype $itemtype $branchcode ";
-    # try to find issuelength & return the 1st available.
-    # check with borrowertype, itemtype and branchcode, then without one of those parameters
-    $sth->execute( $borrowertype, $itemtype, $branchcode );
-    my $loanlength = $sth->fetchrow_hashref;
-    return $loanlength->{issuelength}
-      if defined($loanlength) && $loanlength->{issuelength} ne 'NULL';
-
-    $sth->execute( $borrowertype, "*", $branchcode );
-    $loanlength = $sth->fetchrow_hashref;
-    return $loanlength->{issuelength}
-      if defined($loanlength) && $loanlength->{issuelength} ne 'NULL';
-
-    $sth->execute( "*", $itemtype, $branchcode );
-    $loanlength = $sth->fetchrow_hashref;
-    return $loanlength->{issuelength}
-      if defined($loanlength) && $loanlength->{issuelength} ne 'NULL';
-
-    $sth->execute( "*", "*", $branchcode );
-    $loanlength = $sth->fetchrow_hashref;
-    return $loanlength->{issuelength}
-      if defined($loanlength) && $loanlength->{issuelength} ne 'NULL';
-
-    $sth->execute( $borrowertype, $itemtype, "*" );
-    $loanlength = $sth->fetchrow_hashref;
-    return $loanlength->{issuelength}
-      if defined($loanlength) && $loanlength->{issuelength} ne 'NULL';
-
-    $sth->execute( $borrowertype, "*", "*" );
-    $loanlength = $sth->fetchrow_hashref;
-    return $loanlength->{issuelength}
-      if defined($loanlength) && $loanlength->{issuelength} ne 'NULL';
-
-    $sth->execute( "*", $itemtype, "*" );
-    $loanlength = $sth->fetchrow_hashref;
-    return $loanlength->{issuelength}
-      if defined($loanlength) && $loanlength->{issuelength} ne 'NULL';
-
-    $sth->execute( "*", "*", "*" );
-    $loanlength = $sth->fetchrow_hashref;
-    return $loanlength->{issuelength}
-      if defined($loanlength) && $loanlength->{issuelength} ne 'NULL';
-
-    # if no rule is set => 21 days (hardcoded)
-    return 21;
+    my $loanlength=GetIssuingRule($borrowertype,$itemtype,$branchcode);
+    return $loanlength->{issuelength};
 }
 
 =head2 AddReturn

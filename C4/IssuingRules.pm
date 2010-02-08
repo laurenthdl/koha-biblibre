@@ -131,7 +131,7 @@ sub GetIssuingRule {
             'categorycode'      => $categorycode,
             'branchcode'        => $branchcode,
             'holdspickupdelay'  => 0,
-            'maxissueqty'       => 0,
+       #     'maxissueqty'       => 0,
             'renewalsallowed'   => 0,
             'firstremind'       => 0,
             'accountsent'       => 0,
@@ -145,7 +145,7 @@ sub GetIssuingRule {
             'allowonshelfholds' => 0,
             'reservesallowed'   => 0,
             'chargeperiod'      => 0,
-            'issuelength'       => 0,
+       #     'issuelength'       => 0,
             'renewalperiod'     => 0,
         };
     }
