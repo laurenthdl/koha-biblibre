@@ -72,8 +72,9 @@ if (scalar @ARGV > 0) {
     $commandline = 1;
 
     if ($help) {
-	print "import_borrowers.pl [--matchpoint=matchpoint] [--overwrite] [--preserve_attributes] --file=csvtoimport.csv\n";
-	print "Default values can be specified in import_borrowers.yaml (keys must be column names from the borrowers table)\n";
+	print "\nimport_borrowers.pl [--matchpoint=matchpoint] [--overwrite] [--preserve_attributes] --file=csvtoimport.csv\n\n";
+	print " * matchpoint is either 'cardnumber' or like 'patron_attribute_' + patron attribute code (example: patron_attribute_EXTERNALID)\n";
+	print " * Default values can be specified in import_borrowers.yaml (keys must be column names from the borrowers table)\n\n";
 	exit;
     } 
 
