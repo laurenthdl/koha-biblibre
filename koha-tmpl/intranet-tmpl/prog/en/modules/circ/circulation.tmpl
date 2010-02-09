@@ -250,6 +250,11 @@ function refocus(calendar) {
 <!-- TMPL_IF NAME="NOT_FOR_LOAN_FORCING" -->
     <li>Item is normally not for loan.  Check out anyway?</li>
 <!-- /TMPL_IF -->
+
+<!-- TMPL_IF NAME="DAMAGED" -->
+    <li>Items is considered damaged (<!-- TMPL_VAR NAME="DAMAGED" -->). Check out anyway?</li>
+<!-- /TMPL_IF -->
+
 </ul>
 
 <form method="post" action="/cgi-bin/koha/circ/circulation.pl">
