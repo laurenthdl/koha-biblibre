@@ -2031,39 +2031,39 @@ sub AddRenewal {
     return $datedue;
 }
 
-# Obsolete  ?????
+sub GetRenewCount {
+    # check renewal status
+    my ( $bornum, $itemno ) = @_;
+    my $dbh           = C4::Context->dbh;
+    my $renewcount    = 0;
+    my $renewsallowed = 0;
+    my $renewsleft    = 0;
 
-#sub GetRenewCount {
-#
-#    # check renewal status
-#    my ( $bornum, $itemno ) = @_;
-#    my $dbh           = C4::Context->dbh;
-#    my $renewcount    = 0;
-#    my $renewsallowed = 0;
-#    my $renewsleft    = 0;
-#
-#    # Look in the issues table for this item, lent to this borrower,
-#    # and not yet returned.
-#
-#    # FIXME - I think this function could be redone to use only one SQL call.
-#    my $sth = $dbh->prepare(
-#        "select * from issues
-#                                where (borrowernumber = ?)
-#                                and (itemnumber = ?)"
-#    );
-#    $sth->execute( $bornum, $itemno );
-#    my $data = $sth->fetchrow_hashref;
-#    $renewcount = $data->{'renewals'} if $data->{'renewals'};
-#    $sth->finish;
-#    $item and $borrower should be calculated
-#    my $branchcode = _GetCircControlBranch($item, $borrower);
-#    
-#    my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{itype}, $branchcode);
-#    
-#    $renewsallowed = $issuingrule->{'renewalsallowed'};
-#    $renewsleft    = $renewsallowed - $renewcount;
-#    return ( $renewcount, $renewsallowed, $renewsleft );
-#}
+    my $borrower = C4::Members::GetMemberDetails($bornum);
+    my $item     = GetItem($itemno); 
+
+    # Look in the issues table for this item, lent to this borrower,
+    # and not yet returned.
+
+    # FIXME - I think this function could be redone to use only one SQL call.
+    my $sth = $dbh->prepare(
+        "select * from issues
+                                where (borrowernumber = ?)
+                                and (itemnumber = ?)"
+    );
+    $sth->execute( $bornum, $itemno );
+    my $data = $sth->fetchrow_hashref;
+    $renewcount = $data->{'renewals'} if $data->{'renewals'};
+    $sth->finish;
+    # $item and $borrower should be calculated
+    my $branchcode = _GetCircControlBranch($item, $borrower);
+    
+    my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{itype}, $branchcode);
+    
+    $renewsallowed = $issuingrule->{'renewalsallowed'};
+    $renewsleft    = $renewsallowed - $renewcount;
+    return ( $renewcount, $renewsallowed, $renewsleft );
+}
 
 =head2 GetIssuingCharges
 
