@@ -388,13 +388,23 @@ foreach my $code ( keys %$messages ) {
     }
     elsif ( $code eq 'WasTransfered' ) {
         ;    # FIXME... anything to do here?
-    }elsif ( $code eq 'NotForLoan' ) {
+    }
+    elsif ( $code eq 'NotForLoan' ) {
         my $fw               = GetFrameworkCode($biblio->{'biblionumber'});
         my $category         = GetAuthValCode('items.notforloan',$fw);
         my $authorizedvalues = GetAuthorisedValues($category, $messages->{$code});
 
         foreach my $authvalue (@$authorizedvalues){
             $err{notforloan} = $authvalue->{lib} if $authvalue->{'authorised_value'} eq $messages->{$code};
+        }
+    }
+    elsif ( $code eq 'Damaged' ) {
+        my $fw               = GetFrameworkCode($biblio->{'biblionumber'});
+        my $category         = GetAuthValCode('items.damaged',$fw);
+        my $authorizedvalues = GetAuthorisedValues($category, $messages->{$code});
+
+        foreach my $authvalue (@$authorizedvalues){
+            $err{damaged} = $authvalue->{lib} if $authvalue->{'authorised_value'} eq $messages->{$code};
         }
     }
     elsif( $code eq 'Debarred' ){

@@ -1307,8 +1307,10 @@ sub AddReturn {
         $messages->{'WasLost'} = 1;
     }
     if ($item->{'notforloan'}){
-        warn $item->{notforloan};
         $messages->{'NotForLoan'} = $item->{'notforloan'};
+    }
+    if ($item->{'damaged'}){
+        $messages->{'Damaged'} = $item->{'damaged'};
     }
 
     if ($borrowernumber) {
