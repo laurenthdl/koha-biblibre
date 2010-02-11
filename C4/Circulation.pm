@@ -1306,6 +1306,10 @@ sub AddReturn {
         _FixAccountForLostAndReturned( $item->{'itemnumber'}, $borrowernumber, $barcode );    # can tolerate undef $borrowernumber
         $messages->{'WasLost'} = 1;
     }
+    if ($item->{'notforloan'}){
+        warn $item->{notforloan};
+        $messages->{'NotForLoan'} = $item->{'notforloan'};
+    }
 
     if ($borrowernumber) {
         # fix up the overdues in accounts...
