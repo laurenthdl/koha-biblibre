@@ -83,7 +83,7 @@ $columns_out is an array ref on field names is used to limit results on those fi
 
 $filtercolums is an array ref on field names : is used to limit expansion of research for strings
 
-$searchtype is string Can be "start_with" or "exact" 
+$searchtype is string Can be "field_start_with", "start_with" or "exact" 
 
 =cut
 
@@ -355,6 +355,7 @@ sub _filter_string{
 	my @columns_filtered= _filter_columns($tablename,$searchtype,$filtercolumns);
 	my $columns= _get_columns($tablename);
 	my (@values,@keys);
+    my $first=1;
 	foreach my $operand (@operands){
 		my @localkeys;
 		foreach my $field (@columns_filtered){
@@ -366,6 +367,10 @@ sub _filter_string{
 		}
 		my $sql= join (' OR ', @localkeys);
 		push @keys, $sql;
+        if ($first && $searchtype eq "field_start_with"){
+           $searchtype="start_with";
+           $first=0;
+        }
 	}
 
 	if (@keys){
