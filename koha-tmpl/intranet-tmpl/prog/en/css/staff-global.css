@@ -514,7 +514,7 @@ div.yui-b fieldset.brief {
 	padding : .4em .7em;
 }
 
-label {  
+#filters label {  
 	float: left;  
 	width: 12em;  
 	margin-right: 1em;  
