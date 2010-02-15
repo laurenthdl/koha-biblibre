@@ -71,7 +71,7 @@ else {
     $limit = 50;
 }
 
-my ( $count, $issues ) = GetAllIssues( $borrowernumber, $order2, $limit );
+my ( $issues ) = GetAllIssues( $borrowernumber, $order2, $limit );
 
 my $borr = GetMemberDetails( $borrowernumber );
 my @bordat;
@@ -80,22 +80,21 @@ $template->param( BORROWER_INFO => \@bordat );
 
 my @loop_reading;
 
-for ( my $i = 0 ; $i < $count ; $i++ ) {
+foreach my $issue (@{$issues} ) {
     my %line;
 	
 	# XISBN Stuff
-	my $isbn = GetNormalizedISBN($issues->[$i]->{'isbn'});
+	my $isbn               = GetNormalizedISBN($issue->{'isbn'});
 	$line{normalized_isbn} = $isbn;
-    $line{biblionumber}   = $issues->[$i]->{'biblionumber'};
-    $line{title}          = $issues->[$i]->{'title'};
-    $line{author}         = $issues->[$i]->{'author'};
-    $line{itemcallnumber} = $issues->[$i]->{'itemcallnumber'};
-    $line{date_due}       = format_date( $issues->[$i]->{'date_due'} );
-    $line{returndate}     = format_date( $issues->[$i]->{'returndate'} );
-    $line{volumeddesc}    = $issues->[$i]->{'volumeddesc'};
-    $line{counter}        = $i + 1;
-    $line{'description'} = $itemtypes->{ $issues->[$i]->{'itemtype'} }->{'description'};
-    $line{imageurl}       = getitemtypeimagelocation( 'opac', $itemtypes->{ $issues->[$i]->{'itemtype'}  }->{'imageurl'} );
+    $line{biblionumber}    = $issue->{'biblionumber'};
+    $line{title}           = $issue->{'title'};
+    $line{author}          = $issue->{'author'};
+    $line{itemcallnumber}  = $issue->{'itemcallnumber'};
+    $line{date_due}        = format_date( $issue->{'date_due'} );
+    $line{returndate}      = format_date( $issue->{'returndate'} );
+    $line{volumeddesc}     = $issue->{'volumeddesc'};
+    $line{'description'}   = $itemtypes->{ $issue->{'itemtype'} }->{'description'};
+    $line{imageurl}        = getitemtypeimagelocation( 'opac', $itemtypes->{ $issue->{'itemtype'}  }->{'imageurl'} );
     push( @loop_reading, \%line );
 }
 
@@ -123,11 +122,11 @@ for(qw(AmazonCoverImages GoogleJackets)) {	# BakerTaylorEnabled handled above
 }
 
 $template->param(
-    count          => $count,
     READING_RECORD => \@loop_reading,
     limit          => $limit,
     showfulllink   => 1,
-	readingrecview => 1
+	readingrecview => 1,
+	count          => scalar @loop_reading,
 );
 
 output_html_with_http_headers $query, $cookie, $template->output;

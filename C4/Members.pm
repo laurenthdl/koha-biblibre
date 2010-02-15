@@ -998,16 +998,15 @@ sub GetAllIssues {
 
     #FIXME: sanity-check order and limit
     my $dbh   = C4::Context->dbh;
-    my $count = 0;
     my $query =
-  "SELECT *,issues.renewals AS renewals,items.renewals AS totalrenewals,items.timestamp AS itemstimestamp 
+  "SELECT *, issues.timestamp as issuestimestamp, issues.renewals AS renewals,items.renewals AS totalrenewals,items.timestamp AS itemstimestamp 
   FROM issues 
   LEFT JOIN items on items.itemnumber=issues.itemnumber
   LEFT JOIN biblio ON items.biblionumber=biblio.biblionumber
   LEFT JOIN biblioitems ON items.biblioitemnumber=biblioitems.biblioitemnumber
   WHERE borrowernumber=? 
   UNION ALL
-  SELECT *,old_issues.renewals AS renewals,items.renewals AS totalrenewals,items.timestamp AS itemstimestamp 
+  SELECT *, old_issues.timestamp as issuestimestamp, old_issues.renewals AS renewals,items.renewals AS totalrenewals,items.timestamp AS itemstimestamp 
   FROM old_issues 
   LEFT JOIN items on items.itemnumber=old_issues.itemnumber
   LEFT JOIN biblio ON items.biblionumber=biblio.biblionumber
@@ -1024,9 +1023,7 @@ sub GetAllIssues {
     my @result;
     my $i = 0;
     while ( my $data = $sth->fetchrow_hashref ) {
-        $result[$i] = $data;
-        $i++;
-        $count++;
+        push @result, $data;
     }
 
     # get all issued items for borrowernumber from oldissues table
@@ -1044,7 +1041,7 @@ sub GetAllIssues {
                       WHERE borrowernumber=? 
                       ORDER BY $order";
         if ( $limit != 0 ) {
-            $limit = $limit - $count;
+            $limit = $limit - scalar(@result);
             $query2 .= " limit $limit";
         }
 
@@ -1052,12 +1049,11 @@ sub GetAllIssues {
         $sth2->execute($borrowernumber);
 
         while ( my $data2 = $sth2->fetchrow_hashref ) {
-            $result[$i] = $data2;
-            $i++;
+            push @result, $data2;
         }
     }
 
-    return ( $i, \@result );
+    return \@result;
 }
 
 
