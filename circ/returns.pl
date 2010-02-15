@@ -249,7 +249,7 @@ if ($barcode) {
         $input{return_overdue} = 1 if ($duedate and $duedate lt $today->output('iso'));
         push( @inputloop, \%input );
     }
-    elsif ( !$messages->{'BadBarcode'} ) {
+    elsif ( !$messages->{'BadBarcode'} and ! $messages->{'Wrongbranch'} ) {
         $input{duedate}   = 0;
         $returneditems{0} = $barcode;
         $riduedate{0}     = 0;
@@ -290,9 +290,12 @@ if ( $messages->{'NeedsTransfer'} ){
 }
 
 if ( $messages->{'Wrongbranch'} ){
-    $template->param(
-        wrongbranch => 1,
-    );
+	$template->param(
+		wrongbranch => 1,
+		barcode     => $barcode,
+		exemptfine  => $exemptfine,
+		dropboxmode => $dropboxmode,
+	);
 }
 
 # case of wrong transfert, if the document wasn't transfered to the right library (according to branchtransfer (tobranch) BDD)
