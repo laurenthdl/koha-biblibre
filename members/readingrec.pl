@@ -37,7 +37,7 @@ my $borrowernumber = $input->param('borrowernumber');
 my $limit          = $input->param('limit');
 my $order          = $input->param('order') || '';
 
-$order = "issuestimestamp desc" if not any { $order =~ $_ } ('issuestimestamp', 'title', 'author', 'returndate');
+$order = "issuestimestamp desc" if not any { $order =~ $_ } ('issuestimestamp', 'title', 'author', 'returndate', 'date_due');
 
 #get borrower details
 my $data=GetMember('borrowernumber'=>$borrowernumber);
