@@ -344,69 +344,11 @@ $error = &CanBookBeReserved($borrowernumber, $biblionumber)
 sub CanBookBeReserved{
     my ($borrowernumber, $biblionumber) = @_;
 
-    my $dbh           = C4::Context->dbh;
-    my $biblio        = GetBiblioData($biblionumber);
-    my $borrower      = C4::Members::GetMember(borrowernumber=>$borrowernumber);
-    my $controlbranch = C4::Context->preference('ReservesControlBranch');
-    my $itype         = C4::Context->preference('item-level_itypes');
-    my $reservesrights= 0;
-    my $reservescount = 0;
-    
-    # we retrieve the user rights
-    my @args;
-    my $branchcode;
-    
-    
-    $branchcode=GetReservesControlBranch($borrower,$biblio);
-    if($itype){
-        my @all_items = C4::Items::GetItemsInfo($biblionumber);
-        my %itypes;
-        for my $item (@all_items){
-            $itypes{$item->{itype}} = 1;
-        }
-        for my $key (keys %itypes){
-            my $rightsquery = GetIssuingRule($borrower->{categorycode}, $key, $branchcode);
-            $reservesrights += $rightsquery->{reservesallowed};
-        }
-        
-    }else{
-        my $rightsquery = GetIssuingRule($borrower->{categorycode}, $biblio->{itemtype}, $branchcode);
-        $reservesrights = $rightsquery->{reservesallowed};
+    my @items = GetItemsInfo($biblionumber);
+    foreach my $item (@items){
+        return 1 if CanItemBeReserved($borrowernumber, $item->{itemnumber});
     }
-    
-    @args = ();
-    # we count how many reserves the borrower have
-    my $countquery = "SELECT count(*) as count
-                      FROM reserves
-                      LEFT JOIN items USING (itemnumber)
-                      LEFT JOIN biblioitems ON (reserves.biblionumber=biblioitems.biblionumber)
-                      LEFT JOIN borrowers USING (borrowernumber)
-                      WHERE borrowernumber = ?
-                    ";
-    push @args, $borrowernumber;
-    
-    if(not $itype){
-           $countquery .= "AND itemtype = ?";
-           push @args, $biblio->{itemtype};
-    }
-    
-    if($controlbranch eq "PatronLibrary"){
-        $countquery .= " AND borrowers.branchcode = ? ";
-        push @args, $borrower->{branchcode};
-    }
-    
-    my $sthcount = $dbh->prepare($countquery);
-    $sthcount->execute(@args);
-    
-    if(my $row = $sthcount->fetchrow_hashref()){
-       $reservescount = $row->{count};
-    }
-    if($reservescount < $reservesrights){
-        return 1;
-    }else{
-        return 0;
-    }
-    
+    return 0;
 }
 
 =item CanItemBeReserved
