@@ -323,6 +323,13 @@ if ($barcode) {
 		}
         unless($confirm_required) {
             AddIssue( $borrower, $barcode, $datedue, $cancelreserve );
+            my $remotehost=$query->remote_host();
+            warn $query->remote_host();
+#            my $pid=fork();
+#            unless($pid){
+                system("../services/magnetise.pl"," op=out "," ip=".$remotehost);
+#                exit 1;
+#            }
 			$inprocess = 1;
             if($globalduedate && ! $stickyduedate && $duedatespec_allow ){
                 $duedatespec = $globalduedate->output();
