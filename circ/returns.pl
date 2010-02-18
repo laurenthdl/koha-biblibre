@@ -207,7 +207,8 @@ if ($barcode) {
 #
     ( $returned, $messages, $issueinformation, $borrower ) =
       AddReturn( $barcode, $userenv_branch, $exemptfine, $dropboxmode,$override);     # do the return
-         system("../services/magnetise.pl","op=in","ip=".$query->remote_host);
+         my $remotehost=$query->remote_host;
+         system("../services/magnetise.pl $remotehost in");
 
     # get biblio description
     $biblio = GetBiblioFromItemNumber($itemnumber);
