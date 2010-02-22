@@ -56,7 +56,7 @@ if ($supplierid) {
 
 my ($singlesupplier,@supplierinfo);
 if($supplierid){
-   (@supplierinfo)=GetBookSeller($supplierid);
+    @supplierinfo = GetBookSellerFromId($supplierid);
 } else { # set up supplierid for the claim links out of main table if all suppliers is chosen
    for my $mi (@missingissues){
        $mi->{supplierid} = getsupplierbyserialid($mi->{serialid});
