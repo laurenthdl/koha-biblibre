@@ -29,17 +29,19 @@ my ($template, $loggedinuser, $cookie)
             flagsrequired => {serials => 1},
             debug => 1,
             });
-my $supplier_loop = [];
-foreach my $s_id (sort {$supplierlist{$a} cmp $supplierlist{$b} } keys %supplierlist){
-        my ($count) = GetLateOrMissingIssues($s_id,q{},$order);
-        push @{$supplier_loop}, {
-            id   => $s_id,
-            name => $supplierlist{$s_id} . "($count)",
-            selected => ( $supplierid && $supplierid == $s_id ),
-        };
+
+my @suploop;
+for ( sort {$supplierlist{$a} cmp $supplierlist{$b} } keys %supplierlist ) {
+    my ($count, @dummy) = GetLateOrMissingIssues($_, "", $order);
+    push @suploop, {
+        id       => $_,
+        name     => $supplierlist{$_},
+        count    => $count,
+        selected => $_ == $supplierid,
+    };
 }
 
-my $letters = GetLetters('claimissues');
+my $letters = GetLetters("claimissues");
 my @letters;
 foreach (keys %{$letters}){
     push @letters ,{code=>$_,name=> $letters->{$_}};
@@ -76,7 +78,7 @@ if ($op eq "send_alert"){
 $template->param('letters'=>\@letters,'letter'=>$letter);
 $template->param(
         order =>$order,
-        supplier_loop => $supplier_loop,
+        suploop => \@suploop,
         phone => $supplierinfo[0]->{phone},
         booksellerfax => $supplierinfo[0]->{booksellerfax},
         bookselleremail => $supplierinfo[0]->{bookselleremail},
