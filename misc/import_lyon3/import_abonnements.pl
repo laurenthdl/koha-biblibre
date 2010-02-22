@@ -217,7 +217,7 @@ if ( $file_input && length($file_input) > 0 ) {
         ## Now we have initial data as a hash well encoded
         ##Maps fromdata with Koha fields
         my $targetdata;
-        @$targetdata{qw(manualhistory serialsadditems)}=qw(1 0);
+        @$targetdata{qw(manualhistory serialsadditems graceperiod intranetserial opacserialissue)}=qw(1 0 0 5 5);
         foreach my $key ( keys %$fromdata ) {
                my $transformedkey=$map->{$key} ||$key;
                my $value=$fromdata->{$key};
