@@ -441,7 +441,7 @@ sub get_vendor{
 }
 sub get_biblionumber{
   my ($information)=@_;
-  my ( $error, $results, $total_hits ) = SimpleSearch( "sn,ltrn=$information", 0, 12, [qw'biblioserver'] );
+  my ( $error, $results, $total_hits ) = SimpleSearch( "ident=\"ADV$information\"", 0, 12, [qw'biblioserver'] );
   #my ( $error, $results, $total_hits ) = SimpleSearch( "sn,ltrn:$information", 0, 12, [qw'biblioserver'] );
    if (defined $error) {
            warn "error: ".$error;
