@@ -490,8 +490,7 @@ sub patronflags {
             $flags{'DEBARRED'}     = \%flaginfo;
         }
     }
-    if (   $patroninformation->{'borrowernotes'}
-        && $patroninformation->{'borrowernotes'} )
+    if ( $patroninformation->{'borrowernotes'} )
     {
         my %flaginfo;
         $flaginfo{'message'} = $patroninformation->{'borrowernotes'};
