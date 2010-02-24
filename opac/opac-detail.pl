@@ -177,13 +177,15 @@ for my $itm (@items) {
 ## get notes and subjects from MARC record
 my $dbh              = C4::Context->dbh;
 my $marcflavour      = C4::Context->preference("marcflavour");
+my $fw               = GetFrameworkCode($biblionumber);
 my $normalized_isbn  = GetNormalizedISBN($dat->{isbn},$record,$marcflavour);
 my $marcnotesarray   = GetMarcNotes     ($record,$marcflavour);
 my $marcauthorsarray = GetMarcAuthors   ($record,$marcflavour);
 my $marcsubjctsarray = GetMarcSubjects  ($record,$marcflavour);
 my $marcseriesarray  = GetMarcSeries    ($record,$marcflavour);
 my $marcurlsarray    = GetMarcUrls      ($record,$marcflavour);
-my $subtitle         = GetRecordValue('subtitle', $record, GetFrameworkCode($biblionumber));
+my $subtitle         = GetRecordValue('subtitle', $record, $fw);
+my $serialsinformation = GetRecordValue('serialsinformation', $record, $fw);
 
     $template->param(
                      normalized_oclc         => GetNormalizedOCLCNumber($record,$marcflavour),
@@ -200,9 +202,10 @@ my $subtitle         = GetRecordValue('subtitle', $record, GetFrameworkCode($bib
                      itemdata_enumchron      => $itemfields{enumchron},
                      itemdata_uri            => $itemfields{uri},
                      itemdata_copynumber     => $itemfields{copynumber},
-                     itemdata_itemnotes          => $itemfields{itemnotes},
+                     itemdata_itemnotes      => $itemfields{itemnotes},
                      authorised_value_images => $biblio_authorised_value_images,
                      subtitle                => $subtitle,
+                     serialsinformation      => $serialsinformation,
     );
 
 foreach ( keys %{$dat} ) {

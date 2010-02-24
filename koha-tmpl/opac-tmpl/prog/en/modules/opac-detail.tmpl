@@ -162,6 +162,11 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
         
     </span>
     <!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="serialsinformation" -->
+        <span class="results_summary"><span class="label">Serials information: </span>
+            <!-- TMPL_LOOP NAME="serialsinformation" --><!-- TMPL_VAR NAME="subfield" --><!-- /TMPL_LOOP -->
+        </span>
+    <!-- /TMPL_IF -->
     <!-- TMPL_IF name="unititles" -->
     <span class="results_summary"><span class="label">Uniform titles:</span>
         <!-- TMPL_LOOP name="unititles" -->

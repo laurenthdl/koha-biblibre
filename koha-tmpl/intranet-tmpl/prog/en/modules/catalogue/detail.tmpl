@@ -88,6 +88,11 @@ function verify_images() {
                 <!-- TMPL_IF name="pages" --> <!-- /TMPL_IF --><!-- TMPL_VAR name="pages" --> <!-- TMPL_IF NAME="illus" --><!-- TMPL_VAR NAME="illus" --><!-- /TMPL_IF -->
                 <!-- TMPL_IF name="size" --><!-- TMPL_VAR name="size" --><!-- /TMPL_IF -->
         </li>
+    <!-- TMPL_IF NAME="serialsinformation" -->
+        <li><strong>Serials information:</strong>
+            <!-- TMPL_LOOP NAME="serialsinformation" --><!-- TMPL_VAR NAME="subfield" --><!-- /TMPL_LOOP -->
+        </li>
+    <!-- /TMPL_IF -->
 <!-- TMPL_IF name="MARCURLS" --><li>
     
 	<strong>Online Resources:</strong>
