@@ -11,15 +11,14 @@ warn $Bin;
 my $configfile=$ENV{CONFIG_MAGNETISE}||qq($Bin/etc/magnetise.yaml);
 my $cgi    = CGI->new;
 my $ip     = $cgi->param('ip');
+my $op     = $cgi->param('op');
 my $config = LoadFile($configfile);
-my $socket = new IO::Socket::INET(LocalAddr => $ip,
-    				LocalPort => $config->{'port'},
-                    Listen  =>1,
+my $socket = new IO::Socket::INET(PeerAddr => $ip,
+    				PeerPort => $config->{'port'},
 				    Proto	 => "tcp"
                 	);
 die "Could not create socket: $!\n" unless $socket; 
-my $newsocket=$socket->accept;
-while (<$newsocket>) {
-    print "$_ \n"; 
+while (<$socket>) {
+    print $_ "\n"; 
 }
-close($newsocket);
+close($socket);

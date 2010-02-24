@@ -327,7 +327,7 @@ if ($barcode) {
             warn $query->remote_host();
 #            my $pid=fork();
 #            unless($pid){
-                system("../services/magnetise.pl $remotehost out");
+                system("../services/magnetise.pl"," op=out "," ip=".$remotehost);
 #                exit 1;
 #            }
 			$inprocess = 1;
