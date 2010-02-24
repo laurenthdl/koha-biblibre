@@ -82,8 +82,6 @@ foreach my $itemno (@data) {
 	my ($renewokay,$error) = CanBookBeRenewed($borrowernumber,$itemno,$override_limit);
     if ($renewokay){
         AddRenewal($borrowernumber,$itemno,$branch,$datedue);
-        my $remotehost=$query->remote_host;
-        system("../services/magnetise.pl $remotehost out");
     }
 	else {
 		$failedrenews.="&failedrenew=$itemno";        
@@ -94,10 +92,6 @@ foreach my $barcode (@barcodes) {
     # check status before renewing issue
    my ( $returned, $messages, $issueinformation, $borrower ) = 
     AddReturn($barcode, $branch, $exemptfine);
-    if ($returned){
-        my $remotehost=$query->remote_host;
-        system("../services/magnetise.pl $remotehost in");
-    }
    $failedreturn.="&failedreturn=$barcode" unless ($returned);
 }
 
