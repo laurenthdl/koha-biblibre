@@ -113,6 +113,9 @@ my $valuesmapping;
 my $insertserial=C4::Context->dbh->prepare(<<INSERTSERIAL);
 INSERT INTO serial (biblionumber,subscriptionid,serialseq,publisheddate,planneddate,status) VALUES(?,?,?,?,?,?);
 INSERTSERIAL
+my $updateserial=C4::Context->dbh->prepare(<<UPDATESERIAL);
+UPDATE serial set serialseq=?, planneddate=?, publisheddate=? WHERE biblionumber=? and subscriptionid=? and status=?;
+UPDATESERIAL
 #my %status_advance_2_koha=(
 #1=>2, # RECU
 #3=>5, # RECLAME
@@ -340,7 +343,17 @@ if ( $file_input && length($file_input) > 0 ) {
 		
 		 foreach my $hashissue (@receivedissues){
 			#received status=2
-			$insertserial->execute( 
+            if ($$hashissue{'geac_status'}==1){
+			    $updateserial->execute( 
+									@$hashissue{qw(serialseq publisheddate planneddate)}
+									,$$targetdata{biblionumber}
+									,$subscriptionid
+									,$$hashissue{'geac_status'}
+                                    )
+
+            }
+            else {
+			    $insertserial->execute( 
 									$$targetdata{biblionumber},
 									$subscriptionid	,
 									@$hashissue{qw(serialseq publisheddate planneddate)}
@@ -349,6 +362,7 @@ if ( $file_input && length($file_input) > 0 ) {
 #										$status_advance_2_koha{$$hashissue{'geac_status'}}
 #										:$$hashissue{'geac_status'})
 									);
+           }
 #			my $status="received" if ($status_advance_2_koha{$$hashissue{'geac_status'}}==2);
 #		   $status="missing" if ($status_advance_2_koha{$$hashissue{'geac_status'}}==4);
 			my $status="received" if ($$hashissue{'geac_status'}==2);
