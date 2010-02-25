@@ -303,13 +303,14 @@ foreach my $biblionumber (@biblionumbers) {
         my $num_available = 0;
         my $num_override  = 0;
         
-        $biblioitem->{description} =
-          $itemtypes->{ $biblioitem->{itemtype} }{description};
         $biblioloopiter{description} = $biblioitem->{description};
         $biblioloopiter{itypename} = $biblioitem->{description};
-        $biblioloopiter{imageurl} =
-          getitemtypeimagelocation('intranet', $itemtypes->{$biblioitem->{itemtype}}{imageurl});
-        
+        if($biblioitem->{itemtype}){
+            $biblioloopiter{imageurl} =
+              getitemtypeimagelocation('intranet', $itemtypes->{$biblioitem->{itemtype}}{imageurl});
+            $biblioitem->{description} = 
+              $itemtypes->{ $biblioitem->{itemtype} }{description};
+        }
         foreach my $itemnumber ( @{ $itemnumbers_of_biblioitem{$biblioitemnumber} } )    {
             my $item = $iteminfos_of->{$itemnumber};
             
