@@ -98,6 +98,12 @@ my $to=$from+$resultsperpage;
 if ($results){
 	$count =scalar(@$results);
 }
+
+if($count == 1){
+    print $input->redirect("/cgi-bin/koha/members/moremember.pl?borrowernumber=" . @$results[0]->{borrowernumber});
+    exit;
+}
+
 my @resultsdata;
 $to=($count>$to?$to:$count);
 my $index=$from;
