@@ -474,7 +474,7 @@ sub patronflags {
         $flaginfo{'noissues'} = 1;
         $flags{'LOST'}        = \%flaginfo;
     }
-    if ( $patroninformation->{'debarred'} && check_date(split(/-/,$patroninformation->{'dateexpiry'})) ){
+    if ( check_date(split(/-/,$patroninformation->{'dateexpiry'})) ){
         if(Date_to_Days(Date::Calc::Today) > Date_to_Days(split(/-/,$patroninformation->{'dateexpiry'}) )){
             my %flaginfo;
             $flaginfo{'noissues'} = 1;
