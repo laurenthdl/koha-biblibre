@@ -131,6 +131,21 @@ for my $thisbranch (sort { $branches->{$a}->{branchname} cmp $branches->{$b}->{b
             );
     push @branchloop, \%row;
 }
+
+my $fw = GetFrameworkCode( $biblionumber );
+my $shelflocations = GetKohaAuthorisedValues('items.location', $fw);
+
+my @locationarg;
+foreach my $key (keys %{$shelflocations}){
+    my %row = {
+         code  => $key,
+         value => $shelflocations->{$key}
+    };
+    $row{selected} = 1 if ($key eq $subs->{location});
+    push @locationarg, %row;
+}
+$template->param(shelflocations => \@locationarg );
+
 $template->param(branchloop => \@branchloop,
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
@@ -196,9 +211,9 @@ if ($op eq 'addsubscription') {
 	my $staffdisplaycount = $query->param('staffdisplaycount');
 	my $opacdisplaycount = $query->param('opacdisplaycount');
     my $location = $query->param('location');
-    my $startdate       = format_date_in_iso($query->param('startdate'));
+    $startdate       = format_date_in_iso($query->param('startdate'));
     my $enddate       = format_date_in_iso($query->param('enddate'));
-    my $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));    
+    $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));    
     my $histenddate = format_date_in_iso($query->param('histenddate'));
     my $histstartdate = format_date_in_iso($query->param('histstartdate'));
     my $recievedlist = $query->param('recievedlist');
@@ -232,7 +247,7 @@ if ($op eq 'addsubscription') {
     my $nextacquidate = $query->param('nextacquidate') ?
                             format_date_in_iso($query->param('nextacquidate')):
                             format_date_in_iso($query->param('startdate'));
-    my $enddate = format_date_in_iso($query->param('enddate'));
+    $enddate = format_date_in_iso($query->param('enddate'));
     my $periodicity = $query->param('periodicity');
     my $dow = $query->param('dow');
     my $sublength = $query->param('sublength');
