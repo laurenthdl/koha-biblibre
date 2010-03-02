@@ -2111,17 +2111,20 @@ sub _marc_from_item_hash {
                                 : ()  } keys %{ $item } }; 
 
     my $item_marc = MARC::Record->new();
-    foreach my $item_field (keys %{ $mungeditem }) {
-        my ($tag, $subfield) = GetMarcFromKohaField($item_field, $frameworkcode);
-        next unless defined $tag and defined $subfield; # skip if not mapped to MARC field
-        if (my $field = $item_marc->field($tag)) {
-            $field->add_subfields($subfield => $mungeditem->{$item_field});
-        } else {
-            my $add_subfields = [];
-            if (defined $unlinked_item_subfields and ref($unlinked_item_subfields) eq 'ARRAY' and $#$unlinked_item_subfields > -1) {
-                $add_subfields = $unlinked_item_subfields;
+    foreach my $item_field ( keys %{$mungeditem} ) {
+        my ( $tag, $subfield ) = GetMarcFromKohaField( $item_field, $frameworkcode );
+        next unless defined $tag and defined $subfield;    # skip if not mapped to MARC field
+        my @values = split(/\s?\|\s?/, $mungeditem->{$item_field}, -1);
+        foreach my $value (@values){
+            if ( my $field = $item_marc->field($tag) ) {
+                    $field->add_subfields( $subfield => $value );
+            } else {
+                my $add_subfields = [];
+                if (defined $unlinked_item_subfields and ref($unlinked_item_subfields) eq 'ARRAY' and $#$unlinked_item_subfields > -1) {
+                    $add_subfields = $unlinked_item_subfields;
             }
-            $item_marc->add_fields( $tag, " ", " ", $subfield =>  $mungeditem->{$item_field}, @$add_subfields);
+            $item_marc->add_fields( $tag, " ", " ", $subfield => $value, @$add_subfields );
+            }
         }
     }
 
