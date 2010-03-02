@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nicomo-fr-FR-i-opac-t-prog-v-3000000\n"
 "POT-Creation-Date: 2010-02-17 17:46+0100\n"
-"PO-Revision-Date: 2010-02-19 15:54+0100\n"
+"PO-Revision-Date: 2010-02-23 11:49+0100\n"
 "Last-Translator: nicomo <nicolas.morin@biblibre.com>\n"
 "Language-Team: Français\n"
 "MIME-Version: 1.0\n"
@@ -1122,7 +1122,7 @@ msgstr "<a1>Sélectionner tout</a> <a2>Effacer tout</a>"
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:308
 #, c-format
 msgid "<a1>Unhighlight</a> <a2>Highlight</a>"
-msgstr "<a1>Unhighlight</a> <a2>Surligner</a>"
+msgstr "<a1>Ne pas surligner</a> <a2>Surligner</a>"
 
 #. %1$s: TMPL_VAR name=shelfname
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-addbybiblionumber.tmpl:14
@@ -1444,16 +1444,16 @@ msgstr "Tout format"
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:124
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:246
 msgid "Any Phrase"
-msgstr "N'importe quelle expression"
+msgstr "Toute expression"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:123
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:245
 msgid "Any Word"
-msgstr "N'importe quel mot"
+msgstr "Tout mot"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/includes/subtypes_unimarc.inc:157
 msgid "Any regularity"
-msgstr "N'importe quelle régularité"
+msgstr "Toutes régularités"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/includes/subtypes_unimarc.inc:123
 msgid "Any type"
@@ -1703,7 +1703,7 @@ msgstr "Braille"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/includes/subtypes_unimarc.inc:24
 msgid "Braille or Moon script"
-msgstr "Script Braille ou Moon"
+msgstr "Braille ou Moon"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:336
 msgid "Branch"
@@ -2669,7 +2669,7 @@ msgstr "Créer une suggestion d'achat"
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-advsearch.tmpl:97
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-advsearch.tmpl:112
 msgid "Enter search terms"
-msgstr "Saisissez les termes de recherche"
+msgstr "Saisissez votre recherche"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/sco/help.tmpl:20
 msgid "Enter your User ID, and click the submit button (or press the enter key)."
@@ -3272,7 +3272,7 @@ msgstr "Jeunesse"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-advsearch.tmpl:62
 msgid "Keyword"
-msgstr "Tous les mots"
+msgstr "Tous mots"
 
 #. LINK
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:10
@@ -3990,7 +3990,7 @@ msgstr "Aucun tag déclaré."
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:237
 msgid "No tags from this library for this title."
-msgstr "Pas de tags de cette bibliothèque pour ce titre."
+msgstr "Pas de tags pour ce titre."
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:278
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:376
@@ -4030,7 +4030,7 @@ msgstr "Pas prêté"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/includes/subtypes_unimarc.inc:52
 msgid "Not a biography"
-msgstr "N'est pas une biographie"
+msgstr "n'est pas une biographie"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:285
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:502
@@ -4265,7 +4265,7 @@ msgid "Partial contents:"
 msgstr "Contenu partiel :"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/xslt/UNIMARCslim2OPACResults.xsl:98
-msgid "Pas de copie disponible"
+msgid "Pas d'exemplaire disponible"
 msgstr ""
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-auth.tmpl:65
@@ -5373,7 +5373,7 @@ msgstr "Statut du tag."
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:233
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:237
 msgid "Tags from this library:"
-msgstr "Tags de cette bibliothèque :"
+msgstr "Tags :"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:433
 msgid "Tags:"
@@ -5564,7 +5564,7 @@ msgstr "L'identifiant usager"
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:574
 #, c-format
 msgid "There are %s subscription(s) associated with this title."
-msgstr "%s abonnement(s) sont associé(s) à ce titre."
+msgstr "%s abonnement(s) associé(s) à ce titre."
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:678
 msgid "There are no comments for this item."
@@ -5716,9 +5716,8 @@ msgid "Title (Z-A)"
 msgstr "Titre (Z-A)"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:292
-#, fuzzy
 msgid "Title Notes"
-msgstr "Titres"
+msgstr "Note"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:126
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:248
@@ -7206,7 +7205,7 @@ msgstr "sans illustrations"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-advsearch.tmpl:56
 msgid "not"
-msgstr "pas"
+msgstr "sauf"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/includes/subtypes_unimarc.inc:44
 msgid "not a literary text"
@@ -7406,7 +7405,7 @@ msgstr "portraits"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/xslt/UNIMARCslim2OPACResults.xsl:102
 msgid "pour le prêt:"
-msgstr ""
+msgstr "disponible :"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/includes/subtypes_unimarc.inc:8
 msgid "pre-primary (0-5)"
@@ -7969,158 +7968,231 @@ msgstr "Editions"
 
 #~ msgid "$%s"
 #~ msgstr "%s €"
+
 #~ msgid "%s -- Self Checkout"
 #~ msgstr "%s -- Prêt auto-contrôlé"
+
 #~ msgid "%s record(s)"
 #~ msgstr "%s notice(s)"
+
 #~ msgid "&lt;&lt;Previous"
 #~ msgstr "&lt;&lt;Précédent"
+
 #~ msgid "&nbsp;&nbsp;&nbsp;&nbsp; Corporate Name Phrase"
 #~ msgstr "&nbsp;&nbsp;&nbsp;&nbsp;Expression Nom de société"
+
 #~ msgid "(no title)"
 #~ msgstr "(pas de titre)"
+
 #~ msgid "; By %s"
 #~ msgstr "; Par %s"
+
 #~ msgid "<a1>%s</a>,"
 #~ msgstr "<a1>%s</a>,"
+
 #~ msgid "<a1>Click here</a> for more information on subscription(s) history"
 #~ msgstr ""
 #~ "<a1>Cliquer ici</a> pour plus d'information sur l'historique de(s) "
 #~ "l'abonnement(s)"
+
 #~ msgid "<b>Selected items :</b> <a1>Remove</a>"
 #~ msgstr "<b>Documents sélectionnés&nbsp;:</b> <a1> Retirer </a>"
+
 #~ msgid "<em>Error type:</em> %s"
 #~ msgstr "<em>Type d'erreur&nbsp;:</em> %s"
+
 #~ msgid "At library: %s %s"
 #~ msgstr "A la bibliothèque&nbsp;: %s %s"
+
 #~ msgid "Attempting to issue %s by %s to %s %s."
 #~ msgstr "Prêt de %s par %s à %s %s."
 
 #, fuzzy
 #~ msgid "Below is a list of the %s latest issues :"
 #~ msgstr "Ci-dessous les 3 derniers numéros parus&nbsp;:"
+
 #~ msgid "Catalog &rsaquo; Details for:"
 #~ msgstr "Catalogue &rsaquo; Détails pour&nbsp;:"
+
 #~ msgid "Catalog &rsaquo; Dictionary Search"
 #~ msgstr "Catalogue &rsaquo; Recherche dictionnaire"
+
 #~ msgid "Catalog Search Results"
 #~ msgstr "Résultats de la recherche catalogue"
+
 #~ msgid "Click Here to Complete Transaction"
 #~ msgstr "Cliquer ici pour poursuivre la transaction"
+
 #~ msgid "Click Here to End Transaction"
 #~ msgstr "Cliquer ici pour terminer la transaction"
+
 #~ msgid "Confirm"
 #~ msgstr "Confirmer "
+
 #~ msgid "Confirm Reservation"
 #~ msgstr "Confirmer la réservation"
+
 #~ msgid "Confirm?"
 #~ msgstr "Confirmer ?"
+
 #~ msgid "Copy Number"
 #~ msgstr "Exemplaire numéro"
+
 #~ msgid "Copyright:"
 #~ msgstr "Copyright&nbsp;:"
+
 #~ msgid "Copyrightdate"
 #~ msgstr "Date de copyright"
+
 #~ msgid "Delete Checked Items"
 #~ msgstr "Supprimer les références cochées"
+
 #~ msgid "Delete List"
 #~ msgstr "Supprimer la liste"
+
 #~ msgid "Delete this List"
 #~ msgstr "Supprimer cette liste"
+
 #~ msgid "Descriptions"
 #~ msgstr "Notes"
+
 #~ msgid "Detailed notes:"
 #~ msgstr "Notes détaillées&nbsp;:"
+
 #~ msgid "Dictionary Search"
 #~ msgstr "Recherche dictionnaire"
+
 #~ msgid "Due Date"
 #~ msgstr "Date de retour"
+
 #~ msgid "Edit"
 #~ msgstr "Modifier"
+
 #~ msgid "Edit List"
 #~ msgstr "Modifier liste"
+
 #~ msgid "Enter the item barcode:"
 #~ msgstr "Entrer le code-barres du document&nbsp;:"
+
 #~ msgid "Error Issuing Book"
 #~ msgstr "Erreur lors du prêt du document"
+
 #~ msgid "Finish and Place Reservation"
 #~ msgstr "Finaliser et localiser la réservation"
+
 #~ msgid "For:"
 #~ msgstr "Pour&nbsp;:"
+
 #~ msgid "Go"
 #~ msgstr "Allez"
+
 #~ msgid "Issue number"
 #~ msgstr "Fascicule Numéro"
+
 #~ msgid "Issues"
 #~ msgstr "Prêts"
+
 #~ msgid "Issuing Question"
 #~ msgstr "Question pour le prêt"
+
 #~ msgid "Item waiting to be pulled"
 #~ msgstr "A mettre de côté par la bibliothèque"
+
 #~ msgid "Keyword(s):"
 #~ msgstr "Mot(s)-clé&nbsp;:"
+
 #~ msgid "Koha Self Checkout"
 #~ msgstr "Koha prêt auto-contrôlé"
+
 #~ msgid "LCCN:"
 #~ msgstr "LCCN&nbsp;:"
+
 #~ msgid "Last Seen"
 #~ msgstr "Vu le"
+
 #~ msgid "Log In"
 #~ msgstr "Se connecter"
+
 #~ msgid "Manage your Messaging settings"
 #~ msgstr "Gérer vos paramétrages de message"
+
 #~ msgid "Message from the library"
 #~ msgstr "Message de la bibliothèque"
+
 #~ msgid "Modify Your Record"
 #~ msgstr "Modifier mes coordonnées"
+
 #~ msgid "Next&gt;&gt;"
 #~ msgstr "Suivant &gt;&gt;"
+
 #~ msgid "No borrower matched %s"
 #~ msgstr "Pas d'adhérent correspondant à %s"
+
 #~ msgid "No result found !"
 #~ msgstr "Pas de réponse !"
+
 #~ msgid "No results found in Authorities."
 #~ msgstr "Pas de réponses dans les autorités."
+
 #~ msgid "No results found in the catalog."
 #~ msgstr "Pas de réponses dans le catalogue."
+
 #~ msgid "No results in Authorities"
 #~ msgstr "Pas de réponses dans les autorités"
+
 #~ msgid "Not Published"
 #~ msgstr "Pas paru"
+
 #~ msgid "Not for loan :"
 #~ msgstr "Exclu du prêt :"
+
 #~ msgid "OK"
 #~ msgstr "OK"
+
 #~ msgid "Online Stores (Bookfinder.com)"
 #~ msgstr "Boutiques en ligne (bookfinder.com)"
+
 #~ msgid "Other Databases (Google Scholar)"
 #~ msgstr "Autres bases (Google Scholar)"
+
 #~ msgid "Other Libraries (WorldCat)"
 #~ msgstr "Autres bibliothèques (WorldCat)"
+
 #~ msgid "Password or PIN"
 #~ msgstr "Mot de passe ou PIN"
+
 #~ msgid "Permanent Address"
 #~ msgstr "Adresse permanente"
+
 #~ msgid "Physical Details:"
 #~ msgstr "Caractéristiques physiques&nbsp;:"
+
 #~ msgid "Pick up From:"
 #~ msgstr "A retirer à &nbsp;:"
+
 #~ msgid "Pick up from:"
 #~ msgstr "A retirer à&nbsp;:"
+
 #~ msgid "Place a hold on <a1>%s</a>"
 #~ msgstr "Réserver <a1>%s</a>"
+
 #~ msgid "Place a hold on the next available copy"
 #~ msgstr "Réserver le prochain disponible"
+
 #~ msgid "Please Click Here to Exit"
 #~ msgstr "Merci de cliquer ici pour sortir"
+
 #~ msgid "Publication year:"
 #~ msgstr "Année d'édition"
+
 #~ msgid "Rating (from Amazon.com):"
 #~ msgstr "Classement (de Amazon.com):"
+
 #~ msgid "Record No.:"
 #~ msgstr "Notice N°&nbsp;:"
+
 #~ msgid "Related links:"
 #~ msgstr "Liens connexes:"
+
 #~ msgid "Remove Selected Items"
 #~ msgstr "Supprimer les références cochées"
-
