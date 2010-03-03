@@ -1912,7 +1912,6 @@ sub CanBookBeRenewed {
         $renewokay = 0;
         $error->{message} = "on_reserve";
     }
-    $error->{reserves}       = $resrec;
     $error->{renewals}       = $itemissue->{'issues.renewals'};
     $error->{renewalsallowed}= $issuingrule->{renewalsallowed};
 
