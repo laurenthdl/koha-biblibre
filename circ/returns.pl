@@ -49,7 +49,7 @@ use C4::Koha;   # FIXME : is it still useful ?
 use C4::Debug;
 
 my $query = new CGI;
-
+my $remotehost=$query->remote_host();
 if (!C4::Context->userenv){
 	my $sessionID = $query->cookie("CGISESSID");
 	my $session = get_session($sessionID);
