@@ -35,6 +35,7 @@ use C4::Output;
 use C4::Circulation;
 use C4::Dates qw/format_date/;
 use Date::Calc qw/Add_Delta_Days/;
+use List::MoreUtils qw/any/;
 use C4::Calendar;
 use C4::Budgets qw/GetCurrency/;
 use C4::Print;
@@ -207,7 +208,16 @@ if ($barcode and not $query->param('cancel')) {
 #
     ( $returned, $messages, $issueinformation, $borrower ) =
       AddReturn( $barcode, $userenv_branch, $exemptfine, $dropboxmode,$override);     # do the return
-
+            my @ips=split /,|\|/, C4::Context->preference("CI-3M:AuthorizedIPs");
+            #my $pid=fork();
+            #unless($pid && $remotehost=~qr(^$ips$)){
+            #if (!$pid && any{ $remotehost eq $_ }@ips ){
+	    my $remotehost=$query->remote_host();
+            if (any{ $remotehost eq $_ }@ips ){
+                warn $remotehost;
+                system("../services/magnetise.pl $remotehost in");
+                #die 0;
+            }
     # get biblio description
     $biblio = GetBiblioFromItemNumber($itemnumber);
     # fix up item type for display
