@@ -207,6 +207,8 @@ if ($barcode and not $query->param('cancel')) {
 #
     ( $returned, $messages, $issueinformation, $borrower ) =
       AddReturn( $barcode, $userenv_branch, $exemptfine, $dropboxmode,$override);     # do the return
+         my $remotehost=$query->remote_host;
+         system("../services/magnetise.pl $remotehost in");
 
     # get biblio description
     $biblio = GetBiblioFromItemNumber($itemnumber);
