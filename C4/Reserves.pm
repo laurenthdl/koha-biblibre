@@ -376,7 +376,9 @@ sub CanItemBeReserved{
     my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber);     
     
     if( $controlbranch eq "ItemHomeLibrary" ){
-        $branchcode = $item->{homebranch};
+        my $field=C4::Context->preference("HomeOrHoldingBranch")||"homebranch";
+        $branchfield = "items.$field";
+        $branchcode = $item->{$field};
     }elsif( $controlbranch eq "PatronLibrary" ){
         $branchcode = $borrower->{branchcode};
     }else{
@@ -671,7 +673,7 @@ Returns the branchcode to consider to check hold rules against
 sub GetReservesControlBranch{
     my ($borrower, $item) = @_;
     my $controlbranch = C4::Context->preference('ReservesControlBranch');
-    my $hbr           = C4::Context->preference('HomeOrHoldingBranch');
+    my $hbr           = C4::Context->preference('HomeOrHoldingBranch')||"homebranch";
     my $branchcode="*";
     if($controlbranch eq "ItemHomeLibrary"){
         $branchcode = $item->{$hbr};
