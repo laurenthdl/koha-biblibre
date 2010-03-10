@@ -3799,6 +3799,44 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.005";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do("UPDATE systempreferences SET options = 'Calendar|Days|Datedue' WHERE variable = 'useDaysMode'");
+	
+    print "Upgrade to $DBversion done (upgrade useDaysMode syspref)\n";
+    SetVersion ($DBversion);
+}
+
+$DBversion = "3.02.00.006";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(qq{
+	CREATE TABLE IF NOT EXISTS pending_offline_operations (
+	    operationid INT(11) NOT NULL AUTO_INCREMENT,
+	    userid VARCHAR(30) NOT NULL,
+	    branchcode VARCHAR(10) NOT NULL,
+	    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	    action VARCHAR(10) NOT NULL,
+	    barcode VARCHAR(20) NOT NULL,
+	    cardnumber VARCHAR(16) NULL,
+	    PRIMARY KEY (operationid)
+	);
+	});
+
+    print "Upgrade to $DBversion done (isbd updated)\n";
+    SetVersion ($DBversion);
+}
+
+$DBversion = "3.02.00.007";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	my $borrowers=$dbh->selectall_arrayref("SELECT borrowernumber from borrowers where debarred <>0;",[0]);
+	$dbh->do("ALTER TABLE borrowers MODIFY debarred DATE DEFAULT NULL;");
+	$dbh->do("UPDATE borrowers set debarred='9999-12-31' where borrowernumber IN (".join (",",@$borrowers).");");
+	$dbh->do("ALTER TABLE borrowers ADD COLUMN debarredcomment VARCHAR(255) DEFAULT NULL AFTER debarred;");
+	print "Upgrade done (Change borrowers.debarred into Date )\n";
+
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
