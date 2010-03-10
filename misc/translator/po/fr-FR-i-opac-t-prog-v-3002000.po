@@ -2165,7 +2165,7 @@ msgstr "Commentaire&nbsp;:"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:317
 msgid "Comments"
-msgstr "commentaires"
+msgstr "Commentaires"
 
 #. %1$s: TMPL_VAR name=title
 #. %2$s: TMPL_VAR name=subtitle
@@ -7385,8 +7385,8 @@ msgid "project description"
 msgstr "description de projet"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/xslt/UNIMARCslim2OPACResults.xsl:102
-msgid "prêtables :"
-msgstr ""
+msgid "available :"
+msgstr "disponible :"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-serial-issues.tmpl:43
 msgid "quarter"

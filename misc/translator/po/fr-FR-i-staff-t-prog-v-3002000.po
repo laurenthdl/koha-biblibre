@@ -1,23 +1,23 @@
 # translation of nicomo-fr-FR-i-staff-t-prog-v-3000000.po to Français
-# paul POULAIN <paul@koha-fr.org>, 2007, 2008.
-# Nicolas Morin <nicolas.morin@biblibre.com>, 2008.
 # translation of nicomo-fr-FR-i-staff-t-prog-v-3000000.po to
 # translation of fr-FR-i-staff-t-prog-v-3000000.po to
 # translation of fr-FR-i-staff-t-prog-v-30000.po to
 # Copyright (C) 2008, 2009 BibLibre SARL
+# paul POULAIN <paul@koha-fr.org>, 2007, 2008.
+# Nicolas Morin <nicolas.morin@biblibre.com>, 2008, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: nicomo-fr-FR-i-staff-t-prog-v-3000000\n"
 "POT-Creation-Date: 2010-03-02 15:33+0100\n"
-"PO-Revision-Date: 2010-03-02 16:39+0100\n"
-"Last-Translator: nicomo <nicolas.morin@biblibre.com>\n"
-"Language-Team: Français\n"
+"PO-Revision-Date: 2010-03-12 16:33+0100\n"
+"Last-Translator: \n"
+"Language-Team: American English <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 1.2.0\n"
+"X-Generator: Lokalize 1.0\n"
 
 #. For the first occurrence,
 #. SCRIPT
@@ -63,9 +63,8 @@ msgstr "sont entrés. <br \\/>Merci de signaler à quelle(s) date(s) vous n'atte
 
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/subscription-add.tmpl:942
-#, fuzzy
 msgid " were entered.<p class=\\\"warning\\\"> You seem to have indicated more issues per year than expected.<\\/p>"
-msgstr "sont entrés.<p class='warning'>Vous semblez avoir signalé plus de numéros par an que prévu.<\\/p>"
+msgstr "sont entrés.<p class=\\\"warning\\\"> Vous semblez avoir signalé plus de numéros par an que prévu.<\\/p>"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/marc21_field_008.tmpl:258
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/marc21_field_008.tmpl:260
@@ -1115,9 +1114,9 @@ msgstr "%s&nbsp;: %s"
 
 #. %1$s: TMPL_VAR name=limit_phrase
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/branch_transfer_limits.tmpl:85
-#, fuzzy, c-format
+#, c-format
 msgid "%ss: <a1>Check All</a>"
-msgstr ". <a1>Annuler réservation(s)</a>"
+msgstr "%ss: <a1>Sélectionnez tout</a>"
 
 #. %1$s: TMPL_VAR name=unitpricesupplier
 #. %2$s: TMPL_VAR name=quantity
@@ -2230,11 +2229,11 @@ msgstr "(modifié le %s)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember-print.tmpl:15
 msgid "(no email on file)"
-msgstr "(pas d'adresse email enregistrée)"
+msgstr "(pas d'adresse email)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember-print.tmpl:14
 msgid "(no phone number on file)"
-msgstr "(pas de numéro de téléphone enregistré)"
+msgstr "(pas de numéro de téléphone)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/branches.tmpl:183
 msgid "(nothing entered)"
@@ -4544,7 +4543,7 @@ msgstr "<a1>Mots vides</a> &rsaquo; Mot vide enregistré"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:125
 #, c-format
 msgid "<a1>Detail</a> Duplicate ? <a2>Yes</a> &nbsp;&nbsp;&nbsp; No, it is not"
-msgstr "<a1>Detail</a> Doublon ? <a2>Oui</a> &nbsp;&nbsp;&nbsp; Non, n'en est pas un"
+msgstr "<a1>Detail</a> Doublon ? <a2>Oui</a> &nbsp;&nbsp;&nbsp; Non"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/patron-attr-types.tmpl:225
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/classsources.tmpl:270
@@ -4878,9 +4877,9 @@ msgid "<a1>Home</a> &rsaquo; <a2>Circulation</a> &rsaquo; Hold Ratios"
 msgstr "<a1>Accueil</a> &rsaquo; <a2>Circulation</a> &rsaquo; Ratios de réservation"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/offline_circ/list.tmpl:34
-#, fuzzy, c-format
+#, c-format
 msgid "<a1>Home</a> &rsaquo; <a2>Circulation</a> &rsaquo; Offline Circulation"
-msgstr "<a1>Accueil</a> &rsaquo; <a2>Circulation</a> &rsaquo; Ratios de réservation"
+msgstr "<a1>Accueil</a> &rsaquo; <a2>Circulation</a> &rsaquo; Prêt secouru"
 
 #. %1$s: TMPL_VAR name=todaysdate
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/circ/overdue.tmpl:77
@@ -4959,7 +4958,7 @@ msgstr "<a1> Accueil </a> &rsaquo;<a2>Adhérents</a> &rsaquo; Dette manuelle"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/pay.tmpl:9
 #, c-format
 msgid "<a1>Home</a> &rsaquo; <a2>Patrons</a> &rsaquo; Pay Fines for %s %s"
-msgstr "<a1> Accueil </a> &rsaquo;<a2>Adhérents</a> &rsaquo; Payer amendes de %s %s"
+msgstr "<a1>Accueil</a> &rsaquo;<a2>Adhérents</a> &rsaquo; Payer amendes de %s %s"
 
 #. %1$s: TMPL_VAR name=firstname
 #. %2$s: TMPL_VAR name=surname
@@ -4971,9 +4970,9 @@ msgstr "<a1> Accueil </a> &rsaquo;<a2>Adhérents</a> &rsaquo; Historique de lect
 #. %1$s: TMPL_VAR name=firstname
 #. %2$s: TMPL_VAR name=surname
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/notices.tmpl:22
-#, fuzzy, c-format
+#, c-format
 msgid "<a1>Home</a> &rsaquo; <a2>Patrons</a> &rsaquo; Sent notices for %s %s"
-msgstr "<a1> Accueil </a> &rsaquo;<a2>Adhérents</a> &rsaquo; Permissions de %s %s"
+msgstr "<a1> Accueil </a> &rsaquo;<a2>Adhérents</a> &rsaquo; Notifications envoyées pour %s %s"
 
 #. %1$s: TMPL_VAR name=surname
 #. %2$s: TMPL_VAR name=firstname
@@ -5112,10 +5111,9 @@ msgstr "<a1> Accueil </a> &rsaquo;<a2>Outils</a>"
 msgid "<a1>Home</a> &rsaquo; <a2>Tools</a> &rsaquo;"
 msgstr "<a1> Accueil </a> &rsaquo;<a2>Outils</a> &rsaquo;"
 
-#: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchMod-del.tmpl:36
-#, fuzzy, c-format
+#: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchMod-del.tmpl:36, c-format
 msgid "<a1>Home</a> &rsaquo; <a2>Tools</a> &rsaquo; <a3>Delete batches of items</a>"
-msgstr "<a1> Accueil </a> &rsaquo; <a2>Outils</a> &rsaquo; <a3>Import Adhérents</a>"
+msgstr "<a1> Accueil </a> &rsaquo; <a2>Outils</a> &rsaquo; <a3>Suppression d'exemplaires par lots</a>"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/import_borrowers.tmpl:14
 #, c-format
@@ -5123,15 +5121,13 @@ msgid "<a1>Home</a> &rsaquo; <a2>Tools</a> &rsaquo; <a3>Import Patrons</a>"
 msgstr "<a1> Accueil </a> &rsaquo; <a2>Outils</a> &rsaquo; <a3>Import Adhérents</a>"
 
 #. %1$s: TMPL_VAR name=batch_id
-#: ../../koha-tmpl/intranet-tmpl/prog/en/modules/labels/label-edit-batch.tmpl:10
-#, fuzzy, c-format
+#: ../../koha-tmpl/intranet-tmpl/prog/en/modules/labels/label-edit-batch.tmpl:10, c-format
 msgid "<a1>Home</a> &rsaquo; <a2>Tools</a> &rsaquo; <a3>Labels Home</a> &rsaquo; <a4>Mange Label Batches</a> &rsaquo; Manage Batch Number %s"
-msgstr "<a1> Accueil </a> &rsaquo;<a2>Outils</a> &rsaquo; <a3>Etiquettes</a> &rsaquo; <a4>Modèles d'étiquette</a> &rsaquo; Modifier le modèle d'étiquette"
+msgstr "<a1> Accueil </a> &rsaquo;<a2>Outils</a> &rsaquo; <a3>Etiquettes</a> &rsaquo; <a4>Modèles d'étiquette</a> &rsaquo; Gérer lot num. %s"
 
-#: ../../koha-tmpl/intranet-tmpl/prog/en/modules/labels/label-edit-layout.tmpl:26
-#, fuzzy, c-format
+#: ../../koha-tmpl/intranet-tmpl/prog/en/modules/labels/label-edit-layout.tmpl:26, c-format
 msgid "<a1>Home</a> &rsaquo; <a2>Tools</a> &rsaquo; <a3>Labels Home</a> &rsaquo; <a4>Mange Label Layouts</a> &rsaquo;"
-msgstr "<a1>Accueil</a> &rsaquo; <a2>Outils</a> &rsaquo; <a3>Etiquettes</a>&rsaquo; Créer modèle"
+msgstr "<a1>Accueil</a> &rsaquo; <a2>Outils</a> &rsaquo; <a3>Etiquettes</a>&rsaquo; <a4>Gérer modèles</a>"
 
 #. %1$s: TMPL_VAR name=label_element_title
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/labels/label-manage.tmpl:86
@@ -5605,9 +5601,9 @@ msgid "<a1>Total</a>:"
 msgstr "<a1>Total</a>&nbsp;:"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/results.tmpl:232
-#, fuzzy, c-format
+#, c-format
 msgid "<a1>Unhighlight</a> <a2>Highlight</a>"
-msgstr "<a1>Modifier</a> <a2>Supprimer</a>"
+msgstr "<a1>Ne pas surligner</a> <a2>Surligner</a>"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/picture-upload.tmpl:72
 #, c-format
@@ -6216,7 +6212,7 @@ msgstr "Compte"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/maninvoice.tmpl:60
 msgid "Account Management Fee"
-msgstr "Gestion de la comptabilité des cotisations"
+msgstr "Coût d'inscription"
 
 #. %1$s: TMPL_VAR name=firstname
 #. %2$s: TMPL_VAR name=surname
@@ -6224,7 +6220,7 @@ msgstr "Gestion de la comptabilité des cotisations"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember-print.tmpl:11
 #, c-format
 msgid "Account Summary: %s %s (%s)"
-msgstr "Résumé pour&nbsp;: %s %s (%s)"
+msgstr "Compte de&nbsp;: %s %s (%s)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/pay.tmpl:35
 msgid "Account Type"
@@ -6421,9 +6417,9 @@ msgstr "Ajouter"
 
 #. %1$s: TMPL_VAR name=total
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/virtualshelves/addbybiblionumber.tmpl:13
-#, fuzzy, c-format
+#, c-format
 msgid "Add %s items to"
-msgstr "Ajouter exemplaire"
+msgstr "Ajouter à la liste"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/serials/subscription-add.tmpl:108
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/serials/subscription-add.tmpl:117
@@ -6707,9 +6703,8 @@ msgstr "Ajoutez les photos et le fichier TXT dans un fichier ZIP"
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/cat-toolbar.inc:160
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/virtualshelves/addbybiblionumber.tmpl:15
-#, fuzzy
 msgid "Add to"
-msgstr "Ajouter un champ"
+msgstr "Ajouter"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/basket/basket.tmpl:176
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/basket/basket.tmpl:355
@@ -7011,7 +7006,7 @@ msgstr "Contraintes avancées&nbsp;:"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/suggestion/suggestion.tmpl:57
 msgid "After choosing your reason, click 'Change Status'"
-msgstr ""
+msgstr "Après avoir sélectionner le motif, cliquez sur 'Changer le statut'"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/acqui/booksellers.tmpl:22
 msgid "After clicking 'Save' you will be brought to an order summary"
@@ -7048,7 +7043,7 @@ msgstr "Après avoir sauvegarder une notice MARC, vous accédez à un écran d'a
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/tools/holidays.tmpl:25
 msgid "After saving you will see the event listed in the summary below the calendar"
-msgstr ""
+msgstr "Après avoir sauvegardé vous verrez les événements affichés sous le calendrier"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/acqui/parcels.tmpl:9
 msgid "After searching for a vendor you will see all open orders on a summary page"
@@ -7056,7 +7051,7 @@ msgstr "Après avoir fait une recherche fournisseur, vous verrez toutes les comm
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/circ/returns.tmpl:16
 msgid "After this item is checked in the status of the item will be changed in the catalog to 'in transit'"
-msgstr ""
+msgstr "Après le retour, le statut du document sera changé à 'en transit' à l'opac"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/tools/manage-marc-import.tmpl:12
 msgid "After your import is complete, you will be given a summary of the import and the ability to undo your actions"
@@ -7083,7 +7078,7 @@ msgstr "Agnes Imecs"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/about.tmpl:267
 msgid "Ailé Filippi"
-msgstr ""
+msgstr "Ailé Filippi"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_120.tmpl:390
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_120.tmpl:392
@@ -7177,7 +7172,7 @@ msgstr "Allen Reinmeyer"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:119
 msgid "Allow on shelf holds"
-msgstr ""
+msgstr "Réservation doc. disponibles"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/patron-attr-types.tmpl:116
 msgid "Allow password:"
@@ -7196,9 +7191,8 @@ msgid "Allow staff member to manage serials subscriptions and claims"
 msgstr "Permet aux bibliothécaires de gérer abonnements et réclamations"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/branch_transfer_limits.tmpl:103
-#, fuzzy
 msgid "Allow transfer?"
-msgstr "Date de transfert"
+msgstr "Autoriser transfert"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/circ/view_holdsqueue.tmpl:7
 msgid "Allows the library to specify a list of library location codes -- if used alone, it will rank the list statically, selecting the top-ranking available location to be added to the picklist."
@@ -7211,7 +7205,7 @@ msgstr "Date de réception"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/cataloguing/addbiblio.tmpl:138
 msgid "Alter your search and choose Z39.50 targets from the pop-up window"
-msgstr ""
+msgstr "Modifiez votre recherche et sélectionnez des cibles Z3950"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/authorities/authorities.tmpl:21
 msgid "Altering Authorities Records"
@@ -7322,7 +7316,7 @@ msgstr "Une ligne de commande peut comporter plusieurs exemplaire d'un même doc
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/labels/label-manage.tmpl:140
 #, c-format
 msgid "An error was encountered and %s %s was not deleted. Please have your system administrator check the error log for details."
-msgstr ""
+msgstr "Une erreur s'est produite et la suppression de %s %s n'a pas eu lieu. Voyez votre administrateur système."
 
 #. %1$s: TMPL_VAR name=errstr
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/labels/label-edit-batch.tmpl:57
@@ -7379,7 +7373,7 @@ msgstr "Anousak Anthony Souphavanh"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/reports/guided_reports.tmpl:13
 msgid "Answer the 6 questions presented in order to create your report."
-msgstr ""
+msgstr "Suivez les 6 étapes présentées pour créer un rapport"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/about.tmpl:122
 msgid "Antoine Farnault"
@@ -7572,9 +7566,8 @@ msgstr "Êtes vous sûr de vouloir supprimer cet exemplaire ?"
 
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:92
-#, fuzzy
 msgid "Are you sure you want to delete this patron image? This cannot be undone."
-msgstr "Êtes vous sûr de vouloir supprimer cet adhérent ? Opération irréversible."
+msgstr "Êtes vous sûr de vouloir supprimer cette photo?"
 
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/circ-toolbar.inc:109
@@ -7621,9 +7614,8 @@ msgstr "Êtes vous sûr de vouloir fermer cette liste ?"
 
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:92
-#, fuzzy
 msgid "Are you sure you want to replace the current patron image? This cannot be undone."
-msgstr "Êtes vous sûr de vouloir supprimer cet adhérent ? Opération irréversible."
+msgstr "Êtes vous sûr de vouloir supprimer cette photo?"
 
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/circ-toolbar.inc:109
@@ -8294,13 +8286,12 @@ msgid "Barcode: %s"
 msgstr "code-barres&nbsp;: %s"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchMod.tmpl:39
-#, fuzzy
 msgid "Barcodes file"
-msgstr "Nom de fichier code-barres&nbsp;:"
+msgstr "Fichier de code-barres"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchMod.tmpl:49
 msgid "Barcodes list (one barcode per line):"
-msgstr ""
+msgstr "liste de code-barres (un par ligne):"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_128c.tmpl:323
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_128c.tmpl:325
@@ -8856,7 +8847,7 @@ msgstr "Mike Johnson"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/member.tmpl:21
 msgid "Browse by last name:"
-msgstr ""
+msgstr "Feuilleter par nom :"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/labels/pcard-members-search.tmpl:55
 #, c-format
@@ -8946,7 +8937,7 @@ msgstr "Date budget"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/aqbudgets.tmpl:190
 msgid "Budget hierarchy"
-msgstr ""
+msgstr "Hiérarchie budgétaire"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/admin/aqbudget.tmpl:27
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/admin/aqbookfund.tmpl:36
@@ -9540,7 +9531,7 @@ msgstr "Impossible de supprimer la règle de classement"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/categorie.tmpl:128
 msgid "Cannot have \"months\" and \"until date\" at the same time"
-msgstr ""
+msgstr "Les choix \"mois\" et \"jusqu'à une date\" sont incompatibles"
 
 #. For the first occurrence,
 #. %1$s: TMPL_VAR name=OPNLINK
@@ -9608,9 +9599,8 @@ msgstr "Ce numéro de carte est déjà utilisé"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/header.inc:10
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/cat-toolbar.inc:160
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/results.tmpl:171
-#, fuzzy
 msgid "Cart"
-msgstr "Catégorie"
+msgstr "Panier"
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/advsearch.tmpl:169
@@ -9653,7 +9643,7 @@ msgstr "Communes &rsaquo;"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/basket/sendbasketform.tmpl:1
 msgid "Catalog &rsaquo; Sending Your Cart"
-msgstr ""
+msgstr "Catalogue &rsaquo; Envoi du panier"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/virtualshelves/sendshelfform.tmpl:1
 #, fuzzy
@@ -9866,14 +9856,14 @@ msgstr "Changer mot de passe"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/member-password.tmpl:9
 msgid "Change Username and/or Password"
-msgstr "Modification de l'identifiant utilisateur et/ou du mot de passe"
+msgstr "Changer identifiant et/ou mot de passe"
 
 #. %1$s: TMPL_VAR name=firstname
 #. %2$s: TMPL_VAR name=surname
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/member-password.tmpl:40
 #, c-format
 msgid "Change Username and/or Password for %s %s"
-msgstr "Modification de l'identifiant utilisateur et/ou du mot de passe de %s %s"
+msgstr "Changer identifiant et/ou mot de passe de %s %s"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/addbiblio.tmpl:654
 msgid "Change framework:"
@@ -9936,9 +9926,8 @@ msgstr "Activé"
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/claims.tmpl:141
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/branch_transfer_limits.tmpl:98
-#, fuzzy
 msgid "Check All"
-msgstr "Retour"
+msgstr "Sélectionnez tout"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/serials-menu.inc:11
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/serials/checkexpiration.tmpl:3
@@ -10062,7 +10051,7 @@ msgstr "Vérification du nom de l'hôte dans koha.xml"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/patron-attr-types.tmpl:122
 msgid "Check to display this attribute on a patron's details page in the OPAC."
-msgstr "Coccher pour afficher cet attribut dans la page de détail de l'OPAC."
+msgstr "Cocher pour afficher cet attribut dans la page de détail de l'OPAC."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/patron-attr-types.tmpl:108
 msgid "Check to let a patron record have multiple values of this attribute. This setting cannot be changed after an attribute is defined."
@@ -10078,7 +10067,7 @@ msgstr "Cocher pour rendre cet attribut interrogeable dans l'interface professio
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/patron-attr-types.tmpl:130
 msgid "Check to show this attribute in member check-out."
-msgstr ""
+msgstr "Cocher pour afficher cet attribut dans le bloc d'identification de l'adhérent en circulation."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/installer/step2.tmpl:39
 msgid "Check your database settings in"
@@ -10119,9 +10108,8 @@ msgid "Checked Out"
 msgstr "Prêt(s)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember-receipt.tmpl:22
-#, fuzzy
 msgid "Checked Out Today"
-msgstr "Prêt(s)"
+msgstr "Prêt(s) du jour"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/detail.tmpl:220
 msgid "Checked out"
@@ -10145,16 +10133,16 @@ msgstr "Emprunté le"
 
 #. %1$s: TMPL_VAR name=cardnumber
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember-receipt.tmpl:17
-#, fuzzy, c-format
+#, c-format
 msgid "Checked out to <a1>%s</a>"
-msgstr "Prêté à&nbsp;: <a1>%s</a>, retour pour le %s"
+msgstr "Prêté à <a1>%s</a>"
 
 #. %1$s: TMPL_VAR name=cardnumber
 #. %2$s: TMPL_VAR name=datedue
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/moredetail.tmpl:65
 #, c-format
 msgid "Checked out to <a1>%s</a>, Due back on %s"
-msgstr "Prêté à&nbsp;: <a1>%s</a>, retour pour le %s"
+msgstr "Prêté à <a1>%s</a>, retour pour le %s"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/circ/returns.tmpl:381
 msgid "Checked-In items"
@@ -10238,7 +10226,7 @@ msgstr "Enfant"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/members/memberentry.tmpl:17
 msgid "Child = A patron who can have an adult guarantor."
-msgstr "Les adhérents enfants sont une catégorie qui peut avoir\t un garant."
+msgstr "Les adhérents enfants sont une catégorie qui peut avoir un garant."
 
 #. For the first occurrence,
 #. SCRIPT
@@ -10692,9 +10680,8 @@ msgstr "Note de circulation"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/reports/issues_stats.tmpl:23
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/reports/issues_stats.tmpl:68
-#, fuzzy
 msgid "Circulation statistics"
-msgstr "Statistiques de circulation&nbsp;: "
+msgstr "Stats de circulation"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/admin/systempreferences.tmpl:12
 msgid "Circulation:"
@@ -11005,7 +10992,7 @@ msgstr "Cliquez sur 'Import'"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/admin/branch_transfer_limits.tmpl:16
 msgid "Click 'Library Transfer Limits'"
-msgstr ""
+msgstr "Cliquez 'Limites de transfert réseau'"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/suggestion/suggestion.tmpl:27
 #, fuzzy
@@ -11192,7 +11179,7 @@ msgstr "Pour terminer, cliquez sur Finir et afficher dans l'Interface bibliothé
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/offline_circ/process_koc.tmpl:14
 #, fuzzy
 msgid "Click on the &ldquo;Offline Circulation File (.koc) Uploader&quot; option."
-msgstr "Koha &rsaquo;  Circulation &rsaquo; Statistiques de prêt pour %s"
+msgstr "Cliquez sur l'option de chargement du fichier de prêt secouru (.koc)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/members/boraccount.tmpl:12
 msgid "Click on the 'Fines' tab under the patron information on the left"
@@ -11243,7 +11230,7 @@ msgstr "Cliquez sur le résumé de la notice à modifier"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/offline_circ/process_koc.tmpl:23
 msgid "Click the &ldquo;Process offline circulation file&rdquo; button to process the data."
-msgstr ""
+msgstr "Cliquez sur &ldquo;Traiter le fichier .koc&rdquo; pour traiter les données"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/tools/letter.tmpl:24
 msgid "Click the '&gt;&gt;' button to insert that field into your text message where you'd like it to appear in the notice."
@@ -11537,9 +11524,8 @@ msgstr "Commentaire"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/virtualshelves/sendshelfform.tmpl:27
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:952
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/basket/sendbasketform.tmpl:27
-#, fuzzy
 msgid "Comment:"
-msgstr "Commentaire"
+msgstr "Commentaire :"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/reviews/reviewswaiting.tmpl:40
 msgid "Commenter"
@@ -11816,9 +11802,8 @@ msgstr "Contactez votre administrateur système pour pouvoir créer ce répertoi
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/acqui/uncertainprice.tmpl:39
-#, fuzzy
 msgid "Contact:"
-msgstr "Contact "
+msgstr "Contact :"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/subtypes_unimarc.inc:85
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/notices.tmpl:36
@@ -12136,9 +12121,8 @@ msgstr "Décompte"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:460
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:587
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:692
-#, fuzzy
 msgid "Country:"
-msgstr "Décompte"
+msgstr "Pays :"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/about.tmpl:71
 msgid "Crawford County Federated Library System"
@@ -12245,9 +12229,8 @@ msgstr "Créer facture manuelle"
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/tools-home.tmpl:24
-#, fuzzy
 msgid "Create printable labels and barcodes from catalog data"
-msgstr "Créer des étiquettes et des code-barres imprimables à partir des données du catalogue et créer des cartes adhérents à partir des informations adhérent"
+msgstr "Créer des étiquettes et des code-barres imprimables à partir des données du catalogue"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/acqui/booksellers.tmpl:79
 msgid "Created by"
@@ -12398,9 +12381,8 @@ msgid "Current Terms"
 msgstr "Termes actuels"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:109
-#, fuzzy
 msgid "Current checkouts allowed"
-msgstr "Prêts autorisés"
+msgstr "Prêts autorisés (Nbre)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/scheduler.tmpl:29
 msgid "Current server time is:"
@@ -12659,7 +12641,7 @@ msgstr "Date de naissance invalide."
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:195
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:244
 msgid "Date of birth:"
-msgstr "Date de naissance"
+msgstr "Date de naissance :"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:165
 msgid "Date of enrollment is invalid."
@@ -12820,7 +12802,7 @@ msgstr "Suspendu&nbsp;:"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:141
 #, c-format
 msgid "Debug is on (level %s)"
-msgstr "Débugguage activé (niveau %s)"
+msgstr "Débugage activé (niveau %s)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_121b.tmpl:224
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_121b.tmpl:226
@@ -12941,7 +12923,6 @@ msgid "Define item types and circulation codes used for circulation rules."
 msgstr "Définir les types de documents utilisés pour les règles de prêt."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/admin-home.tmpl:34
-#, fuzzy
 msgid "Define libraries, branches and groups."
 msgstr "Définir les bibliothèques, et groupes"
 
@@ -13151,9 +13132,8 @@ msgstr "Supprimer"
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/labels-batches-toolbar.inc:170
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/labels-batches-toolbar.inc:174
-#, fuzzy
 msgid "Delete Batch"
-msgstr "Supprimer la liste"
+msgstr "Supprimer le lot"
 
 #. %1$s: TMPL_VAR name=budget_name
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/aqbudgets.tmpl:389
@@ -15381,7 +15361,6 @@ msgstr "Sélectionner"
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/member-search.tmpl:26
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/search.tmpl:3
-#, fuzzy
 msgid "Filter :"
 msgstr "Filtrer sur&nbsp;:"
 
@@ -15465,14 +15444,13 @@ msgid "Fine"
 msgstr "Amende"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:111
-#, fuzzy
 msgid "Fine amount"
-msgstr "Montant de l'amende"
+msgstr "Amende (montant)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:112
 #, fuzzy
 msgid "Fine charging interval"
-msgstr "Périodicité de l'amende"
+msgstr "Amende (périodicité)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/circ-menu.inc:96
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/members-menu.inc:6
@@ -16278,19 +16256,17 @@ msgid "Government Publication"
 msgstr "Publication officielle"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:113
-#, fuzzy
 msgid "Grace period (day)"
-msgstr "Période de grâce"
+msgstr "Grâce (j.)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/serials/subscription-add.tmpl:23
 msgid "Grace period : number of days before a late issue has status from expected to late automatically set and the next expected issue is generated."
-msgstr ""
+msgstr "Période de grâce : nombre de jours avant qu'un fascicule passe du statut attendu au statut en retard, et à partir duquel un nouveau fascicule attendu est créé."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/subscription-add.tmpl:1024
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/subscription-detail.tmpl:92
-#, fuzzy
 msgid "Grace period:"
-msgstr "Période de grâce"
+msgstr "Période de grâce :"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_128c.tmpl:118
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_128c.tmpl:120
@@ -16723,9 +16699,8 @@ msgid "Holds Queue"
 msgstr "File des réservations"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:117
-#, fuzzy
 msgid "Holds allowed (count)"
-msgstr "Réservation non autorisée"
+msgstr "Réservations (Nbre)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/circ/waitingreserves.tmpl:3
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/circ/circulation-home.tmpl:38
@@ -16740,12 +16715,11 @@ msgstr "Réservations en attente de retrait pour votre bibliothèque au&nbsp;: %
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:118
 msgid "Holds pickup delay (day)"
-msgstr ""
+msgstr "Réservations, attente retrait (j.)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:120
-#, fuzzy
 msgid "Holds restricted to library"
-msgstr "Merci de renvoyer ce document au site de rattachement&nbsp;: %s"
+msgstr "Réservations limitées à la bib."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/circ/circulation-home.tmpl:37
 msgid "Holds to pull"
@@ -17873,7 +17847,7 @@ msgstr "Indique la durée de l'abonnement à ce périodique."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/advsearch.tmpl:257
 msgid "Individual Libraries:"
-msgstr "Bibliothèques particulières&nbsp;:"
+msgstr "Bibliothèque :"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/viewlog.tmpl:155
 msgid "Info"
@@ -19199,9 +19173,8 @@ msgid "Koha &rsaquo; Circulation &rsaquo; Items Overdue as of %s"
 msgstr "Koha &rsaquo; Circulation &rsaquo; Documents en retard au %s"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/offline_circ/list.tmpl:2
-#, fuzzy
 msgid "Koha &rsaquo; Circulation &rsaquo; Offline Circulation"
-msgstr "Koha &rsaquo;  Circulation &rsaquo; Statistiques de prêt pour %s"
+msgstr "Koha &rsaquo;  Circulation &rsaquo; Prêt secouru"
 
 #. %1$s: TMPL_VAR name=LoginBranchname
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/circ/branchoverdues.tmpl:2
@@ -19502,15 +19475,13 @@ msgid "Koha &rsaquo; Tools &rsaquo;"
 msgstr "Koha &rsaquo; Outils &rsaquo;"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchMod-del.tmpl:2
-#, fuzzy
 msgid "Koha &rsaquo; Tools &rsaquo; Batch Deletion of Items"
-msgstr "Koha &rsaquo; Outils &rsaquo; Etiquettes"
+msgstr "Koha &rsaquo; Outils &rsaquo; Suppression d'exemplaires par lots"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchMod.tmpl:2
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchMod-edit.tmpl:2
-#, fuzzy
 msgid "Koha &rsaquo; Tools &rsaquo; Batch Modification of Items"
-msgstr "Koha &rsaquo; Outils &rsaquo; Charger des photos d'adhérents"
+msgstr "Koha &rsaquo; Outils &rsaquo; Modification d'exemplaires par lots"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/holidays.tmpl:2
 msgid "Koha &rsaquo; Tools &rsaquo; Calendar"
@@ -20278,7 +20249,6 @@ msgid "Libraries can define library closings and holidays to be used when calcul
 msgstr "Vous pouvez utiliser le calendrier des fermetures en activant les préférences systèmes requises"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/admin-home.tmpl:33
-#, fuzzy
 msgid "Libraries, branches and groups"
 msgstr "Bibliothèques et Groupes"
 
@@ -20322,7 +20292,7 @@ msgstr "Site"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/branch_transfer_limits.tmpl:68
 #, c-format
 msgid "Library %s - %s Checkin and Transfer Policy"
-msgstr ""
+msgstr "%s - %s Politique de transfert et de retours"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/serials-home.tmpl:87
 msgid "Library (Callnumber)"
@@ -20347,9 +20317,8 @@ msgstr "Eléments de gestion"
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/admin/branch_transfer_limits.tmpl:2
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/admin-home.tmpl:52
-#, fuzzy
 msgid "Library Transfer Limits"
-msgstr "Sites de la bibliothèque"
+msgstr "Limites de transfert réseau"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/members/memberentry.tmpl:135
 msgid "Library branches are defined in your Basic Parameters."
@@ -20409,9 +20378,8 @@ msgstr "Choix bibliothèque"
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/admin-menu.inc:19
-#, fuzzy
 msgid "Library transfer limits"
-msgstr "Sites de la bibliothèque"
+msgstr "Limites de transfert réseau"
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:298
@@ -20460,7 +20428,7 @@ msgstr ""
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/admin-home.tmpl:53
 msgid "Limit the ability to transfer items between libraries based on the library sending, the library receiving, and the item type involved. These rules only go into effect if the preference UseBranchTransferLimits is set to ON."
-msgstr ""
+msgstr "Limite les transferts selon les critères: bibliothèque de départ, bibliothèque d'arrivée, type de document. Ces règles ne s'appliquent que si la préférence système UseBranchTransferLimits est activée."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/facets.inc:6
 #, c-format
@@ -20587,7 +20555,7 @@ msgstr ""
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/detail.tmpl:162
 msgid "Lists that include this title:"
-msgstr ""
+msgstr "Listes qui incluent ce titre :"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_125b.tmpl:13
 msgid "Literary Text Indicator:"
@@ -20623,9 +20591,8 @@ msgid "Loan length"
 msgstr "Durée du prêt"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:110
-#, fuzzy
 msgid "Loan period (day)"
-msgstr "Durée de prêt"
+msgstr "Durée prêt (j.)"
 
 #. LABEL
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/advsearch.tmpl:229
@@ -21328,9 +21295,8 @@ msgid "Manual issue %S"
 msgstr "Numéro hors série %S"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/tools/tools-home.tmpl:4
-#, fuzzy
 msgid "Many of the subsidiary modules can be found under Tools."
-msgstr "Beaucoup des modules complémentaires se trouvent ici."
+msgstr "Beaucoup de modules complémentaires se trouvent dans Outils"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/marc21_field_007.tmpl:12
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/marc21_field_007.tmpl:14
@@ -22696,7 +22662,7 @@ msgstr "Ajouter imprimante"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/csv-profiles.tmpl:42
 msgid "New profile for CSV export"
-msgstr ""
+msgstr "Nouveau profil d'export CSV"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/suggestion/suggestion.tmpl:66
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/suggestion/suggestion.tmpl:152
@@ -23003,7 +22969,7 @@ msgstr "Pas d irrégularités détectées"
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/doc-head-close.inc:98
 msgid "No item was added to your cart"
-msgstr ""
+msgstr "Aucun document ajouté au panier"
 
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/doc-head-close.inc:98
@@ -23375,7 +23341,7 @@ msgstr "Aucun de ci-dessus"
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/reserve/request.tmpl:133
 msgid "None of these items can normally be put on hold for this patron."
-msgstr ""
+msgstr "Aucune de ces référence ne peut être réservée pour cet adhérent."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/marc21_field_007.tmpl:42
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/marc21_field_007.tmpl:44
@@ -23509,7 +23475,7 @@ msgstr "Exclu du prêt (%s)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/inventory.tmpl:213
 msgid "Not found among barcodes in barcodes file."
-msgstr ""
+msgstr "Pas trouvé parmi les code-barres du fichier."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/inventory.tmpl:215
 #, fuzzy
@@ -23633,7 +23599,7 @@ msgstr ""
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tags/tags.tmpl:68
 msgid "Note: you can only delete your own tags."
-msgstr ""
+msgstr "Note : vous ne supprimer que vos propres tags."
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/systempreferences.tmpl:174
@@ -23642,11 +23608,11 @@ msgstr "Remarque&nbsp;: vous ne devriez pas avoir de raison de modifier les vale
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tags/tags.tmpl:69
 msgid "Note: your tag contained markup code that was removed."
-msgstr ""
+msgstr "Note : votre tag contenait du code informatique qui a été supprimé."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tags/tags.tmpl:71
 msgid "Note: your tag was entirely markup code. It was NOT added."
-msgstr ""
+msgstr "Note : votre tag contenait du code informatique et n'a pas été enregistré."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/results.tmpl:291
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/reserve/request.tmpl:534
@@ -23875,7 +23841,7 @@ msgstr "Nombre d'exemplaires affichés"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/subscription-add.tmpl:1061
 msgid "Number of issues to display to the public:"
-msgstr ""
+msgstr "Nbre de numéros à afficher au public :"
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/subscription-detail.tmpl:223
@@ -24224,7 +24190,7 @@ msgstr "Une fois approuvé, un commentaire apparaît à l'OPAC dans l'onglet 'Co
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/offline_circ/process_koc.tmpl:33
 msgid "Once a file has been uploaded the data remains in the file. The library may want to keep a copy of the file in another directory, or change the file extension frm .koc to .txt.&nbsp; The utility only looks at files with a .koc extenison. If this isn't done, staff may accidentally add new data to an old file."
-msgstr ""
+msgstr "Une fois le fichier chargé, les données sont conservées dans le fichier. Vous pouvez ensuite conserver une copie en renommant le fichier de .koc en .txt et en le déplaçant. Le programme ne traite que les fichiers en .koc."
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/admin/biblio_framework.tmpl:7
@@ -24324,14 +24290,14 @@ msgstr ""
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/aqplan.tmpl:85
 msgid "One or more cell values is non-numeric"
-msgstr ""
+msgstr "Une ou plusieurs cellules ont un contenu non-numérique"
 
 #. For the first occurrence,
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/doc-head-close.inc:98
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/results.tmpl:171
 msgid "One or more selected items cannot be reserved."
-msgstr ""
+msgstr "Un ou plusieurs exemplaires sélectionnés ne peuvent être réservé."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/help-top.inc:2
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/edithelp.tmpl:2
@@ -24371,7 +24337,7 @@ msgstr "Seulement les documents actuellement en rayon"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/aqbudget_owner_search.tmpl:44
 msgid "Only staff with superlibrarian or acquisitions permissions are returned in the search results"
-msgstr ""
+msgstr "Seuls les bibliothécaires avec les droits superlibrarian ou acquisitions sont montrés ici."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/auth_subfields_structure.tmpl:92
 msgid "Opac:"
@@ -24388,7 +24354,7 @@ msgstr "Ouverte"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/detail.tmpl:112
 msgid "Open in new window"
-msgstr ""
+msgstr "Ouvrir dans une nouvelle fenêtre"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/acqui/neworderempty.tmpl:89
 #, fuzzy
@@ -24419,7 +24385,7 @@ msgstr "Les options du type bouton radio, comme 'Statut adhérent', 'Activité a
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchMod.tmpl:46
 msgid "Or scan items one-by-one"
-msgstr ""
+msgstr "Ou scanner les exemplaires un par un"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_128c.tmpl:98
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_128c.tmpl:100
@@ -24559,7 +24525,7 @@ msgstr "Prix de commande"
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/acqui/uncertainprice.tmpl:25
 #, c-format
 msgid "Orders with uncertain prices for vendor <a1>%s</a> <a2>(edit)</a>"
-msgstr ""
+msgstr "Commandes avec prix incertains pour <a1>%s</a> <a2>(modifier)</a>"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_128c.tmpl:238
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/cataloguing/value_builder/unimarc_field_128c.tmpl:240
@@ -25222,9 +25188,8 @@ msgstr "L'adhérent est suspendu"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:285
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:1098
-#, fuzzy
 msgid "Patron messaging preferences"
-msgstr "Préférences communication adhérent"
+msgstr "Préférences notifications adhérent"
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/viewalerts.tmpl:22
@@ -25509,7 +25474,7 @@ msgstr "Affiner votre recherche"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/tools-home.tmpl:84
 msgid "Perform batch deletion of items"
-msgstr ""
+msgstr "Suppression d'exemplaires par lots"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/tools/tools-home.tmpl:79
 msgid "Perform batch modification of items"
@@ -25839,9 +25804,8 @@ msgstr "Merci de voir le log des erreurs pour plus de détails."
 
 #. SCRIPT
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:92
-#, fuzzy
 msgid "Please choose a file to upload"
-msgstr "Sélectionnez le fichier à importer&nbsp;:"
+msgstr "Sélectionnez le fichier à importer"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/clone-rules.tmpl:37
 #, fuzzy
@@ -25995,9 +25959,9 @@ msgstr "Polarité&nbsp;:"
 #. %1$s: TMPL_VAR name=limit_phrase
 #. %2$s: TMPL_VAR name=code
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/branch_transfer_limits.tmpl:97
-#, fuzzy, c-format
+#, c-format
 msgid "Policy for %s: %s"
-msgstr "Pas d'exemplaires à %s"
+msgstr "Transferts %s : %s"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/about.tmpl:262
 msgid "Polski (Polish)"
@@ -26347,7 +26311,6 @@ msgid "Professional Patrons: can also be associated with a guarantor (usually an
 msgstr "Les adhérents professionnels peuvent être associés à un garant (habituellement une organisation)."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:187
-#, fuzzy
 msgid "Professional mobile:"
 msgstr "Portable professionnel&nbsp;: "
 
@@ -27182,13 +27145,12 @@ msgid "Renewal due date: %S"
 msgstr "Date de retour du renouvellement&nbsp;: %S"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:115
-#, fuzzy
 msgid "Renewals allowed (count)"
-msgstr "Échec du renouvellement"
+msgstr "Prolongations (Nbre)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:116
 msgid "Renewals period (days)"
-msgstr ""
+msgstr "Prolongations (période - j.)"
 
 #
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/bull/statecollection.tmpl:25
@@ -27514,9 +27476,9 @@ msgstr "Réponses %s à  %s sur %s"
 #. %3$s: TMPL_VAR
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/serials/member-search.tmpl:48
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/member.tmpl:29
-#, fuzzy, c-format
+#, c-format
 msgid "Results %s to %s of %s found for"
-msgstr "Réponses %s à  %s sur %s trouvées pour '"
+msgstr "Résultats %s à  %s sur %s :"
 
 #. %1$s: TMPL_VAR
 #. %2$s: TMPL_VAR
@@ -30539,7 +30501,7 @@ msgstr "Enquêtes"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/smart-rules.tmpl:114
 msgid "Suspension duration (day)"
-msgstr ""
+msgstr "Suspension (j.)"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/about.tmpl:268
 msgid "Svenska (Swedish)"
@@ -31436,7 +31398,7 @@ msgstr ""
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/offline_circ/process_koc.tmpl:7
 #, c-format
 msgid "The Offline Circulation tool can be used should your library lose Internet access.&nbsp; Learn more about the tool here: <a1>http://kylehall.info/index.php/projects/koha-tools/koha-offline-circulation/</a>"
-msgstr ""
+msgstr "L'outil de prêt secouru peut-être utilisé quand la bibliothèque perd son accès à internet."
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/members/members-home.tmpl:6
 msgid "The Patrons portion stores the information you add about your patrons."
@@ -32223,7 +32185,7 @@ msgstr "C'est un lien terme-à-terme.Autrement dit un sous champ MARC ne peut ê
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/detail.tmpl:364
 msgid "This is a serial subscription"
-msgstr "Ceci est un abonnement de périodique"
+msgstr "Abonnement de périodique"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/export/marc.tmpl:5
 msgid "This is a tool to export your bibliographic records in standard MARC communications format (ISO 2709). It exports only the basic bibliographic information with no holdings information other than any holdings information originally loaded into Koha using the bulkmarcimport tool."
@@ -33161,9 +33123,9 @@ msgstr "Pour mettre à jour la grille MARC avec votre nouveau type d'autorité, 
 #. %1$s: TMPL_VAR name=title
 #. %2$s: TMPL_VAR name=surname
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:230
-#, fuzzy, c-format
+#, c-format
 msgid "To update the image for %s %s, select a new image file and click 'Upload.'"
-msgstr "Pour mettre à jour l'image pour %s %s, entrez le nom du fichier image à télécharger et cliquez sur \"Télécharger\""
+msgstr "Mettre à jour la photo de %s %s : sélectionnez un fichier image et cliquez sur 'Télécharger'"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/labels/spinelabel-home.tmpl:7
 #, fuzzy
@@ -33865,9 +33827,8 @@ msgid "UTF-8"
 msgstr "UTF-8"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:127
-#, fuzzy
 msgid "Unable to delete patron"
-msgstr "Impossible de supprimer l'adhérent&nbsp;:"
+msgstr "Impossible de supprimer l'adhérent"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:123
 msgid "Unable to delete patrons from other libraries with current settings"
@@ -33875,7 +33836,7 @@ msgstr "Imposible de supprimer des adhérents d'autres bibliothèques avec les r
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:119
 msgid "Unable to delete staff user"
-msgstr "Impossible de supprimer l'utilisateur bibliothécaire"
+msgstr "Impossible de supprimer l'adhérent"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/installer/auth.tmpl:14
 #, c-format
@@ -33907,9 +33868,8 @@ msgstr "Prix de commande"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/branch_transfer_limits.tmpl:85
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/admin/branch_transfer_limits.tmpl:98
-#, fuzzy
 msgid "Uncheck All"
-msgstr "Tout renouveler"
+msgstr "Désélectionnez tout"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:323
 msgid "Undefined"
@@ -35491,7 +35451,7 @@ msgstr "Vous pouvez tester votre liste (blanche ou noire) en entrant des termes 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/circ/branchtransfers.tmpl:141
 #, c-format
 msgid "You cannot transfer items of %s <b>%s</b> to <b>%s</b>"
-msgstr "Impossible de transférer les exemplaires de %s <b>%s</b> vers <b>%s</b>" 
+msgstr "Impossible de transférer les exemplaires de %s <b>%s</b> vers <b>%s</b>"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/catalogue/results.tmpl:2
 msgid "You did not specify any search criteria"
@@ -38065,14 +38025,12 @@ msgid "catechism"
 msgstr "catéchisme"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/reports/guided_reports.tmpl:61
-#, fuzzy
 msgid "categorycode"
-msgstr "Code catégorie"
+msgstr "categorycode"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/includes/patron-search.inc:69
-#, fuzzy
 msgid "categorycode :"
-msgstr "Code catégorie&nbsp;:"
+msgstr "Catégorie&nbsp;:"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/xslt/UNIMARCslim2OPACDetail.xsl:540
 #: ../../koha-tmpl/intranet-tmpl/prog/en/xslt/UNIMARCslim2intranetDetail.xsl:518
@@ -47448,9 +47406,8 @@ msgid "until %s"
 msgstr "jusque %s"
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/members/memberentrygen.tmpl:973
-#, fuzzy
 msgid "until:"
-msgstr "Initiales&nbsp;: "
+msgstr "jusqu'au&nbsp;: "
 
 #: ../../koha-tmpl/intranet-tmpl/prog/en/modules/help/members/member-flags.tmpl:74
 msgid "updatecharges"
@@ -48384,59 +48341,42 @@ msgstr ""
 
 #~ msgid "\" >Choose Order Of Text Fields to Print"
 #~ msgstr "\" >Choisir l'ordre des champs texte à imprimer"
-
 #~ msgid "\"> List Fields"
 #~ msgstr "\"> Liste de champs"
-
 #~ msgid "$"
 #~ msgstr "€"
-
 #~ msgid "$%S"
 #~ msgstr "%S €"
-
 #~ msgid "$%s"
 #~ msgstr "%s €"
-
 #~ msgid "%S (Fill when receiving)"
 #~ msgstr "%S (remplir à la réception)"
-
 #~ msgid "%S <a1>Mark all with this reason</a> <a2>Cancel</a>"
 #~ msgstr "%S <a1>Tout marquer avec cette raison</a> <a2>Annuler</a>"
-
 #~ msgid "%S order by:"
 #~ msgstr "%S Trié par"
 
 #, fuzzy
 #~ msgid "%p List Fields"
 #~ msgstr "Liste de champs"
-
 #~ msgid "%s Overdues"
 #~ msgstr "%s Retards"
-
 #~ msgid "%s day(s)"
 #~ msgstr "%s jour(s)"
-
 #~ msgid "%s not for loan:"
 #~ msgstr "%s exclu du prêt :"
-
 #~ msgid "%s records(s)"
 #~ msgstr "%s notice(s)"
-
 #~ msgid "&gt;="
 #~ msgstr "&gt;="
-
 #~ msgid "&lt;&lt; Continue without Marking"
 #~ msgstr "&lt;&lt; Continuer sans marquer"
-
 #~ msgid "&lt;="
 #~ msgstr "&lt;="
-
 #~ msgid "&nbsp; (<b>%s </b>)"
 #~ msgstr "&nbsp; (<b>%s </b>)"
-
 #~ msgid "&nbsp;&nbsp;to"
 #~ msgstr "&nbsp;&nbsp;à"
-
 #~ msgid ""
 #~ "&quot;Funds&quot; are accounts that you establish to keep track of your "
 #~ "expenditures for library materials. They may be used for any kind of "
@@ -48452,31 +48392,22 @@ msgstr ""
 #~ "une ligne de budget pour les livres, une autre pour les documents "
 #~ "audiovisuels, une troisième pour les périodiques et une quatrième pour "
 #~ "les bases de données électroniques, vous aurez quatre lignes de budget."
-
 #~ msgid "&rsaquo; <a1>Holds Queue</a> &rsaquo; Results"
 #~ msgstr "&rsaquo; <a1>file des réservations</a> &rsaquo; Résultats"
-
 #~ msgid "&rsaquo; Add classification source"
 #~ msgstr "&rsaquo; Ajout source de classification"
-
 #~ msgid "&rsaquo; Add filing rule"
 #~ msgstr "&rsaquo; Ajouter une règle de classement"
-
 #~ msgid "&rsaquo; Add fund"
 #~ msgstr "&rsaquo; Ajout Budget"
-
 #~ msgid "&rsaquo; Checkout statistics"
 #~ msgstr "&rsaquo; Statistiques sur les prêts"
-
 #~ msgid "&rsaquo; Holds Queue"
 #~ msgstr "&rsaquo; File des réservations"
-
 #~ msgid "&rsaquo; Modify classification source"
 #~ msgstr "&rsaquo; Modifier la source de classification"
-
 #~ msgid "&rsaquo; Modify filing rule"
 #~ msgstr "&rsaquo; Modifier la règle de classement"
-
 #~ msgid ""
 #~ "'Select a borrower category' using the dropdown menu provided (or select "
 #~ "the default 'Any Category code' at the top of the dropdown menu to choose "
@@ -48484,7 +48415,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Sélectionnez une catégorie d'adhérent dans le menu déroulant (ou "
 #~ "sélectionnez la valeur par défaut 'Toutes les catégories d'adhérent')"
-
 #~ msgid ""
 #~ "'Select a branch' to report on (or, leave at the default 'all' to perform "
 #~ "the report on all branches)"
@@ -48492,123 +48422,88 @@ msgstr ""
 #~ "Sélectionnez le site sur lequel vous voulez un rapport (ou sélectionner "
 #~ "la valeur par défaut 'tous sites' pour faire un rapport concernant tous "
 #~ "les sites)"
-
 #~ msgid "(default if none is defined)"
 #~ msgstr "(défaut si rien n'est défini)"
 
 #, fuzzy
 #~ msgid "(not set)"
 #~ msgstr "(Perdu)"
-
 #~ msgid "**"
 #~ msgstr "**"
-
 #~ msgid ", France (Koha 2.0, 2.2 Release Manager and 3.0 Release Maintainer)"
 #~ msgstr ", France (Responsable des Versions 2.0 puis 2.2)"
-
 #~ msgid ", by <a1>%s</a>"
 #~ msgstr ", par <a1>%s</a>"
-
 #~ msgid "- Relation hiérachique non définie"
 #~ msgstr "- Relation hiérachique non définie"
-
 #~ msgid ". Other filters are ignored)"
 #~ msgstr ".Les autres filtres sont ignorés)"
-
 #~ msgid "0- Pas de relation hiérarchique"
 #~ msgstr "0- Pas de relation hiérarchique"
-
 #~ msgid "1- Non rédigée \"document en mains\""
 #~ msgstr "1- Non rédigée \"document en mains\""
-
 #~ msgid "1- Notice de niveau le + élevé (notice mère)"
 #~ msgstr "1- Notice de niveau le + élevé (notice mère)"
-
 #~ msgid "1-4 Taille"
 #~ msgstr "1-4 Taille"
-
 #~ msgid "1. First Issue ETA"
 #~ msgstr "1. Date d'arrivée prévue  du 1er n°"
-
 #~ msgid "17- Niveau de catalogage"
 #~ msgstr "17- Niveau de catalogage"
-
 #~ msgid "19-24 entry map & lengths"
 #~ msgstr "19-24 "
-
 #~ msgid "20-24 entry map & lengths"
 #~ msgstr "20-24 structure et longueur des entrées"
-
 #~ msgid "4. Begins on"
 #~ msgstr "4. Commence le"
-
 #~ msgid "6- Type de document"
 #~ msgstr "6- Type de document"
-
 #~ msgid ""
 #~ ":Holidays that either repeat the same day of every week or repeated "
 #~ "yearly on the same date."
 #~ msgstr ""
 #~ ": Jour de fermeture répété chaque année à la même date, ou chaque semaine "
 #~ "au même jour."
-
 #~ msgid ":One off events or closeures."
 #~ msgstr ": Fermeture et congés."
-
 #~ msgid ""
 #~ "<!-- TMPL_IF NAME=\"startlabel\" --><!-- TMPL_VAR NAME=\"startlabel\" --"
 #~ "><!-- TMPL_ELSE -->1<!-- /TMPL_IF -->"
 #~ msgstr ""
 #~ "<!-- TMPL_IF NAME=\"startlabel\" --><!-- TMPL_VAR NAME=\"startlabel\" --"
 #~ "><!-- TMPL_ELSE -->1<!-- /TMPL_IF -->"
-
 #~ msgid "<a1> </a><h2>Generating A New Report From SQL</h2>"
 #~ msgstr "<a1> </a><h2>Générer un nouveau rapport à partir de SQL</h2>"
-
 #~ msgid "<a1> </a><h2>Saving A Report</h2>"
 #~ msgstr "<a1> </a><h2>Sauvegarder un rapport</h2>"
-
 #~ msgid "<a1> </a><h2>Scheduling A Report</h2>"
 #~ msgstr "<a1> </a><h2>Planifier un rapport</h2>"
-
 #~ msgid "<a1>%s</a> <a2>[email]</a> (%s)"
 #~ msgstr "<a1> %s </a> <a2>[email]</a> (%s)"
-
 #~ msgid "<a1>%s</a>&nbsp; / &nbsp;%s"
 #~ msgstr "<a1>%s</a>&nbsp; / &nbsp;%s"
-
 #~ msgid "<a1></a> <h1>Guided Reports Help</h1>"
 #~ msgstr "<a1></a> <h1>Aide sur les rapports</h1>"
-
 #~ msgid "<a1></a><h2>Building A New Report</h2>"
 #~ msgstr "<a1></a><h2>Créer un nouveau rapport</h2>"
-
 #~ msgid "<a1>Authority Types</a> &rsaquo; Confirm Deletion of Authority Type"
 #~ msgstr ""
 #~ "<a1>Types d'autorité</a> &rsaquo; Confirmer la suppression du type "
 #~ "d'autorité"
-
 #~ msgid "<a1>Authority Types</a> &rsaquo; Modify authority type"
 #~ msgstr "<a1>Types d'autorité</a> &rsaquo; Modifier le type d'autorité"
-
 #~ msgid "<a1>Authority Types</a> &rsaquo; New authority type"
 #~ msgstr "<a1>Types d'autorité</a> &rsaquo; Ajouter un type d'autorité"
-
 #~ msgid "<a1>Back</a> &nbsp; <a2>Print</a>"
 #~ msgstr "<a1> Retour </a> &nbsp <a2>Imprimer</a>"
-
 #~ msgid "<a1>Budgets</a> &rsaquo; Budget Data Recorded"
 #~ msgstr "<a1>Budgets</a> &rsaquo; Donnée de budget sauvegardée"
-
 #~ msgid "<a1>Budgets</a> &rsaquo; Budget Deleted"
 #~ msgstr "<a1>Budgets</a> &rsaquo; Budget supprimé"
-
 #~ msgid "<a1>Cities</a> &rsaquo; Confirm Deletion of City"
 #~ msgstr "<a1>Villes</a> &rsaquo; Confirmer la suppression de la ville"
-
 #~ msgid "<a1>Funds and Budgets</a> &rsaquo; Add fund"
 #~ msgstr "<a1>Budgets</a> &rsaquo; Ajout budget"
-
 #~ msgid ""
 #~ "<a1>Home</a> &rsaquo; <a2>Acquisitions</a> &rsaquo; Budgets and funds: "
 #~ "Spent"
@@ -48621,15 +48516,12 @@ msgstr ""
 #~ "Budgets</a>"
 #~ msgstr ""
 #~ "<a1>Accueil</a> &rsaquo; <a2>Administration</a> &rsaquo; Règles de prêt"
-
 #~ msgid "<a1>Home</a> &rsaquo; <a2>Circulation</a>"
 #~ msgstr "<a1>Accueil</a> &rsaquo; <a2>Circulation</a>"
-
 #~ msgid "<a1>Home</a> &rsaquo; <a2>Serials</a> &rsaquo; Distribution Lists"
 #~ msgstr ""
 #~ "<a1> Accueil </a> &rsaquo;<a2>Périodiques</a> &rsaquo; Listes de "
 #~ "circulation"
-
 #~ msgid ""
 #~ "<a1>Home</a> &rsaquo; <a2>Tools</a> &rsaquo; <a3>Labels</a> &rsaquo; "
 #~ "<a4>Printer Profiles</a> &rsaquo; Create Printer Profile"
@@ -48637,102 +48529,79 @@ msgstr ""
 #~ "<a1> Accueil </a> &rsaquo;<a2>Outils</a> &rsaquo; <a3>Etiquettes</a> "
 #~ "&rsaquo; <a4>Profils d'imprimante</a> &rsaquo; Créer un profil "
 #~ "d'imprimante"
-
 #~ msgid ""
 #~ "<a1>Home</a> &rsaquo; <a2>Tools</a> &rsaquo; <a3>Labels</a> &rsaquo; "
 #~ "Create Label Template"
 #~ msgstr ""
 #~ "<a1> Accueil </a> &rsaquo;<a2>Etiquettes</a> &rsaquo; <a3>Etiquettes</a> "
 #~ "&rsaquo; Créer un modèle d'étiquette"
-
 #~ msgid ""
 #~ "<a1>Home</a> &rsaquo; <a2>Tools</a> &rsaquo; Stage MARC Records For Import"
 #~ msgstr ""
 #~ "<a1> Accueil </a> &rsaquo;<a2>Outils</a> &rsaquo; Traiter les notices "
 #~ "MARC pour l'import"
-
 #~ msgid ""
 #~ "<a1>Home</a>&rsaquo; <a2>Tools</a> &rsaquo; <a3>Labels</a> &rsaquo; "
 #~ "Printer Profiles"
 #~ msgstr ""
 #~ "<a1> Accueil </a> &rsaquo;<a2>Outils</a> &rsaquo; <a3>Profils "
 #~ "d'imprimante</a> &rsaquo; Profils d'imprimante"
-
 #~ msgid "<a1>Libraries and Groups</a> &rsaquo;"
 #~ msgstr "<a1>Bibliothèques &amp; Groupes</a> &rsaquo; "
-
 #~ msgid "<a1>Libraries and Groups</a> &rsaquo; Confirm Deletion of Group %s"
 #~ msgstr ""
 #~ "<a1>Bibliothèques et Groupes</a> &rsaquo;  Confirmer la suppression du "
 #~ "groupe %s"
-
 #~ msgid ""
 #~ "<a1>Libraries and Groups</a> &rsaquo; Confirm deletion of library '%s'"
 #~ msgstr ""
 #~ "<a1>Bibliothèques et Groupes</a> &rsaquo;  Confirmer la suppression de la "
 #~ "bibliothèque '%s'"
-
 #~ msgid "<a1>MARC Frameworks</a> &rsaquo;"
 #~ msgstr "<a1>Grilles de catalogage</a> &rsaquo;"
-
 #~ msgid ""
 #~ "<a1>MARC Frameworks</a> &rsaquo; <a2>MARC Framework for %s (%s)</a> "
 #~ "&rsaquo; %s %s"
 #~ msgstr ""
 #~ "<a1>Grilles de catalogage</a> &rsaquo; <a2>Grille de catalogage %s (%s) </"
 #~ "a> &rsaquo; %s %s"
-
 #~ msgid "<a1>MARC Frameworks</a> &rsaquo; Confirm Deletion of Tag '%s'"
 #~ msgstr ""
 #~ "<a1>Grille de catalogage</a> &rsaquo; Confirmez la suppression du champ '%"
 #~ "s'"
-
 #~ msgid "<a1>MARC Frameworks</a> &rsaquo; Data Deleted"
 #~ msgstr "<a1>Grilles de catalogage</a> &rsaquo; Donnée supprimée"
-
 #~ msgid "<a1>MARC Frameworks</a> &rsaquo; Delete Framework for %s (%s)?"
 #~ msgstr ""
 #~ "<a1>Grilles de catalogage</a> &rsaquo; Supprimer la grille pour %s (%s) ?"
-
 #~ msgid "<a1>MARC Frameworks</a> &rsaquo; MARC Framework for %s (%s)"
 #~ msgstr ""
 #~ "<a1>Grilles de catalogage</a> &rsaquo; Grille de catalogage pour  %s (%"
 #~ "s) ?"
-
 #~ msgid "<a1>Manage staged MARC records</a>."
 #~ msgstr "<a1>Gestion des notices MARC dans le réservoir</a>"
 
 #, fuzzy
 #~ msgid "<a1>Offline Circulation File Upload</a> &rsaquo; Results"
 #~ msgstr "<a1>Documents circulant le plus</a> &rsaquo; Résultats"
-
 #~ msgid "<a1>Perform a new search</a> <a2>Close</a>"
 #~ msgstr "<a1>Effectuer nouvelle recherche</a> <a2>Fermer</a>"
-
 #~ msgid "<a1>Search for another Biblio</a> <a2> Close</a>"
 #~ msgstr "<a1>Rechercher une autre notice</a> &nbsp;<a2>Fermer</a>"
-
 #~ msgid "<a1>Stop Words</a> &rsaquo;"
 #~ msgstr "<a1>Mots vides</a> &rsaquo; "
-
 #~ msgid "<a1>Stop Words</a> &rsaquo; Data deleted"
 #~ msgstr "<a1>Mots vides</a> &rsaquo; Donnée supprimée"
-
 #~ msgid "<a1>Stop Words</a> &rsaquo; Delete Stop Word '%s' ?"
 #~ msgstr "<a1>Mots vides</a> &rsaquo; Supprimer le mot vide '%s' ?"
-
 #~ msgid "<a1>Suggestions Management</a> &rsaquo; Accepted"
 #~ msgstr "<a1>Gestion suggestions</a> &rsaquo; Acceptées"
-
 #~ msgid "<a1>Suggestions Management</a> &rsaquo; Rejected"
 #~ msgstr "<a1>Gestion suggestions</a> &rsaquo; Rejetées"
-
 #~ msgid "<b>%s results found</b> %s"
 #~ msgstr "<b>%s réponse(s) trouvée(s)</b> %s"
-
 #~ msgid "<b>Issue:</b> %s"
 #~ msgstr "<b>Numéro&nbsp;: </b> %s"
-
 #~ msgid "<b>Serial Title:</b> %s"
 #~ msgstr "<b>Titre de périodique&nbsp;: </b> %s"
 
@@ -48745,23 +48614,18 @@ msgstr ""
 #, fuzzy
 #~ msgid "<em>Get there:</em> Circulation &gt; Check In"
 #~ msgstr "<em>Aller à:</em> Plus &gt; Acquisitions &gt; Commandes en retard"
-
 #~ msgid "<em>Get there:</em> More &gt; Serials &gt; New Subscription"
 #~ msgstr "<em>Allez à:</em> Plus &gt; Périodiques &gt; Ajouter abonnement"
-
 #~ msgid "="
 #~ msgstr "="
-
 #~ msgid "A Basket is a collection of orders."
 #~ msgstr "Un panier est un regroupement de lignes de commandes."
-
 #~ msgid ""
 #~ "A red box will alert you. Fines are calculated and posted the following "
 #~ "day."
 #~ msgstr ""
 #~ "Un pavé rouge va vous alerter. Les amendes sont calculées à partir du "
 #~ "lendemain."
-
 #~ msgid ""
 #~ "A red typed alert saying &quot;Reserve Found&quot; will be displayed "
 #~ "along with the Reserve listing information. Click on the confirm button "
@@ -48775,7 +48639,6 @@ msgstr ""
 #~ "confirmée, le document sera en status &quot;mis de coté&quot; Si le "
 #~ "document  est demandé par une autre personne dans un autre site, vous "
 #~ "devez valider le transfert."
-
 #~ msgid ""
 #~ "A report can be generated directly using from an SQL statement. On the "
 #~ "&quot;Create from SQL&quot; page, give the report a Title and Description "
@@ -48786,21 +48649,18 @@ msgstr ""
 #~ "la page \"Générer à partir de SQL\", donnez  un titre  et une description "
 #~ "au rapport (en utilisant la zone de notes) et copiez votre requête SQL "
 #~ "dans le champ texte."
-
 #~ msgid ""
 #~ "A: Confirming will checkout the check out and automatically check in the "
 #~ "item from the other patron account."
 #~ msgstr ""
 #~ "R&nbsp;: Une confirmation validera le prêt, et  affectera automatiquement "
 #~ "le prêt sur le compte de l'adhérent."
-
 #~ msgid ""
 #~ "A: If the checking out is really impossible (for example, the barcode "
 #~ "does not exist), then you can&rsquo;t confirm the checkout."
 #~ msgstr ""
 #~ "R&nbsp;: Si le prêt est réellement impossible (par exemple, le code-"
 #~ "barres n'existe pas), alors vous ne pouvez pas confirmer le prêt."
-
 #~ msgid ""
 #~ "A: If there is a problem with an checkout, then a box will appear and ask "
 #~ "for confirmation, if possible. Confirming will override the system and "
@@ -48810,7 +48670,6 @@ msgstr ""
 #~ "demandera confirmation si le prêt est techniquement possible. La "
 #~ "confirmation permet d'outrepasser les règles de prêt définies pour le "
 #~ "document et/ou l'adhérent."
-
 #~ msgid ""
 #~ "A: If you wish to have this item and all subsequent items in this "
 #~ "transaction to have a date due other than the default date due defined "
@@ -48821,7 +48680,6 @@ msgstr ""
 #~ "transaction aient une date de retour autre que la date définie par défaut "
 #~ "pour ce type de document utilisez la \"date de retour manuelle\" pour "
 #~ "choisir la date de retour avant de scanner le premier document."
-
 #~ msgid ""
 #~ "A: Start by scanning the patron&rsquo;s barcode or type in their name to "
 #~ "find their account. Once Koha has found the patron, you will see a new "
@@ -48835,60 +48693,46 @@ msgstr ""
 #~ "le document (en général un code-barres).Si le document peut être prêté "
 #~ "sans problème, cela sera fait tout de suite et affiché en dessous avec "
 #~ "les autres emprunts de l'adhérent."
-
 #~ msgid "ACQCLAIM (Acquisition Claim): Used in the claimacquisition module"
 #~ msgstr ""
 #~ "ACQCLAIM (Réclamation Acquisition): Utilisé dans le module "
 #~ "claimacquisition module"
-
 #~ msgid "Accept"
 #~ msgstr "Accepter"
-
 #~ msgid "Accepted payment (%s) from <a1>%s %s</a> (%s): %s"
 #~ msgstr "Paiement accepté (%s) de <a1>%s %s</a> (%s): %s"
 
 #, fuzzy
 #~ msgid "Add &amp; Duplicate"
 #~ msgstr "Dupliquer"
-
 #~ msgid "Add <i>%s</i>"
 #~ msgstr "Ajouter <i>%s</i>"
-
 #~ msgid "Add List Member"
 #~ msgstr "Ajouter un membre à la liste"
-
 #~ msgid "Add MARC Record Help"
 #~ msgstr "Aide sur l'ajout de notice MARC"
 
 #, fuzzy
 #~ msgid "Add Multiple Copies"
 #~ msgstr "m- dates multiples"
-
 #~ msgid "Add Record Without Search"
 #~ msgstr "Ajouter une notice sans recherche"
 
 #, fuzzy
 #~ msgid "Add book fund"
 #~ msgstr "Ajouter un budget"
-
 #~ msgid "Add checked"
 #~ msgstr "Ajout validé"
-
 #~ msgid "Add help"
 #~ msgstr "Ajouter de l'aide"
-
 #~ msgid "Add item(s) to batch"
 #~ msgstr "Ajouter exemplaire(s) au traitement"
-
 #~ msgid "Add patron(s) to batch"
 #~ msgstr "Ajouter adhérent(s) au traitement"
-
 #~ msgid "Add to List"
 #~ msgstr "Ajouter à liste"
-
 #~ msgid "Address (cont.):"
 #~ msgstr "Adresse (suite)&nbsp;:"
-
 #~ msgid ""
 #~ "Aile Filippi, Alejandro Tiraboschi, Bernardo G. Kriegel, Pablo A. "
 #~ "Bianchi, Santiago Hermira and Veronica Lencinas. With support from the "
@@ -48897,10 +48741,8 @@ msgstr ""
 #~ "Aile Filippi, Alejandro Tiraboschi, Bernardo G. Kriegel, Pablo A. "
 #~ "Bianchi, Santiago Hermira and Veronica Lencinas. Avec l'aide de la "
 #~ "communauté Koha-es"
-
 #~ msgid "AllowHoldPolicyOverride"
 #~ msgstr "AllowHoldPolicyOverride"
-
 #~ msgid "Allowed"
 #~ msgstr "Autorisé"
 
@@ -49013,13 +48855,10 @@ msgstr ""
 #, fuzzy
 #~ msgid "Canned Notes:"
 #~ msgstr "Gestion des notes&nbsp;:"
-
 #~ msgid "Catalog Results"
 #~ msgstr "Réponses catalogue"
-
 #~ msgid "Category: %s (%s)"
 #~ msgstr "Catégorie&nbsp;: %s (%s)"
-
 #~ msgid "Center"
 #~ msgstr "Centrer"
 
@@ -49036,44 +48875,33 @@ msgstr ""
 #, fuzzy
 #~ msgid "Checked out <a1>%s</a> (%s) to <a2>%s %s</a> (%s): %s"
 #~ msgstr "Prêté à&nbsp;: <a1>%s</a>, retour pour le %s"
-
 #~ msgid "Checkout statistics"
 #~ msgstr "Statistiques sur les prêts"
-
 #~ msgid "Choose 'Calendar'"
 #~ msgstr "Sélectionnez 'calendrier'"
-
 #~ msgid "Choose 'Checkouts by patron category' under 'Other'"
 #~ msgstr "Sélectionnez 'prêts par catégorie d'adhérent' sous 'autre'"
 
 #, fuzzy
 #~ msgid "Choose .koc File:"
 #~ msgstr "Choisissez un module"
-
 #~ msgid "Choose Barcode Type:"
 #~ msgstr "Choisissez le type de code-barres"
-
 #~ msgid "Choose Layout Type:"
 #~ msgstr "Choisissez le type de présentation"
-
 #~ msgid "Choose Order Of Fields to Print"
 #~ msgstr "Choisir l'ordre des champs à imprimer"
-
 #~ msgid ""
 #~ "Choose a &ldquo;Category&rdquo; (&rdquo;Public&rdquo; or &ldquo;"
 #~ "Private&rdquo;)"
 #~ msgstr "Choisissez la &ldquo;catégorie&rdquo; (Publique ou privée)"
-
 #~ msgid ""
 #~ "Chose whether this holiday is repeated every day of the week or yearly."
 #~ msgstr "Sélectionnez: jour de fermeture répétable, hebdomadaire ou annuel."
-
 #~ msgid "City name & zipcode missing"
 #~ msgstr "Nom de commune et code postal absents"
-
 #~ msgid "Claim Order"
 #~ msgstr "Réclamation commande"
-
 #~ msgid "Claim Serial Issues"
 #~ msgstr "Réclamation numéros manquants"
 
@@ -49084,24 +48912,20 @@ msgstr ""
 #, fuzzy
 #~ msgid "Click 'Check out'"
 #~ msgstr "Cliquez sur 'Ajouter notification'"
-
 #~ msgid ""
 #~ "Click on &ldquo;Lists&rdquo; (You should see a list of shelves that have "
 #~ "already been created)"
 #~ msgstr ""
 #~ "Cliquer sur &ldquo;Listes&rdquo; (vous devriez voir les listes qui "
 #~ "existent déjà)"
-
 #~ msgid ""
 #~ "Click on the 18th of February 2008 and fill in the necessary fields for "
 #~ "your library."
 #~ msgstr ""
 #~ "Cliquez sur le 18 février et remplissez les champs nécessaires pour votre "
 #~ "bibliothèque."
-
 #~ msgid "Click to &quot;Unmap&quot;"
 #~ msgstr "Cliquer pour \"supprimer\""
-
 #~ msgid ""
 #~ "Clicking on the ... for some plugins will bring up a pop up window where "
 #~ "you can make various selections to populate the field. This is "
@@ -49110,66 +48934,48 @@ msgstr ""
 #~ "Cliquer sur ... va afficher une fenêtre surgissante à partir de laquelle "
 #~ "vous pourrez faire des sélections pour remplir les champs. C'est "
 #~ "particulièrement intéressant pour le leader et les champs codés."
-
 #~ msgid "Closed On: %s"
 #~ msgstr "Fermé le&nbsp;: %s"
-
 #~ msgid "Code reverse"
 #~ msgstr "Inversion de l'ordre"
-
 #~ msgid "Company"
 #~ msgstr "Société"
-
 #~ msgid "Company Name *"
 #~ msgstr "Nom de la Société *"
-
 #~ msgid "Comtd"
 #~ msgstr "Engagé"
-
 #~ msgid "Confirm Deletion of Fund <em>%s</em>"
 #~ msgstr "Confirmer la suppression du poste budgétaire <em>%s</em>"
-
 #~ msgid "Confirm hold"
 #~ msgstr "Confirmer la réservation"
-
 #~ msgid "Confirm hold and Transfer"
 #~ msgstr "Confirmer la réservation et transférer"
-
 #~ msgid "Continue without Marking &gt;&gt;"
 #~ msgstr "Continuer sans marquer &gt;&gt;"
-
 #~ msgid "Count : Returns a count of each value"
 #~ msgstr "Décompte&nbsp;: renvoie un décompte de chaque valeur"
-
 #~ msgid "Create Label Template"
 #~ msgstr "Créer un modèle d'étiquette"
-
 #~ msgid "Create Printer Profile"
 #~ msgstr "Créer un profil d'imprimante"
-
 #~ msgid "Create report from SQL"
 #~ msgstr "Créer rapport à partir de SQL"
-
 #~ msgid "Creep-Horizontal"
 #~ msgstr "Marge-horizontale"
-
 #~ msgid "Creep-Vertical"
 #~ msgstr "Marge-verticale"
-
 #~ msgid ""
 #~ "Criteria allow you to limit your report to display results to a given "
 #~ "criteria.Criteria are bound to a specific reporting area."
 #~ msgstr ""
 #~ "Les critères vous permettent de limiter votre rapport à l'affichage de "
 #~ "certains critères. Les critères correspondent à une partie de votre base"
-
 #~ msgid ""
 #~ "Currently, this means hold policies. The various policies have the "
 #~ "following effects:"
 #~ msgstr ""
 #~ "A l'heure actuelle, cela concerne les politiques de réservations. Les "
 #~ "différentes politiques fonctionnenet comme suit:"
-
 #~ msgid "Date Accessioned"
 #~ msgstr "Date d'accès"
 
@@ -49183,44 +48989,32 @@ msgstr ""
 #, fuzzy
 #~ msgid "Defaults for this library"
 #~ msgstr "Site par défaut"
-
 #~ msgid "Delete Definition"
 #~ msgstr "Supprimer définition"
-
 #~ msgid "Delete Library"
 #~ msgstr "Supprimer le site"
-
 #~ msgid "Delete classification source"
 #~ msgstr "Supprimer la source de classification"
-
 #~ msgid "Delete current batch"
 #~ msgstr "Supprimer le lot en court"
-
 #~ msgid "Delete filing rule"
 #~ msgstr "Supprimer la règle de classement"
-
 #~ msgid "Delete patron attribute type"
 #~ msgstr "Supprimer cet attribut adhérent"
-
 #~ msgid "Delete record matching rule"
 #~ msgstr "Supprimer la règle de concordance"
-
 #~ msgid "Delete this Category"
 #~ msgstr "Supprimer cette catégorie"
-
 #~ msgid "Delete this Currency"
 #~ msgstr "Supprimer cette devise"
-
 #~ msgid "Delete this Item Type"
 #~ msgstr "Supprimer ce type de document"
-
 #~ msgid "Delete this Server"
 #~ msgstr "Supprimer ce serveur"
 
 #, fuzzy
 #~ msgid "Delete?alter"
 #~ msgstr "Supprimer ?"
-
 #~ msgid ""
 #~ "Depending on the chosen framework, the various MARC tags will appear on "
 #~ "each tab. Use the tabs across the top of the page to enter record data."
@@ -49228,13 +49022,10 @@ msgstr ""
 #~ "En fonction de la grille, différents champs apparaitront dans les "
 #~ "onglets. Utiliser les onglets en haut de la page pour entrer les données "
 #~ "&nbsp; de la notice."
-
 #~ msgid "Description%s"
 #~ msgstr "Description %s"
-
 #~ msgid "Dictionary Criteria"
 #~ msgstr "Critère dictionnaire"
-
 #~ msgid "Dictionary Search"
 #~ msgstr "Recherche dictionnaire"
 
@@ -49246,7 +49037,6 @@ msgstr ""
 #~ "caché&nbsp;: vous permet de choisir les conditions de visibilité "
 #~ "possibles. Chaque session OPAC, INTRANET ou Editeur peuvent être traités "
 #~ "séparément&nbsp;: "
-
 #~ msgid ""
 #~ "Displays a calendar &ndash; choose the date of the first issue. For "
 #~ "example, the library is subscribing to a monthly magazine and the first "
@@ -49256,29 +49046,22 @@ msgstr ""
 #~ "Affiche un calendrier &ndash; pour choisir la date du premier bulletin. "
 #~ "Par exemple, si la bibliothèque s'abonne à un mensuel et que le premier "
 #~ "numéro attendu est pour février, vous devez indiquer 1er février."
-
 #~ msgid "Distributed to"
 #~ msgstr "Distribué à"
-
 #~ msgid "Do Not Delete"
 #~ msgstr "Ne pas supprimer"
-
 #~ msgid "Do not Delete"
 #~ msgstr "Ne pas supprimer"
-
 #~ msgid "Documentation"
 #~ msgstr "Documentation"
 
 #, fuzzy
 #~ msgid "Download Shelf"
 #~ msgstr "Télécharger"
-
 #~ msgid "Draw Guide Boxes:"
 #~ msgstr "Tracer des cases modèles"
-
 #~ msgid "ERROR: Illegal sort requested by &quot;%s&quot;."
 #~ msgstr "ERREUR&nbsp;: tri illégal par &quot;%s&quot;."
-
 #~ msgid ""
 #~ "Each fund has a unique fund code, limited to no more than five "
 #~ "characters, that identifies it. You should decide on your fund codes (e."
@@ -49290,28 +49073,20 @@ msgstr ""
 #~ "Vous devrez choisir vos codes (par exemple LIVRE, REVUE, BANQ, puis "
 #~ "saisir ce code dans le champ \"Code crédit\", et le nom complet dans le "
 #~ "champ \"Nom\"."
-
 #~ msgid "Edit Subfields"
 #~ msgstr "Modifier les sous-champs"
-
 #~ msgid "Edit Vendor"
 #~ msgstr "Modifier fournisseur"
-
 #~ msgid "Edit help"
 #~ msgstr "Ajouter de l'aide"
-
 #~ msgid "Edit subfields"
 #~ msgstr "Modifier les sous-champs"
-
 #~ msgid "End date (%s):"
 #~ msgstr "Date de fin (%s)&nbsp;:"
-
 #~ msgid "Error Creating Profile"
 #~ msgstr "Erreur lors de l'enregistrement du profil"
-
 #~ msgid "Estimated cost per unit"
 #~ msgstr "Coût estimé par document"
-
 #~ msgid ""
 #~ "Example, February 18, 2008 is President's Day and the library is closed."
 #~ msgstr ""
@@ -49321,27 +49096,20 @@ msgstr ""
 #, fuzzy
 #~ msgid "Extended Attributes"
 #~ msgstr "Attributs adhérent"
-
 #~ msgid "Field Options:"
 #~ msgstr "Options de champ&nbsp;: "
-
 #~ msgid "Fill in information about your library service outlets on this page."
 #~ msgstr ""
 #~ "Dans cette page, saisissez les informations sur les offres de service de "
 #~ "votre bibliothèque."
-
 #~ msgid "Fine Days"
 #~ msgstr "Jours d'amendes"
-
 #~ msgid "Fine Grace Period"
 #~ msgstr "Période de grâce"
-
 #~ msgid "Fines and Charges"
 #~ msgstr "Amendes & Frais"
-
 #~ msgid "Finish"
 #~ msgstr "Terminer"
-
 #~ msgid ""
 #~ "For help with the Reports Dictionary - see online help within the "
 #~ "Dictionary Pages"
@@ -49357,7 +49125,6 @@ msgstr ""
 #~ "Pour ce site, vous pouvez définir le nombre maximum de prêts qu'un "
 #~ "adhérent peut faire en fonction de sa catégorie, quel que soit le type de "
 #~ "document."
-
 #~ msgid ""
 #~ "For this library, you can specify the maximum number of loans that a "
 #~ "patron of a given category can make, regardless of the item type."
@@ -49365,10 +49132,8 @@ msgstr ""
 #~ "Pour ce site, vous pouvez définir le nombre maximum de prêts qu'un "
 #~ "adhérent peut faire en fonction de sa catégorie, quel que soit le type de "
 #~ "document."
-
 #~ msgid "For vendor ID: %s"
 #~ msgstr "Pour le fournisseur N°%s"
-
 #~ msgid "Free"
 #~ msgstr "Libre"
 
@@ -49387,30 +49152,22 @@ msgstr ""
 #, fuzzy
 #~ msgid "From Home Library:"
 #~ msgstr "Site de rattachement"
-
 #~ msgid "From the pull down you can choose which branch to apply holidays to."
 #~ msgstr ""
 #~ "Vous pouvez choisir à quel site s'appliquent ces fermetures dans le menu "
 #~ "déroulant."
-
 #~ msgid "Fund"
 #~ msgstr "Poste budgétaire"
-
 #~ msgid "Fund added"
 #~ msgstr "Poste budgétaire ajouté"
-
 #~ msgid "Fund modified"
 #~ msgstr "Poste budgétaire modifié"
-
 #~ msgid "Funds and Budgets"
 #~ msgstr "Postes et budgets"
-
 #~ msgid "Funds and budgets"
 #~ msgstr "Postes et budgets"
-
 #~ msgid "Funds and budgets administration for acquisitions."
 #~ msgstr "Administration des postes et budgets pour les acquisitions"
-
 #~ msgid ""
 #~ "Funds may be ignored if you are setting your System Preferences to &quot;"
 #~ "simple&quot; acquisitions: the funds are only useful when using &quot;"
@@ -49419,60 +49176,44 @@ msgstr ""
 #~ "Les Fonds peuvent être ignorés si vous avez réglé vos Préférences Système "
 #~ "sur acquisitions\"simples\"&nbsp;: les fonds sont utiles uniquement quand "
 #~ "vous utilisez les acquisitions \"normales\"."
-
 #~ msgid "GNU General Public License, version 2"
 #~ msgstr "Licence publique publique Générale GNU/GPL, version 2"
-
 #~ msgid "GST Registered"
 #~ msgstr "TVA enregistrée"
-
 #~ msgid "Generate labels for Batch"
 #~ msgstr "Générer les étiquettes pour le lot"
-
 #~ msgid "Generating A New Report From SQL"
 #~ msgstr "Générer un nouveau rapport à partir du SQL"
-
 #~ msgid "Get this one !"
 #~ msgstr "Choisir celui-ci !"
-
 #~ msgid "Go"
 #~ msgstr "Valider"
-
 #~ msgid "Group:"
 #~ msgstr "Groupe&nbsp;:"
-
 #~ msgid "Guided Report Wizard"
 #~ msgstr "Assistant de rapport"
 
 #, fuzzy
 #~ msgid "Hold Policy"
 #~ msgstr "Réservation pour&nbsp;:"
-
 #~ msgid "Hold priority <b> %s </b>"
 #~ msgstr "Priorité de la réservation&nbsp;: <b>%s</b>"
-
 #~ msgid ""
 #~ "Holidays are set per library and the same holiday will need to be set for "
 #~ "all libraries in a system."
 #~ msgstr ""
 #~ "Les jours de fermeture sont définis par bibliothèque et le planning doit "
 #~ "être défini pour tous les sites du système."
-
 #~ msgid "How do I add the cataloging data?"
 #~ msgstr "Comment puis-je créer la notice bibliographique ?"
-
 #~ msgid "How do I manage suggestions?"
 #~ msgstr "Comment puis-je gérer les suggestions ?"
-
 #~ msgid "How do I&nbsp; check in (return) an item?"
 #~ msgstr "Comment puis-je &nbsp; enregistrer le retour d'un document ?"
-
 #~ msgid "How to configure Koha?"
 #~ msgstr "Comment puis-je configurer Koha ?"
-
 #~ msgid "INFORMATION: BRANCH AND PRINTER SETTINGS."
 #~ msgstr "INFORMATION&nbsp;: PARAMETRES de SITE et IMPRIMANTE."
-
 #~ msgid ""
 #~ "If the total amount loanable for a given patron category is left blank, "
 #~ "no limit applies, except possibly for a limit you define for a specific "
@@ -49481,7 +49222,6 @@ msgstr ""
 #~ "Si la quantité totale de documents empruntables pour une catégorie "
 #~ "d'adhérent est laissé blanc, il n'y aura pas de limites, sauf si vous en "
 #~ "définissez une pour les types de documents."
-
 #~ msgid ""
 #~ "If you click in the input field of any field that has a ..., the field "
 #~ "will be populated with the default data for the plugin. This default data "
@@ -49490,7 +49230,6 @@ msgstr ""
 #~ "Si vous cliquez sur la zone d'entrée de tout champ suivi de ..., le champ "
 #~ "sera rempli par la valeur par défaut du plugin.Cette valeur par défaut "
 #~ "est fixée soit par le plugin lui-même soit par les préférences système."
-
 #~ msgid ""
 #~ "If you know the items all have fines or debts associated with them, you "
 #~ "can chose to &quot;Forgive All Debts&quot; by using the Check box. By "
@@ -49501,77 +49240,56 @@ msgstr ""
 #~ "associés, vous pouvez choisir de &quot;Annuler toutes les dettes&quot; en "
 #~ "utilisant la case à cocher.En utilisant cette case à cocher, plus aucune "
 #~ "charge ne sera portée sur le compte des adhérents."
-
 #~ msgid "Ignore"
 #~ msgstr "Ignorer"
-
 #~ msgid "Import into catalog"
 #~ msgstr "Importer dans le catalogue"
-
 #~ msgid ""
 #~ "In addition to ODUE ('Overdue Notice'), there are two other notices that "
 #~ "come pre-defined in Koha:"
 #~ msgstr ""
 #~ "Mis à part ODUE (\"Overdue Notice\" - lettre de retard) deux autres "
 #~ "messages sont prédéfinis dans Koha:"
-
 #~ msgid "In the case of President's Day it is not repeatable."
 #~ msgstr "Dans le cas du jour du Maire, il n'est pas répétable."
-
 #~ msgid "Invoice"
 #~ msgstr "Numéro de facture"
-
 #~ msgid "Invoice / Code:"
 #~ msgstr "N° de facture ou de livraison&nbsp;:"
-
 #~ msgid "Issued To <a1>%s</a>"
 #~ msgstr "Prêté à <a1>%s</a>"
-
 #~ msgid "Item barcode:"
 #~ msgstr "code-barres de l'exemplaire&nbsp;: "
-
 #~ msgid "Item details: (add to catalog)"
 #~ msgstr "Détails de l'exemplaire&nbsp;: (ajouter au catalogue)"
-
 #~ msgid "Item location between:"
 #~ msgstr "Localisation entre&nbsp;:"
-
 #~ msgid "Item not for loan, are you sure you want to check it out ?"
 #~ msgstr "Exemplaire exclu du prêt, être vous sûr de vouloir le prêter?"
-
 #~ msgid "Item types"
 #~ msgstr "Type de documents"
-
 #~ msgid "Items in shipment"
 #~ msgstr "Documents dans le colis"
-
 #~ msgid "Koha &rsaquo; Acquisitions &rsaquo; Budgets and Funds: Spent"
 #~ msgstr ""
 #~ "Koha &rsaquo; Acquisitions &rsaquo; Budgets et ligne de budget&nbsp;: "
 #~ "dépensé"
-
 #~ msgid "Koha &rsaquo; Acquisitions &rsaquo; Funds"
 #~ msgstr "Koha &rsaquo; Acquisitions &rsaquo; Budgets"
-
 #~ msgid "Koha &rsaquo; Acquisitions &rsaquo; Suggestions Management"
 #~ msgstr "Koha &rsaquo; Acquisitions &rsaquo; Gestion des suggestions"
-
 #~ msgid "Koha &rsaquo; Dictionary Search"
 #~ msgstr "Koha &rsaquo; Recherche dictionnaire "
-
 #~ msgid "Koha &rsaquo; Search Results"
 #~ msgstr "Koha &rsaquo; Résultats de la recherche"
-
 #~ msgid "Koha &rsaquo; Serials"
 #~ msgstr "Koha &rsaquo; Périodiques"
-
 #~ msgid "Koha &rsaquo; Serials &rsaquo; %s &rsaquo; Edit Routing List"
 #~ msgstr "Koha &rsaquo; Périodiques &rsaquo; Modifier la liste de circulation"
 
 #, fuzzy
 #~ msgid "Koha Offline Circulation"
 #~ msgstr "Koha &rsaquo; Circulation"
-
 #~ msgid ""
 #~ "Koha has an built in z39.50 client that can be used to query any number "
 #~ "of z39.50 servers. To use the z39.50 search enter at least the ISBN and "
@@ -49585,28 +49303,20 @@ msgstr ""
 #~ "résultats des serveurs que vous avez interrogés.Sélectionnez la notice "
 #~ "que souhaitez récupéré et les champs seront remplis par les informations "
 #~ "bibliographiques de ce serveur."
-
 #~ msgid "Koha supports two types of Lists:"
 #~ msgstr "Koha gère deux types de listes&nbsp;:"
-
 #~ msgid "Label and Patron Card Creator"
 #~ msgstr "Créateur d'étiquettes exemplaires et adhérents"
-
 #~ msgid "Label batch created, with id: %s"
 #~ msgstr "Traitement créé avec l'identifians %s"
-
 #~ msgid "Labels (spine and barcode)"
 #~ msgstr "Etiquettes (cote et code-barres)"
-
 #~ msgid "Layout"
 #~ msgstr "Format"
-
 #~ msgid "Left"
 #~ msgstr "Gauche"
-
 #~ msgid "Left on Order"
 #~ msgstr "Commande en cours"
-
 #~ msgid ""
 #~ "LibLime (Joshua Ferraro, Ryan Higgins, Galen Charlton, Mason James, Chris "
 #~ "Catalfo, Joe Atzberger, Russel Garlick, Andrew Moore, Chris Nighswonger, "
@@ -49615,30 +49325,23 @@ msgstr ""
 #~ "LibLime (Joshua Ferraro, Ryan Higgins, Galen Charlton, Mason James, Chris "
 #~ "Catalfo, Joe Atzberger, Russel Garlick, Andrew Moore, Chris Nighswonger, "
 #~ "Jesse Weaver)"
-
 #~ msgid "Libraries and Groups &rsaquo; Confirm Deletion of Group %s"
 #~ msgstr ""
 #~ "Bibliothèques et Groupes &rsaquo;  Confirmer la suppression du groupe %s"
-
 #~ msgid "Libraries and Groups &rsaquo; Confirm deletion of library '%s'"
 #~ msgstr ""
 #~ "Bibliothèques et Groupes &rsaquo;  Confirmer la suppression de la "
 #~ "bibliothèques '%s'"
-
 #~ msgid "Libraries and Groups &rsaquo; Edit Group %s"
 #~ msgstr ""
 #~ "Bibliothèques et Groupes &rsaquo;  Confirmer la suppression du groupe %s"
-
 #~ msgid "Libraries and Groups &rsaquo; Modify library %s"
 #~ msgstr ""
 #~ "Bibliothèques et Groupes &rsaquo;  Confirmer la suppression du site '%s'"
-
 #~ msgid "Libraries and Groups &rsaquo; New Group"
 #~ msgstr "Bibliothèques et Groupes &rsaquo; Ajouter groupe"
-
 #~ msgid "Lift Debarment"
-#~ msgstr "Réactiver adhérent"
-
+#~ msgstr "Lever la restriction"
 #~ msgid ""
 #~ "Lists are a great tool for Reader&rsquo;s Advisory. Staff can use Lists "
 #~ "to create a variety of reading lists for patrons (for example, according "
@@ -49648,7 +49351,6 @@ msgstr ""
 #~ "bibliothécaires peuvent les utiliser pour créer des listes de lecture "
 #~ "pour les adhérents (par exemple, en fonction de l'âge, du niveau de "
 #~ "lecteur, ou sur un sujet donné)."
-
 #~ msgid ""
 #~ "Lists are editable, permanent book lists. If the 'virtualshelves' Systems "
 #~ "Preference has been enabled, both staff and patrons may create Lists. An "
@@ -49664,7 +49366,6 @@ msgstr ""
 #~ "liste est immédiatement visible dans l'OPAC. Cliquer dessus depuis la "
 #~ "liste permet de se rendre sur la notice détaillée du document, pour voir "
 #~ "sa disponibilité et/ou le réserver."
-
 #~ msgid ""
 #~ "Lists can be used by professors to create a bibliography/reading list for "
 #~ "class assignments. Clicking on an item in a List connects directly to the "
@@ -49676,16 +49377,12 @@ msgstr ""
 #~ "listes de lecture, des bibliographies. Cliquez sur un item de la liste "
 #~ "pour aller à la notice dans le catalogue. Les adhérents peuvent "
 #~ "facilement voir la localisation et la disponibilité du document."
-
 #~ msgid "Localisation"
 #~ msgstr "Localisation"
-
 #~ msgid "Login &raquo;"
 #~ msgstr "Connexion &raquo;"
-
 #~ msgid "MARC Frameworks &rsaquo;"
 #~ msgstr "Grilles de catalogage MARC &rsaquo;"
-
 #~ msgid "MARC Frameworks &rsaquo; Delete Framework for %s (%s)?"
 #~ msgstr ""
 #~ "Grilles de catalogage MARC &rsaquo; Supprimer la grille pour %s (%s) ?"
@@ -49768,63 +49465,46 @@ msgstr ""
 #, fuzzy
 #~ msgid "No Holds Allowed:"
 #~ msgstr "Réservation non autorisée"
-
 #~ msgid "No Printer Profiles currently defined."
 #~ msgstr "Pas de profil d'imprimante défini."
-
 #~ msgid "No accepted suggestions."
 #~ msgstr "Aucune suggestion acceptée."
 
 #, fuzzy
 #~ msgid "No patron may put this book on hold."
 #~ msgstr "Cet adhérent n'a pas de réservation"
-
 #~ msgid "No pending suggestions."
 #~ msgstr "Pas de suggesiton en attente."
-
 #~ msgid "No reasons defined in <a1>authorized values</a>"
 #~ msgstr "Pas de motif défini dans les <a1>valeurs autorisées</a>"
-
 #~ msgid "No rejected suggestions."
 #~ msgstr "Pas de suggestion rejetée."
-
 #~ msgid "No results in Authorities"
 #~ msgstr "Pas de résultat dans les autorités"
-
 #~ msgid "No, Do Not Delete"
 #~ msgstr "Non, ne pas supprimer"
-
 #~ msgid "No, Do not Delete"
 #~ msgstr "Non, ne pas supprimer"
-
 #~ msgid "No, Do not Delete!"
 #~ msgstr "Non, ne pas supprimer !"
-
 #~ msgid "No, Don't Check Out (N)"
 #~ msgstr "Non, ne pas prêter (N)"
-
 #~ msgid "No, do not Delete"
 #~ msgstr "Non, ne pas supprimer"
-
 #~ msgid "No: Save as New Record"
 #~ msgstr "Non&nbsp;: Enregistrer comme une nouvelle notice"
-
 #~ msgid "None Defined"
 #~ msgstr "Aucun défini"
-
 #~ msgid "Not allowed"
 #~ msgstr "Non autorisé"
-
 #~ msgid "Not finished"
 #~ msgstr "Pas terminé"
-
 #~ msgid "Not seen since:"
 #~ msgstr "Pas vu depuis&nbsp;: "
 
 #, fuzzy
 #~ msgid "Note that if the system preference"
 #~ msgstr "Modifier une préférence système"
-
 #~ msgid ""
 #~ "Now add the names and addresses, phone numbers, etc of your libraries in "
 #~ "the &quot;Branches&quot; section. (All of your libraries should be "
@@ -49839,14 +49519,12 @@ msgstr ""
 #~ "bibliothèque un code unique et facile à retenir (maximum 4 caractères). "
 #~ "Ce code sera utilisé dans Koha pour identifier chaque bibliothèque. Les "
 #~ "bibliothèques seront affichées par Koha par ordre alphabétique des codes."
-
 #~ msgid ""
 #~ "Now choose operations that you want to preform on each column. The "
 #~ "operations that can be selected are:"
 #~ msgstr ""
 #~ "Maintenant, choisissez les opérations que vous voulez réaliser sur chaque "
 #~ "colonne. Les opérations possibles sont&nbsp;:"
-
 #~ msgid ""
 #~ "Now select the criteria that you wish to use to build your definition. "
 #~ "Click on the database column name and then press the add button. Once you "
@@ -49856,10 +49534,8 @@ msgstr ""
 #~ "votre définition. Cliquez sur le nom de la colonne de la base, et appuyez "
 #~ "sur le bouton d'ajout. Lorsque vous avez sélectionné toutes les colonnes "
 #~ "que vous souhaitez, appuyez sur Suivant."
-
 #~ msgid "Numbering Calculation formula"
 #~ msgstr "Formule de Calcul de la numérotation"
-
 #~ msgid "OK, Preview Routing Slip"
 #~ msgstr "OK, Aperçu du bon de circulation"
 
@@ -49870,25 +49546,20 @@ msgstr ""
 #, fuzzy
 #~ msgid "Offline Circulation File Upload"
 #~ msgstr "Rapports de circulation"
-
 #~ msgid "Offset-Horizontal"
 #~ msgstr "Offset-horizontal"
-
 #~ msgid "Offset-Vertical"
 #~ msgstr "Offset-vertical"
-
 #~ msgid "Once saved your holiday will be color-coded on the calendar"
 #~ msgstr ""
 #~ "une fois saisies, les fermetures apparaîtront dans le calendrier selon un "
 #~ "code-couleur"
-
 #~ msgid ""
 #~ "Once the status and reason have been selected, these will display for the "
 #~ "suggestor in the OPAC."
 #~ msgstr ""
 #~ "Une fois que le statut et le motif auront été sélectionné, ceux-ci seront "
 #~ "affichés à l'OPAC pour le prescripteur."
-
 #~ msgid ""
 #~ "Once you have generated a report, you can now choose to save the report "
 #~ "definition so that you can run it again when required, or setup the Task "
@@ -49898,7 +49569,6 @@ msgstr ""
 #~ "pouvoir l'exécuter lorsque vous le souhaitez, ou bien utiliser la "
 #~ "planificateur pour qu'il soit lancé automatiquement de manière "
 #~ "périodique. "
-
 #~ msgid ""
 #~ "Once you have set up a fund, you will see a link to a page for setting up "
 #~ "the fund budget. Here you will enter the beginning and ending dates of "
@@ -49912,27 +49582,20 @@ msgstr ""
 #~ "spécifique. N'utilisez aucune sorte d'abréviation pour les devises (comme "
 #~ "€) ou de virgule lorsque vous saisissez les chiffres. (Les virgules "
 #~ "seront converties en chiffres décimaux)."
-
 #~ msgid "Only PNG, JPEG, XPM formats are supported."
 #~ msgstr "Seuls les formats PNG, GIF, JPEG et XPM sont gérés."
-
 #~ msgid "Only patrons from the item's home library may put this book on hold."
 #~ msgstr ""
 #~ "Seuls les adhérents de la bibliothèque de l'exemplaire peuvent réserver "
 #~ "ce document."
-
 #~ msgid "OpenNCIP"
 #~ msgstr "OpenNCIP"
-
 #~ msgid "Paper Bin"
 #~ msgstr "Bac papier"
-
 #~ msgid "Papertype:%s"
 #~ msgstr "Type de papier&nbsp;: %s"
-
 #~ msgid "Patron current holds"
 #~ msgstr "Réservation(s) en cours de l'adhérent"
-
 #~ msgid "Patron has no pending holds."
 #~ msgstr "Cet adhérent n'a pas de réservation en suspens."
 
@@ -49963,30 +49626,22 @@ msgstr ""
 #, fuzzy
 #~ msgid "Pick"
 #~ msgstr "Prix"
-
 #~ msgid "Please use valid sort criteria. <a1>Return to default results.</a>"
 #~ msgstr ""
 #~ "Utilisez des critères de tri valides. <a1>Retourner aux résultats par "
 #~ "défaut.</a>"
-
 #~ msgid "Print Preview"
 #~ msgstr "Aperçu avant impression"
-
 #~ msgid "Print Slip and Confirm"
 #~ msgstr "Imprimer ticket & Confirmer"
-
 #~ msgid "Print Type"
 #~ msgstr "Type d'impression"
-
 #~ msgid "Print and Confirm"
 #~ msgstr "Imprimer et confirmer"
-
 #~ msgid "Print slip, Transfer, and Confirm"
 #~ msgstr "Imprimer, transférer et confirmer"
-
 #~ msgid "Printer Profiles"
 #~ msgstr "Profils d'imprimante"
-
 #~ msgid ""
 #~ "Private Lists: Only the person who created the list may view and edit it."
 #~ msgstr ""
@@ -49996,33 +49651,24 @@ msgstr ""
 #, fuzzy
 #~ msgid "Process offline circulation file"
 #~ msgstr "Adhérents et circulation"
-
 #~ msgid "Publishers and Imprints:"
 #~ msgstr "Editeurs référencés&nbsp;:"
-
 #~ msgid "Purchase order:"
 #~ msgstr "Numéro de commande&nbsp;:"
-
 #~ msgid "Q: How do I check out an item to a patron?"
 #~ msgstr "Q&nbsp;: Comment puis-je préter un document à un adhérent ?"
-
 #~ msgid "Q: How do I create a new &quot;List&quot; from the Staff Intranet?"
 #~ msgstr ""
 #~ "Q&nbsp;: Comment puis-je créer une nouvelle &quot;liste&quot; depuis "
 #~ "l'interface professionnelle ?"
-
 #~ msgid "Q: How do I set up a sticky date?"
 #~ msgstr "Q&nbsp;: Comment puis-je fixer une date manuelle ?"
-
 #~ msgid "Q: What are &quot;Lists&quot;?"
 #~ msgstr "Q&nbsp;: Que sont les &quot;listes&quot; ?"
-
 #~ msgid "Q: What can I do with a blocked checkout?"
 #~ msgstr "Q&nbsp;: Que faire lorsque qu'un prêt bloque ?"
-
 #~ msgid "Q: What to do I do if there is a problem with a checkout?"
 #~ msgstr "Q&nbsp;: Que puis-je faire s'il y a un problème avec un prêt"
-
 #~ msgid "Q: What types of &quot;Lists&quot; are there?"
 #~ msgstr "Q&nbsp;: Quels sont les différents types de &quot;listes&quot; ?"
 
@@ -50097,58 +49743,40 @@ msgstr ""
 #, fuzzy
 #~ msgid "Save Message"
 #~ msgstr "Messages"
-
 #~ msgid "Save Report"
 #~ msgstr "Enregistrer rapport"
-
 #~ msgid "Save changes"
 #~ msgstr "Enregistrer les modifications"
-
 #~ msgid "Save subscription history"
 #~ msgstr "Enregistrer l'historique d'abonnement"
-
 #~ msgid "Saving A Report"
 #~ msgstr "Sauvegarder un rapport"
-
 #~ msgid "Scheduling A Report"
 #~ msgstr "Planifier un rapport"
-
 #~ msgid "Search Funds"
 #~ msgstr "lignes de crédit"
-
 #~ msgid "Search Funds:"
 #~ msgstr "Recherche ligne de crédit&nbsp;:"
-
 #~ msgid "Search ISBN or Title:"
 #~ msgstr "Chercher ISBN ou titre&nbsp;:"
-
 #~ msgid "Search String Matches"
 #~ msgstr "Chercher les concordances de chaîne"
-
 #~ msgid "Search for keyword(s):"
 #~ msgstr "Recherche par mots clés&nbsp;: "
-
 #~ msgid "Search orders to add to this shipment"
 #~ msgstr "Recherche de documents à ajouter à ce colis"
-
 #~ msgid "Seasonal only[a]"
 #~ msgstr "Seulement saisonnier[a]"
-
 #~ msgid "See &gt; More details about Planning"
 #~ msgstr "Voir &gt; plus de détails sur la planification"
-
 #~ msgid "See More detail about the Numbering Calculation formula"
 #~ msgstr "Voir plus de détails à propos de la formule de numérotation"
-
 #~ msgid "Sel. &amp; close"
 #~ msgstr "Sélect. & Fermer"
-
 #~ msgid "Select From Database Value"
 #~ msgstr "Sélectionner à partir des valeurs de la base"
-
 #~ msgid "Select borrowers or enter manually the names"
 #~ msgstr "Sélectionnez des adhérents ou entrer les noms à la main"
-
 #~ msgid ""
 #~ "Select how you wish to order the report. You can select multiple criteria "
 #~ "to order against and the hierarchy that the are applied. For example "
@@ -50157,7 +49785,6 @@ msgstr ""
 #~ "Sélectionnez comment vous souhaitez trier le rapport. Vous pouvez "
 #~ "sélectionner plusieurs critères, et les trier. Par exemple, trier "
 #~ "alphabétiquement par nom, puis par prénom."
-
 #~ msgid ""
 #~ "Select one of the module areas to report on. Guided reports can only "
 #~ "generate reports from within one module. For reports across modules, you "
@@ -50168,7 +49795,6 @@ msgstr ""
 #~ "peuvent être créés seulement pour un module de Koha. Pour les rapports "
 #~ "inter-modules, vous devez utiliser un rapport composite, ou un rapport "
 #~ "personnalisé à l'aide de requètes SQL."
-
 #~ msgid ""
 #~ "Select the columns to draw the report data from. Click the column to add "
 #~ "in the left hand box and then click the &quot;Add&quot; button. Your "
@@ -50187,40 +49813,28 @@ msgstr ""
 #, fuzzy
 #~ msgid "Select to display or not:"
 #~ msgstr "Sélectionnez le fichier à importer&nbsp;: "
-
 #~ msgid "Send SMS"
 #~ msgstr "Envoyer SMS"
-
 #~ msgid "Send letter"
 #~ msgstr "Envoyer la lettre"
-
 #~ msgid "Set Active Layout"
 #~ msgstr "Définir le format actif"
-
 #~ msgid "Set Active Template"
 #~ msgstr "Définir le modèle actif"
-
 #~ msgid "Set Flags"
 #~ msgstr "Enregistrer permissions"
-
 #~ msgid "Set Status"
 #~ msgstr "Définir statut"
-
 #~ msgid "Set date last seen to:"
 #~ msgstr "Vu pour la dernière fois le&nbsp;:"
-
 #~ msgid "Settings Updated"
 #~ msgstr "Paramêtres mis à jour"
-
 #~ msgid "Shelf location:"
 #~ msgstr "Localisation&nbsp;:"
-
 #~ msgid "Show"
 #~ msgstr "Voir"
-
 #~ msgid "Simple report of columns only."
 #~ msgstr "Rapport simple avec uniquement des colonnes"
-
 #~ msgid ""
 #~ "Simply scan or type the returned item's identifying number (usually a "
 #~ "barcode) in the box provided."
@@ -50231,68 +49845,48 @@ msgstr ""
 #, fuzzy
 #~ msgid "Standard Number:"
 #~ msgstr "Numéro normalisé"
-
 #~ msgid "Start date (%s):"
 #~ msgstr "Date de début (%s)&nbsp;:"
-
 #~ msgid "Start search"
 #~ msgstr "Rechercher"
-
 #~ msgid "Start, receive, or modify any order"
 #~ msgstr "Créer, réceptionner, modifier une commande"
-
 #~ msgid "Step 1 of 4 Name"
 #~ msgstr "Etape 1 sur 4 Nom"
-
 #~ msgid "Step 2 of 4 Area"
 #~ msgstr "Etape 2 sur 4&nbsp;: table"
-
 #~ msgid "Step 3 of 4 Columns"
 #~ msgstr "Etape 3 sur 4 Colonnes"
-
 #~ msgid "Step 4 of 4 Values"
 #~ msgstr "Etape 4 sur 4 Valeurs"
-
 #~ msgid "Step 4: Fill out the details in the Planning box."
 #~ msgstr "Etape 4&nbsp;: Remplir les détails dans la partie \"planification\""
-
 #~ msgid "Step 6 of 6: Select how you want the report ordered"
 #~ msgstr "Etape 6 sur 6&nbsp;: Choisir comment votre rapport sera trié"
-
 #~ msgid "Step 6: Numbering Calculation"
 #~ msgstr "Etape 6&nbsp;: Définir la formule de numérotation"
-
 #~ msgid "Still on order"
 #~ msgstr "Toujours en commande"
-
 #~ msgid "Stop words &rsaquo;"
 #~ msgstr "Mots vides &rsaquo;"
-
 #~ msgid "Stop words &rsaquo; Data deleted"
 #~ msgstr "Mots vides &rsaquo; Donnée supprimée"
 
 #, fuzzy
 #~ msgid "String:"
 #~ msgstr "Printemps"
-
 #~ msgid "Sub-Class"
 #~ msgstr "Sous-classification"
-
 #~ msgid "SubTotal"
 #~ msgstr "Sous-total"
-
 #~ msgid "Subclass"
 #~ msgstr "Sous-classe"
-
 #~ msgid "Submit Changes"
 #~ msgstr "Valider les modifications"
-
 #~ msgid "Subtitle"
 #~ msgstr "Sous-titre"
-
 #~ msgid "Subtotal"
 #~ msgstr "Sous-total"
-
 #~ msgid ""
 #~ "Suggestions that have been placed but not acted upon will show on the "
 #~ "&quot;Waiting&quot; tab below. To process a suggestion the &quot;"
@@ -50301,23 +49895,18 @@ msgstr ""
 #~ "Les suggestions qui ont été émises mais pas validées seront montrées dans "
 #~ "la table &quot;En attente&quot; ci-dessous.Pour traiter une suggestion le "
 #~ "&quot;Statut&quot; doit être changé et un &quot;Motif&quot; choisie."
-
 #~ msgid "Sum : Returns the sum of all values"
 #~ msgstr "Somme&nbsp;: renvoie la somme de toutes les valeurs"
-
 #~ msgid "System Generated Criteria"
 #~ msgstr "Critère généré par le système"
-
 #~ msgid "System Parameters"
 #~ msgstr "Préférences système"
-
 #~ msgid ""
 #~ "TIP: An example of a repeatable holiday would be Christmas, New Year's or "
 #~ "a staff in-service day"
 #~ msgstr ""
 #~ "ASTUCE&nbsp;: Un exemple de fermeture répétable serait Noël, ou le jour "
 #~ "de l'an."
-
 #~ msgid ""
 #~ "TIP: At present you will have to enter holidays in for each library, "
 #~ "there is no way to apply holidays to all libraries at once."
@@ -50325,7 +49914,6 @@ msgstr ""
 #~ "ASTUCE&nbsp;: Vous devez entrer les dates de fermeture pour chaque "
 #~ "bibliothèque, vous ne pouvez pas appliquer les fermetures à toutes les "
 #~ "bibliothèques d'un coup."
-
 #~ msgid ""
 #~ "TIP: Notice also that if you'd like to notify patrons of new serial "
 #~ "issues, you can click on 'define a notice' which will take you to the "
@@ -50334,23 +49922,17 @@ msgstr ""
 #~ "ASTUCE&nbsp;: Si vous voulez prévenir les adhérentes de l'arrivée d'un "
 #~ "nouveau fascicule de périodiques, vous pouvez cliquer sur 'définir une "
 #~ "notification', qui vous amènera à l'outil 'Messages'"
-
 #~ msgid "TIP: Patron uses for Lists"
 #~ msgstr "Astuce&nbsp;: Usage des listes pour les adhérents"
-
 #~ msgid "TIP: Why educators might use Lists"
 #~ msgstr "Astuce&nbsp;: Pourquoi les professeurs peuvent utiliser les listes"
-
 #~ msgid "TIP: Why staff might use Lists"
 #~ msgstr ""
 #~ "ASTUCE&nbsp;: Pourquoi les bibliothécaires peuvent utiliser les listes"
-
 #~ msgid "TOTAL (%s)"
 #~ msgstr "TOTAL (%s)"
-
 #~ msgid "Tabular:"
 #~ msgstr "Tabulaire&nbsp;:"
-
 #~ msgid ""
 #~ "Talk to your system administrator about loading additional plugins for "
 #~ "use in this module."
@@ -50488,13 +50070,10 @@ msgstr ""
 #, fuzzy
 #~ msgid "Toggle All"
 #~ msgstr "Tout effacer"
-
 #~ msgid "Too Many Renewals"
 #~ msgstr "Renouvellements épuisés"
-
 #~ msgid "Total Current Checkouts Allowed"
 #~ msgstr "Nombre total de prêts autorisés"
-
 #~ msgid "Total Renewals:"
 #~ msgstr "Total de renouvellements&nbsp;:"
 
@@ -50512,25 +50091,18 @@ msgstr ""
 #, fuzzy
 #~ msgid "Unset"
 #~ msgstr "Insérer"
-
 #~ msgid "Update SQL"
 #~ msgstr "Mettre à jour SQL"
-
 #~ msgid "Update hold(s)"
 #~ msgstr "Mettre à jour réservation(s)"
-
 #~ msgid "Updating the Calendar:"
 #~ msgstr "Mettre à jour le calendrier:"
-
 #~ msgid "Upload"
 #~ msgstr "Télécharger"
-
 #~ msgid "Upload Offline Circulation Data"
 #~ msgstr "Charger les données de prêt secouru"
-
 #~ msgid "Use saved"
 #~ msgstr "Rapports sauvegardés"
-
 #~ msgid ""
 #~ "Use the radio buttons under 'Row' and 'Column' to choose which data set "
 #~ "will appear where"
@@ -50552,13 +50124,10 @@ msgstr ""
 #, fuzzy
 #~ msgid "View Spine Label"
 #~ msgstr "Vue ISBD"
-
 #~ msgid "Volume/Copy (for serials):"
 #~ msgstr "Infos sur le volume (pour les périodiques)&nbsp;:"
-
 #~ msgid "WARNING: BRANCH AND PRINTING SETTINGS."
 #~ msgstr "ATTENTION&nbsp;: CONFIGURATIONS DES SITES ET IMPRIMANTES."
-
 #~ msgid ""
 #~ "Warning: This file is version %s, but I only know how to import version %"
 #~ "s. I'll try my best."
@@ -50573,10 +50142,8 @@ msgstr ""
 #~ msgstr ""
 #~ "Imposible de supprimer des adhérents d'autres bibliothèques avec les "
 #~ "réglages actuels"
-
 #~ msgid "What do I need to setup a subscription?"
 #~ msgstr "Que dois-je faire pour créer un abonnement ?"
-
 #~ msgid "What do the &quot;...&quot; mean?"
 #~ msgstr "Que signifient les &quot;...&quot; ?"
 
@@ -50585,22 +50152,16 @@ msgstr ""
 #~ msgstr ""
 #~ "Q&nbsp;: Que se passe-t-il lorsqu'un document est prêté à un autre "
 #~ "adhérent ?"
-
 #~ msgid "What happens if a patron has debts?"
 #~ msgstr "Que se passe-t-il si un adhérent a des dettes ?"
-
 #~ msgid "What happens if the item is on reserve?"
 #~ msgstr "Que se passe-t-il si un document est en réservation ?"
-
 #~ msgid "What is the Holidays Calendar?"
 #~ msgstr "Le Calendrier des Jours de fermeture, qu'est-ce que c'est ?"
-
 #~ msgid "What is the Reports Dictionary"
 #~ msgstr "Qu'est-ce que le dictionnaire des rapports"
-
 #~ msgid "What is the z39.50 search?"
 #~ msgstr "Qu'est-ce que c'est, la recherche z3950 ?"
-
 #~ msgid ""
 #~ "When ever the status is changed to Accepted or Rejected, the reason for "
 #~ "the status change can be selected from the &quot;Reason&quot; drop down. "
@@ -50612,7 +50173,6 @@ msgstr ""
 #~ "Motif&quot;. Les motifs sont des valeurs autorisées paramétrées par la "
 #~ "bibliothèque. On peut aussi sélectionner &quot;Autre&quot; et saisir un "
 #~ "motif personnalisé."
-
 #~ msgid "When you've entered the necessary data click 'Save'"
 #~ msgstr "Quand vous avez saisi les données utiles, cliquez 'Sauvegarder'"
 
@@ -50658,15 +50218,12 @@ msgstr ""
 #, fuzzy
 #~ msgid "be transferable."
 #~ msgstr "Date de transfert"
-
 #~ msgid "change location"
 #~ msgstr "Changer la localisation"
-
 #~ msgid "considered lost"
 #~ msgstr "considéré comme perdu"
-
 #~ msgid "day(s)"
 #~ msgstr "jour(s)"
-
 #~ msgid "filter"
 #~ msgstr "Sélectionner"
+
