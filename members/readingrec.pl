@@ -85,6 +85,7 @@ for (my $i=0;$i<$count;$i++){
 	$line{date_due}=format_date($issues->[$i]->{'date_due'});
 	$line{returndate}=format_date($issues->[$i]->{'returndate'});
 	$line{issuedate}=format_date($issues->[$i]->{'issuedate'});
+	$line{issuingbranch}=GetBranchName($issues->[$i]->{'issuingbranch'});
 	$line{renewals}=$issues->[$i]->{'renewals'};
 	$line{barcode}=$issues->[$i]->{'barcode'};
 	$line{volumeddesc}=$issues->[$i]->{'volumeddesc'};
