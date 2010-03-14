@@ -64,6 +64,7 @@ my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
 my $biblionumber = $query->param('biblionumber') || $query->param('bib');
 
 $template->param( 'ItemsIssued' => CountItemsIssued( $biblionumber ) );
+$template->param(C4::Search::enabled_opac_search_views);
 
 
 my $record       = GetMarcBiblio($biblionumber);

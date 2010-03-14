@@ -122,6 +122,7 @@ $template->param(
 );
 
 ## Check if an item Can be holds on shelf
+$template->param(C4::Search::enabled_opac_search_views);
 my @all_items = &GetItemsInfo( $biblionumber, 'opac' );
 my $allowonshelfholds = 0;
 for my $item (@all_items){
