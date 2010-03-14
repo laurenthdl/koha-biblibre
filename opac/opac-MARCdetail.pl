@@ -81,6 +81,8 @@ $template->param(
 
 $template->param( 'AllowOnShelfHolds' => C4::Context->preference('AllowOnShelfHolds') );
 $template->param( 'ItemsIssued' => CountItemsIssued( $biblionumber ) );
+$template->param( 'ItemsCount' => GetItemsCount( $biblionumber ) );
+$template->param(C4::Search::enabled_opac_search_views);
 
 # adding the $RequestOnOpac param
 my $RequestOnOpac;
