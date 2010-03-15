@@ -46,6 +46,7 @@ use C4::Circulation;
 use C4::Koha;
 use C4::Letters;
 use C4::Biblio;
+use C4::Items;
 use C4::Reserves;
 use C4::Branch; # GetBranchName
 use C4::Form::MessagingPreferences;
