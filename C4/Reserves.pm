@@ -361,7 +361,7 @@ this function return 1 if an item can be issued by this borrower.
 
 sub CanItemBeReserved{
     my ($borrowernumber, $itemnumber) = @_;
-    
+
     my $dbh             = C4::Context->dbh;
     my $allowedreserves = 0;
     my $reservecount    = "0";
@@ -388,7 +388,7 @@ sub CanItemBeReserved{
     # We see if he have right or not to reserve this item(Y or N), we don't care about the number of reserves allowed
     # if he have no rule set, he have not right
     my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{$itype}, $branchcode);
-    return 0 if( not $issuingrule->{reservesallowed} );
+    return 0 if( defined $issuingrule->{reservesallowed} && not $issuingrule->{reservesallowed} );
     
     # We retrieve the count of reserves allowed for this category code
     $issuingrule  = GetIssuingRule ($borrower->{categorycode}, "*", "*");
