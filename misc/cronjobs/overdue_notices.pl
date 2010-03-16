@@ -32,6 +32,7 @@ use C4::Context;
 use C4::Dates qw/format_date/;
 use C4::Debug;
 use C4::Letters;
+use open qw(:std :utf8);
 
 use Getopt::Long;
 use Pod::Usage;
@@ -442,7 +443,7 @@ END_SQL
             $sth->execute(@borrower_parameters);
             $verbose and warn $borrower_sql . "\n $branchcode | " . $overdue_rules->{'categorycode'} . "\n ($mindays, $maxdays)\nreturns " . $sth->rows . " rows";
 
-            while( my ( $itemcount, $borrowernumber, $firstname, $lastname, $address1, $address2, $city, $postcode, $email ) = $sth->fetchrow ) {
+            while( my ( $itemcount, $borrowernumber, $firstname, $lastname, $address1, $address2, $city, $postcode, $country, $email ) = $sth->fetchrow ) {
                 $verbose and warn "borrower $firstname, $lastname ($borrowernumber) has $itemcount items triggering level $i.";
     
                 my $letter = C4::Letters::getletter( 'circulation', $overdue_rules->{"letter$i"} );
@@ -517,6 +518,7 @@ END_SQL
                             address1       => $address1,
                             address2       => $address2,
                             city           => $city,
+                            country        => $country,
                             postcode       => $postcode,
                             email          => $email,
                             itemcount      => $itemcount,
@@ -545,6 +547,7 @@ END_SQL
                                 address1       => $address1,
                                 address2       => $address2,
                                 city           => $city,
+                                country        => $country,
                                 postcode       => $postcode,
                                 email          => $email,
                                 itemcount      => $itemcount,
@@ -688,7 +691,7 @@ sub prepare_letter_for_printing {
     if ( exists $params->{'outputformat'} && $params->{'outputformat'} eq 'csv' ) {
         if ($csv->combine(
                 $params->{'firstname'}, $params->{'lastname'}, $params->{'address1'},  $params->{'address2'}, $params->{'postcode'},
-                $params->{'city'},      $params->{'email'},    $params->{'itemcount'}, $params->{'titles'}
+                $params->{'city'}, $params->{'country'},      $params->{'email'},    $params->{'itemcount'}, $params->{'titles'}
             )
           ) {
             return $csv->string, "\n";
