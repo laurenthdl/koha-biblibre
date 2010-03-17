@@ -51,6 +51,7 @@ use C4::Reserves;
 use C4::Branch; # GetBranchName
 use C4::Form::MessagingPreferences;
 use C4::Overdues qw/CheckBorrowerDebarred/;
+use JSON;
 
 #use Smart::Comments;
 #use Data::Dumper;
