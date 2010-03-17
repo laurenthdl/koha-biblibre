@@ -1,6 +1,7 @@
 INSERT INTO permissions (module_bit, code, description) VALUES
    ( 1, 'circulate_remaining_permissions', 'Remaining circulation permissions'),
    ( 1, 'override_renewals', 'Override blocked renewals'),
+   ( 1, 'view_borrowers_logs', 'Voir les logs adhérents'),
    ( 9, 'edit_catalogue', 'Editer le  catalogue'),
    ( 9, 'fast_cataloging', 'Catalogage rapide'),
    (11, 'vendors_manage', 'Manage vendors'),
