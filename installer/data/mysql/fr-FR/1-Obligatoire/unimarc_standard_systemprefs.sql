@@ -290,3 +290,4 @@ INSERT INTO `systempreferences` ( `variable` , `value` , `options` , `explanatio
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('ILS-DI','0','Active les services ILS-DI à l''OPAC.','','YesNo');
 INSERT INTO systempreferences (variable,value, options, explanation, type) VALUES('ReservesControlBranch','PatronLibrary','ItemHomeLibrary|PatronLibrary','Site considéré pour calculer les droits de réservation','Choice');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('OPACPickUpLocation','1','Permet aux adhérent de choisir leur bibliothèque de retrait pour une réservation','','YesNo');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('CI-3M:AuthorizedIPs','','Liste des IPs autorisées pour la magnétisation 3M','','Free');
