@@ -404,7 +404,7 @@ sub GetPatronInfo {
             # Add additional fields
             $reserve->{'item'}       = $item;
             $reserve->{'branchname'} = $branchname;
-            $reserve->{'title'}      = ( GetBiblio( $reserve->{'biblionumber'} ) )[1]->{'title'};
+            $reserve->{'title'}      = GetBiblio( $reserve->{'biblionumber'} )->{'title'};
         }
         $borrower->{'holds'}->{'hold'} = \@reserves;
     }
@@ -590,10 +590,11 @@ sub HoldTitle {
 
     # Get the biblio record, or return an error code
     my $biblionumber = $cgi->param('bib_id');
-    my ( $count, $biblio ) = GetBiblio( $biblionumber );
-    return { code => 'RecordNotFound' } unless $$biblio{biblionumber};
-    
-    my $title = $$biblio{title};
+    my $biblio = GetBiblio($biblionumber);
+    if ( not $biblio->{'biblionumber'} ) {
+        return { code => 'RecordNotFound' };
+    }
+    my $title = $biblio->{'title'};
 
     # Check if the biblio can be reserved
     return { code => 'NotHoldable' } unless CanBookBeReserved( $borrowernumber, $biblionumber );
@@ -655,10 +656,18 @@ sub HoldItem {
 
     # Get the biblio or return an error code
     my $biblionumber = $cgi->param('bib_id');
+<<<<<<< HEAD:C4/ILSDI/Services.pm
     my ( $count, $biblio ) = GetBiblio($biblionumber);
     return { code => 'RecordNotFound' } unless $$biblio{biblionumber};
 
     my $title = $$biblio{title};
+=======
+    my $biblio = GetBiblio($biblionumber);
+    if ( not $biblio->{'biblionumber'} ) {
+        return { message => 'RecordNotFound' };
+    }
+    my $title = $biblio->{'title'};
+>>>>>>> abeac2b... (bug #4321) clean C4::Biblio::GetBiblio and uses:C4/ILSDI/Services.pm
 
     # Get the item or return an error code
     my $itemnumber = $cgi->param('item_id');
