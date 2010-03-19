@@ -941,7 +941,32 @@ h2 span.hint {
 	margin : 0pt 5px 5px 0pt;
 }
 a.cancel {
-	padding-left : 1em;
+	text-decoration: none;
+	background-attachment:scroll;
+	background-position:0 0;
+	background : #B8D0E6 url(../../images/submit-bg.gif) top left repeat-x;
+	border-bottom-color:#EEEEEE;
+	border-bottom-style:solid;
+	border-bottom-width:1px;
+	border-left-color:#CCCCCC;
+	border-left-style:solid;	
+	border-left-width:1px;
+	border-right-color:#EEEEEE;
+	border-right-style:solid;
+	border-right-width:1px;
+	border-top-color:#CCCCCC;
+	border-top-style:solid;
+	border-top-width:1px;
+	color:#333333;
+	font-size:93%;
+	font-weight:bold;
+	padding:4.5px;
+}
+
+a.cancel:before{
+ 	content:url(../../images/shelf-delete.gif);
+	vertical-align:middle;
+	padding-right: 1.5px;
 }
 
 a.hidemytags {

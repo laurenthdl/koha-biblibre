@@ -698,8 +698,31 @@ width: 100%;
 }
 
 a.cancel {
-	padding-left : 1em;
+	font-size: 13.3333px;
+	font-family: "Sans";
+	text-decoration: none;
+	cursor: default;
+	background : #E8E8E8 url(../../img/button-bg.gif) top left repeat-x;
+	border-bottom-color: #999999;
+	border-bottom-style: outset;
+	border-bottom-width: 1px;
+	border-left-color: #666;
+	border-left-style: outset;
+	border-left-width: 1px;
+	border-right-color: #999999;
+	border-right-style: outset;
+	border-right-width: 1px;
+	border-top-color: #666666;
+	border-top-style: outset;
+	border-top-width: 1px;
+	color: #333333;
+	padding: 0.34em;
+	
 }
+a.cancel:before {
+ 	content:url(../../img/deny.gif);
+	vertical-align:middle;
+ }
 
 fieldset.rows fieldset.action {
 	padding : 1em;
