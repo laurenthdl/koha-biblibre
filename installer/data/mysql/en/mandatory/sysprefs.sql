@@ -286,3 +286,5 @@ INSERT INTO `systempreferences` ( `variable` , `value` , `options` , `explanatio
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('ILS-DI','0','Enables ILS-DI services at OPAC.','','YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('ILS-DI:Authorized_IPs','','.','Restricts usage of ILS-DI to some IPs','Free');
 INSERT INTO systempreferences set value='../koha-tmpl/intranet-tmpl/prog/en/xslt/MARC21slim2IntranetDetails.xsl',type='Free', variable='IntranetXSLTResultsDisplay';
+INSERT INTO `systempreferences` ( `variable` , `value` , `options` , `explanation` , `type` ) VALUES ( 'PrintNoticesMaxLines', '0', '', 'If greater than 0, sets the maximum number of lines an overdue notice will print. If the number of items is greater than this number, the notice will end with a warning asking the borrower to check their online account for a full list of overdue items.', 'Integer' );
+INSERT INTO systempreferences (variable,value, options, explanation, type) VALUES('ReservesControlBranch','PatronLibrary','ItemHomeLibrary|PatronLibrary','Branch checked for members reservations rights','Choice');
