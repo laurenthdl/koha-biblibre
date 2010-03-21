@@ -15,7 +15,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: nicomo-fr-FR-i-opac-t-prog-v-3000000\n"
-"POT-Creation-Date: 2010-03-15 19:09+0100\n"
+"POT-Creation-Date: 2010-03-21 14:43+0100\n"
 "PO-Revision-Date: 2010-03-02 15:55+0100\n"
 "Last-Translator: nicomo <nicolas.morin@biblibre.com>\n"
 "Language-Team: Français\n"
@@ -190,7 +190,7 @@ msgid "%s months"
 msgstr "%s mois"
 
 #. %1$s: TMPL_VAR name=ExpectedAtLibrary
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:469
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:473
 #, c-format
 msgid "%s since"
 msgstr "depuis %s"
@@ -2043,7 +2043,7 @@ msgid "Back to biblio"
 msgstr "Retour à la notice"
 
 #
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:416
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:420
 msgid "Barcode"
 msgstr "Code-barres"
 
@@ -2174,7 +2174,7 @@ msgstr "Cote"
 #: ../../koha-tmpl/opac-tmpl/prog/en/includes/masthead.inc:65
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:379
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-advsearch.tmpl:94
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:421
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:425
 msgid "Call Number"
 msgstr "Cote"
 
@@ -2228,7 +2228,7 @@ msgid "Cancels an active hold request for the patron."
 msgstr "Annule une réservation sur le compte de l'adhérent."
 
 #. IMG
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:436
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:440
 msgid "Cannot be put on hold"
 msgstr "Ne peut pas être réservé"
 
@@ -2680,7 +2680,7 @@ msgid "Copies available:"
 msgstr "Exemplaires disponibles&nbsp;:"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:382
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:412
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:416
 msgid "Copy"
 msgstr "Copie"
 
@@ -2957,7 +2957,7 @@ msgid "Due"
 msgstr "Retour le"
 
 #. %1$s: TMPL_VAR name=date_due
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:456
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:460
 #, c-format
 msgid "Due %s"
 msgstr "Retour le %s"
@@ -3511,7 +3511,7 @@ msgstr "Réservations"
 msgid "Holds Waiting"
 msgstr "Réservations disponibles"
 
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:418
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:422
 msgid "Home Library"
 msgstr "Site d'origine"
 
@@ -3664,7 +3664,7 @@ msgstr "En transit de %s vers %s depuis le %s"
 #. %1$s: TMPL_VAR name=transfertfrom
 #. %2$s: TMPL_VAR name=transfertto
 #. %3$s: TMPL_VAR name=transfertwhen
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:458
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:462
 #, c-format
 msgid "In transit from %s, to %s, since %s"
 msgstr "En transit de %s vers %s, le %s"
@@ -3682,7 +3682,7 @@ msgstr "Répertorié dans&nbsp;:"
 msgid "Indexes"
 msgstr "Index"
 
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:425
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:429
 msgid "Information"
 msgstr "Information"
 
@@ -3720,7 +3720,7 @@ msgstr "Il y a <b>%s</b> entrées."
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-user.tmpl:195
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-user.tmpl:273
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:239
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:414
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:418
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-shelves.tmpl:244
 msgid "Item Type"
 msgstr "Type de document"
@@ -3763,9 +3763,10 @@ msgid "Item type :"
 msgstr "Type de document&nbsp;:"
 
 #. %1$s: TMPL_VAR name=wbrname
+#. %2$s: TMPL_VAR name=formattedwaitingdate
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-user.tmpl:359
-#, c-format
-msgid "Item waiting at <b> %s</b>"
+#, fuzzy, c-format
+msgid "Item waiting at <b> %s</b> until %s"
 msgstr "Document mis de coté à <b> %s </b>"
 
 #. %1$s: TMPL_VAR name=wbrname
@@ -3889,7 +3890,7 @@ msgstr "Langues&nbsp;:"
 msgid "Large print"
 msgstr "Gros caractères"
 
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:419
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:423
 msgid "Last Location"
 msgstr "Dernière Localisation"
 
@@ -4575,12 +4576,12 @@ msgid "Not for loan"
 msgstr "Exclu du prêt"
 
 #. %1$s: TMPL_VAR name=notforloanvalue
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:465
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:469
 #, c-format
 msgid "Not for loan (%s)"
 msgstr "Exclu du prêt (%s)"
 
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:474
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:478
 msgid "Not on hold"
 msgstr "Pas réservé"
 
@@ -4706,7 +4707,7 @@ msgid "On Reserve"
 msgstr "Réservé"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:426
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:468
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:472
 msgid "On hold"
 msgstr "Réservé"
 
@@ -4935,8 +4936,8 @@ msgstr "Image"
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-topissues.tmpl:70
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:256
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:259
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:489
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:491
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:493
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:495
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-shelves.tmpl:144
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-basket.tmpl:117
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:200
@@ -5534,7 +5535,7 @@ msgstr "Tout sélectionner"
 msgid "Select a List"
 msgstr "Sélectionner une liste"
 
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:410
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:414
 msgid "Select a specific copy:"
 msgstr "Réserver un exemplaire spécifique"
 
@@ -6531,7 +6532,7 @@ msgstr "URL&nbsp;: %s"
 msgid "URL(s)"
 msgstr "URL(s)"
 
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:462
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:466
 msgid "Unavailable (lost or missing)"
 msgstr "Indisponible (perdu ou manquant)"
 
@@ -6661,14 +6662,14 @@ msgid "Visual Material"
 msgstr " "
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:380
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:423
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:427
 msgid "Vol Info"
 msgstr "Info vol."
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-user.tmpl:125
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-user.tmpl:179
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-full-serial-issues.tmpl:185
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:468
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:472
 msgid "Waiting"
 msgstr "En attente"
 
@@ -6763,7 +6764,7 @@ msgstr ""
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:300
 #, c-format
 msgid "You are number %s in line"
-msgstr ""
+msgstr "Vous êtes num. %s"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/ilsdi.tmpl:112
 msgid "You can use OAI-PMH ListRecords instead of this service."
@@ -6780,8 +6781,7 @@ msgstr "Vous n'avez pas de prêt en cours."
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-user.tmpl:135
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-user.tmpl:145
 msgid "You currently owe fines and charges amounting to:"
-msgstr ""
-"Vous devez actuellement des amendes et des frais s'élevant à&nbsp;:&nbsp;:"
+msgstr "Vos amendes et frais s'élevent à&nbsp;:&nbsp;:"
 
 #: ../../koha-tmpl/opac-tmpl/prog/en/includes/masthead.inc:165
 #: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:6
@@ -7106,7 +7106,7 @@ msgstr "reproduction photomécanique"
 #: ../../koha-tmpl/opac-tmpl/prog/en/xslt/UNIMARCslim2OPACDetail.xsl:505
 #: ../../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACDetail.xsl:516
 #: ../../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACDetail.xsl:570
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:469
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:473
 msgid "at"
 msgstr "à"
 
@@ -7488,7 +7488,7 @@ msgstr "essais"
 msgid "examination paper"
 msgstr "copie d'examen"
 
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:469
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:473
 msgid "expected at"
 msgstr "Attendu pour le"
 
@@ -7583,7 +7583,7 @@ msgstr "pour"
 msgid "for '%s'"
 msgstr "pour \"%s\""
 
-#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:468
+#: ../../koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:472
 msgid "for patron"
 msgstr "pour l'adhérent"
 
