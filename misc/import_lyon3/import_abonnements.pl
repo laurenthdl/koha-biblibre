@@ -58,10 +58,9 @@ use Getopt::Long;
 use utf8;
 
 # Text::CSV::Unicode, even in binary mode, fails to parse lines with these diacriticals:
-my $debug = $ENV{DEBUG};
-
-# ė
-# č
+my $debug=$ENV{DEBUG};
+# e
+# c
 
 our (
     $file_input, $file_output, $import_param_id, $operation,        $encoding,   $test,         $update, $insert,
