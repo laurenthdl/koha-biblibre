@@ -99,7 +99,7 @@ BEGIN {
 
 use DBI;
 use ZOOM;
-use XML::Simple;
+use YAML qw/LoadFile/;
 use C4::Boolean;
 use C4::Debug;
 use POSIX ();
@@ -113,7 +113,7 @@ C4::Context - Maintain and manipulate the context of a Koha script
 
   use C4::Context;
 
-  use C4::Context("/path/to/koha-conf.xml");
+  use C4::Context("/path/to/koha-conf.yml");
 
   $config_value = C4::Context->config("config_variable");
 
@@ -128,7 +128,7 @@ C4::Context - Maintain and manipulate the context of a Koha script
 =head1 DESCRIPTION
 
 When a Koha script runs, it makes use of a certain number of things:
-configuration settings in F</etc/koha/koha-conf.xml>, a connection to the Koha
+configuration settings in F</etc/koha/koha-conf.yml>, a connection to the Koha
 databases, and so forth. These things make up the I<context> in which
 the script runs.
 
@@ -149,7 +149,7 @@ different contexts to search both databases. Such scripts should use
 the C<&set_context> and C<&restore_context> functions, below.
 
 By default, C4::Context reads the configuration from
-F</etc/koha/koha-conf.xml>. This may be overridden by setting the C<$KOHA_CONF>
+F</etc/koha/koha-conf.yml>. This may be overridden by setting the C<$KOHA_CONF>
 environment variable to the pathname of a configuration file to use.
 
 =head1 METHODS
@@ -165,7 +165,7 @@ environment variable to the pathname of a configuration file to use.
 # config
 #    A reference-to-hash whose keys and values are the
 #    configuration variables and values specified in the config
-#    file (/etc/koha/koha-conf.xml).
+#    file (/etc/koha/koha-conf.yml).
 # dbh
 #    A handle to the appropriate database for this context.
 # dbh_stack
@@ -174,24 +174,24 @@ environment variable to the pathname of a configuration file to use.
 # Zconn
 #     A connection object for the Zebra server
 
-# Koha's main configuration file koha-conf.xml
+# Koha's main configuration file koha-conf.yml
 # is searched for according to this priority list:
 #
-# 1. Path supplied via use C4::Context '/path/to/koha-conf.xml'
+# 1. Path supplied via use C4::Context '/path/to/koha-conf.yml'
 # 2. Path supplied in KOHA_CONF environment variable.
 # 3. Path supplied in INSTALLED_CONFIG_FNAME, as long
 #    as value has changed from its default of 
-#    '__KOHA_CONF_DIR__/koha-conf.xml', as happens
+#    '__KOHA_CONF_DIR__/koha-conf.yml', as happens
 #    when Koha is installed in 'standard' or 'single'
 #    mode.
 # 4. Path supplied in CONFIG_FNAME.
 #
 # The first entry that refers to a readable file is used.
 
-use constant CONFIG_FNAME => "/etc/koha/koha-conf.xml";
+use constant CONFIG_FNAME => "/etc/koha/koha-conf.yml";
                 # Default config file, if none is specified
                 
-my $INSTALLED_CONFIG_FNAME = '__KOHA_CONF_DIR__/koha-conf.xml';
+my $INSTALLED_CONFIG_FNAME = '__KOHA_CONF_DIR__/koha-conf.yml';
                 # path to config file set by installer
                 # __KOHA_CONF_DIR__ is set by rewrite-confg.PL
                 # when Koha is installed in 'standard' or 'single'
@@ -228,7 +228,7 @@ Reads the specified Koha config file.
 
 Returns an object containing the configuration variables. The object's
 structure is a bit complex to the uninitiated ... take a look at the
-koha-conf.xml file as well as the XML::Simple documentation for details. Or,
+koha-conf.yml file as well as the XML::Simple documentation for details. Or,
 here are a few examples that may give you what you need:
 
 The simple elements nested within the <config> element:
@@ -250,7 +250,8 @@ Returns undef in case of error.
 =cut
 
 sub read_config_file {		# Pass argument naming config file to read
-    my $koha = XMLin(shift, keyattr => ['id'], forcearray => ['listen', 'server', 'serverinfo'], suppressempty => '');
+    my $filename=shift;
+    my $koha = LoadFile($filename);
     return $koha;			# Return value: ref-to-hash holding the configuration
 }
 
@@ -290,11 +291,11 @@ sub import {
 =item new
 
   $context = new C4::Context;
-  $context = new C4::Context("/path/to/koha-conf.xml");
+  $context = new C4::Context("/path/to/koha-conf.yml");
 
 Allocates a new context. Initializes the context from the specified
 file, which defaults to either the file given by the C<$KOHA_CONF>
-environment variable, or F</etc/koha/koha-conf.xml>.
+environment variable, or F</etc/koha/koha-conf.yml>.
 
 C<&new> does not set this context as the new default context; for
 that, use C<&set_context>.
@@ -326,7 +327,7 @@ sub new {
         } elsif (-s CONFIG_FNAME) {
             $conf_fname = CONFIG_FNAME;
         } else {
-            warn "unable to locate Koha configuration file koha-conf.xml";
+            warn "unable to locate Koha configuration file koha-conf.yml";
             return undef;
         }
     }
@@ -552,7 +553,7 @@ creates one and connects.
 
 C<$self> 
 
-C<$server> one of the servers defined in the koha-conf.xml file
+C<$server> one of the servers defined in the koha-conf.yml file
 
 C<$async> whether this is a asynchronous connection
 
@@ -591,7 +592,7 @@ $context->{"Zconn"} = &_new_Zconn($server,$async);
 
 Internal function. Creates a new database connection from the data given in the current context and returns it.
 
-C<$server> one of the servers defined in the koha-conf.xml file
+C<$server> one of the servers defined in the koha-conf.yml file
 
 C<$async> whether this is a asynchronous connection
 
@@ -1168,7 +1169,7 @@ Joshua Ferraro <jmf at liblime dot com>
 #
 # Revision 1.43.2.1  2006/10/06 13:47:28  toins
 # Synch with dev_week.
-#  /!\ WARNING :: Please now use the new version of koha.xml.
+#  /!\ WARNING :: Please now use the new version of koha.yml.
 #
 # Revision 1.18.2.5.2.14  2006/09/24 15:24:06  kados
 # remove Zebraauth routine, fold the functionality into Zconn
@@ -1188,7 +1189,7 @@ Joshua Ferraro <jmf at liblime dot com>
 #
 # Lots of modifications to Context.pm, you can now store user and pass info for
 # multiple servers (for federated searching) using the <serverinfo> element.
-# I'll commit my koha.xml to demonstrate this or you can refer to the POD in
+# I'll commit my koha.yml to demonstrate this or you can refer to the POD in
 # Context.pm (which I also expanded on).
 #
 # Revision 1.18.2.5.2.13  2006/08/10 02:10:21  kados
@@ -1215,7 +1216,7 @@ Joshua Ferraro <jmf at liblime dot com>
 # config file by all means do.
 #
 # Revision 1.18.2.5.2.7  2006/06/04 22:50:33  tgarip1957
-# We do not hard code cql2rpn conversion file in context.pm our koha.xml configuration file already describes the path for this file.
+# We do not hard code cql2rpn conversion file in context.pm our koha.yml configuration file already describes the path for this file.
 # At cql searching we use method CQL not CQL2RPN as the cql2rpn conversion file is defined at server level
 #
 # Revision 1.18.2.5.2.6  2006/06/02 23:11:24  kados
