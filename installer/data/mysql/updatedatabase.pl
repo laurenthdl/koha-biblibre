@@ -3525,6 +3525,16 @@ INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES (
     print "Upgrade to $DBversion done (Adding permissions for staff member access to borrowers logs.  )\n";
     SetVersion ($DBversion);
 }
+$DBversion = "3.02.00.023";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+    ALTER TABLE language_descriptions ADD INDEX LANG (subtag, type, lang);
+    });
+    print "Upgrade to $DBversion done (Adding index to language_descriptions table)\n";
+    SetVersion ($DBversion);
+}
+
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
