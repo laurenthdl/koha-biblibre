@@ -1167,6 +1167,7 @@ sub GetCOinSBiblio {
     my $record = GetMarcBiblio($biblionumber);
 
     # get the coin format
+    return unless $record;
     my $pos7 = substr $record->leader(), 7, 1;
     my $pos6 = substr $record->leader(), 6, 1;
     my $mtx;
