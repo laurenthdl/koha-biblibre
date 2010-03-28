@@ -1,106 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
-  xmlns:marc="http://www.loc.gov/MARC21/slim"
-  xmlns:items="http://www.koha.org/items"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="marc items">
-
-<xsl:import href="UNIMARCslimUtils.xsl"/>
-<xsl:output method = "xml" indent="yes" omit-xml-declaration = "yes" />
-<xsl:template match="/">
-  <xsl:apply-templates/>
-</xsl:template>
-
-<xsl:template match="marc:record">
-  <xsl:variable name="leader" select="marc:leader"/>
-  <xsl:variable name="leader6" select="substring($leader,7,1)"/>
-  <xsl:variable name="leader7" select="substring($leader,8,1)"/>
-  <xsl:variable name="biblionumber" select="marc:datafield[@tag=090]/marc:subfield[@code='a']"/>
-  
-
-  <xsl:if test="marc:datafield[@tag=200]">
-    <xsl:for-each select="marc:datafield[@tag=200]">
-      <h1>
-        <xsl:call-template name="addClassRtl" />
-        <xsl:variable name="title" select="marc:subfield[@code='a']"/>
-        <xsl:variable name="ntitle"
-         select="translate($title, '&#x0098;&#x009C;','')"/>
-        <xsl:value-of select="$ntitle" />
-        <xsl:if test="marc:subfield[@code='e']">
-          <xsl:text> : </xsl:text>
-          <xsl:for-each select="marc:subfield[@code='e']">
-            <xsl:value-of select="."/>
-          </xsl:for-each>
-        </xsl:if>
-        <xsl:if test="marc:subfield[@code='b']">
-          <xsl:text> [</xsl:text>
-          <xsl:value-of select="marc:subfield[@code='b']"/>
-          <xsl:text>]</xsl:text>
-        </xsl:if>
-        <xsl:if test="marc:subfield[@code='f']">
-          <xsl:text> / </xsl:text>
-          <xsl:value-of select="marc:subfield[@code='f']"/>
-        </xsl:if>
-        <xsl:if test="marc:subfield[@code='g']">
-          <xsl:text> ; </xsl:text>
-          <xsl:value-of select="marc:subfield[@code='g']"/>
-        </xsl:if>
-      </h1>
-    </xsl:for-each>
-  </xsl:if>
-
-  <div id="views">
-    <span class="view">
-      <span id="Normalview">Normal View</span>
-    </span>
-    <span class="view">
-      <a id="MARCviewPop" href="/cgi-bin/koha/opac-showmarc.pl?id={marc:datafield[@tag=090]/marc:subfield[@code='a']}" title="MARC" rel="gb_page_center[600,500]">MARC View</a>
-    </span>
-    <span class="view">
-      <a id="MARCview" href="/cgi-bin/koha/opac-MARCdetail.pl?biblionumber={marc:datafield[@tag=090]/marc:subfield[@code='a']}" title="MARC">Expanded MARC View</a>
-    </span>
-    <span class="view">
-      <a id="ISBDview" href="/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber={marc:datafield[@tag=090]/marc:subfield[@code='a']}">Card View (ISBD)</a>
-    </span>
-  </div>
-  
-  <xsl:call-template name="tag_4xx" />
-
-  <xsl:call-template name="tag_7xx">
-    <xsl:with-param name="tag">700</xsl:with-param>
-    <xsl:with-param name="label">Auteur principal</xsl:with-param>
-  </xsl:call-template>
-
-  <xsl:call-template name="tag_7xx">
-    <xsl:with-param name="tag">710</xsl:with-param>
-    <xsl:with-param name="label">Collectivité principale</xsl:with-param>
-  </xsl:call-template>
-
-  <xsl:call-template name="tag_7xx">
-    <xsl:with-param name="tag">701</xsl:with-param>
-    <xsl:with-param name="label">Co-auteur</xsl:with-param>
-  </xsl:call-template>
-
-  <xsl:call-template name="tag_7xx">
-    <xsl:with-param name="tag">702</xsl:with-param>
-    <xsl:with-param name="label">Auteur</xsl:with-param>
-  </xsl:call-template>
-
-  <xsl:call-template name="tag_7xx">
-    <xsl:with-param name="tag">711</xsl:with-param>
-    <xsl:with-param name="label">Collectivité co-auteur</xsl:with-param>
-  </xsl:call-template>
-
-  <xsl:call-template name="tag_7xx">
-    <xsl:with-param name="tag">712</xsl:with-param>
-    <xsl:with-param name="label">Collectivité secondaire</xsl:with-param>
-  </xsl:call-template>
-
-  <xsl:if test="marc:datafield[@tag=101]">
-	  <span class="results_summary">
-      <span class="label">Langue: </span>
-      <xsl:for-each select="marc:datafield[@tag=101]">
-        <xsl:for-each select="marc:subfield">
+<!-- $Id: MARC21slim2DC.xsl,v 1.1 2003/01/06 08:20:27 adam Exp $ -->
+<xsl:stylesheet xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:items="http://www.koha.org/items" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" exclude-result-prefixes="marc items">
+  <xsl:import href="UNIMARCslimUtils.xsl"/>
+  <xsl:output method="xml" indent="yes" omit-xml-declaration="yes"/>
+  <xsl:template match="/">
+    <xsl:apply-templates/>
+  </xsl:template>
+  <xsl:template match="marc:record">
+    <xsl:variable name="leader" select="marc:leader"/>
+    <xsl:variable name="leader6" select="substring($leader,7,1)"/>
+    <xsl:variable name="leader7" select="substring($leader,8,1)"/>
+    <xsl:variable name="biblionumber" select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
+    <xsl:if test="marc:datafield[@tag=200]">
+      <xsl:for-each select="marc:datafield[@tag=200]">
+        <h1>
+            <xsl:variable name="title" select="marc:subfield[@code='a']"/>
+            <xsl:variable name="ntitle"
+                select="translate($title, '&#x0098;&#x009C;&#xC29C;&#xC29B;&#xC298;&#xC288;&#xC289;','')"/>
+            <xsl:value-of select="$ntitle" />
+          <xsl:if test="marc:subfield[@code='e']">
+            <xsl:text> : </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='e']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='b']">
+            <xsl:text> [</xsl:text>
+            <xsl:value-of select="marc:subfield[@code='b']"/>
+            <xsl:text>]</xsl:text>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='h']">
+            <xsl:text> ; </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='h']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='i']">
+            <xsl:text> ; </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='i']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='f']">
+            <xsl:text> / </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='f']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='g']">
+            <xsl:text> ; </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='g']"/>
+          </xsl:if>
+        </h1>
+      </xsl:for-each>
+    </xsl:if>
+    <div id="views">
+      <span class="view">
+        <span id="Normalview">Notice simple</span>
+      </span>
+      <span class="view">
+        <a id="MARCviewPop" href="/cgi-bin/koha/opac-showmarc.pl?id={marc:datafield[@tag=999]/marc:subfield[@code='9']}" title="MARC" rel="gb_page_center[600,500]">Notice MARC</a>
+      </span>
+      <span class="view">
+        <a id="MARCview" href="/cgi-bin/koha/opac-MARCdetail.pl?biblionumber={marc:datafield[@tag=999]/marc:subfield[@code='9']}" title="MARC">Notice MARC développée</a>
+      </span>
+      <span class="view">
+        <a id="ISBDview" href="/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber={marc:datafield[@tag=999]/marc:subfield[@code='9']}">Notice ISBD</a>
+      </span>
+    </div><br/>
+    <xsl:call-template name="tag_4xx"/>
+    <xsl:if test="marc:datafield[@tag=700] or marc:datafield[@tag=701] or marc:datafield[@tag=702] or marc:datafield[@tag=710] or marc:datafield[@tag=711] or marc:datafield[@tag=712]">
+      <span class="results_summary">
+      <span class="label">Auteur(s) : </span>
+      <xsl:for-each select="marc:datafield[@tag=700]">
+            <a>
+              <xsl:choose>
+                <xsl:when test="marc:subfield[@code=9]">
+                  <xsl:attribute name="href">
+                  /cgi-bin/koha/opac-search.pl?idx=an&amp;q=<xsl:value-of select="marc:subfield[@code=9]"/>
+                </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="href">/cgi-bin/koha/opac-search.pl?idx=au&amp;q=<xsl:value-of select="marc:subfield[@code='a']"/><xsl:text> </xsl:text><xsl:value-of select="marc:subfield[@code='b']"/></xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
+              <xsl:if test="marc:subfield[@code='a']">
+                <xsl:value-of select="marc:subfield[@code='a']"/>
+              </xsl:if>
+              <xsl:if test="marc:subfield[@code='b']">,
+              <xsl:value-of select="marc:subfield[@code='b']"/>
+            </xsl:if>
+              <xsl:if test="marc:subfield[@code='f']"> (<xsl:value-of select="marc:subfield[@code='f']"/>)
+            </xsl:if>
+            </a>
+      </xsl:for-each>
+      <xsl:if test="marc:datafield[@tag=700] and marc:datafield[@tag>700]/@tag &lt; 800"><xsl:text> ; </xsl:text></xsl:if>
+      <xsl:for-each select="marc:datafield[@tag=701]">
+          <a>
+            <xsl:choose>
+              <xsl:when test="marc:subfield[@code=9]">
+                <xsl:attribute name="href">/cgi-bin/koha/opac-search.pl?idx=an&amp;q=<xsl:value-of select="marc:subfield[@code=9]"/></xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="href">/cgi-bin/koha/opac-search.pl?idx=au&amp;q=<xsl:value-of select="marc:subfield[@code='a']"/><xsl:text> </xsl:text><xsl:value-of select="marc:subfield[@code='b']"/></xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+            <xsl:if test="marc:subfield[@code='a']">
+              <xsl:value-of select="marc:subfield[@code='a']"/>
+            </xsl:if>
+            <xsl:if test="marc:subfield[@code='b']">,
+              <xsl:value-of select="marc:subfield[@code='b']"/>
+            </xsl:if>
+            <xsl:if test="marc:subfield[@code='f']"> (<xsl:value-of select="marc:subfield[@code='f']"/>)
+            </xsl:if>
+          </a>
+          <xsl:call-template name="RelatorCode"/>
           <xsl:choose>
             <xsl:when test="@code='b'">de la trad. intermédiaire, </xsl:when>
             <xsl:when test="@code='c'">de l'œuvre originale, </xsl:when>
