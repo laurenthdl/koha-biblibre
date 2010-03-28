@@ -1664,10 +1664,7 @@ sub searchResults {
         }
 
         # XSLT processing of some stuff
-	use C4::Charset;
-	SetUTF8Flag($marcrecord);
-	$debug && warn $marcrecord->as_formatted;
-        # FIXME : This needs some work in order to be more flexible : Can not use a result list for intranet different from OPAC
+        $marcrecord->encoding('UTF-8');
         if (C4::Context->preference("XSLTResultsDisplay") && !$scan) {
             $oldbiblio->{XSLTResultsRecord} = XSLTParse4Display(
                 $oldbiblio->{biblionumber}, $marcrecord, C4::Context->preference("XSLTResultsDisplay") );

@@ -70,9 +70,10 @@ if ( ! $record ) {
     print $query->redirect("/cgi-bin/koha/errors/404.pl");
     exit;
 }
+$record->encoding('UTF-8');
 $template->param( biblionumber => $biblionumber );
-	use C4::Charset;
-	SetUTF8Flag($record);
+	#use C4::Charset;
+	#SetUTF8Flag($record);
 # XSLT processing of some stuff
 if (C4::Context->preference("XSLTDetailsDisplay") ) {
     $template->param(
