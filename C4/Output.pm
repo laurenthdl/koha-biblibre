@@ -449,8 +449,8 @@ sub output_with_http_headers($$$$;$) {
         $options->{'Content-Script-Type'} = 'text/javascript';
     }
     # remove SUDOC specific NSB NSE
-    $data =~ s/\x{C2}\x{98}|\x{C2}\x{9C}/ /g;
-    $data =~ s/\x{C2}\x{88}|\x{C2}\x{89}/ /g;
+#    $data =~ s/\x{C2}\x{98}|\x{C2}\x{9C}/ /g;
+#    $data =~ s/\x{C2}\x{88}|\x{C2}\x{89}/ /g;
     print $query->header($options), $data;
 }
 
