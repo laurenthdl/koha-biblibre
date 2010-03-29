@@ -23,7 +23,7 @@ creates templates for languages: fr-FR and en-ES
 sub install_code {
     my $code = shift;
     opendir(PO_DIR, "po") or die "Unable to open po directory";
-    my @po_files = grep { /^$code-i-opac|^$code-i-staff/ } readdir PO_DIR;
+    my @po_files = grep { /^$code-i-opac.*.po$|^$code-i-staff.*.po$/ } readdir PO_DIR;
     closedir PO_DIR;
     
     foreach ( @po_files ) {
