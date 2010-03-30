@@ -25,6 +25,7 @@ use C4::Search;
 use C4::AuthoritiesMarc::MARC21;
 use C4::AuthoritiesMarc::UNIMARC;
 use C4::Charset;
+use C4::Debug;
 
 use vars qw($VERSION @ISA @EXPORT);
 
@@ -222,32 +223,31 @@ sub SearchAuthorities {
         for(my $i = 0 ; $i <= $#{$value} ; $i++)
         {
             my $querypart;
-            if (@$value[$i]){
+            next unless (@$value[$i]);
             ##If mainentry search $a tag
-                if (@$tags[$i] eq "mainmainentry") {
+            if (@$tags[$i] eq "mainmainentry") {
 
 # FIXME: 'Heading-Main' index not yet defined in zebra
 #                $attr =" \@attr 1=Heading-Main "; 
                 $attr =" \@attr 1=Heading-Main ";
 
-                }elsif (@$tags[$i] eq "mainentry") {
-                $attr =" \@attr 1=Heading ";
-                }else{
+            }elsif (@$tags[$i] eq "mainentry") {
+               $attr =" \@attr 1=Heading ";
+            }else{
                 $attr =" \@attr 1=Any ";
-                }
-                if (@$operator[$i] eq 'is') {
+            }
+            if (@$operator[$i] eq 'is') {
                     $attr.=" \@attr 4=1  \@attr 5=100 ";##Phrase, No truncation,all of subfield field must match
-                }elsif (@$operator[$i] eq "="){
+            }elsif (@$operator[$i] eq "="){
                     $attr.=" \@attr 4=107 ";           #Number Exact match
-                }elsif (@$operator[$i] eq "start"){
+            }elsif (@$operator[$i] eq "start"){
                     $attr.=" \@attr 3=2 \@attr 4=1 \@attr 5=1 ";#Firstinfield Phrase, Right truncated
-                } else {
+            } else {
                     $attr .=" \@attr 5=1 \@attr 4=6 ";## Word list, right truncated, anywhere
-                }
-                $attr =$attr."\"".@$value[$i]."\"";
-                $querypart .=$attr;
+            }
+            $attr =$attr."\"".@$value[$i]."\"";
+            $querypart .=$attr;
             $dosearch=1;
-            }#if value
             push @q2, $querypart;
         }
         ##Add how many queries generated
@@ -260,6 +260,7 @@ sub SearchAuthorities {
             }
         }
                  
+        $debug && warn $query;
         ## Adding order
         #$query=' @or  @attr 7=2 @attr 1=Heading 0 @or  @attr 7=1 @attr 1=Heading 1'.$query if ($sortby eq "HeadingDsc");
         my $orderstring= ($sortby eq "HeadingAsc"?
