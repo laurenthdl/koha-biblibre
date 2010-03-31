@@ -5,7 +5,7 @@ SUBLOC: location
 CALL.NO: callnumber
 VENDOR: aqbooksellerid
 PRICE: cost
-NOTE: internalnotes
+NOTE: librariannotes
 LOCAL: opacnote
 RECUS: received
 PERIODICITE: periodicity
