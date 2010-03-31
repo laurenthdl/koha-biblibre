@@ -162,7 +162,15 @@
                 <form action="/cgi-bin/koha/acqui/basketgroup.pl" method="post">
                 <p>Closed on:  <!-- TMPL_VAR name="closedate" --></p>
                 <!-- TMPL_IF name="basketgroups" -->
-                    <p> basketgroup: <select id="basketgroupid" name="basketgroupid">
+                    <p> basketgroup:
+                    <!-- TMPL_LOOP name="basketgroups" -->
+                    <!-- TMPL_IF name="default" -->
+                    <!-- TMPL_UNLESS name="nogroup" --> 
+                    <a href="/cgi-bin/koha/acqui/basketgroup.pl?op=add&booksellerid=<!-- TMPL_VAR name="basketgroups" -->&basketgroupid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="name" --></a>
+                    <!-- /TMPL_UNLESS --> 
+                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_LOOP -->
+                        <select id="basketgroupid" name="basketgroupid">
                         <!-- TMPL_LOOP name="basketgroups" -->
                             <!-- TMPL_IF name="default" -->
                             <option value="<!-- TMPL_VAR name="id" -->" selected="selected"><!-- TMPL_VAR name="name" --></option>
