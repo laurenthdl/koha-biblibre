@@ -3620,6 +3620,15 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.002";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+    ALTER TABLE language_descriptions ADD INDEX LANG (subtag, type, lang);
+    });
+    print "Upgrade to $DBversion done (Adding index to language_descriptions table)\n";
+    SetVersion ($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 
