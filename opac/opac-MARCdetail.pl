@@ -46,7 +46,7 @@ use C4::Output;
 use CGI;
 use MARC::Record;
 use C4::Biblio;
-use C4::Items qw/GetItemsInfo/;
+use C4::Items; #qw/GetItemsInfo GetItemsCount/;
 use C4::Reserves qw/CanHoldOnShelf/;
 use C4::Acquisition;
 use C4::Koha;
