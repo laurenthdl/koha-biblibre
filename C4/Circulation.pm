@@ -1278,7 +1278,7 @@ sub AddReturn {
     	if ( $item->{'holdingbranch'} ne $branch ) {
        	    UpdateHoldingbranch( $branch, $item->{'itemnumber'} );
             $item->{'holdingbranch'} = $branch;    # update item data holdingbranch too
-	}	   
+	   }	   
     }
 
     ModDateLastSeen( $item->{'itemnumber'} );
@@ -1313,7 +1313,7 @@ sub AddReturn {
         $messages->{'Damaged'} = $item->{'damaged'};
     }
 
-    if ($borrowernumber) {
+    if ($borrowernumber && $doreturn) {
         # fix up the overdues in accounts...
         my $fix = _FixOverduesOnReturn($borrowernumber, $item->{itemnumber}, $exemptfine, $dropbox);
         defined($fix) or warn "_FixOverduesOnReturn($borrowernumber, $item->{itemnumber}...) failed!";  # zero is OK, check defined
