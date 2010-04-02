@@ -393,6 +393,8 @@ if ($borrowernumber) {
         $getreserv{itemcallnumber} = $getiteminfo->{'itemcallnumber'};
         $getreserv{biblionumber}   = $getiteminfo->{'biblionumber'};
         $getreserv{waitingat}      = GetBranchName( $num_res->{'branchcode'} );
+	my $materials = $getiteminfo->{'materials'};
+        $template->param(materials         => $materials);
         #         check if we have a waiting status for reservations
         if ( $num_res->{'found'} eq 'W' ) {
             $getreserv{color}   = 'reserved';
@@ -724,7 +726,6 @@ if($bor_messages_loop){ $template->param(flagged => 1 ); }
 
 
 $duedatespec = "" if not ($stickyduedate or scalar $confirm_required);
-
 $template->param(
     issued_itemtypes_count_loop => \@issued_itemtypes_count_loop,
     lib_messages_loop		=> $lib_messages_loop,
@@ -744,7 +745,7 @@ $template->param(
     duedatespec       => $duedatespec,
     message           => $message,
     CGIselectborrower => $CGIselectborrower,
-	totalprice        => sprintf("%.2f", $totalprice),
+#    totalprice        => sprintf("%.2f", $totalprice),
     totaldue          => sprintf("%.2f", $total),
     todayissues       => \@todaysissues,
     previssues        => \@previousissues,
