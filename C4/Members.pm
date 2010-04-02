@@ -585,7 +585,7 @@ sub IsMemberBlocked {
         "SELECT COUNT(*) as latedocs
          FROM issues
          WHERE borrowernumber = ?
-         AND date_due < now()"
+         AND date_due < CURRENT_DATE"
     );
     $sth->execute($borrowernumber);
     my $latedocs = $sth->fetchrow_hashref->{'latedocs'};
