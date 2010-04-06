@@ -219,6 +219,14 @@ if ($barcode and not $query->param('cancel')) {
       AddReturn( $barcode, $userenv_branch, $exemptfine, $dropboxmode,$override);     # do the return
     my $homeorholdingbranchreturn = C4::Context->preference('HomeOrHoldingBranchReturn') or 'homebranch';
 
+            my @ips=split /,|\|/, C4::Context->preference("CI-3M:AuthorizedIPs");
+            #my $pid=fork();
+            #unless($pid && $remotehost=~qr(^$ips$)){
+            #if (!$pid && any{ $remotehost eq $_ }@ips ){
+            if (any{ $remotehost eq $_ }@ips ){
+                system("../services/magnetise.pl $remotehost in");
+                #die 0;
+            }
     # get biblio description
     $biblio = GetBiblioFromItemNumber($itemnumber);
     # fix up item type for display
