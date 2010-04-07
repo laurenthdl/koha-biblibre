@@ -3630,6 +3630,14 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 }
 
 
+$DBversion = "3.02.00.003";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do("INSERT INTO systempreferences SET variable='IndependentBranchPatron',value=0");
+	
+    print "Upgrade to $DBversion done (IndependentBranchPatron syspref added)\n";
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

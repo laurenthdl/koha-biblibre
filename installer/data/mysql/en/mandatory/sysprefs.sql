@@ -288,3 +288,4 @@ INSERT INTO `systempreferences` ( `variable` , `value` , `options` , `explanatio
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('ILS-DI','0','Enables ILS-DI services at OPAC.','','YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('ILS-DI:Authorized_IPs','','.','Restricts usage of ILS-DI to some IPs','Free');
 INSERT INTO systempreferences set value='../koha-tmpl/intranet-tmpl/prog/en/xslt/MARC21slim2IntranetDetails.xsl',type='Free', variable='IntranetXSLTResultsDisplay';
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('IndependentBranchPatron',0,'If ON, librarian patron search can only be done on patron of same library as librarian',NULL,'YesNo');
