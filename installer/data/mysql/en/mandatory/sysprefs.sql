@@ -275,3 +275,4 @@ INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('ILS-DI:AuthorizedIPs','','.','Restricts usage of ILS-DI to some IPs','Free');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES ('OverduesBlockCirc','noblock','When checking out an item should overdues block checkout, generate a confirmation dialogue, or allow checkout','noblock|confirmation|block','Choice');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES ('DisplayMultiPlaceHold','1','Display the ability to place multiple holds or not','','YesNo');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('IndependentBranchPatron',0,'If ON, librarian patron search can only be done on patron of same library as librarian',NULL,'YesNo');

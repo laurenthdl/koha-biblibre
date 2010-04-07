@@ -85,6 +85,7 @@ $tabsysprefs{OpacMaintenance}       = "Admin";
 $tabsysprefs{FrameworksLoaded}      = "Admin";
 $tabsysprefs{delimiter}             = "Admin";
 $tabsysprefs{IndependantBranches}   = "Admin";
+$tabsysprefs{IndependentBranchPatron}= "Admin";
 $tabsysprefs{insecure}              = "Admin";
 $tabsysprefs{KohaAdmin}             = "Admin";
 $tabsysprefs{KohaAdminEmailAddress} = "Admin";
