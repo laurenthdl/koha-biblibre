@@ -137,16 +137,16 @@ if ( $query->param('resbarcode') ) {
 # i.e., whether to apply waiting status
     ModReserveAffect( $item, $borrowernumber, $diffBranchSend);
 #   check if we have other reserves for this document, if we have a return send the message of transfer
-    my ( $messages, $nextreservinfo ) = GetOtherReserves($item);
+    my ( $reservemessages, $nextreservinfo ) = GetOtherReserves($item);
 
     my ($borr) = GetMemberDetails( $nextreservinfo, 0 );
     my $name   = $borr->{'surname'} . ", " . $borr->{'title'} . " " . $borr->{'firstname'};
-    if ( $messages->{'transfert'} ) {
+    if ( $reservemessages->{'transfert'} ) {
         $template->param(
             itemtitle      => $iteminfo->{'title'},
 			itembiblionumber => $iteminfo->{'biblionumber'},
             iteminfo       => $iteminfo->{'author'},
-            tobranchname   => GetBranchName($messages->{'transfert'}),
+            tobranchname   => GetBranchName($reservemessages->{'transfert'}),
             name           => $name,
             borrowernumber => $borrowernumber,
             borcnum        => $borr->{'cardnumber'},
@@ -290,7 +290,8 @@ if ( $messages->{'NeedsTransfer'} ){
 
 if ( $messages->{'Wrongbranch'} ){
 	$template->param(
-		wrongbranch => 1,
+		wrongbranch => $branches->{$messages->{'Wrongbranch'}->{'Wrongbranch'}}->{'branchname'},
+		rightbranch => $branches->{$messages->{'Wrongbranch'}->{'Rightbranch'}}->{'branchname'},
 		barcode     => $barcode,
 		exemptfine  => $exemptfine,
 		dropboxmode => $dropboxmode,
@@ -451,7 +452,6 @@ foreach my $code ( keys %$messages ) {
     }
     elsif ( $code eq 'Wrongbranch' ) {
     }
-		
     else {
         die "Unknown error code $code";    # note we need all the (empty) elsif's above, or we die.
         # This forces the issue of staying in sync w/ Circulation.pm
