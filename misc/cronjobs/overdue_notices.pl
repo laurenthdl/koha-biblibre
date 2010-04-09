@@ -483,7 +483,7 @@ END_SQL
 		    $titles.= "<thead><tr><th>".join("</th><th>",@$columns_def_hashref{@item_content_fields});
 		    warn @item_content_fields;
 		    warn map {"$columns_def_hashref->{$_};"} @item_content_fields;
-		    $titles.= "</th></tr></thead>";
+		    $titles.= "</th></tr></thead><tbody>";
 		}
                 
                 my $i = 0;
