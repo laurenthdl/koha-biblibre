@@ -18,7 +18,7 @@
 <xsl:template match="marc:record">
   <xsl:variable name="leader" select="marc:leader"/>
   <xsl:variable name="leader6" select="substring($leader,7,1)"/>
-  <xsl:variable name="leader7" select="substring($leader,8,1)"/>
+  <xsl:variable name="leader7" select="substring($leader,7,2)"/>
   <xsl:variable name="biblionumber" 
 select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
   <xsl:variable name="isbn" select="marc:datafield[@tag=010]/marc:subfield[@code='a']"/>
@@ -97,8 +97,9 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
           </xsl:choose>
         </xsl:for-each>
       </xsl:when>
+      <xsl:when test="$leader7='as'"><span class="available"><b><xsl:text>à consulter sur place</xsl:text></b></span></xsl:when>
       <xsl:when test="count(key('item-by-status', 'available'))=0 and count(key('item-by-status', 'reference'))=0">
-        Pas de copie disponible
+        Pas d'exemplaire disponible
       </xsl:when>
       <xsl:when test="count(key('item-by-status', 'available'))>0">
         <span class="available">
