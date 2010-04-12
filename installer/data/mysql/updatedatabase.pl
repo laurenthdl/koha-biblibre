@@ -4012,6 +4012,16 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = '3.02.00.025';
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do(q{
+      INSERT INTO systempreferences (variable,value,explanation,options,type)
+      VALUES ('OPACSearchReboundBy', 'term', 'determines if the search rebound use authority number or term.','term|authority','Choice');
+});
+    print "Upgrade to $DBversion done. — Add a new system preference OPACSearchReboundBy\n";
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
