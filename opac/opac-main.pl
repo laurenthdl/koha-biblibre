@@ -74,7 +74,7 @@ if($input->cookie('KohaOpacLanguage')){
     }
     if (not $news_lang) {
         my @languages = split ",", C4::Context->preference("opaclanguages");
-        $news_lang = @languages[0];
+        $news_lang = $languages[0];
     }
 }
 
