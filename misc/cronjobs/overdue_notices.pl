@@ -377,7 +377,6 @@ if ( defined $htmlfilename ) {
 <body>
 HEAD
 }
-
 foreach my $branchcode (@branches) {
 
     my $branch_details = C4::Branch::GetBranchDetail($branchcode) unless ( $branchcode eq "" );
