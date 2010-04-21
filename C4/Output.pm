@@ -79,6 +79,7 @@ my $path = C4::Context->config('intrahtdocs') . "/prog/en/includes/";
 sub _get_template_file {
     my ( $tmplbase, $interface, $query ) = @_;
     my $htdocs = C4::Context->config( $interface ne 'intranet' ? 'opachtdocs' : 'intrahtdocs' );
+    my $path = C4::Context->preference('intranet_includes') || 'includes';
     my ( $theme, $lang ) = themelanguage( $htdocs, $tmplbase, $interface, $query );
     my $opacstylesheet = C4::Context->preference('opacstylesheet');
 
@@ -142,7 +143,7 @@ sub gettemplate {
 # FIXME - POD
 sub themelanguage {
     my ( $htdocs, $tmpl, $interface, $query ) = @_;
-    ($query) or warn "no query in themelanguage";
+   # ($query) or warn "no query in themelanguage";
 
     # Set some defaults for language and theme
     # First, check the user's preferences
