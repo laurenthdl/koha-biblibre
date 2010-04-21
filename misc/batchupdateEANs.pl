@@ -35,6 +35,10 @@ use MARC::File::XML;
 use MARC::Record;
 use Getopt::Long;
 
+# Configuration
+my $eanfield    = '345';
+my $eansubfield = 'b';
+
 my ($verbose, $help) = (0,0);
 
 GetOptions(
@@ -66,9 +70,10 @@ my $query_marcxml = "
 my $update_marcxml = "
     UPDATE biblioitems SET marcxml=? WHERE biblioitemnumber = ? 
 ";
-
 my $sth = $dbh->prepare($query_marcxml);
 $sth->execute;
+
+print "Looking for biblioitems with unnormalized EAN (might take a long time)\n";
 
 while (my $data = $sth->fetchrow_arrayref){
     
@@ -79,17 +84,17 @@ while (my $data = $sth->fetchrow_arrayref){
     
     eval{
 	my $record = MARC::Record->new_from_xml($marcxml,'UTF-8','UNIMARC');
-	my @field = $record->field('345');
+	my @field = $record->field($eanfield);
 	my $flag = 0;
 	foreach my $field (@field){
-	    my $subfield = $field->subfield('b');
+	    my $subfield = $field->subfield($eansubfield);
 	    if($subfield){
 		my $ean = $subfield;
 		if ($subfield =~ /-/) { 
 		    print "\nremoving '-' on marcxml for biblioitemnumber $biblioitemnumber";
 		    $ean =~ s/-//g;
 		    print " ($subfield -> $ean)" if ($verbose);
-		    $field->update('b' => $ean);
+		    $field->update($eansubfield => $ean);
 		    $flag = 1;
 		}
 	    }
