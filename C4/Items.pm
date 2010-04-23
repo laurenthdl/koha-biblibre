@@ -402,7 +402,6 @@ my %default_values_for_mod_from_marc = (
     'items.cn_source'    => undef, 
     copynumber           => undef, 
     damaged              => 0,
-    dateaccessioned      => undef, 
     enumchron            => undef, 
     holdingbranch        => undef, 
     homebranch           => undef, 
