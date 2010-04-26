@@ -5,12 +5,12 @@ SUBLOC: location
 CALL.NO: callnumber
 VENDOR: aqbooksellerid
 PRICE: cost
-NOTE: librariannotes
+NOTE: internalnotes
 LOCAL: opacnote
 RECUS: received
 PERIODICITE: periodicity
 NUMEROTATION: numberingmethod
-FIRSTDATE: firstacquidate
+FIRSTDATE: histstartdate
 STARTDATE: startdate
 ENDDATE: enddate
 LASTDATE: histenddate

@@ -262,6 +262,7 @@ if ( $file_input && length($file_input) > 0 ) {
         #            }
         #        }
         $debug && warn Data::Dumper::Dumper($targetdata);
+        foreach (qw(startdate enddate histstartdate histenddate)) {($targetdata->{$_})||undef $targetdata->{$_};}
         my @missing_criticals;
 
         if (@missing_criticals) {
@@ -357,36 +358,33 @@ if ( $file_input && length($file_input) > 0 ) {
                     )
                   ) {
 
-                    foreach my $hashissue (@receivedissues) {
-
-                        #received status=2
-                        $insertserial->execute(
-                            $$targetdata{biblionumber},
-                            $subscriptionid,
-                            @$hashissue{qw(serialseq publisheddate planneddate)}
-                            , $$hashissue{'geac_status'}
-
-                              #									,($status_advance_2_koha{$$hashissue{'geac_status'}}?
-                              #										$status_advance_2_koha{$$hashissue{'geac_status'}}
-                              #										:$$hashissue{'geac_status'})
-                        );
-
-                        #			my $status="received" if ($status_advance_2_koha{$$hashissue{'geac_status'}}==2);
-                        #		   $status="missing" if ($status_advance_2_koha{$$hashissue{'geac_status'}}==4);
-                        my $status = "received" if ( $$hashissue{'geac_status'} == 2 );
-                        $status = "missing" if ( $$hashissue{'geac_status'} == 4 );
-                        $$targetdata{ $status . "list" } .= $$hashissue{serialseq} . ", " if ($status);
-                    }
-                    ModSubscriptionHistory( $subscriptionid, @$targetdata{qw(firstacquidate histenddate receivedlist missinglist opacnote librariannote)} );
-
-                    #$histstartdate,$enddate,$recievedlist,$missinglist,$opacnote,$librariannote);
-                    $imported++;
-                    %status = ( "insert" => 1, "ok" => 1 );
-                } else {
-                    $invalid++;    # was just "$invalid", I assume incrementing was the point --atz
-                    $errors++;
-                    %status = ( "insert" => 1, "error" => 1 );
-                }
+            }
+            else {
+			    $insertserial->execute( 
+									$$targetdata{biblionumber},
+									$subscriptionid	,
+									@$hashissue{qw(serialseq publisheddate planneddate)}
+									,$$hashissue{'geac_status'}
+#									,($status_advance_2_koha{$$hashissue{'geac_status'}}?
+#										$status_advance_2_koha{$$hashissue{'geac_status'}}
+#										:$$hashissue{'geac_status'})
+									);
+           }
+#			my $status="received" if ($status_advance_2_koha{$$hashissue{'geac_status'}}==2);
+#		   $status="missing" if ($status_advance_2_koha{$$hashissue{'geac_status'}}==4);
+			my $status="received" if ($$hashissue{'geac_status'}==2);
+		   $status="missing" if ($$hashissue{'geac_status'}==4);
+		   $$targetdata{$status."list"}.=$$hashissue{serialseq}.", " if ($status);
+		}
+		ModSubscriptionHistory($subscriptionid,@$targetdata{qw(histstartdate histenddate receivedlist missinglist opacnote librariannote)});
+#$histstartdate,$enddate,$recievedlist,$missinglist,$opacnote,$librariannote);
+                  $imported++;
+                  %status=( "insert" => 1, "ok"=>1);
+              } else {
+                  $invalid++;    # was just "$invalid", I assume incrementing was the point --atz
+                  $errors++;
+                  %status=( "insert" => 1, "error"=>1);
+              }
             }
         }
         push @feedback, { "line" => $., 'lineraw' => output_information($targetdata), warningsline => \@warningsline, %status };
