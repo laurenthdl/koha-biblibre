@@ -49,7 +49,7 @@ my ($picture, $dberror) = GetPatronImage($borrower->{'cardnumber'});
 $template->param( picture => 1 ) if $picture;
 
 # Getting the messages
-my $queued_messages = C4::Letters::GetQueuedMessages({$borrowernumber});
+my $queued_messages = C4::Letters::GetQueuedMessages({borrowernumber => $borrowernumber});
 
 warn Data::Dumper::Dumper( $queued_messages );
 $template->param(
