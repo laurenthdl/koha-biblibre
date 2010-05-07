@@ -159,7 +159,10 @@ if ( $dat->{'serial'} ) {
         $cell{histstartdate}     = format_date( $subscription->{histstartdate} );
         $cell{histenddate}       = format_date( $subscription->{histenddate} );
         $cell{branchcode}        = $subscription->{branchcode};
-        $cell{branchname}        = GetBranchName( $subscription->{branchcode} );
+        $cell{branchname}        = GetBranchName($subscription->{branchcode});
+	$cell{location}		 = $subscription->{location};
+        $cell{location_description} = $shelflocations->{ $subscription->{'location'} };
+	$cell{callnumber}	 = $subscription->{callnumber};
         $cell{hasalert}          = $subscription->{hasalert};
 
         #get the three latest serials.
