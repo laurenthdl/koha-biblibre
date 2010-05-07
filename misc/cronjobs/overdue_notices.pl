@@ -259,11 +259,7 @@ my $csvfilename;
 my $htmlfilename;
 my $triggered = 0;
 my $listall = 0;
-<<<<<<< HEAD:misc/cronjobs/overdue_notices.pl
-my $itemscontent = join( ',', qw( issuedate title barcode author biblionumber ) );
-=======
 my $itemscontent = join( ',', qw( author title barcode issuedate date_due ) );
->>>>>>> MT2268 : Adding headers to overduenotices:misc/cronjobs/overdue_notices.pl
 my @myborcat;
 my @myborcatout;
 
@@ -274,22 +270,23 @@ GetOptions(
     'n'              => \$nomail,
     'max=s'          => \$MAX,
     'library=s'      => \@branchcodes,
-    'csv:s'          => \$csvfilename,    # this optional argument gets '' if not supplied.
-    'html:s'          => \$htmlfilename,    # this optional argument gets '' if not supplied.
+    'csv:s'          => \$csvfilename,     # this optional argument gets '' if not supplied.
+    'html:s'         => \$htmlfilename,    # this optional argument gets '' if not supplied.
     'itemscontent=s' => \$itemscontent,
-    'list-all'      => \$listall,
-    't|triggered'             => \$triggered,
-    'borcat=s'      => \@myborcat,
-    'borcatout=s'   => \@myborcatout,
+    'list-all'       => \$listall,
+    't|triggered'    => \$triggered,
+    'borcat=s'       => \@myborcat,
+    'borcatout=s'    => \@myborcatout,
 ) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage( -verbose => 2 ) if $man;
 
 my $columns_def_hashref = C4::Reports::Guided::_get_column_defs();
-foreach my $key (keys %$columns_def_hashref){
-    my $initkey=$key;
-    $key=~s/[^\.]*\.//;
-    $columns_def_hashref->{$key}=$columns_def_hashref->{$initkey};
+
+foreach my $key ( keys %$columns_def_hashref ) {
+    my $initkey = $key;
+    $key =~ s/[^\.]*\.//;
+    $columns_def_hashref->{$key} = $columns_def_hashref->{$initkey};
 }
 print Dump($columns_def_hashref);
 if ( defined $csvfilename && $csvfilename =~ /^-/ ) {
@@ -496,54 +493,50 @@ END_SQL
                 my @params = ($listall ? ( $borrowernumber , 1 , $MAX ) : ( $borrowernumber, $mindays, $maxdays ));
                 $sth2->execute(@params);
                 my $itemcount = 0;
-<<<<<<< HEAD:misc/cronjobs/overdue_notices.pl
-                my $titles = ($htmlfilename?"<table id='itemscontent$borrowernumber'>":"");
+                my $titles;
+                if ($htmlfilename) {
+                    $titles = "<table id='itemscontent$borrowernumber'>";
+                    $titles .= "<thead><tr><th>" . join( "</th><th>", @$columns_def_hashref{@item_content_fields} );
+                    warn @item_content_fields;
+                    warn map { "$columns_def_hashref->{$_};" } @item_content_fields;
+                    $titles .= "</th></tr></thead><tbody>";
+                }
                 my @items = ();
-=======
-		my $titles;
-                if ($htmlfilename){
-		    $titles="<table id='itemscontent$borrowernumber'>";
-		    $titles.= "<thead><tr><th>".join("</th><th>",@$columns_def_hashref{@item_content_fields});
-		    warn @item_content_fields;
-		    warn map {"$columns_def_hashref->{$_};"} @item_content_fields;
-		    $titles.= "</th></tr></thead><tbody>";
-		}
->>>>>>> MT2268 : Adding headers to overduenotices:misc/cronjobs/overdue_notices.pl
-                
-                my $i = 0;
+
+                my $i                            = 0;
                 my $exceededPrintNoticesMaxLines = 0;
                 while ( my $item_info = $sth2->fetchrow_hashref() ) {
                     if ( ( !$email || $nomail ) && $PrintNoticesMaxLines && $i >= $PrintNoticesMaxLines ) {
-                      $exceededPrintNoticesMaxLines = 1;
-                      last;
+                        $exceededPrintNoticesMaxLines = 1;
+                        last;
                     }
                     $i++;
                     my @item_info = map { $_ =~ /^date|date$/ ? format_date( $item_info->{$_} ) : $item_info->{$_} || '' } @item_content_fields;
-                    if ($htmlfilename){
-                        $titles .= "<tr><td>".join("</td><td>", @item_info). "</td></tr>";
+                    if ($htmlfilename) {
+                        $titles .= "<tr><td>" . join( "</td><td>", @item_info ) . "</td></tr>";
                     } else {
-                        $titles .= join("\t", @item_info) . "\n";
+                        $titles .= join( "\t", @item_info ) . "\n";
                     }
                     $itemcount++;
-                    push (@items, $item_info->{'biblionumber'});
+                    push( @items, $item_info->{'biblionumber'} );
                 }
-                $titles.="</tbody></table>" if ($htmlfilename);
-		$debug && warn $titles;
+                $titles .= "</tbody></table>" if ($htmlfilename);
+                $debug && warn $titles;
                 $sth2->finish;
                 $letter = parse_letter(
-                    {   letter          => $letter,
-                        borrowernumber  => $borrowernumber,
-                        branchcode      => $branchcode,
-                        biblionumber    => \@items,
-                        substitute      => {    # this appears to be a hack to overcome incomplete features in this code.
-                                            bib             => $branch_details->{'branchname'}, # maybe 'bib' is a typo for 'lib<rary>'?
-                                            'items.content' => $titles
-                                           }
+                    {   letter         => $letter,
+                        borrowernumber => $borrowernumber,
+                        branchcode     => $branchcode,
+                        biblionumber   => \@items,
+                        substitute     => {                  # this appears to be a hack to overcome incomplete features in this code.
+                            bib             => $branch_details->{'branchname'},    # maybe 'bib' is a typo for 'lib<rary>'?
+                            'items.content' => $titles
+                        }
                     }
                 );
-                
-                if ( $exceededPrintNoticesMaxLines ) {
-                  $letter->{'content'} .= "List too long for form; please check your account online for a complete list of your overdue items.";
+
+                if ($exceededPrintNoticesMaxLines) {
+                    $letter->{'content'} .= "List too long for form; please check your account online for a complete list of your overdue items.";
                 }
 
                 my @misses = grep { /./ } map { /^([^>]*)[>]{2,}/; ( $1 || '' ); } split /\<\</, $letter->{'content'};
@@ -551,10 +544,11 @@ END_SQL
                     $verbose and warn "The following terms were not matched and replaced: \n\t" . join "\n\t", @misses;
                 }
                 $letter->{'content'} =~ s/\<\<[^<>]*?\>\>//g;    # Now that we've warned about them, remove them.
-#                $letter->{'content'} =~ s/\<[^<>]*?\>//g;    # 2nd pass for the double nesting.
-    
+
+                #                $letter->{'content'} =~ s/\<[^<>]*?\>//g;    # 2nd pass for the double nesting.
+
                 if ($nomail) {
-    
+
                     push @output_chunks,
                       prepare_letter_for_printing(
                         {   letter         => $letter,
@@ -582,7 +576,7 @@ END_SQL
                             }
                         );
                     } else {
-    
+
                         # If we don't have an email address for this patron, send it to the admin to deal with.
                         push @output_chunks,
                           prepare_letter_for_printing(
@@ -610,14 +604,12 @@ END_SQL
 
     if (@output_chunks) {
         if ( defined $csvfilename ) {
-            print $csv_fh @output_chunks;        
-        }
-        elsif ( defined $htmlfilename ) {
-            print $html_fh @output_chunks;        
-        }
-        elsif ($nomail){
-                local $, = "\f";    # pagebreak
-                print @output_chunks;
+            print $csv_fh @output_chunks;
+        } elsif ( defined $htmlfilename ) {
+            print $html_fh @output_chunks;
+        } elsif ($nomail) {
+            local $, = "\f";    # pagebreak
+            print @output_chunks;
         }
         my $attachment = {
             filename => defined $csvfilename ? 'attachment.csv' : 'attachment.txt',
@@ -647,9 +639,9 @@ if ($csvfilename) {
 }
 
 if ( defined $htmlfilename ) {
-  print $html_fh "</body>\n";
-  print $html_fh "</html>\n";
-  close $html_fh;
+    print $html_fh "</body>\n";
+    print $html_fh "</html>\n";
+    close $html_fh;
 }
 
 =head1 INTERNAL METHODS
