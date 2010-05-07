@@ -15,6 +15,13 @@
     }
 }
 ul.ui-tabs-nav {display:none;}
+.sub_content{
+color:green;
+font-weight:bold;
+}
+.tag_title{
+font-weight:bold;
+}
 </style>
 <script type="text/javascript">
 //<![CDATA[
@@ -108,7 +115,7 @@ function Changefwk(FwkList) {
                 <p class="subfield_line">
                     <span class="subfield-label">&nbsp;
                     <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -117,7 +124,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div> <!-- class='tag' -->
@@ -137,8 +144,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -147,7 +154,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
@@ -167,8 +174,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -177,7 +184,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
@@ -197,8 +204,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -207,7 +214,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
@@ -227,8 +234,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -237,7 +244,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
@@ -257,8 +264,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -267,7 +274,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
@@ -287,8 +294,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -297,7 +304,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
@@ -317,8 +324,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -327,7 +334,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
@@ -347,8 +354,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -357,7 +364,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
@@ -377,8 +384,8 @@ function Changefwk(FwkList) {
             <!-- TMPL_LOOP NAME="subfield" -->
                 <p>
                     <span class="subfield-label">&nbsp;
-                    <!-- TMPL_UNLESS name="hide_marc" --><b><!-- TMPL_VAR NAME="marc_subfield" --></b><!-- /TMPL_UNLESS -->
-                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span>
+                    <!-- TMPL_UNLESS name="hide_marc" --><!-- TMPL_VAR NAME="marc_subfield" --><!-- /TMPL_UNLESS -->
+                    <span title="<!-- TMPL_VAR name="long_desc" -->"><!-- TMPL_VAR NAME="short_desc" --></span></span><span class="sub_content">&nbsp;
                     <!-- TMPL_IF NAME="is_url" --><a href="<!-- TMPL_VAR NAME="marc_value" -->"><!-- TMPL_VAR NAME="marc_value" escape="html" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="marc_value" ESCAPE="html" --><!-- /TMPL_IF -->
                     <!-- TMPL_IF name="link" -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?op=do_search&amp;idx=<!-- TMPL_VAR NAME="link" -->,phr&amp;type=intranet&amp;q=<!-- TMPL_VAR NAME="marc_value" ESCAPE="URL" -->">
@@ -387,7 +394,7 @@ function Changefwk(FwkList) {
                     <!-- /TMPL_IF -->
                     <!-- TMPL_IF NAME="authority" -->
                         <a href="/cgi-bin/koha/authorities/detail.pl?authid=<!-- TMPL_VAR name="authority" -->" class="button">Auth</a>
-                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF --></span>
                 </p>
             <!-- /TMPL_LOOP -->
             </div>
