@@ -33,15 +33,6 @@ my $claimletter = $input->param('claimletter');
 my $supplierid = $input->param('supplierid');
 my $suppliername = $input->param('suppliername');
 my $order = $input->param('order');
-my $supplierlist = GetSuppliersWithLateIssues();
-if ($supplierid) {
-    foreach my $s ( @{$supplierlist} ) {
-        if ($s->{id} == $supplierid ) {
-            $s->{selected} = 1;
-            last;
-        }
-    }
-}
 
 # open template first (security & userenv set here)
 my ($template, $loggedinuser, $cookie)
@@ -53,6 +44,16 @@ my ($template, $loggedinuser, $cookie)
             debug => 1,
             });
 
+my $supplierlist = GetSuppliersWithLateIssues();
+if ($supplierid) {
+    foreach my $s ( @{$supplierlist} ) {
+        if ($s->{id} == $supplierid ) {
+            $s->{selected} = 1;
+            last;
+        }
+    }
+}
+my $supplierlist = GetSuppliersWithLateIssues();
 my @suploop;
 for ( sort {$supplierlist{$a} cmp $supplierlist{$b} } keys %supplierlist ) {
     my ($count, @dummy) = GetLateOrMissingIssues($_, "", $order);
