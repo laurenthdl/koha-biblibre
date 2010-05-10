@@ -118,13 +118,14 @@ BEGIN {
         &CheckReserves
         &CanBookBeReserved
 	&CanItemBeReserved
-        &CancelReserve
-        &CancelExpiredReserves
+      &CanHoldOnShelf
+      &CancelReserve
+      &CancelExpiredReserves
 
-        &IsAvailableForItemLevelRequest
-        
-        &AlterPriority
-        &ToggleLowestPriority
+      &IsAvailableForItemLevelRequest
+
+      &AlterPriority
+      &ToggleLowestPriority
       &CanHoldMultipleItems
       &BorrowerHasReserve
     );
