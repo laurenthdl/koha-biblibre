@@ -595,6 +595,9 @@ foreach ( sort { $a <=> $b } keys %returneditems ) {
         $ri{homebranch}       = $item->{'homebranch'};
         $ri{holdingbranch}    = $item->{'holdingbranch'};
         $ri{barcode}          = $bar_code;
+        my $shelflocations    = GetKohaAuthorisedValues('items.location','');
+        $ri{itemlocation}     = $shelflocations->{$biblio->{'location'}};
+        
     }
     else {
         last;
