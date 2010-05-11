@@ -316,14 +316,17 @@ function popup(subscriptionid) {
                         <!--TMPL_IF name="status4" -->
                             Missing
                         <!-- /TMPL_IF -->
-                        <!--TMPL_IF name="status5" -->
-                            Not Available
-                        <!-- /TMPL_IF -->
                         <!-- TMPL_IF name="status7" -->
                             Claimed
                              <!-- TMPL_IF name="claimdate" -->
                              <!-- TMPL_VAR NAME="claimdate" -->
                              <!-- /TMPL_IF -->
+                        <!-- /TMPL_IF -->
+                        <!--TMPL_IF name="status8" -->
+                            For binding
+                        <!-- /TMPL_IF -->
+                        <!--TMPL_IF name="status5" -->
+                            Hardback
                         <!-- /TMPL_IF -->
                 </td>
             </tr>

@@ -140,7 +140,37 @@ $(document).ready(function() {
         }
     });
 });
+
 //]]>
+
+function today() {
+var myDate=new Date();
+    var d = new Array( myDate.getFullYear(), myDate.getMonth() + 1 ,myDate.getDate());
+    if(d[1].toString().length == 1) { d[1] = '0'+d[1] };
+    if(d[2].toString().length == 1) { d[2] = '0'+d[2] };
+	return(d[2] + '/' + d[1] + '/' + d[0]) ;      
+}
+function ind(elt,name){
+var sta=document.getElementsByName(name);
+for(var i=0;i<sta.length;i++){
+  if (elt ===sta[i]){
+  return i;
+  break;}
+}}
+function reception(eltsel){
+    var pla=document.getElementsByName('planneddate')[ind(eltsel,'status')];
+  if(eltsel.options[eltsel.selectedIndex].value==2){
+    pla.value=today();
+  }else if (eltsel.options[eltsel.selectedIndex].value==8){
+  var nts=document.getElementsByName('notes')[ind(eltsel,'status')];
+  nts.value=today();
+  }else if (eltsel.options[eltsel.selectedIndex].value==5){
+  var nts=document.getElementsByName('notes')[ind(eltsel,'status')];
+  nts.value='';
+  }else{
+    pla.value=document.getElementsByName('publisheddate')[ind(eltsel,'status')].value;
+}
+}
 </script>
 <style type="text/css">#serials_edit fieldset.rows label, #serials_edit fieldset.rows span.label {
 	font-size : 100%;
@@ -216,7 +246,7 @@ $(document).ready(function() {
               <!--TMPL_IF Name="serialsadditems"-->
               <select name="status" size="1" id="status<!-- TMPL_VAR NAME="serialid" -->" onchange="if (this.value==2){unHideItems('items'+<!-- TMPL_VAR NAME="subscriptionid" -->+<!-- TMPL_VAR NAME="serialid" -->,'label<!-- TMPL_VAR NAME="subscriptionid" --><!--TMPL_VAR Name="serialid"-->', '<!--TMPL_VAR Name="serialid"-->')} else { HideItems('items'+<!-- TMPL_VAR NAME="subscriptionid" -->+<!-- TMPL_VAR NAME="serialid" -->,'label<!-- TMPL_VAR NAME="subscriptionid" --><!--TMPL_VAR Name="serialid"-->')}" >
                <!--TMPL_ELSE -->
-              <select name="status" size="1" id="status<!-- TMPL_VAR NAME="serialid" -->" >
+              <select name="status" size="1" id="status<!-- TMPL_VAR NAME="num" -->" onchange="reception(this)" >
                <!--/TMPL_IF--> 
             <!--/TMPL_IF-->
   <!--TMPL_IF name="status1" -->
@@ -242,16 +272,22 @@ $(document).ready(function() {
   <!-- TMPL_ELSE -->
                     <option value="7">Claimed</option>
   <!-- /TMPL_IF -->
-  <!--TMPL_IF name="status5" -->
-                    <option value="5" selected="selected">Not Available</option>
+  <!--TMPL_IF name="status8" -->
+                    <option value="8" selected="selected">For binding</option>
   <!-- TMPL_ELSE -->
-                    <option value="5">Not Available</option>
+                    <option value="8">For binding</option>
+  <!-- /TMPL_IF -->
+  <!--TMPL_IF name="status5" -->
+                    <option value="5" selected="selected">Hardback</option>
+  <!-- TMPL_ELSE -->
+                    <option value="5">Hardback</option>
   <!-- /TMPL_IF -->
   <!--TMPL_IF name="status6" -->
                     <option value="6" selected="selected">Delete</option>
   <!-- TMPL_ELSE -->
                     <option value="6">Delete</option>
   <!-- /TMPL_IF -->
+   
             </select>
 
         </td>
@@ -322,7 +358,7 @@ $(document).ready(function() {
             <input type="text" name="planneddate" value="<!-- TMPL_VAR name="planneddate" -->" size="10" maxlength="15" />
         </td>
         <td>
-            <select name="status" size="1" id="addstatus<!-- TMPL_VAR NAME="serialid" -->">
+            <select name="status" size="1" id="addstatus<!-- TMPL_VAR NAME="num" -->" onchange="reception(this)">
                     <option value="">----</option>
   <!--TMPL_IF name="status1" -->
                     <option value="1" selected="selected">Expected</option>
@@ -347,10 +383,15 @@ $(document).ready(function() {
   <!-- TMPL_ELSE -->
                     <option value="7">Claimed</option>
   <!-- /TMPL_IF -->
-  <!--TMPL_IF name="status5" -->
-                    <option value="5" selected="selected">Not Available</option>
+  <!--TMPL_IF name="status8" -->
+                    <option value="8" selected="selected">For binding</option>
   <!-- TMPL_ELSE -->
-                    <option value="5">Not Available</option>
+                    <option value="8">For binding</option>
+  <!-- /TMPL_IF -->
+  <!--TMPL_IF name="status5" -->
+                    <option value="5" selected="selected">Hardback</option>
+  <!-- TMPL_ELSE -->
+                    <option value="5">Hardback</option>
   <!-- /TMPL_IF -->
   <!--TMPL_IF name="status6" -->
                     <option value="6" selected="selected">Delete</option>
