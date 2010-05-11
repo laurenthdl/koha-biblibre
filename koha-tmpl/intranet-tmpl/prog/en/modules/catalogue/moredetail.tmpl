@@ -71,6 +71,7 @@
                     <input type="hidden" name="biblioitemnumber" value="<!-- TMPL_VAR Name="biblioitemnumber" -->" />
                     <input type="hidden" name="itemnumber" value="<!-- TMPL_VAR Name="itemnumber" -->" />
                     <select name="itemlost" >
+                    <option value="">Choose</option>
             <!-- TMPL_LOOP NAME="itemlostloop" -->
                 <!-- TMPL_IF NAME="selected" -->
                         <option value="<!-- TMPL_VAR NAME="authorised_value" -->" selected="selected"><!-- TMPL_VAR NAME="lib" --></option>
@@ -98,6 +99,7 @@
                     <input type="hidden" name="biblioitemnumber" value="<!-- TMPL_VAR Name="biblioitemnumber" -->" />
                     <input type="hidden" name="itemnumber" value="<!-- TMPL_VAR Name="itemnumber" -->" />
                     <select name="damaged" >
+                    <option value="">Choose</option>
             <!-- TMPL_LOOP NAME="itemdamagedloop" -->
                 <!-- TMPL_IF NAME="selected" -->
                     <option value="<!-- TMPL_VAR NAME="authorised_value" -->" selected="selected"><!-- TMPL_VAR NAME="lib" --></option>
