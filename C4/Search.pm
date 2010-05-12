@@ -683,6 +683,7 @@ sub _detect_truncation {
             push @nontruncated, $word;
         }
         else {
+            $word=~s/\*/.*/g;
             push @regexpr, $word;
         }
     }
@@ -1172,7 +1173,7 @@ sub buildQuery {
                 # Apply Truncation
                 if (
                     scalar(@$righttruncated) + scalar(@$lefttruncated) +
-                    scalar(@$rightlefttruncated) > 0 )
+                    scalar(@$rightlefttruncated) + scalar(@$regexpr)> 0 )
                 {
 
                # Don't field weight or add the index to the query, we do it here
@@ -1196,6 +1197,11 @@ sub buildQuery {
                     if (scalar @$rightlefttruncated) {
                         $truncated_operand .= "and " if $previous_truncation_operand;
                         $truncated_operand .= $index_plus_comma . "rltrn:@$rightlefttruncated ";
+                        $previous_truncation_operand = 1;
+                    }
+                    if (scalar @$regexpr) {
+                        $truncated_operand .= "and " if $previous_truncation_operand;
+                        $truncated_operand .= $index_plus_comma . "regExpr-1:@$regexpr ";
                         $previous_truncation_operand = 1;
                     }
                 }
