@@ -1039,7 +1039,10 @@ The MARC record contains both biblio & item data.
 
 sub GetMarcBiblio {
     my $biblionumber = shift;
+    my $deletedtable = shift;
     my $dbh          = C4::Context->dbh;
+    my $strsth       = qq{SELECT marcxml FROM biblioitems WHERE biblionumber=?};
+    $strsth .= qq{UNION SELECT marcxml FROM deletedbiblioitems WHERE biblionumber=?} if $deletedtable;
     my $sth          = $dbh->prepare("SELECT marcxml FROM biblioitems WHERE biblionumber=? ");
     $sth->execute($biblionumber);
     my $row     = $sth->fetchrow_hashref;
