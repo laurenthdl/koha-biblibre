@@ -92,6 +92,8 @@ BEGIN {
       &ModBiblio
       &ModBiblioframework
       &ModZebra
+
+      &BatchModField
     );
 
     # To delete something
@@ -1073,8 +1075,11 @@ The MARC record contains both biblio & item data.
 
 sub GetMarcBiblio {
     my $biblionumber = shift;
+    my $deletedtable = shift;
     my $dbh          = C4::Context->dbh;
-    my $sth          = $dbh->prepare("SELECT marcxml FROM biblioitems WHERE biblionumber=? ");
+    my $strsth       = qq{SELECT marcxml FROM biblioitems WHERE biblionumber=?};
+    $strsth .= qq{UNION SELECT marcxml FROM deletedbiblioitems WHERE biblionumber=?} if $deletedtable;
+    my $sth = $dbh->prepare("SELECT marcxml FROM biblioitems WHERE biblionumber=? ");
     $sth->execute($biblionumber);
     my $row     = $sth->fetchrow_hashref;
     my $marcxml = StripNonXmlChars( $row->{'marcxml'} );
@@ -2342,6 +2347,7 @@ sub PrepareItemrecordDisplay {
                                 push @authorised_values, $branchcode;
                                 $authorised_lib{$branchcode} = $branchname;
                             }
+                            $defaultvalue = C4::Context->userenv->{branch};
                         }
 
                         #----- itemtypes
@@ -3497,6 +3503,40 @@ sub get_biblio_authorised_values {
 
     # warn ( Data::Dumper->Dump( [ $authorised_values ], [ 'authorised_values' ] ) );
     return $authorised_values;
+}
+
+=head3 BatchModField
+
+  Mod subfields in field record
+
+
+=cut
+
+sub BatchModField {
+    my ( $field, $subfield, $action, $condval, $repval ) = @_;
+
+    if ( $action eq "add" ) {
+        $field->add_subfields( $subfield => $repval );
+    } else {
+        my @subfields = $field->subfield($subfield);
+
+        $field->delete_subfield( code => $subfield );
+
+        foreach my $subf (@subfields) {
+            if ( $action eq "mod" ) {
+                if ( $subf =~ /^$condval$/ ) {
+                    $field->add_subfields( $subfield => $repval );
+                } else {
+                    $field->add_subfields( $subfield => $subf );
+                }
+            } elsif ( $action eq "del" ) {
+                if ( $subf !~ /^$condval$/ ) {
+                    $field->add_subfields( $subfield => $subf );
+                }
+            }
+        }
+    }
+
 }
 
 1;

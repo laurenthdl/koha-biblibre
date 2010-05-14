@@ -391,7 +391,10 @@ sub get_raw_marc_record {
     my $marc; 
     if ($record_type eq 'biblio') {
         if ($noxml) {
-            my $fetch_sth = $dbh->prepare_cached("SELECT marc FROM biblioitems WHERE biblionumber = ?");
+            my $fetch_sth = $dbh->prepare_cached(
+                "SELECT marc FROM biblioitems WHERE biblionumber = ?
+                 UNION SELECT marc from deletedbiblioitems where biblionumber=?"
+            );
             $fetch_sth->execute($record_number);
             if (my ($blob) = $fetch_sth->fetchrow_array) {
                 $marc = MARC::Record->new_from_usmarc($blob);
@@ -402,7 +405,7 @@ sub get_raw_marc_record {
                         # trying to process a record update
             }
         } else {
-            eval { $marc = GetMarcBiblio($record_number); };
+            eval { $marc = GetMarcBiblio( $record_number, "include_deleted_table" ); };
             if ($@) {
                 # here we do warn since catching an exception
                 # means that the bib was found but failed
@@ -418,11 +421,7 @@ sub get_raw_marc_record {
             return;
         }
     }
-    if ($marc->fields()){
-        return $marc;
-    } else {
-        return undef;
-    }
+    return $marc;
 }
 
 sub fix_leader {
@@ -452,7 +451,8 @@ sub fix_biblio_ids {
         $biblioitemnumber = shift;
     } else {    
         my $sth = $dbh->prepare(
-            "SELECT biblioitemnumber FROM biblioitems WHERE biblionumber=?");
+            "SELECT biblioitemnumber FROM biblioitems WHERE biblionumber=?
+             UNION SELECT biblioitemnumber FROM deletedbiblioitems WHERE biblionumber=?");
         $sth->execute($biblionumber);
         ($biblioitemnumber) = $sth->fetchrow_array;
         $sth->finish;
