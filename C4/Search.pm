@@ -1163,11 +1163,8 @@ sub buildQuery {
 "TRUNCATION: NON:>@$nontruncated< RIGHT:>@$righttruncated< LEFT:>@$lefttruncated< RIGHTLEFT:>@$rightlefttruncated< REGEX:>@$regexpr<"
                   if $DEBUG;
 
-                # Apply Truncation
-                if (
-                    scalar(@$righttruncated) + scalar(@$lefttruncated) +
-                    scalar(@$rightlefttruncated) > 0 )
-                {
+                        # Apply Truncation
+                if ( scalar(@$righttruncated) + scalar(@$lefttruncated) + scalar(@$rightlefttruncated) + scalar(@$regexpr) > 0 ) {
 
                # Don't field weight or add the index to the query, we do it here
                     $indexes_set = 1;
@@ -1273,7 +1270,6 @@ sub buildQuery {
         # group_OR_limits, prefixed by mc-
         # OR every member of the group
         elsif ( $this_limit =~ /mc/ ) {
-#        if ( $this_limit =~ /mc/ ) {
             $group_OR_limits .= " or " if $group_OR_limits;
             $limit_desc      .= " or " if $group_OR_limits;
             $group_OR_limits .= "$this_limit";
@@ -1311,9 +1307,7 @@ sub buildQuery {
     # Normalize the query and limit strings
     # This is flawed , means we can't search anything with : in it
     # if user wants to do ccl or cql, start the query with that
-#    $query =~ s/:/=/g;
-    $query =~ s/(?<=(ti|au|pb|su|an|kw|mc)):/=/g;
-    $query =~ s/(?<=rtrn):/=/g;
+    $query =~ s/:/=/g;
     $limit =~ s/:/=/g;
     for ( $query, $query_desc, $limit, $limit_desc ) {
         s/  / /g;    # remove extra spaces
