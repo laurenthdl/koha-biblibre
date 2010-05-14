@@ -130,12 +130,7 @@ Repetable field, permis to exclude some patrons categories.
 This option causes a notice to be generated if and only if 
 an item is overdue by the number of days defined in a notice trigger.
 
-By default, a notice is sent each time the script runs, which is suitable for 
-less frequent run cron script, but requires syncing notice triggers with 
-the  cron schedule to ensure proper behavior.
-Add the --triggered option for daily cron, at the risk of no notice 
-being generated if the cron fails to run on time.
-
+By default, a notice is sent each time the script runs, which is suitable for less frequent run cron script, but requires syncing notice triggers with the  cron schedule to ensure proper behavior.  Add the --triggered option for daily cron, at the risk of no notice being generated if the cron fails to run on time.  
 =item B<-list-all>
 
 Default items.content lists only those items that fall in the 
@@ -254,9 +249,9 @@ my @branchcodes;    # Branch(es) passed as parameter
 my @branchcodesout;   
 my $csvfilename;
 my $htmlfilename;
-my $triggered    = 0;
-my $listall      = 0;
-my $itemscontent = join( ',', qw( author title barcode issuedate date_due ) );
+my $triggered = 0;
+my $listall = 0;
+my $itemscontent = join( ',', qw( author title barcode itemcallnumber issuedate date_due branchcode ) );
 my @myborcat;
 my @myborcatout;
 
@@ -533,6 +528,8 @@ END_SQL
                         }
                     }
                 );
+		$titles=~ s/(.*\t.*\t.*\t)(.*)\t(.*)\t(.*)\t(MAN|BLL|BDP|CEUBA)/$1 cote : $2  empruntï¿½ le $3 ï¿½ devait 
+être rendu au plus tard le $4/g;                
                 $letter->{'content-type'}="text/".($htmlfilename?"html":"plain");
 
                 if ($exceededPrintNoticesMaxLines) {
@@ -678,6 +675,21 @@ sub parse_letter {    # FIXME: this code should probably be moved to C4::Letters
 
     if ( $params->{'substitute'} ) {
         while ( my ( $key, $replacedby ) = each %{ $params->{'substitute'} } ) {
+           if ($key eq 'items.content'){
+              my %bibs=(               
+              "CEUBA" => 'à la Bibliothèque du CEUBA, 3 rue des Casernes, 01000 BOURG-EN-BRESSE, Tél 04 74 23 82 35, Mél sophie.perrin@univ-lyon3.fr',
+                
+              "MAN" => 'à la Bibliothèque de la Manufacture, 6 cours A.Thomas, 69008 LYON, Tél 04 78 78 79 40, Mél scd.manu@univ-lyon3.fr',
+               
+              "BLL" => 'à la Bibliothèque Lettres et Langues, 13 rue Bancel, 69007 LYON, Tél 04 37 65 40 20, Mél scd.bll@univ-lyon3.fr',
+                
+              "BDP" => 'à la Bibliothèque Droit et Philosophie, 15 quai C.Bernard, 69007 LYON, Tél 04 78 78 70 56, Mél demortiere.scd@univ-lyon3.fr',
+                ) ;     
+              $replacedby=~ s/(.*\t.*\t.*\t)(.*)\t(.*)\t(.*)\t(MAN|BLL|BDP|CEUBA)/"$1 cote : $2  emprunté le $3 à 
+devait être rendu au plus tard le $4 $bibs{$5}\n"/egm;
+          }
+              
+          
             my $replacefield = "<<$key>>";
             $params->{'letter'}->{title}   =~ s/$replacefield/$replacedby/g;
             $params->{'letter'}->{content} =~ s/$replacefield/$replacedby/g;
@@ -755,10 +767,12 @@ sub prepare_letter_for_printing {
             $verbose and warn 'combine failed on argument: ' . $csv->error_input;
         }
     } elsif ( exists $params->{'outputformat'} && $params->{'outputformat'} eq 'html' ) {
-        $return = "<pre>\n";
+      $return = "<pre>\n";
         $params->{'letter'}->{'content'} =~ s##<br/>#g;
-        $return .= "$params->{'letter'}->{'content'}\n";
-        $return .= "\n</pre>\n";
+      $params->{'letter'}->{'content'}=~s#
+#<br/>#g;
+      $return .= "$params->{'letter'}->{'content'}\n";
+      $return .= "\n</pre>\n";
     } else {
         $return .= "$params->{'letter'}->{'content'}\n";
 
