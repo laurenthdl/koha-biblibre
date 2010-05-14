@@ -528,9 +528,9 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 	    </tr></thead>
 	    <tbody><!-- TMPL_LOOP NAME="ITEM_RESULTS" -->
 	    <tr><!-- TMPL_IF NAME="item-level_itypes" --><td><!-- TMPL_IF NAME="imageurl" --><img src="<!-- TMPL_VAR NAME="imageurl" -->" title="<!-- TMPL_VAR NAME="description" -->" alt="<!-- TMPL_VAR NAME="description" -->" /><!-- /TMPL_IF --> <!-- TMPL_VAR NAME="description" --></td><!-- /TMPL_IF -->
-		<td><!-- TMPL_UNLESS NAME="singleBranchMode" --><!-- TMPL_IF name="branchurl" --><a href="<!-- TMPL_VAR NAME="branchurl" -->"><!-- TMPL_VAR NAME="branchname" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branchname" --><!-- /TMPL_IF --><!-- /TMPL_UNLESS --> <!-- TMPL_VAR NAME="location_description" --> </td>
+		<td><!-- TMPL_UNLESS NAME="singleBranchMode" --><!-- TMPL_IF name="branchurl" --><a href="<!-- TMPL_VAR NAME="branchurl" -->"><!-- TMPL_VAR NAME="branchname" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branchname" --><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><br><!-- TMPL_VAR NAME="location_description" --> </td>
 		<!-- TMPL_IF NAME="itemdata_ccode" --><td><!-- TMPL_VAR NAME="ccode" --></td><!-- /TMPL_IF -->
-		<td><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="OPACShelfBrowser" -->(<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">Browse Shelf</a>)<!-- /TMPL_IF --></td>
+		<td><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="OPACShelfBrowser" --><br>(<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">Browse Shelf</a>)<!-- /TMPL_IF --></td>
 		<!-- TMPL_IF NAME="itemdata_enumchron" --><td><!-- TMPL_VAR NAME="enumchron" --></td><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_uri" --><td><a href="<!-- TMPL_VAR NAME="uri" -->"><!-- TMPL_VAR NAME="uri" --></a></td><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_copynumber" --><td><!-- TMPL_VAR NAME="copynumber" --></td><!-- /TMPL_IF -->
@@ -698,13 +698,16 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
     <h2>This is a serial</h2>
     <p>There are <!-- TMPL_VAR NAME="subscriptionsnumber" --> subscription(s) associated with this title.</p>
     <!-- TMPL_LOOP Name="subscriptions" -->
-    <!-- TMPL_IF name="branchname" --><h3>At library: <!-- TMPL_VAR NAME="branchname" --></h3><!-- TMPL_ELSE -->
-    <!-- TMPL_IF name="branchcode" --><h3>At branch: <!-- TMPL_VAR NAME="branchcode" --></h3><!-- /TMPL_IF --><!-- /TMPL_IF -->
+    <h3><br>
+    <!-- TMPL_IF NAME="branchname" --><!-- TMPL_VAR NAME="branchname" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branchcode" --><!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="location_description" -->, <!-- TMPL_VAR NAME="location_description" --><!-- TMPL_ELSE -->, <!-- TMPL_VAR NAME="location" --><!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="callnumber" -->, <!-- TMPL_VAR NAME="callnumber" --><!-- /TMPL_IF -->
+    </h3>
     <!-- TMPL_IF NAME="subscriptionnotes" --><p><!--TMPL_VAR NAME="subscriptionnotes"--> </p><!-- /TMPL_IF -->
     <!--<p>Issues between: <!--TMPL_VAR NAME="histstartdate"-->  and:<!-- TMPL_IF NAME="histenddate" --> <!--TMPL_VAR NAME="histenddate"--> <!-- 
 TMPL_ELSE --> now (current)<!-- /TMPL_IF --></p>-->
     <!-- TMPL_IF NAME="missinglist" --><p>Missing issues: <!--TMPL_VAR NAME="missinglist"--> </p><!-- /TMPL_IF -->
-    <!-- TMPL_IF name="opacnote" --><p>(<!-- TMPL_VAR NAME="opacnote" -->)</p><!-- /TMPL_IF -->
+<!--    <!-- TMPL_IF name="opacnote" --><p>(<!-- TMPL_VAR NAME="opacnote" -->)</p><!-- /TMPL_IF --> -->
 <!--TMPL_IF NAME="latestserials"-->
     <p> The <!-- TMPL_VAR NAME="opacdisplaycount" --> latest issues for this subscription:</p>
     <table>
