@@ -22,18 +22,18 @@
             <xsl:text> : </xsl:text>
             <xsl:value-of select="marc:subfield[@code='e']"/>
           </xsl:if>
+          <xsl:if test="marc:subfield[@code='h']">
+            <xsl:text>. </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='h']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='i']">
+            <xsl:text>, </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='i']"/>
+          </xsl:if>
           <xsl:if test="marc:subfield[@code='b']">
             <xsl:text> [</xsl:text>
             <xsl:value-of select="marc:subfield[@code='b']"/>
             <xsl:text>]</xsl:text>
-          </xsl:if>
-          <xsl:if test="marc:subfield[@code='h']">
-            <xsl:text> ; </xsl:text>
-            <xsl:value-of select="marc:subfield[@code='h']"/>
-          </xsl:if>
-          <xsl:if test="marc:subfield[@code='i']">
-            <xsl:text> : </xsl:text>
-            <xsl:value-of select="marc:subfield[@code='i']"/>
           </xsl:if>
           <xsl:if test="marc:subfield[@code='f']">
             <xsl:text> / </xsl:text>
@@ -224,18 +224,23 @@
 -->
     <xsl:call-template name="tag_210"/>
     <xsl:call-template name="tag_215"/>
+    
+    <xsl:call-template name="tag_title">
+    <xsl:with-param name="tag">225</xsl:with-param>
+    <xsl:with-param name="label">Collection</xsl:with-param>
+    </xsl:call-template>
     <abbr class="unapi-id" title="koha:biblionumber:{marc:datafield[@tag=090]/marc:subfield[@code='a']}">
       <!-- unAPI -->
     </abbr>
     <xsl:if test="marc:datafield[@tag=010]/marc:subfield[@code='a']">
       <span class="results_summary">
-        <span class="label">ISBN: </span>
+        <span class="label">ISBN : </span>
         <xsl:for-each select="marc:datafield[@tag=010]">
           <xsl:variable name="isbn" select="marc:subfield[@code='a']"/>
           <xsl:value-of select="marc:subfield[@code='a']"/>
           <xsl:choose>
             <xsl:when test="position()=last()">
-              <xsl:text>.</xsl:text>
+              <xsl:text> </xsl:text>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text> ; </xsl:text>
@@ -246,12 +251,12 @@
     </xsl:if>
     <xsl:if test="marc:datafield[@tag=011]">
       <span class="results_summary">
-        <span class="label">ISSN: </span>
+        <span class="label">ISSN : </span>
         <xsl:for-each select="marc:datafield[@tag=011]">
           <xsl:value-of select="marc:subfield[@code='a']"/>
           <xsl:choose>
             <xsl:when test="position()=last()">
-              <xsl:text>.</xsl:text>
+              <xsl:text> </xsl:text>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>; </xsl:text>
@@ -260,14 +265,14 @@
         </xsl:for-each>
       </span>
     </xsl:if>
-    <xsl:if test="marc:datafield[@tag=676]">
+     <xsl:if test="marc:datafield[@tag=676]">
       <span class="results_summary">
-        <span class="label">Dewey: </span>
+        <span class="label">Dewey : </span>
         <xsl:for-each select="marc:datafield[@tag=676]">
           <xsl:value-of select="marc:subfield[@code='a']"/>
           <xsl:choose>
             <xsl:when test="position()=last()">
-              <xsl:text>.</xsl:text>
+              <xsl:text> </xsl:text>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>; </xsl:text>
@@ -278,7 +283,7 @@
     </xsl:if>
     <xsl:if test="marc:datafield[@tag=330]">
       <span class="results_summary">
-        <span class="label">Résumé: </span>
+        <span class="label">Résumé : </span>
         <xsl:for-each select="marc:datafield[@tag=330]">
           <xsl:value-of select="marc:subfield[@code='a']"/>
           <xsl:choose>
@@ -292,22 +297,22 @@
         </xsl:for-each>
       </span>
     </xsl:if>
-    <xsl:if test="marc:datafield[@tag=317]">
+<!--    <xsl:if test="marc:datafield[@tag=317]">
       <span class="results_summary">
-        <span class="label">Note sur la provenance: </span>
+        <span class="label">Note sur la provenance : </span>
         <xsl:for-each select="marc:datafield[@tag=317]">
           <xsl:value-of select="marc:subfield[@code='a']"/>
         </xsl:for-each>
       </span>
-    </xsl:if>
+    </xsl:if>-->
     <xsl:if test="marc:datafield[@tag=320]">
       <span class="results_summary">
-        <span class="label">Bibliographie: </span>
+        <span class="label">Bibliographie : </span>
         <xsl:for-each select="marc:datafield[@tag=320]">
           <xsl:value-of select="marc:subfield[@code='a']"/>
           <xsl:choose>
             <xsl:when test="position()=last()">
-              <xsl:text>.</xsl:text>
+              <xsl:text> </xsl:text>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>; </xsl:text>
@@ -318,7 +323,7 @@
     </xsl:if>
     <xsl:if test="marc:datafield[@tag=328]">
       <span class="results_summary">
-        <span class="label">Thèse: </span>
+        <span class="label">Thèse : </span>
         <xsl:for-each select="marc:datafield[@tag=328]">
           <xsl:value-of select="marc:subfield[@code='a']"/>
           <xsl:choose>
@@ -350,7 +355,7 @@
     </xsl:if>
     <xsl:if test="marc:datafield[@tag=600 or @tag=601 or @tag=606 or @tag=607 or @tag=610]">
       <span class="results_summary">
-        <span class="label">Sujets: </span>
+        <span class="label">Sujets : </span>
         <xsl:for-each select="marc:datafield[@tag=600 or @tag=601 or @tag=606 or @tag=607 or @tag=610]">
           <a>
             <xsl:choose>

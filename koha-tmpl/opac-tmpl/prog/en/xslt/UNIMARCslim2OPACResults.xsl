@@ -36,18 +36,18 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
         <xsl:text> : </xsl:text>
         <xsl:value-of select="marc:subfield[@code='e']"/>
       </xsl:if>
+      <xsl:if test="marc:subfield[@code='h']">
+        <xsl:text>. </xsl:text>
+        <xsl:value-of select="marc:subfield[@code='h']"/>
+      </xsl:if>
+      <xsl:if test="marc:subfield[@code='i']">
+        <xsl:text>, </xsl:text>
+        <xsl:value-of select="marc:subfield[@code='i']"/>
+      </xsl:if>
       <xsl:if test="marc:subfield[@code='b']">
         <xsl:text> [</xsl:text>
         <xsl:value-of select="marc:subfield[@code='b']"/>
         <xsl:text>]</xsl:text>
-      </xsl:if>
-      <xsl:if test="marc:subfield[@code='h']">
-        <xsl:text> : </xsl:text>
-        <xsl:value-of select="marc:subfield[@code='h']"/>
-      </xsl:if>
-      <xsl:if test="marc:subfield[@code='i']">
-        <xsl:text> : </xsl:text>
-        <xsl:value-of select="marc:subfield[@code='i']"/>
       </xsl:if>
       <xsl:if test="marc:subfield[@code='f']">
         <xsl:text> / </xsl:text>
@@ -61,14 +61,14 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
     </xsl:for-each>
   </xsl:if>
 
-  <xsl:call-template name="tag_4xx" />
+<!--  <xsl:call-template name="tag_4xx" />-->
 
   <xsl:call-template name="tag_210" />
 
   <xsl:call-template name="tag_215" />
 
   <span class="results_summary">
-    <span class="label">Disponibilité: </span>
+    <span class="label">Disponibilité : </span>
     <xsl:choose>
       <xsl:when test="marc:datafield[@tag=856]">
         <xsl:for-each select="marc:datafield[@tag=856]">
@@ -126,7 +126,7 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
     <xsl:choose>
       <xsl:when test="count(key('item-by-status', 'reference'))>0">
         <span class="available">
-          <b><xsl:text>Copies available for reference: </xsl:text></b>
+          <b><xsl:text>Indisponible : </xsl:text></b>
           <xsl:variable name="reference_items"
                         select="key('item-by-status', 'reference')"/>
           <xsl:for-each select="$reference_items[generate-id() = generate-id(key('item-by-status-and-branch', concat(items:status, ' ', items:homebranch))[1])]">

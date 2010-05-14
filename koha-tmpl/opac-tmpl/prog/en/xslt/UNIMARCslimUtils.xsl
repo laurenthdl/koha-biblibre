@@ -23,7 +23,7 @@
 	<xsl:template name="tag_210">
     <xsl:for-each select="marc:datafield[@tag=210]">
   	    <span class="results_summary">
-        <span class="label">Édition: </span> 
+        <span class="label">Édition : </span> 
         <xsl:value-of select="marc:subfield[@code='a']"/>
         <xsl:if test="marc:subfield[@code='c']">
           <xsl:if test="marc:subfield[@code='a']"> : </xsl:if>
@@ -33,7 +33,7 @@
           <xsl:if test="marc:subfield[@code='a' or @code='c']">, </xsl:if>        
           <xsl:value-of select="marc:subfield[@code='d']"/>&#xA0;
         </xsl:if>
-        <xsl:value-of select="marc:subfield[@code='e']"/>
+       <!-- <xsl:value-of select="marc:subfield[@code='e']"/>
         <xsl:if test="marc:subfield[@code='g']">
           <xsl:if test="marc:subfield[@code='e']"> : </xsl:if>
           <xsl:value-of select="marc:subfield[@code='g']"/>
@@ -41,7 +41,7 @@
         <xsl:if test="marc:subfield[@code='h']">
           <xsl:if test="marc:subfield[@code='e' or @code='g']">, </xsl:if>        
           <xsl:value-of select="marc:subfield[@code='h']"/>
-        </xsl:if>
+        </xsl:if>-->
       </span>
     </xsl:for-each>
   </xsl:template>
@@ -49,7 +49,7 @@
 	<xsl:template name="tag_215">
     <xsl:for-each select="marc:datafield[@tag=215]">
   	  <span class="results_summary">
-        <span class="label">Description: </span> 
+        <span class="label">Description : </span> 
         <xsl:if test="marc:subfield[@code='a']">
           <xsl:value-of select="marc:subfield[@code='a']"/>
         </xsl:if>
@@ -68,7 +68,7 @@
 
 
   <xsl:template name="tag_4xx">
-    <xsl:if test="marc:datafield[@tag=461]">
+    <xsl:if test="marc:datafield[@tag=464 or @tag=461]">
       <span class="results_summary">
       <span class="label">Fait partie de : </span> 
       <xsl:value-of select="marc:subfield[@code='t']"/>
@@ -98,6 +98,55 @@
         </xsl:if>
       </span>
     </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template name="tag_title">
+    <xsl:param name="tag" />
+    <xsl:param name="label" />
+    <xsl:if test="marc:datafield[@tag=$tag]">
+    <span class="results_summary">
+      <li>
+        <xsl:value-of select="$label"/> : 
+        <xsl:for-each select="marc:datafield[@tag=$tag]">
+          <xsl:value-of select="marc:subfield[@code='a']" />
+          <xsl:if test="marc:subfield[@code='d']">
+            <xsl:text> : </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='e']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='e']">
+            <xsl:for-each select="marc:subfield[@code='e']">
+              <xsl:text> </xsl:text>
+              <xsl:value-of select="."/>
+            </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='f']">
+            <xsl:text> / </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='f']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='h']">
+            <xsl:text>, </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='h']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='i']">
+            <xsl:text>, </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='i']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='v']">
+            <xsl:text>, </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='v']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='x']">
+            <xsl:text>, </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='x']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='z']">
+            <xsl:text>, </xsl:text>
+            <xsl:value-of select="marc:subfield[@code='z']"/>
+          </xsl:if>
+        </xsl:for-each>
+      </li>
+      </span>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="RelatorCode">
