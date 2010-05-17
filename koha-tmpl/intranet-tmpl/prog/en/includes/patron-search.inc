@@ -50,8 +50,8 @@ YAHOO.util.Event.onContentReady("header_search", function() {
 	<form action="/cgi-bin/koha/members/member.pl" method="post">
     <input id="searchmember" size="25" class="focus" name="member" type="text" value="<!--TMPL_VAR Name="member"-->"/>
 	<!--TMPL_IF Name="branchloop"-->
-	<span class="filteraction" id="filteraction_off"> <a href="#" onClick="$('#filters').toggle();$('.filteraction').toggle();">[-]</a></span>
-	<span class="filteraction" id="filteraction_on"> <a href="#" onClick="$('#filters').toggle();$('.filteraction').toggle();">[+]</a></span>
+	<span class="filteraction" id="filteraction_off"> <a href="#" onClick="$('#filters').toggle();$('.filteraction').toggle();$('#filters :input').attr('disabled','disabled');">[-]</a></span>
+	<span class="filteraction" id="filteraction_on"> <a href="#" onClick="$('#filters').toggle();$('.filteraction').toggle();$('#filters :input').removeAttr('disabled');">[+]</a></span>
 	<!--/TMPL_IF -->
     order by:
     <select name="orderby" id="searchorderby">
@@ -115,7 +115,8 @@ YAHOO.util.Event.onContentReady("header_search", function() {
 <script type="text/javascript">//<![CDATA[
 $(document).ready(function() {
 	$("#filters").toggle(); 
-	$("#filteraction_off").toggle(); 
+	$('#filters :input').attr('disabled','disabled');
+    $("#filteraction_off").toggle(); 
 }); 
 //]]>
 </script>
