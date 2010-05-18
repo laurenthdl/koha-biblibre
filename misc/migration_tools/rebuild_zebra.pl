@@ -453,7 +453,7 @@ sub fix_biblio_ids {
         my $sth = $dbh->prepare(
             "SELECT biblioitemnumber FROM biblioitems WHERE biblionumber=?
              UNION SELECT biblioitemnumber FROM deletedbiblioitems WHERE biblionumber=?");
-        $sth->execute($biblionumber);
+        $sth->execute($biblionumber,$biblionumber);
         ($biblioitemnumber) = $sth->fetchrow_array;
         $sth->finish;
         unless ($biblioitemnumber) {
