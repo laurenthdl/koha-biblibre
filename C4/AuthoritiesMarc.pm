@@ -1124,8 +1124,8 @@ sub BuildUnimarcHierarchies{
   my $data = GetHeaderAuthority($authid);
   if ($data->{'authtrees'} and not $force){
     return $data->{'authtrees'};
-  } elsif ($data->{'authtrees'}){
-    $hierarchies=$data->{'authtrees'};
+#  } elsif ($data->{'authtrees'}){
+#    $hierarchies=$data->{'authtrees'};
   } else {
     my $record = GetAuthority($authid);
     my $found;
