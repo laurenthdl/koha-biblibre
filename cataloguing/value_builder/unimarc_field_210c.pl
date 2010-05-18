@@ -133,26 +133,24 @@ my ($input) = @_;
         # builds tag and subfield arrays
         my @tags;
 
-        my ($results,$total) = SearchAuthorities( \@tags,\@and_or,
-                                            \@excluding, \@operator, \@value,
-                                            $startfrom*$resultsperpage, $resultsperpage,$authtypecode, $orderby);
+        my ( $results, $total ) = SearchAuthorities( \@tags, \@and_or, \@excluding, \@operator, \@value, $startfrom * $resultsperpage, $resultsperpage, $authtypecode, $orderby );
 
-	# Getting the $b if it exists
-	for (@$results) {
-	    my $authority = GetAuthority($_->{authid});
-		if ($authority->field('200') and $authority->subfield('200','b')) {
-		    $_->{to_report} = $authority->subfield('200','b');
-	    }
- 	}
+    	for (@$results) {
+    	    my $authority = GetAuthority($_->{authid});
+    		if ($authority->field('200') and $authority->subfield('200','b')) {
+    		    $_->{to_report} = $authority->subfield('200','b');
+            }
+        }
 
-        ($template, $loggedinuser, $cookie)
-            = get_template_and_user({template_name => "cataloguing/value_builder/unimarc_field_210c.tmpl",
-                    query => $query,
-                    type => 'intranet',
-                    authnotrequired => 0,
-                    flagsrequired => {editcatalogue => '*'},
-                    debug => 1,
-                    });
+        ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+            {   template_name   => "cataloguing/value_builder/unimarc_field_210c.tmpl",
+                query           => $query,
+                type            => 'intranet',
+                authnotrequired => 0,
+                flagsrequired   => { editcatalogue => '*' },
+                debug           => 1,
+            }
+        );
 
         # multi page display gestion
         my $displaynext=0;
@@ -183,6 +181,7 @@ my ($input) = @_;
         } else {
             $to = (($startfrom+1)*$resultsperpage);
         }
+<<<<<<< HEAD
         my $link="../cataloguing/plugin_launcher.pl?plugin_name=unimarc_field_210c.pl&amp;authtypecode=EDITORS&and_or=$and_or&amp;marclist=$marclist&amp;operator=$operator&amp;orderby=$orderby&amp;excluding=$excluding&amp;".join("&amp;",map {"value=".$_} @value)."&amp;op=do_search&amp;type=intranet&amp;index=$index";
 
         $template->param(result => $results) if $results;
@@ -206,6 +205,30 @@ my ($input) = @_;
                                     'startfrom'
                                 ),
                                 );
+=======
+        my $link =
+"../cataloguing/plugin_launcher.pl?plugin_name=unimarc_field_210c.pl&amp;authtypecode=EDITORS&and_or=$and_or&amp;marclist=$marclist&amp;operator=$operator&amp;orderby=$orderby&amp;excluding=$excluding&amp;"
+          . join( "&amp;", map { "value=" . $_ } @value )
+          . "&amp;op=do_search&amp;type=intranet&amp;index=$index";
+
+        $template->param( result => $results ) if $results;
+        $template->param( 'index' => $query->param('index') );
+        $template->param(
+            startfrom      => $startfrom,
+            displaynext    => $displaynext,
+            displayprev    => $displayprev,
+            resultsperpage => $resultsperpage,
+            startfromnext  => $startfrom + 1,
+            startfromprev  => $startfrom - 1,
+            total          => $total,
+            from           => $from,
+            to             => $to,
+            numbers        => \@numbers,
+            authtypecode   => $authtypecode,
+            resultstring   => $value[0],
+            pagination_bar => pagination_bar( $link, getnbpages( $total, $resultsperpage ), $startfrom, 'startfrom' ),
+        );
+>>>>>>> (bug #4522) fix plugin unimarc 210$c
     } else {
         ($template, $loggedinuser, $cookie)
             = get_template_and_user({template_name => "cataloguing/value_builder/unimarc_field_210c.tmpl",
