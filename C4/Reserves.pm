@@ -256,8 +256,7 @@ sub GetReservesFromBiblionumber {
 
     # Find the desired items in the reserves
     my $query = "
-        SELECT  reserves.reservenumber,
-                reserves.branchcode,
+        SELECT  reserves.branchcode,
                 reserves.timestamp AS rtimestamp,
                 reserves.priority,
                 reserves.biblionumber,
@@ -1585,7 +1584,7 @@ sub IsAvailableForItemLevelRequest {
     if (C4::Context->preference('AllowOnShelfHolds')) {
         return $available_per_item;
     } else {
-        return ($available_per_item and ($item->{onloan} or GetReserveStatus($itemnumber) eq "W")); 
+        return ($available_per_item and ($item->{onloan} or GetReserveStatus($itemnumber) eq "W"))?1:0;
     }
 }
 
