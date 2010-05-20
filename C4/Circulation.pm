@@ -376,23 +376,23 @@ sub TooMany {
                 if ($rule_itemtype eq "*") {
                     # matching rule has the default item type, so count all the items issued for that branch no
                     # those existing loans that don't fall under a more
-                    # specific rule Not QUITE 
-#                    if (C4::Context->preference('item-level_itypes')) {
-#                        $count_query .= " WHERE items.itype NOT IN (
-#                                            SELECT itemtype FROM issuingrules
-#                                            WHERE branchcode = ?
-#                                            AND   (categorycode = ? OR categorycode = ?)
-#                                            AND   itemtype <> '*'
-#                                          ) ";
-#                    } else { 
-#                        $count_query .= " JOIN  biblioitems USING (biblionumber) 
-#                                          WHERE biblioitems.itemtype NOT IN (
-#                                            SELECT itemtype FROM issuingrules
-#                                            WHERE branchcode = ?
-#                                            AND   (categorycode = ? OR categorycode = ?)
-#                                            AND   itemtype <> '*'
-#                                          ) ";
-#                    }
+                    # specific rule Not QUITE
+                    if (C4::Context->preference('item-level_itypes')) {
+                        $count_query .= " WHERE items.itype NOT IN (
+                                                SELECT itemtype FROM issuingrules
+                                                WHERE branchcode = ?
+                                                AND   (categorycode = ? OR categorycode = ?)
+                                                AND   itemtype <> '*'
+                                           )";
+                    } else {
+                        $count_query .= " JOIN  biblioitems USING (biblionumber)
+                                            WHERE biblioitems.itemtype NOT IN (
+                                                SELECT itemtype FROM issuingrules
+                                                WHERE branchcode = ?
+                                                AND   (categorycode = ? OR categorycode = ?)
+                                                AND   itemtype <> '*'
+                                           )";
+                    }
                     push @bind_params, $issuing_rule->{branchcode};
                     push @bind_params, $issuing_rule->{categorycode};
                     push @bind_params, $cat_borrower;
