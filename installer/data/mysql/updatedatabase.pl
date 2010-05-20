@@ -4022,7 +4022,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = '3.02.00.019';
+$DBversion = '3.02.00.026';
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do(q{
       ALTER TABLE reserves ADD `reservenumber` int(11) NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (`reservenumber`);
@@ -4035,10 +4035,10 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = '3.02.00.020';
+$DBversion = '3.02.00.027';
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do(q{
-      ALTER TABLE borrower_attribute_types ADD `display_checkout` TINYINT(1) NOT NULL DEFAULT '0' AFTER `authorised_value_category`;
+      ALTER TABLE borrower_attribute_types ADD `display_checkout` TINYINT(1) NOT NULL DEFAULT '0';
 });
     print "Upgrade to $DBversion done. — Add display_checkout in borrowers attributes\n";
     SetVersion ($DBversion);
