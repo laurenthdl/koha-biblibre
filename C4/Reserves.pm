@@ -256,7 +256,8 @@ sub GetReservesFromBiblionumber {
 
     # Find the desired items in the reserves
     my $query = "
-        SELECT  reserves.branchcode,
+        SELECT  reserves.reservenumber,
+                reserves.branchcode,
                 reserves.timestamp AS rtimestamp,
                 reserves.priority,
                 reserves.biblionumber,
