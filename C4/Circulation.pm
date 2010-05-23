@@ -103,7 +103,7 @@ BEGIN {
 	
 	# subs to deal with offline circulation
 	push @EXPORT, qw(
-		&GetOfflineOperations
+		&GetOfflineOperation
 		&AddOfflineOperation
 		&DeleteOfflineOperation
 		&ProcessOfflineOperation
