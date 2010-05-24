@@ -150,11 +150,17 @@ sub AddReserve {
     my $const   = lc substr( $constraint, 0, 1 );
     $resdate = format_date_in_iso( $resdate ) if ( $resdate );
     $resdate = C4::Dates->today( 'iso' ) unless ( $resdate );
+    my $item = C4::Items::GetItem($checkitem);
+    my @maxPickupDate = GetMaxPickupDate($resdate, $borrowernumber, $item);
+    my $maxpickupdate = sprintf( "%d-%02d-%02d", @maxPickupDate );
     if ($expdate) {
         $expdate = format_date_in_iso( $expdate );
+        my @expdate = split("-", $expdate);
+        $expdate = $maxpickupdate if Delta_Days(@expdate[ 0 .. 2 ], @maxPickupDate[ 0 .. 2 ]) < 0;
     } else {
-        undef $expdate; # make reserves.expirationdate default to null rather than '0000-00-00'
+        $expdate = $maxpickupdate;   
     }
+    undef $expdate if $resdate eq $maxpickupdate; # make reserves.expirationdate default to null rather than '0000-00-00'
     if ( C4::Context->preference( 'AllowHoldDateInFuture' ) ) {
 	# Make room in reserves for this before those of a later reserve date
 	$priority = _ShiftPriorityByDateAndPriority( $biblionumber, $resdate, $priority );
