@@ -1582,10 +1582,10 @@ sub IsAvailableForItemLevelRequest {
                                $notforloan_per_itemtype;
 
 
-    if (C4::Context->preference('AllowOnShelfHolds')) {
+    if (CanHoldOnShelf($itemnumber)) {
         return $available_per_item;
     } else {
-        return ($available_per_item and ($item->{onloan} or GetReserveStatus($itemnumber) eq "W"))?1:0;
+        return ($available_per_item and ($item->{onloan} or GetReserveStatus($itemnumber) eq "W"));
     }
 }
 
