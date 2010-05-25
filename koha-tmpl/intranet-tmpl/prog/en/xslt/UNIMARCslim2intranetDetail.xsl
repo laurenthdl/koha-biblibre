@@ -278,15 +278,32 @@
     </li>
   </xsl:if>
 
-  <xsl:if test="marc:datafield[@tag=328]">
-    <li>
-      <strong>Thèse : </strong>
-      <xsl:for-each select="marc:datafield[@tag=328]">
-        <xsl:value-of select="marc:subfield[@code='a']"/>
-        <xsl:choose><xsl:when test="position()=last()"><xsl:text>.</xsl:text></xsl:when><xsl:otherwise><xsl:text>; </xsl:text></xsl:otherwise></xsl:choose>
-      </xsl:for-each>
-    </li>
-  </xsl:if>
+     <xsl:if test="marc:datafield[@tag=328]">
+      <span class="results_summary">
+        <span class="label">Thèse : </span>
+        <xsl:for-each select="marc:datafield[@tag=328]">
+          <xsl:value-of select="marc:subfield[@code='a']"/>
+		  <xsl:value-of select="marc:subfield[@code='b']"/>
+		<xsl:if test="marc:subfield[@code='c']">	
+			<xsl:text> : </xsl:text>
+			<xsl:value-of select="marc:subfield[@code='c']"/>
+		</xsl:if>	
+		<xsl:if test="marc:subfield[@code='e']">	
+			<xsl:text> : </xsl:text>
+			<xsl:value-of select="marc:subfield[@code='e']"/>
+		</xsl:if>	
+		<xsl:if test="marc:subfield[@code='d']">	
+			<xsl:text> : </xsl:text>
+			<xsl:value-of select="marc:subfield[@code='d']"/>
+		</xsl:if>
+			<xsl:choose>
+            <xsl:when test="position()=last()">
+              <xsl:text>. </xsl:text>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:for-each>
+      </span>
+    </xsl:if>
 
   <xsl:if test="marc:datafield[@tag=333]">
     <li>
