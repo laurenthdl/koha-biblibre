@@ -222,7 +222,8 @@
 <!--  <xsl:if test="marc:datafield[@tag=101]"><span class="results_summary"><span class="label">Langue: </span><xsl:for-each select="marc:datafield[@tag=101]"><xsl:for-each select="marc:subfield"><xsl:choose><xsl:when test="@code='b'">de la trad. intermédiaire, </xsl:when><xsl:when test="@code='c'">de l'œuvre originale, </xsl:when><xsl:when test="@code='d'">du résumé, </xsl:when><xsl:when test="@code='e'">de la table des matières, </xsl:when><xsl:when test="@code='f'">de la page de titre, </xsl:when><xsl:when test="@code='g'">du titre propre, </xsl:when><xsl:when test="@code='h'">d'un livret, </xsl:when><xsl:when test="@code='i'">des textes d'accompagnement, </xsl:when><xsl:when test="@code='j'">des sous-titres, </xsl:when></xsl:choose><xsl:value-of select="text()"/><xsl:choose><xsl:when test="position()=last()"><xsl:text>.</xsl:text></xsl:when><xsl:otherwise><xsl:text> ; </xsl:text></xsl:otherwise></xsl:choose></xsl:for-each></xsl:for-each></span></xsl:if>
       <xsl:if test="marc:datafield[@tag=102]"><span class="results_summary"><span class="label">Pays: </span><xsl:for-each select="marc:datafield[@tag=102]"><xsl:for-each select="marc:subfield"><xsl:value-of select="text()"/><xsl:choose><xsl:when test="position()=last()"><xsl:text>.</xsl:text></xsl:when><xsl:otherwise><xsl:text>, </xsl:text></xsl:otherwise></xsl:choose></xsl:for-each></xsl:for-each></span></xsl:if>
 -->
-    <xsl:call-template name="tag_210"/>
+    <xsl:call-template name="tag_205"/>
+	<xsl:call-template name="tag_210"/>
     <xsl:call-template name="tag_215"/>
     
     <xsl:call-template name="tag_title">
@@ -315,7 +316,7 @@
               <xsl:text> </xsl:text>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:text>; </xsl:text>
+              <xsl:text> ; </xsl:text>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:for-each>
@@ -326,13 +327,23 @@
         <span class="label">Thèse : </span>
         <xsl:for-each select="marc:datafield[@tag=328]">
           <xsl:value-of select="marc:subfield[@code='a']"/>
-          <xsl:choose>
+		  <xsl:value-of select="marc:subfield[@code='b']"/>
+		<xsl:if test="marc:subfield[@code='c']">	
+			<xsl:text> : </xsl:text>
+			<xsl:value-of select="marc:subfield[@code='c']"/>
+		</xsl:if>	
+		<xsl:if test="marc:subfield[@code='e']">	
+			<xsl:text> : </xsl:text>
+			<xsl:value-of select="marc:subfield[@code='e']"/>
+		</xsl:if>	
+		<xsl:if test="marc:subfield[@code='d']">	
+			<xsl:text> : </xsl:text>
+			<xsl:value-of select="marc:subfield[@code='d']"/>
+		</xsl:if>
+			<xsl:choose>
             <xsl:when test="position()=last()">
-              <xsl:text>.</xsl:text>
+              <xsl:text>. </xsl:text>
             </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>; </xsl:text>
-            </xsl:otherwise>
           </xsl:choose>
         </xsl:for-each>
       </span>
