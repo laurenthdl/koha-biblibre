@@ -80,9 +80,10 @@
   </xsl:template>
 
 	<xsl:template name="tag_4xx">
-    <xsl:for-each select="marc:datafield[@tag=464 or @tag=461]">
+	<xsl:if test="marc:datafield[@tag=461]">
+        <strong>Fait partie de : </strong>
+    <xsl:for-each select="marc:datafield[@tag=461]">
         <li>
-        <strong>Contient : </strong>
         <span>
           <xsl:call-template name="addClassRtl" />
           <xsl:if test="marc:subfield[@code='t']">
@@ -100,6 +101,29 @@
         </span>
       </li>
     </xsl:for-each>
+	</xsl:if>
+	<xsl:if test="marc:datafield[@tag=464]">
+        <strong>Contient : </strong>
+    <xsl:for-each select="marc:datafield[@tag=464]">
+        <li>
+        <span>
+          <xsl:call-template name="addClassRtl" />
+          <xsl:if test="marc:subfield[@code='t']">
+            <xsl:value-of select="marc:subfield[@code='t']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='e']"> :
+            <xsl:value-of select="marc:subfield[@code='e']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='f']"> /
+            <xsl:value-of select="marc:subfield[@code='f']"/>
+          </xsl:if>
+          <xsl:if test="marc:subfield[@code='v']">,
+            <xsl:value-of select="marc:subfield[@code='v']"/>
+          </xsl:if>
+        </span>
+      </li>
+    </xsl:for-each>
+	</xsl:if>
   </xsl:template>
 
 	<xsl:template name="subfieldSelect">
