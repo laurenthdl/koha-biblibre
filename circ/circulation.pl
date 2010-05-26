@@ -619,7 +619,7 @@ foreach my $flag ( sort keys %$flags ) {
             $template->param( lost => 'true', lostcomment => $borrower->{'lostcomment'}, warning => 1 );
         }
         elsif ( $flag eq 'DEBARRED' ) {
-            $template->param( debarred => 'true', warning => 1, debarredcomment=>$borrower->{'debarredcomment'});
+            $template->param( userdebarred => 'true', warning => 1, userdebarreddate=> format_date($flags->{DEBARRED}->{dateend}),debardebarredcomment=>$borrower->{'debarredcomment'});
         }
         elsif ( $flag eq 'CHARGES' ) {
             $template->param(
