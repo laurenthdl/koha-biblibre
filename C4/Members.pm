@@ -497,11 +497,12 @@ sub patronflags {
     if ( $patroninformation->{'debarred'} && check_date(split(/-/,$patroninformation->{'debarred'})) ){
         if(Date_to_Days(Date::Calc::Today) < Date_to_Days(split(/-/,$patroninformation->{'debarred'}) )){
             my %flaginfo;
-            $flaginfo{'debarredcomment'}  = $patroninformation->{'debarredcomment'};
-            $flaginfo{'message'}  = $patroninformation->{'debarredcomment'};
-            $flaginfo{'noissues'} = 1;
-            $flaginfo{'dateend'} = $patroninformation->{'debarred'};
-            $flags{'DEBARRED'}     = \%flaginfo;
+            $flaginfo{'debarredcomment'} = $patroninformation->{'debarredcomment'};
+            $flaginfo{'message'}         = $patroninformation->{'debarredcomment'};
+            $flaginfo{'noissues'}        = 1;
+            $flaginfo{'dateend'}         = $patroninformation->{'debarred'} if $patroninformation->{'debarred'} ne "9999-12-31";
+            $flaginfo{'dateend'}         = $patroninformation->{'debarred'};
+            $flags{'DEBARRED'}           = \%flaginfo;
         }
     }
     if ( $patroninformation->{'borrowernotes'} )
