@@ -208,50 +208,40 @@ sub GetRecords {
     for my $biblionumber ( split( / /, $cgi->param('id') ) ) {
 
         # Get the biblioitem from the biblionumber
-        my $biblioitem = ( GetBiblioItemByBiblioNumber( $biblionumber ) )[0];
+        my $biblioitem = ( GetBiblioItemByBiblioNumber( $biblionumber, undef ) )[0];
+        if ( not $biblioitem->{'biblionumber'} ) {
+            $biblioitem->{code} = "RecordNotFound";
+        }
 
-        if ( $$biblioitem{biblionumber} ) {
+        # We don't want MARC to be displayed
+        delete $biblioitem->{'marc'};
 
-            # We don't want MARC to be displayed
-            delete $$biblioitem{marc};
-
-            # nor the XML declaration of MARCXML
-            $$biblioitem{marcxml} =~ s/<\?xml(.*)\?>//go;
-
-            # Get most of the needed data
-            my $biblioitemnumber = $$biblioitem{biblioitemnumber};
-            my @reserves         = GetReservesFromBiblionumber( $biblionumber );
-            my $issues           = GetBiblioIssues( $biblionumber );
-            my $items            = GetItemsByBiblioitemnumber( $biblioitemnumber );
-
+        # Get most of the needed data
+        my $biblioitemnumber = $biblioitem->{'biblioitemnumber'};
+        my @reserves         = GetReservesFromBiblionumber( $biblionumber, undef, undef );
+        my $issues           = GetBiblioIssues($biblionumber);
+        my $items            = GetItemsByBiblioitemnumber($biblioitemnumber);
+          
             # We loop over the items to clean them
             for ( @$items ) {
 
                 # This hides additionnal XML subfields, we don't need these info
                 delete $$_{more_subfields_xml};
-
                 # Display branch names instead of branch codes
                 $$_{homebranchname}    = GetBranchName( $$_{homebranch} );
                 $$_{holdingbranchname} = GetBranchName( $$_{holdingbranch} );
             }
 
-            # Hashref building...
-            $$biblioitem{items}{item}       = $items;
-            $$biblioitem{reserves}{reserve} = $reserves[1];
-            $$biblioitem{issues}{issue}     = $issues;
-
-            $_ = encode_entities( $$biblioitem{$_}, '&' ) for @$biblioitem{ grep {!/marcxml/} keys %$biblioitem };
-            
-            push @records, $biblioitem;
-            
-        } else {
-            push @records, { code => 'RecordNotFound' };
-        }
+        # Hashref building...
+        $biblioitem->{'items'}->{'item'}       = $items;
+        $biblioitem->{'reserves'}->{'reserve'} = $reserves[1];
+        $biblioitem->{'issues'}->{'issue'}     = $issues;
+        
+        push @records, $biblioitem;
     }
 
     return { record => \@records };
 }
-
 =head2 GetAuthorityRecords
     
 	Given a list of authority record identifiers, returns a list of record 
@@ -276,18 +266,16 @@ sub GetAuthorityRecords {
         return { code => 'UnsupportedSchema' };
     }
 
-    my $records;
+    my @records;
 
     # Let's loop over the authority IDs
     for my $authid ( split( / /, $cgi->param('id') ) ) {
 
         # Get the record as XML string, or error code
-        my $record = GetAuthorityXML($authid) || "<record><code>RecordNotFound</code></record>";
-        $record =~ s/<\?xml(.*)\?>//go;
-        $records .= $record;
+        push @records, GetAuthorityXML($authid) || { code => 'RecordNotFound' };
     }
 
-    return $records;
+    return { record => \@records };
 }
 
 =head2 LookupPatron
