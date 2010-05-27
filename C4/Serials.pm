@@ -577,17 +577,24 @@ sub GetSubscriptions {
         push @bind_params, $biblionumber;
     }
     if ($string) {
-        my @sqlstrings;
+		if (index($string,'*')==0){
+			$string=substr($string,1);
+			@bind_params=("%$string%");
+			$sqlwhere=" WHERE (subscription.branchcode LIKE ? )";
+		}else{
+		my @sqlstrings;
         my @strings_to_search;
-        @strings_to_search = map { "%$_%" } split( / /, $string );
-        foreach my $index qw(biblio.title subscription.callnumber subscription.location subscription.notes subscription.internalnotes) {
+		@strings_to_search = map { "%$_%" } split( / /, $string );
+        foreach my $index qw(biblio.title subscription.callnumber subscription.location subscription.notes subscription.internalnotes subscriptionhistory.librariannote) {
             push @bind_params, @strings_to_search;
             my $tmpstring = "AND $index LIKE ? " x scalar(@strings_to_search);
             $debug && warn "$tmpstring";
             $tmpstring =~ s/^AND //;
             push @sqlstrings, $tmpstring;
         }
-        $sqlwhere .= ( $sqlwhere ? " AND " : " WHERE " ) . "(" . join( ") OR (", @sqlstrings ) . ")";
+		$sqlwhere .= ( $sqlwhere ? " AND " : " WHERE " ) . "(" . join( ") OR (", @sqlstrings ) . ")";
+		}
+        
     }
     if ($issn) {
         my @sqlstrings;
