@@ -153,6 +153,7 @@ if($input->param('field') and not defined $op){
     my @subfields = $input->param('subfield');
     my @actions   = $input->param('action');
     my @condvals   = $input->param('condval');
+    my @nocondvals = $input->param('nocondval');
     my @repvals    = $input->param('repval');
 
     foreach my $biblionumber ( @biblionumbers ){
@@ -163,9 +164,10 @@ if($input->param('field') and not defined $op){
             my $subfield = $subfields[$i];
             my $action   = $actions[$i];
             my $condval  = $condvals[$i];
+            my $nocond   = $nocondvals[$i];
             my $repval   = $repvals[$i];
 
-                BatchModField($record, $field, $subfield, $action, $condval, $repval);
+                BatchModField($record, $field, $subfield, $action, $condval, $nocond, $repval);
         }
         ModBiblio($record, $biblionumber, $biblio->{frameworkcode});
     }

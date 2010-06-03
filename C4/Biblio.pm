@@ -3420,9 +3420,8 @@ sub get_biblio_authorised_values {
 =cut
 
 sub BatchModField {
-<<<<<<< HEAD
-    my ($field, $subfield, $action, $condval, $repval) = @_;
-    
+    my ( $record, $field, $subfield, $action, $condval, $nocond, $repval ) = @_;
+
     return unless $record;
 
     if($action eq "add"){
@@ -3438,16 +3437,16 @@ sub BatchModField {
             my @subfields = $rfield->subfield($subfield);
 
             $rfield->delete_subfield( code => $subfield );
-
-        foreach my $subf (@subfields) {
-            if ( $action eq "mod" ) {
-                if ( $subf =~ /^$condval$/ ) {
+    
+            foreach my $subf (@subfields) {
+                if ( $action eq "mod" ) {
+                    if ( $subf =~ /^$condval$/ || $nocond eq "true" ) {
                         $rfield->add_subfields( $subfield => $repval );
                 } else {
                         $rfield->add_subfields( $subfield => $subf );
-                }
-            } elsif ( $action eq "del" ) {
-                if ( $subf !~ /^$condval$/ ) {
+                    }
+                } elsif ( $action eq "del" ) {
+                    if ( $subf !~ /^$condval$/ && $nocond eq "false" ) {
                         $rfield->add_subfields( $subfield => $subf );
                     }
                 }
