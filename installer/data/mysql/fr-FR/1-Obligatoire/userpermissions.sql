@@ -37,6 +37,9 @@ INSERT INTO permissions (module_bit, code, description) VALUES
    (13, 'rotating_collections', 'Gérer les collections tournantes'),
    (13, 'items_batchmod', 'Modifier les exemplaires par lot'),
    (13, 'items_batchdel', 'Supprimer les exemplaires par lot'),
+   (13, 'batchmod', 'Modifier les exemplaires par lot'),
+   (13, 'batchdel', 'Supprimer les exemplaires par lot'),
+   (13, 'batchedit', 'Modifier les notices par lot'),
    (15, 'check_expiration', 'Check the expiration of a serial'),
    (15, 'claim_serials', 'Claim missing serials'),
    (15, 'create_subscription', 'Create a new subscription'),
@@ -46,8 +49,7 @@ INSERT INTO permissions (module_bit, code, description) VALUES
    (15, 'renew_subscription', 'Renew a subscription'),
    (15, 'routing', 'Routing'),
    (16, 'execute_reports', 'Lancer les rapports SQL'),
-   (16, 'create_reports', 'Créer les rapports SQL Reports')
-
+   (16, 'create_reports', 'Créer les rapports SQL Reports'),
    (13, 'edit_news', 'Write news for the OPAC and staff interfaces'),
    (13, 'label_creator', 'Create printable labels and barcodes from catalog and patron data'),
    (13, 'edit_calendar', 'Define days when the library is closed'),
