@@ -169,8 +169,8 @@ for my $itm (@items) {
         $itm->{'imageurl'}    = getitemtypeimagelocation( 'opac', $itemtypes->{ $itm->{itype} }->{'imageurl'} );
         $itm->{'description'} = $itemtypes->{ $itm->{itype} }->{'description'};
     }
-    foreach (qw(ccode enumchron copynumber itemnotes uri)) {
-        $itemfields{$_} = 1 if ($itm->{$_});
+    foreach (qw(ccode enumchron copynumber itemnotes uri serialseq publisheddate)) {
+        $itemfields{$_} = 1 if ( $itm->{$_} );
     }
 
      # walk through the item-level authorised values and populate some images
@@ -193,7 +193,8 @@ for my $itm (@items) {
         $itm->{transfertwhen} = format_date($transfertwhen);
         $itm->{transfertfrom} = $branches->{$transfertfrom}{branchname};
         $itm->{transfertto}   = $branches->{$transfertto}{branchname};
-     }
+    }
+    $itm->{publisheddate}=format_date($itm->{publisheddate});
 }
 
 ## get notes and subjects from MARC record
@@ -246,6 +247,8 @@ $template->param(
     MARCURLS                => $marcurlsarray,
     norequests              => $norequests,
     RequestOnOpac           => C4::Context->preference("RequestOnOpac"),
+    itemdata_serialseq      => $itemfields{serialseq},
+    itemdata_publisheddate  => $itemfields{publisheddate},
     itemdata_ccode          => $itemfields{ccode},
     itemdata_enumchron      => $itemfields{enumchron},
     itemdata_uri            => $itemfields{uri},
