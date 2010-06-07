@@ -52,9 +52,10 @@ use Date::Calc qw(
 # PARAMETERS READING
 #
 my $query = new CGI;
-
-my $sessionID = $query->cookie("CGISESSID") ;
-my $session = get_session($sessionID);
+my $dbh = C4::Context->dbh;
+my $remotehost = $query->remote_host();
+my $sessionID  = $query->cookie("CGISESSID");
+my $session    = get_session($sessionID);
 
 # branch and printer are now defined by the userenv
 # but first we have to check if someone has tried to change them
@@ -337,6 +338,17 @@ if ($barcode) {
     $template->param( issuecount   => $issue );
 }
 
+# Setting the right status if an hold has been confirmed
+my $resbarcode = $query->param("resbarcode");
+if ($resbarcode) {
+    my $itemnumber = GetItemnumberFromBarcode($resbarcode);
+    my $query = "UPDATE reserves SET found='W' WHERE itemnumber=? AND found IS NULL";
+    my $sth_set = $dbh->prepare($query);
+    $sth_set->execute($itemnumber);
+}
+
+
+
 # reload the borrower info for the sake of reseting the flags.....
 if ($borrowernumber) {
     $borrower = GetMemberDetails( $borrowernumber, 0 );
@@ -524,7 +536,6 @@ $template->param(reserves_waiting=>\@reserveswaiting);
 #### ADDED BY JF FOR COUNTS BY ITEMTYPE RULES
 # FIXME: This should utilize all the issuingrules options rather than just the defaults
 # and it should be moved to a module
-my $dbh = C4::Context->dbh;
 
 # how many of each is allowed?
 my $issueqty_sth = $dbh->prepare(
