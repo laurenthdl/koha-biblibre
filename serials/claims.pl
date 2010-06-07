@@ -45,23 +45,13 @@ my ($template, $loggedinuser, $cookie)
             });
 
 my $supplierlist = GetSuppliersWithLateIssues();
-if ($supplierid) {
-    foreach my $s ( @{$supplierlist} ) {
-        if ($s->{id} == $supplierid ) {
-            $s->{selected} = 1;
-            last;
-        }
-    }
-}
-my $supplierlist = GetSuppliersWithLateIssues();
 my @suploop;
-for ( sort {$supplierlist{$a} cmp $supplierlist{$b} } keys %supplierlist ) {
-    my ($count, @dummy) = GetLateOrMissingIssues($_, "", $order);
+for my $s ( sort {$a->{name} cmp $b->{name} } @$supplierlist ) {
+    my @list = GetLateOrMissingIssues($s, "", $order);
     push @suploop, {
-        id       => $_,
-        name     => $supplierlist{$_},
-        count    => $count,
-        selected => $_ == $supplierid,
+        %$s,
+        count    => scalar(@list),
+        selected => $s->{id} == $supplierid,
     };
 }
 
