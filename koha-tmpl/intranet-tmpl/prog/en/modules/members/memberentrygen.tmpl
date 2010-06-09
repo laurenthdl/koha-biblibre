@@ -6,6 +6,17 @@
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
+function FillinId(){
+
+var cat=document.getElementById('categorycode');
+var lec=cat.options[cat.selectedIndex].value ;
+var nbcard=document.getElementById('cardnumber').value;
+var dtbirth=document.getElementById('dateofbirth').value; 
+  if ((lec==='ETUPRES') || (lec==='ETUAUT') || (lec==='LECAUT') || (lec==='PROPRES')){
+document.getElementById('userid').value='id'+nbcard;
+document.getElementById('password').value=dtbirth.substr(3,2)+dtbirth.substr(8,2);  
+}
+}
     $(document).ready(function() {
 
 
@@ -244,7 +255,8 @@
                 Date of birth: </label>
 				
 	<!-- TMPL_IF NAME="metric" -->			
-                <input type="text" id="dateofbirth" name="dateofbirth" size="20" onchange="CheckDate(document.form.dateofbirth);" value="<!-- TMPL_IF NAME="opduplicate" --><!--TMPL_ELSE--><!-- TMPL_VAR NAME="dateofbirth" --><!-- /TMPL_IF -->" />
+                <input type="text" id="dateofbirth" name="dateofbirth" size="20" 
+onchange="CheckDate(document.form.dateofbirth);FillinId();" value="<!-- TMPL_VAR NAME="dateofbirth" -->" />
 <!-- TMPL_ELSE -->
                 <input type="text" id="dateofbirth" name="dateofbirth" size="20" value="<!-- TMPL_IF NAME="opduplicate" --><!--TMPL_ELSE--><!-- TMPL_VAR NAME="dateofbirth" --><!-- /TMPL_IF -->" />
 <!-- /TMPL_IF -->
@@ -750,7 +762,7 @@
       <label for="cardnumber">
     <!-- /TMPL_IF--> 
     Card number: </label>
-    <input type="text" id="cardnumber" name="cardnumber" size="20" value="<!-- TMPL_IF NAME="opduplicate" --><!--TMPL_ELSE--><!-- TMPL_VAR NAME="cardnumber" --><!-- /TMPL_IF -->" />
+    <input type="text" id="cardnumber" name="cardnumber" size="20" value="<!-- TMPL_VAR NAME="cardnumber" -->" onchange="FillinId();" />
 	  <!-- TMPL_IF NAME="mandatorycardnumber" --><span class="required">Required</span><!-- /TMPL_IF --></li>
     <li>
       <!-- TMPL_IF NAME="mandatorybranchcode" -->
