@@ -67,6 +67,4 @@ INSERT INTO permissions (module_bit, code, description) VALUES
    (13, 'schedule_tasks', 'Schedule tasks to run'),
    (13, 'items_batchmod', 'Modification Par lot des exemplaires'),
    (13, 'items_batchdel', 'Suppression par lot des exemplaires')
-   (13, 'manage_csv_profiles', 'Manage CSV export profiles'),
-   (13, 'moderate_tags', 'Moderer les tags adhérents'),
 ;
