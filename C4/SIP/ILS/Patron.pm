@@ -48,7 +48,7 @@ sub new {
 	$debug and warn "new Patron (GetMemberDetails): " . Dumper($kp);
 	my $pw        = $kp->{password};  ### FIXME - md5hash -- deal with . 
 	my $flags     = $kp->{flags};     # or warn "Warning: No flags from patron object for '$patron_id'"; 
-	my $debarred  = $kp->{debarred};  # 1 if ($kp->{flags}->{DBARRED}->{noissues});
+	my $debarred  = defined($kp->{flags}->{DEBARRED});  # 1 if ($kp->{flags}->{DBARRED}->{noissues});
 	$debug and warn sprintf("Debarred = %s : ", ($debarred||'undef')) . Dumper(%{$kp->{flags}});
 	my %ilspatron;
 	my $adr     = $kp->{streetnumber} || '';
