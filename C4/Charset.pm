@@ -33,6 +33,7 @@ BEGIN {
     require Exporter;
     @ISA    = qw(Exporter);
     @EXPORT = qw(
+        NormalizeString
         IsStringUTF8ish
         MarcToUTF8Record
         SetUTF8Flag

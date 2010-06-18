@@ -3423,6 +3423,7 @@ sub BatchModField {
     my ( $record, $field, $subfield, $action, $condval, $nocond, $repval ) = @_;
 
     return unless $record;
+    $condval=NormalizeString($condval);
 
     if($action eq "add"){
         for my $rfield ($record->field($field)){
@@ -3439,6 +3440,7 @@ sub BatchModField {
             $rfield->delete_subfield( code => $subfield );
     
             foreach my $subf (@subfields) {
+                $subf=NormalizeString($subf);
                 if ( $action eq "mod" ) {
                     if ( $subf =~ /^$condval$/ || $nocond eq "true" ) {
                         $rfield->add_subfields( $subfield => $repval );
