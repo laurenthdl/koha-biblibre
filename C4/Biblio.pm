@@ -3415,8 +3415,9 @@ sub get_biblio_authorised_values {
 =head3 BatchModField
 
   Mod subfields in field record
-
-  returns 1 if succeed
+  
+  returns 1,$record if succeed
+  returns 0,$record if Action was not processed
   returns -1 if no record
   returns -2 if no action done on record
 
@@ -3449,8 +3450,8 @@ sub BatchModField {
             foreach my $subf (@subfields) {
                     if ($subf->[0] eq $subfield){
                         $subf->[1]=NormalizeString($subf->[1]);
-                if ( $action eq "mod" ) {
-                            if ( $nocond ne "true" && $subf->[1] =~ s/$condition/$repval/ 
+                        if ( $action eq "mod" ) {
+                            if ( $nocond ne "true" && $subf->[1] =~ s/$condition/$repval/g
                                 ) {
                                 $done=1;
                             } 
@@ -3483,7 +3484,16 @@ sub BatchModField {
                 }
                 else {
                     if ($field < 10){
-                       $record->field($field)->update($repval) if ($record->field($field)->data()=~ $condition || $nocond eq 'true')
+                       my $value=$record->field($field)->data();
+                       if ($value=~ s/$condition/$repval/g){
+                        $record->field($field)->update($value);
+                        $done=1;
+
+                       }
+                       if ( $nocond eq 'true'){
+                        $record->field($field)->update($repval);
+                        $done=1;
+                       }
                     }
                 }
             }
