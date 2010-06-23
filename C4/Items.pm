@@ -1864,6 +1864,7 @@ sub _koha_new_item {
             enumchron           = ?,
             more_subfields_xml  = ?,
             copynumber          = ?,
+            stocknumber         = ?,
             statisticvalue      = ?
           ";
     my $sth = $dbh->prepare($query);
@@ -1901,6 +1902,7 @@ sub _koha_new_item {
             $item->{'enumchron'},
             $item->{'more_subfields_xml'},
             $item->{'copynumber'},
+            $item->{'stocknumber'},
             $item->{'statisticvalue'}
     );
     my $itemnumber = $dbh->{'mysql_insertid'};
