@@ -1633,9 +1633,12 @@ sub searchResults {
         }
 
         # XSLT processing of some stuff
-        use C4::Charset;
-        SetUTF8Flag($marcrecord);
-        $debug && warn $marcrecord->as_formatted;
+	use C4::Charset;
+	SetUTF8Flag($marcrecord);
+        if (C4::Context->preference("XSLTResultsDisplay") && !$scan) {
+            $oldbiblio->{XSLTResultsRecord} = XSLTParse4Display(
+                $oldbiblio->{biblionumber}, $marcrecord, 'Results' );
+        }
 
 	# If it is opac, or OPAC, or OpAc or whatever, we use 'OPAC' so it works with the XSLT syspref
 	$interface =~ s/(opac)/\U$1/i;
