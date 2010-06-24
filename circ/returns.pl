@@ -35,6 +35,7 @@ use C4::Output;
 use C4::Circulation;
 use C4::Dates qw/format_date/;
 use Date::Calc qw/Add_Delta_Days/;
+use List::MoreUtils qw/any/;
 use C4::Calendar;
 use C4::Print;
 use C4::Reserves;
@@ -45,6 +46,7 @@ use C4::Branch; # GetBranches GetBranchName
 use C4::Koha;   # FIXME : is it still useful ?
 
 my $query = new CGI;
+my $remotehost = $query->remote_host();
 
 if (!C4::Context->userenv){
 	my $sessionID = $query->cookie("CGISESSID");
@@ -182,6 +184,10 @@ if ($barcode and not $query->param('cancel')) {
     ( $returned, $messages, $issueinformation, $borrower ) =
       AddReturn( $barcode, $userenv_branch, $exemptfine, $dropboxmode);     # do the return
 
+    my @ips=split /,|\|/, C4::Context->preference("CI-3M:AuthorizedIPs");
+    if (any{ $remotehost eq $_ }@ips ){
+        system("../services/magnetise.pl $remotehost in");
+    }
     # get biblio description
     my $biblio = GetBiblioFromItemNumber($itemnumber);
     # fix up item type for display

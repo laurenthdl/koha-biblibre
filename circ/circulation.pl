@@ -34,6 +34,8 @@ use C4::Members;
 use C4::Biblio;
 use C4::Reserves;
 use C4::Context;
+use C4::Debug;
+use List::MoreUtils qw/any/;
 use CGI::Session;
 
 use Date::Calc qw(
@@ -49,6 +51,7 @@ use Date::Calc qw(
 #
 my $query = new CGI;
 
+my $remotehost=$query->remote_host();
 my $sessionID = $query->cookie("CGISESSID") ;
 my $session = get_session($sessionID);
 
@@ -315,6 +318,14 @@ if ($barcode) {
 		}
         unless($confirm_required) {
             AddIssue( $borrower, $barcode, $datedue, $cancelreserve );
+            my @ips=split /,|\|/, C4::Context->preference("CI-3M:AuthorizedIPs");
+            #my $pid=fork();
+            #unless($pid && $remotehost=~qr(^$ips$)){
+            #if (!$pid && any{ $remotehost eq $_ }@ips ){
+            if (any{ $remotehost eq $_ }@ips ){
+                warn $remotehost;
+                system("../services/magnetise.pl $remotehost out");
+            }
 			$inprocess = 1;
             if($globalduedate && ! $stickyduedate && $duedatespec_allow ){
                 $duedatespec = $globalduedate->output();
