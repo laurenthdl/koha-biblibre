@@ -767,6 +767,14 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.00.06.011";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('CI-3M:AuthorizedIPs','','Liste des IPs autorisées pour la magnétisation 3M','','Free');
+    });
+    print "Upgrade to $DBversion done (Adding permissions for staff member access to borrowers logs.  )\n";
+    SetVersion ($DBversion);
+}
 
 
 =item DropAllForeignKeys($table)
