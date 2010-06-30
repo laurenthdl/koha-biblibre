@@ -1715,6 +1715,7 @@ sub TransformHtmlToXml {
         @$values[$i] =~ s/>/&gt;/g;
         @$values[$i] =~ s/"/&quot;/g;
         @$values[$i] =~ s/'/&apos;/g;
+	@$values[$i] = NormalizeString(@$values[$i]);
 
         #         if ( !utf8::is_utf8( @$values[$i] ) ) {
         #             utf8::decode( @$values[$i] );
