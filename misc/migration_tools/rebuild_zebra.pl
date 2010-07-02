@@ -177,14 +177,14 @@ sub index_records {
         mkdir "$directory" unless (-d $directory);
         mkdir "$directory/$record_type" unless (-d "$directory/$record_type");
         if ($process_zebraqueue) {
-            my $entries = select_zebraqueue_records($record_type, 'deleted');
-            mkdir "$directory/del_$record_type" unless (-d "$directory/del_$record_type");
-            $num_records_deleted = generate_deleted_marc_records($record_type, $entries, "$directory/del_$record_type", $as_xml);
-            mark_zebraqueue_batch_done($entries);
-            $entries = select_zebraqueue_records($record_type, 'updated');
+            my $entries = select_zebraqueue_records($record_type, 'updated');
             mkdir "$directory/upd_$record_type" unless (-d "$directory/upd_$record_type");
             $num_records_exported = export_marc_records_from_list($record_type, 
                                                                   $entries, "$directory/upd_$record_type", $as_xml, $noxml);
+            mark_zebraqueue_batch_done($entries);
+            $entries = select_zebraqueue_records($record_type, 'deleted');
+            mkdir "$directory/del_$record_type" unless (-d "$directory/del_$record_type");
+            $num_records_deleted = generate_deleted_marc_records($record_type, $entries, "$directory/del_$record_type", $as_xml);
             mark_zebraqueue_batch_done($entries);
         } else {
             my $sth = select_all_records($record_type);
@@ -205,10 +205,10 @@ sub index_records {
     }
 	my $record_fmt = ($as_xml) ? 'marcxml' : 'iso2709' ;
     if ($process_zebraqueue) {
-        do_indexing($record_type, 'delete', "$directory/del_$record_type", $reset, $noshadow, $record_fmt, $zebraidx_log_opt) 
-            if $num_records_deleted;
         do_indexing($record_type, 'update', "$directory/upd_$record_type", $reset, $noshadow, $record_fmt, $zebraidx_log_opt)
             if $num_records_exported;
+        do_indexing($record_type, 'delete', "$directory/del_$record_type", $reset, $noshadow, $record_fmt, $zebraidx_log_opt) 
+            if $num_records_deleted;
     } else {
         do_indexing($record_type, 'update', "$directory/$record_type", $reset, $noshadow, $record_fmt, $zebraidx_log_opt)
             if ($num_records_exported or $skip_export);
