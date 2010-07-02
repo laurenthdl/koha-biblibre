@@ -992,10 +992,14 @@ END_SQL
         push @where_strings, 'items.location = ?';
         push @bind_params, $location;
     }
-    
-    if ( $branch ) {
+
+    if ( $branchcode ) {
+        if($branch eq "homebranch"){
         push @where_strings, 'items.homebranch = ?';
-        push @bind_params, $branch;
+        }else{
+            push @where_strings, 'items.holdingbranch = ?';
+        }
+        push @bind_params, $branchcode;
     }
     
     if ( $itemtype ) {
