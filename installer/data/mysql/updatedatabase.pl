@@ -4053,7 +4053,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = '3.02.00.023';
+$DBversion = '3.02.00.029';
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do(q{
 	ALTER TABLE items 
@@ -4067,6 +4067,19 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     print "Upgrade to $DBversion done. — Add permission to batch modifications on records\n";
     SetVersion ($DBversion);
 }
+
+$DBversion = "3.02.00.030";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+    ALTER TABLE deletedborrowers ADD COLUMN gonenoaddresscomment VARCHAR(255) AFTER gonenoaddress, ADD COLUMN lostcomment VARCHAR(255) AFTER lost,ADD COLUMN debarredcomment VARCHAR(255) AFTER debarred;
+    });
+	$dbh->do(q{
+    ALTER TABLE deletedborrowers CHANGE COLUMN debarred debarred DATE;
+    });
+    print "Upgrade to $DBversion done (Synching  deletedborrowers with borrowers)\n";
+    SetVersion ($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 
