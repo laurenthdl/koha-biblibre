@@ -2942,6 +2942,10 @@ BUDGETAUTOINCREMENT
 ALTER TABLE aqbudget RENAME `aqbudgets`
 BUDGETNAME
 
+    $dbh->do(<<BUDGETNAME);
+ALTER TABLE aqbudget RENAME `aqbudgets`
+BUDGETNAME
+
     $dbh->do(<<BUDGETS);
 ALTER TABLE `aqbudgets`
    CHANGE  COLUMN aqbudgetid `budget_id` int(11) NOT NULL AUTO_INCREMENT,
