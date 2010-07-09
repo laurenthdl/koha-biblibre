@@ -197,7 +197,7 @@ if ($op eq "show"){
     my @contentlist;
     if ($filefh){
         while (my $content=<$filefh>){
-            chomp $content;
+            $content =~ s/[\r\n]*$//g;
             push @contentlist, $content if $content;
         }
 
