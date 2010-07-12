@@ -190,6 +190,8 @@ if ($op eq "show"){
     if ($filefh){
         while (my $content=<$filefh>){
             chomp $content;
+            #Windows file donot have same Line Return as Linux
+            $content=~s/\r//g;
             push @contentlist, $content if $content;
         }
 
