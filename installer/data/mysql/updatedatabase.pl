@@ -4084,12 +4084,23 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.02.00.025";
+$DBversion = "3.02.00.031";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("ALTER TABLE borrowers ADD KEY `guarantorid` (guarantorid);");
     print "Upgrade to $DBversion done (Add index on guarantorid)\n";
     SetVersion ($DBversion);
 }
+
+$DBversion = "3.02.00.032";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do(q{
+      INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AllowMultipleHoldsPerBib','','','Enter here the different itemtypes separated by space you want to allow librarians or OPAC users (if OPACItemHolds is enabled) to set holds on multiple items','Free');
+      });
+    print "Upgrade to $DBversion done (Add index on guarantorid)\n";
+    SetVersion ($DBversion);
+}
+
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
