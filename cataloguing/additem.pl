@@ -584,11 +584,13 @@ foreach my $tag ( keys %{$tagslib}){
         next if ($tagslib->{$tag}->{$subtag}->{'tab'} ne "10");
         next if any { /^$tag$subtag$/ }  @fields;
 
-        my $value = "";
-        my $subfield_data = generate_subfield_form($tag, $subtag, $value, $tagslib, $tagslib->{$tag}->{$subtag}, $branches, $today_iso, $biblionumber, $temp, \@loop_data, $i);
-
-        push (@loop_data, $subfield_data);
-        $i++;
+        my @values = (undef);
+        @values = $itemrecord->field($tag)->subfield($subtag) if ($itemrecord && defined($itemrecord->field($tag)->subfield($subtag)));
+        for my $value (@values){
+            my $subfield_data = generate_subfield_form($tag, $subtag, $value, $tagslib, $tagslib->{$tag}->{$subtag}, $branches, $today_iso, $biblionumber, $temp, \@loop_data, $i); 
+            push (@loop_data, $subfield_data);
+            $i++;
+        } 
     }
     elsif ( $tag eq '' ) {       # it's an hidden field
         $subfield_data{marc_value} = qq(<input type="hidden" $attributes />);
