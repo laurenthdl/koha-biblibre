@@ -813,13 +813,23 @@ sub _send_message_by_email ($) {
                                    status     => 'failed' } );
             return;
         }
-        unless ($to_address = $member->{email}) {   # assigment, not comparison
+        unless($member->{emailpro}){
+			unless($member->{email}){
             # warn "FAIL: No 'to_address' and no email for " . ($member->{surname} ||'') . ", borrowernumber ($message->{borrowernumber})";
             # warning too verbose for this more common case?
             _set_message_status( { message_id => $message->{'message_id'},
                                    status     => 'failed' } );
-            return;
-        }
+			return;
+			}else{
+			$to_address = $member->{email};
+			}
+			#return;
+		}else{
+		$to_address=$member->{emailpro};
+			if($member->{email}){
+			$to_address.=";".$member->{email};
+			}
+		}
     }
 
 	my $content = encode('utf8', $message->{'content'});
