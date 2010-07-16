@@ -795,25 +795,10 @@ sub _send_message_by_email ($;$$$) {
 		      '2' => 'B_email',
 		      '3' => 'cardnumber'};
 
-    my $to_address = $message->{to_address};
-    unless ($to_address) {
-        my $member = C4::Members::GetMember( 'borrowernumber' => $message->{'borrowernumber'} );
-        unless ($member) {
-            warn "FAIL: No 'to_address' and INVALID borrowernumber ($message->{borrowernumber})";
-            _set_message_status(
-                {   message_id => $message->{'message_id'},
-                    status     => 'failed'
-                }
-            );
-            return;
-        }
-	$to_address = GetFirstValidEmailAddress($message->{'borrowernumber'});
+	my $to_address = GetFirstValidEmailAddress($message->{'borrowernumber'});
 
 	unless ($to_address) {
 	    $to_address = C4::Context->preference('KohaAdminEmailAddress');
-	}
-
-        unless ($to_address) {
 
             # warn "FAIL: No 'to_address' and no email for " . ($member->{surname} ||'') . ", borrowernumber ($message->{borrowernumber})";
             # warning too verbose for this more common case?
@@ -823,7 +808,6 @@ sub _send_message_by_email ($;$$$) {
                 }
             );
             return;
-        }
     }
 
     my $utf8   = decode('MIME-Header', $message->{'subject'} );
