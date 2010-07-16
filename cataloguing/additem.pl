@@ -241,6 +241,19 @@ my $biblionumber = $input->param('biblionumber');
 my $itemnumber   = $input->param('itemnumber');
 my $op           = $input->param('op');
 
+if ($op eq "barcode"){
+my $barcode      = $input->param('barcode');
+$itemnumber=get_item_from_barcode($barcode);
+if (!defined($itemnumber)){
+my $cgi = new CGI;
+print $cgi->redirect("/cgi-bin/koha/catalogue/search.pl?idx=bc&q=code-barre_$barcode");
+exit;
+}else{
+$biblionumber=&GetBiblionumberFromItemnumber($itemnumber);
+$op="edititem";
+}
+}
+
 my $frameworkcode = &GetFrameworkCode($biblionumber);
 
 # Defining which userflag is needing according to the framework currently used
@@ -609,6 +622,7 @@ $template->param(
     item_header_loop => \@header_value_loop,
     item             => \@loop_data,
     itemnumber       => $itemnumber,
+	barcode          => GetBarcodeFromItemnumber($itemnumber),
     itemtagfield     => $itemtagfield,
     itemtagsubfield  => $itemtagsubfield,
     op               => $nextop,
