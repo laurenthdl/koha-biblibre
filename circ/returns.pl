@@ -510,6 +510,7 @@ if ($borrower) {
                     reservedate => format_date($item->{'reservedate'}),
                     waitingdate => format_date($item->{'waitingdate'}),
                     barcode     => $item->{'barcode'},
+                    maxpickupdate=> format_date( sprintf("%d-%02d-%02d",GetMaxPickupDate($item->{'waitingdate'}, $borrower->{borrowernumber},$item ))),
                     title       => $biblio->{'title'},
                     brname      => $branches->{ $item->{'branchcode'} }->{'branchname'},
                     waitinghere => ($item->{'branchcode'} eq $userenv_branch)

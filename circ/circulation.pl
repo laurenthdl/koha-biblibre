@@ -394,6 +394,11 @@ if ($borrowernumber) {
             $getreserv{color}   = 'reserved';
             $getreserv{waiting} = 1;
 #     genarate information displaying only waiting reserves
+        my @maxpickupdate = $num_res->{'waitingdate'} ? GetMaxPickupDate( $num_res->{'waitingdate'}, $borrowernumber, $num_res ) : '';
+        $getreserv{'maxpickupdate'} = sprintf( "%d-%02d-%02d", @maxpickupdate );
+        $getWaitingReserveInfo{'formattedwaitingdate'} = format_date( $getreserv{'maxpickupdate'} );
+        $getreserv{'formattedwaitingdate'} = format_date( $getreserv{'maxpickupdate'} );
+
         $getWaitingReserveInfo{title}        = $getiteminfo->{'title'};
         $getWaitingReserveInfo{biblionumber} = $getiteminfo->{'biblionumber'};
         $getWaitingReserveInfo{itemtype}     = $itemtypeinfo->{'description'};
