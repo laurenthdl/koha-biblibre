@@ -251,9 +251,18 @@ my $csvfilename;
 my $htmlfilename;
 my $triggered = 0;
 my $listall = 0;
-my $itemscontent = join( ',', qw( author title barcode itemcallnumber issuedate date_due branchcode ) );
+my $itemscontent = join( ',', qw( title author barcode itemcallnumber issuedate date_due branchcode ) );
 my @myborcat;
 my @myborcatout;
+my %bibs=(               
+              "CEUBA" => 'à la Bibliothèque du CEUBA, 3 rue des Casernes, 01000 BOURG-EN-BRESSE'."\n".'tél : 04 74 23 82 35, mél : sophie.perrin@univ-lyon3.fr',
+                
+              "MAN" => 'à la Bibliothèque de la Manufacture, 6 cours A.Thomas, 69008 LYON'."\n".'tél : 04 78 78 79 20, mél : muriel.ferez@univ-lyon3.fr',
+               
+              "BLL" => 'à la Bibliothèque Lettres et Langues, 13 rue Bancel, 69007 LYON'."\n".'tél : 04 37 65 40 20, mél : etienne.de-beauville@univ-lyon3.fr',
+                
+              "BDP" => 'à la Bibliothèque Droit et Philosophie, 15 quai C.Bernard, 69007 LYON'."\n".'tél : 04 78 78 70 56, mél : Claire.Viennois@univ-lyon3.fr',
+              ) ;
 
 GetOptions(
     'help|?'         => \$help,
@@ -339,7 +348,8 @@ if ( defined $csvfilename ) {
     } else {
         open $csv_fh, ">", $csvfilename or die "unable to open $csvfilename: $!";
     }
-    if ( $csv->combine(qw(name surname address1 address2 zipcode city country email itemcount itemsinfo)) ) {
+    if ( $csv->combine(qw(name surname numnotif borrowernumber address1 address2 zipcode city country email itemcount man bdp bll ceuba)) 
+) {
         print $csv_fh $csv->string, "\n";
     } else {
         $verbose and warn 'combine failed on argument: ' . $csv->error_input;
@@ -434,7 +444,7 @@ END_SQL
             # <date> <itemcount> <firstname> <lastname> <address1> <address2> <address3> <city> <postcode>
 
             my $borrower_sql = <<'END_SQL';
-SELECT COUNT(*), issues.borrowernumber, firstname, surname, address, address2, city, zipcode, country, email, MIN(date_due) as longest_issue
+SELECT COUNT(*), issues.borrowernumber, firstname, surname, address, address2, city, concat( zipcode,' '), country, email, emailpro, MIN(date_due) as longest_issue
 FROM   issues,borrowers,categories
 WHERE  issues.borrowernumber=borrowers.borrowernumber
 AND    borrowers.categorycode=categories.categorycode
@@ -466,12 +476,12 @@ END_SQL
             $sth->execute(@borrower_parameters);
             $verbose and warn $borrower_sql . "\n $branchcode | " . $overdue_rules->{'categorycode'} . "\n ($mindays, $maxdays)\nreturns " . $sth->rows . " rows";
 
-            while ( my ( $itemcount, $borrowernumber, $firstname, $lastname, $address1, $address2, $city, $postcode, $country, $email, $longest_issue ) = $sth->fetchrow ) {
+            while( my ( $itemcount, $borrowernumber, $firstname, $lastname, $address1, $address2, $city, $postcode, $country, $email, $emailpro , $longest_issue) = $sth->fetchrow ) {
                 $email=C4::Members::GetFirstValidEmailAddress($borrowernumber);
                 $verbose and warn "borrower $firstname, $lastname ($borrowernumber) has $itemcount items triggering level $i.";
 
                 my $letter = C4::Letters::getletter( 'circulation', $overdue_rules->{"letter$i"} );
-
+		my $numnotif=$overdue_rules->{"letter$i"};
                 unless ($letter) {
                     $verbose and warn "Message '$overdue_rules->{letter$i}' content not found";
 
@@ -564,7 +574,7 @@ END_SQL
                         }
                       );
                 } else {
-                    if ($email) {
+                    if ($email or $emailpro) {
                         C4::Letters::EnqueueLetter(
                             {   letter                 => $letter,
                                 borrowernumber         => $borrowernumber,
@@ -574,11 +584,17 @@ END_SQL
                             }
                         );
                     } else {
-
+						my $titlebis=$titles; my $man; my $bdp; my $bll; my $ceuba;
+						$titles=~ s/(.*\t.*\t)(.*)\t(.*)\t(.*)\t(.*)\t(MAN|BLL|BDP|CEUBA)/$1\ncode-barre : $2 cote : $3\nemprunté le $4 devait être rendu au plus tard le $5\n/g;              
+						if ($titlebis=~/MAN$/){$man=$titles;}
+						elsif ($titlebis=~/BDP$/){$bdp=$titles;}
+						elsif ($titlebis=~/BLL$/){$bll=$titles;}
+						elsif ($titlebis=~/CEUBA$/){$ceuba=$titles;}
                         # If we don't have an email address for this patron, send it to the admin to deal with.
                         push @output_chunks,
                           prepare_letter_for_printing(
                             {   letter         => $letter,
+								numnotif       => $numnotif,
                                 borrowernumber => $borrowernumber,
                                 firstname      => $firstname,
                                 lastname       => $lastname,
@@ -589,7 +605,10 @@ END_SQL
                                 postcode       => $postcode,
                                 email          => $email,
                                 itemcount      => $itemcount,
-                                titles         => $titles,
+                                man            => $man,
+								bdp            => $bdp,
+								bll            => $bll,
+								ceuba          => $ceuba,
                                 outputformat   => defined $csvfilename ? 'csv' : defined $htmlfilename ? 'html' : '',
                             }
                           );
@@ -613,9 +632,10 @@ END_SQL
         $content .= join( "\n", map { m/(.+)/ } @output_chunks );
 
         my $attachment = {
-            filename => defined $csvfilename ? 'attachment.csv' : 'attachment.txt',
+            filename => defined $csvfilename ? 'relances.csv' : 'relances.txt',
             type => 'text/plain',
-            content => join( "\n", @output_chunks )
+            content => "name;surname;numnotif;borrowernumber;address;address2;zipcode;city;country;email;itemcount;man;bdp;bll;ceuba\n".join( "\n", @output_chunks),
+ 
         };
 
         my $letter = {
@@ -676,17 +696,8 @@ sub parse_letter {    # FIXME: this code should probably be moved to C4::Letters
     if ( $params->{'substitute'} ) {
         while ( my ( $key, $replacedby ) = each %{ $params->{'substitute'} } ) {
            if ($key eq 'items.content'){
-              my %bibs=(               
-              "CEUBA" => 'à la Bibliothèque du CEUBA, 3 rue des Casernes, 01000 BOURG-EN-BRESSE, Tél 04 74 23 82 35, Mél sophie.perrin@univ-lyon3.fr',
-                
-              "MAN" => 'à la Bibliothèque de la Manufacture, 6 cours A.Thomas, 69008 LYON, Tél 04 78 78 79 40, Mél scd.manu@univ-lyon3.fr',
-               
-              "BLL" => 'à la Bibliothèque Lettres et Langues, 13 rue Bancel, 69007 LYON, Tél 04 37 65 40 20, Mél scd.bll@univ-lyon3.fr',
-                
-              "BDP" => 'à la Bibliothèque Droit et Philosophie, 15 quai C.Bernard, 69007 LYON, Tél 04 78 78 70 56, Mél demortiere.scd@univ-lyon3.fr',
-                ) ;     
-              $replacedby=~ s/(.*\t.*\t.*\t)(.*)\t(.*)\t(.*)\t(MAN|BLL|BDP|CEUBA)/"$1 cote : $2  emprunté le $3 à 
-devait être rendu au plus tard le $4 $bibs{$5}\n"/egm;
+                  
+              $replacedby=~ s/(.*\t.*\t)(.*)\t(.*)\t(.*)\t(.*)\t(MAN|BLL|BDP|CEUBA)/"$1code-barre : $2 cote : $3  emprunté le $4 devait être rendu au plus tard le $5 $bibs{$6}\n"/egm;
           }
               
           
@@ -758,11 +769,12 @@ sub prepare_letter_for_printing {
     my $return;
     if ( exists $params->{'outputformat'} && $params->{'outputformat'} eq 'csv' ) {
         if ($csv->combine(
-                $params->{'firstname'}, $params->{'lastname'}, $params->{'address1'}, $params->{'address2'},  $params->{'postcode'},
-                $params->{'city'},      $params->{'country'},  $params->{'email'},    $params->{'itemcount'}, $params->{'titles'}
+                $params->{'firstname'}, $params->{'lastname'},$params->{'numnotif'}, $params->{'borrowernumber'}, $params->{'address1'},$params->{'address2'}, 
+				$params->{'postcode'},$params->{'city'}, $params->{'country'}, $params->{'email'}, $params->{'itemcount'},
+				$params->{'man'},$params->{'bdp'},$params->{'bll'},$params->{'ceuba'}
             )
           ) {
-            return $csv->string, "\n";
+            return $csv->string ;
         } else {
             $verbose and warn 'combine failed on argument: ' . $csv->error_input;
         }
