@@ -1643,9 +1643,9 @@ sub _koha_notify_reserve {
     my $messagingprefs;
     if ( $borrower->{'email'} || $borrower->{'smsalertnumber'} ) {
         $messagingprefs = C4::Members::Messaging::GetMessagingPreferences( { borrowernumber => $borrowernumber, message_name => 'Hold Filled' } );
-
-        return if ( !defined( $messagingprefs->{'letter_code'} ) );
-        $letter_code = $messagingprefs->{'letter_code'};
+        @{$messagingprefs->{transports}}='email';$letter_code='HOLD';
+#        return if ( !defined( $messagingprefs->{'letter_code'} ) );
+#        $letter_code = $messagingprefs->{'letter_code'};
     } else {
         $letter_code = 'HOLD';
         $print_mode = 1;
