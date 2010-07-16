@@ -517,7 +517,7 @@ if ($borrower) {
             } else {
                 $flag = "gonenoaddress";
             }
-            %flaginfo = ( $flag => 1, $flag . "comment" => $borrower->{ $flag . "comment" }, dateend => $flags->{ uc($flag) }->{dateend} );
+            %flaginfo = ( $flag => 1, $flag . "comment" => $borrower->{ $flag . "comment" },dateend=>format_date($flags->{uc($flag)}->{dateend}));
         } elsif ( $flag eq 'ODUES' ) {
             my $items = $flags->{$flag}->{'itemlist'};
             my @itemloop;
