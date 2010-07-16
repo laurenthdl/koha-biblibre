@@ -1869,15 +1869,15 @@ sub _koha_notify_reserve {
     my ($itemnumber, $borrowernumber, $biblionumber, $reservenumber) = @_;
 
     my $dbh = C4::Context->dbh;
-    my $borrower = C4::Members::GetMember( $borrowernumber );
+    my $borrower = C4::Members::GetMember( 'borrowernumber'=>$borrowernumber );
     my $letter_code;
     my $print_mode = 0;
     my $messagingprefs;
     if ( C4::Members::GetFirstValidEmailAddress($borrowernumber) || $borrower->{'smsalertnumber'} ) {
         $messagingprefs = C4::Members::Messaging::GetMessagingPreferences( { borrowernumber => $borrowernumber, message_name => 'Hold Filled' } );
-
-        return if ( !defined( $messagingprefs->{'letter_code'} ) );
-        $letter_code = $messagingprefs->{'letter_code'};
+        @{$messagingprefs->{transports}}='email';$letter_code='HOLD';
+#        return if ( !defined( $messagingprefs->{'letter_code'} ) );
+#        $letter_code = $messagingprefs->{'letter_code'};
     } else {
         $letter_code = 'HOLD';
         $print_mode  = 1;
