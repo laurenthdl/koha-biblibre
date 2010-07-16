@@ -7,12 +7,11 @@
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
 function FillinId(){
-
 var cat=document.getElementById('categorycode');
 var lec=cat.options[cat.selectedIndex].value ;
 var nbcard=document.getElementById('cardnumber').value;
 var dtbirth=document.getElementById('dateofbirth').value; 
-  if ((lec==='ETUPRES') || (lec==='ETUAUT') || (lec==='LECAUT') || (lec==='PROPRES')){
+  if ((lec==='ETUPRES') || (lec==='ETUAUT') || (lec==='LECTAUT') || (lec==='PROPRES')){
 document.getElementById('userid').value='id'+nbcard;
 document.getElementById('password').value=dtbirth.substr(3,2)+dtbirth.substr(8,2);  
 }
@@ -777,7 +776,7 @@ onchange="CheckDate(document.form.dateofbirth);FillinId();" value="<!-- TMPL_VAR
     <li>
     <!-- TMPL_IF NAME="typeloop" -->
         <label for="categorycode">Category: </label>
-        <select id="categorycode" name="categorycode">
+        <select id="categorycode" name="categorycode" onchange="FillinId();">
         <!-- TMPL_LOOP NAME="typeloop" -->
 		<!-- TMPL_IF EXPR="typename eq 'C'" --><optgroup label="Child"><!-- /TMPL_IF -->
 		<!-- TMPL_IF EXPR="typename eq 'A'" --><optgroup label="Adult"><!-- /TMPL_IF -->
