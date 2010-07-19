@@ -3444,7 +3444,6 @@ sub BatchModField {
     } else {
         my $done=0;
         for my $rfield ($record->field($field)) {
-            my $initfield=$rfield->clone();
             if ($subfield && $subfield ne "@"){
                 my @subfields = $rfield->subfields();
                 my @subfields_to_add; 
@@ -3466,15 +3465,15 @@ sub BatchModField {
                                 next;
                     }
                 }
-            }
                     push @subfields_to_add,@$subf;
+            }
         }
                 if ($done){
                     if (@subfields_to_add){
                         $rfield->replace_with(MARC::Field->new($rfield->tag,$rfield->indicator(1),$rfield->indicator(2),@subfields_to_add)) if ($done);
     }
                     else {
-                        my $count= $record->delete_field($initfield);
+                        my $count= $record->delete_field($rfield);
                     }
                 }
             }
