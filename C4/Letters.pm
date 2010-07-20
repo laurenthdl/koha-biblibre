@@ -788,6 +788,10 @@ ENDSQL
 
 sub _send_message_by_email ($;$$$) {
     my $message = shift or return;
+    my $value_for = { '0' => 'email',
+		      '1' => 'emailpro',
+		      '2' => 'B_email',
+		      '3' => 'cardnumber'};
 
     my $to_address = $message->{to_address};
     unless ($to_address) {

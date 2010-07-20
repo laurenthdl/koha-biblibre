@@ -1951,6 +1951,7 @@ sub _koha_notify_reserve {
     C4::Letters::parseletter( $letter, 'borrowers', $borrowernumber );
     C4::Letters::parseletter( $letter, 'biblio', $biblionumber );
     C4::Letters::parseletter( $letter, 'reserves', $borrowernumber, $biblionumber );
+    C4::Letters::parseletter( $letter, 'items',  $itemnumber );
 
     if ( $reserve->{'itemnumber'} ) {
         C4::Letters::parseletter( $letter, 'items', $reserve->{'itemnumber'} );
