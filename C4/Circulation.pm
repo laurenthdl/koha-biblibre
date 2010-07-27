@@ -103,6 +103,7 @@ BEGIN {
 	
 	# subs to deal with offline circulation
 	push @EXPORT, qw(
+      &GetOfflineOperations
 		&GetOfflineOperation
 		&AddOfflineOperation
 		&DeleteOfflineOperation
@@ -995,7 +996,9 @@ sub AddIssue {
 					ModReserve(1,
 						$res->{'biblionumber'},
 						$res->{'borrowernumber'},
-						$res->{'branchcode'}
+						$res->{'branchcode'},
+						undef,
+						$res->{'reservenumber'}
 					);
 				}
 			}
