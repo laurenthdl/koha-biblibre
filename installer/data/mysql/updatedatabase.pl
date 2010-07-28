@@ -4108,6 +4108,15 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.034";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+        ALTER TABLE issuingrules ADD COLUMN `holdspickupdelay` INT(11) NULL default NULL ;
+    });
+	print "Upgrade to $DBversion done\n";
+	SetVersion ($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 
