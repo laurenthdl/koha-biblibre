@@ -164,6 +164,7 @@ $template->param(
 $template->param(
     branchloop=>$branches,
     categories=>\@categories,
+    showfilter => ( $$patron{branchcode} || $$patron{categorycode}),
 );
 
 
