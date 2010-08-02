@@ -67,6 +67,8 @@ This module provides searching functions for Koha's bibliographic databases
   &AddSearchHistory
   &GetDistinctValues
   &BiblioAddAuthorities
+  &GetIndexes
+  &GetMappings
 );
 #FIXME: i had to add BiblioAddAuthorities here because in Biblios.pm it caused circular dependencies (C4::Search uses C4::Biblio, and BiblioAddAuthorities uses SimpleSearch from C4::Search)
 
@@ -2681,6 +2683,27 @@ sub GetDistinctValues {
    }
 }
 
+sub GetIndexes {
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare("SELECT * FROM indexes");
+    $sth->execute;
+    return $sth->fetchall_arrayref({});
+}
+
+sub GetMappings {
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare("SELECT * FROM indexmappings");
+    $sth->execute;
+    return $sth->fetchall_arrayref({});
+}
+
+sub GetSubfieldsForIndex {
+    my $index = shift;
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare("SELECT field, subfield FROM indexmappings WHERE index=?");
+    $sth->execute($index);
+    return $sth->fetchrow_hashref;
+}
 
 END { }    # module clean-up code here (global destructor)
 
