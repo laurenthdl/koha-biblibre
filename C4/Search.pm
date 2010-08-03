@@ -1092,7 +1092,8 @@ sub buildQuery {
 
             # COMBINE OPERANDS, INDEXES AND OPERATORS
             if ( $operands[$i] ) {
-		$operands[$i]=~s/^\s+//;
+		        $operands[$i]=~s/^\s+//;
+                next unless $operands[$i];
 
               # A flag to determine whether or not to add the index to the query
                 my $indexes_set;
@@ -1266,6 +1267,7 @@ sub buildQuery {
     my $group_OR_limits;
     my $availability_limit;
     foreach my $this_limit (@limits) {
+        next unless $this_limit;
         if ( $this_limit =~ /available/ ) {
 #
 ## 'available' is defined as (items.onloan is NULL) and (items.itemlost = 0)
