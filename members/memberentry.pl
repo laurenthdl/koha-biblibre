@@ -547,6 +547,13 @@ for my $branch (sort { $branches->{$a}->{branchname} cmp $branches->{$b}->{branc
     $select_branches{$branch} = $branches->{$branch}->{'branchname'};
     $default = C4::Context->userenv->{'branch'} if (C4::Context->userenv && C4::Context->userenv->{'branch'});
 }
+
+if ($category_type eq 'A' || $category_type eq 'P') {
+    $template->param(
+	addtoorganization => 1
+		    );
+}
+
 # --------------------------------------------------------------------------------------------------------
   #in modify mod :default value from $CGIbranch comes from borrowers table
   #in add mod: default value come from branches table (ip correspendence)
