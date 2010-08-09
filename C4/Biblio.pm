@@ -2234,6 +2234,14 @@ sub PrepareItemrecordDisplay {
                         $defaultvalue = $defaultvalues->{branchcode} if $defaultvalues;
                     }
                 }
+                if (   ( $tagslib->{$tag}->{$subfield}->{kohafield} eq 'items.location' )
+                    && $defaultvalues
+                    && $defaultvalues->{'location'} ) {
+                    my $temp = $itemrecord->field($subfield) if ($itemrecord);
+                    unless ($temp) {
+                        $defaultvalue = $defaultvalues->{location} if $defaultvalues;
+                    }
+                }
                 if ( $tagslib->{$tag}->{$subfield}->{authorised_value} ) {
                     my @authorised_values;
                     my %authorised_lib;
