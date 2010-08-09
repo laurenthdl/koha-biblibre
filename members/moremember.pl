@@ -202,10 +202,10 @@ if ( $category_type eq 'A' ) {
             }
         );
     }
+    warn Data::Dumper::Dumper(@guaranteedata);
     $template->param( guaranteeloop => \@guaranteedata );
     ( $template->param( adultborrower => 1 ) ) if ( $category_type eq 'A' );
 }
-else {
     if ($data->{'guarantorid'}){
 	    my ($guarantor) = GetMember( 'borrowernumber' =>$data->{'guarantorid'});
 		$template->param(guarantor => 1);
@@ -216,7 +216,6 @@ else {
 	if ($category_type eq 'C'){
 		$template->param('C' => 1);
 	}
-}
 
 my %bor;
 $bor{'borrowernumber'} = $borrowernumber;
