@@ -10,19 +10,6 @@ function confirm_deletion(id) {
         window.location="authorities-home.pl?op=delete&amp;authid="+id;
     }
 }
-function Help() {
-    newin=window.open("/cgi-bin/koha/help.pl","KohaHelp",'width=600,height=600,toolbar=false,scrollbars=yes');
-}
-
-function addauthority() {
-    X = document.forms[0].authtype.value;
-    window.location="/cgi-bin/koha/authorities/authorities.pl?authtypecode="+X;
-}
-function searchauthority() {
-    X = document.forms[0].authtype2.value;
-    Y = document.forms[0].value.value;
-    window.location="/cgi-bin/koha/authorities/authorities-home.pl?op=do_search&type=intranet&authtypecode="+X+"&value="+Y+"&marclist=&and_or=and&excluding=&operator=contains";
-}
 //]]>
 </script>
 </head>
@@ -67,7 +54,7 @@ function searchauthority() {
       <td><a href="detail.pl?authid=<!-- TMPL_VAR NAME="authid" -->">Details</a></td>
   <!-- TMPL_UNLESS name="isEDITORS" -->
       <td>
-        <a href="../catalogue/search.pl?type=intranet&amp;op=do_search&amp;idx=an&amp;q=<!--TMPL_VAR Name="authid" -->" class="button"><!-- TMPL_VAR NAME="used" --> biblio(s)</a>
+        <a href="../catalogue/search.pl?q=*:*&amp;filters=authid:<!--TMPL_VAR ESCAPE="URL" Name="authid" -->" class="button"><!-- TMPL_VAR NAME="used" --> biblio(s)</a>
       </td>
   <!-- /TMPL_UNLESS -->
       <td>
@@ -80,7 +67,7 @@ function searchauthority() {
   </table>
 </div>
 
-<div class="paginationBar"><!-- TMPL_VAR NAME="pagination_bar" --></div>
+<!-- TMPL_INCLUDE NAME="authorities-page-numbers.inc" -->
 
 <!-- TMPL_ELSE -->
   No results found
