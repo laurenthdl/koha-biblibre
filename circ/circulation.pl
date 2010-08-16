@@ -533,6 +533,22 @@ if ($borrower) {
     # If we have more than one borrower, we display their names
     @borrowers_with_issues = uniq @borrowers_with_issues;
     $template->param('multiple_borrowers' => 1) if (@borrowers_with_issues > 1);
+}
+
+if ($borrower) {
+
+    # Getting borrower relatives
+    my @relborrowernumbers = GetMemberRelatives($borrower->{'borrowernumber'});
+    #push @borrowernumbers, $borrower->{'borrowernumber'};
+
+    # get each issue of the borrower & separate them in todayissues & previous issues
+    my ($issueslist) = GetPendingIssues($borrower->{'borrowernumber'});
+    my ($relissueslist) = GetPendingIssues(@relborrowernumbers);
+
+    build_issue_data($issueslist, 0);
+    build_issue_data($relissueslist, 1);
+  
+    $displayrelissues = scalar($relissueslist);
 
     if ( C4::Context->preference("todaysIssuesDefaultSortOrder") eq 'asc' ) {
         @todaysissues = sort { $a->{'timestamp'} cmp $b->{'timestamp'} } @todaysissues;
