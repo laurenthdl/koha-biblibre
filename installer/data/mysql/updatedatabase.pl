@@ -4117,6 +4117,24 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.035";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+	ALTER TABLE `search_history` ADD `limit_desc` VARCHAR( 255 ) NULL DEFAULT NULL AFTER `query_cgi` ,
+	ADD `limit_cgi` VARCHAR( 255 ) NULL DEFAULT NULL AFTER `limit_desc` 
+    });
+	print "Upgrade to $DBversion done\n";
+	SetVersion ($DBversion);
+}
+
+$DBversion = "3.02.00.036";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES  
+		('OpacAdvancedSearchContent','','Use HTML tabs to create your own advanced search menu in OPAC','70|10','Textarea'),
+		('AdvancedSearchContent','','Use HTML tabs to create your own advanced search menu','70|10','Textarea')");
+    print "Upgrade to $DBversion done (adding OpacAdvancedSearchContent and AdvancedSearchContent systempref, in 'Searching' tab)\n";
+    SetVersion($DBversion);
+}
 
 =item DropAllForeignKeys($table)
 

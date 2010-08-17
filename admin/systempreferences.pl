@@ -263,6 +263,8 @@ $tabsysprefs{QueryAutoTruncate}       = "Searching";
 $tabsysprefs{QueryRemoveStopwords}    = "Searching";
 $tabsysprefs{AdvancedSearchTypes}     = "Searching";
 $tabsysprefs{DisplayMultiPlaceHold}   = "Searching";
+$tabsysprefs{AdvancedSearchContent}   	  = "Searching";
+$tabsysprefs{OpacAdvancedSearchContent}   = "Searching";
 
 # EnhancedContent
 $tabsysprefs{AmazonEnabled}          = "EnhancedContent";
