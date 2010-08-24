@@ -1678,7 +1678,7 @@ sub SetMemberInfosInTemplate {
 
     # Computes full borrower address
     my ( undef, $roadttype_hashref ) = &GetRoadTypes();
-    my $address = $borrower->{'streetnumber'} . ' ' . $roadttype_hashref->{ $borrower->{'streettype'} } . ' ' . $borrower->{'address'};
+    my $address =getFullBorrowerAddress($borrower);
     $template->param(
         is_child => ( $borrower->{'category_type'} eq 'C' ),
         address => $address,
@@ -1701,8 +1701,7 @@ sub SetMemberInfosInTemplate {
 }
 
 sub getFullBorrowerAddress {
-    my ( $borrowernumber ) = @_;
-    my $borrower = GetMemberDetails( $borrowernumber, 0 );
+    my ( $borrower ) = @_;
     # Computes full borrower address
     my ( undef, $roadttype_hashref ) = &GetRoadTypes();
     my $address1="";
