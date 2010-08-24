@@ -284,6 +284,7 @@ if ($noreport) {
             push @patron_attr_value_loop, { value => join(', ', sort { lc $a cmp lc $b } @displayvalues) };
         }
 
+        $data->{email}=C4::Members::GetFirstValidEmailAddress($data->{borrowernumber});
         push @overduedata, {
             duedate                => format_date($data->{date_due}),
             borrowernumber         => $data->{borrowernumber},
