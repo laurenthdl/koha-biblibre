@@ -477,7 +477,7 @@ for my $branch (sort { $branches->{$a}->{branchname} cmp $branches->{$b}->{branc
 # --------------------------------------------------------------------------------------------------------
   #in modify mod :default value from $CGIbranch comes from borrowers table
   #in add mod: default value come from branches table (ip correspendence)
-$default=$data{'branchcode'}  if ($op eq 'modify' || ($op eq 'add' && $category_type eq 'C'));
+$default=$data{'branchcode'}  if ($op eq 'modify');
 my $CGIbranch = CGI::scrolling_list(-id    => 'branchcode',
             -name   => 'branchcode',
             -values => \@select_branch,
