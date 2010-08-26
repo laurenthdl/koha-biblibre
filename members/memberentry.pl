@@ -557,7 +557,7 @@ if ($category_type eq 'A' || $category_type eq 'P') {
 # --------------------------------------------------------------------------------------------------------
 #in modify mod :default value from $CGIbranch comes from borrowers table
 #in add mod: default value come from branches table (ip correspendence)
-$default = $data{'branchcode'} if ( $op eq 'modify' || ( $op eq 'add' && $category_type eq 'C' ) );
+$default = $data{'branchcode'} if ( $op eq 'modify');
 my $CGIbranch = CGI::scrolling_list(
     -id       => 'branchcode',
     -name     => 'branchcode',
