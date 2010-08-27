@@ -4496,6 +4496,20 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.031";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `accountlines` ADD `note` text NULL default NULL");
+    print "Upgrade to $DBversion done (adding note field in accountlines table)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.032";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `accountlines` ADD `manager_id` int( 11 ) NULL ");
+    print "Upgrade to $DBversion done (adding manager_id field in accountlines table)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
