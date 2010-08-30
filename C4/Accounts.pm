@@ -36,7 +36,7 @@ BEGIN {
 	@ISA    = qw(Exporter);
 	@EXPORT = qw(
 		&recordpayment &makepayment &manualinvoice
-		&getnextacctno &reconcileaccount &getcharges &updatenote &getcredits
+		&getnextacctno &reconcileaccount &getcharges &Modnote &getcredits
 		&getrefunds &chargelostitem
 		&ReversePayment
 	); # removed &fixaccounts
@@ -607,7 +607,7 @@ sub getcharges {
     return (@results);
 }
 
-sub updatenote {
+sub ModNote {
     my ( $borrowernumber, $accountno, $note ) = @_;
     my $dbh = C4::Context->dbh;
     my $sth = $dbh->prepare('UPDATE accountlines SET note = ? WHERE borrowernumber = ? AND accountno = ?');
