@@ -774,6 +774,13 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.00.06.012";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do(qq{INSERT IGNORE INTO borrower_message_preferences (`borrowernumber`, `message_attribute_id`, `days_in_advance`, `wants_digest`) SELECT borrowernumber, 4,NULL,NULL from borrowers;});
+    $dbh->do(qq{INSERT IGNORE INTO borrower_message_transport_preferences (borrower_message_preference_id, `message_transport_type`) SELECT borrower_message_preference_id, "email" from borrower_message_preferences ;});
+    print "Upgrade to $DBversion done  (Add mailing mode for each borrower in borrower_message_preferences and borrower_message_transport_preferences)\n";
+    SetVersion ($DBversion);
+}
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
