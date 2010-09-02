@@ -51,7 +51,7 @@
     <!-- TMPL_IF NAME="CAN_user_serials" -->
         <li><a href="/cgi-bin/koha/serials/serials-home.pl">Serials</a></li>
     <!-- /TMPL_IF -->
-    <!-- TMPL_IF NAME="CAN_user_editcatalogue" -->
+    <!-- TMPL_IF NAME="CAN_user_editcatalogue_edit_catalogue" -->
     </ul></li>
     
     <li><a href="/cgi-bin/koha/acqui/acqui-home.pl">Acquisitions</a></li>

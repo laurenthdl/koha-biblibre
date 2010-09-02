@@ -53,7 +53,7 @@ my ($template, $loggedinuser, $cookie);
                  query => $cgi,
                  type => "intranet",
                  authnotrequired => 0,
-                 flagsrequired => { serials => 'routing' },
+                 flagsrequired => { borrowers=>1, serials => 'routing' },
                  });
 
 foreach my $category (@categories){
