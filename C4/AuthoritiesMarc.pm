@@ -54,7 +54,6 @@ BEGIN {
 
       &CountUsage
       &CountUsageChildren
-      &SearchAuthorities
 
       &BuildSummary
       &BuildUnimarcHierarchies
@@ -693,8 +692,6 @@ sub FindDuplicateAuthority {
     my ($auth_tag_to_report) = $sth->fetchrow;
     $sth->finish;
 
-    #     warn "record :".$record->as_formatted."  auth_tag_to_report :$auth_tag_to_report";
-    # build a request for SearchAuthorities
     my $query        = 'at=' . $authtypecode . ' ';
     my $filtervalues = qr([\001-\040\!\'\"\`\#\$\%\&\*\+,\-\./:;<=>\?\@\(\)\{\[\]\}_\|\~]);
     if ( $record->field($auth_tag_to_report) ) {
