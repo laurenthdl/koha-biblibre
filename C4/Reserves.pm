@@ -929,7 +929,9 @@ sub CheckReserves {
     # If we get this far, then no exact match was found.
     # We return the most important (i.e. next) reservation.
     if ($highest) {
+warn "CheckReserve";
         $highest->{'itemnumber'} = $item;
+warn Data::Dumper::Dumper($highest);
         return ( "Reserved", $highest );
     } else {
         return ( 0, 0 );
@@ -1874,6 +1876,7 @@ sub _koha_notify_reserve {
     my $print_mode = 0;
     my $messagingprefs;
     if ( C4::Members::GetFirstValidEmailAddress($borrowernumber) || $borrower->{'smsalertnumber'} ) {
+    #if ( $borrower->{'email'} ||$borrower->{'emailpro'} || $borrower->{'smsalertnumber'} ) {
         $messagingprefs = C4::Members::Messaging::GetMessagingPreferences( { borrowernumber => $borrowernumber, message_name => 'Hold Filled' } );
         @{$messagingprefs->{transports}}='email';$letter_code='HOLD';
 #        return if ( !defined( $messagingprefs->{'letter_code'} ) );
