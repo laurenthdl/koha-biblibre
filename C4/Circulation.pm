@@ -963,7 +963,10 @@ sub AddIssue {
 				# who wants to borrow it now. mark it returned before issuing to the new borrower
 				AddReturn(
 					$item->{'barcode'},
-					C4::Context->userenv->{'branch'}
+					C4::Context->userenv->{'branch'},
+					undef,
+					undef,
+					1
 				);
 			}
 
