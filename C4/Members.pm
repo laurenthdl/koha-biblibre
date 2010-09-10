@@ -2181,7 +2181,8 @@ sub GetMessages {
     my $query = "SELECT
                   branches.branchname,
                   messages.*,
-                  DATE_FORMAT( message_date, '%m/%d/%Y' ) AS message_date_formatted,
+                  DATE_FORMAT( message_date, '%d/%m/%Y' ) AS 
+message_date_formatted,
                   messages.branchcode LIKE '$branchcode' AS can_delete
                   FROM messages, branches
                   WHERE borrowernumber = ?
