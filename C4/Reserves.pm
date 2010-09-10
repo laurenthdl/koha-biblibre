@@ -626,6 +626,7 @@ sub GetMaxPickupDate{
     my $inputdate=shift;
     my $borrowernumber=shift;
     my $item=shift;
+    return unless $inputdate;
     my @date = split(/-/,$inputdate);
     my $delay = GetMaxPickupDelay($borrowernumber, $item->{'itemnumber'});
     ( @date ) =
