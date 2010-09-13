@@ -4522,6 +4522,16 @@ $dbh->do("
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.035";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES  
+('IssuingRulesHeritage','0','Enables IssuingRules Heritage e.g. any rule defined at "higher" level will be applied unless there is a rule defined','','YesNo');
+    });
+    print "Upgrade to $DBversion done (adding IssuingRulesHeritage systempref, in 'Circulation' tab)\n";
+    SetVersion($DBversion);
+}
+
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

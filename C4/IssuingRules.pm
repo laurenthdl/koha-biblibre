@@ -87,6 +87,10 @@ sub GetIssuingRule {
 
     # This configuration table defines the order of inheritance. We'll loop over it.
     my @attempts = (
+        [ $categorycode, $itemtype, $branchcode ],
+    );
+
+    unshift @attempts,(
         [ "*",           "*",       "*" ],
         [ "*",           $itemtype, "*" ],
         [ $categorycode, "*",       "*" ],
@@ -94,9 +98,7 @@ sub GetIssuingRule {
         [ "*",           "*",       $branchcode ],
         [ "*",           $itemtype, $branchcode ],
         [ $categorycode, "*",       $branchcode ],
-        [ $categorycode, $itemtype, $branchcode ],
-    );
-
+    ) if C4::Context->preference("IssuingRulesHeritage");
     # This complex query returns a nested hashref, so we can access a rule using :
     # my $rule = $$rules{$categorycode}{$itemtype}{$branchcode};
     # this will be usefull in the inheritance computation code
