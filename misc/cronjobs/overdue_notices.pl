@@ -472,6 +472,7 @@ END_SQL
                     $address1, $address2, $city, $postcode, $country, $email,
                     $longest_issue ) = $sth->fetchrow )
             {
+                $email=C4::Members::GetFirstValidEmailAddress($borrowernumber);
                 $verbose and warn "borrower $firstname, $lastname ($borrowernumber) has $itemcount items triggering level $i.";
     
                 my $letter = C4::Letters::getletter( 'circulation', $overdue_rules->{"letter$i"} );
