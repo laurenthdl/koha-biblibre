@@ -3451,8 +3451,7 @@ sub BatchModField {
                     if ($subf->[0] eq $subfield){
                         $subf->[1]=NormalizeString($subf->[1]);
                         if ( $action eq "mod" ) {
-                            if ( $nocond ne "true" && $subf->[1] =~ s/$condition/$repval/
-                                ) {
+                            if ( $nocond ne "true" && $subf->[1] =~ s/$condition/$repval/) {
                                 $done=1;
                             } 
                             if ($nocond eq "true"){
@@ -3463,14 +3462,14 @@ sub BatchModField {
                             if ( $subf->[1] =~ m/$condition/ || $nocond eq "true" ) {
                                 $done=1;
                                 next;
+                            }
+                        }
                     }
-                }
                     push @subfields_to_add,@$subf;
-            }
         }
                 if ($done){
                     if (@subfields_to_add){
-                        $rfield->replace_with(MARC::Field->new($rfield->tag,$rfield->indicator(1),$rfield->indicator(2),@subfields_to_add)) if ($done);
+                        $rfield->replace_with(MARC::Field->new($rfield->tag,$rfield->indicator(1),$rfield->indicator(2),@subfields_to_add));
     }
                     else {
                         my $count= $record->delete_field($rfield);
