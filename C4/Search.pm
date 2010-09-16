@@ -1666,7 +1666,6 @@ sub searchResults {
         # XSLT processing of some stuff
 	use C4::Charset;
 	SetUTF8Flag($marcrecord);
-	$debug && warn $marcrecord->as_formatted;
         if (!$scan && $search_context eq 'opac' && C4::Context->preference("OPACXSLTResultsDisplay")) {
             # FIXME note that XSLTResultsDisplay (use of XSLT to format staff interface bib search results)
             # is not implemented yet
