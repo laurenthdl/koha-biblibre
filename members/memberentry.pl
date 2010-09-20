@@ -222,6 +222,7 @@ if (    defined($guarantorid)
             $newdata{'contactfirstname'} = $guarantordata->{'firstname'};
             $newdata{'contactname'}      = $guarantordata->{'surname'};
             $newdata{'contacttitle'}     = $guarantordata->{'title'};
+            $newdata{'contactdateofbirth'}     = C4::Dates->new($guarantordata->{'dateofbirth'},'iso')->output();
             foreach (
                 qw(streetnumber address streettype address2
                 zipcode country city phone phonepro mobile fax email emailpro branchcode)

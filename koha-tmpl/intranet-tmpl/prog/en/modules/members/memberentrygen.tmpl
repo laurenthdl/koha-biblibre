@@ -218,9 +218,9 @@
 		<!-- /TMPL_IF-->
 		Surname: </label>
 		<!-- TMPL_IF NAME="uppercasesurnames" -->
-		<input style="text-transform:uppercase;" type="text" id="surname" name="surname" size="20"  value="<!-- TMPL_VAR NAME="surname" -->" />
+		<input style="text-transform:uppercase;" type="text" id="surname" name="surname" size="20"  value="<!--TMPL_IF Name="showguarantor"--><!-- TMPL_VAR NAME="contactname" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="surname" --><!-- /TMPL_IF -->"<!--TMPL_IF Name="showguarantor"--> onclick="this.value=''"<!-- /TMPL_IF --> />
 		<!-- TMPL_ELSE -->
-		<input type="text" id="surname" name="surname" size="20"  value="<!-- TMPL_VAR NAME="surname" -->" />
+		<input type="text" id="surname" name="surname" size="20"  value="<!--TMPL_IF Name="showguarantor"--><!-- TMPL_VAR NAME="contactname" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="surname" --><!-- /TMPL_IF -->"<!--TMPL_IF Name="showguarantor"--> onclick="this.value=''"<!-- /TMPL_IF --> />
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="mandatorysurname" --><span class="required">Required</span><!-- /TMPL_IF -->
 		</li>
@@ -232,7 +232,7 @@
                 <label for="firstname">
                 <!-- /TMPL_IF-->
                 First name: </label>
-                <input type="text" id="firstname" name="firstname" size="20"  value="<!-- TMPL_VAR NAME="firstname" -->" />
+                <input type="text" id="firstname" name="firstname" size="20"  value="<!--TMPL_IF Name="showguarantor"--><!-- TMPL_VAR NAME="contactfirstname" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="firstname" --><!-- /TMPL_IF -->"<!--TMPL_IF Name="showguarantor"--> onclick="this.value=''"<!-- /TMPL_IF --> />
                 <!-- TMPL_IF NAME="mandatoryfirstname" --><span class="required">Required</span><!-- /TMPL_IF -->
             </li>
             <li>
@@ -244,9 +244,9 @@
                 Date of birth: </label>
 				
 	<!-- TMPL_IF NAME="metric" -->			
-                <input type="text" id="dateofbirth" name="dateofbirth" size="20" onchange="CheckDate(document.form.dateofbirth);" value="<!-- TMPL_VAR NAME="dateofbirth" -->" />
+                <input type="text" id="dateofbirth" name="dateofbirth" size="20" onchange="CheckDate(document.form.dateofbirth);" value="<!--TMPL_IF Name="showguarantor"--><!-- TMPL_VAR NAME="contactdateofbirth" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="dateofbirth" --><!-- /TMPL_IF -->"<!--TMPL_IF Name="showguarantor"--> onclick="this.value=''"<!-- /TMPL_IF --> />
 <!-- TMPL_ELSE -->
-                <input type="text" id="dateofbirth" name="dateofbirth" size="20" value="<!-- TMPL_VAR NAME="dateofbirth" -->" />
+                <input type="text" id="dateofbirth" name="dateofbirth" size="20" value="<!--TMPL_IF Name="showguarantor"--><!-- TMPL_VAR NAME="contactdateofbirth" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="dateofbirth" --><!-- /TMPL_IF -->"<!--TMPL_IF Name="showguarantor"--> onclick="this.value=''"<!-- /TMPL_IF --> />
 <!-- /TMPL_IF -->
 
                 <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="dateofbirth_button" alt="Show Calendar" />
