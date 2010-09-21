@@ -2275,6 +2275,7 @@ sub PrepareItemrecordDisplay {
                             }
 			    $defaultvalue = C4::Context->userenv->{branch};
                         }
+                        $defaultvalue = C4::Context->userenv->{branch};
 
                         #----- itemtypes
                     } elsif ( $tagslib->{$tag}->{$subfield}->{authorised_value} eq "itemtypes" ) {
