@@ -2022,7 +2022,14 @@ sub DelItemCheck {
     my $sth=$dbh->prepare("select * from issues i where i.itemnumber=?");
     $sth->execute($itemnumber);
 
-    my $onloan=$sth->fetchrow;
+    my $item = GetItem($itemnumber);
+    my $onloan = $sth->fetchrow;
+    if ($onloan) {
+        $error = "book_on_loan";
+    }
+    elsif (C4::Context->preference("IndependantBranches") and (C4::Context->userenv->{branch} ne $item->{C4::Context->preference("HomeOrHoldingBranch")||'homebranch'})){
+        $error = "not_same_branch";
+    } else {
 
     if ($onloan){
         $error = "book_on_loan" 
