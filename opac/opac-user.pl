@@ -200,7 +200,8 @@ foreach my $res (@reserves) {
         $res->{'maxpickupdate'} = sprintf( "%d-%02d-%02d", @maxpickupdate );
         $res->{'formattedwaitingdate'} = format_date( $res->{'maxpickupdate'} );
     }
-    $res->{'branch'} = $branches->{ $res->{'branchcode'} }->{'branchname'};
+    #$res->{'branch'} = $branches->{ $res->{'branchcode'} }->{'branchname'};
+    $res->{'branch'} = 'Communiqué par mail';
     my $biblioData = GetBiblioData( $res->{'biblionumber'} );
     $res->{'reserves_title'} = $biblioData->{'title'};
     if ($OPACDisplayRequestPriority) {
@@ -234,9 +235,11 @@ foreach my $res (@reserves) {
             $res->{'holdingbranch'} = $item->{'holdingbranch'};
             $res->{'biblionumber'}  = $item->{'biblionumber'};
             $res->{'barcodenumber'} = $item->{'barcode'};
-            $res->{'wbrcode'}       = $res->{'branchcode'};
+            #$res->{'wbrcode'}       = $res->{'branchcode'};
+	        $res->{'wbrcode'} = $item->{'holdingbranch'};
             $res->{'itemnumber'}    = $res->{'itemnumber'};
-            $res->{'wbrname'}       = $branches->{ $res->{'branchcode'} }->{'branchname'};
+            #$res->{'wbrname'}       = $branches->{ $res->{'branchcode'} }->{'branchname'};
+	        $res->{'wbrname'} = $branches->{$item->{'holdingbranch'}}->{'branchname'};
             if ( $res->{'holdingbranch'} eq $res->{'wbrcode'} ) {
                 $res->{'atdestination'} = 1;
             }

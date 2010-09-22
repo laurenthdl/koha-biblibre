@@ -615,6 +615,7 @@ sub GetOtherReserves {
     my ( $restype, $checkreserves ) = CheckReserves($itemnumber);
     if ($checkreserves) {
         my $iteminfo = C4::Items::GetItem($itemnumber);
+	$checkreserves->{'branchcode'}=$iteminfo->{'holdingbranch'};
         if ( $iteminfo->{'holdingbranch'} ne $checkreserves->{'branchcode'} ) {
             $messages->{'transfert'} = $checkreserves->{'branchcode'};
 
@@ -895,6 +896,7 @@ sub CheckReserves {
 
     # note: we get the itemnumber because we might have started w/ just the barcode.  Now we know for sure we have it.
     my ( $biblio, $bibitem, $notforloan_per_itemtype, $notforloan_per_item, $itemnumber ) = $sth->fetchrow_array;
+warn "notforloan_per_itemtype $notforloan_per_itemtype, notforloan_per_item $notforloan_per_item";
 
     return ( 0, 0 ) unless $itemnumber;    # bail if we got nothing.
 
@@ -1896,7 +1898,7 @@ sub _koha_notify_reserve {
     my $branch_details = GetBranchDetail( $reserve->{'branchcode'} );
 
     my $admin_email_address = $branch_details->{'branchemail'} || C4::Context->preference('KohaAdminEmailAddress');
-
+    $reserve->{'branchcode'}=GetItem($itemnumber)->{'homebranch'};
     my $letter = getletter( 'reserves', $letter_code );
     die "Could not find a letter called '$letter_code' in the 'reserves' module" unless ($letter);
 

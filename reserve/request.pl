@@ -476,9 +476,11 @@ foreach my $biblionumber (@biblionumbers) {
             $reserve{'holdingbranch'} = $item->{'holdingbranch'};
             $reserve{'biblionumber'}  = $item->{'biblionumber'};
             $reserve{'barcodenumber'} = $item->{'barcode'};
-            $reserve{'wbrcode'}       = $res->{'branchcode'};
+            #$reserve{'wbrcode'}       = $res->{'branchcode'};
+	        $reserve{'wbrcode'} = $item->{'holdingbranch'};
             $reserve{'itemnumber'}    = $res->{'itemnumber'};
-            $reserve{'wbrname'}       = $branches->{ $res->{'branchcode'} }->{'branchname'};
+            #$reserve{'wbrname'}       = $branches->{ $res->{'branchcode'} }->{'branchname'};
+	        $reserve{'wbrname'} = $branches->{$item->{'holdingbranch'}}->{'branchname'};
             if ( $reserve{'holdingbranch'} eq $reserve{'wbrcode'} ) {
                 $reserve{'atdestination'} = 1;
             }
