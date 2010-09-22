@@ -72,6 +72,8 @@ my $op              = $input->param('op')||'else';
 my @editsuggestions = $input->param('edit_field');
 my $branchfilter   = $input->param('branchcode');
 my $suggestedby    = $input->param('suggestedby');
+my $returnsuggested = $input->param('returnsuggested');
+my $returnsuggestedby = $input->param('returnsuggestedby');
 my $managedby    = $input->param('managedby');
 my $displayby    = $input->param('displayby');
 my $tabcode    = $input->param('tabcode');
@@ -220,6 +222,10 @@ $template->param(
     "op"             =>$op,
 );
 
+if(defined($returnsuggested) and $returnsuggested ne "noone")
+{
+	print $input->redirect("/cgi-bin/koha/members/moremember.pl?borrowernumber=".$returnsuggested."#suggestions");
+}
 
 ####################
 ## Initializing selection lists
@@ -258,6 +264,7 @@ foreach my $support(@$supportlist){
     }
 }
 $template->param(itemtypeloop=>$supportlist);
+$template->param( returnsuggestedby => $returnsuggestedby );
 
 #Budgets management
 my $searchbudgets={ budget_branchcode=>$branchfilter} if $branchfilter;
