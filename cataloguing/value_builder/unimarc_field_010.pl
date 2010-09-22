@@ -65,6 +65,7 @@ sub plugin_javascript {
         }
 
         function Clic$field_number() {
+	    Blur$field_number();
             return 1;
         }
     </script>
