@@ -70,10 +70,9 @@ if ( $reserveMode && ( $reserveMode eq 'single' ) ) {
 if ( !$biblionumbers ) {
     $biblionumbers = $query->param('biblionumber');
 }
-
-if ( ( !$biblionumbers ) && ( !$query->param('place_reserve') ) ) {
-    $template->param( message => 1, no_biblionumber => 1 );
-    &get_out( $query, $cookie, $template->output );
+if ((! $biblionumbers) && (! $query->param('place_reserve'))) {
+    $template->param(message=>1, no_biblionumber=>1);
+    &get_out($query, $cookie, $template->output);
 }
 
 # Pass the numbers to the page so they can be fed back
@@ -93,11 +92,11 @@ if ( ( $#biblionumbers < 0 ) && ( !$query->param('place_reserve') ) ) {
 my $branch = $query->param('branch') || C4::Context->userenv->{branch} || '';
 ( $branches->{$branch} ) or $branch = "";    # Confirm branch is real
 $template->param( branch     => $branch );
-$template->param( branchname => $branches->{$branch}->{branchname} );
+$template->param( branchname => 'Communiqué par mail');
+#$template->param( branchname => $branches->{$branch}->{branchname} );
 
 # make branch selection options...
 my $CGIbranchloop = GetBranchesLoop($branch);
-$template->param( CGIbranch => $CGIbranchloop );
 
 #
 #
@@ -212,6 +211,7 @@ if ( $query->param('place_reserve') ) {
         }
 
         # Here we actually do the reserveration. Stage 3.
+        $branch=undef;
         AddReserve( $branch, $borrowernumber, $biblioNum, 'a', [$biblioNum], $rank, $startdate, $expiration_date, $notes, $biblioData->{'title'}, $itemNum, $found )
           if ($canreserve);
     }
@@ -289,7 +289,7 @@ my $itemLevelTypes     = C4::Context->preference('item-level_itypes');
 $template->param( 'item-level_itypes' => $itemLevelTypes );
 
 foreach my $biblioNum (@biblionumbers) {
-
+    my $numItemsHoldable=0;
     my $record = GetMarcBiblio($biblioNum);
 
     # Init the bib item with the choices for branch pickup
@@ -430,9 +430,12 @@ foreach my $biblioNum (@biblionumbers) {
         # If there is no loan, return and transfer, we show a checkbox.
         $itemLoopIter->{notforloan} = $itemLoopIter->{notforloan} || 0;
 
-        if ( IsAvailableForItemLevelRequest($itemNum) and CanItemBeReserved( $borrowernumber, $itemNum ) ) {
-            $itemLoopIter->{available} = 1;
-            $numCopiesAvailable++;
+	if (CanItemBeReserved($borrowernumber,$itemNum)){
+	 $numItemsHoldable++;
+        	if (IsAvailableForItemLevelRequest($itemNum) and CanItemBeReserved($borrowernumber,$itemNum)) {
+            	$itemLoopIter->{available} = 1;
+            	$numCopiesAvailable++;
+		}
         }
 
         # FIXME: move this to a pm
@@ -453,10 +456,10 @@ foreach my $biblioNum (@biblionumbers) {
         push @{ $biblioLoopIter{itemLoop} }, $itemLoopIter;
     }
 
-    if ( $numCopiesAvailable > 0 ) {
-        $numBibsAvailable++;
-        $biblioLoopIter{bib_available} = 1;
-        $biblioLoopIter{holdable}      = 1;
+    if ($numCopiesAvailable == $numItemsHoldable) {
+       $numBibsAvailable++;
+       $biblioLoopIter{bib_available} = 1;
+       $biblioLoopIter{holdable} = 1;
     }
 #    $biblioLoopIter{multi} = $canReserveMultiple;
     if ( $biblioLoopIter{already_reserved} && !$canReserveMultiple ) {
@@ -472,8 +475,7 @@ foreach my $biblioNum (@biblionumbers) {
 
     push @$biblioLoop, \%biblioLoopIter;
 }
-
-if ( $numBibsAvailable == 0 ) {
+    if ( $numBibsAvailable == 0 ) {
     $template->param( none_available => 1, message => 1 );
 }
 

@@ -64,7 +64,9 @@ my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
 my $biblionumber = $query->param('biblionumber') || $query->param('bib');
 
 $template->param( 'AllowOnShelfHolds' => C4::Context->preference('AllowOnShelfHolds') );
-$template->param( 'ItemsIssued'       => CountItemsIssued($biblionumber) );
+#$template->param( 'ItemsIssued'       => CountItemsIssued($biblionumber) );
+$template->param( 'ItemsIssued' => 1);
+#$template->param( 'ItemsIssued' => CountItemsIssued( $biblionumber ) );
 $template->param(C4::Search::enabled_opac_search_views);
 
 my $record = GetMarcBiblio($biblionumber);
@@ -236,11 +238,11 @@ my $branches   = GetBranches();
 my %itemfields;
 for my $itm (@items) {
     $norequests = 0
-      if ( ( not $itm->{'wthdrawn'} )
-        && ( not $itm->{'itemlost'} )
-        && ( $itm->{'itemnotforloan'} < 0 || not $itm->{'itemnotforloan'} )
-        && ( not $itemtypes->{ $itm->{'itype'} }->{notforloan} )
-        && ( $itm->{'itemnumber'} ) );
+       if ( (not $itm->{'wthdrawn'} )
+         && (not $itm->{'itemlost'} )
+         && ($itm->{'itemnotforloan'}<0 || not $itm->{'itemnotforloan'})
+		 && (not $itemtypes->{$itm->{'itype'}}->{notforloan} )
+         && ($itm->{'itemnumber'} ) );
 
     if ( defined $itm->{'publictype'} ) {
 
@@ -276,21 +278,31 @@ for my $itm (@items) {
         $itm->{'lostimagelabel'} = $lostimageinfo->{'label'};
     }
 
-    if ( $itm->{'count_reserves'} ) {
-        if ( $itm->{'count_reserves'} eq "Waiting" )  { $itm->{'waiting'} = 1; }
-        if ( $itm->{'count_reserves'} eq "Reserved" ) { $itm->{'onhold'}  = 1; }
-    }
+     # walk through the item-level authorised values and populate some images
+     my $item_authorised_value_images = C4::Items::get_authorised_value_images( C4::Items::get_item_authorised_values( $itm->{'itemnumber'} ) );
+     # warn( Data::Dumper->Dump( [ $item_authorised_value_images ], [ 'item_authorised_value_images' ] ) );
 
-    my ( $transfertwhen, $transfertfrom, $transfertto ) = GetTransfers( $itm->{itemnumber} );
-    if ( defined($transfertwhen) && $transfertwhen ne '' ) {
+     if ( $itm->{'itemlost'} ) {
+         my $lostimageinfo = List::Util::first { $_->{'category'} eq 'LOST' } @$item_authorised_value_images;
+         $itm->{'lostimageurl'}   = $lostimageinfo->{ 'imageurl' };
+         $itm->{'lostimagelabel'} = $lostimageinfo->{ 'label' };
+     }
+
+     if( $itm->{'count_reserves'}){
+          if( $itm->{'count_reserves'} eq "Waiting"){ $itm->{'waiting'} = 1; }
+          #if( $itm->{'count_reserves'} eq "Reserved"){ $itm->{'onhold'} = 1; }
+	warn $itm->{'count_reserves'};
+     }
+    
+     my ( $transfertwhen, $transfertfrom, $transfertto ) = GetTransfers($itm->{itemnumber});
+     if ( defined( $transfertwhen ) && $transfertwhen ne '' ) {
         $itm->{transfertwhen} = format_date($transfertwhen);
         $itm->{transfertfrom} = $branches->{$transfertfrom}{branchname};
         $itm->{transfertto}   = $branches->{$transfertto}{branchname};
     }
     $itm->{publisheddate}=format_date($itm->{publisheddate});
 }
-
-## get notes and subjects from MARC record
+## get notes and subjects from MARC reco='/home/kohaadmin/src/circ/olitest';
 my $dbh              = C4::Context->dbh;
 my $marcflavour      = C4::Context->preference("marcflavour");
 my $marcnotesarray   = GetMarcNotes( $record, $marcflavour );
