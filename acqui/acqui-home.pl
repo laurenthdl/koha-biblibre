@@ -77,7 +77,6 @@ if ( $cur_format eq 'FR' ) {
 
 my $status           = $query->param('status') || "ASKED";
 my $suggestions_count       = CountSuggestion($status);
-
 my $budget_arr =
   GetBudgetHierarchy( '', $user->{branchcode},
     $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'} );
@@ -127,14 +126,14 @@ foreach my $budget ( @{$budget_arr} ) {
 }
 
 $template->param(
-    type          => 'intranet',
-    loop_budget   => $budget_arr,
-    branchname    => $branchname,
-    total         => $num_formatter->format_price($total),
-    totspent      => $num_formatter->format_price($totspent),
-    totordered    => $num_formatter->format_price($totordered),
-    totcomtd      => $num_formatter->format_price($totcomtd),
-    totavail      => $num_formatter->format_price($totavail),
+    type        => 'intranet',
+    loop_budget => $budget_arr,
+    branchname  => $branchname,
+    total       => $num_formatter->format_price($total),
+    totspent    => $num_formatter->format_price($totspent),
+    totordered  => $num_formatter->format_price($totordered),
+    totcomtd    => $num_formatter->format_price($totcomtd),
+    totavail    => $num_formatter->format_price($totavail),
     suggestions_count    => $suggestions_count,
 );
 
