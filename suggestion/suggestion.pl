@@ -80,6 +80,7 @@ my $tabcode    = $input->param('tabcode');
 
 # filter informations which are not suggestion related.
 my $suggestion_ref  = $input->Vars;
+
 delete $$suggestion_ref{$_} foreach qw( suggestedbyme op displayby tabcode edit_field );
 foreach (keys %$suggestion_ref){
     delete $$suggestion_ref{$_} if (!$$suggestion_ref{$_} && ($op eq 'else' || $op eq 'change'));
@@ -201,7 +202,7 @@ if ($op=~/else/) {
     );
 }
 
-foreach my $element qw(managedby suggestedby){
+foreach my $element qw(managedby suggestedby acceptedby) {
 #    $debug || warn $$suggestion_ref{$element};
     if ($$suggestion_ref{$element}){
         my $member=GetMember(borrowernumber=>$$suggestion_ref{$element});
@@ -275,9 +276,10 @@ foreach my $budget (@$budgets){
 };
 
 $template->param( budgetsloop => $budgets);
+$template->param( "statusselected_$$suggestion_ref{'STATUS'}" =>1);
 
 my %hashlists;
-foreach my $field qw(managedby acceptedby suggestedby budgetid STATUS) {
+foreach my $field qw(managedby acceptedby suggestedby budgetid) {
     my $values_list;
     $values_list=GetDistinctValues("suggestions.".$field) ;
     my @codes_list = map{
