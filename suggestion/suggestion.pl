@@ -75,12 +75,15 @@ my $op              = $input->param('op') || 'else';
 my @editsuggestions = $input->param('edit_field');
 my $branchfilter    = $input->param('branchcode');
 my $suggestedby     = $input->param('suggestedby');
+my $returnsuggestedby = $input->param('returnsuggestedby');
+my $returnsuggested = $input->param('returnsuggested');
 my $managedby       = $input->param('managedby');
 my $displayby       = $input->param('displayby');
 my $tabcode         = $input->param('tabcode');
 
 # filter informations which are not suggestion related.
 my $suggestion_ref = $input->Vars;
+
 delete $$suggestion_ref{$_} foreach qw( suggestedbyme op displayby tabcode edit_field );
 foreach ( keys %$suggestion_ref ) {
     delete $$suggestion_ref{$_} if ( !$$suggestion_ref{$_} && ( $op eq 'else' || $op eq 'change' ) );
@@ -92,7 +95,6 @@ my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
         flagsrequired => { catalogue => 1 },
     }
 );
-
 #########################################
 ##  Operations
 ##
@@ -156,6 +158,7 @@ if ( $op =~ /save/i ) {
     }
     $op = 'else';
 }
+
 if ( $op =~ /else/ ) {
     $op = 'else';
 
@@ -201,7 +204,7 @@ if ( $op =~ /else/ ) {
     );
 }
 
-foreach my $element qw(managedby suggestedby) {
+foreach my $element qw(managedby suggestedby acceptedby) {
 
     #    $debug || warn $$suggestion_ref{$element};
     if ( $$suggestion_ref{$element} ) {
@@ -222,6 +225,11 @@ $template->param(
     dateformat => C4::Context->preference("dateformat"),
     "op"       => $op,
 );
+
+if(defined($returnsuggested) and $returnsuggested ne "noone")
+{
+	print $input->redirect("/cgi-bin/koha/members/moremember.pl?borrowernumber=".$returnsuggested."#suggestions");
+}
 
 ####################
 ## Initializing selection lists
@@ -252,8 +260,9 @@ $template->param(
 
 # the index parameter is different for item-level itemtypes
 my $supportlist = GetSupportList();
+
 foreach my $support (@$supportlist) {
-    $$support{'selected'} = $$support{'code'} eq $$suggestion_ref{'itemtype'};
+    $$support{'selected'} = $$support{'itemtype'} eq $$suggestion_ref{'itemtype'};
     if ( $$support{'imageurl'} ) {
         $$support{'imageurl'} = getitemtypeimagelocation( 'intranet', $$support{'imageurl'} );
     } else {
@@ -261,7 +270,7 @@ foreach my $support (@$supportlist) {
     }
 }
 $template->param( itemtypeloop => $supportlist );
-
+$template->param( returnsuggestedby => $returnsuggestedby );
 #Budgets management
 my $searchbudgets = { budget_branchcode => $branchfilter } if $branchfilter;
 my $budgets = GetBudgets($searchbudgets);
@@ -271,9 +280,10 @@ foreach my $budget (@$budgets) {
 }
 
 $template->param( budgetsloop => $budgets );
+$template->param( "statusselected_$$suggestion_ref{'STATUS'}" =>1);
 
 my %hashlists;
-foreach my $field qw(managedby acceptedby suggestedby budgetid STATUS) {
+foreach my $field qw(managedby acceptedby suggestedby budgetid) {
     my $values_list;
     $values_list = GetDistinctValues( "suggestions." . $field );
     my @codes_list = map { { 'code' => $$_{'value'}, 'desc' => GetCriteriumDesc( $$_{'value'}, $field ), 'selected' => $$_{'value'} eq $$suggestion_ref{$field} } } @$values_list;
