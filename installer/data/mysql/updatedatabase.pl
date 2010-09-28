@@ -4850,6 +4850,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 
 
 $DBversion = "3.02.00.046";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `accountlines` ADD `note` text NULL default NULL");
     print "Upgrade to $DBversion done (adding note field in accountlines table)\n";
     SetVersion($DBversion);
