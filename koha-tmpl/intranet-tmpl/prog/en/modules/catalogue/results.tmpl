@@ -393,6 +393,10 @@ function GetZ3950Terms(){
                                 <input type="checkbox" class="selection" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" style="display:none" />
                             </td>
                             <td>
+			    <!-- TMPL_IF NAME="coins" --> 
+				<!-- COinS / OpenURL --><span class="Z3988" title="<!-- TMPL_VAR NAME="coins" -->"></span> 
+			    <!-- /TMPL_IF -->
+
                                 <p><!-- TMPL_VAR NAME="result_number" -->.
                                 <!-- TMPL_INCLUDE NAME="biblio-default-view.inc" -->
                                             <b><!-- TMPL_IF NAME="title" --><!-- TMPL_VAR NAME="title" ESCAPE="html" --><!-- TMPL_ELSE -->No title<!-- /TMPL_IF --></b>
