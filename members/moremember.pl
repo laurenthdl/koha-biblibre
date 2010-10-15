@@ -403,6 +403,7 @@ if ($borrowernumber) {
             $getreserv{frombranch} = GetBranchName($transfertfrom);
         }
 
+	$num_res->{'branchcode'} = $getiteminfo->{'holdingbranch'};
         if ( ( $getiteminfo->{'holdingbranch'} ne $num_res->{'branchcode'} )
             and not $transfertwhen ) {
             $getreserv{nottransfered}   = 1;

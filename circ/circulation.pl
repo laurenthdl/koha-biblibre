@@ -416,7 +416,7 @@ if ($borrowernumber) {
         $getreserv{barcodereserv}  = $getiteminfo->{'barcode'};
         $getreserv{itemcallnumber} = $getiteminfo->{'itemcallnumber'};
         $getreserv{biblionumber}   = $getiteminfo->{'biblionumber'};
-        $getreserv{waitingat}      = GetBranchName( $num_res->{'branchcode'} );
+        $getreserv{waitingat}      = GetBranchName( $getiteminfo->{'branchcode'} );
         my $materials = $getiteminfo->{'materials'};
         $template->param( materials => $materials );
 
@@ -435,7 +435,7 @@ if ($borrowernumber) {
             $getWaitingReserveInfo{itemtype}     = $itemtypeinfo->{'description'};
             $getWaitingReserveInfo{author}       = $getiteminfo->{'author'};
             $getWaitingReserveInfo{reservedate}  = format_date( $num_res->{'reservedate'} );
-            $getWaitingReserveInfo{waitingat}    = GetBranchName( $num_res->{'branchcode'} );
+            $getWaitingReserveInfo{waitingat}    = GetBranchName( $getiteminfo->{'branchcode'} );
             $getWaitingReserveInfo{waitinghere}  = 1 if $num_res->{'branchcode'} eq $branch;
         }
         #         check transfers with the itemnumber foud in th reservation loop
@@ -445,7 +445,7 @@ if ($borrowernumber) {
             $getreserv{datesent}   = format_date($transfertwhen);
             $getreserv{frombranch} = GetBranchName($transfertfrom);
         } elsif ( $getiteminfo->{'holdingbranch'} ne $num_res->{'branchcode'} ) {
-            $getreserv{nottransfered}   = 1;
+            $getreserv{nottransfered}   = 0;
             $getreserv{nottransferedby} = GetBranchName( $getiteminfo->{'holdingbranch'} );
         }
 
