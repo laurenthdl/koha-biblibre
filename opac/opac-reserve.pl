@@ -55,6 +55,10 @@ sub get_out ($$$) {
 # get borrower information ....
 my ($borr) = GetMemberDetails($borrowernumber);
 
+if ($borr->{'categorycode'} eq 'ETUCEU'){
+   $template->param(message=>1, none_available=>1);
+   &get_out($query, $cookie, $template->output);
+}
 # get branches and itemtypes
 my $branches  = GetBranches();
 my $itemTypes = GetItemTypes();
@@ -432,7 +436,7 @@ foreach my $biblioNum (@biblionumbers) {
 
 	if (CanItemBeReserved($borrowernumber,$itemNum)){
 	 $numItemsHoldable++;
-        	if (IsAvailableForItemLevelRequest($itemNum) and CanItemBeReserved($borrowernumber,$itemNum)) {
+        	if (IsAvailableForItemLevelRequest($itemNum)){ 
             	$itemLoopIter->{available} = 1;
             	$numCopiesAvailable++;
 		}

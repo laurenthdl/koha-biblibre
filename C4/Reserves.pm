@@ -872,7 +872,7 @@ table in the Koha database.
 =cut
 
 sub CheckReserves {
-    my ( $item, $barcode ) = @_;
+    my ( $item, $barcode,$branch) = @_;
     my $dbh = C4::Context->dbh;
     my $sth;
     my $select = "
@@ -920,10 +920,17 @@ warn "notforloan_per_itemtype $notforloan_per_itemtype, notforloan_per_item $not
             } else {
 
                 # See if this item is more important than what we've got so far
-                if ( $res->{'priority'} && $res->{'priority'} < $priority ) {
-                    $priority = $res->{'priority'};
-                    $highest  = $res;
-                }
+		if ($branch && $branch ne 'CEUBA'){
+		     if ( $res->{'priority'} && $res->{'priority'} < $priority && $res->{'branchcode'} ne 'CEUBA') {
+		        $priority = $res->{'priority'};
+			$highest  = $res;
+	             } 
+	        } else {
+		     if ( $res->{'priority'} && $res->{'priority'} < $priority){
+		        $priority = $res->{'priority'};
+			$highest  = $res;
+	             }
+		}
             }
         }
     }
@@ -1310,7 +1317,7 @@ sub ModReserveAffect {
     my $already_on_shelf = ( $request && $request->{found} eq 'W' ) ? 1 : 0;
 
     # If we affect a reserve that has to be transfered, don't set to Waiting
-    my $query;
+    my $query; 
     if ($transferToDo) {
         $query = "
         UPDATE reserves

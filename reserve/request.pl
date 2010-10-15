@@ -70,14 +70,17 @@ foreach my $branchcode ( sort keys %{$branches} ) {
     $label_of{$branchcode} = $branches->{$branchcode}->{branchname};
 }
 my $CGIbranch = CGI::scrolling_list(
-    -name     => 'pickup',
-    -id       => 'pickup',
-    -values   => \@values,
-    -default  => $default,
-    -labels   => \%label_of,
-    -size     => 1,
-    -multiple => 0,
-);
+                                    -name     => 'pickup',
+                                    -id          => 'pickup',
+                                    -values   => \@values,
+                                    -default  => $default,
+                                    -labels   => \%label_of,
+                                    -size     => 1,
+                                    -multiple => 0,
+				    );
+#if($default ne 'CEUBA'){
+#$CGIbranch = undef; 
+#}
 
 # Select borrowers infos
 my $findborrower = $input->param('findborrower');
@@ -139,7 +142,7 @@ if ($cardnumber) {
 
     if ( not CanBookBeReserved( $borrowerinfo->{borrowernumber}, $input->param('biblionumber') ) ) {
         $warnings    = 1;
-        $maxreserves = 1;
+        $maxreserves = 0;
     }
 
     # we check the date expiry of the borrower (only if there is an expiry date, otherwise, set to 1 (warn)
@@ -316,6 +319,8 @@ foreach my $biblionumber (@biblionumbers) {
             $biblioitem->{description} = 
               $itemtypes->{ $biblioitem->{itemtype} }{description};
         }
+	my $numItemsHoldable=0;
+	my $numItemsHoldableNow=0;
         foreach my $itemnumber ( @{ $itemnumbers_of_biblioitem{$biblioitemnumber} } )    {
             my $item = $iteminfos_of->{$itemnumber};
 
@@ -404,9 +409,11 @@ foreach my $biblionumber (@biblionumbers) {
             my $branchitemrule = GetIssuingRule( $borrowerinfo->{categorycode}, $item->{'itype'}, GetReservesControlBranch( $borrowerinfo, $item ) );
             my $policy_holdrestricted = $branchitemrule->{'reservesallowed'};
             $item->{'holdrestricted'} = $branchitemrule->{'holdrestricted'};
-
-            if ( IsAvailableForItemLevelRequest($itemnumber) and not $item->{cantreserve} and CanItemBeReserved( $borrowerinfo->{borrowernumber}, $itemnumber ) ) {
-                if ( not $policy_holdrestricted and C4::Context->preference('AllowHoldPolicyOverride') ) {
+	  if (CanItemBeReserved($borrowerinfo->{borrowernumber}, $itemnumber)){
+	    $numItemsHoldable++;
+            if (IsAvailableForItemLevelRequest($itemnumber) and not $item->{cantreserve}) {
+	    $numItemsHoldableNow++;
+                if ( not $policy_holdrestricted and C4::Context->preference( 'AllowHoldPolicyOverride' ) ) {
                     $item->{override} = 1;
                     $num_override++;
                 } elsif ($policy_holdrestricted) {
@@ -414,7 +421,7 @@ foreach my $biblionumber (@biblionumbers) {
                     $num_available++;
                 }
             }
-
+	  }
             # If none of the conditions hold true, then neither override nor available is set and the item cannot be checked
 
             # FIXME: move this to a pm
@@ -435,13 +442,13 @@ foreach my $biblionumber (@biblionumbers) {
         }
         if ( $num_override > 0 ) {
             $template->param( override_required => 1 );
-        } elsif ( $num_available == 0 ) {
-            $template->param( none_available => 1 );
-            $template->param( warnings       => 1 );
-            $biblioloopiter{warn}       = 1;
-            $biblioloopiter{none_avail} = 1;
+        } elsif($numItemsHoldable!=$numItemsHoldableNow or $numItemsHoldable==0){
+       	   $template->param( none_available => 1 );
+	   $template->param( warnings => 1 );
+	   $biblioloopiter{warn} = 1;
+	   $biblioloopiter{none_avail} = 1;
         }
-
+     
         push @bibitemloop, $biblioitem;
     }
 
@@ -527,7 +534,18 @@ foreach my $biblionumber (@biblionumbers) {
 
     # get the time for the form name...
     my $time = time();
-
+	
+    if ($borrowerinfo->{'categorycode'} ne 'ETUCEU'){
+    	#$CGIbranch=undef;
+	$CGIbranch=~ s/name="pickup"(.+>?)/$1<option>Site du prochain exemplaire disponible<\/option>/;
+	$CGIbranch=~ s/selected="selected"//;
+    } elsif ($borrowerinfo->{'categorycode'} eq 'ETUCEU' && $default ne 'CEUBA') {
+    $CGIbranch=undef;
+    $template->param(none_available=> 1);
+    }
+    #$CGIbranch=~ s/(id="pickup">)/$1<option >Site du prochain exemplaire disponible<\/option>/;
+    #$CGIbranch=~ s/selected="selected"//;
+    
     $template->param(
         CGIbranch => $CGIbranch,
 

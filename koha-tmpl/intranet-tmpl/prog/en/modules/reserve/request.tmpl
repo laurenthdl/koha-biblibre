@@ -283,7 +283,7 @@ function checkMultiHold() {
         </li>
         <li>
             <label for="pickup">Pickup at:</label>
-            <!-- TMPL_VAR NAME="CGIbranch" -->
+            <!-- TMPL_VAR NAME="CGIbranch"-->
         </li>
 
 	<!-- TMPL_IF NAME="reserve_in_future" -->
@@ -379,7 +379,7 @@ function checkMultiHold() {
             <!-- TMPL_IF NAME="publicationyear" --><li><span class="label">Publication year:</span> <!-- TMPL_VAR NAME="publicationyear" --></li><!-- /TMPL_IF -->
           </ol>
 
-        <table id="requestspecific">
+       <!-- <table id="requestspecific">
         <caption>Place a hold on a specific copy</caption>
 		<tr>
             <th>Hold</th>
@@ -474,8 +474,8 @@ function checkMultiHold() {
             </td>
         </tr>
     <!-- /TMPL_LOOP --> <!-- itemloop -->
-        </table>
-
+        </table> -->
+        
     <!-- /TMPL_LOOP --> <!-- bibitemloop -->
 
   <!-- TMPL_ELSE --><!-- UNLESS multi_hold -->
@@ -544,8 +544,8 @@ function checkMultiHold() {
     </table>
 
   <!-- /TMPL_UNLESS --><!-- /multi_hold -->
-
-    <fieldset class="action">
+    
+   <!-- <fieldset class="action">
         <!-- TMPL_IF NAME="cardnumber"-->
             <!-- TMPL_IF NAME="override_required" -->
                 <input type="submit" class="warning" value="Place Hold" />
@@ -555,7 +555,7 @@ function checkMultiHold() {
                 <input type="submit" value="Place Hold" />
             <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
-    </fieldset>
+    </fieldset> -->
     </form>
 	</fieldset>
 <!-- /TMPL_UNLESS -->

@@ -4,6 +4,7 @@
 <script type="text/javascript" src="/intranet-tmpl/prog/en/lib/jquery/plugins/jquery.highlight-3.js"></script>
 <script type="text/javascript">
 //<![CDATA[
+
 var MSG_NO_ITEM_SELECTED = _("Nothing is selected.");
 var MSG_NON_RESERVES_SELECTED = _("One or more selected items cannot be reserved.");
 <!-- TMPL_IF NAME="AmazonEnabled" -->
@@ -170,7 +171,7 @@ function GetZ3950Terms(){
 //]]>
 </script>
 </head>
-<body>
+<body onload="document.getElementById('search-form').focus();">
 <!-- TMPL_INCLUDE NAME="header.inc" -->
 <!-- TMPL_INCLUDE NAME="cat-search.inc" -->
 
@@ -231,9 +232,9 @@ function GetZ3950Terms(){
                 |
                 <a href="#" class="highlight_toggle" id="highlight_toggle_off">Unhighlight</a>
                 <a href="#" class="highlight_toggle" id="highlight_toggle_on">Highlight</a>
-                <!-- TMPL_IF NAME="CAN_user_reserveforothers" -->
-                | <a href="/cgi-bin/koha/catalogue/search.pl" onclick="placeHold(); return false;">Place Hold</a>
-                <!-- /TMPL_IF -->
+                <!-- <TMPL_IF NAME="CAN_user_reserveforothers">-->
+                <!--| <a href="/cgi-bin/koha/catalogue/search.pl" onclick="placeHold(); return false;">Place Hold</a>-->
+                <!--</TMPL_IF> -->
 		<span class="addto"></span>
 
 				<!-- TMPL_IF NAME="CAN_user_editcatalogue_edit_catalogue" --><input type="button" onclick="PopupZ3950(); return false;" value="Z39.50 Search"/><!-- /TMPL_IF -->
