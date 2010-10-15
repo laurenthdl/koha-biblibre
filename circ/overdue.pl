@@ -26,7 +26,7 @@ use CGI qw(-oldstyle_urls);
 use C4::Auth;
 use C4::Branch;
 use C4::Debug;
-use C4::Dates qw/format_date/;
+use C4::Dates qw/format_date format_date_in_iso/;
 use Date::Calc qw/Today/;
 use Text::CSV_XS;
 
@@ -39,6 +39,8 @@ my $itemtypefilter  = $input->param('itemtype') || '';
 my $borflagsfilter  = $input->param('borflag') || '';
 my $branchfilter    = $input->param('branch') || '';
 my $op              = $input->param('op') || '';
+my $dateduefrom = format_date_in_iso($input->param( 'dateduefrom' )) || '';
+my $datedueto   = format_date_in_iso($input->param( 'datedueto' )) || '';
 my $isfiltered      = $op =~ /apply/i && $op =~ /filter/i;
 my $noreport        = C4::Context->preference('FilterBeforeOverdueReport') && ! $isfiltered && $op ne "csv";
 
@@ -206,6 +208,9 @@ $template->param(
     borcatloop=> \@borcatloop,
     itemtypeloop => \@itemtypeloop,
     patron_attr_filter_loop => \@patron_attr_filter_loop,
+    dateduefrom => $input->param( 'dateduefrom' ) || '',
+    datedueto   => $input->param( 'datedueto' ) || '',
+    DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
     borname => $bornamefilter,
     order => $order,
     showall => $showall);
@@ -253,6 +258,8 @@ if ($noreport) {
     $strsth.=" AND biblioitems.itemtype   = '" . $itemtypefilter . "' " if $itemtypefilter;
     $strsth.=" AND borrowers.flags        = '" . $borflagsfilter . "' " if $borflagsfilter;
     $strsth.=" AND borrowers.branchcode   = '" . $branchfilter   . "' " if $branchfilter;
+    $strsth .= " AND date_due < '" . $datedueto . "' "  if $datedueto;
+    $strsth .= " AND date_due > '" . $dateduefrom . "' " if $dateduefrom;
     # restrict patrons (borrowers) to those matching the patron attribute filter(s), if any
     my $bnlist = $have_pattr_filter_data ? join(',',keys %borrowernumber_to_attributes) : '';
     $strsth =~ s/WHERE 1=1/WHERE 1=1 AND borrowers.borrowernumber IN ($bnlist)/ if $bnlist;
