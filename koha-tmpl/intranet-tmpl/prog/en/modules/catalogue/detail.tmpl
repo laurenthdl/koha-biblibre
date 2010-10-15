@@ -3,6 +3,27 @@
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" --><script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
 // http://www.oreillynet.com/pub/a/javascript/2003/10/21/amazonhacks.html
+$(document).ready(function(){
+$("#search-form").change(function(){
+var kword=$("#search-form").val();
+if (kword.substr(0,3)=="978" && (kword.length==13 || kword.length==17)){
+$("#search-form").val(kword+" or "+calcISBN(kword));
+}
+});
+})
+
+function calcISBN (ean) {
+ean.replace("-","");
+var isbn=ean.substr(3,9);
+var cle_isbn=0; var i=0;
+for (i=0;i<9;++i) { cle_isbn +=isbn.substr(i,1)*(10-i); }
+cle_isbn = 11-(cle_isbn % 11);
+if (cle_isbn==11) { cle_isbn='0'; } 
+if (cle_isbn==10) { cle_isbn='X'; } 
+isbn=isbn+cle_isbn;
+return isbn;
+}
+
 function verify_images() {
     $("#bookcoverimg img").each(function(i){
            if ((this.src.indexOf('images.amazon.com') >= 0) || (this.src.indexOf('g-images.amazon.com') >=0)) {
@@ -39,7 +60,7 @@ function verify_images() {
 </script>
 </head>
 
-<body>
+<body onload="document.getElementById('search-form').focus();">
 
 <!-- TMPL_INCLUDE NAME="header.inc" -->
 <!-- TMPL_INCLUDE NAME="cat-search.inc" -->

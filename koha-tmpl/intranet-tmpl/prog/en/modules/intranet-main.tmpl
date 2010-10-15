@@ -2,7 +2,30 @@
 <title>Koha staff client</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <style type="text/css"> #koha-news { border: 1px solid #EEEEEE; margin: .2em;} #koha-news h3 {background-color: #EEEEEE; padding : .3em; margin: 0;} .newsitem {margin: .3em; border-bottom: 1px solid #EEE;} .newsitem:last-child {border-bottom : 0;} .newsfooter {font-size: 80%; color: #CCCCCC;} </style>
+<script type="text/javascript">
+$(document).ready(function(){
+$("#navkeyword").change(function(){
+var kword=$("#navkeyword").val();
+if (kword.substr(0,3)=="978" && (kword.length==13 || kword.length==17)){
+$("#navkeyword").val(kword+" or "+calcISBN(kword));
+}
+});
+})
+
+function calcISBN (ean) {
+ean.replace("-","");
+var isbn=ean.substr(3,9);
+var cle_isbn=0; var i=0;
+for (i=0;i<9;++i) { cle_isbn +=isbn.substr(i,1)*(10-i); }
+cle_isbn = 11-(cle_isbn % 11);
+if (cle_isbn==11) { cle_isbn='0'; } 
+if (cle_isbn==10) { cle_isbn='X'; } 
+isbn=isbn+cle_isbn;
+return isbn;
+}
+</script>
 </head>
+
 <body>
 <!-- TMPL_INCLUDE NAME="header.inc" -->
 <!-- TMPL_IF NAME="koha_news_count" --><div id="doc3" class="yui-t3"><!-- TMPL_ELSE --><div id="doc3" class="yui-t7"><!-- /TMPL_IF -->
