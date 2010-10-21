@@ -51,6 +51,7 @@ BEGIN {
       &getitemtypeimagesrc
       &getitemtypeimagelocation
       &GetAuthorisedValues
+      &GetAuthorisedValueByCode
       &GetAuthorisedValueCategories
       &GetKohaAuthorisedValues
       &GetKohaAuthorisedValuesFromField
@@ -1129,6 +1130,25 @@ sub GetAuthorisedValueCategories {
         push @results, $category;
     }
     return \@results;
+}
+
+=head2 GetAuthorisedValueByCode
+
+$authhorised_value = GetAuthorisedValueByCode( $category, $authvalcode );
+
+Return an hashref of the authorised value represented by $authvalcode.
+
+=cut
+
+sub GetAuthorisedValueByCode {
+	my ( $category, $authvalcode ) = @_;
+	
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare("SELECT lib FROM authorised_values WHERE category=? AND authorised_value =?");
+    $sth->execute( $category, $authvalcode );
+     while ( my $data = $sth->fetchrow_hashref ) {
+     	return $data->{'lib'};
+     }
 }
 
 =head2 GetKohaAuthorisedValues

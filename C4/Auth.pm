@@ -462,6 +462,7 @@ sub get_template_and_user {
             OPACSerialIssueDisplayCount    => C4::Context->preference("OPACSerialIssueDisplayCount"),
             OpacAddMastheadLibraryPulldown => C4::Context->preference("OpacAddMastheadLibraryPulldown"),
             OPACXSLTDetailsDisplay         => C4::Context->preference("OPACXSLTDetailsDisplay"),
+            OPACXSLTItemsDetailsDisplay    => C4::Context->preference("OPACXSLTItemsDetailsDisplay"),
             OPACXSLTResultsDisplay         => C4::Context->preference("OPACXSLTResultsDisplay"),
             SyndeticsClientCode            => C4::Context->preference("SyndeticsClientCode"),
             SyndeticsEnabled               => C4::Context->preference("SyndeticsEnabled"),
