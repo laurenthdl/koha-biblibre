@@ -5322,6 +5322,17 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.065";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(
+        "INSERT INTO `systempreferences` (variable,value,options,explanation,type)
+         VALUES('OPACXSLTItemsDetailsDisplay','','','Enable XSL stylesheet control over items on details page display on OPAC exemple : ../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACItemsDetail.xsl','Free')"
+    );
+    print "Upgrade to $DBversion done (added new syspref: OPACXSLTItemsDetailsDisplay)\n";
+    SetVersion($DBversion);
+}
+
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
