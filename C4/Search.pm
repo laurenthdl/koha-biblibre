@@ -2509,6 +2509,7 @@ sub GetFacetedIndexes {
     while ( my $row = $sth->fetchrow_hashref() ) {
        push @indexes, "sfield_" . $row->{code};
     }
+
     return \@indexes;
 }
 
@@ -2546,7 +2547,7 @@ sub SetMappings {
 
 sub GetMappings {
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare("SELECT indexmappings.*, indexes.plugin as plugin FROM indexmappings LEFT JOIN indexes ON (indexmappings.index=indexes.code AND indexmappings.ressource_type=indexes.ressource_type) WHERE indexmappings.ressource_type = ? ORDER BY field, subfield");
+    my $sth = $dbh->prepare("SELECT * FROM indexmappings WHERE indexmappings.ressource_type = ? ORDER BY field, subfield");
     $sth->execute(shift);
     return $sth->fetchall_arrayref({});
 }
@@ -2578,13 +2579,11 @@ sub GetSubfieldsForIndex {
     return $sth->fetchrow_hashref;
 }
 
-sub GetSolrRessource {
-
-    my $solr_url = C4::Context->preference("SolrAPI");
-    return Data::SearchEngine::Solr->new(
-          url => $solr_url,
-          options => {autocommit => 1, }
-       );
+sub GetSolrConnection {
+    Data::SearchEngine::Solr->new(
+        url     => C4::Context->preference("SolrAPI"),
+        options => { autocommit => 1 }
+    );
 }
 
 sub IndexRecord {
@@ -2592,7 +2591,7 @@ sub IndexRecord {
     my $recordnum  = shift;
 
     my $mappings = GetMappingsAndIndexes($recordtype);
-    my $solr     = GetSolrRessource();
+    my $sc       = GetSolrConnection;
 
     my @recordids;
     if ( $recordnum =~ m/(\d+)-(\d+)/g ){
@@ -2628,10 +2627,8 @@ sub IndexRecord {
         for my $mapping ( @$mappings ) {
 
             my @values;
-            my $oldval = $solrrecord->get_value( "field_" . $mapping->{code} ) || ();
-            @values = @$oldval if $oldval;
 
-            if( $mapping->{plugin} ) {
+            if ( $mapping->{plugin} ) {
                 my $plugin = $mapping->{plugin};
                 $plugin = LoadSearchPlugin( $plugin ) if $plugin;
                 @values = &$plugin( $record );
@@ -2665,38 +2662,35 @@ sub IndexRecord {
         push @recordpush, $solrrecord;
 
         if ( scalar(@recordpush) == 1000 ) {
-            $solr->add( \@recordpush );
+            $sc->add( \@recordpush );
             @recordpush = ();
         }
     }
-    $solr->add( \@recordpush );
+    $sc->add( \@recordpush );
 }
 
 sub DeleteRecordIndex {
-   my ($recordtype, $id) = @_;
-
-   my $solr    = GetSolrRessource();
-
-   $solr->remove ( "${recordtype}_${id}" );
+    my ( $recordtype, $id ) = @_;
+    my $sc = GetSolrConnection;
+    $sc->remove( "${recordtype}_${id}" );
 }
 
 sub LoadSearchPlugin {
     my $plugin = shift;
     if ( grep( /^$plugin$/, GetSearchPlugins()) ) {
-	eval "require $plugin";
+        eval "require $plugin";
 
         return do {
-              no strict 'refs';
-              my $symbol = $plugin. "::ComputeValue";
-              \&{"$symbol"};
-           };
-
+            no strict 'refs';
+            my $symbol = $plugin. "::ComputeValue";
+            \&{"$symbol"};
+        };
     }
 }
 
 sub GetSearchPlugins {
    use Module::List;
-   my $plugins = Module::List::list_modules("C4::Search::Plugins::", { list_modules => 1});
+   my $plugins = Module::List::list_modules( "C4::Search::Plugins::", { list_modules => 1 } );
    return keys %$plugins;
 }
 
@@ -2706,39 +2700,37 @@ sub GetSearchPlugins {
 =cut
 
 sub SimpleSearch {
-    my ( $query, $filters, $page, $max_results, $sort) = @_;
+    my ( $q, $filters, $page, $max_results, $sort) = @_;
 
     $page        ||= 1;
     $max_results ||= 999999999;
     $sort        ||= 'score desc';
 
-    my $solr    = GetSolrRessource();
+    my $sc = GetSolrConnection;
 
-    $solr->options->{'facet'} = 'true';
-    $solr->options->{'facet.mincount'} = 1;
-    $solr->options->{'facet.limit'} = 10;
-    $solr->options->{'facet.field'} = GetFacetedIndexes($filters->{recordtype});
-    $solr->options->{'sort'} = ( $sort =~ m/^score/ ) ? $sort : "sfield_$sort" || 'score desc';
+    $sc->options->{'facet'}          = 'true';
+    $sc->options->{'facet.mincount'} = 1;
+    $sc->options->{'facet.limit'}    = 10;
+    $sc->options->{'facet.field'}    = GetFacetedIndexes($filters->{recordtype});
+    $sc->options->{'sort'}           = $sort =~ m/^score/ ? $sort : "sfield_$sort" || 'score desc';
 
     my @filterlist;
     for ( keys %$filters ) {
-        my $index = ( m/^recordtype$/ ) ? $_ : "sfield_${_}" ; 
-        push @filterlist, "${index}:" . $filters->{$_};
+        my $index = ( m/^recordtype$/ ) ? $_ : "sfield_$_" ;
+        push @filterlist, "$index:" . $filters->{$_};
     }
 
-    $solr->options->{'fq'} = \@filterlist;
+    $sc->options->{'fq'} = \@filterlist;
 
-    my $solr_query = 
-          Data::SearchEngine::Query->new(
-             page => $page,
-             count => $max_results,
-             query => $query,
-          );
+    my $sq = Data::SearchEngine::Query->new(
+        page  => $page,
+        count => $max_results,
+        query => $q,
+    );
 
-    my $result = eval {$solr->search($solr_query);};
-    if ( $@ ) {
-       warn $@;
-    }
+    my $result = eval { $sc->search( $sq ) };
+    warn $@ if $@;
+
     return $result;
 }
 
