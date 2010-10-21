@@ -27,6 +27,7 @@ use C4::Items;
 use C4::Koha;
 use C4::Biblio;
 use C4::Circulation;
+use C4::Dates qw/format_date/;
 use C4::Reserves;
 use Encode;
 use XML::LibXML;
@@ -141,7 +142,7 @@ sub XSLTParse4Display {
     my $itemsxml  = buildKohaItemsNamespace($biblionumber);
     my $xmlrecord = $record->as_xml( C4::Context->preference('marcflavour') );
     my $sysxml    = "<sysprefs>\n";
-    foreach my $syspref (qw/OPACURLOpenInNewWindow DisplayOPACiconsXSLT URLLinkText viewISBD/) {
+    foreach my $syspref (qw/OPACURLOpenInNewWindow singleBranchMode Version item-level_itypes OPACShelfBrowser DisplayOPACiconsXSLT URLLinkText viewISBD/) {
         $sysxml .= "<syspref name=\"$syspref\">" . C4::Context->preference($syspref) . "</syspref>\n";
     }
     $sysxml .= "</sysprefs>\n";
@@ -153,6 +154,7 @@ sub XSLTParse4Display {
 
     # don't die when you find &, >, etc
     $parser->recover_silently(1);
+
     my $source = $parser->parse_string($xmlrecord);
     unless ( $stylesheet->{$xslfilename} ) {
         my $xslt = XML::LibXSLT->new();
@@ -168,6 +170,7 @@ sub XSLTParse4Display {
     }
     my $results      = $stylesheet->{$xslfilename}->transform($source);
     my $newxmlrecord = $stylesheet->{$xslfilename}->output_string($results);
+    #warn Data::Dumper::Dumper $xmlrecord;
     return $newxmlrecord;
 }
 
@@ -179,7 +182,7 @@ sub buildKohaItemsNamespace {
     my $xml            = '';
     for my $item (@items) {
         my $status;
-
+		my $displayedstatus;
         my ( $transfertwhen, $transfertfrom, $transfertto ) = C4::Circulation::GetTransfers( $item->{itemnumber} );
 
         my ( $reservestatus, $reserveitem ) = C4::Reserves::CheckReserves( $item->{itemnumber} );
@@ -194,37 +197,52 @@ sub buildKohaItemsNamespace {
             || $item->{itemnotforloan}
             || ( defined $reservestatus && $reservestatus eq "Waiting" ) ) {
             if ( $item->{notforloan} < 0 ) {
-                $status = "On order";
+                $status = "On order"; $displayedstatus = "On order";
             }
             if ( $item->{itemnotforloan} > 0 || $item->{notforloan} > 0 || $itemtypes->{ $item->{itype} }->{notforloan} == 1 ) {
-                $status = "reference";
+                $status = "reference"; $displayedstatus = "Not for loan";
             }
             if ( $item->{onloan} ) {
-                $status = "Checked out";
+                $status = "Checked out"; $displayedstatus = "Checked out";
             }
             if ( $item->{wthdrawn} ) {
-                $status = "Withdrawn";
+                $status = "Withdrawn"; $displayedstatus = "Withdrawn";
             }
             if ( $item->{itemlost} ) {
-                $status = "Lost";
+                $status = "Lost"; $displayedstatus = "Lost";
             }
             if ( $item->{damaged} ) {
-                $status = "Damaged";
+                $status = "Damaged"; $displayedstatus = "Damaged";
             }
             if ( defined $transfertwhen && $transfertwhen ne '' ) {
-                $status = 'In transit';
+                $status = 'In transit'; $displayedstatus = "In transit";
             }
             if ( defined $reservestatus && $reservestatus eq "Waiting" ) {
-                $status = 'Waiting';
+                $status = 'Waiting'; $displayedstatus = "Waiting";
             }
         } else {
-            $status = "available";
+            $status = "available"; $displayedstatus = "Available";
         }
         my $homebranch = $branches->{ $item->{homebranch} }->{'branchname'};
         my $itemcallnumber = $item->{itemcallnumber} || '';
+        my $itemnumber = $item->{itemnumber} || '';
+        my $itemdescription = $item->{description} || '';
         my $itemlocation = GetAuthorisedValueByCode( "LOC", $item->{location}) || '';
+        my $itemitype = $item->{itype} || '';
+        my $itembranchurl = $item->{branchurl} || '';
+        my $itemccode = $item->{ccode} || '';
+        my $itemenumchron = $item->{enumchron} || '';
+		my $itemuri = $item->{uri} || '';
+		my $itemcopynumber = $item->{copynumber} || '';
+		my $itemitemnotes = $item->{itemnotes} || '';
+		my $itemserialseq = $item->{serialseq} || '';
+		my $itempublisheddate = $item->{publisheddate} || '';
+		my $itemdatedue = format_date( $item->{datedue} ) || '';
+		my $itemimageurl = getitemtypeimagelocation( 'opac', $itemtypes->{$itemitype}->{'imageurl'} ) || '';
+		
+        #warn Data::Dumper::Dumper $item;
         $itemcallnumber =~ s/\&/\&amp\;/g;
-        $xml .= "<item><homebranch>$homebranch</homebranch><itemlocation>$itemlocation</itemlocation>" . "<status>$status</status>" . "<itemcallnumber>" . $itemcallnumber . "</itemcallnumber>" . "</item>";
+        $xml .= "<item><itemnumber>$itemnumber</itemnumber><itemimageurl>$itemimageurl</itemimageurl><itemdatedue>$itemdatedue</itemdatedue><itempublisheddate>$itempublisheddate</itempublisheddate><itemserialseq>$itemserialseq</itemserialseq><itemitemnotes>$itemitemnotes</itemitemnotes><itemcopynumber>$itemcopynumber</itemcopynumber><itemuri>$itemuri</itemuri><itemenumchron>$itemenumchron</itemenumchron><itemccode>$itemccode</itemccode><itembranchurl>$itembranchurl</itembranchurl><itemitype>$itemitype</itemitype><displayedstatus>$displayedstatus</displayedstatus><itemlocation>$itemlocation</itemlocation><itemdescription>$itemdescription</itemdescription><homebranch>$homebranch</homebranch>" . "<status>$status</status>" . "<itemcallnumber>" . $itemcallnumber . "</itemcallnumber>" . "</item>";
 
     }
     $xml = "<items xmlns=\"http://www.koha.org/items\">" . $xml . "</items>";

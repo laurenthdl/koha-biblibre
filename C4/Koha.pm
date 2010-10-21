@@ -51,6 +51,7 @@ BEGIN {
       &getitemtypeimagesrc
       &getitemtypeimagelocation
       &GetAuthorisedValues
+      &GetAuthorisedValueByCode
       &GetAuthorisedValueCategories
       &GetDefaultAuthorisedValueCategories
       &GetAuthorisedValueLib

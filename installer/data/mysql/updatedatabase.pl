@@ -4870,6 +4870,54 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.055";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
+	");
+	$dbh->do("
+	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
+	");
+    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.056";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
+	");
+    print "Upgrade to $DBversion done (Adding PrefillItem syspref)\n";
+    SetVersion($DBversion);
+}
+
+
+$DBversion = "3.02.00.057";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
+	");
+
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
+	");
+    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.058";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
+	");
+
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
+	");
+    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.02.00.059";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
@@ -5179,62 +5227,14 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.02.00.055";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
-	");
-	$dbh->do("
-	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
-	");
-    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.056";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
-	");
-    print "Upgrade to $DBversion done (Adding PrefillItem syspref)\n";
-    SetVersion($DBversion);
-}
-
-
-$DBversion = "3.02.00.057";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
-	");
-
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
-	");
-    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.058";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
-	");
-
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
-	");
-    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.059";
+$DBversion = "3.02.00.060";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE overduerules ALTER delay1 SET DEFAULT NULL, ALTER delay2 SET DEFAULT NULL, ALTER delay3 SET DEFAULT NULL");
     print "Upgrade to $DBversion done (Setting NULL default value for delayn columns in table overduerules)\n";
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.060";
+$DBversion = "3.02.00.061";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
 	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BlockRenewWhenOverdue','0','If Set, when item is overdue, renewals are blocked','','YesNo');
@@ -5243,7 +5243,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.061";
+$DBversion = "3.02.00.062";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
     	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
@@ -5252,6 +5252,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+<<<<<<< HEAD
 $DBversion = "3.02.00.062";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectreLogin', '', 'Login for Electre ws',NULL,'free')");
@@ -5272,8 +5273,18 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("UPDATE `systempreferences` SET options='asc|desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder')");
     $dbh->do("UPDATE `systempreferences` SET value='score' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
     print "Upgrade to $DBversion done (Update System Preferences defaultSortField and OPACdefaultSortField)\n";
+}
+
+$DBversion = "3.02.00.064";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(
+        "INSERT INTO `systempreferences` (variable,value,options,explanation,type)
+         VALUES('OPACXSLTItemsDetailsDisplay','','','Enable XSL stylesheet control over items on details page display on OPAC exemple : ../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACItemsDetail.xsl','Free')"
+    );
+    print "Upgrade to $DBversion done (added new syspref: OPACXSLTItemsDetailsDisplay)\n";
     SetVersion($DBversion);
 }
+
 
 =item DropAllForeignKeys($table)
 
