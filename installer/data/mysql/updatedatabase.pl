@@ -4882,6 +4882,28 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.055";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
+	");
+	$dbh->do("
+	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
+	");
+    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.056";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(
+        "INSERT INTO `systempreferences` (variable,value,options,explanation,type)
+         VALUES('OPACXSLTItemsDetailsDisplay','','','Enable XSL stylesheet control over items on details page display on OPAC exemple : ../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACItemsDetail.xsl','Free')"
+    );
+    print "Upgrade to $DBversion done (added new syspref: OPACXSLTItemsDetailsDisplay)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.02.00.059";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
@@ -5290,18 +5312,6 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Search Engine','Choice')");
     print "Upgrade to $DBversion done (Solr tables)\n";
     SetVersion ($DBversion);
-=======
-$DBversion = "3.02.00.055";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
-	");
-	$dbh->do("
-	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
-	");
-    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
-    SetVersion($DBversion);
->>>>>>> (MT #5290) remove unicity from index itemsstocknumberidx
 }
 
 =item DropAllForeignKeys($table)
