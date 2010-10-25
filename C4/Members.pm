@@ -1028,7 +1028,7 @@ sub GetPendingIssues {
     # FIXME: namespace collision: other collisions possible.
     # FIXME: most of this data isn't really being used by callers.
     my $query =
-        "SELECT issues.*,
+        qq(SELECT issues.*,
             items.*,
            biblio.*,
            biblioitems.volume,
