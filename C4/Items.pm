@@ -949,7 +949,7 @@ sub GetLostItems {
 =head2 GetItemsForInventory
 
   $itemlist = GetItemsForInventory($minlocation, $maxlocation, 
-                 $location, $itemtype $datelastseen, $branch, 
+                 $location, $itemtype, $datelastseen, $branchcode, $branch,
                  $offset, $size, $statushash);
 
 Retrieve a list of title/authors/barcode/callnumber, for biblio inventory.
@@ -966,7 +966,7 @@ $statushash requires a hashref that has the authorized values fieldname (intems.
 =cut
 
 sub GetItemsForInventory {
-    my ( $minlocation, $maxlocation,$location, $itemtype, $ignoreissued, $datelastseen, $branch, $offset, $size, $statushash ) = @_;
+    my ( $minlocation, $maxlocation, $location, $itemtype, $ignoreissued, $datelastseen, $branchcode, $branch, $offset, $size, $statushash ) = @_;
     my $dbh = C4::Context->dbh;
     my ( @bind_params, @where_strings );
 
