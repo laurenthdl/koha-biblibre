@@ -591,28 +591,6 @@ foreach my $tag ( keys %{$tagslib}){
             push (@loop_data, $subfield_data);
             $i++;
         } 
-    }
-    elsif ( $tag eq '' ) {       # it's an hidden field
-        $subfield_data{marc_value} = qq(<input type="hidden" $attributes />);
-    }
-    elsif ( $tagslib->{$tag}->{$subfield}->{'hidden'} ) {   # FIXME: shouldn't input type be "hidden" ?
-        $subfield_data{marc_value} = qq(<input type="text" $attributes />);
-    }
-    elsif ( length($value) > 100
-            or (C4::Context->preference("marcflavour") eq "UNIMARC" and
-                  300 <= $tag && $tag < 400 && $subfield eq 'a' )
-            or (C4::Context->preference("marcflavour") eq "MARC21"  and
-                  500 <= $tag && $tag < 600                     )
-          ) {
-        # oversize field (textarea)
-        $subfield_data{marc_value} = "<textarea $attributes_no_value>$value</textarea>\n";
-    } else {
-        # it's a standard field
-         $subfield_data{marc_value} = "<input $attributes />";
-    }
-#   $subfield_data{marc_value}="<input type=\"text\" name=\"field_value\">";
-    push (@loop_data, \%subfield_data);
-    $i++
   }
 }
 # what's the next op ? it's what we are not in : an add if we're editing, otherwise, and edit.
