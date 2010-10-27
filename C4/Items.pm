@@ -2029,10 +2029,6 @@ sub DelItemCheck {
     }
     elsif (C4::Context->preference("IndependantBranches") and (C4::Context->userenv->{branch} ne $item->{C4::Context->preference("HomeOrHoldingBranch")||'homebranch'})){
         $error = "not_same_branch";
-    } else {
-
-    if ($onloan){
-        $error = "book_on_loan" 
     }else{
         # check it doesnt have a waiting reserve
         $sth=$dbh->prepare("SELECT * FROM reserves WHERE (found = 'W' or found = 'T') AND itemnumber = ?");
