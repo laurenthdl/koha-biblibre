@@ -32,7 +32,22 @@ use JSON;
 my $input = new CGI;
 my $dbh = C4::Context->dbh;
 
-my @biblionumbers = split('/', $input->param('bib_list'));
+my $filefh = $input->param('uploadfile');
+my $recordslist = $input->param('recordslist');
+my $bib_list = $input->param('bib_list'); 
+my @biblionumbers;
+
+if ($filefh) {
+    while ( my $biblionumber = <$filefh> ) {
+        $biblionumber =~ s/[\r\n]*$//g;
+        push @biblionumbers, $biblionumber if $biblionumber;
+    }
+} elsif ($recordslist) {
+    push @biblionumbers, split( /\s\n/, $recordslist );
+} elsif ($bib_list) {
+    push @biblionumbers, split('/', $bib_list);
+}
+
 my $op            = $input->param('op');
 my ($template, $loggedinuser, $cookie);
 
@@ -122,33 +137,34 @@ if($input->param('field') and not defined $op){
     exit;
 }else{
     ($template, $loggedinuser, $cookie)
-        = get_template_and_user({template_name => "tools/batchedit.tmpl",
-                 query => $input,
-                 type => "intranet",
-                 authnotrequired => 0,
-                 flagsrequired => "batchedit",
-                 });
+            = get_template_and_user({template_name => "tools/batchedit.tmpl",
+                     query => $input,
+                     type => "intranet",
+                     authnotrequired => 0,
+                     flagsrequired => "batchedit",
+                     });
 
+    $template->param( inputform => 1, ) unless @biblionumbers;
     
     if(!defined $op) {
-    my @modifiablefields;
+        my @modifiablefields;
     
-    foreach my $tag (sort keys %{$tagslib}) {
-        my %subfield_data;        
-        foreach my $subfield (sort keys %{$tagslib->{$tag}}) {
-            next if $subfield_data{tag};
-            next if subfield_is_koha_internal_p($subfield);
-            next if ($tagslib->{$tag}->{$subfield}->{'tab'} eq "10");
-            
-            $subfield_data{tag}      = $tag;
-            
-            push @modifiablefields, \%subfield_data;
+        foreach my $tag (sort keys %{$tagslib}) {
+            my %subfield_data;        
+            foreach my $subfield (sort keys %{$tagslib->{$tag}}) {
+                next if $subfield_data{tag};
+                next if subfield_is_koha_internal_p($subfield);
+                next if ($tagslib->{$tag}->{$subfield}->{'tab'} eq "10");
+                
+                $subfield_data{tag}      = $tag;
+                
+                push @modifiablefields, \%subfield_data;
+            }
         }
-    }
     
-    $template->param( marcfields  => \@modifiablefields,
-                      bib_list    => $input->param('bib_list'),
-                     );        
+        $template->param( marcfields  => \@modifiablefields,
+                          bib_list    => $input->param('bib_list'),
+                         );        
 
     }else{
         my @fields     = $input->param('field');
@@ -175,7 +191,7 @@ if($input->param('field') and not defined $op){
             }
             if (@failed_actions == scalar(@fields)){
                 $report_actions{$biblionumber}->{status}="No_Actions";
-        }
+            }
             elsif (@failed_actions>0 and @failed_actions < scalar(@fields)){ 
                 $report_actions{$biblionumber}->{status}="Actions_Failed";
                 $report_actions{$biblionumber}->{failed_actions}=\@failed_actions;
