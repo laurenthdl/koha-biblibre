@@ -468,82 +468,74 @@ my $previssues   = '';
 my @todaysissues;
 my @previousissues;
 my @borrowers_with_issues;
+my @relissues;
+my @relprevissues;
+my $displayrelissues;
 ## ADDED BY JF: new itemtype issuingrules counter stuff
 my $issued_itemtypes_count;
 my @issued_itemtypes_count_loop;
 my $totalprice = 0;
 
-if ($borrower) {
+sub build_issue_data {
+    my $issueslist = shift;
+    my $relatives = shift;
 
-    # Getting borrower relatives
-    my @borrowernumbers = GetMemberRelatives($borrower->{'borrowernumber'});
-    push @borrowernumbers, $borrower->{'borrowernumber'};
+  # split in 2 arrays for today & previous
+    foreach my $it (@$issueslist) {
+        my $itemtypeinfo = getitemtypeinfo( ( C4::Context->preference('item-level_itypes') ) ? $it->{'itype'} : $it->{'itemtype'} );
 
-    # get each issue of the borrower & separate them in todayissues & previous issues
-    my ($issueslist) = GetPendingIssues(@borrowernumbers);
-    foreach my $it ( @$issueslist ) {
-        my $itemtypeinfo = getitemtypeinfo( (C4::Context->preference('item-level_itypes')) ? $it->{'itype'} : $it->{'itemtype'} );
 	# Getting borrower details
 	my $memberdetails = GetMemberDetails($it->{'borrowernumber'});
 	$it->{'borrowername'} = $memberdetails->{'firstname'} . " " . $memberdetails->{'surname'};
 
-	# Adding this borrower to the list of borrowers with issue
-	push @borrowers_with_issues, $it->{'borrowernumber'};
-
         # set itemtype per item-level_itype syspref - FIXME this is an ugly hack
-        $it->{'itemtype'} = ( C4::Context->preference( 'item-level_itypes' ) ) ? $it->{'itype'} : $it->{'itemtype'};
+        $it->{'itemtype'} = ( C4::Context->preference('item-level_itypes') ) ? $it->{'itype'} : $it->{'itemtype'};
 
-        ($it->{'charge'}, $it->{'itemtype_charge'}) = GetIssuingCharges(
-            $it->{'itemnumber'}, $borrower->{'borrowernumber'}
-        );
-        $it->{'charge'} = sprintf("%.2f", $it->{'charge'});
-        my ($can_renew, $can_renew_error) = CanBookBeRenewed( 
-            $borrower->{'borrowernumber'},$it->{'itemnumber'}
-        );
-        if (defined $can_renew_error->{message}){
-            $it->{"renew_error_".$can_renew_error->{message}} = 1;
-		    $it->{'renew_error'} = 1;
+        ( $it->{'charge'}, $it->{'itemtype_charge'} ) = GetIssuingCharges( $it->{'itemnumber'}, $borrower->{'borrowernumber'} );
+        $it->{'charge'} = sprintf( "%.2f", $it->{'charge'} );
+        my ( $can_renew, $can_renew_error ) = CanBookBeRenewed( $borrower->{'borrowernumber'}, $it->{'itemnumber'} );
+        if ( defined $can_renew_error->{message} ) {
+            $it->{ "renew_error_" . $can_renew_error->{message} } = 1;
+            $it->{'renew_error'} = 1;
         }
         $it->{renewals} ||= 0;
         $it->{$_} = $can_renew_error->{$_} for (qw(renewalsallowed reserves));
         my ( $restype, $reserves ) = CheckReserves( $it->{'itemnumber'} );
-        if ($restype){
-		    $it->{'reserved'} = 1;
-            $it->{$restype}=1
+        if ($restype) {
+            $it->{'reserved'} = 1;
+            $it->{$restype} = 1;
         }
-		$it->{'can_renew'} = $can_renew;
-		$it->{'can_confirm'} = !$can_renew && !$restype;
-		$it->{'renew_error'} = $restype;
-	    $it->{'checkoutdate'} = $it->{'issuedate'};
+        $it->{'can_renew'}    = $can_renew;
+        $it->{'can_confirm'}  = !$can_renew && !$restype;
+        $it->{'renew_error'}  = $restype;
+        $it->{'checkoutdate'} = $it->{'issuedate'};
 
         $totalprice += $it->{'replacementprice'};
-        $it->{'itemtype'} = $itemtypeinfo->{'description'};
+        $it->{'itemtype'}       = $itemtypeinfo->{'description'};
         $it->{'itemtype_image'} = $itemtypeinfo->{'imageurl'};
-        $it->{'dd'} = format_date($it->{'date_due'});
-        $it->{'displaydate'} = format_date($it->{'issuedate'});
-        $it->{'od'} = ( $it->{'date_due'} lt $todaysdate ) ? 1 : 0 ;
-        ($it->{'author'} eq '') and $it->{'author'} = ' ';
-        if (defined($return_failed{$it->{'itemnumber'}})){
-            $it->{'return_error_'.$return_failed{$it->{'itemnumber'}}->{message}}=1;
-            delete $return_failed{$it->{'itemnumber'}};
+        $it->{'dd'}             = format_date( $it->{'date_due'} );
+        $it->{'displaydate'}    = format_date( $it->{'issuedate'} );
+        ( $it->{'author'} eq '' ) and $it->{'author'} = ' ';
+        if ( defined( $return_failed{ $it->{'itemnumber'} } ) ) {
+            $it->{ 'return_error_' . $return_failed{ $it->{'itemnumber'} }->{message} } = 1;
+            delete $return_failed{ $it->{'itemnumber'} };
         }
-         if (defined($renew_failed{$it->{'itemnumber'}})){
-            $it->{'renew_error_'.$renew_failed{$it->{'itemnumber'}}->{message}}=1;
+        if ( defined( $renew_failed{ $it->{'itemnumber'} } ) ) {
+            $it->{ 'renew_error_' . $renew_failed{ $it->{'itemnumber'} }->{message} } = 1;
         }
-        $it->{'return_failed'} = defined($return_failed{$it->{'itemnumber'}});
-	$it->{'branchdisplay'} = GetBranchName((C4::Context->preference('HomeOrHoldingBranch') eq 'holdingbranch') ? $it->{'holdingbranch'} : $it->{'homebranch'});
+        $it->{'return_failed'} = defined( $return_failed{ $it->{'itemnumber'} } );
+        $it->{'branchdisplay'} = GetBranchName( ( C4::Context->preference('HomeOrHoldingBranch') eq 'holdingbranch' ) ? $it->{'holdingbranch'} : $it->{'homebranch'} );
+
         # ADDED BY JF: NEW ITEMTYPE COUNT DISPLAY
         $issued_itemtypes_count->{ $it->{'itemtype'} }++;
-        if ( $todaysdate eq $it->{'checkoutdate'} or $todaysdate eq $it->{'lastreneweddate'} ) {
-            push @todaysissues, $it;
-        } else {
-            push @previousissues, $it;
-        }
+	if ( $todaysdate eq $it->{'checkoutdate'} or $todaysdate eq $it->{'lastreneweddate'} ) {
+	    (!$relatives) ? push @todaysissues, $it : push @relissues, $it;
+	} else {
+	    (!$relatives) ? push @previousissues, $it : push @relprevissues, $it;
+	}
+
     }
 
-    # If we have more than one borrower, we display their names
-    @borrowers_with_issues = uniq @borrowers_with_issues;
-    $template->param('multiple_borrowers' => 1) if (@borrowers_with_issues > 1);
 }
 
 if ($borrower) {
@@ -804,6 +796,9 @@ $template->param(
     totaldue          => sprintf('%.2f', $total),
     todayissues       => \@todaysissues,
     previssues        => \@previousissues,
+    relissues			=> \@relissues,
+    relprevissues		=> \@relprevissues,
+    displayrelissues		=> $displayrelissues,
     inprocess         => $inprocess,
     memberofinstution => $member_of_institution,
     CGIorganisations  => $CGIorganisations,
