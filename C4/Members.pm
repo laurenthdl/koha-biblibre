@@ -1053,7 +1053,7 @@ sub GetPendingIssues {
     LEFT JOIN biblioitems ON items.biblioitemnumber = biblioitems.biblioitemnumber
     WHERE
       $bquery 
-    ORDER BY issues.issuedate"
+    ORDER BY issues.issuedate
     );
     my $sth = C4::Context->dbh->prepare($query);
     $sth->execute(@borrowernumbers);
