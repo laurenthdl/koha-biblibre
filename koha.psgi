@@ -3,7 +3,8 @@ use Plack::Builder;
 use Plack::App::CGIBin;
 use Plack::Middleware::Debug;
 use Plack::Middleware::Debug::MemLeak;
-use lib("/home/koha/gitosis-admin/am123/");
+use lib("/home/koha/Code/wip_master/");
+use DBI;
 use C4::Context;
 use C4::Languages;
 use C4::Members;
@@ -15,7 +16,7 @@ use C4::XSLT;
 use C4::Branch;
 use C4::Category;
 
-my $app=Plack::App::CGIBin->new(root => "/home/koha/gitosis-admin/am123/opac");
+my $app=Plack::App::CGIBin->new(root => "/home/koha/Code/wip_master");
 
   builder {
       enable 'Debug',  panels =>
