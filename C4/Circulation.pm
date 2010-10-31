@@ -22,7 +22,6 @@ use strict;
 #use warnings; FIXME - Bug 2505
 use C4::Context;
 use C4::Stats;
-use C4::Reserves;
 use C4::Koha;
 use C4::Biblio;
 use C4::Items;
@@ -321,7 +320,7 @@ sub transferbook {
 
     # find reserves.....
     # That'll save a database query.
-    my ( $resfound, $resrec ) = CheckReserves($itemnumber);
+    my ( $resfound, $resrec ) = C4::Reserves::CheckReserves($itemnumber);
     if ( $resfound and not $ignoreRs ) {
         $resrec->{'ResFound'} = $resfound;
 
