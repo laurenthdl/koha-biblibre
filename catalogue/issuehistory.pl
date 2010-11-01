@@ -57,11 +57,9 @@ if ($itemnumber){
 	);
 } else {
 	$issues = GetBiblioIssues($biblionumber);
-	my (undef,@biblio)=GetBiblio($biblionumber);
+    my $biblio = GetBiblio($biblionumber);
 	my $total  = scalar @$issues;
-	$template->param(
-		%{$biblio[0]},
-	);
+    $template->param( %{$biblio}, );
 } 
 foreach (@$issues){
 	$_->{date_due}   = format_date($_->{date_due});
