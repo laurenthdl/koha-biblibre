@@ -568,32 +568,8 @@ my $onlymine = C4::Context->preference('IndependantBranches') &&
 my $branches = GetBranchesLoop(undef,$onlymine);  # build once ahead of time, instead of multiple times later.
 
 # We generate form, from actuel record
-my @fields;
-if($itemrecord){
-    foreach my $field ($itemrecord->fields()){
-        my $tag = $field->{_tag};
-        foreach my $subfield ( $field->subfields() ){
-
-            my $subfieldtag = $subfield->[0];
-            my $value       = $subfield->[1];
-            my $subfieldlib = $tagslib->{$tag}->{$subfieldtag};
-
-            next if subfield_is_koha_internal_p($subfieldtag);
-            next if ($tagslib->{$tag}->{$subfieldtag}->{'tab'} ne "10");
-
-            my $subfield_data = generate_subfield_form($tag, $subfieldtag, $value, $tagslib, $subfieldlib, $branches, $today_iso, $biblionumber, $temp, \@loop_data, $i);        
-
-            push @fields, "$tag$subfieldtag";
-            push (@loop_data, $subfield_data);
-            $i++;
-                    }
-
-                }
-            }
-    # and now we add fields that are empty
-
 foreach my $tag ( keys %{$tagslib}){
-    foreach my $subtag (keys %{$tagslib->{$tag}}){
+    foreach my $subtag (sort keys %{$tagslib->{$tag}}){
         next if subfield_is_koha_internal_p($subtag);
         next if ($tagslib->{$tag}->{$subtag}->{'tab'} ne "10");
         next if any { /^$tag$subtag$/ }  @fields;
