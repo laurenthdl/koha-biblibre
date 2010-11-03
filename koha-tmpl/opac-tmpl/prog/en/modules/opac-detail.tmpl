@@ -170,6 +170,12 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
     <div id="catalogue_detail_biblio">
 
     <div id="bookcover">
+    <!-- TMPL_IF NAME="OpacElectreImage" -->
+    <!-- TMPL_IF NAME="ElectreImage" -->
+    <img src="data:image/jpeg;base64,<!-- TMPL_VAR NAME="ElectreImage" -->" />
+    <!-- /TMPL_IF -->
+    <!-- /TMPL_IF -->
+    
     <!-- TMPL_IF NAME="OPACAmazonEnabled" --><!-- TMPL_IF NAME="OPACAmazonCoverImages" --><!-- TMPL_IF NAME="OPACURLOpenInNewWindow" --><a href="http://www.amazon<!-- TMPL_VAR NAME="AmazonTld" -->/gp/reader/<!-- TMPL_VAR NAME="normalized_isbn" -->/ref=sib_dp_pt/002-7879865-0184864#reader-link" target="_blank"><img border="0" src="http://images.amazon.com/images/P/<!-- TMPL_VAR NAME="normalized_isbn" -->.01.MZZZZZZZ.jpg" alt="Cover Image" /></a><!-- TMPL_ELSE --><a href="http://www.amazon<!-- TMPL_VAR NAME="AmazonTld" -->/gp/reader/<!-- TMPL_VAR NAME="normalized_isbn" -->/ref=sib_dp_pt/002-7879865-0184864#reader-link"><img border="0" src="http://images.amazon.com/images/P/<!-- TMPL_VAR NAME="normalized_isbn" -->.01.MZZZZZZZ.jpg" alt="Cover Image" /></a><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
 
     <!-- TMPL_IF NAME="SyndeticsEnabled" --><!-- TMPL_IF NAME="SyndeticsCoverImages" --><!-- TMPL_IF NAME="content_identifier_exists" --><!-- TMPL_IF NAME="using_https" -->
@@ -408,7 +414,17 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
         <!-- /TMPL_IF -->
         </div>
     <!-- /TMPL_IF -->
-
+    <!-- TMPL_IF NAME="OpacElectreQuatriemeXml" -->
+    <!-- TMPL_IF NAME="ElectreQuatriemeXml" --><span class="results_summary"><span class="label">Synopsis:</span>
+    <!-- TMPL_VAR NAME="ElectreQuatriemeXml" --></span>
+    <!-- /TMPL_IF -->
+    <!-- /TMPL_IF -->
+    
+    <!-- TMPL_IF NAME="OpacElectreResume" -->
+    <!-- TMPL_IF NAME="ElectreResume" --><span class="results_summary"><span class="label">Summary:</span>
+    <!-- TMPL_VAR NAME="ElectreResume" --></span>
+    <!-- /TMPL_IF -->
+    <!-- /TMPL_IF -->
         <!-- TMPL_IF NAME="SyndeticsEnabled" --><!-- TMPL_IF NAME="SyndeticsSeries" --><!-- TMPL_IF NAME="SyndeticsSERIES1Exists" -->
         <span class="results_summary">
         <span class="label">Series Information:</span> <!-- TMPL_IF NAME="using_https" --><a target="_blank" href="https://secure.syndetics.com/ffseries.aspx?isbn=<!--TMPL_ELSE --><a target="_blank" href="http://www.syndetics.com/ffseries.aspx?isbn=<!-- /TMPL_IF --><!-- TMPL_VAR NAME="normalized_isbn" -->&amp;type=series&amp;num=1&amp;client=<!-- TMPL_VAR NAME="SyndeticsClientCode" --><!-- TMPL_IF NAME="normalized_upc" -->&amp;upc=<!-- TMPL_VAR NAME="normalized_upc" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="normalized_oclc" -->&amp;oclc=<!-- TMPL_VAR NAME="normalized_oclc" --><!-- /TMPL_IF -->">Click to open in new window</a>
