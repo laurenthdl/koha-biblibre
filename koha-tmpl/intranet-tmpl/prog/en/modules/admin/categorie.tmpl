@@ -268,7 +268,7 @@ Confirm Deletion of Category <!-- TMPL_VAR NAME="categorycode" escape="html" -->
 		</select>
 	</form>
 </span>
-        <table id="table_categorie">
+        <table id="table_categorie" class="zebra">
 		<thead>
 			<th scope="col">Code</th>
 			<th scope="col">Category name</th>
@@ -285,11 +285,7 @@ Confirm Deletion of Category <!-- TMPL_VAR NAME="categorycode" escape="html" -->
 			<th scope="col" colspan="2">&nbsp; </th>
 		</thead>
 		<!-- TMPL_LOOP NAME="loop" -->
-		<!-- TMPL_UNLESS NAME="__odd__" -->
-			<tr class="highlight">
-		<!-- TMPL_ELSE -->
 			<tr>
-		<!-- /TMPL_UNLESS -->
                         <td><!-- TMPL_VAR NAME="categorycode" escape="html" --></td>
                         <td>
                             <a href="<!-- TMPL_VAR NAME="script_name" -->?op=add_form&amp;categorycode=<!-- TMPL_VAR NAME="categorycode" escape="url" -->"><!-- TMPL_VAR NAME="description" escape="html" --></a>

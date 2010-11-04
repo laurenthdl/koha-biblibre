@@ -303,6 +303,10 @@ tr.highlight.onissue td {
 	background-color: #FFFFE1;
 }
 
+.zebra tr:nth-child(odd) td {
+	background-color:#eee;
+}
+
 tfoot td {
 	background-color : #f3f3f3;
 	font-weight : bold;
