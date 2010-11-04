@@ -303,7 +303,7 @@ tr.highlight.onissue td {
 	background-color: #FFFFE1;
 }
 
-.zebra tr:nth-child(odd) td {
+.zebra tr:nth-child(even) td {
 	background-color:#eee;
 }
 
