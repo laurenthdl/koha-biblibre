@@ -286,7 +286,7 @@ $template->param(
 );
 
 # populate results with records
-my @results = map { $_->id =~ m/(\d+)$/; GetBiblio( $1 ); } @{ $res->items };
+my @results = map { GetBiblio $_->{'values'}->{'recordid'} } @{ $res->items };
 
 # build facets
 my @facets;
@@ -317,7 +317,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
 }
 
 $template->param(
-    'total'          => $res->{pager}->{total_entries},
+    'total'          => $res->{'pager'}->{'total_entries'},
     'opacfacets'     => 1,
     'search_error'   => $error,
     'SEARCH_RESULTS' => \@results,
