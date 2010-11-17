@@ -391,7 +391,7 @@ function GetZ3950Terms(){
                                 <input type="checkbox" class="selection" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" style="display:none" />
                             </td>
                             <td>
-                                <p><!-- TMPL_VAR NAME="result_number" -->.
+                                <p><!-- TMPL_VAR EXPR="__counter__+((current_page-1)*10)" -->.
                                     <!-- TMPL_IF name="BiblioDefaultViewmarc" -->
                                         <a class="title" href="/cgi-bin/koha/catalogue/MARCdetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->">
                                     <!-- TMPL_ELSIF NAME="BiblioDefaultViewlabeled_marc" -->
