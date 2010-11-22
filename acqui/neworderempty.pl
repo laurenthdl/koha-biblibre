@@ -348,7 +348,7 @@ $template->param(
     publicationyear  => $data->{'publicationyear'},
     budget_loop      => $budget_loop,
     isbn             => $data->{'isbn'},
-    seriestitle      => $data->{'seriestitle'},
+    collectiontitle      => $data->{'collectiontitle'},
     quantity         => $data->{'quantity'},
     quantityrec      => $data->{'quantity'},
     rrp              => $data->{'rrp'},
@@ -357,6 +357,7 @@ $template->param(
     ecost => $data->{'ecost'},
     notes => $data->{'notes'},
     publishercode => $data->{'publishercode'},
+    place => $data->{'place'},
 
     import_batch_id => $import_batch_id,
 
