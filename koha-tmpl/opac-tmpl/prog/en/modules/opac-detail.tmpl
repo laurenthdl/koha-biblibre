@@ -386,6 +386,18 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 	</span>
 <!-- /TMPL_IF -->
 
+<!-- TMPL_IF NAME="OpacElectreQuatriemeXml" -->
+	<!-- TMPL_IF NAME="ElectreQuatriemeXml" --><span class="results_summary"><span class="label">Synopsis:</span>
+		<!-- TMPL_VAR NAME="ElectreQuatriemeXml" --></span>
+	<!-- /TMPL_IF -->
+<!-- /TMPL_IF -->
+
+<!-- TMPL_IF NAME="OpacElectreResume" -->
+	<!-- TMPL_IF NAME="ElectreResume" --><span class="results_summary"><span class="label">Summary:</span>
+		<!-- TMPL_VAR NAME="ElectreResume" --></span>
+	<!-- /TMPL_IF -->
+<!-- /TMPL_IF -->
+
     <!-- TMPL_IF NAME="TagsShowOnDetail" -->
         <div class="results_summary">
         <!-- TMPL_IF NAME="TagLoop" -->
@@ -412,17 +424,6 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
             <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
         </div>
-    <!-- /TMPL_IF -->
-    <!-- TMPL_IF NAME="OpacElectreQuatriemeXml" -->
-    <!-- TMPL_IF NAME="ElectreQuatriemeXml" --><span class="results_summary"><span class="label">Synopsis:</span>
-    <!-- TMPL_VAR NAME="ElectreQuatriemeXml" --></span>
-    <!-- /TMPL_IF -->
-    <!-- /TMPL_IF -->
-    
-    <!-- TMPL_IF NAME="OpacElectreResume" -->
-    <!-- TMPL_IF NAME="ElectreResume" --><span class="results_summary"><span class="label">Summary:</span>
-    <!-- TMPL_VAR NAME="ElectreResume" --></span>
-    <!-- /TMPL_IF -->
     <!-- /TMPL_IF -->
         <!-- TMPL_IF NAME="SyndeticsEnabled" --><!-- TMPL_IF NAME="SyndeticsSeries" --><!-- TMPL_IF NAME="SyndeticsSERIES1Exists" -->
         <span class="results_summary">
