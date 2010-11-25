@@ -1,5 +1,4 @@
 package C4::Auth_with_ldap;
-
 # Copyright 2000-2002 Katipo Communications
 #
 # This file is part of Koha.
@@ -17,11 +16,9 @@ package C4::Auth_with_ldap;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
+use Modern::Perl;
 
-#use warnings; FIXME - Bug 2505
 use Digest::MD5 qw(md5_base64);
-
 use C4::Debug;
 use C4::Context;
 use C4::Members qw(AddMember changepassword);
@@ -31,6 +28,7 @@ use C4::Utils qw( :all );
 use List::MoreUtils qw( any );
 use Net::LDAP;
 use Net::LDAP::Filter;
+require YAML;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug);
 
@@ -52,11 +50,25 @@ sub ldapserver_error ($) {
     return sprintf( 'No ldapserver "%s" defined in KOHA_CONF: ' . $ENV{KOHA_CONF}, shift );
 }
 
+# constants 
+sub DEBUG         { 1 }
+sub LDAP_CANTBIND { 'LDAP_CANTBIND' }
+
+sub debug_msg { DEBUG and say STDERR @_ }
+sub logger { say STDERR YAML::Dump @_ }
+
 use vars qw($mapping @ldaphosts $base $ldapname $ldappassword);
 my $context  = C4::Context->new()                or die 'C4::Context->new failed';
 my $ldap     = C4::Context->config("ldapserver") or die 'No "ldapserver" in server hash from KOHA_CONF: ' . $ENV{KOHA_CONF};
-my $prefhost = $ldap->{hostname}                 or die ldapserver_error('hostname');
-my $base     = $ldap->{base}                     or die ldapserver_error('base');
+
+my ( $prefhost, $base ) = ('')x2;
+
+unless ( $$ldap{authmethod} ) {
+    say STDERR "deprecated ldap configuration, see documentation";
+    $base = $$ldap{base} or die ldapserver_error('base');
+    $prefhost = $$ldap{hostname} or die ldapserver_error('hostname');
+}
+
 $ldapname     = $ldap->{user};
 $ldappassword = $ldap->{pass};
 our %mapping = %{ $ldap->{mapping} };    # FIXME dpavlin -- don't die because of || (); from 6eaf8511c70eb82d797c941ef528f4310a15e9f9
@@ -98,45 +110,172 @@ sub search_method {
         return 0;
     }
     if ( $count != 1 ) {
-        warn sprintf( "LDAP Auth rejected : %s gets %d hits\n", $filter->as_string, $count );
+        warn sprintf( "LDAP Auth rejected : %s gets %d his\n", $filter->as_string, $count );
         return 0;
     }
     return $search;
 }
 
+# $cnx is an Net::LDAP object that dies when error occurs
+# $search_params are params for the search method (default base is the one set in the config)
+
+# TODO:
+# this function name suck: find something more generic around koha manager auth and anonymous one
+
+sub _anon_search {
+
+    my ( $cnx, $search ) = @_;
+
+    # bind MUST success
+    my $msg = eval {
+	$cnx->bind ( $$ldap{manager}, password => $$ldap{password} )
+    };
+    debug_msg "ldap $_:", $msg->$_ for qw/ error code /;
+    if ( $@ ) { return {qw/ error LDAP_CANTBIND msg /, $@} };
+
+    my $entry;
+    for my $branch ( @{ $$ldap{branch} } ) {
+	debug_msg "search $$search{filter} at $$branch{dn}";
+
+	my $branch_search = { %$search, base => $$branch{dn}, search => "ObjectClass=*" };
+	$entry = eval {
+	    $cnx
+	    ->search( %$branch_search )
+	    ->shift_entry
+	};
+
+	if ( $entry ) {
+	    debug_msg "found ", $entry->dn;
+	    return { entry => $entry, branch => $branch }
+	}
+	elsif ( $@  ) { return { qw/ error UNKNOWN msg /, $@ }        } 
+	else { DEBUG and logger { "failed search" => $branch_search } }
+    }
+}
+
 sub checkpw_ldap {
     my ( $dbh, $userid, $password ) = @_;
     my @hosts = split( ',', $prefhost );
+    my $uattr =  $$ldap{mapping}{userid}{is} or die "userid mapping not set";
     my $db = Net::LDAP->new( \@hosts );
 
-    #$debug and $db->debug(5);
+    # $userldapentry is a crappy global value user at bottom
+    # of this fonction to build the koha user 
     my $userldapentry;
-    if ( $ldap->{auth_by_bind} ) {
-        my $principal_name = $ldap->{principal_name};
-        if ( $principal_name and $principal_name =~ /\%/ ) {
-            $principal_name = sprintf( $principal_name, $userid );
-        } else {
-            $principal_name = $userid;
-        }
-        my $res = $db->bind( $principal_name, password => $password );
-        if ( $res->code ) {
-            $debug and warn "LDAP bind failed as kohauser $principal_name: " . description($res);
-            return 0;
-        }
 
-        # FIXME dpavlin -- we really need $userldapentry leater on even if using auth_by_bind!
-        my $search = search_method( $db, $userid ) or return 0;    # warnings are in the sub
-        $userldapentry = $search->shift_entry;
+    if ( $$ldap{authmethod} ) {
 
+	# TODO: do this test sooner ? 
+	for ( $$ldap{branch} ) {
+	    $_ or die "no branch, no auth";
+	    ref $_ ~~ 'HASH' and $_ = [$_];
+	}
+
+	# This code is an attempt to introduce a new codebase that can be hookable
+	# and can mangage more cases than the old way
+
+	# if the filter isn't set, userid mapping is used
+	$$ldap{filter} ||= $$ldap{mapping}{userid}{is}.'=%s';
+
+	my $cnx = Net::LDAP->new( $$ldap{uri}, qw/ onerror die / ) or do {
+	    warn "ldap error: $!";
+	    return 0;
+	};
+
+	# login can be either ...
+	my $login = do {
+
+	    # An Active Directory principal_name. Just replace the %s by the userid
+	    # well ... don't try if not AD
+	    if ( $$ldap{authmethod} ~~ [qw/ principal_name principalname principalName /] ) {
+		sprintf( $$ldap{principal_name}, $userid )
+	    }
+
+	    # for other LDAP implementation, the standard way is to
+	    # A) Bind with the manager account and search for the DN of the user entry
+	    # B) Bind with the user DN and password.
+	    # Auth is completed if bind success.
+	    # so in this code;
+	    # - i fill $userldapentry for later use
+	    # - i return the DN
+
+	    elsif ( $$ldap{authmethod} ~~ [qw/ searchdn searchDn search_dn /] ) {
+
+		my $result = _anon_search
+		( $cnx
+		, { filter => sprintf( $$ldap{filter}, $userid ) }
+		) or do {
+		    debug_msg "no answer from ldap";
+		    return 0;
+		};
+
+		if ( $$result{error} ) {
+		    say STDERR $$result{msg};
+		    return 0;
+		} 
+
+		# TODO:
+		# here comes the branch by branch mapping
+		# $$result{branch}{mapping} 
+
+		$userldapentry = $$result{entry} or do {
+		    debug_msg "no entry returned? weird ...";
+		};
+
+		# login is the dn of the entry
+		if ( $userldapentry ) { $userldapentry->dn }
+		else {
+		    debug_msg "can't authenticate $userid";
+		    return 0;
+		}
+	    } else {
+		say STDERR "$$ldap{authmethod} authmethod is invalid,"
+		, "please check your ldap configuration in $ENV{KOHA_CONF}"
+		;
+		return 0;
+	    }
+	};
+
+	eval { $cnx->bind( $login, password => $password ) };
+	if ( $@ ) {
+	    say STDERR "ldap bind with $login failed: $@";
+	    return 0;
+	}
+	debug_msg "congrats, you're one of us";
     } else {
-        my $search = search_method( $db, $userid ) or return 0;    # warnings are in the sub
-        $userldapentry = $search->shift_entry;
-        my $cmpmesg = $db->compare( $userldapentry, attr => 'userpassword', value => $password );
-        if ( $cmpmesg->code != 6 ) {
-            warn "LDAP Auth rejected : invalid password for user '$userid'. " . description($cmpmesg);
-            return 0;
-        }
+	# This is the old stuff: 
+	#
+	#$debug and $db->debug(5);
+	if ( $ldap->{auth_by_bind} ) {
+	    my $principal_name = $ldap->{principal_name};
+	    if ( $principal_name and $principal_name =~ /\%/ ) {
+		$principal_name = sprintf( $principal_name, $userid );
+	    } else {
+		$principal_name = $userid;
+	    }
+	    my $res = $db->bind( $principal_name, password => $password );
+	    if ( $res->code ) {
+		$debug and warn "LDAP bind failed as kohauser $principal_name: " . description($res);
+		return 0;
+	    }
+
+	    # FIXME dpavlin -- we really need $userldapentry leater on even if using auth_by_bind!
+	    my $search = search_method( $db, $userid ) or return 0;    # warnings are in the sub
+	    $userldapentry = $search->shift_entry;
+
+	} else {
+	    # i wish this would NEVER EVER BE !
+	    say STDERR "deprecated kludge: use authmethod search_dn instead";
+	    my $search = search_method( $db, $userid ) or return 0;    # warnings are in the sub
+	    $userldapentry = $search->shift_entry;
+	    my $cmpmesg = $db->compare( $userldapentry, attr => 'userpassword', value => $password );
+	    if ( $cmpmesg->code != 6 ) {
+		warn "LDAP Auth rejected : invalid password for user '$userid'. " . description($cmpmesg);
+		return 0;
+	    }
+	}
     }
+
 
     # To get here, LDAP has accepted our user's login attempt.
     # But we still have work to do.  See perldoc below for detailed breakdown.
@@ -144,7 +283,7 @@ sub checkpw_ldap {
     my (%borrower);
     my ( $borrowernumber, $cardnumber, $local_userid, $savedpw ) = exists_local($userid);
 
-    if (   ( $borrowernumber and $config{update} )
+    if (  ( $borrowernumber and $config{update} )
         or ( !$borrowernumber and $config{replicate} ) ) {
         %borrower = ldap_entry_2_hash( $userldapentry, $userid );
         $debug and print STDERR "checkpw_ldap received \%borrower w/ " . keys(%borrower), " keys: ", join( ' ', keys %borrower ), "\n";
