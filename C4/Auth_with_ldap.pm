@@ -17,26 +17,33 @@ package C4::Auth_with_ldap;
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 use Modern::Perl;
-
 use Digest::MD5 qw(md5_base64);
 use C4::Debug;
 use C4::Context;
-use C4::Members qw(AddMember changepassword);
-use C4::Members::Attributes;
+use C4::Members qw/ GetMember AddMember changepassword /;
+use C4::Members::Attributes qw/ SetBorrowerAttributes /;
 use C4::Members::AttributeTypes;
 use C4::Utils qw( :all );
 use List::MoreUtils qw( any );
 use Net::LDAP;
 use Net::LDAP::Filter;
+use parent 'Exporter';
 require YAML;
 
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug);
+our $VERSION = 3.10;                 # set the version for version checking
+our @ISA     = qw(Exporter);
+our @EXPORT  = qw( checkpw_ldap );
 
-BEGIN {
-    require Exporter;
-    $VERSION = 3.10;                 # set the version for version checking
-    @ISA     = qw(Exporter);
-    @EXPORT  = qw( checkpw_ldap );
+# return the ref of the subroutine
+sub load_subroutine {
+    require Package::Stash;
+    my ( $module, $sub ) = @_;
+    my $stash = Package::Stash->new($module);
+    unless ( %{ $stash->namespace } ) {
+	eval "require $module";
+	$@ and die $@;
+    }
+    $stash->get_package_symbol('&'.$sub);
 }
 
 # Redefine checkpw_ldap:
@@ -51,7 +58,7 @@ sub ldapserver_error ($) {
 }
 
 # constants 
-sub DEBUG         { 1 }
+sub DEBUG         { 0 }
 sub LDAP_CANTBIND { 'LDAP_CANTBIND' }
 
 sub debug_msg { DEBUG and say STDERR @_ }
@@ -71,7 +78,7 @@ unless ( $$ldap{authmethod} ) {
 
 $ldapname     = $ldap->{user};
 $ldappassword = $ldap->{pass};
-our %mapping = %{ $ldap->{mapping} };    # FIXME dpavlin -- don't die because of || (); from 6eaf8511c70eb82d797c941ef528f4310a15e9f9
+our %mapping = %{ $ldap->{mapping} || {} };    # FIXME dpavlin -- don't die because of || (); from 6eaf8511c70eb82d797c941ef528f4310a15e9f9
 my @mapkeys = keys %mapping;
 $debug and print STDERR "Got ", scalar(@mapkeys), " ldap mapkeys (  total  ): ", join ' ', @mapkeys, "\n";
 @mapkeys = grep { defined $mapping{$_}->{is} } @mapkeys;
@@ -153,11 +160,92 @@ sub _anon_search {
     }
 }
 
+sub set_xattr {
+    my ( $id, $borrower ) = @_;
+    if ( my $x = $$borrower{xattr} ) {
+	my $attrs = [ map +{ code => $_, value => $$x{$_} }, keys %$x ];
+	logger { "creating $id" => $attrs };
+	SetBorrowerAttributes( $id, $attrs );
+    }
+}
+
+# sub raising_error (&) {
+#     my ( $block ) = @_;
+#     my $RaiseError;
+#     my $dbh = C4::Context->dbh;
+#     $RaiseError = $$dbh{RaiseError};
+#     $$dbh{RaiseError} = 1;
+#     eval { $block->() };
+#     $$dbh{RaiseError} = $RaiseError;
+# }
+
+sub accept_borrower {
+    my ($userid,$borrower) = @_;
+    for ( $$borrower{column}{userid} ) {
+	unless ( $_ ) {
+	    $_ = $userid;
+	    next;
+	}
+	unless ( $userid ~~ $_ ) {
+	    warn "userid $_ don't match authentication credential $userid";
+	    return 0;
+	}
+    }
+
+    my $id = ( GetMember( userid => $userid ) || {} )->{borrowernumber}
+	or debug_msg "$userid is newcommer";
+
+    my $newcommer = not defined $id;
+
+    # for ($$ldap{dry_run}) {
+    #     if ( $_ && not /no/) {
+    #         DEBUG and logger
+    #         { ( $newcommer ? 'newcommer' : 'existing_user' )
+    #         , { map { $_, $$borrower{$_} } qw/ column xattr / }
+    #         };
+    #         return 0;
+    #     }
+    # }
+
+    if ( $newcommer ) {
+	return 0 unless $config{update};
+	$id = AddMember( %{ $$borrower{column} } ) or return 0;
+	# raising_error { AddMember( %{ $$borrower{column} } ) };
+	# if ( $@ || not defined $id ) {
+	#     DEBUG and logger { $@, $$borrower{column} };
+	#     return 0;
+	# }
+    } else {
+	if ( $config{replicate} ) {
+	    my $cardnumber = update_local
+	    ( $userid, $$borrower{column}{password}, $id, $$borrower{column} ); 
+	    if ( my $old_cardnumber = $$borrower{column}{cardnumber} ) {
+		if ( $cardnumber ne $cardnumber ) {
+		    warn "update_local returned cardnumber '$cardnumber' instead of '$old_cardnumber'";
+		    return 0;
+		}
+	    }
+	}
+    }
+
+    if ( $newcommer || $config{update} ) {
+	logger { "changing attrs for $id" => $$borrower{xattr} };
+	set_xattr $id,$borrower;
+    }
+
+    return 1
+}
+
 sub checkpw_ldap {
     my ( $dbh, $userid, $password ) = @_;
     my @hosts = split( ',', $prefhost );
-    my $uattr =  $$ldap{mapping}{userid}{is} or die "userid mapping not set";
     my $db = Net::LDAP->new( \@hosts );
+    my $to_borrower = {};
+
+    my $uattr
+    =  $$ldap{userid_from} 
+    || $$ldap{mapping}{userid}{is}
+	or die "userid mapping not set";
 
     # $userldapentry is a crappy global value user at bottom
     # of this fonction to build the koha user 
@@ -175,7 +263,7 @@ sub checkpw_ldap {
 	# and can mangage more cases than the old way
 
 	# if the filter isn't set, userid mapping is used
-	$$ldap{filter} ||= $$ldap{mapping}{userid}{is}.'=%s';
+	$$ldap{filter} ||= "$uattr=%s";
 
 	my $cnx = Net::LDAP->new( $$ldap{uri}, qw/ onerror die / ) or do {
 	    warn "ldap error: $!";
@@ -201,7 +289,7 @@ sub checkpw_ldap {
 
 	    elsif ( $$ldap{authmethod} ~~ [qw/ searchdn searchDn search_dn /] ) {
 
-		my $result = _anon_search
+		$to_borrower = _anon_search
 		( $cnx
 		, { filter => sprintf( $$ldap{filter}, $userid ) }
 		) or do {
@@ -209,8 +297,8 @@ sub checkpw_ldap {
 		    return 0;
 		};
 
-		if ( $$result{error} ) {
-		    say STDERR $$result{msg};
+		if ( $$to_borrower{error} ) {
+		    say STDERR $$to_borrower{msg};
 		    return 0;
 		} 
 
@@ -218,14 +306,14 @@ sub checkpw_ldap {
 		# here comes the branch by branch mapping
 		# $$result{branch}{mapping} 
 
-		$userldapentry = $$result{entry} or do {
+		$userldapentry = $$to_borrower{entry} or do {
 		    debug_msg "no entry returned? weird ...";
 		};
 
 		# login is the dn of the entry
 		if ( $userldapentry ) { $userldapentry->dn }
 		else {
-		    debug_msg "can't authenticate $userid";
+		    say STDERR "can't authenticate $userid";
 		    return 0;
 		}
 	    } else {
@@ -276,11 +364,24 @@ sub checkpw_ldap {
 	}
     }
 
+    if ( my $t = $$ldap{transformation} ) {
+	$$t{subroutine} ||= 'get_borrower';
+	my $get_borrower = load_subroutine ( @$t{qw/ module subroutine /} );
+	unless ( $get_borrower ) {
+	    warn "no get_borrower $$t{subroutine} subroutine in $$t{module}";
+	    return 0;
+	}
+	debug_msg  "$$t{subroutine} subroutine loaded from $$t{module}";
+	if ( my $b = $get_borrower->( $$to_borrower{entry} ) ) {
+	    return accept_borrower $userid,$b;
+	}
+	else { return 0 }
+    }
 
     # To get here, LDAP has accepted our user's login attempt.
     # But we still have work to do.  See perldoc below for detailed breakdown.
 
-    my (%borrower);
+    my %borrower;
     my ( $borrowernumber, $cardnumber, $local_userid, $savedpw ) = exists_local($userid);
 
     if (  ( $borrowernumber and $config{update} )
@@ -298,7 +399,15 @@ sub checkpw_ldap {
             return ( 1, $cardnumber );    # FIXME dpavlin -- don't destroy ExtendedPatronAttributes
         }
     } elsif ( $config{replicate} ) {    # A2, C2
-        $borrowernumber = AddMember(%borrower) or die "AddMember failed";
+	debug_msg "$borrower{userid} # = $borrowernumber";
+        AddMember(%borrower);
+	# $borrowernumber = eval { AddMember(%borrower) };
+	# if ( $@ || not defined $borrowernumber ) {
+	#     die logger { $@ => \%borrower };
+	#     if (DEBUG) { logger { $@ => \%borrower } }
+	#     else { say STDERR "ldap account $borrower{userid} can't be replicated in koha" }
+	#     return 0;
+	# }
     } else {
         return 0;                       # B2, D2
     }
