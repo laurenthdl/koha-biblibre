@@ -1,0 +1,34 @@
+# This file is used for custom bibtex export
+# You can define one mapping per ccode
+# (this is an example file, remove the .orig
+# file extension)
+# Example :
+
+"ARTICLE":
+ type: article
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ journal:
+   - 463$t
+ year:
+   - 463$d
+ volume:
+   - 463$v
+ pages:
+   - 215$a
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ 
+# Note:
+# Having multiple lines of fields for one entry (like for "pages" in the example
+# above) means that the next line will be tried if there's not at least one value
+# for the previous one.
