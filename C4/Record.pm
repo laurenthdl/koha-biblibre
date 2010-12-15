@@ -850,68 +850,134 @@ sub marc2bibtex {
     my ( $record, $id ) = @_;
     my $tex;
 
-    # Authors
-    my $marcauthors = GetMarcAuthors( $record, C4::Context->preference("marcflavour") );
-    my $author;
-    for my $authors (
-        map {
-            map { @$_ } values %$_
-        } @$marcauthors
-      ) {
-        $author .= " and " if ( $author && $$authors{value} );
-        $author .= $$authors{value} if ( $$authors{value} );
+    # Getting yaml file
+    my $configfile = "../C4/bibtex.yaml";
+    my $config;
+    if ( -e $configfile ) {
+        $config = YAML::LoadFile($configfile);
     }
 
-    # Defining the conversion hash according to the marcflavour
-    my %bh;
-    if ( C4::Context->preference("marcflavour") eq "UNIMARC" ) {
+    # If there is a yaml configuration, we use it
+    if ($config) {
+	my %bh;
 
-        # FIXME, TODO : handle repeatable fields
-        # TODO : handle more types of documents
+	# Getting the mapper (or ccode, by default)
+	my ($tag, $subtag) = GetMarcFromKohaField($config->{'mapper'} || 'items.ccode', GetFrameworkCode($id));
+	my $ccode = $record->field($tag)->subfield($subtag);
 
-        # Unimarc to bibtex hash
-        %bh = (
+	# Getting the separator (or space, by default)
+	my $separator = $config->{'separator'} || ' ';
 
-            # Mandatory
-            author    => $author,
-            title     => $record->subfield( "200", "a" ) || "",
-            editor    => $record->subfield( "210", "g" ) || "",
-            publisher => $record->subfield( "210", "c" ) || "",
-            year      => $record->subfield( "210", "d" ) || $record->subfield( "210", "h" ) || "",
+	# Getting the mappings for this mapper (or the default mappings)
+	my $mappings = $config->{$ccode} || $config->{$config->{'default'}};
 
-            # Optional
-            volume  => $record->subfield( "200", "v" ) || "",
-            series  => $record->subfield( "225", "a" ) || "",
-            address => $record->subfield( "210", "a" ) || "",
-            edition => $record->subfield( "205", "a" ) || "",
-            note    => $record->subfield( "300", "a" ) || "",
-            url     => $record->subfield( "856", "u" ) || ""
-        );
+	# Foreach entry (author, title...)
+	foreach my $mapping (keys %$mappings) {
+
+	    # We don't deal with document type right here
+	    next if $mapping eq "bibtextype";
+
+	    # We get the field lists
+	    foreach (@{$mappings->{$mapping}}) {
+		my $fieldsstr = $_;
+		my @fields = split(/ /, $fieldsstr);
+
+		my $atleastonevalue = 0;
+
+		# Foreach field defined in the mapping
+		my $value;
+		my @values;
+		foreach my $field (@fields) {
+		    my ($tag, $subtag) = split(/\$/, $field);
+
+		    foreach ($record->field($tag)) {
+			foreach ($_->subfield($subtag)) {
+			    push @values, $_ if ($_);
+			}
+		    }
+		    $value = join($separator, @values);
+		    %bh->{$mapping} = $value if ($value);
+		    $atleastonevalue = 1 if ($value);
+		}
+
+		# No need to use next field list for this entry if we got at least one value
+		last if $atleastonevalue;
+	    }
+
+	}
+	$tex .= "\@" . $mappings->{'bibtextype'} . "{";
+	$tex .= join( ",\n", $id, map { $bh{$_} ? qq(\t$_ = {$bh{$_}}) : () } keys %bh );
+	$tex .= "\n}\n";
+	warn $tex;
+
+    # Else, we use standard mapping
     } else {
 
-        # Marc21 to bibtex hash
-        %bh = (
+	# Authors
+	my $marcauthors = GetMarcAuthors( $record, C4::Context->preference("marcflavour") );
+	my $author;
+	for my $authors (
+	    map {
+		map { @$_ } values %$_
+	    } @$marcauthors
+	  ) {
+	    $author .= " and " if ( $author && $$authors{value} );
+	    $author .= $$authors{value} if ( $$authors{value} );
+	}
 
-            # Mandatory
-            author    => $author,
-            title     => $record->subfield( "245", "a" ) || "",
-            editor    => $record->subfield( "260", "f" ) || "",
-            publisher => $record->subfield( "260", "b" ) || "",
-            year      => $record->subfield( "260", "c" ) || $record->subfield( "260", "g" ) || "",
 
-            # Optional
-            # unimarc to marc21 specification says not to convert 200$v to marc21
-            series  => $record->subfield( "490", "a" ) || "",
-            address => $record->subfield( "260", "a" ) || "",
-            edition => $record->subfield( "250", "a" ) || "",
-            note    => $record->subfield( "500", "a" ) || "",
-            url     => $record->subfield( "856", "u" ) || ""
-        );
+	my %bh;
+	# Defining the conversion hash according to the marcflavour
+	if ( C4::Context->preference("marcflavour") eq "UNIMARC" ) {
+
+	    # FIXME, TODO : handle repeatable fields
+	    # TODO : handle more types of documents
+
+	    # Unimarc to bibtex hash
+	    %bh = (
+
+		# Mandatory
+		author    => $author,
+		title     => $record->subfield( "200", "a" ) || "",
+		editor    => $record->subfield( "210", "g" ) || "",
+		publisher => $record->subfield( "210", "c" ) || "",
+		year      => $record->subfield( "210", "d" ) || $record->subfield( "210", "h" ) || "",
+
+		# Optional
+		volume  => $record->subfield( "200", "v" ) || "",
+		series  => $record->subfield( "225", "a" ) || "",
+		address => $record->subfield( "210", "a" ) || "",
+		edition => $record->subfield( "205", "a" ) || "",
+		note    => $record->subfield( "300", "a" ) || "",
+		url     => $record->subfield( "856", "u" ) || ""
+	    );
+	} else {
+
+	    # Marc21 to bibtex hash
+	    %bh = (
+
+		# Mandatory
+		author    => $author,
+		title     => $record->subfield( "245", "a" ) || "",
+		editor    => $record->subfield( "260", "f" ) || "",
+		publisher => $record->subfield( "260", "b" ) || "",
+		year      => $record->subfield( "260", "c" ) || $record->subfield( "260", "g" ) || "",
+
+		# Optional
+		# unimarc to marc21 specification says not to convert 200$v to marc21
+		series  => $record->subfield( "490", "a" ) || "",
+		address => $record->subfield( "260", "a" ) || "",
+		edition => $record->subfield( "250", "a" ) || "",
+		note    => $record->subfield( "500", "a" ) || "",
+		url     => $record->subfield( "856", "u" ) || ""
+	    );
+	}
+
+	$tex .= "\@book{";
+	$tex .= join( ",\n", $id, map { $bh{$_} ? qq(\t$_ = "$bh{$_}") : () } keys %bh );
+	$tex .= "\n}\n";
+
     }
-
-    $tex .= "\@book{";
-    $tex .= join( ",\n", $id, map { $bh{$_} ? qq(\t$_ = "$bh{$_}") : () } keys %bh );
-    $tex .= "\n}\n";
 
     return $tex;
 }
