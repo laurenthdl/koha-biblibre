@@ -133,13 +133,6 @@ sub _anon_search {
 
     my ( $cnx, $search ) = @_;
 
-    # bind MUST success
-    my $msg = eval {
-	$cnx->bind ( $$ldap{manager}, password => $$ldap{password} )
-    };
-    debug_msg "ldap $_:", $msg->$_ for qw/ error code /;
-    if ( $@ ) { return {qw/ error LDAP_CANTBIND msg /, $@} };
-
     my $entry;
     for my $branch ( @{ $$ldap{branch} } ) {
 	debug_msg "search $$search{filter} at $$branch{dn}";
@@ -164,7 +157,7 @@ sub set_xattr {
     my ( $id, $borrower ) = @_;
     if ( my $x = $$borrower{xattr} ) {
 	my $attrs = [ map +{ code => $_, value => $$x{$_} }, keys %$x ];
-	logger { "creating $id" => $attrs };
+	DEBUG and logger { "creating $id" => $attrs };
 	SetBorrowerAttributes( $id, $attrs );
     }
 }
@@ -180,8 +173,9 @@ sub set_xattr {
 # }
 
 sub accept_borrower {
-    my ($userid,$borrower) = @_;
+    my ($borrower,$userid) = @_;
     for ( $$borrower{column}{userid} ) {
+	$userid ||= $_ or die;
 	unless ( $_ ) {
 	    $_ = $userid;
 	    next;
@@ -209,6 +203,7 @@ sub accept_borrower {
 
     if ( $newcommer ) {
 	return 0 unless $config{update};
+	DEBUG and logger { Member => $$borrower{column} };
 	$id = AddMember( %{ $$borrower{column} } ) or return 0;
 	# raising_error { AddMember( %{ $$borrower{column} } ) };
 	# if ( $@ || not defined $id ) {
@@ -229,12 +224,25 @@ sub accept_borrower {
     }
 
     if ( $newcommer || $config{update} ) {
-	logger { "changing attrs for $id" => $$borrower{xattr} };
+	DEBUG and logger { "changing attrs for $id" => $$borrower{xattr} };
 	set_xattr $id,$borrower;
     }
 
     return 1
 }
+
+sub cnx {
+	state $cnx = Net::LDAP->new( $$ldap{uri}, qw/ onerror die / ) or do {
+	    warn "ldap error: $!";
+	};
+    # bind MUST success
+    my $msg = eval { $cnx->bind ( $$ldap{manager}, password => $$ldap{password} ) };
+    debug_msg "ldap $_:", $msg->$_ for qw/ error code /;
+    if ( $@ ) { return {qw/ error LDAP_CANTBIND msg /, $@} };
+	$cnx;
+}
+
+
 
 sub checkpw_ldap {
     my ( $dbh, $userid, $password ) = @_;
@@ -265,10 +273,7 @@ sub checkpw_ldap {
 	# if the filter isn't set, userid mapping is used
 	$$ldap{filter} ||= "$uattr=%s";
 
-	my $cnx = Net::LDAP->new( $$ldap{uri}, qw/ onerror die / ) or do {
-	    warn "ldap error: $!";
-	    return 0;
-	};
+	my $cnx = cnx or return 0;
 
 	# login can be either ...
 	my $login = do {
@@ -373,7 +378,7 @@ sub checkpw_ldap {
 	}
 	debug_msg  "$$t{subroutine} subroutine loaded from $$t{module}";
 	if ( my $b = $get_borrower->( $$to_borrower{entry} ) ) {
-	    return accept_borrower $userid,$b;
+	    return accept_borrower $b,$userid;
 	}
 	else { return 0 }
     }
