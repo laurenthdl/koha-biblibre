@@ -96,22 +96,14 @@ our $supelecTypePersonne =
 };
 
 our %cardnumber_attribute_for_categorycode = qw/
-PSUPELEC	supelecUid
-PERSLABO	supelecUid
-PERSLABO	supelecUid
-VAC	supelecUid
-ETU	supelecMatriculeEleve
-ETU	supelecUid
-DOCTSUP	supelecMatriculeEleve
-DOCTSUP	supelecMatriculeEleve
 DOCTLABO	supelecUid
-PSUPELEC	supelecUid
-PSUPELEC	supelecUid
+DOCTSUP	supelecMatriculeEleve
+ETU	supelecMatriculeEleve
 PERSLABO	supelecUid
+PSUPELEC	supelecUid
 STAGEXT	supelecUid
 STAGSUP	supelecUid
-ETU	supelecMatriculeEleve
-ETU	supelecMatriculeEleve
+VAC	supelecUid
 /;
 
 sub set_category_code (_) {
@@ -121,7 +113,8 @@ sub set_category_code (_) {
 
     $$user{column}{categorycode} = $$supelecTypePersonne{categorycode}{$type}
     || do {
-	$rapport{'supelecTypePersonne sans categorycode'}{$type}++;
+	push @{ $rapport{'supelecTypePersonne sans categorycode'}{$type}
+	}, $$user{column}{userid};
 	'ETU';
     };
 
@@ -234,7 +227,7 @@ sub HashLdapEntry(_) {
 }
 
 sub get_borrower {
-    state $today=`date +%F`;
+    state $today = (map { chomp; $_ } `date +%F`)[0];
     my $ldap_entry = shift;
     my $user = { src => HashLdapEntry( $ldap_entry ) };
 
@@ -256,6 +249,7 @@ sub get_borrower {
 	) 
     }
 
+    set_cardnumber( $user );
     set_branchcode( $user )
 	or push @{ $rapport{'missing cardnumber'} }, $$user{src}{dn};
     set_xattrs( $user );

@@ -21,17 +21,16 @@ for my $site ( @{ $$config{branch} } ) {
     , callback => sub {
 	    my ( $m, $e ) = @_;
 	    $e or return;
-	    # $e->dump;
+	    $e->dump;
 	    my $b = LDAPSupelec::get_borrower($e) or return;
-	    # $e->dump;
-	    say YAML::Dump(
-	        { c => $$b{column}
-	        , x => $$b{xattr}
-	        }
-	    );
-	    # C4::Auth_with_ldap::accept_borrower( $b );
-	    # $LDAPSupelec::rapport{ $$site{dn} }++;
-	    # $m->shift_entry;
+	    # say YAML::Dump(
+	    #     { c => $$b{column}
+	    #     , x => $$b{xattr}
+	    #     }
+	    # );
+	    C4::Auth_with_ldap::accept_borrower( $b );
+	    $LDAPSupelec::rapport{ $$site{dn} }++;
+	    $m->shift_entry;
     }
 );
     $m->code and die $m->error;
