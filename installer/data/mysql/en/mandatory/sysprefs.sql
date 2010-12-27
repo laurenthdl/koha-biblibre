@@ -295,3 +295,4 @@ INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('AdvancedSearchContent','','Use HTML tabs to create your own advanced search menu','70|10','Textarea');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('MeansOfPayment','Undefined|Cash|Cheque|Bank card|Credit transfer|Direct debit','Define means of payment for borrowers payments','Undefined|Cash|Cheque|Bank card|Credit transfer|Direct debit','free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SolrAPI','http://localhost:8080/solr','','Solr web service URL.','Free');
+INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Search Engine','Choice');
