@@ -5,15 +5,27 @@
 #  - remove the "new" status of an item
 #  - change the itype to a given ccode
 
-new_status_tag: 995$j          # The tag where the "new" status is defined
-new_status_value: New          # The value used in the above tag to tell the item is new
-itype_new_value: NEW           # The itype code used to tell the item is new
+
+# The tag where the "new" status is defined
+new_status_tag: 995$j
+
+# The value used in the above tag to tell the item is new
+new_status_value: New
+
+# The itype code used to tell the item is new
+itype_new_value: NEW
+
 ---
 # The rules:
 -
- ccode: 3                      # The targetted ccode
- duration: 20                  # Minimum number of days between dateaccessioned and now for the rule to be applied
- dest_ccode: 4                 # The ccode the itype will be changed to
+ # The targetted ccode
+ ccode: 3
+
+ # Minimum number of days between dateaccessioned and now for the rule to be applied
+ duration: 20
+
+ # The ccode the itype will be changed to
+ dest_ccode: 4
 -
  ccode: 4
  duration: 30
