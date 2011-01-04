@@ -862,7 +862,7 @@ sub marc2bibtex {
 	my %bh;
 
 	# Getting the ccode
-	my ($tag, $subtag) = GetMarcFromKohaField('items.ccode', GetFrameworkCode($id));
+	my ($tag, $subtag) = GetMarcFromKohaField($config->{'mapper'} || 'items.ccode', GetFrameworkCode($id));
 	my $ccode = $record->field($tag)->subfield($subtag);
 
 	# Getting the mappings for this ccode

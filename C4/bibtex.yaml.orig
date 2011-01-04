@@ -4,6 +4,9 @@
 # file extension)
 # Example :
 
+mapper: items.ccode
+# (we may want to use biblioitems.itype or biblioitems.ccode instead of items.ccode) 
+
 "ARTICLE":
  type: article
  author:
