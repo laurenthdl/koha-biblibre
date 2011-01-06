@@ -31,6 +31,10 @@ use C4::Branch;    # XXX subfield_is_koha_internal_p
 use C4::ClassSource;
 use C4::Dates;
 use List::MoreUtils qw/any/;
+use Storable qw(thaw freeze);
+use URI::Escape;
+
+
 
 use MARC::File::XML;
 
@@ -233,6 +237,20 @@ sub generate_subfield_form {
         return \%subfield_data;
 }
 
+sub removeFieldsForPrefill {
+    #FIXME: this is not generic enough
+    my $item = shift;
+    my $field = $item->field('995');
+    $field->delete_subfield(code => 'f');
+    $field->delete_subfield(code => 'k');
+    $field->delete_subfield(code => 'u');
+    $field->delete_subfield(code => 'v');
+    $field->delete_subfield(code => 'x');
+    $field->delete_subfield(code => 'z');
+
+    return $item;
+
+}
 
 my $input = new CGI;
 my $dbh = C4::Context->dbh;
@@ -273,6 +291,21 @@ my $itemrecord;
 my $nextop = "additem";
 my @errors;    # store errors found while checking data BEFORE saving item.
 
+# Getting last created item cookie
+my $prefillitem = C4::Context->preference('PrefillItem');
+my $justaddeditem;
+my $cookieitemrecord;
+if ($prefillitem) {
+    my $lastitemcookie = $input->cookie('LastCreatedItem');
+    if ($lastitemcookie) {
+	$lastitemcookie = uri_unescape($lastitemcookie);
+	if ( thaw($lastitemcookie) ) {
+	    $cookieitemrecord = thaw($lastitemcookie) ;
+	    $cookieitemrecord = removeFieldsForPrefill($cookieitemrecord);
+	}
+    }
+}
+
 #-------------------------------------------------------------------------------
 if ( $op eq "additem" ) {
 
@@ -294,6 +327,14 @@ if ( $op eq "additem" ) {
     my $add_multiple_copies_submit = $input->param('add_multiple_copies_submit');
     my $number_of_copies           = $input->param('number_of_copies');
 
+    # This is a bit tricky : if there is a cookie for the last created item and
+    # we just added an item, the cookie value is not correct yet (it will be updated
+    # next page). To prevent the form from being filled with outdated values, we
+    # force the use of "add and duplicate" feature, so the form will be filled with 
+    # correct values.
+    $add_duplicate_submit = 1 if ($prefillitem);
+    $justaddeditem = 1;
+
     # if autoBarcode is set to 'incremental', calculate barcode...
     # NOTE: This code is subject to change in 3.2 with the implemenation of ajax based autobarcode code
     # NOTE: 'incremental' is the ONLY autoBarcode option available to those not using javascript
@@ -313,6 +354,7 @@ if ( $op eq "additem" ) {
         }
     }
 
+  
     my $addedolditem = TransformMarcToKoha( $dbh, $record );
 
     # If we have to add or add & duplicate, we add the item
@@ -326,6 +368,19 @@ if ( $op eq "additem" ) {
         unless ($exist_itemnumber) {
             my ( $oldbiblionumber, $oldbibnum, $oldbibitemnum ) = AddItemFromMarc( $record, $biblionumber );
             set_item_default_location($oldbibitemnum);
+
+	  # Pushing the last created item cookie back
+	  if ($prefillitem && defined $record) {
+                my $itemcookie = $input->cookie(
+                    -name => 'LastCreatedItem',
+                    # We uri_escape the whole freezed structure so we're sure we won't have any encoding problems
+                    -value   => uri_escape( freeze( $record ) ),
+                    -expires => ''
+                );
+
+		$cookie = ( $cookie, $itemcookie );
+	    }
+
         }
         $nextop = "additem";
         if ($exist_itemnumber) {
@@ -353,6 +408,7 @@ if ( $op eq "additem" ) {
             }
         }
         $itemrecord = $record;
+	$itemrecord = removeFieldsForPrefill($itemrecord) if ($prefillitem);
     }
 
     # If we have to add multiple copies
@@ -581,8 +637,11 @@ my $onlymine = C4::Context->preference('IndependantBranches') &&
                C4::Context->userenv->{branch};
 my $branches = GetBranchesLoop(C4::Context->userenv->{branch},$onlymine);  # build once ahead of time, instead of multiple times later.
 
+# Using last created item if it exists
+
+$itemrecord = $cookieitemrecord if ($prefillitem and not $justaddeditem); 
+
 # We generate form, and fill with values if defined
-    
 foreach my $tag ( keys %{$tagslib}){
     foreach my $subtag (sort keys %{$tagslib->{$tag}}){
         next if subfield_is_koha_internal_p($subtag);
