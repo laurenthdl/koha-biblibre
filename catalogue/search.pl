@@ -434,6 +434,12 @@ if (!$res){
     exit;
 }
 
+if (!$res){
+    $template->param(query_error => "Bad request! help message ?");
+    output_with_http_headers $cgi, $cookie, $template->output, 'html';
+    exit;
+}
+
 my $pager = Data::Pagination->new(
     $res->{'pager'}->{'total_entries'},
     $count,
