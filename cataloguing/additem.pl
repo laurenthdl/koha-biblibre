@@ -644,7 +644,7 @@ my $branches = GetBranchesLoop(undef,$onlymine);  # build once ahead of time, in
 
 # Using last created item if it exists
 
-$itemrecord = $cookieitemrecord if ($prefillitem and not $justaddeditem); 
+$itemrecord = $cookieitemrecord if ($prefillitem and not $justaddeditem and $op ne "edititem"); 
 
 # We generate form, and fill with values if defined
 foreach my $tag ( keys %{$tagslib}){
