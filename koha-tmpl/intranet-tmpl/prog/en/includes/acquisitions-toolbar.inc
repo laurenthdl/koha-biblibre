@@ -1,3 +1,4 @@
+
 <div id="toolbar"><script type="text/javascript">
     //<![CDATA[
 
@@ -21,7 +22,9 @@
         new YAHOO.widget.Button("editcontracts");
 
         var manageorders = [
+	    <!-- TMPL_IF NAME="active" -->
             { text: _("New basket"), url: "/cgi-bin/koha/acqui/basketheader.pl?booksellerid=<!-- TMPL_VAR NAME="id" -->&op=add_form"},
+	    <!-- /TMPL_IF -->
             { text: _("Baskets"), url: "/cgi-bin/koha/acqui/booksellers.pl?supplierid=<!--TMPL_VAR Name="id"-->"},
             { text: _("Basket groups"), url: "/cgi-bin/koha/acqui/basketgroup.pl?booksellerid=<!-- TMPL_VAR NAME="id" -->"},
             { text: _("Receive shipments"), url: "/cgi-bin/koha/acqui/parcels.pl?supplierid=<!--TMPL_VAR Name="id"-->" },
@@ -46,7 +49,9 @@
             <li><a id="newcontract" href="/cgi-bin/koha/admin/aqcontract.pl?op=add_form&booksellerid=<!-- TMPL_VAR name="id" -->">New Contract</a></li>
             <li><a id="editcontracts" href="/cgi-bin/koha/admin/aqcontract.pl?booksellerid=<!-- TMPL_VAR name="id" -->">Contracts</a></li>
             <!-- TMPL_UNLESS NAME="basketcount" -->
-                <li><a id="newbasket" href="/cgi-bin/koha/acqui/basketheader.pl?booksellerid=<!-- TMPL_VAR name="id" -->&op=add_form">New Basket</a></li>
+		<!-- TMPL_IF NAME="active" -->
+		    <li><a id="newbasket" href="/cgi-bin/koha/acqui/basketheader.pl?booksellerid=<!-- TMPL_VAR name="id" -->&op=add_form">New Basket</a></li>
+		<!-- /TMPL_IF -->
             <!-- /TMPL_UNLESS -->
         <!-- TMPL_ELSE -->
             <li><a id="newbudget" href="/cgi-bin/koha/acqui/supplier.pl?op=enter">New Vendor</a></li>
