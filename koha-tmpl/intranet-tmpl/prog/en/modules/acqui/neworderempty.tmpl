@@ -102,8 +102,12 @@ $(document).ready(function()
     <!-- TMPL_ELSE -->
         New order
     <!-- /TMPL_IF -->
-        <!-- TMPL_IF name="suggestionid" -->(defined from suggestion #<!-- TMPL_VAR NAME="suggestionid" -->)<!-- /TMPL_IF -->
 </h2>
+
+<!-- TMPL_IF name="suggestionid" -->
+    <br/>
+    Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)
+<!-- /TMPL_IF -->
 
 <!-- TMPL_IF name="basketno" -->
     <div id="acqui_basket_summary"  class="yui-g">

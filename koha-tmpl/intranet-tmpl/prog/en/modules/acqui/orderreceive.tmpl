@@ -17,6 +17,12 @@
 
 <h1>Receive items from : <!-- TMPL_VAR NAME="name" --> <!-- TMPL_IF NAME="invoice" -->[<!-- TMPL_VAR NAME="invoice" -->] <!-- /TMPL_IF --> (order #<!-- TMPL_VAR NAME="ordernumber" -->)</h1>
 
+<!-- TMPL_IF name="suggestionid" -->
+    <br/>
+    Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)
+<!-- /TMPL_IF -->
+
+
 <!-- TMPL_IF name="count" -->
     <form action="/cgi-bin/koha/acqui/finishreceive.pl" method="post">
 <div class="yui-g">

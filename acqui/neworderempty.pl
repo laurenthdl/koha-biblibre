@@ -105,6 +105,7 @@ my $uncertainprice  = $input->param('uncertainprice');
 my $import_batch_id = $input->param('import_batch_id');      # if this is filled, we come from a staged file, and we will return here after saving the order !
 my $data;
 my $new = 'no';
+my $suggestion;
 
 my $budget_name;
 
@@ -189,6 +190,7 @@ if ( $ordernumber eq '' ) {    # create order
     my $data2 = GetBasket( $data->{'basketno'} );
     $basketno     = $data2->{'basketno'};
     $booksellerid = $data2->{'booksellerid'};
+    $suggestion   = shift @{ GetSuggestionInfoFromBiblionumber($biblionumber) }
 }
 
 # get currencies (for change rates calcs if needed)
@@ -327,7 +329,9 @@ $template->param(
     closedate            => C4::Dates->new( $basket->{'closedate'}, 'iso' )->output,
 
     # order details
-    suggestionid     => $suggestionid,
+    suggestionid     => $$suggestion{suggestionid},
+    surnamesuggestedby => $$suggestion{surnamesuggestedby},
+    firstnamesuggestedby => $$suggestion{firstnamesuggestedby},
     biblionumber     => $biblionumber,
     uncertainprice   => $data->{'uncertainprice'},
     authorisedbyname => $borrower->{'firstname'} . " " . $borrower->{'surname'},
