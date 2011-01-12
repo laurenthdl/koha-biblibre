@@ -39,6 +39,7 @@ our @EXPORT  = qw<
   &GetSuggestion
   &GetSuggestionByStatus
   &GetSuggestionFromBiblionumber
+  &GetSuggestionInfoFromBiblionumber
   &ModStatus
   &ModSuggestion
   &NewSuggestion
@@ -64,6 +65,7 @@ BEGIN {
       &ModSuggestion
       &ConnectSuggestionAndBiblio
       &GetSuggestionFromBiblionumber
+      &GetSuggestionInfoFromBiblionumber
       &ConnectSuggestionAndBiblio
       &DelSuggestion
       &GetSuggestion
@@ -247,6 +249,32 @@ sub GetSuggestionFromBiblionumber {
     $sth->execute($biblionumber);
     my ($ordernumber) = $sth->fetchrow;
     return $ordernumber;
+}
+
+=head2 GetSuggestionInfoFromBiblionumber
+
+Get a suggestion and borrower's informations from it's biblionumber.
+
+return :
+all informations (suggestion and borrower) of the suggestion which is related to the biblionumber given on input args.
+
+=cut
+
+sub GetSuggestionInfoFromBiblionumber {
+    my ($biblionumber) = @_;
+    my $query = qq{
+        SELECT suggestions.*,
+        U1.surname   AS surnamesuggestedby,
+        U1.firstname AS firstnamesuggestedby,
+        U1.borrowernumber AS borrnumsuggestedby
+        FROM suggestions
+        LEFT JOIN borrowers AS U1 ON suggestedby=U1.borrowernumber
+        WHERE biblionumber = ?
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($biblionumber);
+    return $sth->fetchall_arrayref( {} );
 }
 
 =head2 GetSuggestionByStatus
