@@ -154,6 +154,12 @@
 <div id="yui-main">
 <div class="yui-b" id="content">
 
+<!-- TMPL_IF NAME="sql_error" -->
+    <div class="sql_error">
+        <!-- TMPL_VAR NAME="sql_error" -->
+    </div>
+<!-- /TMPL_IF -->
+
 <!-- TMPL_UNLESS name="delete_confirm" --><!-- TMPL_INCLUDE NAME="budgets-admin-toolbar.inc" --><!-- /TMPL_UNLESS -->
 <!-- TMPL_IF name="else" -->
 
