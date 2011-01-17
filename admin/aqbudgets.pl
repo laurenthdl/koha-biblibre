@@ -42,6 +42,7 @@ use C4::Debug;
 
 my $input = new CGI;
 my $dbh   = C4::Context->dbh;
+my $sql_error = 0;
 
 my ( $template, $borrowernumber, $cookie, $staffflags ) = get_template_and_user(
     {   template_name   => "admin/aqbudgets.tmpl",
@@ -221,11 +222,14 @@ if ( $op eq 'add_form' ) {
     if ( $op eq 'delete_confirmed' ) {
         my $rc = DelBudget($budget_id);
     } elsif ( $op eq 'add_validate' ) {
+        my $status;
         if ( defined $$budget_hash{budget_id} ) {
-            ModBudget($budget_hash);
+            $status = ModBudget($budget_hash);
         } else {
-            AddBudget($budget_hash);
+            $status = AddBudget($budget_hash);
         }
+        $sql_error = "This fund name (or code) already exists" unless $status;
+
     }
     my $branches              = GetBranches();
     my $budget_period_dropbox = GetBudgetPeriodsDropbox( $$period{budget_period_id} );
@@ -344,6 +348,7 @@ if ( $op eq 'add_form' ) {
         period_alloc_total  => $num->format_price($period_alloc_total),
         base_spent_total    => $num->format_price($base_spent_total),
         branchloop          => \@branchloop2,
+        sql_error           => $sql_error,
     );
 
 }    #---- END $OP eq DEFAULT

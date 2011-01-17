@@ -1963,3 +1963,10 @@ div.suggestion_info {
 span.suggestion_info {
     color: #336600;
 }
+div.sql_error {
+	border : 2px dashed #990000;
+	background-color : #FFFF99;
+	padding : .5em;
+	margin : 1em;
+}
+
