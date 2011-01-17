@@ -5283,6 +5283,28 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.060";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+    ALTER TABLE `aqbudgetperiods` MODIFY COLUMN `budget_period_description` VARCHAR(255)  CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+    });
+	$dbh->do(q{
+    ALTER TABLE `aqbudgetperiods` ADD UNIQUE ( budget_period_description);
+    });
+	$dbh->do(q{
+    ALTER TABLE `aqbudgets` MODIFY COLUMN `budget_name` VARCHAR(80)  CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+    });
+	$dbh->do(q{
+    ALTER TABLE `aqbudgets` MODIFY COLUMN `budget_code` VARCHAR(30)  CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+    });
+	$dbh->do(q{
+    ALTER TABLE `aqbudgets` ADD UNIQUE ( budget_name, budget_code);
+    });
+
+    print "Upgrade to $DBversion done (aqbudgets and aqbudgetperiods. Unique constraint on field.)\n";
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
