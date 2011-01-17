@@ -2395,8 +2395,8 @@ DROP TABLE IF EXISTS `aqbudgets`;
 CREATE TABLE `aqbudgets` (
   `budget_id` int(11) NOT NULL auto_increment,
   `budget_parent_id` int(11) default NULL,
-  `budget_code` varchar(30) default NULL,
-  `budget_name` varchar(80) default NULL,
+  `budget_code` varchar(30) NOT NULL,
+  `budget_name` varchar(80) NOT NULL,
   `budget_branchcode` varchar(10) default NULL,
   `budget_amount` decimal(28,6) NULL default '0.00',
   `budget_encumb` decimal(28,6) NULL default '0.00',
@@ -2408,7 +2408,8 @@ CREATE TABLE `aqbudgets` (
   `sort2_authcat` varchar(80) default NULL,
   `budget_owner_id` int(11) default NULL,
   `budget_permission` int(1) default '0',
-  PRIMARY KEY  (`budget_id`)
+  PRIMARY KEY  (`budget_id`),
+  UNIQUE KEY `uniq_aqbudgets` (`budget_name`, `budget_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2423,12 +2424,13 @@ CREATE TABLE `aqbudgetperiods` (
   `budget_period_startdate` date NOT NULL,
   `budget_period_enddate` date NOT NULL,
   `budget_period_active` tinyint(1) default '0',
-  `budget_period_description` mediumtext,
+  `budget_period_description` varchar(255) NOT NULL,
   `budget_period_total` decimal(28,6),
   `budget_period_locked` tinyint(1) default NULL,
   `sort1_authcat` varchar(10) default NULL,
   `sort2_authcat` varchar(10) default NULL,
-  PRIMARY KEY  (`budget_period_id`)
+  PRIMARY KEY  (`budget_period_id`),
+  UNIQUE KEY `uniq_aqbudgetperiods` (`budget_period_description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

@@ -4870,6 +4870,54 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.055";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
+	");
+	$dbh->do("
+	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
+	");
+    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.056";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
+	");
+    print "Upgrade to $DBversion done (Adding PrefillItem syspref)\n";
+    SetVersion($DBversion);
+}
+
+
+$DBversion = "3.02.00.057";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
+	");
+
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
+	");
+    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.058";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
+	");
+
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
+	");
+    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.02.00.059";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
@@ -5280,62 +5328,14 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.02.00.055";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
-	");
-	$dbh->do("
-	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
-	");
-    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.056";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
-	");
-    print "Upgrade to $DBversion done (Adding PrefillItem syspref)\n";
-    SetVersion($DBversion);
-}
-
-
-$DBversion = "3.02.00.057";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
-	");
-
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
-	");
-    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.058";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
-	");
-
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
-	");
-    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.059";
+$DBversion = "3.02.00.060";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE overduerules ALTER delay1 SET DEFAULT NULL, ALTER delay2 SET DEFAULT NULL, ALTER delay3 SET DEFAULT NULL");
     print "Upgrade to $DBversion done (Setting NULL default value for delayn columns in table overduerules)\n";
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.060";
+$DBversion = "3.02.00.061";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
 	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BlockRenewWhenOverdue','0','If Set, when item is overdue, renewals are blocked','','YesNo');
@@ -5344,6 +5344,27 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.062";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+    ALTER TABLE `aqbudgetperiods` MODIFY COLUMN `budget_period_description` VARCHAR(255)  CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+    });
+	$dbh->do(q{
+    ALTER TABLE `aqbudgetperiods` ADD UNIQUE ( budget_period_description);
+    });
+	$dbh->do(q{
+    ALTER TABLE `aqbudgets` MODIFY COLUMN `budget_name` VARCHAR(80)  CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+    });
+	$dbh->do(q{
+    ALTER TABLE `aqbudgets` MODIFY COLUMN `budget_code` VARCHAR(30)  CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+    });
+	$dbh->do(q{
+    ALTER TABLE `aqbudgets` ADD UNIQUE ( budget_name, budget_code);
+    });
+
+    print "Upgrade to $DBversion done (aqbudgets and aqbudgetperiods. Unique constraint on field.)\n";
+    SetVersion ($DBversion);
+}
 
 =item DropAllForeignKeys($table)
 
