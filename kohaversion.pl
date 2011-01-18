@@ -10,11 +10,7 @@
 use strict;
 
 sub kohaversion {
-<<<<<<< HEAD
     our $VERSION = '3.02.00.060';
-=======
-    our $VERSION = '3.02.00.056';
->>>>>>> origin/origin/limoges/MT4187
     # version needs to be set this way
     # so that it can be picked up by Makefile.PL
     # during install
