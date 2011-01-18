@@ -4882,18 +4882,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.055";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
-	");
-	$dbh->do("
-	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
-	");
-    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
-    SetVersion($DBversion);
-}
-
 $DBversion = "3.02.00.056";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(
@@ -5323,6 +5311,15 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Search Engine','Choice')");
     print "Upgrade to $DBversion done (Solr tables)\n";
     SetVersion ($DBversion);
+}
+
+$DBversion = "3.02.00.060";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
+	");
+    print "Upgrade to $DBversion done (Adding PrefillItem syspref)\n";
+    SetVersion($DBversion);
 }
 
 =item DropAllForeignKeys($table)
