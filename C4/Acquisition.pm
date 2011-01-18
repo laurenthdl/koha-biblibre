@@ -28,6 +28,9 @@ use C4::Biblio;
 use C4::Debug;
 use C4::SQLHelper qw(InsertInTable);
 use C4::Items;
+use C4::Bookseller qw(GetBookSellerFromId);
+use Text::CSV::Encoded;
+use utf8;
 
 use Time::localtime;
 use HTML::Entities;
@@ -42,7 +45,7 @@ BEGIN {
     @ISA    = qw(Exporter);
     @EXPORT = qw(
       &GetBasket &NewBasket &CloseBasket &DelBasket &ModBasket
-      &GetBasketAsCSV
+      &GetBasketAsCSV &GetBasketGroupAsCSV
       &GetBasketsByBookseller &GetBasketsByBasketgroup
 
       &ModBasketHeader
@@ -237,11 +240,12 @@ sub GetBasketAsCSV {
     my $basket     = GetBasket($basketno);
     my @orders     = GetOrders($basketno);
     my $contract   = GetContract( $basket->{'contractnumber'} );
-    my $csv        = Text::CSV->new();
+    my $csv        = Text::CSV::Encoded->new ({ encoding  => "utf8" });
+
     my $output;
 
     # TODO: Translate headers
-    my @headers = qw(contractname ordernumber line entrydate isbn author title publishercode collectiontitle notes quantity rrp);
+    my @headers = qw(contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp);
 
     $csv->combine(@headers);
     $output = $csv->string() . "\n";
@@ -264,6 +268,61 @@ sub GetBasketAsCSV {
         $csv->combine(@$row);
         $output .= $csv->string() . "\n";
 
+    }
+
+    return $output;
+
+}
+
+=head3 GetBasketGroupAsCSV
+
+=over 4
+
+&GetBasketGroupAsCSV($basketgroupid);
+
+Export a basket group as CSV
+
+=back
+
+=cut
+
+sub GetBasketGroupAsCSV {
+    my ($basketgroupid) = @_;
+    my $baskets = GetBasketsByBasketgroup($basketgroupid);
+
+    # TODO: Translate headers
+    my @headers = qw(booksellername bookselleraddress booksellerpostal contractnumber contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp);
+
+    my $csv = Text::CSV::Encoded->new ({ encoding  => "utf8" });
+
+    my $output;
+    $csv->combine(@headers);
+    $output = $csv->string() . "\n";
+
+    for my $basket (@$baskets) {
+        my @orders     = GetOrders( $$basket{basketno} );
+        my $contract   = GetContract( $$basket{contractnumber} );
+        my $bookseller = GetBookSellerFromId( $$basket{booksellerid} );
+
+        my @rows;
+        foreach my $order (@orders) {
+            my @cols;
+            my $bd = GetBiblioData( $order->{'biblionumber'} );
+            #utf8::decode($bd->{'title'}) unless ( utf8::is_utf8($bd->{'title'}) ); # FIXME ?
+            push( @cols,
+                $bookseller->{name}, $bookseller->{address1}, $bookseller->{postal},
+                $contract->{contractnumber}, $contract->{contractname},
+                $order->{ordernumber},  $order->{entrydate}, $order->{isbn},
+                $bd->{author}, $bd->{title}, $bd->{publishercode}, $bd->{collectiontitle},
+                $order->{notes}, $order->{quantity}, $order->{rrp}, );
+            push( @rows, \@cols );
+        }
+
+        foreach my $row (@rows) {
+            $csv->combine(@$row);
+            $output .= $csv->string() . "\n";
+
+        }
     }
 
     return $output;
@@ -504,7 +563,7 @@ Returns a reference to all baskets that belong to basketgroup $basketgroupid.
 
 sub GetBasketsByBasketgroup {
     my $basketgroupid = shift;
-    my $query         = "SELECT * FROM aqbasket
+    my $query         = "SELECT *, aqbasket.booksellerid as booksellerid FROM aqbasket
                 LEFT JOIN aqcontract USING(contractnumber) WHERE basketgroupid=?";
     my $dbh = C4::Context->dbh;
     my $sth = $dbh->prepare($query);
@@ -688,7 +747,7 @@ $basketgroup = &GetBasketgroup($basketgroupid);
 
 =over 2
 
-Returns a reference to the hash containing all infermation about the basketgroup.
+Returns a reference to the hash containing all information about the basketgroup.
 
 =back
 
