@@ -84,7 +84,7 @@ YAHOO.util.Event.onContentReady("header_search", function() {
                         <option value="start">starts with</option>
                         <option value="is">is exactly</option>
                     </select>
-                    <input id="value_mainstr" type="text" name="value_mainstr" value="<!-- TMPL_VAR ESCAPE="HTML" name="value_mainstr" -->" />
+                    <input id="value_mainstr" style="width:400px;" type="text" name="value_mainstr" value="<!-- TMPL_VAR ESCAPE="HTML" name="value_mainstr" -->" />
 		    <div id="yvaluecontainermainmainentry"></div>
                 </li>
 
@@ -98,7 +98,7 @@ YAHOO.util.Event.onContentReady("header_search", function() {
                         <option value="start">starts with</option>
                         <option value="is">is exactly</option>
                     </select>
-                    <input id="value_main" type="text" name="value_main" value="<!-- TMPL_VAR ESCAPE="HTML" name="value_main" -->" />
+                    <input id="value_main" style="width:400px;" type="text" name="value_main" value="<!-- TMPL_VAR ESCAPE="HTML" name="value_main" -->" />
 		    <div id="yvaluecontainermainentry"></div>
                 </li>
 
@@ -112,7 +112,7 @@ YAHOO.util.Event.onContentReady("header_search", function() {
                         <option value="start">starts with</option>
                         <option value="is">is exactly</option>
                     </select>
-                    <input id="value_any" type="text" name="value_any" value="<!-- TMPL_VAR ESCAPE="HTML" name="value_any" -->" />
+                    <input id="value_any"  style="width:400px;" type="text" name="value_any" value="<!-- TMPL_VAR ESCAPE="HTML" name="value_any" -->" />
 		    <div id="yvaluecontainermarclist"></div>
 
                 </li>
