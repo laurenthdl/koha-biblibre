@@ -4891,7 +4891,8 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     print "Upgrade to $DBversion done (added new syspref: OPACXSLTItemsDetailsDisplay)\n";
     SetVersion($DBversion);
 }
-$DBversion = "3.02.00.056";
+
+$DBversion = "3.02.00.057";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectreLogin', '', 'Login for Electre ws',NULL,'free')");
 $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectrePassw', '', 'Password for Electre ws',NULL,'free')");
