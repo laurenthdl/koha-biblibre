@@ -2382,6 +2382,7 @@ CREATE TABLE `aqbooksellers` (
   `gstrate` decimal(6,4) default NULL,
   `discount` float(6,4) default NULL,
   `fax` varchar(50) default NULL,
+  `clientnumber` VARCHAR(50) default NULL,
   PRIMARY KEY  (`id`),
   KEY `listprice` (`listprice`),
   KEY `invoiceprice` (`invoiceprice`),
