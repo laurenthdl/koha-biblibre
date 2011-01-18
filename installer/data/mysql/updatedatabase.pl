@@ -5305,6 +5305,16 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.061";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+	$dbh->do(q{
+        ALTER TABLE `aqbooksellers` ADD COLUMN `clientnumber` VARCHAR(40) DEFAULT NULL;
+    });
+
+    print "Upgrade to $DBversion done (aqbooksellers.client number field)\n";
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

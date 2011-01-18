@@ -291,7 +291,7 @@ sub GetBasketGroupAsCSV {
     my $baskets = GetBasketsByBasketgroup($basketgroupid);
 
     # TODO: Translate headers
-    my @headers = qw(booksellername bookselleraddress booksellerpostal contractnumber contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp);
+    my @headers = qw(booksellername bookselleraddress booksellerpostal clientnumber contractnumber contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp);
 
     my $csv = Text::CSV::Encoded->new ({ encoding  => "utf8" });
 
@@ -310,7 +310,7 @@ sub GetBasketGroupAsCSV {
             my $bd = GetBiblioData( $order->{'biblionumber'} );
             #utf8::decode($bd->{'title'}) unless ( utf8::is_utf8($bd->{'title'}) ); # FIXME ?
             push( @cols,
-                $bookseller->{name}, $bookseller->{address1}, $bookseller->{postal},
+                $bookseller->{name}, $bookseller->{address1}, $bookseller->{postal}, $bookseller->{clientnumber},
                 $contract->{contractnumber}, $contract->{contractname},
                 $order->{ordernumber},  $order->{entrydate}, $order->{isbn},
                 $bd->{author}, $bd->{title}, $bd->{publishercode}, $bd->{collectiontitle},

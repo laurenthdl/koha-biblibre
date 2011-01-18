@@ -76,6 +76,9 @@ if (f.company.value == "") {
         <div class="yui-g">
         <fieldset class="rows">
             <legend>Ordering information</legend>
+            <ol><label for="clientnumber">Client number :</label>
+                <input type="text" size="40" id="clientnumber" name="clientnumber" value="<!-- TMPL_VAR NAME="clientnumber" -->" /></ol>
+
             <ol class="radio"><li><label for="activestatus" class="radio">Vendor is:</label>
                     <!-- TMPL_IF name="active" -->
                         <label for="activestatus">Active</label> <input type="radio" id="activestatus" name="status" value="1" checked="checked" />
@@ -173,6 +176,7 @@ if (f.company.value == "") {
         </div>
         <div id="supplier-ordering-information" class="yui-g">
         <h3>Ordering information</h3>
+            <p><strong>Client number: </strong><!-- TMPL_VAR NAME="clientnumber" --></p>
             <p><strong>Vendor is: </strong>
                     <!-- TMPL_IF name="active" -->
                         Active

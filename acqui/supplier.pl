@@ -118,6 +118,7 @@ if ( $op eq "display" ) {
         listprice     => $booksellers[0]->{'listprice'},
         GST           => $GST,
         basketcount   => $booksellers[0]->{'basketcount'},
+        clientnumber  => $booksellers[0]->{'clientnumber'},
         contracts     => \@contracts
     );
 } elsif ( $op eq 'delete' ) {
@@ -167,6 +168,7 @@ if ( $op eq "display" ) {
         invoiceincgst        => $booksellers[0]->{'invoiceincgst'},
         gstrate              => $booksellers[0]->{'gstrate'} * 100,
         discount             => $booksellers[0]->{'discount'},
+        clientnumber         => $booksellers[0]->{'clientnumber'},
         loop_pricescurrency  => \@loop_pricescurrency,
         loop_invoicecurrency => \@loop_invoicecurrency,
         GST                  => $GST,
