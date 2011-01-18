@@ -280,3 +280,5 @@ INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES (
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AllowMultipleHoldsPerBib','','','Entrez ici la liste des types de documents (séparés par des espaces) pour lesquelles vous voulez permettre la réservation multiple des exemplaires.','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SolrAPI','http://localhost:8080/solr','','URL du service web Solr.','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Moteur de recherche','Choice');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadPath','','Le chemin vers le répertoire de stockage pour le plugin upload.pl','','');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadWebPath','','Le chemin vers le répertoire de stockage à partir de la racine de publication du serveur web pour le plugin upload.pl','','');

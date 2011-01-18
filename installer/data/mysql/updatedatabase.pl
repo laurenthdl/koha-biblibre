@@ -4904,6 +4904,19 @@ $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,optio
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.058";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
+	");
+
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
+	");
+    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.02.00.059";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
@@ -5322,6 +5335,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     print "Upgrade to $DBversion done (Adding PrefillItem syspref)\n";
     SetVersion($DBversion);
 }
+
 
 =item DropAllForeignKeys($table)
 

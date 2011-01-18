@@ -304,3 +304,5 @@ INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) V
 INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreQuatriemeXml', '0', 'if ON, enable outside back cover displaying from Electre ws',NULL,'YesNo');
 INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreResume', '0', 'if ON, enable resume displaying from Electre ws',NULL,'YesNo');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadPath','','Sets the upload path for the upload.pl plugin','','');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
