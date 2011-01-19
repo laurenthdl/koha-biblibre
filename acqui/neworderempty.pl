@@ -190,8 +190,9 @@ if ( $ordernumber eq '' ) {    # create order
     my $data2 = GetBasket( $data->{'basketno'} );
     $basketno     = $data2->{'basketno'};
     $booksellerid = $data2->{'booksellerid'};
-    $suggestion   = shift @{ GetSuggestionInfoFromBiblionumber($biblionumber) }
 }
+
+$suggestion = GetSuggestionInfo($suggestionid) if $suggestionid;
 
 # get currencies (for change rates calcs if needed)
 my @rates = GetCurrencies();
