@@ -8,6 +8,7 @@
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.pager.js"></script>
 <script type="text/javascript" id="js">$(document).ready(function() {
 	$("#table_authtagstructure").tablesorter({
+	    widgets : ['zebra'],    
 		sortList: [[0,0]],
 		headers: { 5: { sorter: false},6: { sorter: false},7: { sorter: false}}
 	}).tablesorterPager({container: $("#pagertable_authtagstructure"),positionFixed: false,size: 20});

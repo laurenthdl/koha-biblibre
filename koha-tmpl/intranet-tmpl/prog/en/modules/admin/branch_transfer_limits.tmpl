@@ -100,6 +100,7 @@
 	<p><a id="CheckAll<!-- TMPL_VAR NAME="code" -->table" class="checkall" href="#">Check All</a> | <a id="UncheckAll<!-- TMPL_VAR NAME="code" -->table" class="uncheckall" href="#">Uncheck All</a></p>
 	<script type="text/javascript" id="js">$(document).ready(function() {
 	$("#<!-- TMPL_VAR NAME="code" -->table").tablesorter({
+	    widgets : ['zebra'],    
 		sortList: [[0,0]],
 		headers: { 1: { sorter: false}}
 	}).tablesorterPager({container: $("#pager<!-- TMPL_VAR NAME="code" -->table"),positionFixed: false,size: 10});
