@@ -60,6 +60,8 @@ my $input          = new CGI;
 my $title          = $input->param('title');
 my $author         = $input->param('author');
 my $name           = $input->param('name');
+my $ean            = $input->param('ean');
+warn "---- $name $ean";
 my $from_placed_on = C4::Dates->new( $input->param('from') );
 my $to_placed_on   = C4::Dates->new( $input->param('to') );
 
@@ -76,7 +78,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 
 my $from_iso = C4::Dates->new( $input->param('from') )->output('iso') if $input->param('from');
 my $to_iso   = C4::Dates->new( $input->param('to') )->output('iso')   if $input->param('iso');
-my ( $order_loop, $total_qty, $total_price, $total_qtyreceived ) = &GetHistory( $title, $author, $name, $from_iso, $to_iso );
+my ( $order_loop, $total_qty, $total_price, $total_qtyreceived ) = &GetHistory( $title, $author, $name, $ean, $from_iso, $to_iso );
 
 $template->param(
     suggestions_loop         => $order_loop,
@@ -87,6 +89,7 @@ $template->param(
     title                    => $title,
     author                   => $author,
     name                     => $name,
+    ean                      => $ean,
     from_placed_on           => $from_placed_on->output('syspref'),
     to_placed_on             => $to_placed_on->output('syspref'),
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
