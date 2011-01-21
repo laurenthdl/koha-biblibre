@@ -99,11 +99,12 @@ if ( $input->param('format') eq "json" ) {
 
     my @datas;
     my $search   = $input->param('search')     || '';
+    my $ean      = $input->param('ean')        || '';
     my $supplier = $input->param('supplierid') || '';
     my $basketno = $input->param('basketno')   || '';
     my $orderno  = $input->param('orderno')    || '';
 
-    my $orders = SearchOrder( $orderno, $search, $supplier, $basketno );
+    my $orders = SearchOrder( $orderno, $search, $ean, $supplier, $basketno );
     foreach my $order (@$orders) {
         if ( $order->{quantityreceived} < $order->{quantity} ) {
             my $data = {};

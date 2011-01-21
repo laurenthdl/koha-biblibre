@@ -5283,6 +5283,14 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.060";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `biblioitems` ADD `ean` VARCHAR( 13 ) NULL AFTER issn");
+    $dbh->do("CREATE INDEX `ean` ON biblioitems (`ean`) ");
+    print "Upgrade to $DBversion done (Adding ean in biblioitems)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

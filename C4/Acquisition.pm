@@ -1278,7 +1278,7 @@ C<@results> is an array of references-to-hash with the following keys:
 
 sub SearchOrder {
 #### -------- SearchOrder-------------------------------
-    my ( $ordernumber, $search, $supplierid, $basket ) = @_;
+    my ( $ordernumber, $search, $ean, $supplierid, $basket ) = @_;
 
     my $dbh   = C4::Context->dbh;
     my @args  = ();
@@ -1296,6 +1296,10 @@ sub SearchOrder {
     if ($search) {
         $query .= " AND (biblio.title like ? OR biblio.author LIKE ? OR biblioitems.isbn like ?)";
         push @args, ( "%$search%", "%$search%", "%$search%" );
+    }
+    if ($ean) {
+        $query .= " AND biblioitems.ean = ?";
+        push @args, $ean;
     }
     if ($supplierid) {
         $query .= "AND aqbasket.booksellerid = ?";
@@ -1653,19 +1657,20 @@ returns:
 =cut
 
 sub GetHistory {
-    my ( $title, $author, $name, $from_placed_on, $to_placed_on ) = @_;
+    my ( $title, $author, $name, $ean, $from_placed_on, $to_placed_on ) = @_;
     my @order_loop;
     my $total_qty         = 0;
     my $total_qtyreceived = 0;
     my $total_price       = 0;
 
     # don't run the query if there are no parameters (list would be too long for sure !)
-    if ( $title || $author || $name || $from_placed_on || $to_placed_on ) {
+    if ( $title || $author || $name || $ean || $from_placed_on || $to_placed_on ) {
         my $dbh   = C4::Context->dbh;
         my $query = "
             SELECT
                 biblio.title,
                 biblio.author,
+		biblioitems.ean,
                 aqorders.basketno,
 		aqbasket.basketname,
 		aqbasket.basketgroupid,
@@ -1684,7 +1689,8 @@ sub GetHistory {
             LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
 	    LEFT JOIN aqbasketgroups ON aqbasket.basketgroupid=aqbasketgroups.id
             LEFT JOIN aqbooksellers ON aqbasket.booksellerid=aqbooksellers.id
-            LEFT JOIN biblio ON biblio.biblionumber=aqorders.biblionumber";
+            LEFT JOIN biblio ON biblio.biblionumber=aqorders.biblionumber
+            LEFT JOIN biblioitems ON biblioitems.biblionumber=aqorders.biblionumber";
 
         $query .= " LEFT JOIN borrowers ON aqbasket.authorisedby=borrowers.borrowernumber"
           if ( C4::Context->preference("IndependantBranches") );
@@ -1707,6 +1713,10 @@ sub GetHistory {
         if ( defined $name ) {
             $query .= " AND aqbooksellers.name LIKE ? ";
             push @query_params, "%$name%";
+        }
+	if ( defined $ean and $ean ) {
+            $query .= " AND biblioitems.ean = ? ";
+            push @query_params, "$ean";
         }
 
         if ( defined $from_placed_on ) {
