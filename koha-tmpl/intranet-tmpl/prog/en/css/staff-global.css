@@ -1973,10 +1973,16 @@ div#acqui_order_supplierlist > div.vendor {
     padding: 1em;
 }
 div#acqui_order_supplierlist > div.vendor > span.vendor_name {
-	display : block;
-    font-size : 1.5em;
+	display : inline;
+    font-size : 1.7em;
     margin-bottom: 0.5em;
+}
+div#acqui_order_supplierlist > div.vendor > span.action {
+    margin-left: 5em;
 }
 div#acqui_order_supplierlist > div.vendor > div.baskets {
     margin-top: 0.5em;
+}
+ul.vendors_anchors {
+    margin: 0.5em 1.5em;
 }
