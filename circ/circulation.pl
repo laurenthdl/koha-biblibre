@@ -113,7 +113,7 @@ my $borrowernumber = $query->param('borrowernumber');
 $branch  = C4::Context->userenv->{'branch'};
 $printer = C4::Context->userenv->{'branchprinter'};
 
-# If AutoLocation is not activated, we show the Circulation Parameters to chage settings of librarian
+# If AutoLocation is not activated, we show the Circulation Parameters to change settings of librarian
 if ( C4::Context->preference("AutoLocation") != 1 ) {
     $template->param( ManualLocation => 1 );
 }
@@ -502,9 +502,9 @@ sub build_issue_data {
     foreach my $it (@$issueslist) {
         my $itemtypeinfo = getitemtypeinfo( ( C4::Context->preference('item-level_itypes') ) ? $it->{'itype'} : $it->{'itemtype'} );
 
-	# Getting borrower details
-	my $memberdetails = GetMemberDetails($it->{'borrowernumber'});
-	$it->{'borrowername'} = $memberdetails->{'firstname'} . " " . $memberdetails->{'surname'};
+        # Getting borrower details
+        my $memberdetails = GetMemberDetails($it->{'borrowernumber'});
+        $it->{'borrowername'} = $memberdetails->{'firstname'} . " " . $memberdetails->{'surname'};
 
         # set itemtype per item-level_itype syspref - FIXME this is an ugly hack
         $it->{'itemtype'} = ( C4::Context->preference('item-level_itypes') ) ? $it->{'itype'} : $it->{'itemtype'};
@@ -840,5 +840,6 @@ $template->param(
     AllowRenewalLimitOverride => C4::Context->preference("AllowRenewalLimitOverride"),
     dateformat                => C4::Context->preference("dateformat"),
     DHTMLcalendar_dateformat  => C4::Dates->DHTMLcalendar(),
+    librarytype               => C4::Context->preference("LibraryType"),
 );
 output_html_with_http_headers $query, $cookie, $template->output;
