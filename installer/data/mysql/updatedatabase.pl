@@ -5000,6 +5000,24 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.063";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('CsvProfileForExport','0','Set a profile name for CSV export','','');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference CsvProfileForExport)\n";
+    SetVersion($DBversion)
+}
+
+$DBversion = "3.02.00.064";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('LibraryType','Public','Set a type for the library','Academic|Public|Special','Choice');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference LibraryType)\n";
+    SetVersion($DBversion)
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
