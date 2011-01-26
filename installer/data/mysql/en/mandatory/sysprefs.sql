@@ -300,3 +300,6 @@ INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES (
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadPath','','Sets the upload path for the upload.pl plugin','','');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('BlockRenewWhenOverdue','0','Blocks renewals when overdue','','YesNo');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES('CsvProfileForExport','0','Set a profile name for CSV export','','');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES('LibraryType','Public','Set a type for the library','Academic|Public|Special','Choice');
+
