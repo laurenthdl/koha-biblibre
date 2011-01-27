@@ -250,6 +250,10 @@ $(document).ready(function() {
         <li><a href="#patron-library-details">Library details</a></li>
         <li><a href="#patron-alternate-address">Alternate address</a></li>
         <li><a href="#patron-alternative-contact">Alternative contact</a></li>
+        <!-- TMPL_IF EXPR="librarytype eq 'Special'"-->
+            <li><a href="#patron-statistics">Statistics</a></li>
+        <!-- /TMPL_IF -->
+
     </ul>
 
 <div id="patron-information">
@@ -440,7 +444,7 @@ $(document).ready(function() {
    <div class="action"><a href="memberentry.pl?op=modify&amp;borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->&amp;step=6">Edit</a></div>
 </div>
 
- <div id="patron-alternative-contact">
+<div id="patron-alternative-contact">
  <h3>Alternative Contact</h3>	
    <div class="rows"> <ol><li><span class="label">Surname: </span><!-- TMPL_VAR NAME="altcontactsurname" --></li>
     <li><span class="label">First name: </span><!-- TMPL_VAR NAME="altcontactfirstname" --></li>    
@@ -451,6 +455,18 @@ $(document).ready(function() {
 	<li><span class="label">Country: </span><!-- TMPL_VAR NAME="altcontactcountry" --></li>
     <li><span class="label">Phone: </span><!-- TMPL_VAR NAME="altcontactphone" --></li></ol></div>
     <div class="action"><a href="memberentry.pl?op=modify&amp;borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->&amp;step=2">Edit</a></div>
+</div>
+
+<div id="patron-statistics">
+    <h3>Statistics</h3>
+    <div class="rows">
+        <ol>
+            <li><span class="label">Issue count: </span><!-- TMPL_VAR NAME="issuecount" --></li>
+            <li><span class="label">Total issues in last year: </span><!-- TMPL_VAR NAME="totalissueslastyear" --></li>
+            <li><span class="label">Total issues: </span><!-- TMPL_VAR NAME="totalissues" --></li>
+        </ol>
+    </div>
+    <div class="action"></div> <!-- ??? Mandatory else div have not a good size ??? -->
 </div>
 
 </div><!-- patron details -->
@@ -578,7 +594,7 @@ $(document).ready(function() {
             <th scope="col">Barcode</th>
             <th scope="col">Item Type</th>
             <th scope="col">Checked out on</th> 
-	    <th scope="col">Call no</th>
+            <th scope="col">Call no</th>
             <th scope="col">Charge</th>
             <th scope="col">Price</th>
             <th scope="col">Renew <p class="column-tool"><a href="#" id="CheckAllitems">select all</a> | <a href="#" id="CheckNoitems">none</a></p></th>

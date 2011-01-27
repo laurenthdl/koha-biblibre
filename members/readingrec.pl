@@ -88,6 +88,9 @@ foreach my $issue ( @{$issues} ) {
     $line{renewals}        = $issue->{'renewals'};
     $line{barcode}         = $issue->{'barcode'};
     $line{volumeddesc}     = $issue->{'volumeddesc'};
+    $line{itemtype}        = $issue->{'itemtype'};
+    $line{location}        = $issue->{'location'};
+    $line{ccode}           = $issue->{'ccode'};
     push( @loop_reading, \%line );
 }
 
