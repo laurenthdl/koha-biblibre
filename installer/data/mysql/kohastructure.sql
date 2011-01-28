@@ -282,6 +282,7 @@ CREATE TABLE `borrower_attribute_types` (
   `staff_searchable` tinyint(1) NOT NULL default 0,
   `authorised_value_category` varchar(10) default NULL,
   `display_checkout` TINYINT(1) NOT NULL DEFAULT '0',
+  `category_type` VARCHAR(1) NOT NULL DEFAULT '',
   PRIMARY KEY  (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

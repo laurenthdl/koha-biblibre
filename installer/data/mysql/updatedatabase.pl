@@ -5000,6 +5000,14 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.063";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    ALTER TABLE borrower_attribute_types ADD COLUMN category_type VARCHAR(1)  NOT NULL DEFAULT '' AFTER `display_checkout`;
+    });
+    print "Upgrade to $DBversion done (New field borrower_attribute_types.category_type)\n";
+    SetVersion($DBversion);
+}
 
 
 =item DropAllForeignKeys($table)
