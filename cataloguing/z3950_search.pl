@@ -35,6 +35,9 @@ use ZOOM;
 use XML::LibXSLT;
 use XML::LibXML;
 
+use utf8;
+use open qw(:std :utf8);
+
 
 my $input         = new CGI;
 my $dbh           = C4::Context->dbh;
@@ -227,7 +230,8 @@ if ( $op ne "do_search" ) {
                         $marcdata = $rec->raw();
 
                         my ( $charset_result, $charset_errors );
-                        ( $marcrecord, $charset_result, $charset_errors ) = MarcToUTF8Record( $marcdata, C4::Context->preference('marcflavour'), $encoding[$k] );
+			my $marcflavour = C4::Context->preference('marcflavour');
+                        ( $marcrecord, $charset_result, $charset_errors ) = MarcToUTF8Record( $marcdata, $marcflavour, $encoding[$k] );
 ####WARNING records coming from Z3950 clients are in various character sets MARC8,UTF8,UNIMARC etc
 ## In HEAD i change everything to UTF-8
                         # In rel2_2 i am not sure what encoding is so no character conversion is done here
@@ -235,7 +239,7 @@ if ( $op ne "do_search" ) {
 
 			# If the syntax used by the z3950 server is different from our marcflavour,
 			# We use the xslt property (if defined) to transform the document
-			if ($syntax[$k] ne C4::Context->preference('marcflavour') and defined $xslt[$k]) {
+			if ($syntax[$k] ne $marcflavour and defined $xslt[$k]) {
 
 			    my $parser = XML::LibXML->new();
 			    my $xslt   = XML::LibXSLT->new();
@@ -245,9 +249,10 @@ if ( $op ne "do_search" ) {
 			    my $source = $parser->parse_string($xmlrec);
 #			    warn " -------------------------- source : " . $source->toString();
 
-			    my $style_doc = $parser->load_xml(location => $ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k], no_cdata => 1);
+			    #my $style_doc = $parser->load_xml(location => $ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k], no_cdata => 1);
+			    my $style_doc = $parser->parse_file($ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k]);
 #			    warn " --------------------------- style_doc : " . $style_doc->toString();
-			    XML::LibXSLT->debug_callback(sub { warn("XML::LibXSLT debug call back :".shift); });
+#			    XML::LibXSLT->debug_callback(sub { warn("XML::LibXSLT debug call back :".shift); });
 
 			    my $stylesheet = $xslt->parse_stylesheet($style_doc);
 #			    warn " -------------------------- stylesheet " . Data::Dumper::Dumper($stylesheet);
@@ -257,9 +262,11 @@ if ( $op ne "do_search" ) {
 				die "LibXSLT died with: $@\n";
 			    }
 
-#			    warn " -------------------------- result : " . $stylesheet->output_string($results) . Data::Dumper::Dumper($results);
+			    warn " -------------------------- result : " . $stylesheet->output_string($results);
 #			    warn " -------------------------- result : " . $stylesheet->output_as_bytes($results) ;
-
+			    my ($error, $marcrecord) = marcxml2marc($stylesheet->output_string($results), $encoding[$k], $marcflavour);
+			    warn $error;
+			    warn $marcrecord->as_formatted;
 
 
 			    
