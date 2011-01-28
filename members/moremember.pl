@@ -58,6 +58,7 @@ use C4::Form::MessagingPreferences;
 use C4::Overdues qw/CheckBorrowerDebarred/;
 use JSON;
 use List::MoreUtils qw/uniq/;
+use C4::Stats;
 
 #use Smart::Comments;
 #use Data::Dumper;
@@ -244,6 +245,8 @@ my @issuedata;
 my @borrowers_with_issues;
 my $overdues_exist = 0;
 my $totalprice     = 0;
+my $totalissues= GetTotalIssuesByBorrower($borrowernumber);
+my $totalissueslastyear = GetTotalIssuesLastYearByBorrower($borrowernumber);
 
 my @issuedata = build_issue_data($issue, $issuecount);
 my @relissuedata = build_issue_data($relissue, $relissuecount);
@@ -551,18 +554,22 @@ $template->param(
     issueloop                 => @issuedata,
     relissueloop              => @relissuedata,
     issuecount                => $issuecount,
+    totalissues               => $totalissues,
+    totalissueslastyear       => $totalissueslastyear,
     relissuecount             => $relissuecount,
     overdues_exist            => $overdues_exist,
     error                     => $error,
     $error                    => 1,
     StaffMember               => ( $category_type eq 'S' ),
     is_child                  => ( $category_type eq 'C' ),
+    librarytype               => C4::Context->preference("LibraryType"),
 
     #   reserveloop     => \@reservedata,
     dateformat => C4::Context->preference("dateformat"),
     "dateformat_" . ( C4::Context->preference("dateformat") || '' ) => 1,
     samebranch => $samebranch,
     quickslip  => $quickslip,
+
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;
