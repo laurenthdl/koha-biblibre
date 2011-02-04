@@ -1,0 +1,80 @@
+=head1 LDAP auth_method configuration
+
+This document is a step by step explaination for the new LDAP configuration method. The old one ( see C4::Auth_with_ldap ) still exists and you should give it a try if your needs of mappings and transformations are low.
+
+=head2 What do I have to ask to the directory administrator
+
+=head3 How to reach the service
+
+What we need is build the url of the ldap service we want to reach. so ask him for the URL. If he don't know, ask for the scheme (or protocol), the hostname and the port of the directory. Only hostname and scheme are mandatory.
+
+The scheme must be ldap or ldaps ( ldaps is for crypted ldap, ldap over SSL). the url construction is 
+
+    scheme://hostname:port
+    scheme://hostname
+
+examples
+
+    host=directory.example.com port=389 scheme=ldap
+
+gives you 
+
+    ldap://directory.example.com:389
+
+Also: Active Directory (the Microsoft implementation) is an LDAP alike directory but Koha have to know it's active directory to use it. so please ask.
+
+=head3 What is the binding method ?
+
+Are anonymous allowed to make some searches on the server? If not, what is the credentials for the koha account ?
+Credentials are a pair ( DN, password )
+
+    uid=koha,ou=people,dc=example,dc=com MYS3CRET
+
+in Active Directory, it can be a login@example.com with a password
+
+    koha@example.com MYS3CRET
+
+=head3 Now configure koha
+
+This is a basic exemple of things you will add in the C</config> part of C<koha-conf.xml>. 
+
+First of all, you need to tell koha that ldap authentication is now relevant 
+
+    <useldapserver>1</useldapserver>
+    </ldapserver>
+
+If you use anonymous method, you have to give credentials of koha account 
+
+    <ldapserver url="ldap://directory.example.com"
+          manager="uid=koha,ou=people,dc=example,dc=com"
+          password="MYS3CRET"
+          authmethod="search_dn" >
+
+Also, you can set the values for replication and update (documented in legacy pod): 
+
+    <ldapserver url="ldap://directory.example.com"
+          manager="uid=koha,ou=people,dc=example,dc=com"
+          password="MYS3CRET"
+          authmethod="search_dn"
+          replicate="1" update="1"
+	  >
+
+You must now tell koha the ldap branches where find users
+
+    <useldapserver>1</useldapserver>
+    <ldapserver url="ldap://directory.example.com"
+          manager="uid=koha,ou=people,dc=example,dc=com"
+          password="MYS3CRET"
+          authmethod="search_dn"
+          replicate="1" update="1"
+	  >
+      <branch dn="ou=people,dc=site1,dc=example,dc=com" />
+      <branch dn="ou=people,dc=site2,dc=example,dc=com" />
+      <branch dn="ou=people,dc=site4,dc=example,dc=com" />
+
+The best part of this new config is that you don't have to rely on simple mappings anymore: you can use a perl module to write much sofisticated transformations directly in perl:
+
+      <transformation module="LDAPSupelec" />
+
+
+
