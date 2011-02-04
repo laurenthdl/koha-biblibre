@@ -12,56 +12,53 @@ YAHOO.util.Event.onContentReady("header_search", function() {
             return (aMarkup.join(""));
         };
 
-	// marclist
-        this.marclistDS = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
-        this.marclistDS.scriptQueryAppend = "op=do_search&type=intranet&and_or=and&operator=contains&orderby=HeadingAsc&querytype=marclist";
-        this.marclistDS.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
-        this.marclistDS.maxCacheEntries = 60;
-        this.marclistDS.queryMatchSubset = false;
+        // authority_search
+        this.authority_search_ds = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
+        this.authority_search_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=authority_search";
+        this.authority_search_ds.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
+        this.authority_search_ds.maxCacheEntries = 60;
+        this.authority_search_ds.queryMatchSubset = false;
 
-        var myInput = document.getElementById('value_any');
-        var myContainer = document.getElementById('yvaluecontainermarclist');
-        this.oAutoComp = new YAHOO.widget.AutoComplete(myInput,myContainer,this.marclistDS);
+        var myInput = document.getElementById('authority_search');
+        var myContainer = document.getElementById('authority_search_container');
+        this.oAutoComp = new YAHOO.widget.AutoComplete(myInput,myContainer,this.authority_search_ds);
+        this.oAutoComp.queryDelay = 1;
+        this.oAutoComp.formatResult = this.fnCustomFormatter;
+        this.oAutoComp.maxResultsDisplayed = 1000;
+
+        // main_heading
+        this.main_heading_ds = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
+        this.main_heading_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=main_heading";
+        this.main_heading_ds.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
+        this.main_heading_ds.maxCacheEntries = 60;
+        this.main_heading_ds.queryMatchSubset = false;
+
+        var myInput = document.getElementById('main_heading');
+        var myContainer = document.getElementById('main_heading_container');
+        this.oAutoComp = new YAHOO.widget.AutoComplete(myInput,myContainer,this.main_heading_ds);
         this.oAutoComp.queryDelay = 1;
         this.oAutoComp.formatResult = this.fnCustomFormatter;
         this.oAutoComp.maxResultsDisplayed = 1000;
 
 
-	// mainentry
-	this.mainentryDS = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
-        this.mainentryDS.scriptQueryAppend = "op=do_search&type=intranet&and_or=and&operator=contains&orderby=HeadingAsc&querytype=mainentry";
-        this.mainentryDS.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
-        this.mainentryDS.maxCacheEntries = 60;
-        this.mainentryDS.queryMatchSubset = false;
+        // all_headings
+        this.all_headings_ds = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
+        this.all_headings_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=all_headings";
+        this.all_headings_ds.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
+        this.all_headings_ds.maxCacheEntries = 60;
+        this.all_headings_ds.queryMatchSubset = false;
 
-        var myInput = document.getElementById('value_main');
-        var myContainer = document.getElementById('yvaluecontainermainentry');
-        this.oAutoComp = new YAHOO.widget.AutoComplete(myInput,myContainer,this.mainentryDS);
+        var myInput = document.getElementById('all_headings');
+        var myContainer = document.getElementById('all_headings_container');
+        this.oAutoComp = new YAHOO.widget.AutoComplete(myInput,myContainer,this.all_headings_ds);
         this.oAutoComp.queryDelay = 1;
         this.oAutoComp.formatResult = this.fnCustomFormatter;
         this.oAutoComp.maxResultsDisplayed = 1000;
 
-
-	// mainmainentry
-	this.mainentryDS = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
-        this.mainentryDS.scriptQueryAppend = "op=do_search&type=intranet&and_or=and&operator=contains&orderby=HeadingAsc&querytype=mainmainentry";
-        this.mainentryDS.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
-        this.mainentryDS.maxCacheEntries = 60;
-        this.mainentryDS.queryMatchSubset = false;
-
-        var myInput = document.getElementById('value_mainstr');
-        var myContainer = document.getElementById('yvaluecontainermainmainentry');
-        this.oAutoComp = new YAHOO.widget.AutoComplete(myInput,myContainer,this.mainentryDS);
-        this.oAutoComp.queryDelay = 1;
-        this.oAutoComp.formatResult = this.fnCustomFormatter;
-        this.oAutoComp.maxResultsDisplayed = 1000;
-
-
-}
-});    
+    }
+});
 //]]>
 </script>
-
 
 <span id="header_search">
 <form name="f" method="get" action="auth_finder.pl">
@@ -72,33 +69,33 @@ YAHOO.util.Event.onContentReady("header_search", function() {
             <li>
                 <span class="label">Authority type</span>
                 <!-- TMPL_VAR NAME="authtypecode" -->
-                <input type="hidden" name="authtypecode" value="<!-- TMPL_VAR NAME="authtypecode" -->" />
+                <input type="hidden" name="authtypecode" value="<!-- TMPL_VAR ESCAPE="HTML" NAME="authtypecode" -->" />
             </li>
             <li>
-                <label for="mainmainentry">Main entry ($a only): </label>
-                <input type="hidden" name="marclist" value="mainmainentry" />
-                <input type="text" name="authority_search" value="<!-- TMPL_VAR ESCAPE="HTML" name="authority_search" -->" />
+                <label for="authority_search">Main entry ($a only): </label>
+                <input id="authority_search" style="width:400px;" type="text" name="authority_search" value="<!-- TMPL_VAR ESCAPE="HTML" name="authority_search" -->" />
+                <div id="authority_search_container"></div>
 
             </li>
             <li>
-                <label for="mainentry">Main entry: </label>
-                <input type="hidden" name="marclist" value="mainentry" />
-                <input type="text" name="main_heading" value="<!-- TMPL_VAR ESCAPE="HTML" name="main_heading" -->" />
+                <label for="main_heading">Main entry: </label>
+                <input id="main_heading" style="width:400px;" type="text" name="main_heading" value="<!-- TMPL_VAR ESCAPE="HTML" name="main_heading" -->" />
+                <div id="main_heading_container"></div>
             </li>
             <li>
-                <label for="marclist">Anywhere: </label>
-                <input type="hidden" name="marclist" value="" />
-                <input type="text" name="all_headings" value="<!-- TMPL_VAR ESCAPE="HTML" name="value_any" -->" />
+                <label for="all_headings">Anywhere: </label>
+                <input id="all_headings" style="width:400px;" type="text" name="all_headings" value="<!-- TMPL_VAR ESCAPE="HTML" name="all_headings" -->" />
+                <div id="all_headings_container"></div>
             </li>
 
             <li>
                 <label for="orderby">Sort by </label>
                 <select name="orderby" id="orderby">
                     <option value="">No order</option>
-                    <option value="txt_name asc" selected="selected">Heading Ascendant</option>
-                    <option value="txt_name desc">Heading Descendant</option>
-                    <option value="int_usedinxbiblios asc">Usage Ascendant</option>
-                    <option value="int_usedinxbiblios desc">Usage Descendant</option>
+                    <option value="<!-- TMPL_VAR NAME="name_index_name" --> asc" selected="selected">Heading Ascendant</option>
+                    <option value="<!-- TMPL_VAR NAME="name_index_name" --> desc">Heading Descendant</option>
+                    <option value="<!-- TMPL_VAR NAME="usedinxbiblios_index_name" --> asc">Usage Ascendant</option>
+                    <option value="<!-- TMPL_VAR NAME="usedinxbiblios_index_name" --> desc">Usage Descendant</option>
                 </select>
             </li>
         </ol>

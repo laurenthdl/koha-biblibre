@@ -26,12 +26,14 @@
 
 use strict;
 
-#use warnings; FIXME - Bug 2505
+use warnings;
 use CGI;
 use C4::Context;
 use C4::AuthoritiesMarc;
 use C4::Auth qw/check_cookie_auth/;
 use Switch;
+use C4::Search::Query;
+use C4::Search;
 
 my $query = new CGI;
 
@@ -43,51 +45,41 @@ if ( $auth_status ne "ok" ) {
     exit 0;
 }
 
-    my $searchstr = $query->param('query');
-    my $searchtype = $query->param('querytype');
-    my @value;
-    switch ($searchtype) {
-	case "marclist"      { @value = (undef, undef, $searchstr); }
-	case "mainentry"     { @value = (undef, $searchstr, undef); }
-	case "mainmainentry" { @value = ($searchstr, undef, undef); }
-    }
-    my @marclist  = ($searchtype);
-    my $authtypecode = $query->param('authtypecode');
-    my @and_or    = $query->param('and_or');
-    my @excluding = $query->param('excluding');
-    my @operator  = $query->param('operator');
-    my $orderby   = $query->param('orderby');
+my $authtypecode = $query->param('authtypecode') || '';
+my $searchstr = $query->param('query');
+my $searchtype = $query->param('searchtype');
+my $orderby   = $query->param('orderby') || '';
+my $page        = $query->param('page') || 1;
+my $count       = 20;
 
-    my $resultsperpage = 50;
-    my $startfrom = 0;
+my $indexes;
+my $operands;
+my $operators;
+push @$indexes, @{GetIndexesBySearchtype($searchtype, $authtypecode)};
+my $value = defined $searchstr ? $searchstr . "*" : '[* TO *]';
 
-    my ( $results, $total ) = SearchAuthorities( \@marclist, \@and_or, \@excluding, \@operator, \@value, $startfrom * $resultsperpage, $resultsperpage, $authtypecode, $orderby );
-#    print $searchtype;
-    foreach (@$results) {
-	my ($value) = $_->{'summary'} =~ /<b>(.*)<\/b>/;
-	print nsb_clean($value) . "\n";
-    }
-
-
-
-sub nsb_clean {
-    my $NSB = '\x88' ;        # NSB : begin Non Sorting Block
-    my $NSE = '\x89' ;        # NSE : Non Sorting Block end
-    my $NSB2 = '\x98' ;        # NSB : begin Non Sorting Block
-    my $NSE2 = '\x9C' ;        # NSE : Non Sorting Block end
-    my $htmlnewline = "<br />";
-    my $newline = "\n";
-    # handles non sorting blocks
-    my ($string) = @_ ;
-    $_ = $string ;
-    s/$NSB//g ;
-    s/$NSE//g ;
-    s/$NSB2//g ;
-    s/$NSE2//g ;
-    s/$htmlnewline/ /g;
-    s/$newline//g;
-    $string = $_ ;
-
-    return($string) ;
+for (@$indexes) {
+    push @$operands, $value;
+    push @$operators, 'AND';
 }
 
+if ( not $indexes ) {
+    push @$indexes, @{GetIndexesBySearchtype('all_headings', $authtypecode)};
+    for (@$indexes) {
+        push @$operands, '[* TO *]';
+    }
+}
+
+my $filters = {
+    recordtype => 'authority',
+};
+my $authtype_index = C4::Search::Query::getIndexName('auth-type');
+$filters->{$authtype_index} = $authtypecode if $authtypecode;
+
+my $q = C4::Search::Query->buildQuery( $indexes, $operands, $operators );
+my $results = SimpleSearch( $q, $filters, $page, $count, $orderby );
+
+map {
+    my $record = GetAuthority( $_->{'values'}->{'recordid'} );
+    print BuildSummary( $record, $_->{'values'}->{'recordid'}, $_->{'values'}->{$authtype_index} ) . "\n";
+} @{ $results->{items} };
