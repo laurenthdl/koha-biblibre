@@ -5,6 +5,7 @@
 <!-- TMPL_IF NAME="delete_confirmed" -->Currency Deleted<!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="else" -->Currencies<!-- /TMPL_IF --></title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
     function toUC(f) {
@@ -58,7 +59,7 @@
             type: 'numeric'
     	});
 
-		 $("#periodsh").tablesorter({
+		 $("#currencyt").tablesorter({
 	            widgets : ['zebra'],
 	            headers:  {
                     1: {sorter: 'amount'},
@@ -198,7 +199,7 @@
         You searched for <!-- TMPL_VAR NAME="searchfield" --></span>
     <!-- /TMPL_IF -->
 
-    <table id="currency">
+    <table id="currencyt">
         <thead>
             <tr>
                 <th>Currency</th>

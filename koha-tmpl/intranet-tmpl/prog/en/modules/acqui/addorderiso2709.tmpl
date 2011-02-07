@@ -17,6 +17,13 @@
                 5: { sorter: false },
             }
         });
+        $("#import_biblios").tablesorter({
+            widgets : ['zebra'],    
+            headers : {
+                3: { sorter: false },
+            }
+        });
+
     });
 //]]>
 </script>
@@ -37,37 +44,38 @@
                        <dd><strong>Staged on:</strong> <!-- TMPL_VAR name="upload_timestamp" --></dd>
                      </dl>
                </div>
-               <div>
-                   <form action="<!--TMPL_VAR name="scriptname" -->" method="post" name="import_biblios">
-                     <input type="hidden" name="basketno" value="<!-- TMPL_VAR NAME="basketno" -->" />
-                     <table>
-                     <tr>
-                         <th>#</th>
-                         <th>Citation</th>
-                         <th>Match?</th>
-                         <th>Order</th>
-                       </tr>
-                       <!-- TMPL_LOOP name="biblio_list" -->
+                <div>
+                    <form action="<!--TMPL_VAR name="scriptname" -->" method="post" name="import_biblios">
+                    <input type="hidden" name="basketno" value="<!-- TMPL_VAR NAME="basketno" -->" />
+                    <table id="import_biblios">
+                    <thead>
                          <tr>
-                             <td><a href="/cgi-bin/koha/catalogue/showmarc.pl?importid=<!-- TMPL_VAR name="import_record_id" -->" rel="gb_page_center[600,500]"><!-- TMPL_VAR name="record_sequence"--></a></td>
-                             <td>
-                                <!-- TMPL_VAR name="citation"-->
-
-                             </td>
-                             <td><!-- TMPL_VAR name="overlay_status"--></td>
-                             <td><a href="/cgi-bin/koha/acqui/neworderempty.pl?booksellerid=<!--TMPL_VAR name="booksellerid" -->&amp;basketno=<!-- TMPL_VAR name="basketno" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->&amp;breedingid=<!-- TMPL_VAR name="import_record_id" -->&amp;import_batch_id=<!-- TMPL_VAR name="import_batch_id" -->">Add order</a></td>
-                         </tr>
-                         <!-- TMPL_IF name="match_biblionumber" -->
-                           <tr>
-                             <td class="highlight" colspan="3">Matches biblio <!-- TMPL_VAR name="match_biblionumber" --> (score = <!-- TMPL_VAR name="match_score" -->): <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="match_biblionumber" -->"><!-- TMPL_VAR name="match_citation" --></a></td>
+                             <th>#</th>
+                             <th>Citation</th>
+                             <th>Match?</th>
+                             <th>Order</th>
                            </tr>
-                         <!-- /TMPL_IF -->
-                       <!-- /TMPL_LOOP -->
-                     </table>
-                     <input type="button" value="Save" onclick="this.form.submit()" />
-                   </form>
-               </div>
-              <!-- TMPL_IF name="pages" -->
+                        </thead>
+                        <tbody>
+                        <!-- TMPL_LOOP name="biblio_list" -->
+                            <tr>
+                                <td><a href="/cgi-bin/koha/catalogue/showmarc.pl?importid=<!-- TMPL_VAR name="import_record_id" -->" rel="gb_page_center[600,500]"><!-- TMPL_VAR name="record_sequence"--></a></td>
+                                <td><!-- TMPL_VAR name="citation"--></td>
+                                <td><!-- TMPL_VAR name="overlay_status"--></td>
+                                <td><a href="/cgi-bin/koha/acqui/neworderempty.pl?booksellerid=<!--TMPL_VAR name="booksellerid" -->&amp;basketno=<!-- TMPL_VAR name="basketno" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->&amp;breedingid=<!-- TMPL_VAR name="import_record_id" -->&amp;import_batch_id=<!-- TMPL_VAR name="import_batch_id" -->">Add order</a></td>
+                            </tr>
+                            <!-- TMPL_IF name="match_biblionumber" -->
+                                <tr>
+                                    <td class="highlight" colspan="3">Matches biblio <!-- TMPL_VAR name="match_biblionumber" --> (score = <!-- TMPL_VAR name="match_score" -->): <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="match_biblionumber" -->"><!-- TMPL_VAR name="match_citation" --></a></td>
+                                </tr>
+                            <!-- /TMPL_IF -->
+                        <!-- /TMPL_LOOP -->
+                        </tbody>
+                    </table>
+                    <input type="button" value="Save" onclick="this.form.submit()" />
+                    </form>
+                </div>
+                <!-- TMPL_IF name="pages" -->
                 <div class="pages">
                 Page 
                   <!-- TMPL_LOOP name="pages" -->

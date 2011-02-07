@@ -228,6 +228,7 @@ if ( $op eq 'save' ) {
 }
 
 # ------------------------------------------------------------
+warn $authcat;
 if ( $authcat =~ m/^Asort/ ) {
 
     # ----------- copied from C4::Input::buildCGIsort()
@@ -413,6 +414,7 @@ foreach my $budget (@budgets) {
 
     %budget_line = (
         lines                   => \@cells_line,
+        lines_number            => scalar(@cells_line),
         budget_name_indent      => $budget->{budget_name_indent},
         budget_amount_formatted => $num->format_price( $budget->{budget_amount} ),
         budget_amount           => $budget->{budget_amount},
