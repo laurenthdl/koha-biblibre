@@ -220,6 +220,10 @@ for ( my $i = 0 ; $i < $countlines ; $i++ ) {
     push @loop_received, \%line;
     $totalprice += $parcelitems[$i]->{'unitprice'};
     $line{unitprice} = sprintf( $cfstr, $parcelitems[$i]->{'unitprice'} );
+    my $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
+    $line{suggestionid}         = $$suggestion{suggestionid};
+    $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
+    $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
 
     #double FIXME - totalfreight is redefined later.
 
