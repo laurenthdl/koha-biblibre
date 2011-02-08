@@ -193,12 +193,13 @@ if ( $orderinfo->{quantity} ne '0' ) {
 
         #if it doesnt create it
         my $record = TransformKohaToMarc(
-            {   "biblio.title"                => "$$orderinfo{title}",
-                "biblio.author"               => "$$orderinfo{author}",
-                "biblio.seriestitle"          => $$orderinfo{series} ? $$orderinfo{series} : "",
-                "biblioitems.isbn"            => $$orderinfo{isbn} ? $$orderinfo{isbn} : "",
-                "biblioitems.publishercode"   => $$orderinfo{publishercode} ? $$orderinfo{publishercode} : "",
-                "biblioitems.publicationyear" => $$orderinfo{publicationyear} ? $$orderinfo{publicationyear} : "",
+            {   "biblio.title"                 => "$$orderinfo{title}",
+                "biblio.author"                => "$$orderinfo{author}",
+                "biblio.seriestitle"           => $$orderinfo{series} ? $$orderinfo{series} : "",
+                "biblioitems.isbn"             => $$orderinfo{isbn} ? $$orderinfo{isbn} : "",
+                "biblioitems.publishercode"    => $$orderinfo{publishercode} ? $$orderinfo{publishercode} : "",
+                "biblioitems.publicationyear"  => $$orderinfo{publicationyear} ? $$orderinfo{publicationyear} : "",
+                "biblioitems.editionstatement" => $$orderinfo{editionstatement} ? $$orderinfo{editionstatement} : "",
             }
         );
 

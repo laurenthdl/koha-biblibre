@@ -197,6 +197,15 @@ $(document).ready(function()
         </li>
         <li>
             <!-- TMPL_IF name="biblionumber" -->
+            <span class="label">Publisher mention: </span>
+                <input type="hidden" size="20" name="editionstatement" id="editionstatement" value="<!-- TMPL_VAR NAME="editionstatement" -->" /><!-- TMPL_VAR NAME="editionstatement" -->
+            <!-- TMPL_ELSE -->
+            <label for="editionstatement">Publisher mention: </label>
+                <input type="text" size="20" name="editionstatement" id="editionstatement" value="<!-- TMPL_VAR NAME="editionstatement" -->" />
+            <!-- /TMPL_IF -->
+        </li>
+        <li>
+            <!-- TMPL_IF name="biblionumber" -->
             <span class="label">Publication year: </span>
                 <input type="hidden" size="20" name="publicationyear" id="publicationyear" value="<!-- TMPL_VAR NAME="publicationyear" -->" /><!-- TMPL_VAR NAME="publicationyear" -->
             <!-- TMPL_ELSE -->
