@@ -156,7 +156,20 @@ sub _anon_search {
 sub set_xattr {
     my ( $id, $borrower ) = @_;
     if ( my $x = $$borrower{xattr} ) {
-	my $attrs = [ map +{ code => $_, value => $$x{$_} }, keys %$x ];
+#SetBorrowerAttributes is not managing when being sent an Array ref
+	my $attrs = [ map
+                    {
+                        my $key=$_;
+                        if (ref ($$x{$key}) eq "ARRAY"){
+                            foreach my $value (@{$$x{$key}}){
+                                +{ code => $key, value => $value }
+                            }
+                        }
+                        else {
+                            +{ code => $key, value => $$x{$key} }
+                        }
+                    }
+                    , keys %$x ];
 	DEBUG and logger { "creating $id" => $attrs };
 	SetBorrowerAttributes( $id, $attrs );
     }
