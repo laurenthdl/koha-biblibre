@@ -355,6 +355,7 @@ $template->param(
     publicationyear  => $data->{'publicationyear'},
     budget_loop      => $budget_loop,
     isbn             => $data->{'isbn'},
+    ean              => $data->{'ean'},
     seriestitle      => $data->{'seriestitle'},
     itemtypeloop  => \@itemtypes,
     collectiontitle      => $data->{'collectiontitle'},
