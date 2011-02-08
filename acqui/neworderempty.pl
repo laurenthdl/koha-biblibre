@@ -347,6 +347,7 @@ $template->param(
     publicationyear  => $data->{'publicationyear'},
     budget_loop      => $budget_loop,
     isbn             => $data->{'isbn'},
+    ean              => $data->{'ean'},
     seriestitle      => $data->{'seriestitle'},
     quantity         => $data->{'quantity'},
     quantityrec      => $data->{'quantity'},

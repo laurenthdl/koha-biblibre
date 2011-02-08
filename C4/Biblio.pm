@@ -3125,7 +3125,8 @@ sub _koha_modify_biblioitem_nonmarc {
         cn_item         = ?,
         cn_suffix       = ?,
         cn_sort         = ?,
-        totalissues     = ?
+        totalissues     = ?,
+	ean             = ?
         where biblioitemnumber = ?
         ";
     my $sth = $dbh->prepare($query);
@@ -3137,6 +3138,7 @@ sub _koha_modify_biblioitem_nonmarc {
         $biblioitem->{'pages'},            $biblioitem->{'bnotes'},           $biblioitem->{'size'},                  $biblioitem->{'place'},
         $biblioitem->{'lccn'},             $biblioitem->{'url'},              $biblioitem->{'biblioitems.cn_source'}, $biblioitem->{'cn_class'},
         $biblioitem->{'cn_item'},          $biblioitem->{'cn_suffix'},        $cn_sort,                               $biblioitem->{'totalissues'},
+	$biblioitem->{'ean'},
         $biblioitem->{'biblioitemnumber'}
     );
     if ( $dbh->errstr ) {
@@ -3192,7 +3194,8 @@ sub _koha_add_biblioitem {
         cn_item         = ?,
         cn_suffix       = ?,
         cn_sort         = ?,
-        totalissues     = ?
+        totalissues     = ?,
+	ean             = ?
         ";
     my $sth = $dbh->prepare($query);
     $sth->execute(
@@ -3203,7 +3206,7 @@ sub _koha_add_biblioitem {
         $biblioitem->{'pages'},            $biblioitem->{'bnotes'},           $biblioitem->{'size'},                  $biblioitem->{'place'},
         $biblioitem->{'lccn'},             $biblioitem->{'marc'},             $biblioitem->{'url'},                   $biblioitem->{'biblioitems.cn_source'},
         $biblioitem->{'cn_class'},         $biblioitem->{'cn_item'},          $biblioitem->{'cn_suffix'},             $cn_sort,
-        $biblioitem->{'totalissues'}
+        $biblioitem->{'totalissues'},      $biblioitem->{'ean'}
     );
     my $bibitemnum = $dbh->{'mysql_insertid'};
 
