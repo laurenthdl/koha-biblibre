@@ -14,7 +14,7 @@ my $config = C4::Context->config("ldapserver")
 for my $site ( @{ $$config{branch} } ) {
     my $m = $ldap->search
     ( base     => $$site{dn}
-    , filter   => '(&(objectClass=supelecPerson)(uid=*))'
+    , filter   => '(&(objectClass=supelecPerson)(uid=*)(!(|(supelecMembreDe=*ACCT-doublonCampus*)(supelecMembreDe=*ACCT-fantome*)(supelecMembreDe=*ACCT-dfantome*)))'
     # , filter   => 'uid=missoffe'
     # , filter   => 'supelecMatriculeEleve=13262'
     , attrs    => \@LDAPSupelec::ATTRS
