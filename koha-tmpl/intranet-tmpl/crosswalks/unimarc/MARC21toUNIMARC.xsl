@@ -61,6 +61,7 @@
 					<datafield tag="100">
 						<xsl:attribute name="ind1"><xsl:value-of select="' '" /></xsl:attribute>
 						<xsl:attribute name="ind2"><xsl:value-of select="' '" /></xsl:attribute>
+						<subfield code="a">
 						<xsl:variable name="deof">
 							<xsl:choose>
 								<xsl:when test="substring(text(),1,2) &lt; 70">
@@ -127,9 +128,11 @@
 						<xsl:variable name="acs"><xsl:value-of select="'    '" /></xsl:variable>
 						<xsl:variable name="aot" select="substring(text(),34,1)" />
 						<xsl:value-of select="concat($deof,$topd,$d1,$d2,$il,$gpc,$mrc,$loc,$tc,$cs,$acs,$aot)" />
+						</subfield>
 					</datafield>
 					<datafield tag="105">
 						<!-- Difficile de faire un bel algo pour les deux variables suivantes -->
+						<subfield code="a">
 						<xsl:variable name="ic"><xsl:value-of select="'    '" /></xsl:variable>
 						<xsl:variable name="focc"><xsl:value-of select="'    '" /></xsl:variable>
 						<xsl:variable name="cc"><xsl:value-of select="substring(text(),30,1)" /></xsl:variable>
@@ -148,14 +151,18 @@
 							</xsl:choose>
 						</xsl:variable>
 						<xsl:value-of select="concat($ic,$focc,$cc,$fi,$ii,$lc,$bc)" />
+						</subfield>
 					</datafield>
 					<datafield tag="106">
+					    <subfield code="a">
 						<xsl:choose>
 							<xsl:when test="substring(text(),24,1) = ' '">y</xsl:when>
 							<xsl:otherwise><xsl:value-of select="substring(text(),24,1)" /></xsl:otherwise>
 						</xsl:choose>
+					    </subfield>
 					</datafield>
 					<datafield tag="110">
+					    <subfield code="a">
 						<xsl:variable name="tos">
 							<xsl:choose>
 								<xsl:when test="substring(text(),22,1) = 'p'">a</xsl:when>
@@ -232,6 +239,7 @@
 						<xsl:variable name="iac">|</xsl:variable>
 						<xsl:variable name="cia">|</xsl:variable>
 						<xsl:value-of select="concat($tos,$foi,$r,$tomc,$nocc,$ci,$tpa,$iac,$cia)" />
+					    </subfield>
 					</datafield>
 				</xsl:for-each>
 				<xsl:for-each select="marc:datafield[@tag='020']">
@@ -359,11 +367,14 @@
 						<xsl:for-each select="marc:subfield[@code='n']"><subfield code="h"><xsl:value-of select="text()" /></subfield></xsl:for-each>
 						<xsl:for-each select="marc:subfield[@code='p']"><subfield code="i"><xsl:value-of select="text()" /></subfield></xsl:for-each>
 					</datafield>
+					<!-- FIXME -->
+					<!--
 					<datafield tag="204">
 						<xsl:attribute name="ind1"><xsl:value-of select="' '" /></xsl:attribute>
 						<xsl:attribute name="ind2"><xsl:value-of select="' '" /></xsl:attribute>
 						<xsl:for-each select="marc:subfield[@code='h']"><subfield code="a"><xsl:value-of select="text()" /></subfield></xsl:for-each>
 					</datafield>
+					-->
 				</xsl:for-each>
 				<xsl:for-each select="marc:datafield[@tag='250']">
 					<datafield tag="205">
@@ -457,8 +468,12 @@
 				</xsl:for-each>
 				<xsl:for-each select="marc:datafield[@tag='505']">
 					<datafield tag="327">
-						<xsl:attribute name="ind1"><xsl:value-of select="@ind1" /></xsl:attribute>
-						<xsl:attribute name="ind2"><xsl:value-of select="@ind2" /></xsl:attribute>
+					    <!-- FIXME: Dummy indicators -->
+						<!--<xsl:attribute name="ind1"><xsl:value-of select="@ind1" /></xsl:attribute>-->
+						<xsl:attribute name="ind1"><xsl:value-of select="' '" /></xsl:attribute>
+						<!--<xsl:attribute name="ind2"><xsl:value-of select="@ind2" /></xsl:attribute>-->
+						<xsl:attribute name="ind2"><xsl:value-of select="' '" /></xsl:attribute>
+						<subfield code="a">bla</subfield>
 						<xsl:for-each select="marc:subfield[@code='a']"><subfield code="a"><xsl:value-of select="text()" /></subfield></xsl:for-each>
 					</datafield>
 				</xsl:for-each>
