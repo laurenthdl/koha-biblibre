@@ -96,7 +96,7 @@ our $supelecTypePersonne =
 };
 
 our %cardnumber_attribute_for_categorycode = qw/
-DOCTLABO	supelecUid
+DOCTLABO	supelecMatriculeEleve
 DOCTSUP	supelecMatriculeEleve
 ETU	supelecMatriculeEleve
 PERSLABO	supelecUid
@@ -108,7 +108,7 @@ VAC	supelecUid
 
 sub set_category_code (_) {
     my $user = shift;
-    my $type = $$user{src}{supelecTypePersonne};
+    my $type = lc $$user{src}{supelecTypePersonne};
     return if $type ~~ $$supelecTypePersonne{to_ignore};
 
     $$user{column}{categorycode} = $$supelecTypePersonne{categorycode}{$type}
@@ -132,6 +132,7 @@ sub set_cardnumber (_) {
     };
 
     my $cn = $$user{src}{$cn_attr}
+    || ($cc =~/DOCTSUP|DOCTLABO|ETU/?$$user{src}{supelecUid}:undef)
     || do {
 	$rapport{'valeur manquante pour le cardnumber'}{$cc}{$cn_attr}++;
 	return;
@@ -176,6 +177,7 @@ sub set_xattrs (_) {
     supelecNiveauScolaire	NIVSCOl
     supelecVoie	VOIE
     supelecDepartement	SUPDPT
+    supelecUid	SUPUID
     /};
 
     my $user = shift;
@@ -201,6 +203,7 @@ sub set_caution_and_debarring (_) {
     my $user = shift;
     my $debarring_date = '9999-12-31';
 
+    return unless (lc $$user{src}{supelecCampusRattachement} ne "gif");
     if ( my $caution = $$user{src}{supelecBibCaution} ) {
 	'N' eq ($$user{xattr}{CAUTION} = $caution)
 	    and $$user{column}{debarred} = $debarring_date;
@@ -253,6 +256,8 @@ sub get_borrower {
     set_branchcode( $user )
 	or push @{ $rapport{'missing cardnumber'} }, $$user{src}{dn};
     set_xattrs( $user );
+    #I Hate doing this... It relies on the knowledge of the data... and a previous process... But Should do what it is supposed to do
+    $$user{column}{dateexpiry}=$$user{'xattr'}{'SORTIE'} if ($$user{'xattr'}{'SORTIE'});
     set_caution_and_debarring( $user );
     my @missing_important_informations = grep { not defined $$user{column}{$_} } qw/
 	userid cardnumber firstname surname categorycode branchcode
