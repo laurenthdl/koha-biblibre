@@ -180,7 +180,7 @@ The other parameters are optional, see ModBasketHeader for more info on them.
 # FIXME : this function seems to be unused.
 
 sub NewBasket {
-    my ( $booksellerid, $authorisedby, $basketname, $basketnote, $basketbooksellernote, $basketcontractnumber ) = @_;
+    my ( $booksellerid, $authorisedby, $basketname, $basketnote, $basketbooksellernote, $basketcontractnumber, $deliveryplace, $billingplace ) = @_;
     my $dbh   = C4::Context->dbh;
     my $query = "
         INSERT INTO aqbasket
@@ -191,7 +191,7 @@ sub NewBasket {
 
     #find & return basketno MYSQL dependant, but $dbh->last_insert_id always returns null :-(
     my $basket = $dbh->{'mysql_insertid'};
-    ModBasketHeader( $basket, $basketname || '', $basketnote || '', $basketbooksellernote || '', $basketcontractnumber || undef );
+    ModBasketHeader( $basket, $basketname || '', $basketnote || '', $basketbooksellernote || '', $basketcontractnumber || undef, $deliveryplace || undef, $billingplace || undef );
     return $basket;
 }
 
@@ -245,7 +245,7 @@ sub GetBasketAsCSV {
     my $output;
 
     # TODO: Translate headers
-    my @headers = qw(contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp);
+    my @headers = qw(contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp basketdeliveryplace basketbillingplace);
 
     $csv->combine(@headers);
     $output = $csv->string() . "\n";
@@ -255,8 +255,19 @@ sub GetBasketAsCSV {
         my @cols;
         my $bd = GetBiblioData( $order->{'biblionumber'} );
         push( @cols,
-            $contract->{'contractname'}, $order->{'ordernumber'},  $order->{'entrydate'}, $order->{'isbn'},     $bd->{'author'}, $bd->{'title'},
-            $bd->{'publishercode'},      $bd->{'collectiontitle'}, $order->{'notes'},     $order->{'quantity'}, $order->{'rrp'}, );
+            $contract->{'contractname'},
+            $order->{'ordernumber'},
+            $order->{'entrydate'},
+            $order->{'isbn'},
+            $bd->{'author'},
+            $bd->{'title'},
+            $bd->{'publishercode'},
+            $bd->{'collectiontitle'},
+            $order->{'notes'},
+            $order->{'quantity'},
+            $order->{'rrp'},
+            $basket->{'deliveryplace'},
+            $basket->{'billingplace'});
         push( @rows, \@cols );
     }
 
@@ -457,7 +468,7 @@ sub ModBasket {
 
 =over 4
 
-&ModBasketHeader($basketno, $basketname, $note, $booksellernote, $contractnumber);
+&ModBasketHeader($basketno, $basketname, $note, $booksellernote, $contractnumber, $deliveryplace, $billingplace );
 
 Modifies a basket's header.
 
@@ -480,11 +491,11 @@ Modifies a basket's header.
 =cut
 
 sub ModBasketHeader {
-    my ( $basketno, $basketname, $note, $booksellernote, $contractnumber ) = @_;
-    my $query = "UPDATE aqbasket SET basketname=?, note=?, booksellernote=? WHERE basketno=?";
+    my ( $basketno, $basketname, $note, $booksellernote, $contractnumber, $deliveryplace, $billingplace) = @_;
+    my $query = "UPDATE aqbasket SET basketname=?, note=?, booksellernote=?, deliveryplace=?, billingplace=? WHERE basketno=?";
     my $dbh   = C4::Context->dbh;
     my $sth   = $dbh->prepare($query);
-    $sth->execute( $basketname, $note, $booksellernote, $basketno );
+    $sth->execute( $basketname, $note, $booksellernote, $deliveryplace, $billingplace, $basketno);
     if ($contractnumber) {
         my $query2 = "UPDATE aqbasket SET contractnumber=? WHERE basketno=?";
         my $sth2   = $dbh->prepare($query2);
