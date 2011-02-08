@@ -243,31 +243,37 @@ if ( $op ne "do_search" ) {
 
 			    my $parser = XML::LibXML->new();
 			    my $xslt   = XML::LibXSLT->new();
+
+			    warn "Source ($syntax[$k]): ";
+			    warn $marcrecord->as_formatted;
+
+			    # Converting the source record to a marcxml string
 			    my $xmlrec = marc2marcxml($marcrecord, $encoding[$k], $syntax[$k]);
-#			    warn " -------------------------- xmlrec : $xmlrec";
+#			    my $xmlrec = marc2marcxml($marcrecord, $encoding[$k], $syntax[$k], 1);
 
+			    # Parsing the marcxml
 			    my $source = $parser->parse_string($xmlrec);
-#			    warn " -------------------------- source : " . $source->toString();
 
+			    # Getting the xslt stylesheet
 			    #my $style_doc = $parser->load_xml(location => $ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k], no_cdata => 1);
 			    my $style_doc = $parser->parse_file($ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k]);
-#			    warn " --------------------------- style_doc : " . $style_doc->toString();
-#			    XML::LibXSLT->debug_callback(sub { warn("XML::LibXSLT debug call back :".shift); });
 
+			    # Parsing the xslt stylesheet
 			    my $stylesheet = $xslt->parse_stylesheet($style_doc);
-#			    warn " -------------------------- stylesheet " . Data::Dumper::Dumper($stylesheet);
 			    
+			    # Transforming the parsed marcxml with the parsed stylesheet
 			    my $results = eval { $stylesheet->transform($source) };
 			    if ($@) {
 				die "LibXSLT died with: $@\n";
 			    }
 
-			    warn " -------------------------- result : " . $stylesheet->output_string($results);
-#			    warn " -------------------------- result : " . $stylesheet->output_as_bytes($results) ;
-			    my ($error, $marcrecord) = marcxml2marc($stylesheet->output_string($results), $encoding[$k], $marcflavour);
-			    warn $error;
+			    # Converting the transformed marcxml back to a marc record
+			    my $error;
+			    ($error, $marcrecord) = marcxml2marc($stylesheet->output_string($results), $encoding[$k], $marcflavour);
+#			    ($error, $marcrecord) = marcxml2marc($stylesheet->output_string($results), "UTF-8", $marcflavour);
+			    warn $error if ($error);
+			    warn "Destination ($marcflavour) :";
 			    warn $marcrecord->as_formatted;
-
 
 			    
 			}
