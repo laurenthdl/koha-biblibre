@@ -23,6 +23,20 @@
 		<li><label for="author">Author: </label> <input type="text" name="author" id="author" value="<!-- TMPL_VAR name="author" -->" /></li>
 		<li><label for="name">Vendor: </label> <input type="text" name="name" id="name" value="<!-- TMPL_VAR name="name" -->" /></li>
 		<li><label for="ean">EAN: </label> <input type="text" name="ean" id="ean" value="<!-- TMPL_VAR name="ean" -->" /></li>
+		<li><label for="isbn">ISBN: </label> <input type="text" name="isbn" id="isbn" value="<!-- TMPL_VAR name="isbn" -->" /></li>
+		<li><label for="budget">Budget: </label> <input type="text" name="budget" id="budget" value="<!-- TMPL_VAR name="budget" -->" /></li>
+		<li><label for="invoicenumber">Invoice number: </label> <input type="text" name="invoicenumber" id="invoicenumber" value="<!-- TMPL_VAR name="invoicenumber" -->" /></li>
+        <!-- TMPL_IF NAME=display_branchcode -->
+            <li><label for="branchcode">Branch code: </label>
+                <select name="branchcode" id="branchcode">
+                    <option value=""></option>
+                    <!-- TMPL_LOOP name="branchloop" -->
+                        <option value="<!-- TMPL_VAR name="value" -->">
+                            <!-- TMPL_VAR name="value" --> - <!-- TMPL_VAR name="branchname" -->
+                        </option>
+                    <!-- /TMPL_LOOP -->
+                </select>
+        <!-- /TMPL_IF -->
 		<li><label for="from">From: </label> 
 			<input type="text" size="10" id="from" name="from" value="<!-- TMPL_VAR name="from_placed_on" -->" />
 			<img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="openCalendarFrom" style="cursor: pointer;" alt="Show Calendar" />
@@ -67,7 +81,7 @@
 				<th>Vendor</th>
 				<th>Placed on</th>
 				<th>Received on</th>
-				<th>Quantity ordered</th>
+				<th>Quantity received/ordered</th>
 				<th>Unit cost</th>
 			</tr>
 			
@@ -86,7 +100,7 @@
 					<td><a href="/cgi-bin/koha/acqui/supplier.pl?supplierid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR NAME="name" --></a></td>
 					<td><!-- TMPL_VAR name="creationdate" --></td>
 					<td><!-- TMPL_VAR name="datereceived" --></td>
-					<td><!-- TMPL_VAR name="quantity" --></td>
+					<td><!-- TMPL_VAR name="quantityreceived" --> / <!-- TMPL_VAR name="quantity" --></td>
 					<td><!-- TMPL_VAR name="ecost" --></td>
 				</tr>
 			<!-- /TMPL_LOOP -->

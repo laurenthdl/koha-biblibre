@@ -55,13 +55,17 @@ use C4::Output;
 use C4::Acquisition;
 use C4::Dates;
 use C4::Debug;
+use C4::Branch;
 
 my $input          = new CGI;
 my $title          = $input->param('title');
 my $author         = $input->param('author');
 my $name           = $input->param('name');
 my $ean            = $input->param('ean');
-warn "---- $name $ean";
+my $isbn           = $input->param('isbn');
+my $budget         = $input->param('budget');
+my $invoicenumber  = $input->param('invoicenumber');
+my $branchcode     = $input->param('branchcode');
 my $from_placed_on = C4::Dates->new( $input->param('from') );
 my $to_placed_on   = C4::Dates->new( $input->param('to') );
 
@@ -77,8 +81,25 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 );
 
 my $from_iso = C4::Dates->new( $input->param('from') )->output('iso') if $input->param('from');
-my $to_iso   = C4::Dates->new( $input->param('to') )->output('iso')   if $input->param('iso');
-my ( $order_loop, $total_qty, $total_price, $total_qtyreceived ) = &GetHistory( $title, $author, $name, $ean, $from_iso, $to_iso );
+my $to_iso   = C4::Dates->new( $input->param('to') )->output('iso')   if $input->param('to');
+my ( $order_loop, $total_qty, $total_price, $total_qtyreceived ) = &GetHistory( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $from_iso, $to_iso );
+
+if ( not C4::Context->preference("IndependantBranches") ){
+    my $branches = GetBranches();
+    my @branchloop;
+    foreach my $thisbranch ( keys %$branches ) {
+        my %row = (
+            value      => $thisbranch,
+            branchname => $branches->{$thisbranch}->{'branchname'},
+        );
+        push @branchloop, \%row;
+    }
+    $template->param(
+        branchcode           => $branchcode,
+        display_branchcode   => !C4::Context->preference("IndependantBranches"),
+        branchloop          => \@branchloop
+    );
+}
 
 $template->param(
     suggestions_loop         => $order_loop,
@@ -90,6 +111,9 @@ $template->param(
     author                   => $author,
     name                     => $name,
     ean                      => $ean,
+    isbn                     => $isbn,
+    budget                   => $budget,
+    invoicenumber            => $invoicenumber,
     from_placed_on           => $from_placed_on->output('syspref'),
     to_placed_on             => $to_placed_on->output('syspref'),
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),

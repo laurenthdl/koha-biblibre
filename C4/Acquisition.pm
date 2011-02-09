@@ -1657,26 +1657,28 @@ returns:
 =cut
 
 sub GetHistory {
-    my ( $title, $author, $name, $ean, $from_placed_on, $to_placed_on ) = @_;
+    my ( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $from_placed_on, $to_placed_on ) = @_;
     my @order_loop;
     my $total_qty         = 0;
     my $total_qtyreceived = 0;
     my $total_price       = 0;
 
     # don't run the query if there are no parameters (list would be too long for sure !)
-    if ( $title || $author || $name || $ean || $from_placed_on || $to_placed_on ) {
+    if ( $title || $author || $name || $ean || $isbn || $budget || $invoicenumber || $branchcode || $from_placed_on || $to_placed_on ) {
         my $dbh   = C4::Context->dbh;
         my $query = "
             SELECT
                 biblio.title,
                 biblio.author,
-		biblioitems.ean,
+                biblioitems.ean,
+                biblioitems.isbn,
                 aqorders.basketno,
-		aqbasket.basketname,
-		aqbasket.basketgroupid,
-		aqbasketgroups.name as groupname,
+                aqorders.booksellerinvoicenumber,
+                aqbasket.basketname,
+                aqbasket.basketgroupid,
+                aqbasketgroups.name as groupname,
                 aqbooksellers.name,
-		aqbasket.creationdate,
+                aqbasket.creationdate,
                 aqorders.datereceived,
                 aqorders.quantity,
                 aqorders.quantityreceived,
@@ -1684,16 +1686,25 @@ sub GetHistory {
                 aqorders.ordernumber,
                 aqorders.booksellerinvoicenumber as invoicenumber,
                 aqbooksellers.id as id,
-                aqorders.biblionumber
+                aqorders.biblionumber";
+        $query .= ", aqbudgets.budget_name AS budget" if defined $budget;
+        $query .= ", borrowers.branchcode " if ( not C4::Context->preference("IndependantBranches")  and defined $branchcode and $branchcode);
+        $query .= "
             FROM aqorders
             LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
-	    LEFT JOIN aqbasketgroups ON aqbasket.basketgroupid=aqbasketgroups.id
+            LEFT JOIN aqbasketgroups ON aqbasket.basketgroupid=aqbasketgroups.id
             LEFT JOIN aqbooksellers ON aqbasket.booksellerid=aqbooksellers.id
             LEFT JOIN biblio ON biblio.biblionumber=aqorders.biblionumber
             LEFT JOIN biblioitems ON biblioitems.biblionumber=aqorders.biblionumber";
 
-        $query .= " LEFT JOIN borrowers ON aqbasket.authorisedby=borrowers.borrowernumber"
-          if ( C4::Context->preference("IndependantBranches") );
+        $query .= " LEFT JOIN aqbudgets ON aqorders.budget_id=aqbudgets.budget_id"
+            if defined $budget;
+
+        if ( C4::Context->preference("IndependantBranches") ) {
+            $query .= " LEFT JOIN borrowers ON aqbasket.authorisedby=borrowers.borrowernumber"
+        } elsif ( defined $branchcode and $branchcode) {
+            $query .= " LEFT JOIN borrowers ON aqorders.branchcode=borrowers.branchcode"
+        }
 
         $query .= " WHERE (datecancellationprinted is NULL or datecancellationprinted='0000-00-00') ";
 
@@ -1714,9 +1725,25 @@ sub GetHistory {
             $query .= " AND aqbooksellers.name LIKE ? ";
             push @query_params, "%$name%";
         }
-	if ( defined $ean and $ean ) {
+
+        if ( defined $ean and $ean ) {
             $query .= " AND biblioitems.ean = ? ";
             push @query_params, "$ean";
+        }
+
+        if ( defined $isbn and $isbn ) {
+            $query .= " AND biblioitems.isbn = ? ";
+            push @query_params, "$isbn";
+        }
+
+        if ( defined $budget and $budget ) {
+            $query .= " AND aqbudgets.budget_name = ? ";
+            push @query_params, "$budget";
+        }
+ 
+        if ( defined $invoicenumber and $invoicenumber ) {
+            $query .= " AND aqorders.booksellerinvoicenumber = ? ";
+            push @query_params, "$invoicenumber";
         }
 
         if ( defined $from_placed_on ) {
@@ -1735,6 +1762,9 @@ sub GetHistory {
                 $query .= " AND (borrowers.branchcode = ? OR borrowers.branchcode ='' ) ";
                 push @query_params, $userenv->{branch};
             }
+        } elsif ( defined $branchcode and $branchcode ) {
+            $query .= " AND borrowers.branchcode = ? ";
+            push @query_params, $branchcode;
         }
         $query .= " ORDER BY id";
         warn $query;
