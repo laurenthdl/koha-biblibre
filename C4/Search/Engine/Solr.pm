@@ -46,6 +46,24 @@ Contains SimpleSearch and IndexRecord for Solr search engine.
 
 =cut
 
+eval {
+    my $servers = C4::Context->config('memcached_servers');
+    if ($servers) {
+        require Memoize::Memcached;
+        import Memoize::Memcached qw(memoize_memcached);
+
+        my $memcached = {
+            servers    => [$servers],
+            key_prefix => C4::Context->config('memcached_namespace') || 'koha',
+        };
+
+        for qw(GetSolrConnection GetIndexes GetRessourceTypes GetSortableindexes GetFacetedIndexes  GetSubfieldsForIndex GetMappings
+                FillSubfieldWithAuthorisedValues LoadSearchPlugin GetSearchPlugins){
+            memoize_memcached( $_,        memcached => $memcached, expire_time => 600000 );    #cache for 10 minutes
+        }
+    }
+};
+
 
 sub GetSolrConnection {
     C4::Search::Engine::Solr->new(
