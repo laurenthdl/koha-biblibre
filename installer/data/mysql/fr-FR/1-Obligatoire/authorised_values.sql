@@ -351,3 +351,8 @@ INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES 
 INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'qualif', '295', 'Donneur de grades');
 INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'qualif', '010', 'Adaptateur');
 INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'LOC', 'En reliure', 'En reliure');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '0', 'Nouveau');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '1', 'Demandé');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '2', 'Partielle');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '3', 'Complète');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '4', 'Supprimée');
