@@ -36,7 +36,7 @@ use XML::LibXSLT;
 use XML::LibXML;
 
 use utf8;
-use open qw(:std :utf8);
+#use open qw(:std :utf8);
 
 
 my $input         = new CGI;
@@ -64,9 +64,7 @@ my $server;
 my $database;
 my $port;
 my $marcdata;
-my @encoding;
-my @syntax;
-my @xslt;
+my @servers;
 my @results;
 my $count;
 my $record;
@@ -83,7 +81,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     {   template_name   => "cataloguing/z3950_search.tmpl",
         query           => $input,
         type            => "intranet",
-        authnotrequired => 1,
+        authnotrequired => 0,
         flagsrequired   => { catalogue => 1 },
         debug           => 1,
     }
@@ -110,6 +108,7 @@ if ( $op ne "do_search" ) {
     );
     output_html_with_http_headers $input, $cookie, $template->output;
 } else {
+    my $marcflavour=C4::Context->preference('marcflavour');
     my @id = $input->param('id');
     my @oConnection;
     my @oResult;
@@ -180,11 +179,20 @@ if ( $op ne "do_search" ) {
             warn( "server data", $server->{name}, $server->{port} ) if $DEBUG;
             $oConnection[$s]->connect( $server->{host}, $server->{port} )
               || $DEBUG && warn( "" . $oConnection[$s]->errmsg() );
-            $serverhost[$s] = $server->{host};
-            $servername[$s] = $server->{name};
-            $encoding[$s]   = ( $server->{encoding} ? $server->{encoding} : "iso-5426" );
-            $syntax[$s]     = $server->{syntax};
-            $xslt[$s]       = $server->{xslt};
+            $servers[$s] = $server;
+            $servers[$s]->{encoding}   ||= "iso-5426" ;
+			    # Getting the xslt stylesheet
+            if ($server->{xslt} and $server->{syntax} ne $marcflavour){
+			    my $parser = XML::LibXML->new();
+			    my $xslt   = XML::LibXSLT->new();
+			    #my $style_doc = $parser->load_xml(location => $ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k], no_cdata => 1);
+			    my $style_doc = $parser->parse_file($ENV{'DOCUMENT_ROOT'} .'/'. $server->{xslt});
+
+			    # Parsing the xslt stylesheet
+			    my $stylesheet = $xslt->parse_stylesheet($style_doc);
+                $servers[$s]->{xslt} = $stylesheet ;
+			}   
+            #$servers[$s]->{xslt}   =  if (defined $servers[$s]->{xslt}) ;
             $s++;
         }    ## while fetch
     }    # foreach
@@ -211,13 +219,13 @@ if ( $op ne "do_search" ) {
 
     if ( $k != 0 ) {
         $k--;
-        warn $serverhost[$k] if $DEBUG;
+        warn $servers[$k]->{host} if $DEBUG;
         my ( $error, $errmsg, $addinfo, $diagset ) = $oConnection[$k]->error_x();
         if ($error) {
             if ( $error =~ m/^(10000|10007)$/ ) {
-                push( @errconn, { 'server' => $serverhost[$k] } );
+                push( @errconn, { 'server' => $servers[$k]->{host} } );
             }
-            $DEBUG and warn "$k $serverhost[$k] error $query: $errmsg ($error) $addinfo\n";
+            $DEBUG and warn "$k $servers[$k]->{host} error $query: $errmsg ($error) $addinfo\n";
         } else {
             my $numresults = $oResult[$k]->size();
             my $i;
@@ -230,61 +238,49 @@ if ( $op ne "do_search" ) {
                         $marcdata = $rec->raw();
 
                         my ( $charset_result, $charset_errors );
-			my $marcflavour = C4::Context->preference('marcflavour');
-                        ( $marcrecord, $charset_result, $charset_errors ) = MarcToUTF8Record( $marcdata, $marcflavour, $encoding[$k] );
-####WARNING records coming from Z3950 clients are in various character sets MARC8,UTF8,UNIMARC etc
-## In HEAD i change everything to UTF-8
-                        # In rel2_2 i am not sure what encoding is so no character conversion is done here
-##Add necessary encoding changes to here -TG
+                        
+                        ( $marcrecord, $charset_result, $charset_errors ) = MarcToUTF8Record( $marcdata, $servers[$k]->{syntax}, $servers[$k]->{encoding} );
+                        SetUTF8Flag($marcrecord);
 
 			# If the syntax used by the z3950 server is different from our marcflavour,
 			# We use the xslt property (if defined) to transform the document
-			if ($syntax[$k] ne $marcflavour and defined $xslt[$k]) {
+			if ($servers[$k]->{syntax} ne $marcflavour and defined $servers[$k]->{xslt}) {
 
 			    my $parser = XML::LibXML->new();
-			    my $xslt   = XML::LibXSLT->new();
 
-			    warn "Source ($syntax[$k]): ";
-			    warn $marcrecord->as_formatted;
+			   # warn "Source ($servers[$k]->{encoding}): ";
+			   # warn $marcrecord->as_formatted;
 
 			    # Converting the source record to a marcxml string
-			    my $xmlrec = marc2marcxml($marcrecord, $encoding[$k], $syntax[$k]);
+			    my $xmlrec = marc2marcxml($marcrecord, "UTF-8", $servers[$k]->{syntax});
 #			    my $xmlrec = marc2marcxml($marcrecord, $encoding[$k], $syntax[$k], 1);
 
 			    # Parsing the marcxml
 			    my $source = $parser->parse_string($xmlrec);
 
-			    # Getting the xslt stylesheet
-			    #my $style_doc = $parser->load_xml(location => $ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k], no_cdata => 1);
-			    my $style_doc = $parser->parse_file($ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k]);
-
-			    # Parsing the xslt stylesheet
-			    my $stylesheet = $xslt->parse_stylesheet($style_doc);
-			    
 			    # Transforming the parsed marcxml with the parsed stylesheet
-			    my $results = eval { $stylesheet->transform($source) };
+			    my $results = eval { $servers[$k]->{xslt}->transform($source) };
 			    if ($@) {
 				die "LibXSLT died with: $@\n";
 			    }
 
 			    # Converting the transformed marcxml back to a marc record
 			    my $error;
-			    ($error, $marcrecord) = marcxml2marc($stylesheet->output_string($results), $encoding[$k], $marcflavour);
+			    ($error, $marcrecord) = marcxml2marc($servers[$k]->{xslt}->output_string($results), "UTF-8", $marcflavour);
+
 #			    ($error, $marcrecord) = marcxml2marc($stylesheet->output_string($results), "UTF-8", $marcflavour);
-			    warn $error if ($error);
-			    warn "Destination ($marcflavour) :";
-			    warn $marcrecord->as_formatted;
+			    SetMarcUnicodeFlag($marcrecord,$marcflavour);
 
 			    
 			}
 
                         my $oldbiblio = TransformMarcToKoha( $dbh, $marcrecord, "" );
                         $oldbiblio->{isbn}   =~ s/ |-|\.//g,
-                          $oldbiblio->{issn} =~ s/ |-|\.//g,
+                        $oldbiblio->{issn} =~ s/ |-|\.//g,
                           my ( $notmarcrecord, $alreadyindb, $alreadyinfarm, $imported, $breedingid ) =
-                          ImportBreeding( $marcdata, 2, $serverhost[$k], $encoding[$k], $random, 'z3950' );
+                          ImportBreeding( $marcrecord->as_usmarc(), 2, $servers[$k]->{host}, "UTF-8", $random, 'z3950' );
                         my %row_data;
-                        $row_data{server}       = $servername[$k];
+                        $row_data{server}       = $servers[$k]->{name};
                         $row_data{isbn}         = $oldbiblio->{isbn};
                         $row_data{lccn}         = $oldbiblio->{lccn};
                         $row_data{title}        = $oldbiblio->{title};
@@ -296,7 +292,7 @@ if ( $op ne "do_search" ) {
                         push( @breeding_loop, \%row_data );
 
                     } else {
-                        push( @breeding_loop, { 'server' => $servername[$k], 'title' => join( ': ', $oConnection[$k]->error_x() ), 'breedingid' => -1, 'biblionumber' => -1 } );
+                        push( @breeding_loop, { 'server' => $servers[$k]->{name}, 'title' => join( ': ', $oConnection[$k]->error_x() ), 'breedingid' => -1, 'biblionumber' => -1 } );
                     }    # $rec
                 }
             }    #$numresults
@@ -305,7 +301,7 @@ if ( $op ne "do_search" ) {
     $numberpending = $nremaining - 1;
     $template->param(
         breeding_loop => \@breeding_loop,
-        server        => $servername[$k],
+        server        => $servers[$k]->{name},
         numberpending => $numberpending,
         biblionumber  => $biblionumber,
         errconn       => \@errconn

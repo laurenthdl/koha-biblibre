@@ -270,7 +270,7 @@ sub MarcToUTF8Record {
             SetMarcUnicodeFlag( $marc_record, $marc_flavour );
             return $marc_record, 'UTF-8', [];
         } else {
-            if ( $marc_flavour eq 'MARC21' ) {
+            if ( $marc_flavour =~/MARC21|USMARC/ ) {
                 return _default_marc21_charconv_to_utf8( $marc_record, $marc_flavour );
             } elsif ( $marc_flavour =~ /UNIMARC/ ) {
                 return _default_unimarc_charconv_to_utf8( $marc_record, $marc_flavour );
@@ -331,7 +331,7 @@ sub SetMarcUnicodeFlag {
     my $marc_flavour = shift;    # || C4::Context->preference("marcflavour");
 
     $marc_record->encoding('UTF-8');
-    if ( $marc_flavour eq 'MARC21' ) {
+    if ( $marc_flavour =~ /MARC21|USMARC/ ) {
         my $leader = $marc_record->leader();
         substr( $leader, 9, 1 ) = 'a';
         $marc_record->leader($leader);
