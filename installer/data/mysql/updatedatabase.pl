@@ -5370,6 +5370,8 @@ $DBversion = "3.02.00.063";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("ALTER TABLE `biblioitems` ADD `ean` VARCHAR( 13 ) NULL AFTER issn");
     $dbh->do("CREATE INDEX `ean` ON biblioitems (`ean`) ");
+    $dbh->do("ALTER TABLE `deletedbiblioitems` ADD `ean` VARCHAR( 13 ) NULL AFTER issn");
+    $dbh->do("CREATE INDEX `ean` ON deletedbiblioitems (`ean`) ");
     print "Upgrade to $DBversion done (Adding ean in biblioitems)\n";
     SetVersion($DBversion);
 }
