@@ -96,7 +96,14 @@ $(document).ready(function() {
             <!-- TMPL_LOOP NAME="lines"	-->
                 <!-- TMPL_VAR EXPR="__counter__ + 1" -->: {sorter: 'amount'},
             <!-- /TMPL_LOOP -->
-            4: {sorter:false},
+            <!-- TMPL_VAR EXPR="lines_number + 2" -->: {sorter: 'amount'},
+
+        },
+        textExtraction: function(node){
+            if ($(node).find('span.for_filter').length!=0){
+                return $(node).find('span.for_filter').text();
+            }
+            return node.innerHTML;
         },
      });
 });
@@ -183,7 +190,7 @@ $(document).ready(function() {
     <table id="plan" width="100%">
     <thead>
         <tr>
-            <th>Fund name</th>
+            <th>Fund name#<!-- TMPL_VAR NAME="lines_number" -->#</th>
             <th>Fund total</th>
 
             <!-- TMPL_LOOP NAME="authvals_row" -->
@@ -218,7 +225,7 @@ $(document).ready(function() {
 
         <td align='left'><!-- TMPL_VAR NAME="budget_name_indent"--></td>
         <td align='right'>
-            <span id='budget_tot_formatted_<!-- TMPL_VAR NAME="budget_id" -->'><!-- TMPL_VAR NAME="budget_amount_formatted"-->&nbsp;</span>
+            <span id='budget_tot_formatted_<!-- TMPL_VAR NAME="budget_id" -->' class='for_filter'><!-- TMPL_VAR NAME="budget_amount_formatted"-->&nbsp;</span>
 
             <!-- NEXT DIV ELEMENT IS USED BY JS FOR CALC-ING AUTO-FILL AND ESTIMATED AMOUNTS -->
             <div style="display:none;" id='budget_tot_<!-- TMPL_VAR NAME="budget_id" -->'><!-- TMPL_VAR NAME="budget_amount"--></div>
@@ -234,7 +241,7 @@ $(document).ready(function() {
             <!-- TMPL_IF Name="show_actual" -->
                 <span style="width:50%; float:left; text-align:right;" ><!-- TMPL_VAR NAME="actual_amount" --></span>
             <!--/TMPL_IF -->
-            <span style="width:auto; float: right; text-align: right;">
+            <span style="width:auto; float: right; text-align: right;" class='for_filter'>
 
             <!--TMPL_IF  Name="budget_lock" -->
                 <!-- TMPL_VAR NAME="estimated_amount" -->&nbsp;
@@ -261,17 +268,14 @@ $(document).ready(function() {
                 <!-- TMPL_VAR NAME="budget_act_remain"-->
 
                 </span>
-
-            <!-- TMPL_ELSE -->
-                <span style="width:auto; float: right; text-align: right;">
             <!-- /TMPL_IF -->
 
             <!-- TMPL_IF NAME="est_negative" -->
-                <span style="color: red; float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->'>
+                <span style="color: red; float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->' class='for_filter'>
             <!-- TMPL_ELSIF NAME="est_positive" -->
-                <span style="color: green; float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->'>
+                <span style="color: green; float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->' class='for_filter'>
             <!-- TMPL_ELSE -->
-                <span style="float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->'>
+                <span style="float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->' class='for_filter'>
             <!--/TMPL_IF -->
 
             <!-- TMPL_VAR NAME="budget_est_remain"-->&nbsp;
