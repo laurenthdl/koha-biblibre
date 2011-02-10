@@ -388,5 +388,4 @@ sub add {
     $self->_solr->add(\@docs, $options);
 }
 
-
 1;
