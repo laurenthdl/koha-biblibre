@@ -109,7 +109,7 @@ VAC	supelecUid
 sub set_category_code (_) {
     my $user = shift;
     my $type = lc $$user{src}{supelecTypePersonne};
-    return if $type ~~ $$supelecTypePersonne{to_ignore};
+    return if $type ~~ /$$supelecTypePersonne{to_ignore}/i;
 
     $$user{column}{categorycode} = $$supelecTypePersonne{categorycode}{$type}
     || do {
@@ -257,6 +257,7 @@ sub get_borrower {
 	or push @{ $rapport{'missing cardnumber'} }, $$user{src}{dn};
     set_xattrs( $user );
     #I Hate doing this... It relies on the knowledge of the data... and a previous process... But Should do what it is supposed to do
+    $$user{column}{dateenrolled}=$$user{'xattr'}{'ENTRE'} if ($$user{'xattr'}{'ENTRE'});
     $$user{column}{dateexpiry}=$$user{'xattr'}{'SORTIE'} if ($$user{'xattr'}{'SORTIE'});
     set_caution_and_debarring( $user );
     my @missing_important_informations = grep { not defined $$user{column}{$_} } qw/
