@@ -81,7 +81,9 @@ my $id = $query->param('id') || $query->param('supplierid');
 my @suppliers;
 
 if ($id) {
-    push @suppliers, GetBookSellerFromId($id);
+    my $bookseller = GetBookSellerFromId($id);
+    push @suppliers, $bookseller;
+    $template->param(active => 1) if ($bookseller->{active} == 1);
 } else {
     @suppliers = GetBookSeller($supplier);
 }
