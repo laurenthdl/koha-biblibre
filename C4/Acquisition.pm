@@ -1709,9 +1709,10 @@ sub GetHistory {
                 aqorders.booksellerinvoicenumber as invoicenumber,
                 aqbooksellers.id as id,
                 aqorders.biblionumber,
-                aqorders.orderstatus";
-        $query .= ", aqbudgets.budget_id AS budget" if defined $budget;
-        $query .= ", aqorders.branchcode " if ( not C4::Context->preference("IndependantBranches")  and defined $branchcode and $branchcode);
+                aqorders.orderstatus,
+                aqbudgets.budget_id AS budget,
+                aqbudgets.budget_name,
+                aqorders.branchcode";
         $query .= "
             FROM aqorders
             LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
@@ -1720,10 +1721,8 @@ sub GetHistory {
             LEFT JOIN biblio ON biblio.biblionumber=aqorders.biblionumber
             LEFT JOIN biblioitems ON biblioitems.biblionumber=aqorders.biblionumber
             LEFT JOIN deletedbiblio ON deletedbiblio.biblionumber=aqorders.biblionumber
-            LEFT JOIN deletedbiblioitems ON deletedbiblioitems.biblionumber=aqorders.biblionumber";
-
-        $query .= " LEFT JOIN aqbudgets ON aqorders.budget_id=aqbudgets.budget_id"
-            if defined $budget;
+            LEFT JOIN deletedbiblioitems ON deletedbiblioitems.biblionumber=aqorders.biblionumber
+            LEFT JOIN aqbudgets ON aqorders.budget_id=aqbudgets.budget_id";
 
         if ( C4::Context->preference("IndependantBranches") ) {
             $query .= " LEFT JOIN borrowers ON aqbasket.authorisedby=borrowers.borrowernumber";
