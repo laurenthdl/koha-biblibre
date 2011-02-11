@@ -160,16 +160,18 @@ sub set_xattr {
 	my $attrs = [ map
                     {
                         my $key=$_;
+			my @listattributes;
                         if (ref ($$x{$key}) eq "ARRAY"){
                             foreach my $value (@{$$x{$key}}){
-                                +{ code => $key, value => $value }
+                              push @listattributes,  { code => $key, value => $value }
                             }
                         }
                         else {
-                            +{ code => $key, value => $$x{$key} }
+                            push @listattributes,{ code => $key, value => $$x{$key} }
                         }
+			@listattributes;
                     }
-                    , keys %$x ];
+                     keys %$x ];
 	DEBUG and logger { "creating $id" => $attrs };
 	SetBorrowerAttributes( $id, $attrs );
     }
@@ -225,6 +227,7 @@ sub accept_borrower {
 	# }
     } else {
 	if ( $config{replicate} ) {
+	    delete $$borrower{column}{dateenrolled};
 	    my $cardnumber = update_local
 	    ( $userid, $$borrower{column}{password}, $id, $$borrower{column} ); 
 	    if ( my $old_cardnumber = $$borrower{column}{cardnumber} ) {
@@ -410,6 +413,7 @@ sub checkpw_ldap {
 
     if ($borrowernumber) {
         if ( $config{update} ) {    # A1, B1
+	    delete $borrower{dateenrolled};
             my $c2 = &update_local( $local_userid, $password, $borrowernumber, \%borrower ) || '';
             ( $cardnumber eq $c2 ) or warn "update_local returned cardnumber '$c2' instead of '$cardnumber'";
         } else {                    # C1, D1

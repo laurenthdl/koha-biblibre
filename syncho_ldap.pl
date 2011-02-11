@@ -14,20 +14,22 @@ my $config = C4::Context->config("ldapserver")
 for my $site ( @{ $$config{branch} } ) {
     my $m = $ldap->search
     ( base     => $$site{dn}
-    , filter   => '(&(objectClass=supelecPerson)(uid=*)(!(|(supelecMembreDe=*ACCT-doublonCampus*)(supelecMembreDe=*ACCT-fantome*)(supelecMembreDe=*ACCT-dfantome*)))'
+	     , filter   => '(&(objectClass=supelecPerson)(uid=*))'
+	     # , filter   => '(&(objectClass=supelecPerson)(|(uid=valanou)(uid=oalassad)))'
+	    #, filter   => '(&(objectClass=supelecPerson)(uid=*)(!(|(supelecMembreDe=cn=ACCT-doublonCampus*)(supelecMembreDe=cn=ACCT-fantome*)(supelecMembreDe=cn=ACCT-dfantome*))))'
     # , filter   => 'uid=missoffe'
-    # , filter   => 'supelecMatriculeEleve=13262'
+#     , filter   => 'supelecMatriculeEleve=13262'
     , attrs    => \@LDAPSupelec::ATTRS
     , callback => sub {
 	    my ( $m, $e ) = @_;
 	    $e or return;
 	    $e->dump;
 	    my $b = LDAPSupelec::get_borrower($e) or return;
-	    # say YAML::Dump(
-	    #     { c => $$b{column}
-	    #     , x => $$b{xattr}
-	    #     }
-	    # );
+#	     say YAML::Dump(
+#	         { c => $$b{column}
+#	         , x => $$b{xattr}
+#	         }
+#	     );
 	    C4::Auth_with_ldap::accept_borrower( $b );
 	    $LDAPSupelec::rapport{ $$site{dn} }++;
 	    $m->shift_entry;
