@@ -190,7 +190,6 @@ if ( $ordernumber eq '' ) {    # create order
     my $data2 = GetBasket( $data->{'basketno'} );
     $basketno     = $data2->{'basketno'};
     $booksellerid = $data2->{'booksellerid'};
-    $suggestion   = shift @{ GetSuggestionInfoFromBiblionumber($biblionumber) }
 }
 
 $suggestion = GetSuggestionInfo($suggestionid) if $suggestionid;
@@ -315,6 +314,8 @@ $template->param(
     budget_id   => $budget_id,
     budget_name => $budget_name
 ) if ($close);
+
+warn Data::Dumper::Dumper($data);
 
 $template->param(
     existing    => $biblionumber,
