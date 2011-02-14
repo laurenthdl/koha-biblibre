@@ -194,6 +194,8 @@ if ( $ordernumber eq '' ) {    # create order
     $suggestion   = shift @{ GetSuggestionInfoFromBiblionumber($biblionumber) }
 }
 
+$suggestion = GetSuggestionInfo($suggestionid) if $suggestionid;
+
 # get currencies (for change rates calcs if needed)
 my @rates = GetCurrencies();
 my $count = scalar @rates;

@@ -289,7 +289,7 @@ if ( $op eq 'delete_confirm' ) {
             $line{'title'} = "Deleted bibliographic notice, can't find title.";
         }
 
-        $suggestion   = shift @{ GetSuggestionInfoFromBiblionumber($line{biblionumber}) };
+        $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
         $line{suggestionid}         = $$suggestion{suggestionid};
         $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
         $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};

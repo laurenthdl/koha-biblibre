@@ -1957,9 +1957,6 @@ select.advsearchoperator {
     color: #ccc;
 }
 
-div.suggestion_info {
-    border : 1px solid #DDDDDD;
-}
 span.suggestion_info {
     color: #336600;
 }

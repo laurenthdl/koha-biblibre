@@ -126,8 +126,7 @@ if ( $count == 1 ) {
         @$results[0]->{'unitprice'} = '';
     }
 
-    my $suggestion   = shift @{ GetSuggestionInfoFromBiblionumber(@$results[0]->{'biblionumber'}) };
-
+    my $suggestion   = GetSuggestionInfoFromBiblionumber(@$results[0]->{'biblionumber'});
 
     $template->param(
         count                 => 1,

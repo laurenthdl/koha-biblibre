@@ -46,6 +46,27 @@
                 $("#active").attr('disabled','disabled');
             }
         });
+
+        $.tablesorter.addParser({
+            id: 'amount',
+            is: function(s) {
+                return false;
+            },
+            format:	function(s) {
+                return s.replace(/ /,"").replace(/,/,"");
+            },
+            type: 'numeric'
+    	});
+
+		 $("#periodsh").tablesorter({
+	            widgets : ['zebra'],
+	            headers:  {
+                    1: {sorter: 'amount'},
+                    4: {sorter:false},
+                    5: {sorter:false},
+                },
+	     });
+
     });
 //]]>
 </script>
@@ -177,15 +198,18 @@
         You searched for <!-- TMPL_VAR NAME="searchfield" --></span>
     <!-- /TMPL_IF -->
 
-    <table>
-        <tr>
-            <th>Currency</th>
-            <th>Rate</th>
-            <th>Symbol</th>
-            <th>Last Updated</th>
-            <th>Active</th>
-            <th colspan="2">Actions&nbsp;</th>
-        </tr>
+    <table id="currency">
+        <thead>
+            <tr>
+                <th>Currency</th>
+                <th>Rate</th>
+                <th>Symbol</th>
+                <th>Last Updated</th>
+                <th>Active</th>
+                <th colspan="2">Actions&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
         <!-- TMPL_LOOP NAME="loop" -->
         <!-- TMPL_UNLESS NAME="__odd__" -->
         <tr class="highlight">
@@ -201,6 +225,7 @@
             <td><a href="<!-- TMPL_VAR NAME="script_name" -->?op=delete_confirm&amp;searchfield=<!-- TMPL_VAR NAME="currency" -->">Delete</a></td>
         </tr>
         <!-- /TMPL_LOOP -->
+        </tbody>
     </table>
 <br />
 

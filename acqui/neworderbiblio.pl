@@ -64,12 +64,13 @@ use C4::Biblio;
 use C4::Auth;
 use C4::Output;
 use C4::Koha;
+use C4::Search::Query;
 
 my $input = new CGI;
 my $params = $input->Vars;
 
 my $page             = $params->{'page'} || 1;
-my $query            = $params->{'q'}    || '*:*';
+my $q                = $params->{'q'}    || '*:*';
 my $results_per_page = $params->{'num'}  || 20;
 my $booksellerid     = $params->{'booksellerid'};
 my $basketno         = $params->{'basketno'};
@@ -85,8 +86,16 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
 } );
 
 my $count = C4::Context->preference('OPACnumSearchResults') || 20;
+# construct the param array
 
-my $res = SimpleSearch( $query, { recordtype => 'biblio' }, $page, $count );
+my @indexes = $params->{'idx'};
+my @operators = ();
+my @operands = $params->{'q'};
+my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
+warn Data::Dumper::Dumper \@indexes;
+warn $q;
+my $res = SimpleSearch( $q, { recordtype => 'biblio' }, $page, $count );
+
 
 my @results = map { GetBiblioData $_->{'values'}->{'recordid'} } @{ $res->items };
 
@@ -103,12 +112,12 @@ $template->param(
     name          => $bookseller->{'name'},
     resultsloop   => \@results,
     total         => $res->{'pager'}->{'total_entries'},
-    query         => $query,
+    query         => $q,
     previous_page => $pager->{'prev_page'},
     next_page     => $pager->{'next_page'},
     PAGE_NUMBERS  => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
     current_page  => $page,
-    pager_params  => [ { ind => 'q'           , val => $query              },
+    pager_params  => [ { ind => 'q'           , val => $q                  },
                        { ind => 'basketno'    , val => $basketno           },
                        { ind => 'booksellerid', val => $bookseller->{'id'} }, ]
 );

@@ -63,6 +63,7 @@ use C4::Items;
 use CGI;
 use C4::Output;
 use C4::Dates qw/format_date format_date_in_iso/;
+use C4::Suggestions;
 use JSON;
 
 my $input      = new CGI;
@@ -220,6 +221,10 @@ for ( my $i = 0 ; $i < $countlines ; $i++ ) {
     push @loop_received, \%line;
     $totalprice += $parcelitems[$i]->{'unitprice'};
     $line{unitprice} = sprintf( $cfstr, $parcelitems[$i]->{'unitprice'} );
+    my $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
+    $line{suggestionid}         = $$suggestion{suggestionid};
+    $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
+    $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
 
     #double FIXME - totalfreight is redefined later.
 
@@ -257,6 +262,10 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     $line{total}      = $total;
     $line{supplierid} = $supplierid;
     $ordergrandtotal += $line{ecost} * $line{quantity};
+    my $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
+    $line{suggestionid}         = $$suggestion{suggestionid};
+    $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
+    $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
     push @loop_orders, \%line if ( $i >= $startfrom and $i < $startfrom + $resultsperpage );
 }
 $freight = $totalfreight unless $freight;

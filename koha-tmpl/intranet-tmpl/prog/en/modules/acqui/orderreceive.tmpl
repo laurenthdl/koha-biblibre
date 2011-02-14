@@ -41,6 +41,15 @@
         <!-- TMPL_VAR NAME="seriestitle" --></li>
     </ol>
 	</fieldset>
+    <!-- TMPL_IF name="suggestionid" -->
+        <fieldset class="rows">
+        <legend>Suggestion</legend>
+        <ol><li><span class="label">Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)</span></li></ol>
+        </fieldset>
+    <!-- /TMPL_IF -->
+
+
+
     <!-- TMPL_IF name="items" -->
     <fieldset class="rows">
         <legend>Item</legend>
