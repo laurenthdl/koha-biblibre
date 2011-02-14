@@ -5387,6 +5387,13 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.02.00.065";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `aqorders` ADD `branchcode` VARCHAR( 10 ) NULL");
+    print "Upgrade to $DBversion done (Adding branchcode in aqorders)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
