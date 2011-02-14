@@ -201,6 +201,7 @@ if ( $orderinfo->{quantity} ne '0' ) {
                 "biblioitems.publishercode"   => $$orderinfo{publishercode} ? $$orderinfo{publishercode} : "",
                 "biblioitems.publicationyear" => $$orderinfo{publicationyear} ? $$orderinfo{publicationyear} : "",
                 "biblioitems.itemtype"        => $$orderinfo{itemtype} ? $$orderinfo{itemtype} : "",
+                "biblioitems.editionstatement" => $$orderinfo{editionstatement} ? $$orderinfo{editionstatement} : "",
             }
         );
 
