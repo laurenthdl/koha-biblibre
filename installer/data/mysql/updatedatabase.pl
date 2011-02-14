@@ -5389,6 +5389,29 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 
 $DBversion = "3.02.00.065";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    my $return_count;
+    eval { $return_count = $dbh->do("SELECT 1 FROM authorised_values WHERE category='order_status'"); };
+    if ( $return_count == 0 ) {
+        $dbh->do("INSERT IGNORE INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '0', 'New');");
+        $dbh->do("INSERT IGNORE INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '1', 'Requested');");
+        $dbh->do("INSERT IGNORE INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '2', 'Partial');");
+        $dbh->do("INSERT IGNORE INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '3', 'Complete');");
+        $dbh->do("INSERT IGNORE INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '4', 'Deleted');");
+    }
+    print "Upgrade to $DBversion done (Adding order_status values in authorised_values table)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.066";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE aqorders ADD COLUMN orderstatus TINYINT(2)  DEFAULT 0;");
+    print "Upgrade to $DBversion done (Adding aqorders.orderstatus field)\n";
+    SetVersion($DBversion);
+}
+
+
+$DBversion = "3.02.00.067";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqorders` ADD `branchcode` VARCHAR( 10 ) NULL");
     print "Upgrade to $DBversion done (Adding branchcode in aqorders)\n";
     SetVersion($DBversion);

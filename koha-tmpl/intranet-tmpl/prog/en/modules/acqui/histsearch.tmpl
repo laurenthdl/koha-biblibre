@@ -2,6 +2,63 @@
 <title>Koha &rsaquo; Acquisitions &rsaquo; <!-- TMPL_IF NAME="suggestions_loop" -->Orders search &rsaquo; Search Results<!-- TMPL_ELSE -->Order search<!-- /TMPL_IF --></title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
+
+<!-- Unused onchange js function !
+<script type="text/JavaScript">
+// <![CDATA[
+    $(document).ready(function() {
+        $('#branchcode').change(function() {
+            var branchcode = $(this).val();
+            var budget= $('#budget').find('option').each(function() {
+                var branchcode_option = $(this).attr('branchcode')
+                if ( branchcode_option == branchcode || branchcode == ''){
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+    });
+// ]]>
+</script>
+-->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.tablesorter.addParser({
+            id: 'amount',
+            is: function(s) {
+                return false;
+            },
+            format: function(s) {
+                return s.replace(/ /,"").replace(/,/,"");
+            },
+            type: 'numeric'
+        });
+
+        $("#orders").tablesorter({
+            widgets : ['zebra'],
+            sortList: [[0,0]],
+            headers:  {
+                10: {sorter: 'amount'},
+            },
+            textExtraction: {
+                2: function(o) {
+                    console.log('toto');
+                    return $('a',o).val();
+                },
+                3: function(o) {
+                    return $('a',o).val();
+                },
+                4: function(o) {
+                    return $('a',o).val();
+                },
+            }
+        });
+    });
+</script>
+
+
 </head>
 <body>
 <!-- TMPL_INCLUDE NAME="header.inc" -->
@@ -23,6 +80,48 @@
 		<li><label for="author">Author: </label> <input type="text" name="author" id="author" value="<!-- TMPL_VAR name="author" -->" /></li>
 		<li><label for="name">Vendor: </label> <input type="text" name="name" id="name" value="<!-- TMPL_VAR name="name" -->" /></li>
 		<li><label for="ean">EAN: </label> <input type="text" name="ean" id="ean" value="<!-- TMPL_VAR name="ean" -->" /></li>
+		<li><label for="isbn">ISBN: </label> <input type="text" name="isbn" id="isbn" value="<!-- TMPL_VAR name="isbn" -->" /></li>
+		<li><label for="invoicenumber">Invoice number: </label> <input type="text" name="invoicenumber" id="invoicenumber" value="<!-- TMPL_VAR name="invoicenumber" -->" /></li>
+
+        <li>
+            <label for="orderstatus">Order Status: </label>
+            <select name="orderstatus" id="orderstatus">
+                <option value=""></option>
+                <!-- TMPL_LOOP NAME="orderstatusloop" -->
+                    <option value="<!-- TMPL_VAR Name="authorised_value" -->"><!-- TMPL_VAR NAME="lib" --></option>
+                <!-- /TMPL_LOOP -->
+            </select>
+        </li>
+
+        <!-- TMPL_IF NAME=display_branchcode -->
+            <li><label for="branchcode">Branch: </label>
+                <select name="branchcode" id="branchcode">
+                    <option value=""></option>
+                    <!-- TMPL_LOOP NAME="branchloop" -->
+                        <option value="<!-- TMPL_VAR name="value" -->">
+                            <!-- TMPL_VAR NAME="value" --> - <!-- TMPL_VAR NAME="branchname" -->
+                        </option>
+                    <!-- /TMPL_LOOP -->
+                </select>
+            </li>
+        <!-- /TMPL_IF -->
+
+        <li>
+            <label for="budget">Budget: </label>
+            <select name="budget" id="budget">
+                <option value="">All budgets</option>
+                <!-- TMPL_LOOP NAME="bp_loop" -->
+                    <optgroup label="<!-- TMPL_VAR name="budget_period_description" -->">
+                    <!-- TMPL_LOOP NAME="hierarchy" -->
+                        <option type="text" name="budget" value="<!-- TMPL_VAR name="budget_id" -->" branchcode="<!-- TMPL_VAR NAME="budget_branchcode" -->">
+                            <!-- TMPL_VAR name="budget_display_name" -->
+                        </option>
+                    <!-- /TMPL_LOOP -->
+                    </optgroup>
+                <!-- /TMPL_LOOP -->
+            </select>
+        </li>
+
 		<li><label for="from">From: </label> 
 			<input type="text" size="10" id="from" name="from" value="<!-- TMPL_VAR name="from_placed_on" -->" />
 			<img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="openCalendarFrom" style="cursor: pointer;" alt="Show Calendar" />
@@ -57,41 +156,49 @@
 	<fieldset class="action"><input type="submit" value="Search" /></fieldset>
 	</form><!-- /TMPL_UNLESS -->
 	<!-- TMPL_IF NAME="suggestions_loop" --><h1>Search Results</h1>
-	<div id="acqui_histsearch">
-		<table>
-			<tr>
-				<th>Basket</th>
-				<th>Basket group</th>
-				<th>Invoice Number</th>
-				<th>Summary</th>
-				<th>Vendor</th>
-				<th>Placed on</th>
-				<th>Received on</th>
-				<th>Quantity ordered</th>
-				<th>Unit cost</th>
-			</tr>
-			
-			<!-- TMPL_LOOP NAME="suggestions_loop" -->
-				<tr>
+    <div id="acqui_histsearch">
+        <table id="orders">
+            <thead>
+                <tr>
+                    <th>Basket</th>
+                    <th>Basket group</th>
+                    <th>Invoice Number</th>
+                    <th>Summary</th>
+                    <th>Vendor</th>
+                    <th>Budget</th>
+                    <th>Branch</th>
+                    <th>Placed on</th>
+                    <th>Received on</th>
+                    <th>Quantity received/ordered</th>
+                    <th>Unit cost</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            <!-- TMPL_LOOP NAME="suggestions_loop" -->
+                <tr>
                     <td><!-- TMPL_VAR name="basketname" --> (<a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->"><!-- TMPL_VAR name="basketno" --></a>)</td>
-			<td><!-- TMPL_VAR name="groupname" --> (<a href="basketgroup.pl?booksellerid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="basketgroupid" --></a>)</td>
-					<td><!-- TMPL_IF NAME="invoicenumber" -->
-					        <a href="/cgi-bin/koha/acqui/parcel.pl?invoice=<!-- TMPL_VAR NAME="invoicenumber"-->&amp;supplierid=<!-- TMPL_VAR NAME="id"-->&amp;datereceived=<!-- TMPL_VAR NAME="datereceived" -->"><!-- TMPL_VAR NAME="invoicenumber"--></a>
-					    <!-- TMPL_ELSE -->
-					        &nbsp;
-					    <!-- /TMPL_IF -->
-					</td>
-					<td><a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html" --></a>
+            <td><!-- TMPL_VAR name="groupname" --> (<a href="basketgroup.pl?booksellerid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="basketgroupid" --></a>)</td>
+                    <td><!-- TMPL_IF NAME="invoicenumber" -->
+                            <a href="/cgi-bin/koha/acqui/parcel.pl?invoice=<!-- TMPL_VAR NAME="invoicenumber"-->&amp;supplierid=<!-- TMPL_VAR NAME="id"-->&amp;datereceived=<!-- TMPL_VAR NAME="datereceived" -->"><!-- TMPL_VAR NAME="invoicenumber"--></a>
+                        <!-- TMPL_ELSE -->
+                            &nbsp;
+                        <!-- /TMPL_IF -->
+                    </td>
+                    <td><a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html" --></a>
                         <br /><!-- TMPL_VAR NAME="author" --></td>
-					<td><a href="/cgi-bin/koha/acqui/supplier.pl?supplierid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR NAME="name" --></a></td>
-					<td><!-- TMPL_VAR name="creationdate" --></td>
-					<td><!-- TMPL_VAR name="datereceived" --></td>
-					<td><!-- TMPL_VAR name="quantity" --></td>
-					<td><!-- TMPL_VAR name="ecost" --></td>
-				</tr>
-			<!-- /TMPL_LOOP -->
-		</table>
-	</div><!-- TMPL_ELSE --><!-- /TMPL_IF -->
+                    <td><a href="/cgi-bin/koha/acqui/supplier.pl?supplierid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR NAME="name" --></a></td>
+                    <td><!-- TMPL_VAR name="budget_name" --></td>
+                    <td><!-- TMPL_VAR name="branchcode" --></td>
+                    <td><!-- TMPL_VAR name="creationdate" --></td>
+                    <td><!-- TMPL_VAR name="datereceived" --></td>
+                    <td><!-- TMPL_VAR name="quantityreceived" --> / <!-- TMPL_VAR name="quantity" --></td>
+                    <td><!-- TMPL_VAR name="ecost" --></td>
+                </tr>
+            <!-- /TMPL_LOOP -->
+            </tbody>
+        </table>
+    </div><!-- TMPL_ELSE --><!-- /TMPL_IF -->
 
 </div>
 </div>

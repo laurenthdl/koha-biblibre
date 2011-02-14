@@ -219,6 +219,15 @@ sub CloseBasket {
     ";
     my $sth = $dbh->prepare($query);
     $sth->execute($basketno);
+
+    my @orders = GetOrders($basketno);
+    foreach my $order (@orders) {
+        $query = "UPDATE aqorders SET orderstatus = 1
+                  WHERE ordernumber = ?;";
+        $sth = $dbh->prepare($query);
+        $sth->execute($order->{'ordernumber'});
+    }
+
 }
 
 #------------------------------------------------------------#
@@ -448,6 +457,16 @@ sub ModBasket {
     my $dbh = C4::Context->dbh;
     my $sth = $dbh->prepare($query);
     $sth->execute(@params);
+
+    # set orders status = new
+    my @orders = GetOrders($basketinfo->{'basketno'});
+    foreach my $order (@orders) {
+        $query = "UPDATE aqorders SET orderstatus = 0
+                  WHERE ordernumber = ?;";
+        $sth = $dbh->prepare($query);
+        $sth->execute($order->{'ordernumber'});
+    }
+
     $sth->finish;
 }
 
@@ -1274,6 +1293,7 @@ sub ModReceiveOrder {
                 , freight=?
                 , rrp=?
                 , quantity=?
+                , orderstatus=3
             WHERE biblionumber=? AND ordernumber=?" );
 
         $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $quantrec, $biblionumber, $ordernumber );
@@ -1285,12 +1305,13 @@ sub ModReceiveOrder {
         }
         $order->{'quantity'} -= $quantrec;
         $order->{'quantityreceived'} = 0;
+        $order->{'orderstatus'} = 2;
         my $newOrder = NewOrder($order);
     } else {
         $sth = $dbh->prepare(
             "update aqorders
                             set quantityreceived=?,datereceived=?,booksellerinvoicenumber=?,
-                                unitprice=?,freight=?,rrp=?
+                                unitprice=?,freight=?,rrp=?,orderstatus=3
                             where biblionumber=? and ordernumber=?"
         );
         $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $biblionumber, $ordernumber );
@@ -1716,26 +1737,29 @@ returns:
 =cut
 
 sub GetHistory {
-    my ( $title, $author, $name, $ean, $from_placed_on, $to_placed_on ) = @_;
+    my ( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $orderstatus, $from_placed_on, $to_placed_on ) = @_;
     my @order_loop;
     my $total_qty         = 0;
     my $total_qtyreceived = 0;
     my $total_price       = 0;
 
     # don't run the query if there are no parameters (list would be too long for sure !)
-    if ( $title || $author || $name || $ean || $from_placed_on || $to_placed_on ) {
+    if ( $title || $author || $name || $ean || $isbn || $budget || $invoicenumber || $branchcode || $orderstatus || $from_placed_on || $to_placed_on ) {
+        my @query_params = ();
         my $dbh   = C4::Context->dbh;
         my $query = "
             SELECT
-                biblio.title,
-                biblio.author,
-		biblioitems.ean,
+                IFNULL(biblio.title,     deletedbiblio.title)     AS title,
+                IFNULL(biblio.author,    deletedbiblio.author)    AS author,
+                IFNULL(biblioitems.ean,  deletedbiblioitems.ean)  AS ean,
+                IFNULL(biblioitems.isbn, deletedbiblioitems.isbn) AS isbn,
                 aqorders.basketno,
-		aqbasket.basketname,
-		aqbasket.basketgroupid,
-		aqbasketgroups.name as groupname,
+                aqorders.booksellerinvoicenumber,
+                aqbasket.basketname,
+                aqbasket.basketgroupid,
+                aqbasketgroups.name as groupname,
                 aqbooksellers.name,
-		aqbasket.creationdate,
+                aqbasket.creationdate,
                 aqorders.datereceived,
                 aqorders.quantity,
                 aqorders.quantityreceived,
@@ -1743,47 +1767,78 @@ sub GetHistory {
                 aqorders.ordernumber,
                 aqorders.booksellerinvoicenumber as invoicenumber,
                 aqbooksellers.id as id,
-                aqorders.biblionumber
+                aqorders.biblionumber,
+                aqorders.orderstatus,
+                aqbudgets.budget_id AS budget,
+                aqbudgets.budget_name,
+                aqorders.branchcode";
+        $query .= "
             FROM aqorders
             LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
-	    LEFT JOIN aqbasketgroups ON aqbasket.basketgroupid=aqbasketgroups.id
+            LEFT JOIN aqbasketgroups ON aqbasket.basketgroupid=aqbasketgroups.id
             LEFT JOIN aqbooksellers ON aqbasket.booksellerid=aqbooksellers.id
             LEFT JOIN biblio ON biblio.biblionumber=aqorders.biblionumber
-            LEFT JOIN biblioitems ON biblioitems.biblionumber=aqorders.biblionumber";
+            LEFT JOIN biblioitems ON biblioitems.biblionumber=aqorders.biblionumber
+            LEFT JOIN deletedbiblio ON deletedbiblio.biblionumber=aqorders.biblionumber
+            LEFT JOIN deletedbiblioitems ON deletedbiblioitems.biblionumber=aqorders.biblionumber
+            LEFT JOIN aqbudgets ON aqorders.budget_id=aqbudgets.budget_id";
 
-        $query .= " LEFT JOIN borrowers ON aqbasket.authorisedby=borrowers.borrowernumber"
-          if ( C4::Context->preference("IndependantBranches") );
+        if ( C4::Context->preference("IndependantBranches") ) {
+            $query .= " LEFT JOIN borrowers ON aqbasket.authorisedby=borrowers.borrowernumber";
+        }
 
-        $query .= " WHERE (datecancellationprinted is NULL or datecancellationprinted='0000-00-00') ";
+        $query .= " WHERE 1 ";
 
-        my @query_params = ();
+        $query .= " AND (datecancellationprinted is NULL or datecancellationprinted='0000-00-00') " if $orderstatus ne '4';
 
-        if ( defined $title ) {
+
+        if ( $title) {
             $query .= " AND biblio.title LIKE ? ";
             $title =~ s/\s+/%/g;
             push @query_params, "%$title%";
         }
 
-        if ( defined $author ) {
+        if ( $author) {
             $query .= " AND biblio.author LIKE ? ";
             push @query_params, "%$author%";
         }
 
-        if ( defined $name ) {
+        if ( $name) {
             $query .= " AND aqbooksellers.name LIKE ? ";
             push @query_params, "%$name%";
         }
-	if ( defined $ean and $ean ) {
+
+        if ( $ean ) {
             $query .= " AND biblioitems.ean = ? ";
             push @query_params, "$ean";
         }
 
-        if ( defined $from_placed_on ) {
+        if ( $isbn ) {
+            $query .= " AND biblioitems.isbn = ? ";
+            push @query_params, "$isbn";
+        }
+
+        if ( $budget ) {
+            $query .= " AND aqbudgets.budget_id = ? ";
+            push @query_params, "$budget";
+        }
+ 
+        if ( $invoicenumber ) {
+            $query .= " AND aqorders.booksellerinvoicenumber = ? ";
+            push @query_params, "$invoicenumber";
+        }
+
+        if ( defined $orderstatus and $orderstatus ne '') {
+            $query .= " AND aqorders.orderstatus = ? ";
+            push @query_params, "$orderstatus";
+        }
+
+        if ( $from_placed_on ) {
             $query .= " AND creationdate >= ? ";
             push @query_params, $from_placed_on;
         }
 
-        if ( defined $to_placed_on ) {
+        if ( $to_placed_on ) {
             $query .= " AND creationdate <= ? ";
             push @query_params, $to_placed_on;
         }
@@ -1794,6 +1849,9 @@ sub GetHistory {
                 $query .= " AND (borrowers.branchcode = ? OR borrowers.branchcode ='' ) ";
                 push @query_params, $userenv->{branch};
             }
+        } elsif ( defined $branchcode and $branchcode ) {
+            $query .= " AND aqorders.branchcode = ? ";
+            push @query_params, $branchcode;
         }
         $query .= " ORDER BY id";
         warn $query;
