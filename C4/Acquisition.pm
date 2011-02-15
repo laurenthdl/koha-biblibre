@@ -302,7 +302,7 @@ sub GetBasketGroupAsCSV {
     my $baskets = GetBasketsByBasketgroup($basketgroupid);
 
     # TODO: Translate headers
-    my @headers = qw(booksellername bookselleraddress booksellerpostal clientnumber contractnumber contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp);
+    my @headers = qw(booksellername bookselleraddress booksellerpostal clientnumber contractnumber contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp basketgroupdeliveryplace basketgroupbillingplace);
 
     my $csv = Text::CSV::Encoded->new ({ encoding  => "utf8" });
 
@@ -314,6 +314,7 @@ sub GetBasketGroupAsCSV {
         my @orders     = GetOrders( $$basket{basketno} );
         my $contract   = GetContract( $$basket{contractnumber} );
         my $bookseller = GetBookSellerFromId( $$basket{booksellerid} );
+        my $basketgroup = GetBasketgroup( $$basket{basketgroupid} );
 
         my @rows;
         foreach my $order (@orders) {
@@ -325,7 +326,7 @@ sub GetBasketGroupAsCSV {
                 $contract->{contractnumber}, $contract->{contractname},
                 $order->{ordernumber},  $order->{entrydate}, $order->{isbn},
                 $bd->{author}, $bd->{title}, $bd->{publishercode}, $bd->{collectiontitle},
-                $order->{notes}, $order->{quantity}, $order->{rrp}, );
+                $order->{notes}, $order->{quantity}, $order->{rrp}, $basketgroup->{deliveryplace}, $basketgroup->{billingplace} );
             push( @rows, \@cols );
         }
 
