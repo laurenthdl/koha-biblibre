@@ -1,0 +1,613 @@
+# Example :
+# ccode:
+#   - (200$a, 200$b)
+#   - (200$c)
+
+mapper: biblioitems.itemtype
+separator: ','
+default: "MISC"
+
+"ARTICLE DE PERIODIQUE":
+ type: article
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ journal:
+   - 463$t
+ year:
+   - 463$d
+   - 210$d
+ volume:
+   - 463$v
+ pages:
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ cote:
+   - 995$k
+ 
+"LIVRE": 
+ type: book
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 210$c
+ address:
+   - 210$a
+ edition:
+   - 205$a
+ series:
+   - 225$a
+ cote:
+   - 995$k
+
+
+"CONTRIBUTION A UN OUVRAGE COLLECTIF":
+ type: incollection
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 463$d
+   - 210$d
+ volume:
+   - 463$v
+ pages:
+   - 463$p
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 210$c
+ address: 
+   - 210$a
+ booktitle:
+   - 463$t 710$e 710$f
+ editor:
+   - 463$a
+ edition:
+   - 205$a
+ series:
+   - 225$a
+ cote:
+   - 995$k
+
+"THESE":
+ type: phdthesis
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ school:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ editor:
+   - 727$a
+ type:
+   - 328$a 328$b
+ cote:
+   - 995$k
+
+
+"DIPLOME DE TROISIEME CYCLE":
+ type: mastersthesis
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ school:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ type:
+   - 328$a 328$b
+ cote:
+   - 995$k
+
+
+"MASTER":
+ type: mastersthesis
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ school:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ type:
+   - 382$a 328$b
+ cote:
+   - 995$k
+
+"MES MEMOIRE DE SEMINAIRE":
+ type: masterthesis
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ school:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ type:
+   - 382$a 328$b
+ cote:
+   - 995$k
+
+"TPFE":
+ type: masterthesis
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ school:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ type:
+   - 382$a 328$b
+ cote:
+   - 995$k
+
+"PFE":
+ type: masterthesis
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ school:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ type:
+   - 382$a 328$b
+ cote:
+   - 995$k
+
+"DPEA":
+ type: masterthesis
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ school:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ type:
+   - 382$a 328$b
+ cote:
+   - 995$k
+
+"RAPPORT":
+ type: techreport
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ instituion:
+   - 210$c
+ address:
+   - 210$a
+ number:
+   - 015$a
+ cote:
+   - 995$k
+ 
+"RAPPORT DE RECHERCHE":
+ type: techreport
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ instituion:
+   - 210$c
+ address:
+   - 210$a
+ number:
+   - 015$a
+ cote:
+   - 995$k
+ 
+"CONGRES":
+ type: proceedings
+ editor:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i 710$e 710$f
+ year:
+   - 210$d
+ pages:
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 210$c
+ address:
+   - 210$a
+ cote:
+   - 995$k
+
+"NUMERO DE PERIODIQUE":
+ type: journal
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ journal:
+   - 463$t
+ year:
+   - 463$d
+   - 210$d
+ volume:
+   - 463$v
+ pages:
+   - 463$p
+   - 215$a
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ editor:
+   - 463$a
+ cote:
+   - 995$k
+
+"AUTRES TRAVAUX D'ELEVES":
+ type: misc
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ cote:
+   - 995$k
+ 
+"COURS":
+ type: misc
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ cote:
+   - 995$k
+ 
+"DIPLOME DE DEUXIEME CYCLE":
+ type: misc
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ cote:
+   - 995$k
+
+"DOCUMENT CARTOGRAPHIQUE":
+ type: misc
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ cote:
+   - 995$k
+
+"DOCUMENT NUMERIQUE":
+ type: misc
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ cote:
+   - 995$k
+
+"DOCUMENT SONORE":
+ type: misc
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ publisher:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ cote:
+   - 995$k
+
+"MISC":
+ type: misc
+ author:
+   - 200$f
+ title:
+   - 200$a 200$c 200$d 200$e 200$h 200$i
+ year:
+   - 210$d
+ pages:
+   - 215$a
+   - 463$p
+ url:
+   - 856$u
+ note:
+   - 300$a
+ abstract:
+   - 330$a
+ keywords:
+   - 600$a 601$a 606$a 607$a 610$a 615$a
+ howpublished:
+   - 328$f
+   - 210$c
+ address:
+   - 328$c
+   - 210$a
+ cote:
+   - 995$k
+

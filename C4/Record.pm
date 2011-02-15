@@ -861,12 +861,15 @@ sub marc2bibtex {
     if ($config) {
 	my %bh;
 
-	# Getting the ccode
+	# Getting the mapper (or ccode, by default)
 	my ($tag, $subtag) = GetMarcFromKohaField($config->{'mapper'} || 'items.ccode', GetFrameworkCode($id));
 	my $ccode = $record->field($tag)->subfield($subtag);
 
-	# Getting the mappings for this ccode
-	my $mappings = $config->{$ccode};
+	# Getting the separator (or space, by default)
+	my $separator = $config->{'separator'} || ' ';
+
+	# Getting the mappings for this mapper (or the default mappings)
+	my $mappings = $config->{$ccode} || $config->{$config->{'default'}};
 
 	# Foreach entry (author, title...)
 	foreach my $mapping (keys %$mappings) {
@@ -882,15 +885,17 @@ sub marc2bibtex {
 		my $atleastonevalue = 0;
 
 		# Foreach field defined in the mapping
+		my $value;
+		my @values;
 		foreach my $field (@fields) {
 		    my ($tag, $subtag) = split(/\$/, $field);
 
-		    my $value;
 		    foreach ($record->field($tag)) {
 			foreach ($_->subfield($subtag)) {
-			    $value .= " " . $_ if ($_);
+			    push @values, $_ if ($_);
 			}
 		    }
+		    $value = join($separator, @values);
 		    %bh->{$mapping} = $value if ($value);
 		    $atleastonevalue = 1 if ($value);
 		}
@@ -901,7 +906,7 @@ sub marc2bibtex {
 
 	}
 	$tex .= "\@" . $mappings->{'type'} . "{";
-	$tex .= join( ",\n", $id, map { $bh{$_} ? qq(\t$_ = "$bh{$_}") : () } keys %bh );
+	$tex .= join( ",\n", $id, map { $bh{$_} ? qq(\t$_ = {$bh{$_}}) : () } keys %bh );
 	$tex .= "\n}\n";
 	warn $tex;
 
