@@ -126,6 +126,26 @@ li.list2 {
                         <input type="text" name="basketname" id="basketname" size="40" maxlength="80" value="<!-- TMPL_VAR NAME="basketname" -->" />
                 </li>
                 <li>
+                    <label for="billingplace">Billing Place:</label>
+                    <select name="billingplace" id="billingplace">
+                        <!-- TMPL_LOOP name="billingplaceloop" -->
+                        <option value="<!-- TMPL_VAR name="value" -->"<!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->>
+                          <!--TMPL_VAR name="branchname" -->
+                        </option>
+                        <!-- /TMPL_LOOP -->
+                    </select>
+                </li>
+                <li>
+                    <label for="deliveryplace">Delivery  Place:</label>
+                    <select name="deliveryplace" id="deliveryplace">
+                        <!-- TMPL_LOOP name="deliveryplaceloop" -->
+                        <option value="<!-- TMPL_VAR name="value" -->"<!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->>
+                          <!--TMPL_VAR name="branchname" -->
+                        </option>
+                        <!-- /TMPL_LOOP -->
+                    </select>
+                </li>
+                <li>
                     <label for="basketnote">Internal note</label> &nbsp;
                     <textarea name="basketnote" id="basketnote" rows="5" cols="40"><!-- TMPL_VAR NAME="basketnote" --></textarea>
                 </li>
