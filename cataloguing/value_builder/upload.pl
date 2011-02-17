@@ -1,20 +1,20 @@
 #!/usr/bin/perl
 
-
 use strict;
 use warnings;
 
 use C4::Auth;
-use CGI;
+use CGI qw/-utf8/;
 use C4::Context;
+use C4::Debug;
 
 use C4::AuthoritiesMarc;
 use C4::Output;
 use File::Basename;
 use Text::Undiacritic qw/undiacritic/;
+use Encode;
 
 #use open qw(:std :utf8);
-use utf8;
 
 
 my $upload_path = C4::Context->preference('uploadPath');
@@ -112,7 +112,10 @@ sub plugin {
 	    # Dealing with filenames:
 
 	    # Normalizing filename:
-	    $uploaded_file = normalize_string($uploaded_file, 1);
+        $debug and warn "before normalize :",$uploaded_file;
+	    $uploaded_file = normalize_string($uploaded_file);
+        $uploaded_file = undiacritic($uploaded_file);
+        $debug and warn "after normalize :",$uploaded_file;
 
 	    # Checking for an existing filename in destination directory
 	    if (-f "$upload_path/$uploaded_file") {
@@ -171,27 +174,19 @@ sub findname {
         Returns a utf8 NFC normalized string
         
         Sample code :
-        my $string=normalize_string ("Pétaudière");
 =cut
 
 sub normalize_string{
-        my ($string, $code)=@_;
-warn $string;
-        use Unicode::Normalize;
-        utf8::decode($string) unless (utf8::is_utf8($string));
-if ($code){
-                $string= NFD($string);
-        }
-        else { 
-                $string=NFC($string);
-        }
-    warn $string;
+        my ($string)=@_;
+    $debug and warn " string in normalize before normalize :",$string;
+    $string=decode_utf8($string,1);
+    $debug and warn " string in normalize :",$string;
     $string=~s/\<|\>|\^|\;|\.|\?|,|\-|\(|\)|\[|\]|\{|\}|\$|\%|\!|\*|\:|\\|\/|\&|\"|\'/ /g;
         #removing one letter words "d'" "l'"  was changed into "d " "l " 
     $string=~s/\b\S\b//g;
     $string=~s/\s+$//g;
     $string=~s/^\s+//g;
-    $string=undiacritic($string);
+    $debug and warn " string after undiacritic :",$string;
     return $string; 
 }
 
