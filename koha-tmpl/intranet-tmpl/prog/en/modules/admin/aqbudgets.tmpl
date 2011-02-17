@@ -121,10 +121,29 @@
             }
         });
         <!-- TMPL_IF NAME="notree" -->
+        $.tablesorter.addParser({
+            id: 'amount',
+            is: function(s) {
+                return false;
+            },
+            format:	function(s) {
+                return s.replace(/ /g,"").replace(/,/g,"");
+            },
+            type: 'numeric'
+    	});
+
         $("#budgeth").tablesorter({
             widgets : ['zebra'],
             sortList: [[0,0]],
-            headers: { 7: { sorter: false }}
+            headers: {
+                2: { sorter: 'amount' },
+                3: { sorter: 'amount' },
+                4: { sorter: 'amount' },
+                5: { sorter: 'amount' },
+                6: { sorter: 'amount' },
+                7: { sorter: false },
+                8: { sorter: false }
+            }
         });
         <!-- TMPL_ELSE -->
         $("#budgeth").treeTable();

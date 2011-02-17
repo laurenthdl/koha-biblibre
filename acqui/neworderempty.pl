@@ -193,6 +193,8 @@ if ( $ordernumber eq '' ) {    # create order
     $suggestion   = shift @{ GetSuggestionInfoFromBiblionumber($biblionumber) }
 }
 
+$suggestion = GetSuggestionInfo($suggestionid) if $suggestionid;
+
 # get currencies (for change rates calcs if needed)
 my @rates = GetCurrencies();
 my $count = scalar @rates;
@@ -334,6 +336,8 @@ $template->param(
     # order details
     suggestionid         => $suggestionid,
     biblionumber         => $biblionumber,
+    surnamesuggestedby   => $$suggestion{surnamesuggestedby},
+    firstnamesuggestedby => $$suggestion{firstnamesuggestedby},
     uncertainprice       => $data->{'uncertainprice'},
     authorisedbyname     => $borrower->{'firstname'} . " " . $borrower->{'surname'},
     biblioitemnumber     => $data->{'biblioitemnumber'},
@@ -350,7 +354,7 @@ $template->param(
     title                => $data->{'title'},
     author               => $data->{'author'},
     publicationyear      => $data->{'publicationyear'},
-    editionstatement    => $data->{'editionstatement'},
+    editionstatement     => $data->{'editionstatement'},
     budget_loop          => $budget_loop,
     isbn                 => $data->{'isbn'},
     seriestitle          => $data->{'seriestitle'},

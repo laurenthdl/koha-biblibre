@@ -1,26 +1,50 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
 $(document).ready(function() 
 {
-$('#showallbudgets').click(function() {
-            if ( $('.b_inactive').is(":visible") && $('#b_inactive').is(":visible")) 
-            {
+    $('#showallbudgets').click(function() {
+        if ( $('.b_inactive').is(":visible") && $('#b_inactive').is(":visible")) 
+        {
             $('.b_inactive').hide();
             $('#b_inactive').hide();
             $('.bu_inactive').show();
             $('.bu_active').hide();
-            }
-            else {
+        }
+        else
+        {
             $('.b_inactive').show();
             $('#b_inactive').show();
             $('.bu_active').show();
             $('.bu_inactive').hide();
-            }
-        });
+        }
+    });
+
+	$.tablesorter.addParser({
+        id: 'amount',
+        is: function(s) {
+            return false;
+        },
+        format:	function(s) {
+            return s.replace(/ /g,"").replace(/,/g,"");
+        },
+        type: 'numeric'
+	});
+    $("#accounts").tablesorter({
+	    widgets : ['zebra'],    
+        headers: {
+            3: {sorter: 'amount'},
+            4: {sorter: 'amount'},
+            5: {sorter: 'amount'},
+            6: {sorter: 'amount'}
+        }
+    });
+
 });
+
 //]]>
 </script>
 
@@ -41,7 +65,7 @@ $('#showallbudgets').click(function() {
 
 <h1>Acquisitions</h1>
 <div class="yui-g">
-<div class="yui-u first">
+<div class="yui-u first" style='display: block;float: none;'>
 <div id="acqui_acqui_home_order">
     <fieldset>
         <legend>Manage orders</legend>
@@ -68,7 +92,7 @@ $('#showallbudgets').click(function() {
 </div>
 </div>
 
-<div class="yui-u">
+<div class="yui-u" style='display: block;float: none;'>
 
         <!-- TMPL_IF name="loop_budget" -->
 
@@ -132,13 +156,14 @@ $('#showallbudgets').click(function() {
                 <tr class="highlight" id = "b_inactive" style="display : none;">
             <!--/TMPL_IF-->
             
-            <td align="center" ><!-- TMPL_VAR name="budget_code" --></td>
+                <td align="center" ><!-- TMPL_VAR name="budget_code" --></td>
                 <td align="center"><!-- TMPL_VAR name="budget_owner" --></td>
                 <td align="center"><!-- TMPL_VAR name="budget_branchname" --></td>
                 <td align="right" ><!-- TMPL_VAR name="budget_amount" --></td>
                 <td align="right" ><!-- TMPL_VAR name="budget_ordered" --></td>
                 <td align="right" ><!-- TMPL_VAR name="budget_spent" --></td>
                 <td align="right" ><!-- TMPL_VAR name="budget_avail" --></td>
+            </tr>
            
             <!-- /TMPL_IF -->
         

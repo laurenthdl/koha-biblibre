@@ -1,6 +1,7 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Z39.50 Search Results</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script language="javascript" type="text/javascript">
 //<![CDATA[
     function Import(GetThisOne) {
@@ -8,6 +9,16 @@
         self.close();
         return false;
     }
+
+    $(document).ready(function(){
+        $("#z3950tableresults").tablesorter({
+            headers: { 
+                4: { sorter: false },            
+                5: { sorter: false },            
+            },
+        }); 
+    });
+
 //]]>
 </script>
 </head>
@@ -15,31 +26,35 @@
 
     <h2>Z3950 Search Results</h2>
     
-    <!-- TMPL_IF NAME="breeding_loop" -->
-<table>
-    <tr>
-        <th>Title</th>
-        <th>Author</th>
-        <th>ISBN</th>
-        <th>coming from</th>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-    </tr>
-                <!-- TMPL_LOOP NAME="breeding_loop" -->
+<!-- TMPL_IF NAME="breeding_loop" -->
+<table id=z3950tableresults>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>coming from</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- TMPL_LOOP NAME="breeding_loop" -->
         <tr bgcolor="<!-- TMPL_VAR NAME="toggle" -->">
-                        <td><!-- TMPL_VAR NAME="title" escape="html" --></td>
+            <td><!-- TMPL_VAR NAME="title" escape="html" --></td>
             <td><!-- TMPL_VAR NAME="author" --></td>
             <td><!-- TMPL_VAR NAME="isbn" --></td>
             <td><!-- TMPL_VAR NAME="file" --></td>
             <td><a href="javascript:Import(<!-- TMPL_VAR NAME="id" -->)">Import this biblio</a></td>
         </tr>
     <!-- /TMPL_LOOP -->
-        </table>
-    <!-- TMPL_ELSE -->
-                <p>Nothing found</p>
-    <!-- /TMPL_IF -->
-    <!-- TMPL_IF NAME="numberpending" --><h1>Still <!-- TMPL_VAR NAME="numberpending" --> requests to go</h1><!-- /TMPL_IF -->
-    
+    </tbody>
+</table>
+<!-- TMPL_ELSE -->
+    <p>Nothing found</p>
+<!-- /TMPL_IF -->
+
+<!-- TMPL_IF NAME="numberpending" --><h1>Still <!-- TMPL_VAR NAME="numberpending" --> requests to go</h1><!-- /TMPL_IF -->
 
 </body>
 </html>
