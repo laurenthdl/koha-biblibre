@@ -56,6 +56,7 @@ BEGIN {
       &GetAuthorisedValueLib
       &GetKohaAuthorisedValues
       &GetKohaAuthorisedValuesFromField
+      &GetOptionsFromSyspref
       &GetAuthorisedValueByCode
       &GetKohaImageurlFromAuthorisedValues
       &GetAuthValCode
@@ -1239,6 +1240,19 @@ sub GetKohaAuthorisedValuesFromField {
     } else {
         return undef;
     }
+}
+
+=head2 GetOptionsFromSyspref
+    Takes $syspref variable name  as parameters
+    Returns system preference option
+=cut
+sub GetOptionsFromSyspref {
+    my $syspref = shift;
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare("SELECT options FROM systempreferences WHERE variable=? LIMIT 1");
+    $sth->execute($syspref);
+    my $options_str = $sth->fetchrow;
+    return split '\|', $options_str;
 }
 
 =head2 display_marc_indicators

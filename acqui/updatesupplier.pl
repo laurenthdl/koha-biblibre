@@ -102,11 +102,12 @@ $data{'listincgst'}    = $input->param('list_gst');
 $data{'invoiceincgst'} = $input->param('invoice_gst');
 
 #have to transform this into fraction so it's easier to use
-$data{'gstrate'}        = $input->param('gstrate') / 100;
-$data{'discount'}       = $input->param('discount') / 100;
+$data{'gstrate'}        = $input->param('gstrate');
+$data{'discount'}       = $input->param('discount');
 $data{'deliverytime'}   = $input->param('deliverytime');
 $data{'active'}         = $input->param('status');
 $data{'clientnumber'}   = $input->param('clientnumber');
+
 if ( $data{'name'} ) {
     if ( $data{'id'} ) {
         ModBookseller( \%data );

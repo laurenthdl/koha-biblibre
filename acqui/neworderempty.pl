@@ -322,6 +322,11 @@ $template->param(
     budget_name => $budget_name
 ) if ($close);
 
+# get option values for gist syspref
+my @gst_auth_values = map {
+    option => $_
+}, GetOptionsFromSyspref("gist");
+
 $template->param(
     existing    => $biblionumber,
     ordernumber => $ordernumber,
@@ -347,7 +352,7 @@ $template->param(
     uncertainprice       => $data->{'uncertainprice'},
     authorisedbyname     => $borrower->{'firstname'} . " " . $borrower->{'surname'},
     biblioitemnumber     => $data->{'biblioitemnumber'},
-    discount_2dp         => sprintf( "%.2f", $bookseller->{'discount'}*100 ),              # for display
+    discount_2dp         => sprintf( "%.2f", $bookseller->{'discount'} ),              # for display
     discount             => $bookseller->{'discount'},
     editionstatement     => $data->{'editionstatement'},
     listincgst           => $bookseller->{'listincgst'},
@@ -357,6 +362,7 @@ $template->param(
     cur_active           => $cur->{'currency'},
     currency             => $bookseller->{'listprice'} || $cur->{'currency'},          # eg: 'EUR'
     loop_currencies      => \@loop_currency,
+    currency_rate        => $cur->{'rate'},
     orderexists          => ( $new eq 'yes' ) ? 0 : 1,
     title                => $data->{'title'},
     author               => $data->{'author'},
@@ -370,6 +376,7 @@ $template->param(
     quantity             => $data->{'quantity'},
     quantityrec          => $data->{'quantity'},
     rrp                  => $data->{'rrp'},
+    gst_values           => \@gst_auth_values,
     listprice            => sprintf( "%.2f", $data->{'listprice'} || $listprice ),
     total                => sprintf( "%.2f", ( $data->{'ecost'} || 0 ) * ( $data->{'quantity'} || 0 ) ),
     ecost                => $data->{'ecost'},
@@ -379,7 +386,7 @@ $template->param(
     import_batch_id      => $import_batch_id,
 
     # CHECKME: gst-stuff needs verifing, mason.
-    gstrate              => $bookseller->{'gstrate'} || C4::Context->preference("gist"),
+    gstrate              => $data->{'gstrate'} || $bookseller->{'gstrate'} || C4::Context->preference("gist"),
     gstreg               => $bookseller->{'gstreg'},
 );
 
