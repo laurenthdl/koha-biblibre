@@ -18,7 +18,6 @@ use Encode;
 
 
 my $upload_path = C4::Context->preference('uploadPath');
-warn $upload_path;
 
 =head1
 
@@ -112,10 +111,8 @@ sub plugin {
 	    # Dealing with filenames:
 
 	    # Normalizing filename:
-        $debug and warn "before normalize :",$uploaded_file;
 	    $uploaded_file = normalize_string($uploaded_file);
-        $uploaded_file = undiacritic($uploaded_file);
-        $debug and warn "after normalize :",$uploaded_file;
+	    $uploaded_file = undiacritic($uploaded_file);
 
 	    # Checking for an existing filename in destination directory
 	    if (-f "$upload_path/$uploaded_file") {
@@ -181,12 +178,9 @@ sub normalize_string{
     $debug and warn " string in normalize before normalize :",$string;
     $string=decode_utf8($string,1);
     $debug and warn " string in normalize :",$string;
-    $string=~s/\<|\>|\^|\;|\.|\?|,|\-|\(|\)|\[|\]|\{|\}|\$|\%|\!|\*|\:|\\|\/|\&|\"|\'/ /g;
-        #removing one letter words "d'" "l'"  was changed into "d " "l " 
-    $string=~s/\b\S\b//g;
+    $string=~s/\<|\>|\^|\;|\?|,|\-|\(|\)|\[|\]|\{|\}|\$|\%|\!|\*|\:|\\|\/|\&|\"|\'|\s/_/g;
     $string=~s/\s+$//g;
     $string=~s/^\s+//g;
-    $debug and warn " string after undiacritic :",$string;
     return $string; 
 }
 
