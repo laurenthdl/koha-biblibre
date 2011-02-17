@@ -200,6 +200,7 @@ if ( $orderinfo->{quantity} ne '0' ) {
                 "biblioitems.ean"             => $$orderinfo{EAN} ? $$orderinfo{EAN} : "",
                 "biblioitems.publishercode"   => $$orderinfo{publishercode} ? $$orderinfo{publishercode} : "",
                 "biblioitems.publicationyear" => $$orderinfo{publicationyear} ? $$orderinfo{publicationyear} : "",
+                "biblioitems.editionstatement" => $$orderinfo{editionstatement} ? $$orderinfo{editionstatement} : "",
                 "biblioitems.itemtype"        => $$orderinfo{itemtype} ? $$orderinfo{itemtype} : "",
             }
         );
