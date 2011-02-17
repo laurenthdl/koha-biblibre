@@ -127,7 +127,7 @@
                 return false;
             },
             format:	function(s) {
-                return s.replace(/ /,"").replace(/,/,"");
+                return s.replace(/ /g,"").replace(/,/g,"");
             },
             type: 'numeric'
     	});
@@ -141,7 +141,8 @@
                 4: { sorter: 'amount' },
                 5: { sorter: 'amount' },
                 6: { sorter: 'amount' },
-                7: { sorter: false }
+                7: { sorter: false },
+                8: { sorter: false }
             }
         });
         <!-- TMPL_ELSE -->
