@@ -2518,6 +2518,7 @@ CREATE TABLE `aqorders` (
   `sort1_authcat` varchar(10) default NULL,
   `sort2_authcat` varchar(10) default NULL,
   `uncertainprice` tinyint(1),
+  `parent_ordernumber` int(11) default NULL,
   PRIMARY KEY  (`ordernumber`),
   KEY `basketno` (`basketno`),
   KEY `biblionumber` (`biblionumber`),

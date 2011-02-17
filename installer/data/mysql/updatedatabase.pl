@@ -5323,6 +5323,14 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.064";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `aqorders` ADD `parent_ordernumber` int(11)  NULL");
+    $dbh->do("UPDATE aqorders SET parent_ordernumber=ordernumber;");
+    print "Upgrade to $DBversion done (Adding parent_ordernumber in aqorders)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

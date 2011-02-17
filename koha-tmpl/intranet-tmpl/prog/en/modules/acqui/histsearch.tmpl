@@ -124,6 +124,7 @@
 	<div id="acqui_histsearch">
 		<table>
 			<tr>
+                <th>Parent order number</th>
 				<th>Basket</th>
 				<th>Basket group</th>
 				<th>Invoice Number</th>
@@ -137,6 +138,7 @@
 			
 			<!-- TMPL_LOOP NAME="suggestions_loop" -->
 				<tr>
+                    <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                     <td><!-- TMPL_VAR name="basketname" --> (<a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->"><!-- TMPL_VAR name="basketno" --></a>)</td>
 			<td><!-- TMPL_VAR name="groupname" --> (<a href="basketgroup.pl?booksellerid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="basketgroupid" --></a>)</td>
 					<td><!-- TMPL_IF NAME="invoicenumber" -->

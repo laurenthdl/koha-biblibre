@@ -61,6 +61,8 @@ BEGIN {
       &GetContracts &GetContract
 
       &GetItemnumbersFromOrder
+
+      &GetParentQuantity
     );
 }
 
@@ -1004,6 +1006,7 @@ The following keys are used: "biblionumber", "title", "basketno", "quantity", "n
 
 sub NewOrder {
     my $orderinfo = shift;
+    my $parent_ordernumber = shift;
 #### ------------------------------
     my $dbh = C4::Context->dbh;
     my @params;
@@ -1023,6 +1026,7 @@ sub NewOrder {
         $orderinfo->{quantityreceived} = 0;
     }
 
+    $orderinfo->{parent_ordernumber} = $parent_ordernumber if $parent_ordernumber;
     my $ordernumber = InsertInTable( "aqorders", $orderinfo );
     return ( $orderinfo->{'basketno'}, $ordernumber );
 }
@@ -1247,7 +1251,7 @@ sub ModReceiveOrder {
         $order->{'quantity'} -= $quantrec;
         $order->{'quantityreceived'} = 0;
         $order->{'orderstatus'} = 2;
-        my $newOrder = NewOrder($order);
+        my $newOrder = NewOrder($order, $ordernumber);
     } else {
         $sth = $dbh->prepare(
             "update aqorders
@@ -1709,7 +1713,8 @@ sub GetHistory {
                 aqorders.booksellerinvoicenumber as invoicenumber,
                 aqbooksellers.id as id,
                 aqorders.biblionumber,
-                aqorders.orderstatus";
+                aqorders.orderstatus,
+                aqorders.parent_ordernumber";
         $query .= ", aqbudgets.budget_id AS budget" if defined $budget;
         $query .= ", aqorders.branchcode " if ( not C4::Context->preference("IndependantBranches")  and defined $branchcode and $branchcode);
         $query .= "
@@ -1809,6 +1814,7 @@ sub GetHistory {
             $total_qty         += $line->{'quantity'};
             $total_qtyreceived += $line->{'quantityreceived'};
             $total_price       += $line->{'quantity'} * $line->{'ecost'};
+            $line->{quantity} = GetParentQuantity($line->{parent_ordernumber});
         }
     }
     return \@order_loop, $total_qty, $total_price, $total_qtyreceived;
@@ -1914,6 +1920,33 @@ sub GetContract {
     $sth->execute($contractno);
     my $result = $sth->fetchrow_hashref;
     return $result;
+}
+
+=head3 GetParentQuantity
+
+=over 4
+
+$quantity = &GetParentQuantity($parent_ordernumber);
+
+Looks up the order's quantity that has ordernumber value $parent_ordernumber
+
+Returns a quantity
+
+=back
+
+=cut
+sub GetParentQuantity {
+    my ($parent_ordernumber) = @_;
+    my $dbh          = C4::Context->dbh;
+    my $query        = "
+        SELECT quantity
+        FROM   aqorders
+        WHERE  ordernumber = ?
+        ";
+
+    my $sth = $dbh->prepare($query);
+    $sth->execute($parent_ordernumber);
+    return $sth->fetchrow;
 }
 
 1;
