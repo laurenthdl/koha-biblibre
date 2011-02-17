@@ -5814,6 +5814,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.017";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("UPDATE systempreferences SET type='Choice', value='0.196', options='0.196|0.055' WHERE variable='gist'");
+    print "Upgrade to $DBversion done (Update gist syspref)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
