@@ -11,6 +11,11 @@ use C4::Context;
 use C4::AuthoritiesMarc;
 use C4::Output;
 use File::Basename;
+use Text::Undiacritic qw/undiacritic/;
+
+#use open qw(:std :utf8);
+use utf8;
+
 
 my $upload_path = C4::Context->preference('uploadPath');
 warn $upload_path;
@@ -106,6 +111,9 @@ sub plugin {
 	
 	    # Dealing with filenames:
 
+	    # Normalizing filename:
+	    $uploaded_file = normalize_string($uploaded_file, 1);
+
 	    # Checking for an existing filename in destination directory
 	    if (-f "$upload_path/$uploaded_file") {
 
@@ -156,4 +164,36 @@ sub findname {
 
     return "$file-$count$ext";
 }
+
+=head2 normalize_string
+        Given 
+            a string
+        Returns a utf8 NFC normalized string
+        
+        Sample code :
+        my $string=normalize_string ("Pétaudière");
+=cut
+
+sub normalize_string{
+        my ($string, $code)=@_;
+warn $string;
+        use Unicode::Normalize;
+        utf8::decode($string) unless (utf8::is_utf8($string));
+if ($code){
+                $string= NFD($string);
+        }
+        else { 
+                $string=NFC($string);
+        }
+    warn $string;
+    $string=~s/\<|\>|\^|\;|\.|\?|,|\-|\(|\)|\[|\]|\{|\}|\$|\%|\!|\*|\:|\\|\/|\&|\"|\'/ /g;
+        #removing one letter words "d'" "l'"  was changed into "d " "l " 
+    $string=~s/\b\S\b//g;
+    $string=~s/\s+$//g;
+    $string=~s/^\s+//g;
+    $string=undiacritic($string);
+    return $string; 
+}
+
+
 1;
