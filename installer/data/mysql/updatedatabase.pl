@@ -5422,6 +5422,12 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE aqbasket ADD deliveryplace VARCHAR(10) default NULL;");
     $dbh->do("ALTER TABLE aqbasket ADD billingplace VARCHAR(10) default NULL;");
     print "Upgrade to $DBversion done (Adding billingplace and deliveryplace to aqbasket)\n";
+
+$DBversion = "3.02.00.069";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `aqorders` ADD `parent_ordernumber` int(11)  NULL");
+    $dbh->do("UPDATE aqorders SET parent_ordernumber=ordernumber;");
+    print "Upgrade to $DBversion done (Adding parent_ordernumber in aqorders)\n";
     SetVersion($DBversion);
 }
 
