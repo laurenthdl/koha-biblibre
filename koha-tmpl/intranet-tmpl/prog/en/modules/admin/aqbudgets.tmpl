@@ -320,14 +320,28 @@
     </li>
 
     <li>
-    <span class="label">Owner: </span>
-    <span  id="budget_owner_name">
-    <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="budget_owner_id" -->"><!-- TMPL_VAR NAME="budget_owner_name" --></a>
-    </span>
+      <span class="label">Owner: </span>
+      <span  id="budget_owner_name">
+        <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="budget_owner_id" -->"><!-- TMPL_VAR NAME="budget_owner_name" --></a>
+      </span>
 
-    <!-- FIXME: hardcoded button positions :/ -->
-    <input style="" type="button" id="edit_owner" value="Edit owner" onclick="ownerPopup(); return false;" />
-    <input style=""  type="button" id="remove_owner" value="Remove owner" onclick="ownerRemove(this.form); return false;" />
+      <!-- FIXME: hardcoded button positions :/ -->
+      <input style="" type="button" id="edit_owner" value="Edit owner" onclick="ownerSearchPopup(); return false;" />
+      <input style=""  type="button" id="remove_owner" value="Remove owner" onclick="ownerRemove(this.form); return false;" />
+    </li>
+
+    <li>
+      <span class="label">Users: </span>
+      <ul id="budget_user_name">
+        <!-- TMPL_LOOP name="budgetusersnames_loop" -->
+        <li id="<!-- TMPL_VAR name="id" -->">
+          <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="name" --></a> 
+          <a href="#" onclick="deleteUser(<!-- TMPL_VAR name='id' -->);return false;">X</a>
+        </li>
+        <!-- /TMPL_LOOP -->
+      </ul>
+      <input type="hidden" id="budget_user_id" name="budgetusersid" value="<!-- TMPL_VAR name="borrowernumberslist" -->"/>
+      <input type="button" id="add_user" value="Add user" onclick="userSearchPopup(); return false;" />
     </li>
 
     <li>
@@ -442,12 +456,8 @@
         </li>
         <li class="radio">
 
-        <label for="show_mine">Show my<br /> funds only</label>
-            <!-- TMPL_IF NAME="show_mine" -->
-                <input type="checkbox" id="show_mine"  name="show_mine" value="1" checked="checked" />
-            <!-- TMPL_ELSE -->
-                <input type="checkbox" id="show_mine"  name="show_mine" value="1" />
-        <!-- /TMPL_IF -->
+        <label for="show_all">Show all funds</label>
+            <input type="checkbox" id="show_all"  name="show_all" value="1" <!-- TMPL_IF NAME="show_all" -->checked="checked"<!-- /TMPL_IF -->/>
         </li>
         </ol>
 

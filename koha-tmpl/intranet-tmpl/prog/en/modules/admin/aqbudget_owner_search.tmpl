@@ -11,13 +11,22 @@
 // modify parent window owner element
 function returnOwner(ownerId, ownerName){
     var top1 = top.opener;
-    top1.document.getElementById('budget_owner_name').innerHTML = ownerName;
-    top1.document.getElementById('budget_owner_id').value = ownerId;
+    var type = '<!-- TMPL_VAR NAME="type" -->';
+    var name = 'budget_<!-- TMPL_VAR NAME="type" -->_name';
+    var id = 'budget_<!-- TMPL_VAR NAME="type" -->_id';
+    if (type == 'user'){
+      top1.document.getElementById(name).innerHTML += "<li><a href=\"/cgi-bin/koha/members/moremember.pl?borrowernumber=\""+ownerId+"\">"+ownerName+"</a></li>";
+      top1.document.getElementById(id).value += ownerId+":";
+    } else if (type == 'owner') {
+      top1.document.getElementById(name).innerHTML = ownerName;
+      top1.document.getElementById(id).value = ownerId;
+    } else {
+      alert ('type is undefined');
+    }
     window.close();
 }
 //]]>
 </script>
-
 
 </head>
 <body>
@@ -26,23 +35,13 @@ function returnOwner(ownerId, ownerName){
 	<div class="yui-g">
 
 
-<h3>Search for Budget Owner</h3>
-	<form action="/cgi-bin/koha/admin/aqbudget_owner_search.pl" method="post">
+  <h3>Search for Budget Owner</h3>
+	<form action="/cgi-bin/koha/admin/aqbudget_borrower_search.pl" method="post">
 		<fieldset>
 		<input type="text" name="member" id="member" value="<!-- TMPL_VAR NAME="member" -->" class="focus" />
-
-
-<!--
- Ordered by
-		<select name="orderby">
-			<option value="surname,firstname">Surname</option>
-			<option value="cardnumber">Cardnumber</option>
-		</select>
--->
-
-<input type="submit" class="button" value="Search" /></fieldset>
-<div class="hint">Only staff with superlibrarian or acquisitions permissions are returned in the search results</div>
-
+    <input type="hidden" value="<!-- TMPL_VAR NAME="type" -->" name="type" />
+    <input type="submit" class="button" value="Search" /></fieldset>
+    <div class="hint">Only staff with superlibrarian or acquisitions permissions are returned in the search results</div>
 	</form>
 
 
