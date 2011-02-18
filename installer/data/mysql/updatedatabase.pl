@@ -4919,7 +4919,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 }
 
 
-$DBversion = "3.02.00.059";
+$DBversion = "3.06.00.001";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
     DROP TABLE IF EXISTS `indexes`;
@@ -5329,14 +5329,14 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.02.00.060";
+$DBversion = "3.06.00.002";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE overduerules ALTER delay1 SET DEFAULT NULL, ALTER delay2 SET DEFAULT NULL, ALTER delay3 SET DEFAULT NULL");
     print "Upgrade to $DBversion done (Setting NULL default value for delayn columns in table overduerules)\n";
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.061";
+$DBversion = "3.06.00.003";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
 	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BlockRenewWhenOverdue','0','If Set, when item is overdue, renewals are blocked','','YesNo');
@@ -5345,7 +5345,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.062";
+$DBversion = "3.06.00.004";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
     ALTER TABLE `aqbudgetperiods` MODIFY COLUMN `budget_period_description` VARCHAR(255)  CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
@@ -5367,7 +5367,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.02.00.063";
+$DBversion = "3.06.00.005";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("ALTER TABLE `biblioitems` ADD `ean` VARCHAR( 13 ) NULL AFTER issn");
     $dbh->do("CREATE INDEX `ean` ON biblioitems (`ean`) ");
@@ -5377,7 +5377,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.064";
+$DBversion = "3.06.00.006";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
         ALTER TABLE `aqbooksellers` ADD COLUMN `clientnumber` VARCHAR(40) DEFAULT NULL;
@@ -5387,7 +5387,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.02.00.065";
+$DBversion = "3.06.00.007";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     my $return_count;
     eval { $return_count = $dbh->do("SELECT 1 FROM authorised_values WHERE category='order_status'"); };
@@ -5402,7 +5402,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.066";
+$DBversion = "3.06.00.008";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE aqorders ADD COLUMN orderstatus TINYINT(2)  DEFAULT 0;");
     print "Upgrade to $DBversion done (Adding aqorders.orderstatus field)\n";
@@ -5410,20 +5410,20 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 }
 
 
-$DBversion = "3.02.00.067";
+$DBversion = "3.06.00.009";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqorders` ADD `branchcode` VARCHAR( 10 ) NULL");
     print "Upgrade to $DBversion done (Adding branchcode in aqorders)\n";
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.068";
+$DBversion = "3.06.00.010";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE aqbasket ADD deliveryplace VARCHAR(10) default NULL;");
     $dbh->do("ALTER TABLE aqbasket ADD billingplace VARCHAR(10) default NULL;");
     print "Upgrade to $DBversion done (Adding billingplace and deliveryplace to aqbasket)\n";
 
-$DBversion = "3.02.00.069";
+$DBversion = "3.06.00.011";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqorders` ADD `parent_ordernumber` int(11)  NULL");
     $dbh->do("UPDATE aqorders SET parent_ordernumber=ordernumber;");
