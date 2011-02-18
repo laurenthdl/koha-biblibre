@@ -2415,7 +2415,14 @@ CREATE TABLE `aqbudgets` (
   UNIQUE KEY `uniq_aqbudgets` (`budget_name`, `budget_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+DROP TABLE IF EXISTS `aqbudgetborrowers`;
+CREATE TABLE  `aqbudgetborrowers` (
+  `budget_id` int(11) NOT NULL,
+  `borrowernumber` int(11) NOT NULL,
+  PRIMARY KEY (`budget_id`,`borrowernumber`),
+  CONSTRAINT `aqbudgetborrowers_ibfk_1` FOREIGN KEY (`budget_id`) REFERENCES `aqbudgets` (`budget_id`),
+  CONSTRAINT `aqbudgetborrowers_ibfk_2` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 --
 -- Table structure for table `aqbudgetperiods`
 --
