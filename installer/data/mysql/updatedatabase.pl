@@ -5422,6 +5422,8 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE aqbasket ADD deliveryplace VARCHAR(10) default NULL;");
     $dbh->do("ALTER TABLE aqbasket ADD billingplace VARCHAR(10) default NULL;");
     print "Upgrade to $DBversion done (Adding billingplace and deliveryplace to aqbasket)\n";
+    SetVersion($DBversion);
+}
 
 $DBversion = "3.06.00.011";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
