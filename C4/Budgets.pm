@@ -43,6 +43,7 @@ BEGIN {
       &DelBudget
       &GetBudgetSpent
       &GetBudgetOrdered
+      &GetUsersFromBudget
       &GetPeriodsCount
       &GetChildBudgetsSpent
 
@@ -50,6 +51,7 @@ BEGIN {
       &GetBudgetPeriods
       &GetBudgetFirstChild
       &GetBudgetParent
+      &ModUsersLinkedToBudget
       &GetBudgetSecondChild
       &ModBudgetPeriod
       &AddBudgetPeriod
@@ -348,10 +350,11 @@ sub GetBudgetPermDropbox {
     $labels{'0'} = 'None';
     $labels{'1'} = 'Owner';
     $labels{'2'} = 'Library';
+    $labels{'3'} = 'Owner + Users';
     my $radio = CGI::scrolling_list(
         -id      => 'budget_permission',
         -name    => 'budget_permission',
-        -values  => [ '0', '1', '2' ],
+        -values  => [ '0', '1', '2', '3' ],
         -default => $perm,
         -labels  => \%labels,
         -size    => 1,
@@ -550,6 +553,33 @@ sub ModBudgetPeriod {
     return UpdateInTable( "aqbudgetperiods", $budget_period_information );
 }
 
+=head3 ModUsersLinkedToBudget
+
+=over 4
+
+&ModUsersLinkedToBudget($budget_id, @budget_users_id);
+
+    - budget_users_id: borrowers list who can use the budget_id
+
+Save the relation between budget and borrower.
+
+=back
+
+=cut
+sub ModUsersLinkedToBudget {
+    my ($budget_id, @budget_users_id) = @_;
+
+    #delete all mention of $bundget_id before insert
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare_cached("DELETE FROM aqbudgetborrowers WHERE budget_id = ?");
+    $sth->execute($budget_id);
+
+    #insert each line in aqbudgetborrowers
+    foreach my $borrowernumber (@budget_users_id) {
+        InsertInTable( "aqbudgetborrowers", {budget_id => $budget_id, borrowernumber => $borrowernumber}, 1);
+    }
+}
+
 # -------------------------------------------------------------------
 sub GetBudgetHierarchy {
     my ( $budget_period_id, $branchcode, $owner ) = @_;
@@ -558,7 +588,8 @@ sub GetBudgetHierarchy {
     my $query = qq|
                     SELECT aqbudgets.*, aqbudgetperiods.budget_period_active
                     FROM aqbudgets 
-                    JOIN aqbudgetperiods USING (budget_period_id)|;
+                    JOIN aqbudgetperiods USING (budget_period_id)
+                  |;
                         
     # show only period X if requested
     my @where_strings;
@@ -569,13 +600,14 @@ sub GetBudgetHierarchy {
     
     # show only budgets owned by me, my branch or everyone
     if ($owner) {
+        $query .= " LEFT JOIN aqbudgetborrowers USING (budget_id)  ";
         if ($branchcode) {
             push @where_strings,
-            qq{ (budget_owner_id = ? OR budget_branchcode = ? OR ((budget_branchcode IS NULL or budget_branchcode="") AND (budget_owner_id IS NULL OR budget_owner_id="")))};
-            push @bind_params, ( $owner, $branchcode );
+            qq{(budget_owner_id = ? OR borrowernumber = ? OR budget_branchcode = ? OR ((budget_branchcode IS NULL or budget_branchcode="") AND (budget_owner_id IS NULL OR budget_owner_id="")))};
+            push @bind_params, ( $owner, $owner, $branchcode );
         } else {
-            push @where_strings, ' (budget_owner_id = ? OR budget_owner_id IS NULL or budget_owner_id ="") ';
-            push @bind_params,   $owner;
+            push @where_strings, ' (budget_owner_id = ? OR borrowernumber = ? OR budget_owner_id IS NULL or budget_owner_id ="") ';
+            push @bind_params, ($owner, $owner);
         }
     } else {
         if ($branchcode) {
@@ -590,7 +622,6 @@ sub GetBudgetHierarchy {
     my $results = $sth->fetchall_arrayref( {} );
     my @res     = @$results;
     my $i       = 0;
-
     while (1) {
         my $depth_cnt = 0;
         foreach my $r (@res) {
@@ -742,13 +773,46 @@ sub GetBudget {
     return $result;
 }
 
-=head3 GetBudgets
+=head3 GetUsersFromBudget
 
 =over 4
 
-&GetBudgets($filter, $order_by);
+&GetUsersFromBudget($budget_id);
 
-gets all budgets
+return Array like:
+$VAR1 = {
+          'borrowernumber' => {
+                       'firstname' => 'xxx',
+                       'borrowernumber' => 'number',
+                       'surname' => 'xxx'
+                     }
+};
+
+
+=back
+
+=cut
+
+sub GetUsersFromBudget {
+    my ($budget_id) = @_;
+    my $dbh         = C4::Context->dbh;
+    my $query       = "SELECT bb.borrowernumber, b.surname, b.firstname
+                FROM aqbudgetborrowers bb, borrowers b
+                WHERE budget_id=? AND bb.borrowernumber = b.borrowernumber";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($budget_id);
+    my $result = $sth->fetchall_hashref (qw(borrowernumber));
+    warn Data::Dumper::Dumper($result);
+    return $result;
+}
+
+=head3 GetChildBudgetsSpent
+
+=over 4
+
+&GetChildBudgetsSpent($budget-id);
+
+gets the total spent of the level and sublevels of $budget_id
 
 =back
 
@@ -774,13 +838,13 @@ sub GetChildBudgetsSpent {
     return $total_spent;
 }
 
-=head3 GetChildBudgetsSpent
+=head3 GetBudgets
 
 =over 4
 
-&GetChildBudgetsSpent($budget-id);
+&GetBudgets($filter, $order_by);
 
-gets the total spent of the level and sublevels of $budget_id
+gets all budgets
 
 =back
 
@@ -792,6 +856,32 @@ sub GetBudgets {
     return SearchInTable( "aqbudgets", $filters, $orderby, undef, undef, undef, "wide" );
 }
 
+=head3 GetUsers
+
+=over 4
+
+&GetUsers($budget_id);
+
+gets all users linked to a budget
+
+=back
+
+=cut
+
+# -------------------------------------------------------------------
+sub GetUsers {
+    my ($budget_id) = @_;
+    my $dbh         = C4::Context->dbh;
+    my $query       = "
+        SELECT borrowernumber
+        FROM   aqbudgetborrowers
+        WHERE  budget_id=?
+        ";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($budget_id);
+    my $result = $sth->fetchrow_hashref;
+    return $result;
+}
 # -------------------------------------------------------------------
 
 =head3 GetCurrencies
