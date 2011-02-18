@@ -1787,7 +1787,7 @@ sub GetHistory {
                 aqorders.orderstatus,
                 aqbudgets.budget_id AS budget,
                 aqbudgets.budget_name,
-                aqorders.branchcode";
+                aqorders.branchcode,
                 aqorders.parent_ordernumber";
         $query .= ", aqbudgets.budget_id AS budget" if defined $budget;
         $query .= ", aqorders.branchcode " if ( not C4::Context->preference("IndependantBranches")  and defined $branchcode and $branchcode);
