@@ -92,10 +92,7 @@ my @indexes = $params->{'idx'};
 my @operators = ();
 my @operands = $params->{'q'};
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
-warn Data::Dumper::Dumper \@indexes;
-warn $q;
 my $res = SimpleSearch( $q, { recordtype => 'biblio' }, $page, $count );
-
 
 my @results = map { GetBiblioData $_->{'values'}->{'recordid'} } @{ $res->items };
 
