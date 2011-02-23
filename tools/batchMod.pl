@@ -49,6 +49,7 @@ my $runinbackground = $input->param('runinbackground');
 
 my $template_name;
 my $template_flag;
+
 if ( !defined $op ) {
     $template_name = "tools/batchMod.tmpl";
     $template_flag = { tools => '*' };
@@ -66,11 +67,14 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     }
 );
 
-# Does the user have a limited item edition permission?
-my $uid = GetMember( borrowernumber => $loggedinuser )->{userid} if ($loggedinuser) ;
-my $limitededition = haspermission($uid,  {'tools' => 'items_limited_batchmod'}) if ($uid);
-# In case user is a superlibrarian, edition is not limited
-$limitededition = 0 if ($limitededition != 0 && $limitededition->{'superlibrarian'} eq 1);
+if ( !defined $op ) {
+
+    # Getting possibly pre-submitted barcode list
+    my @barcodes = $input->param('barcode');
+    my $barcodelist = join("\n", @barcodes);
+    warn $barcodelist;
+    $template->param('barcodelist' => $barcodelist);
+}
 
 my $today_iso = C4::Dates->today('iso');
 $template->param( today_iso => $today_iso );
