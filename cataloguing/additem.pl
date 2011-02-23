@@ -638,7 +638,6 @@ my $onlymine = C4::Context->preference('IndependantBranches') &&
 my $branches = GetBranchesLoop(C4::Context->userenv->{branch},$onlymine);  # build once ahead of time, instead of multiple times later.
 
 # Using last created item if it exists
-
 $itemrecord = $cookieitemrecord if ($prefillitem and not $justaddeditem and $op ne "edititem"); 
 
 # We generate form, and fill with values if defined
