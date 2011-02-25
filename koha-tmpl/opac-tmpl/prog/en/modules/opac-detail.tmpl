@@ -21,8 +21,7 @@
     dateFormat: 'uk',<!-- /TMPL_IF -->
             widgets : ['zebra'],
             sortList: [[0,0]]
-        });
-        <!-- TMPL_IF NAME="GoogleJackets" -->
+        });<!-- TMPL_IF NAME="GoogleJackets" -->
         KOHA.Google.GetCoverFromIsbn();<!-- /TMPL_IF --><!-- TMPL_IF NAME="TagsEnabled" -->
         $(".tagbutton").click(KOHA.Tags.add_tag_button);<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="opacbookbag" -->$("a.print").parent().after("<li><a class=\"addtocart\" href=\"#\" onclick=\"addRecord('"+$("input[name=bib]").val()+"'); return false;\">"+_("Add to Your Cart")+"<\/a><\/li>");
@@ -265,7 +264,7 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
     <!-- /TMPL_IF -->
     <!-- TMPL_IF name="publishercode" -->
     <span class="results_summary"><span class="label">Published by :</span>
-        <a href='/cgi-bin/koha/opac-search.pl?q=pb:"<!-- TMPL_VAR NAME="publishercode" ESCAPE="URL" -->"'>
+        <a href="/cgi-bin/koha/opac-search.pl?q=pb:<!-- TMPL_VAR NAME="publishercode" ESCAPE="URL" --> ">
             <!-- TMPL_VAR NAME="publishercode" ESCAPE="HTML" --> 
         </a> <!-- TMPL_IF name="place" -->(<!-- TMPL_VAR NAME="place"-->)<!--/TMPL_IF--> <!-- TMPL_IF NAME="publicationyear" -->, <!-- TMPL_VAR NAME="publicationyear" --><!-- /TMPL_IF -->
     </span>
@@ -530,15 +529,11 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 </div>
 <!-- /TMPL_IF -->
 
-
 <div id="holdings">
 <!-- TMPL_IF name="count" -->
     <!-- TMPL_IF name="lotsofitems" -->
 	<p>This record has many physical items. <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;viewallitems=1">Click here to view them all.</a></p>
     <!-- TMPL_ELSE -->
-    	    <!-- TMPL_IF NAME="OPACXSLTItemsDetailsDisplay" -->
-        <!-- TMPL_VAR NAME="XSLTItemsBloc" -->
-    	<!-- TMPL_ELSE -->
 	<table id="holdingst">
 	    <thead><tr>
 		<!-- TMPL_IF NAME="item-level_itypes" --><th>Item type</th><!-- /TMPL_IF -->
@@ -554,8 +549,7 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 		<!-- TMPL_IF NAME="itemdata_serialseq" --><th>Serial number</th><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_publisheddate" --><th>Publication date</th><!-- /TMPL_IF -->
 	    </tr></thead>
-	    <tbody>
-	    <!-- TMPL_LOOP NAME="ITEM_RESULTS" -->
+	    <tbody><!-- TMPL_LOOP NAME="ITEM_RESULTS" -->
 	    <tr><!-- TMPL_IF NAME="item-level_itypes" --><td><!-- TMPL_IF NAME="imageurl" --><img src="<!-- TMPL_VAR NAME="imageurl" -->" title="<!-- TMPL_VAR NAME="description" -->" alt="<!-- TMPL_VAR NAME="description" -->" /><!-- /TMPL_IF --> <!-- TMPL_VAR NAME="description" --></td><!-- /TMPL_IF -->
 		<td><!-- TMPL_UNLESS NAME="singleBranchMode" --><!-- TMPL_IF name="branchurl" --><a href="<!-- TMPL_VAR NAME="branchurl" -->"><!-- TMPL_VAR NAME="branchname" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branchname" --><!-- /TMPL_IF --><!-- /TMPL_UNLESS --> <!-- TMPL_VAR NAME="location_description" --> </td>
 		<!-- TMPL_IF NAME="itemdata_ccode" --><td><!-- TMPL_VAR NAME="ccode" --></td><!-- /TMPL_IF -->
@@ -572,10 +566,8 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 		<td><a href="/cgi-bin/koha/maint/catmaintain.pl?type=fixitemtype&amp;bi=<!-- TMPL_VAR NAME="biblioitemnumber" -->&amp;item=<!-- TMPL_VAR NAME="itemtype" -->">Fix Itemtype</a></td>
 		<!-- /TMPL_IF -->
 	    </tr>
-	    <!-- /TMPL_LOOP -->
-	    </tbody>
+	    <!-- /TMPL_LOOP --></tbody>
 	</table>
-	<!-- /TMPL_IF -->
     <!-- /TMPL_IF -->
 <!-- TMPL_ELSE -->
 <p>No physical items for this record</p>
@@ -627,7 +619,6 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
         
 </div>
 <!-- /TMPL_IF -->
-
 <br clear="all" />
 </div>
 

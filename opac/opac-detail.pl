@@ -82,11 +82,6 @@ if ( C4::Context->preference("OPACXSLTDetailsDisplay") ) {
     $template->param( 'XSLTBloc' => XSLTParse4Display( $biblionumber, $record, C4::Context->preference("OPACXSLTDetailsDisplay") ) );
 }
 
-# XSLT processing of some stuff
-if ( C4::Context->preference("OPACXSLTItemsDetailsDisplay") ) {
-    $template->param( 'XSLTItemsBloc' => XSLTParse4Display( $biblionumber, $record, C4::Context->preference("OPACXSLTItemsDetailsDisplay") ) );
-}
-
 $template->param( 'OPACShowCheckoutName' => C4::Context->preference("OPACShowCheckoutName") );
 
 # change back when ive fixed request.pl
@@ -150,7 +145,7 @@ if ( scalar(@serialcollections) > 0 ) {
 #coping with subscriptions
 if ( $dat->{'serial'} ) {
     my $subscriptionsnumber = CountSubscriptionFromBiblionumber($biblionumber);
-    my @subscriptions = GetSubscriptions(undef ,undef, $biblionumber );
+    my @subscriptions = GetSubscriptions( $dat->{title}, $dat->{issn}, $biblionumber );
 
     my @subs;
     $dat->{'serial'} = 1 if $subscriptionsnumber;
@@ -389,7 +384,7 @@ foreach (@$reviews) {
     $_->{userid}       = $borrowerData->{'userid'};
     $_->{cardnumber}   = $borrowerData->{'cardnumber'};
     $_->{datereviewed} = format_date( $_->{datereviewed} );
-    if ( $borrowernumber && $borrowerData->{'borrowernumber'} eq $borrowernumber ) {
+    if ( $borrowerData->{'borrowernumber'} eq $borrowernumber ) {
         $_->{your_comment} = 1;
         $loggedincommenter = 1;
     }
