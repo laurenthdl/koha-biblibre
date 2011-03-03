@@ -4991,6 +4991,28 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.062";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    ALTER TABLE `subscription` ADD `itemtype` VARCHAR( 10 ) NULL ,
+    ADD `support` VARCHAR( 80 ) NULL ,
+    ADD `origin` VARCHAR( 80 ) NULL ,
+    ADD `domain` VARCHAR( 80 ) NULL
+    });
+    print "Upgrade to $DBversion done (Adds fields to subscription table)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.063";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    ALTER TABLE `subscription` CHANGE `support` `ccode` VARCHAR( 10 ) 
+    });
+    print "Upgrade to $DBversion done (Modify field from subscription table)\n";
+    SetVersion($DBversion);
+}
+
+
 
 =item DropAllForeignKeys($table)
 
