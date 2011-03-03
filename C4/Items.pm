@@ -281,9 +281,9 @@ sub AddItem {
     $item->{'itemnumber'} = $itemnumber;
 
     # create MARC tag representing item and add to bib
-    my $new_item_marc = _marc_from_item_hash($item, $frameworkcode, $unlinked_item_subfields);
-    _add_item_field_to_biblio($new_item_marc, $item->{'biblionumber'}, $frameworkcode );
+    #my $new_item_marc = _marc_from_item_hash($item, $frameworkcode, $unlinked_item_subfields);
     #_add_item_field_to_biblio($new_item_marc, $item->{'biblionumber'}, $frameworkcode );
+    ModZebra( $item->{biblionumber}, "specialUpdate", "biblioserver", undef, undef );
    
     logaction("CATALOGUING", "ADD", $itemnumber, "item") if C4::Context->preference("CataloguingLog");
     
@@ -539,6 +539,7 @@ sub ModItem {
 
     # update biblio MARC XML
     my $whole_item = GetItem($itemnumber) or die "FAILED GetItem($itemnumber)";
+    ModZebra( $whole_item->{biblionumber}, "specialUpdate", "biblioserver", undef, undef );
 
     unless ( defined $unlinked_item_subfields ) {
         $unlinked_item_subfields = _parse_unlinked_item_subfields_from_xml( $whole_item->{'more_subfields_xml'} );
@@ -2222,7 +2223,6 @@ sub _koha_modify_item {
         $error .= "ERROR in _koha_modify_item $query" . $dbh->errstr;
         warn $error;
     }
-    ModZebra( $item->{biblionumber}, "specialUpdate", "biblioserver", undef, undef );
     return ($item->{'itemnumber'},$error);
 }
 
