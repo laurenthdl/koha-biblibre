@@ -58,7 +58,7 @@
         });
 	if($(":radio:checked[name='lost']").val() == 0){ $('.classlost').hide() };
 
-    update_category_code($("#categorycode"));
+    if ($("#categorycode").length > 0){update_category_code($("#categorycode"));}
 
    }); 
     	
