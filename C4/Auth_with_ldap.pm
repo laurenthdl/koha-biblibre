@@ -228,10 +228,11 @@ sub accept_borrower {
     } else {
 	if ( $config{replicate} ) {
 	    delete $$borrower{column}{dateenrolled};
+	    delete $$borrower{column}{dateexpiry};
 	    my $cardnumber = update_local
 	    ( $userid, $$borrower{column}{password}, $id, $$borrower{column} ); 
 	    if ( my $old_cardnumber = $$borrower{column}{cardnumber} ) {
-		if ( $cardnumber ne $cardnumber ) {
+		if ( $old_cardnumber ne $cardnumber ) {
 		    warn "update_local returned cardnumber '$cardnumber' instead of '$old_cardnumber'";
 		    return 0;
 		}
@@ -239,7 +240,7 @@ sub accept_borrower {
 	}
     }
 
-    if ( $newcommer || $config{update} ) {
+    if ( $newcommer || $config{'update'} ) {
 	DEBUG and logger { "changing attrs for $id" => $$borrower{xattr} };
 	set_xattr $id,$borrower;
     }

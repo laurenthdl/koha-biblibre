@@ -75,7 +75,7 @@ our $supelecTypePersonne =
     /}
 , to_ignore =>
     [qw/
-    MISSING
+    missing
     c3s
     exterieur
     fc
@@ -84,15 +84,15 @@ our $supelecTypePersonne =
     service
     test
     /]
-, with_caution => [qw/
-    eleve_ecp
-    doctorant-nonsupelec
-    post-doctorant
-    post-doctorant-cdi
-    post-doctorant-nonsupelec
-    stagiaire
-    stagiaire-cdd
-    /]
+#, with_caution => [qw/
+#    eleve_ecp
+#    doctorant-nonsupelec
+#    post-doctorant
+#    post-doctorant-cdi
+#    post-doctorant-nonsupelec
+#    stagiaire
+#    stagiaire-cdd
+#    /]
 };
 
 our %cardnumber_attribute_for_categorycode = qw/
@@ -109,7 +109,7 @@ VAC	supelecUid
 sub set_category_code (_) {
     my $user = shift;
     my $type = lc $$user{src}{supelecTypePersonne};
-    return if $type ~~ /$$supelecTypePersonne{to_ignore}/i;
+    return if $type ~~ $$supelecTypePersonne{to_ignore};
 
     $$user{column}{categorycode} = $$supelecTypePersonne{categorycode}{$type}
     || do {
@@ -203,8 +203,9 @@ sub set_caution_and_debarring (_) {
     my $user = shift;
     my $debarring_date = '9999-12-31';
 
-    return unless (lc $$user{src}{supelecCampusRattachement} ne "gif");
+#    return unless (lc $$user{src}{supelecCampusRattachement} ne "gif");
     if ( my $caution = $$user{src}{supelecBibCaution} ) {
+	$$user{xattr}{CAUTION} = $caution;	
 	'N' eq ($$user{xattr}{CAUTION} = $caution)
 	    and $$user{column}{debarred} = $debarring_date;
 	return
