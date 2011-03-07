@@ -81,7 +81,7 @@ sub GetBorrowerAttributes {
     my $opac_only = @_ ? shift : 0;
 
     my $dbh   = C4::Context->dbh();
-    my $query = "SELECT code, description, attribute, lib, password, display_checkout
+    my $query = "SELECT code, description, attribute, lib, password, display_checkout, category_type, class
                  FROM borrower_attributes
                  JOIN borrower_attribute_types USING (code)
                  LEFT JOIN authorised_values ON (category = authorised_value_category AND attribute = authorised_value)
@@ -99,6 +99,8 @@ sub GetBorrowerAttributes {
             value_description => $row->{'lib'},
             password          => $row->{'password'},
             display_checkout  => $row->{'display_checkout'},
+            category_type     => $row->{'category_type'},
+            class             => $row->{'class'}
           };
     }
     return \@results;

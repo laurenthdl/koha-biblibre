@@ -524,7 +524,22 @@ SetMemberInfosInTemplate( $borrowernumber, $template );
 
 if ( C4::Context->preference('ExtendedPatronAttributes') ) {
     $template->param( ExtendedPatronAttributes => 1 );
-    $template->param( patron_attributes        => C4::Members::Attributes::GetBorrowerAttributes($borrowernumber) );
+
+    my $attributes = C4::Members::Attributes::GetBorrowerAttributes($borrowernumber);
+    my @classes = uniq( map {$_->{class}} @$attributes );
+    my @attributes_loop;
+    for my $class (@classes) {
+        my @items;
+        for my $attr (@$attributes) {
+            push @items, $attr if $attr->{class} eq $class
+        }
+        push @attributes_loop, {
+            class => $class,
+            items => \@items
+        };
+    }
+    $template->param( attributes_loop => \@attributes_loop );
+
     my @types = C4::Members::AttributeTypes::GetAttributeTypes();
     if ( scalar(@types) == 0 ) {
         $template->param( no_patron_attribute_types => 1 );
