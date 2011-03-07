@@ -12,9 +12,11 @@ my $config = C4::Context->config("ldapserver")
     or die qq[No "ldapserver" in server from KOHA_CONF: $ENV{KOHA_CONF}];
 
 for my $site ( @{ $$config{branch} } ) {
+warn $$site{dn};
     my $m = $ldap->search
     ( base     => $$site{dn}
-	     , filter   => '(&(objectClass=supelecPerson)(uid=*))'
+	     , filter   => '(&(objectClass=supelecPerson)(uid=*)(!(|(supelecMembreDe=cn=ACCT-doublonCampus,ou=groups,dc=gif,dc=supelec,dc=fr)(supelecMembreDe=cn=ACCT-doublonCampus,ou=groups,dc=rennes,dc=supelec,dc=fr)(supelecMembreDe=cn=ACCT-doublonCampus,ou=groups,dc=metz,dc=supelec,dc=fr)(supelecMembreDe=cn=ACCT-fantome,ou=groups,dc=gif,dc=supelec,dc=fr)(supelecMembreDe=cn=ACCT-fantome,ou=groups,dc=metz,dc=supelec,dc=fr)(supelecMembreDe=cn=ACCT-fantome,ou=groups,dc=rennes,dc=supelec,dc=fr)(supelecMembreDe=cn=ACCT-service,ou=groups,dc=gif,dc=supelec,dc=fr)(supelecMembreDe=cn=ACCT-service,ou=groups,dc=metz,dc=supelec,dc=fr)(supelecMembreDe=cn=ACCT-service,ou=groups,dc=rennes,dc=supelec,dc=fr))))'
+	     #, filter   => '(&(objectClass=supelecPerson)(uid=*))'
 	     # , filter   => '(&(objectClass=supelecPerson)(|(uid=valanou)(uid=oalassad)))'
 	    #, filter   => '(&(objectClass=supelecPerson)(uid=*)(!(|(supelecMembreDe=cn=ACCT-doublonCampus*)(supelecMembreDe=cn=ACCT-fantome*)(supelecMembreDe=cn=ACCT-dfantome*))))'
     # , filter   => 'uid=missoffe'
@@ -25,17 +27,17 @@ for my $site ( @{ $$config{branch} } ) {
 	    $e or return;
 	    $e->dump;
 	    my $b = LDAPSupelec::get_borrower($e) or return;
-#	     say YAML::Dump(
-#	         { c => $$b{column}
-#	         , x => $$b{xattr}
-#	         }
-#	     );
+	     say YAML::Dump(
+	         { c => $$b{column}
+	         , x => $$b{xattr}
+	         }
+	     );
 	    C4::Auth_with_ldap::accept_borrower( $b );
 	    $LDAPSupelec::rapport{ $$site{dn} }++;
 	    $m->shift_entry;
     }
 );
-    $m->code and die $m->error;
+#    $m->code and warn $m->error;
 }
 
 say YAML::Dump(\%LDAPSupelec::rapport);
