@@ -6199,6 +6199,25 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.042";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT INTO `permissions` (`module_bit`, `code`, `description`) VALUES ('9', 'limited_item_edition', 'Limit item modification to barcode, status and note (please note that edit_item is still required)');
+    });
+
+    $dbh->do(qq{
+        INSERT INTO `permissions` (`module_bit`, `code`, `description`) VALUES ('9', 'delete_all_items', 'Delete all items');
+    });
+
+    $dbh->do(qq{
+        INSERT INTO `permissions` (`module_bit`, `code`, `description`) VALUES ('13', 'items_limited_batchmod', 'Limit batch item modification to item status (please note that items_batchmod is still required)');
+    });
+
+    print "Upgrade to $DBversion done (Adds new permissions for cataloguing and batch item modification)\n";
+
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
