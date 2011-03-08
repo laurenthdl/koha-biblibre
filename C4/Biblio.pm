@@ -3020,7 +3020,7 @@ sub _koha_marc_update_bib_ids {
         # drop old field and create new one...
         $old_field = $record->field($biblio_tag);
         $record->delete_field($old_field) if $old_field;
-        $record->append_fields($new_field);
+        $record->insert_fields_ordered($new_field);
 
         # deal with biblioitemnumber
         if ($biblioitem_tag < 10) {
