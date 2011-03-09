@@ -113,11 +113,18 @@ sub InitEanFromBiblionumber{
 }
 
 sub GetElectreImage{
-	my $biblionumber = shift;
+	my ($biblionumber,$initboolscaled) = @_;
 	my $ean = InitEanFromBiblionumber($biblionumber);
 	if($ean eq '0'){return '0';}
 	my $boolscaled;
-	if(C4::Context->preference("OpacElectreScaledImage")){$boolscaled="true";}else{$boolscaled="false";}
+	if ($initboolscaled and (($initboolscaled eq "true") or ($initboolscaled eq "false")))
+	{
+		$boolscaled=$initboolscaled;
+	}
+	else
+	{
+		if(C4::Context->preference("OpacElectreScaledImage")){$boolscaled="true";}else{$boolscaled="false";}
+	}
 	my $sessionToken=GetElectreSessionToken();
 	my $search=InitElectreSearch();
 	my %result_getImage=$search->getImage($sessionToken, $ean, $boolscaled);

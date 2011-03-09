@@ -170,9 +170,7 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 
     <div id="bookcover">
     <!-- TMPL_IF NAME="OpacElectreImage" -->
-    <!-- TMPL_IF NAME="ElectreImage" -->
-    <img src="data:image/jpeg;base64,<!-- TMPL_VAR NAME="ElectreImage" -->" />
-    <!-- /TMPL_IF -->
+	<img src="http://opac.koha_master.localhost/cgi-bin/koha/opac-gen-electreimage.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->" />
     <!-- /TMPL_IF -->
     
     <!-- TMPL_IF NAME="OPACAmazonEnabled" --><!-- TMPL_IF NAME="OPACAmazonCoverImages" --><!-- TMPL_IF NAME="OPACURLOpenInNewWindow" --><a href="http://www.amazon<!-- TMPL_VAR NAME="AmazonTld" -->/gp/reader/<!-- TMPL_VAR NAME="normalized_isbn" -->/ref=sib_dp_pt/002-7879865-0184864#reader-link" target="_blank"><img border="0" src="http://images.amazon.com/images/P/<!-- TMPL_VAR NAME="normalized_isbn" -->.01.MZZZZZZZ.jpg" alt="Cover Image" /></a><!-- TMPL_ELSE --><a href="http://www.amazon<!-- TMPL_VAR NAME="AmazonTld" -->/gp/reader/<!-- TMPL_VAR NAME="normalized_isbn" -->/ref=sib_dp_pt/002-7879865-0184864#reader-link"><img border="0" src="http://images.amazon.com/images/P/<!-- TMPL_VAR NAME="normalized_isbn" -->.01.MZZZZZZZ.jpg" alt="Cover Image" /></a><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->

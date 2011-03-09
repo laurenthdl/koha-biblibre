@@ -461,14 +461,7 @@ if ( C4::Context->preference("OPACAmazonEnabled") ) {
 
 #Electre stuff
 if(C4::Context->preference("OpacElectreImage")){
-	my $ElectreImage=GetElectreImage($biblionumber);
-	if(defined($ElectreImage) and $ElectreImage ne '' and $ElectreImage ne '0'){
-		$template->param( 'ElectreImage' => $ElectreImage );
-		$template->param( 'OpacElectreImage' => 1 );
-	}
-	else{
-		$template->param( 'OpacElectreImage' => 0 );
-	}
+	$template->param( 'OpacElectreImage' => 1 );
 }
 else{
 	$template->param( 'OpacElectreImage' => 0 );
