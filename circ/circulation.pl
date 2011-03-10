@@ -497,6 +497,7 @@ my $totalprice = 0;
 sub build_issue_data {
     my $issueslist = shift;
     my $relatives = shift;
+    my $shelflocations = GetKohaAuthorisedValues( 'items.location', '', 'opac' );
 
   # split in 2 arrays for today & previous
     foreach my $it (@$issueslist) {
@@ -543,6 +544,7 @@ sub build_issue_data {
         }
         $it->{'return_failed'} = defined( $return_failed{ $it->{'itemnumber'} } );
         $it->{'branchdisplay'} = GetBranchName( ( C4::Context->preference('HomeOrHoldingBranch') eq 'holdingbranch' ) ? $it->{'holdingbranch'} : $it->{'homebranch'} );
+        $it->{'location_description'} = $shelflocations->{ $it->{'location'} };
 
         # ADDED BY JF: NEW ITEMTYPE COUNT DISPLAY
         $issued_itemtypes_count->{ $it->{'itemtype'} }++;
