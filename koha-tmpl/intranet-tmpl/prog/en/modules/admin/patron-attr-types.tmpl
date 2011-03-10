@@ -232,12 +232,14 @@ this feature on.</div>
 <!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="available_attribute_types" --><table>
   <tr>
+    <th>Class</th>
     <th>Code</th>
     <th>Description</th>
     <th>Actions</th>
   </tr>
   <!-- TMPL_LOOP name="available_attribute_types" -->
   <tr>
+    <td><!-- TMPL_VAR name="class" ESCAPE="HTML" --></td>
     <td><!-- TMPL_VAR name="code" ESCAPE="HTML" --></td>
     <td><!-- TMPL_VAR name="description" --></td>
     <td>

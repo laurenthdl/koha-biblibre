@@ -1036,12 +1036,14 @@
     <table id="attributes_table">
         <thead>
             <tr>
+                <th>Class</th>
                 <th>Type</th>
                 <th colspan="2">Value</th>
             </tr>
         </thead>
         <!-- TMPL_LOOP NAME='patron_attributes' -->
         <tr category_type="<!-- TMPL_VAR NAME="category_type" -->">
+            <td><!-- TMPL_VAR NAME="class" --></td>
             <td>
                 <!-- TMPL_VAR NAME="code" --> (<!-- TMPL_VAR NAME="description" -->)
             </td>
