@@ -5308,6 +5308,20 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.064";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectreLogin', '', 'Login for Electre ws',NULL,'free')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectrePassw', '', 'Password for Electre ws',NULL,'free')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreImage', '0', 'if ON, enable cover displaying from Electre ws',NULL,'YesNo')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreScaledImage', '1', 'if ON, enable scaling of cover from Electre ws',NULL,'YesNo')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreQuatriemeXml', '0', 'if ON, enable outside back cover displaying from Electre ws',NULL,'YesNo')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreResume', '0', 'if ON, enable resume displaying from Electre ws',NULL,'YesNo')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreSearchResulstImage', '0', 'if ON, enable cover displaying from Electre ws on OPAC search results',NULL,'YesNo')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreDisplayOnTab', '0', 'if ON, Electre informations (outside back cover and resume) are displayed in a dedicated Tab instead of being in the header',NULL,'YesNo')");
+    print "Upgrade to $DBversion done (Adding OpacElectre sysprefs)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
