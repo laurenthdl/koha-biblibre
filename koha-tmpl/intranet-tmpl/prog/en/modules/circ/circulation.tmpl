@@ -26,11 +26,11 @@ $.tablesorter.addParser({
 
 		$("#issuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
 		dateFormat: 'uk',<!-- /TMPL_IF -->
-		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false}}
+		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false},9:{sorter:false},10:{sorter:false}}
 		});
 		$("#relissuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
 		dateFormat: 'uk',<!-- /TMPL_IF -->
-		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false}}
+		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false},9:{sorter:false},10:{sorter:false}}
 		});
 
 		//FIXME: Sorting does not work when there are previous checkouts only
@@ -54,6 +54,8 @@ var allcheckboxes = $(".checkboxed");
         $("#CheckNoitems"   ).click(function(){ $(".checkboxed").unCheckCheckboxes(":input[name*=items]"); return false; });
         $("#CheckAllreturns").click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=barcodes]"); $(".checkboxed").unCheckCheckboxes(":input[name*=items]"); return false; });
         $("#CheckNoreturns" ).click(function(){ $(".checkboxed").unCheckCheckboxes(":input[name*=barcodes]"); return false; });
+        $("#CheckAllexports").click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=biblionumbers]"); $(".checkboxed").unCheckCheckboxes(":input[name*=items]"); return false; });
+        $("#CheckNoexports").click(function(){ $(".checkboxed").unCheckCheckboxes(":input[name*=biblionumbers]"); return false; });
 
         $("#relrenew_all"      ).click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=items]"   ); $(".checkboxed").unCheckCheckboxes(":input[name*=barcodes]"); });
         $("#relCheckAllitems"  ).click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=items]"   ); $(".checkboxed").unCheckCheckboxes(":input[name*=barcodes]"); return false; });
@@ -109,7 +111,8 @@ var allcheckboxes = $(".checkboxed");
 
 function initExportButton() {
 	var exportmenu = [
-        { text: _("ISO2709"), onclick: {fn: function(){export_submit("iso2709")}} },
+        { text: _("ISO2709 with items"), onclick: {fn: function(){export_submit("iso2709_995")}} },
+        { text: _("ISO2709 without items"), onclick: {fn: function(){export_submit("iso2709")}} },
         { text: _("CSV"), onclick: {fn: function(){export_submit("csv")}} },
     ];
     new YAHOO.widget.Button({
@@ -165,7 +168,13 @@ function export_submit(format) {
     if ($("input:checkbox[name='biblionumbers'][checked]").length < 1){
         alert("You must select a checkout to export");
         return;
-    };
+    }
+    if (format == 'iso2709_995'){
+        format = 'iso2709';
+        $("#dont_export_item").val(0);
+    }else if (format == 'iso2709'){
+        $("#dont_export_item").val(1);
+    }
     document.issues.action="/cgi-bin/koha/tools/export.pl";
     document.getElementById("export_format").value = format;
     document.issues.submit();
@@ -705,7 +714,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
         <th scope="col" filter="false">Material</th>
         <th scope="col" filter="false">Renew <p class="column-tool"><a href="#" id="CheckAllitems">select all</a> | <a href="#" id="CheckNoitems">none</a></p></th>
         <th scope="col" filter="false">Check in <p class="column-tool"><a href="#" id="CheckAllreturns">select all</a> | <a href="#" id="CheckNoreturns">none</a></p></th>
-        <th scope="col" filter="false">Export</th>
+        <th scope="col" filter="false">Export <p class="column-tool"><a href="#" id="CheckAllexports">select all</a> | <a href="#" id="CheckNoexports">none</a></p></th>
     </tr>
     </thead>
 <tfoot>
@@ -861,6 +870,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
         <span id="exportmenuc">Export</span>
         <input type="hidden" name="op" value="export" />
         <input type="hidden" id="export_format" name="format" value="iso2709" />
+        <input type="hidden" id="dont_export_item" name="dont_export_item" value="0" />
     </fieldset>
     <!-- /TMPL_IF -->
 <!-- TMPL_ELSE -->
