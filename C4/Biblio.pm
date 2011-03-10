@@ -1533,7 +1533,8 @@ sub GetMarcAuthors {
               if ( $marcflavour eq 'UNIMARC' and ( $authors_subfield->[0] =~ /4/ ) );
             my @this_link_loop = @link_loop;
             my $separator = C4::Context->preference("authoritysep") unless $count_auth == 0;
-            push @subfields_loop, { code => $subfieldcode, value => $value, link_loop => \@this_link_loop, separator => $separator } unless ( $authors_subfield->[0] eq '9' );
+            # ignore $9 and $6
+            push @subfields_loop, { code => $subfieldcode, value => $value, link_loop => \@this_link_loop, separator => $separator } unless ( $authors_subfield->[0] eq '9' or $authors_subfield->[0] eq '6' );
             $count_auth++;
         }
         push @marcauthors, { MARCAUTHOR_SUBFIELDS_LOOP => \@subfields_loop };
@@ -2988,7 +2989,7 @@ sub _koha_marc_update_bib_ids {
         # drop old field and create new one...
         $old_field = $record->field($biblio_tag);
         $record->delete_field($old_field) if $old_field;
-        $record->append_fields($new_field);
+        $record->insert_fields_ordered($new_field);
 
         # deal with biblioitemnumber
         if ( $biblioitem_tag < 10 ) {
@@ -3431,7 +3432,7 @@ sub ModBiblioMarc {
         }
         substr( $string, 22, 6, "frey50" );
         unless ( $record->subfield( 100, "a" ) ) {
-            $record->insert_grouped_field( MARC::Field->new( 100, "", "", "a" => $string ) );
+            $record->insert_fields_ordered( MARC::Field->new( 100, "", "", "a" => $string ) );
         }
     }
     my $oldRecord;

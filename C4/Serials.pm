@@ -289,7 +289,7 @@ sub UpdateClaimdateIssues {
     my $dbh = C4::Context->dbh;
     $date = strftime( "%Y-%m-%d", localtime ) unless ($date);
     my $query = "
-        UPDATE serial SET claimdate=$date,status=7
+        UPDATE serial SET claimdate='$date',status=7
         WHERE  serialid in (" . join( ",", @$serialids ) . ")";
     my $rq = $dbh->prepare($query);
     $rq->execute;
@@ -564,7 +564,7 @@ sub GetSubscriptions {
     my $dbh = C4::Context->dbh;
     my $sth;
     my $sql = qq(
-            SELECT subscription.*, subscriptionhistory.*, biblio.title,biblioitems.issn,biblio.biblionumber
+            SELECT subscription.*, subscriptionhistory.*, biblio.*,biblioitems.issn,biblio.biblionumber
             FROM   subscription
             LEFT JOIN subscriptionhistory USING(subscriptionid)
             LEFT JOIN biblio ON biblio.biblionumber = subscription.biblionumber

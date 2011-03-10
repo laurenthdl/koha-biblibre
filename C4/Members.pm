@@ -295,6 +295,8 @@ C<&searchtype> is a string telling the type of search you want todo : start_with
 sub Search {
     my ( $filter, $orderby, $limit, $columns_out, $search_on_fields, $searchtype ) = @_;
     my @filters;
+    my %filtersmatching_record;
+    my @finalfilter;
     if ( ref($filter) eq "ARRAY" ) {
         push @filters, @$filter;
     } else {
@@ -302,11 +304,18 @@ sub Search {
     }
     if ( C4::Context->preference('ExtendedPatronAttributes') ) {
         my $matching_records = C4::Members::Attributes::SearchIdMatchingAttribute($filter);
-        push @filters, @$matching_records;
+        if(scalar(@$matching_records)>0) {
+			foreach my $matching_record (@$matching_records) {
+				$filtersmatching_record{$$matching_record[0]}=1;
+			}
+			foreach my $k (keys(%filtersmatching_record)) {
+				push @filters, {"borrowernumber"=>$k};
+			}
+		}
     }
     $searchtype ||= "start_with";
-    my $data = SearchInTable( "borrowers", \@filters, $orderby, $limit, $columns_out, $search_on_fields, $searchtype );
-
+	push @finalfilter, \@filters;
+	my $data = SearchInTable( "borrowers", \@finalfilter, $orderby, $limit, $columns_out, $search_on_fields, $searchtype );
     return ($data);
 }
 
@@ -2213,7 +2222,7 @@ sub GetMessages {
     my $query = "SELECT
                   branches.branchname,
                   messages.*,
-                  DATE_FORMAT( message_date, '%m/%d/%Y' ) AS message_date_formatted,
+                  DATE(message_date) AS message_date_formatted,
                   messages.branchcode LIKE '$branchcode' AS can_delete
                   FROM messages, branches
                   WHERE borrowernumber = ?
@@ -2225,6 +2234,7 @@ sub GetMessages {
     my @results;
 
     while ( my $data = $sth->fetchrow_hashref ) {
+        $data->{message_date_formatted}=C4::Dates->new($data->{message_date_formatted}, 'iso')->output('syspref');
         push @results, $data;
     }
     return \@results;

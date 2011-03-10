@@ -117,7 +117,7 @@ function AreMandatoriesNotOk(){
         var subfield=tagsubfieldid.substr(3,1);    
         StrAlert += "\t* "+_("tag ")+tag+_(" subfield ")+subfield+" "+tabflag[tagsubfieldid][1]+_(" in tab ")+tabflag[tagsubfieldid][2]+"\n";
         //StrAlert += "\t* "+label[i]+_(" in tab ")+tab[i]+"\n"; 
-        flag=1;    
+        //flag=1;    
       }   
     }   
     
@@ -637,6 +637,7 @@ function unHideSubfield(index,labelindex) { // FIXME :: is it used ?
 <!--TMPL_ELSE-->
     <form method="post" name="f" id="f" action="/cgi-bin/koha/cataloguing/addbiblio.pl">
 	<input type="hidden" value="0" id="confirm_not_duplicate" name="confirm_not_duplicate" />
+    <input type="hidden" id="redirect" name="redirect" />
 <!-- /TMPL_IF -->
 	
 <div id="toolbar">
