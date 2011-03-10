@@ -33,6 +33,7 @@ use C4::Tags qw(get_tags);
 use C4::Dates qw/format_date/;
 use C4::XISBN qw(get_xisbns get_biblionumber_from_isbn);
 use C4::External::Amazon;
+use C4::External::Electre;
 use C4::External::Syndetics qw(get_syndetics_index get_syndetics_summary get_syndetics_toc get_syndetics_excerpt get_syndetics_reviews get_syndetics_anotes );
 use C4::Review;
 use C4::Serials;
@@ -457,6 +458,56 @@ if ( C4::Context->preference("OPACAmazonEnabled") ) {
         $template->param( AMAZON_SIMILAR_PRODUCTS => \@similar_products );
     }
 }
+
+#Electre stuff
+if(C4::Context->preference("OpacElectreImage")){
+	$template->param( 'OpacElectreImage' => 1 );
+}
+else{
+	$template->param( 'OpacElectreImage' => 0 );
+}
+if(C4::Context->preference("OpacElectreQuatriemeXml")){
+	my $ElectreQuatriemeXml=GetElectreQuatriemeXml($biblionumber);
+	if(defined($ElectreQuatriemeXml) and $ElectreQuatriemeXml ne '' and $ElectreQuatriemeXml ne '0'){
+		$template->param( 'ElectreQuatriemeXml' => $ElectreQuatriemeXml );
+		$template->param( 'OpacElectreQuatriemeXml' => 1 );
+		if(C4::Context->preference("OpacElectreDisplayOnTab")){
+			$template->param( 'OpacElectreDisplayOnTab' => 1 );
+		}
+		else{
+			$template->param( 'OpacElectreDisplayOnTab' => 0 );
+		}
+	}
+	else{
+		$template->param( 'OpacElectreQuatriemeXml' => 0 );
+	}
+}
+else{
+	$template->param( 'OpacElectreQuatriemeXml' => 0 );
+}
+if(C4::Context->preference("OpacElectreResume")){
+	my $ElectreResume=GetElectreResume($biblionumber);
+	#my $ElectreResume="test";
+	if(defined($ElectreResume) and $ElectreResume ne '' and $ElectreResume ne '0'){
+		$template->param( 'ElectreResume' => $ElectreResume );
+		$template->param( 'OpacElectreResume' => 1 );
+		if(C4::Context->preference("OpacElectreDisplayOnTab")){
+			$template->param( 'OpacElectreDisplayOnTab' => 1 );
+		}
+		else{
+			$template->param( 'OpacElectreDisplayOnTab' => 0 );
+		}
+	}
+	else{
+		$template->param( 'OpacElectreResume' => 0 );
+	}
+}
+else{
+	$template->param( 'OpacElectreResume' => 0 );
+}
+
+
+#warn Data::Dumper::Dumper C4::Context->preference("OpacElectreImage");
 
 my $syndetics_elements;
 
