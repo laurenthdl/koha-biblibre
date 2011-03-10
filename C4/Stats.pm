@@ -131,7 +131,6 @@ sub GetTotalIssuesLastYearByBorrower {
     return $sth->fetchrow;
 }
 
-
 1;
 __END__
 

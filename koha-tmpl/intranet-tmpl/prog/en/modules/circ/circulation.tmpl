@@ -850,8 +850,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
     </table>
     <!--TMPL_IF NAME="issuecount"-->
     <fieldset class="action">
-        <input type="button" name="hidden_submit" value="hidden_submit" id="phony_submit" style="display:none;" onclick="return false;" />
-        <input type="button" name="renew_checked" value="Renew or Return checked items" />
+        <input type="submit" name="renew_checked" value="Renew or Return checked items" />
         <br/><br/>
         <span id="exportmenuc">Export</span>
         <input type="hidden" name="op" value="export" />
