@@ -162,6 +162,10 @@ function refocus(calendar) {
 };
 
 function export_submit(format) {
+    if ($("input:checkbox[name='biblionumbers'][checked]").length < 1){
+        alert("You must select a checkout to export");
+        return;
+    };
     document.issues.action="/cgi-bin/koha/tools/export.pl";
     document.getElementById("export_format").value = format;
     document.issues.submit();
@@ -740,6 +744,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
                 <!-- /TMPL_IF -->
             </td>
             <td/>
+            <td/>
         </tr>
 		</tfoot>
 <!-- TMPL_IF NAME="todayissues" -->	<tbody>
@@ -796,7 +801,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
     <!-- /TMPL_LOOP --> <!-- /loop todayissues -->
     <!-- /if todayissues --><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="previssues" -->
-<tr><th class="{sorter: false}" colspan="10"><a name="previous" id="previous"></a>Previous checkouts</th></tr>
+<tr><th class="{sorter: false}" colspan="11"><a name="previous" id="previous"></a>Previous checkouts</th></tr>
     <!-- TMPL_LOOP NAME="previssues" -->
     <!-- TMPL_IF NAME="__odd__" -->
         <tr>
@@ -903,7 +908,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
     <!-- /TMPL_LOOP --> <!-- /loop todayissues -->
     <!-- /if todayissues --><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="relprevissues" -->
-<tr><th class="{sorter: false}" colspan="10"><a name="relprevious" id="relprevious"></a>Previous checkouts</th></tr>
+<tr><th class="{sorter: false}" colspan="11"><a name="relprevious" id="relprevious"></a>Previous checkouts</th></tr>
     <!-- TMPL_LOOP NAME="relprevissues" -->
     <!-- TMPL_IF NAME="__odd__" -->
         <tr>
