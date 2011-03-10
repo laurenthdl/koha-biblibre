@@ -70,7 +70,7 @@ if ( $op eq "export" ) {
         my $end_callnumber       = $query->param("end_callnumber");
         my $start_accession      = ( $query->param("start_accession") ) ? C4::Dates->new( $query->param("start_accession") ) : '';
         my $end_accession        = ( $query->param("end_accession") ) ? C4::Dates->new( $query->param("end_accession") ) : '';
-        my $dont_export_items    = $query->param("dont_export_item");
+        my $dont_export_items    = $query->param("dont_export_item"); # recommendation 995
         my $strip_nonlocal_items = $query->param("strip_nonlocal_items");
         my $dont_export_fields   = $query->param("dont_export_fields");
         my @biblionumbers        = $query->param("biblionumbers");
