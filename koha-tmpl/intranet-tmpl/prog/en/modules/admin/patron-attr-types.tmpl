@@ -43,6 +43,7 @@ function CheckAttributeTypeForm(f) {
 
 //]]>
 </script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 </head>
 <body>
 <!-- TMPL_INCLUDE NAME="header.inc" -->
@@ -202,6 +203,11 @@ this feature on.</div>
 	// prepare DOM for YUI Toolbar
 	 $(document).ready(function() {
 	    yuiToolbar();
+        $.tablesorter.defaults.widgets = ['zebra'];
+        $("#patron_attribute_types").tablesorter({
+            sortList: [[1,0]],
+            headers: { 3: { sorter: false }}
+        });
 	 });
 	// YUI Toolbar Functions
 	function yuiToolbar() {
@@ -230,13 +236,17 @@ this feature on.</div>
 <div class="dialog message">Could not delete patron attribute type &quot;<!-- TMPL_VAR name="ERROR_delete_not_found" -->&quot; 
     &mdash; it was already absent from the database.</div>
 <!-- /TMPL_IF -->
-<!-- TMPL_IF NAME="available_attribute_types" --><table>
+<!-- TMPL_IF NAME="available_attribute_types" -->
+<table id="patron_attribute_types">
+  <thead>
   <tr>
     <th>Class</th>
     <th>Code</th>
     <th>Description</th>
     <th>Actions</th>
   </tr>
+  </thead>
+  <tbody>
   <!-- TMPL_LOOP name="available_attribute_types" -->
   <tr>
     <td><!-- TMPL_VAR name="class" ESCAPE="HTML" --></td>
@@ -248,6 +258,7 @@ this feature on.</div>
     </td>
   </tr>
   <!-- /TMPL_LOOP -->
+  </tbody>
 </table><!-- TMPL_ELSE --><p>There are no saved patron attribute types.</p><!-- /TMPL_IF -->
 
 <div class="paginationBar"><!-- TMPL_VAR NAME="pagination_bar" --></div>
