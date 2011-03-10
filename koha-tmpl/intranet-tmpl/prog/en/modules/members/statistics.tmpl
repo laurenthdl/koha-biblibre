@@ -1,0 +1,110 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Patrons &rsaquo; <!-- TMPL_IF NAME="unknowuser" -->Patron does not exist<!-- TMPL_ELSE -->Patron Statistics for <!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" --> (<!-- TMPL_VAR NAME="cardnumber" -->)<!-- /TMPL_IF --></title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<!-- TMPL_INCLUDE NAME="calendar.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+</head>
+
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+<!-- TMPL_INCLUDE NAME="patron-search.inc" -->
+
+<div id="breadcrumbs">
+         <a href="/cgi-bin/koha/mainpage.pl">Home</a>
+&rsaquo; <a href="/cgi-bin/koha/members/members-home.pl">Patrons</a>
+&rsaquo; <!-- TMPL_IF NAME="unknowuser" -->Patron does not exist<!-- TMPL_ELSE -->Patron statistics for <!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" --> (<!-- TMPL_VAR NAME="cardnumber" -->)<!-- /TMPL_IF -->
+</div>
+
+<div id="doc3" class="yui-t1">
+   
+   <div id="bd">
+	<div id="yui-main">
+        <div class="yui-b">
+            <div class="yui-g">
+                <h2>Statistics</h2>
+                <table>
+                <thead>
+                    <tr>
+                    <!-- TMPL_LOOP NAME="column_name" -->
+                            <th><!-- TMPL_VAR NAME="name" --></th>
+                    <!-- /TMPL_LOOP -->
+                    <th>Precedent State</th>
+                    <th>Actual State</th>
+                    <th>Issues</th>
+                    <th>Issues returned</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <!-- TMPL_LOOP NAME="datas" -->
+                    <tr>
+                        <!-- FIXME When another tmpl engine will be use -->
+                        <td><!-- TMPL_VAR NAME='0' --></td>
+
+                        <!-- TMPL_IF EXPR="length_keys > 1" -->
+                            <!-- TMPL_IF NAME='1' -->
+                                <td><!-- TMPL_VAR NAME='1' --></td>
+                            <!-- TMPL_ELSE -->
+                                <td>#</td>
+                            <!-- /TMPL_IF -->
+                        <!-- /TMPL_IF -->
+
+                        <!-- TMPL_IF EXPR="length_keys > 2" -->
+                            <!-- TMPL_IF NAME='2' -->
+                                <td><!-- TMPL_VAR NAME='2' --></td>
+                            <!-- TMPL_ELSE -->
+                                <td>#</td>
+                            <!-- /TMPL_IF -->
+                        <!-- /TMPL_IF -->
+
+                        <!-- TMPL_IF EXPR="length_keys > 3" -->
+                            <!-- TMPL_IF NAME='3' -->
+                                <td><!-- TMPL_VAR NAME='3' --></td>
+                            <!-- TMPL_ELSE -->
+                                <td>#</td>
+                            <!-- /TMPL_IF -->
+                        <!-- /TMPL_IF -->
+
+                        <!-- TMPL_IF EXPR="length_keys > 4" -->
+                            <!-- TMPL_IF NAME='4' -->
+                                <td><!-- TMPL_VAR NAME='4' --></td>
+                            <!-- TMPL_ELSE -->
+                                <td>#</td>
+                            <!-- /TMPL_IF -->
+                        <!-- /TMPL_IF -->
+
+                        <!-- TMPL_IF NAME='count_precedent_state' -->
+                            <td><!-- TMPL_VAR NAME='count_precedent_state' --></td>
+                        <!-- TMPL_ELSE -->
+                            <td>0</td>
+                        <!-- /TMPL_IF -->
+
+                        <!-- TMPL_IF NAME='count_actual_state' -->
+                            <td><!-- TMPL_VAR NAME='count_actual_state' --></td>
+                        <!-- TMPL_ELSE -->
+                            <td>0</td>
+                        <!-- /TMPL_IF -->
+
+                        <!-- TMPL_IF NAME='count_total_issues_today' -->
+                            <td><!-- TMPL_VAR NAME='count_total_issues_today' --></td>
+                        <!-- TMPL_ELSE -->
+                            <td>0</td>
+                        <!-- /TMPL_IF -->
+
+                        <!-- TMPL_IF NAME='count_total_issues_returned_today' -->
+                            <td><!-- TMPL_VAR NAME='count_total_issues_returned_today' --></td>
+                        <!-- TMPL_ELSE -->
+                                <td>0</td>
+                        <!-- /TMPL_IF -->
+                    </tr>
+                    <!-- /TMPL_LOOP -->
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+<div class="yui-b">
+<!-- TMPL_INCLUDE NAME="circ-menu.inc" -->
+</div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
