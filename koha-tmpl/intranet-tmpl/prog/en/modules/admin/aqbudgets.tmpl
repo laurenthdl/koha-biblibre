@@ -121,10 +121,29 @@
             }
         });
         <!-- TMPL_IF NAME="notree" -->
+        $.tablesorter.addParser({
+            id: 'amount',
+            is: function(s) {
+                return false;
+            },
+            format:	function(s) {
+                return s.replace(/ /g,"").replace(/,/g,"");
+            },
+            type: 'numeric'
+    	});
+
         $("#budgeth").tablesorter({
             widgets : ['zebra'],
             sortList: [[0,0]],
-            headers: { 7: { sorter: false }}
+            headers: {
+                2: { sorter: 'amount' },
+                3: { sorter: 'amount' },
+                4: { sorter: 'amount' },
+                5: { sorter: 'amount' },
+                6: { sorter: 'amount' },
+                7: { sorter: false },
+                8: { sorter: false }
+            }
         });
         <!-- TMPL_ELSE -->
         $("#budgeth").treeTable();
@@ -154,6 +173,12 @@
 <div id="yui-main">
 <div class="yui-b" id="content">
 
+<!-- TMPL_IF NAME="sql_error" -->
+    <div class="sql_error">
+        <!-- TMPL_VAR NAME="sql_error" -->
+    </div>
+<!-- /TMPL_IF -->
+
 <!-- TMPL_UNLESS name="delete_confirm" --><!-- TMPL_INCLUDE NAME="budgets-admin-toolbar.inc" --><!-- /TMPL_UNLESS -->
 <!-- TMPL_IF name="else" -->
 
@@ -167,6 +192,7 @@
             <th>Fund name</th>
             <th>Total<br />allocated</th>
             <th>Base-level<br />allocated</th>
+            <th>Base-level<br />ordered</th>
             <th>Base-level<br />spent</th>
             <th>Total sublevels<br />spent</th>
             <th>Base-level<br />remaining</th>
@@ -199,6 +225,7 @@
     <td><!-- TMPL_VAR NAME="budget_name" --></td>
     <td class="data"><!-- TMPL_VAR NAME="budget_amount_total" --></td>
     <td class="data"><!-- TMPL_VAR NAME="budget_amount" --> </td>
+    <td class="data"><!-- TMPL_VAR NAME="budget_ordered" --> </td>
     <td class="data"><!-- TMPL_VAR NAME="budget_spent" --> </td>
     <td class="data"><!-- TMPL_VAR NAME="total_levels_spent" --></td>
     <!-- TMPL_IF NAME="remaining_pos" -->
@@ -293,14 +320,28 @@
     </li>
 
     <li>
-    <span class="label">Owner: </span>
-    <span  id="budget_owner_name">
-    <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="budget_owner_id" -->"><!-- TMPL_VAR NAME="budget_owner_name" --></a>
-    </span>
+      <span class="label">Owner: </span>
+      <span  id="budget_owner_name">
+        <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="budget_owner_id" -->"><!-- TMPL_VAR NAME="budget_owner_name" --></a>
+      </span>
 
-    <!-- FIXME: hardcoded button positions :/ -->
-    <input style="" type="button" id="edit_owner" value="Edit owner" onclick="ownerPopup(); return false;" />
-    <input style=""  type="button" id="remove_owner" value="Remove owner" onclick="ownerRemove(this.form); return false;" />
+      <!-- FIXME: hardcoded button positions :/ -->
+      <input style="" type="button" id="edit_owner" value="Edit owner" onclick="ownerSearchPopup(); return false;" />
+      <input style=""  type="button" id="remove_owner" value="Remove owner" onclick="ownerRemove(this.form); return false;" />
+    </li>
+
+    <li>
+      <span class="label">Users: </span>
+      <ul id="budget_user_name">
+        <!-- TMPL_LOOP name="budgetusersnames_loop" -->
+        <li id="<!-- TMPL_VAR name="id" -->">
+          <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="name" --></a> 
+          <a href="#" onclick="deleteUser(<!-- TMPL_VAR name='id' -->);return false;">X</a>
+        </li>
+        <!-- /TMPL_LOOP -->
+      </ul>
+      <input type="hidden" id="budget_user_id" name="budgetusersid" value="<!-- TMPL_VAR name="borrowernumberslist" -->"/>
+      <input type="button" id="add_user" value="Add user" onclick="userSearchPopup(); return false;" />
     </li>
 
     <li>
@@ -415,12 +456,8 @@
         </li>
         <li class="radio">
 
-        <label for="show_mine">Show my<br /> funds only</label>
-            <!-- TMPL_IF NAME="show_mine" -->
-                <input type="checkbox" id="show_mine"  name="show_mine" value="1" checked="checked" />
-            <!-- TMPL_ELSE -->
-                <input type="checkbox" id="show_mine"  name="show_mine" value="1" />
-        <!-- /TMPL_IF -->
+        <label for="show_all">Show all funds</label>
+            <input type="checkbox" id="show_all"  name="show_all" value="1" <!-- TMPL_IF NAME="show_all" -->checked="checked"<!-- /TMPL_IF -->/>
         </li>
         </ol>
 

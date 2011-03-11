@@ -51,7 +51,7 @@ use CGI;
 
 use C4::Bookseller qw/GetBookSellerFromId/;
 use C4::Acquisition
-  qw/CloseBasketgroup ReOpenBasketgroup GetOrders GetBasketsByBasketgroup GetBasketsByBookseller ModBasketgroup NewBasketgroup DelBasketgroup GetBasketgroups ModBasket GetBasketgroup GetBasket/;
+  qw/CloseBasketgroup ReOpenBasketgroup GetOrders GetBasketsByBasketgroup GetBasketsByBookseller ModBasketgroup NewBasketgroup DelBasketgroup GetBasketgroups ModBasket GetBasketgroup GetBasket GetBasketGroupAsCSV/;
 use C4::Bookseller qw/GetBookSellerFromId/;
 use C4::Branch qw/GetBranches/;
 use C4::Members qw/GetMember/;
@@ -278,7 +278,6 @@ if ( $op eq "add" ) {
         my $deliveryplace;
         my $freedeliveryplace;
         if ($basketgroupid) {
-	
 
             # Get the selected baskets in the basketgroup to display them
             my $selecteds = GetBasketsByBasketgroup($basketgroupid);
@@ -425,6 +424,14 @@ if ( $op eq "add" ) {
     my $basketgroupid = $input->param('basketgroupid');
 
     printbasketgrouppdf($basketgroupid);
+}elsif ( $op eq "export" ) {
+    my $basketgroupid = $input->param('basketgroupid');
+    print $input->header(
+        -type       => 'text/csv',
+        -attachment => 'basketgroup' . $basketgroupid . '.csv',
+    );
+    print GetBasketGroupAsCSV( $basketgroupid );
+    exit;
 } elsif ( $op eq "delete" ) {
     my $basketgroupid = $input->param('basketgroupid');
     DelBasketgroup($basketgroupid);

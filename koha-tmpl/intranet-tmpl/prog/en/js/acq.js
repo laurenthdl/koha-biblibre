@@ -535,10 +535,22 @@ function log(message) {
 
 
 
-    function ownerPopup(f) {
-    window.open("/cgi-bin/koha/admin/aqbudget_owner_search.pl?op=budget",'PatronPopup','width=740,height=450,location=yes,toolbar=no,scrollbars=yes,resize=yes');
+    function ownerSearchPopup(f) {
+      window.open("/cgi-bin/koha/admin/aqbudget_borrower_search.pl?op=budget&type=owner",'PatronPopup','width=740,height=450,location=yes,toolbar=no,scrollbars=yes,resize=yes');
     }
-        //
+
+    function userSearchPopup(f) {
+      window.open("/cgi-bin/koha/admin/aqbudget_borrower_search.pl?op=budget&type=user",'PatronPopup','width=740,height=450,location=yes,toolbar=no,scrollbars=yes,resize=yes');
+    }
+
+    function deleteUser (id) {
+      // $("#"+id+":parent").remove();
+      $("#"+id).remove();
+      var ids = $("#budget_user_id").val();
+      ids = ids.replace (id+':', '');
+      $("#budget_user_id").val(ids);
+    }
+
 //=======================================================================
 function getElementsByClass( searchClass, domNode, tagName) {
     if (domNode == null) domNode = document;

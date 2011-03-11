@@ -122,6 +122,14 @@ if ( $op eq "do_search" ) {
         debug           => 1,
     } );
 
+    ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
+        template_name   => "authorities/authorities-home.tmpl",
+        query           => $query,
+        type            => 'intranet',
+        authnotrequired => 0,
+        flagsrequired   => { catalogue => 1 },
+        debug           => 1,
+    } );
 }
 
 $template->param(

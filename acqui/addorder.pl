@@ -121,6 +121,7 @@ use C4::Auth;           # get_template_and_user
 use C4::Acquisition;    # NewOrder DelOrder ModOrder
 use C4::Suggestions;    # ModStatus
 use C4::Biblio;         # AddBiblio TransformKohaToMarc
+use C4::Bookseller;     # GetBookSellerFromId
 use C4::Items;
 use C4::Output;
 
@@ -188,23 +189,44 @@ my $user = $input->remote_user;
 my $bibitemnum;
 if ( $orderinfo->{quantity} ne '0' ) {
 
-    #TODO:check to see if biblio exists
+# Getting bookseller's name
+my $supplierreference;
+if ($$orderinfo{booksellerid}) {
+    my $bookseller = GetBookSellerFromId($$orderinfo{booksellerid});
+    $supplierreference = $bookseller->{name};
+}
+
+# Do we have to add order informations to the marc record?
+my ($ordertag, $ordersubtag) = GetMarcFromKohaField('aqorders.ordernumber', 'ACQ'); 
+my $record;
+my $existingbiblio; # Was the order made on an existing biblio?
+my $ordermodif;     # Is this an order modification?
+
+   #TODO:check to see if biblio exists
     unless ( $$orderinfo{biblionumber} ) {
 
         #if it doesnt create it
-        my $record = TransformKohaToMarc(
+        my $tmprecord = TransformKohaToMarc(
             {   "biblio.title"                => "$$orderinfo{title}",
                 "biblio.author"               => "$$orderinfo{author}",
                 "biblio.seriestitle"          => $$orderinfo{series} ? $$orderinfo{series} : "",
-                "biblioitems.isbn"            => $$orderinfo{isbn} ? $$orderinfo{isbn} : "",
+                "biblioitems.isbn"            => $$orderinfo{ISBN} ? $$orderinfo{ISBN} : "",
+                "biblioitems.ean"             => $$orderinfo{EAN} ? $$orderinfo{EAN} : "",
                 "biblioitems.publishercode"   => $$orderinfo{publishercode} ? $$orderinfo{publishercode} : "",
                 "biblioitems.publicationyear" => $$orderinfo{publicationyear} ? $$orderinfo{publicationyear} : "",
                 "biblioitems.itemtype"        => $$orderinfo{itemtype} ? $$orderinfo{itemtype} : "",
+                "biblioitems.editionstatement" => $$orderinfo{editionstatement} ? $$orderinfo{editionstatement} : "",
+                "aqorders.branchcode"         => $$orderinfo{branchcode} ? $$orderinfo{branchcode} : "",
+                "aqorders.quantity"           => $$orderinfo{quantity} ? $$orderinfo{quantity} : "",
+                "aqorders.listprice"          => $$orderinfo{listprice} ? $$orderinfo{listprice} : "",
+                "aqorders.notes"              => $$orderinfo{notes} ? $$orderinfo{notes} : "",
+                "aqorders.supplierreference"  => $supplierreference ? $supplierreference : "",
             }
         );
 
         # create the record in catalogue, with framework ''
-        my ( $biblionumber, $bibitemnum ) = AddBiblio( $record, '' );
+        my ( $biblionumber, $bibitemnum ) = AddBiblio( $tmprecord, '' );
+
 
         # change suggestion status if applicable
         if ( $$orderinfo{suggestionid} ) {
@@ -212,16 +234,68 @@ if ( $orderinfo->{quantity} ne '0' ) {
         }
         $orderinfo->{biblioitemnumber} = $bibitemnum;
         $orderinfo->{biblionumber}     = $biblionumber;
+    } else {
+	$existingbiblio = 1;
     }
 
-    # if we already have $ordernumber, then it's an ordermodif
+    # Getting record
+    $record = GetMarcBiblio($$orderinfo{biblionumber});
+
+    
+
+     # if we already have $ordernumber, then it's an ordermodif
     if ( $$orderinfo{ordernumber} ) {
         ModOrder($orderinfo);
+	$ordermodif = 1;
+	
     } else {    # else, it's a new line
         @$orderinfo{qw(basketno ordernumber )} = NewOrder($orderinfo);
+
+	# We have to add the ordernumber in the designated subfield
+	if ($ordertag && $record && !$ordermodif) {
+	    # To which field do we add it : to the one with currently no ordernumber
+	    foreach ($record->field($ordertag)) {
+		if (!$_->subfield($ordersubtag)) {
+		    $_->update($ordersubtag, $$orderinfo{ordernumber});
+		}
+	    }
+	    ModBiblio($record, $$orderinfo{biblionumber}, 'ACQ');
+	}
+
+
     }
 
-    # now, add items if applicable
+    if ($record) {
+
+	# If we have to add order infos to the marc record
+	if ($ordertag) {
+
+	    # If the order was made on an existing biblio and it is not a modification, we add the field 
+	    $record->insert_fields_ordered(new MARC::Field($ordertag, '', '', $ordersubtag => $$orderinfo{ordernumber})) if (!$ordermodif && $existingbiblio);
+
+	    foreach ($record->field($ordertag)) {
+		# Looking for the matching one
+		warn $_->as_formatted;
+		#warn $osf . "field " . $_->subfield($osf) . " orderinfo " . $$orderinfo{ordernumber};
+		if ($_->subfield($ordersubtag) eq $$orderinfo{ordernumber}) {
+
+		    # Replacing or creating subfields
+		    my ($t, $st);
+		    for my $tablefield (qw/branchcode quantity listprice notes supplierreference/) {
+			($t, $st) = GetMarcFromKohaField("aqorders.$tablefield", 'ACQ');
+			$_->update($st, $$orderinfo{$tablefield}) if ($$orderinfo{$tablefield});
+		    }
+		    ModBiblio($record, $$orderinfo{biblionumber}, 'ACQ');
+		}
+	    }
+
+	}
+
+    }
+
+
+    
+      # now, add items if applicable
     if ( C4::Context->preference('AcqCreateItem') eq 'ordering' ) {
 
         my @tags         = $input->param('tag');

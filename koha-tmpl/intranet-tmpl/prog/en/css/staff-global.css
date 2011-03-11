@@ -232,13 +232,6 @@ table {
 	border-right : 1px solid #BCBCBC;
 }
 
-table.invis{
-	border : white;
-}
-table.invis tr,table.invis td {
-	border : white;
-}
-
 td, th {
 	border-bottom : 1px solid #BCBCBC;
 	border-left : 1px solid #BCBCBC;
@@ -1960,4 +1953,35 @@ select.advsearchoperator {
 .warning {
     color: red;
     margin-left: 1%;
+}
+
+span.suggestion_info {
+    color: #336600;
+}
+
+div.sql_error {
+	border : 2px dashed #990000;
+	background-color : #FFFF99;
+	padding : .5em;
+	margin : 1em;
+}
+
+div#acqui_order_supplierlist > div.vendor {
+    border: solid 1px #eee;
+    margin: 0.5em;
+    padding: 1em;
+}
+div#acqui_order_supplierlist > div.vendor > span.vendor_name {
+	display : inline;
+    font-size : 1.7em;
+    margin-bottom: 0.5em;
+}
+div#acqui_order_supplierlist > div.vendor > span.action {
+    margin-left: 5em;
+}
+div#acqui_order_supplierlist > div.vendor > div.baskets {
+    margin-top: 0.5em;
+}
+ul.vendors_anchors {
+    margin: 0.5em 1.5em;
 }

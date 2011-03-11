@@ -23,6 +23,7 @@ Data Deleted
 <script type="text/javascript" id="js">$(document).ready(function() {
 	// call the tablesorter plugin
 	$("#table_item_type").tablesorter({
+	    widgets : ['zebra'],    
 		sortList: [[1,0]],
 		headers: { 0: { sorter: false},5: { sorter: false}}
 		   		}).tablesorterPager({container: $("#pagertable_item_type"),positionFixed: false,size: 10});

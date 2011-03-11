@@ -133,6 +133,17 @@ if ( $op eq "do_search" ) {
         debug           => 1,
     } );
 
+    $template->param( result => \@resultrecords );
+
+} else {
+
+    ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
+        template_name   => "opac-authorities-home.tmpl",
+        query           => $query,
+        type            => 'opac',
+        authnotrequired => 1,
+        debug           => 1,
+    } );
 }
 
 $template->param(
@@ -141,5 +152,4 @@ $template->param(
     usage_index_name  => C4::Search::Query::getIndexName('usedinxbiblios')
 );
 
-# Print the page
 output_html_with_http_headers $query, $cookie, $template->output;

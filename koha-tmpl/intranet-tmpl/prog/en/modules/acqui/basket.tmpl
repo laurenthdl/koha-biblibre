@@ -1,20 +1,44 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions &rsaquo; <!-- TMPL_UNLESS name="basketno" -->New <!-- /TMPL_UNLESS --><!-- TMPL_IF NAME="delete_confirm" -->Delete <!-- /TMPL_IF -->Basket <!-- TMPL_VAR NAME="basketname" --> (<!-- TMPL_VAR NAME="basketno" -->) for <!-- TMPL_VAR NAME="name" --></title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
-<!-- TMPL_UNLESS name="closedate" -->
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/JavaScript">
 //<![CDATA[
     $(document).ready(function() {
+        $.tablesorter.addParser({
+            id: 'amount',
+            is: function(s) {
+                return false;
+            },
+            format:	function(s) {
+                return s.replace(/ /g,"").replace(/,/g,"");
+            },
+            type: 'numeric'
+    	});
         $("#orders").tablesorter({
+            widgets : ['zebra'],
             headers: {
-                9: { sorter: false },
-                10: { sorter: false }
-            }
+                1: { sorter: 'amount' },
+                2: { sorter: 'amount' },
+                4: { sorter: 'amount' },
+                <!-- TMPL_IF name="active" -->
+                    <!-- TMPL_UNLESS name="closedate" -->
+                        6: { sorter: false },
+                        7: { sorter: false }
+                    <!-- /TMPL_UNLESS -->
+                <!-- /TMPL_IF -->
+            },
+            textExtraction: function(node){
+                if ($(node).find('p').length!=0){
+                    return $(node).find('p').find('a:first').text();
+                }
+                return node.innerHTML;
+            },
         });
     });
 //]]>
 </script>
+<!-- TMPL_UNLESS name="closedate" -->
 <script type="text/javascript">
 //<![CDATA[
             function confirm_close() {
@@ -98,15 +122,15 @@
                         //]]>
                     </script>
                     <ul id="toolbar-list" class="toolbar">
-                    <li><a href="basketheader.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->&amp;op=add_form" class="button" id="basketheadbutton">Edit basket header information</a></li>
-                    <li><a href="javascript:confirm_deletion();" class="button" id="delbasketbutton">Delete this basket</a></li>
-                    <!-- TMPL_IF name="unclosable" -->
-                        <li><button onclick="confirm_close()" class="yui-button-disabled" id="closebutton" type="push" disabled="true" title="You can not close this basket" >Can not close basket</a></li>
-                    <!-- TMPL_ELSIF name="uncertainprices" -->
-                        <li><a href="/cgi-bin/koha/acqui/uncertainprice.pl?booksellerid=<!-- TMPL_VAR name="booksellerid" -->&amp;owner=1" class="button" id="uncertpricesbutton">Uncertain prices</a></li>
-                    <!-- TMPL_ELSE -->
-                        <li><a href="<!-- TMPL_VAR name="script_name" -->?op=close&amp;basketno=<!-- TMPL_VAR name="basketno" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->" class="button" id="closebutton">Close this basket</a></li>
-                    <!-- /TMPL_IF -->
+                        <li><a href="basketheader.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->&amp;op=add_form" class="button" id="basketheadbutton">Edit basket header information</a></li>
+                        <li><a href="javascript:confirm_deletion();" class="button" id="delbasketbutton">Delete this basket</a></li>
+                        <!-- TMPL_IF name="unclosable" -->
+                            <li><button onclick="confirm_close()" class="yui-button-disabled" id="closebutton" type="push" disabled="true" title="You can not close this basket" >Can not close basket</a></li>
+                        <!-- TMPL_ELSIF name="uncertainprices" -->
+                            <li><a href="/cgi-bin/koha/acqui/uncertainprice.pl?booksellerid=<!-- TMPL_VAR name="booksellerid" -->&amp;owner=1" class="button" id="uncertpricesbutton">Uncertain prices</a></li>
+                        <!-- TMPL_ELSE -->
+                            <li><a href="<!-- TMPL_VAR name="script_name" -->?op=close&amp;basketno=<!-- TMPL_VAR name="basketno" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->" class="button" id="closebutton">Close this basket</a></li>
+                        <!-- /TMPL_IF -->
                         <li><a href="<!-- TMPL_VAR name="script_name" -->?op=export&amp;basketno=<!-- TMPL_VAR name="basketno" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->" class="button" id="exportbutton">Export this basket as CSV</a></li>
                     </ul>
                 </div>
@@ -122,11 +146,13 @@
                         // YUI Toolbar Functions
                         function yuiToolbar() {
                             new YAHOO.widget.Button("reopenbutton");
+                            new YAHOO.widget.Button("exportbutton");
                         }
                         //]]>
                     </script>
                         <ul id="toolbar-list" class="toolbar">
                             <li><a href="javascript:confirm_reopen();" class="button" id="reopenbutton">Reopen this basket</a></li>
+                            <li><a href="<!-- TMPL_VAR name="script_name" -->?op=export&amp;basketno=<!-- TMPL_VAR name="basketno" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->" class="button" id="exportbutton">Export this basket as CSV</a></li>
                         </ul>
                 </div>
                 <!-- /TMPL_UNLESS -->
@@ -262,6 +288,12 @@
                                     <!-- TMPL_IF name="isbn"--> - <!-- TMPL_VAR name="isbn" --><!-- /TMPL_IF -->
                                     <!-- TMPL_IF name="publishercode" -->, <!-- TMPL_VAR NAME="publishercode" --><!-- /TMPL_IF -->
                                     <!-- TMPL_IF name="publicationyear" -->, <!-- TMPL_VAR NAME="publicationyear" --><!-- /TMPL_IF -->
+                                    <br/>
+                                    <!-- TMPL_IF name="suggestionid" -->
+                                        <span class='suggestion_info'>Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" -->
+                                        <!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF -->
+                                        <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)</span>
+                                    <!-- /TMPL_IF -->
                             </p>
                             </td>
                         <td class="number"><!-- TMPL_VAR NAME="rrp" --></td>
@@ -298,6 +330,7 @@
             <form action="/cgi-bin/koha/acqui/neworderbiblio.pl" method="post">
                 <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME="booksellerid" -->" />
                 <input type="hidden" name="basketno" value="<!-- TMPL_VAR NAME="basketno" -->" />
+                <input type="hidden" name="idx" value="all_fields" />
                 <ul><li><label for="q">From an existing record: </label><input id="q" type="text"  size="25" name="q" />
                 <input type="submit" class="submit" value="Search" /></li>
                 <li><a href="/cgi-bin/koha/acqui/newordersuggestion.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">From a Suggestion</a></li>

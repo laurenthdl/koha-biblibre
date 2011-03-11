@@ -107,7 +107,7 @@ my $dat = &GetBiblioData($biblionumber);
 
 #coping with subscriptions
 my $subscriptionsnumber = CountSubscriptionFromBiblionumber($biblionumber);
-my @subscriptions = GetSubscriptions( $dat->{title}, $dat->{issn}, $biblionumber );
+my @subscriptions = GetSubscriptions( $dat->{title}, $dat->{issn}, undef, $biblionumber );
 my @subs;
 $dat->{'serial'} = 1 if $subscriptionsnumber;
 foreach my $subscription (@subscriptions) {

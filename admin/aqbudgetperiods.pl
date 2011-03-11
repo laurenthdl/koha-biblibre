@@ -66,6 +66,8 @@ my $op               = $input->param('op') || "else";
 
 my $budget_period_hashref = $input->Vars;
 
+my $sql_error = 0;
+
 #my $sort1_authcat = $input->param('sort1_authcat');
 #my $sort2_authcat = $input->param('sort2_authcat');
 
@@ -130,12 +132,15 @@ elsif ( $op eq 'add_validate' ) {
 ## add or modify a budget period (confirmation)
 
     ## update budget period data
+    my $status;
      if ( $budget_period_id ne '' ) {
         $$budget_period_hashref{$_} ||= 0 for qw(budget_period_active budget_period_locked);
-        my $status = ModBudgetPeriod($budget_period_hashref);
+        $status = ModBudgetPeriod($budget_period_hashref);
     } else {    # ELSE ITS AN ADD
-        my $budget_period_id = AddBudgetPeriod($budget_period_hashref);
+        $status = AddBudgetPeriod($budget_period_hashref);
     }
+
+    $sql_error = "This budget name already exists" unless $status;
     $op = 'else';
 }
 
@@ -188,5 +193,8 @@ $template->param(
     pagination_bar        => pagination_bar( "aqbudgetperiods.pl", getnbpages( scalar(@$results), $pagesize ), $page ),
 );
 
-$template->param( $op => 1 );
+$template->param(
+    $op => 1,
+    sql_error => $sql_error,
+);
 output_html_with_http_headers $input, $cookie, $template->output;
