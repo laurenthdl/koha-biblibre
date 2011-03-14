@@ -94,14 +94,21 @@ sub buildQuery {
 
 sub BuildTokenString {
     my ($index, $string, $operator) = @_;
-    my $r = "";
+    my $r;
+
     if ($index ne 'all_fields' && $index ne ''){
         if ( $string =~ / / ) {
+            my @dqs; #double-quoted string
+            while ( $string =~ /"(?:[^"\\]++|\\.)*+"/g ) {
+                push @dqs, $&;
+                $string =~ s/\ *$&\ *//; # Remove useless space before and after
+            }
+
             my @words = split ' ', $string;
-            $r = join " AND " , map {
-                "$index:$_"
-            } @words;
-            $r = "(" . $r . ")";
+            my $join = join qq{ AND } , map {
+                qq{$index:$_};
+            } (@dqs, @words);
+            $r .= qq{($join)};
         } else {
             $r = "$index:$string";
         }
@@ -111,14 +118,6 @@ sub BuildTokenString {
 
     return " $operator $r" if $operator;
     return $r;
-#    if ( $string =~ / / ) {
-#        my @words = split ' ', $string;
-#        my $r = join ' AND ' , map {
-#            "$index:$_"
-#        } @words;
-#        return "(" . $r . ")";
-#    }
-#    return "$index:$string";
 }
 
 sub normalSearch {
