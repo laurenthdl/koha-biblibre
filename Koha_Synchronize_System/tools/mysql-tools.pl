@@ -118,15 +118,16 @@ sub purge_mysql_log {
 
     $/ = $sep;
 
-    my @tables     = ('issues', 'items', 'biblio', 'biblioitems', 'statistics');
-    my @tables_not = ('session');
+    my @tables     = ('borrowers', 'items', 'issues', 'old_issues', 'statistics', 'reserves', 'old_reserves', 'action_logs', 'borrower_attributes');
     my @operations = ('INSERT INTO', 'UPDATE', 'DELETE FROM');
+
 
     while ( my $line = <FILE> ) {
         for my $op (@operations){
             for my $table (@tables) {
-                if ( $line =~ "$op $table ") {
+                if ( $line =~ /$op $table( |\n)/ ) {
                     print $line;
+                    #print substr($line, 0, length($line) - 7);
                 }
             }
         }
