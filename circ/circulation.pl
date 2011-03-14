@@ -841,6 +841,7 @@ $template->param(
     CircAutocompl             => C4::Context->preference("CircAutocompl"),
     AllowRenewalLimitOverride => C4::Context->preference("AllowRenewalLimitOverride"),
     dateformat                => C4::Context->preference("dateformat"),
+    dont_export_fields        => C4::Context->preference("DontExportFields"),
     DHTMLcalendar_dateformat  => C4::Dates->DHTMLcalendar(),
     librarytype               => C4::Context->preference("LibraryType"),
 );

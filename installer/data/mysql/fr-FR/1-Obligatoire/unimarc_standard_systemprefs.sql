@@ -298,3 +298,6 @@ INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES (
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadWebPath','','Le chemin vers le répertoire de stockage à partir de la racine de publication du serveur web pour le plugin upload.pl','','');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('BlockRenewWhenOverdue','0','Bloque les renouvellement quand en retard','','YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Nombre de résultats à afficher par défaut sur un fil RSS',NULL,'Integer');
+INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('CsvProfileForExport','0','Set a profile name for CSV export','','');
+INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('LibraryType','Public','Set a type for the library','Academic|Public|Special','Choice');
+INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('DontExportFields','','List of fields for non export in circulation.pl (separated by a space)','','');

@@ -218,6 +218,7 @@ else {
         branchloop               => \@branchloop,
         itemtypeloop             => \@itemtypesloop,
         DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
+        dont_export_fields        => C4::Context->preference("DontExportFields"),
     );
 
     output_html_with_http_headers $query, $cookie, $template->output;
