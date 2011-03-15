@@ -27,6 +27,7 @@ use C4::Items;
 use C4::Koha;
 use C4::Biblio;
 use C4::Circulation;
+use C4::Dates qw/format_date/;
 use C4::Reserves;
 use Encode;
 use XML::LibXML;
@@ -135,13 +136,13 @@ sub XSLTParse4Display {
 
     # grab the XML, run it through our stylesheet, push it out to the browser
     my $record = transformMARCXML4XSLT( $biblionumber, $orig_record );
-	my $itemsimageurl = GetKohaImageurlFromAuthorisedValues( "CCODE", $orig_record->subfield("099", "t")) || '';
-	my $logoxml = "<logo>" . $itemsimageurl . "</logo>\n";
+    my $itemsimageurl = GetKohaImageurlFromAuthorisedValues( "CCODE", $orig_record->subfield("099", "t")) || '';
+    my $logoxml = "<logo>" . $itemsimageurl . "</logo>\n";
     #return $record->as_formatted();
     my $itemsxml  = buildKohaItemsNamespace($biblionumber);
     my $xmlrecord = $record->as_xml( C4::Context->preference('marcflavour') );
     my $sysxml    = "<sysprefs>\n";
-    foreach my $syspref (qw/OPACURLOpenInNewWindow DisplayOPACiconsXSLT URLLinkText viewISBD/) {
+    foreach my $syspref (qw/OPACURLOpenInNewWindow singleBranchMode Version item-level_itypes OPACShelfBrowser DisplayOPACiconsXSLT URLLinkText viewISBD/) {
         $sysxml .= "<syspref name=\"$syspref\">" . C4::Context->preference($syspref) . "</syspref>\n";
     }
     $sysxml .= "</sysprefs>\n";
@@ -153,6 +154,7 @@ sub XSLTParse4Display {
 
     # don't die when you find &, >, etc
     $parser->recover_silently(1);
+
     my $source = $parser->parse_string($xmlrecord);
     unless ( $stylesheet->{$xslfilename} ) {
         my $xslt = XML::LibXSLT->new();
@@ -168,6 +170,7 @@ sub XSLTParse4Display {
     }
     my $results      = $stylesheet->{$xslfilename}->transform($source);
     my $newxmlrecord = $stylesheet->{$xslfilename}->output_string($results);
+    #warn Data::Dumper::Dumper $xmlrecord;
     return $newxmlrecord;
 }
 
@@ -179,11 +182,13 @@ sub buildKohaItemsNamespace {
     my $xml            = '';
     for my $item (@items) {
         my $status;
-
+        my $displayedstatus;
         my ( $transfertwhen, $transfertfrom, $transfertto ) = C4::Circulation::GetTransfers( $item->{itemnumber} );
 
         my ( $reservestatus, $reserveitem ) = C4::Reserves::CheckReserves( $item->{itemnumber} );
-
+        if ( C4::Context->preference('hidelostitems') and $item->{itemlost} ) {
+            next;
+        }
         if (   $itemtypes->{ $item->{itype} }->{notforloan}
             || $item->{notforloan}
             || $item->{onloan}
@@ -194,38 +199,104 @@ sub buildKohaItemsNamespace {
             || $item->{itemnotforloan}
             || ( defined $reservestatus && $reservestatus eq "Waiting" ) ) {
             if ( $item->{notforloan} < 0 ) {
-                $status = "On order";
+                $status = "On order"; $displayedstatus = "On order";
             }
             if ( $item->{itemnotforloan} > 0 || $item->{notforloan} > 0 || $itemtypes->{ $item->{itype} }->{notforloan} == 1 ) {
-                $status = "reference";
+                $status = "reference"; $displayedstatus = "Not for loan";
             }
             if ( $item->{onloan} ) {
-                $status = "Checked out";
+                $status = "Checked out"; $displayedstatus = "Checked out";
             }
             if ( $item->{wthdrawn} ) {
-                $status = "Withdrawn";
+                $status = "Withdrawn"; $displayedstatus = "Withdrawn";
             }
             if ( $item->{itemlost} ) {
-                $status = "Lost";
+                $status = "Lost"; $displayedstatus = "Lost";
             }
             if ( $item->{damaged} ) {
-                $status = "Damaged";
+                $status = "Damaged"; $displayedstatus = "Damaged";
             }
             if ( defined $transfertwhen && $transfertwhen ne '' ) {
-                $status = 'In transit';
+                $status = 'In transit'; $displayedstatus = "In transit";
             }
             if ( defined $reservestatus && $reservestatus eq "Waiting" ) {
-                $status = 'Waiting';
+                $status = 'Waiting'; $displayedstatus = "Waiting";
             }
         } else {
-            $status = "available";
+            $status = "available"; $displayedstatus = "Available";
         }
+        
+        my $itemnumber = $item->{itemnumber} || '';
+        my $biblioitemnumber = $item->{biblioitemnumber} || '';
         my $homebranch = $branches->{ $item->{homebranch} }->{'branchname'};
+        my $itembarcode = $item->{barcode} || '';
+        my $itemprice = $item->{price} || '';
+        my $itemstack = $item->{stack} || '';
+        my $itemdamaged = $item->{damaged} || '';
+        my $itemonloan = $item->{onloan} || '';
+        my $itemlost = $item->{itemlost} || '';
+        my $itemwthdrawn = $item->{wthdrawn} || '';
+        my $itemnotforloan = $item->{notforloan} || '';
         my $itemcallnumber = $item->{itemcallnumber} || '';
+        my $itemdescription = $item->{description} || '';
         my $itemlocation = GetAuthorisedValueByCode( "LOC", $item->{location}) || '';
+        my $itemitype = $item->{itype} || '';
+        my $itembranchurl = $item->{branchurl} || '';
+        my $itemccode = $item->{ccode} || '';
+        my $itemenumchron = $item->{enumchron} || '';
+        my $itemuri = $item->{uri} || '';
+        my $itemcopynumber = $item->{copynumber} || '';
+        my $itemitemnotes = $item->{itemnotes} || '';
+        my $itemserialseq = $item->{serialseq} || '';
+        my $itempublisheddate = format_date( $item->{publisheddate} ) || '';
+        my $itemdatedue = format_date( $item->{datedue} ) || '';
+        my $itemimageurl = getitemtypeimagelocation( 'opac', $itemtypes->{$itemitype}->{'imageurl'} ) || '';
+        my $itemreserves = $item->{reserves} || '';
+        my $itemholdingbranch = $branches->{ $item->{holdingbranch} }->{'branchname'} || '';
+        my $itemcn_source = $item->{cn_source} || '';
+        my $itemcn_sort = $item->{cn_sort} || '';
+        my $itemmaterials = $item->{materials} || '';
+        my $itemstocknumber = $item->{stocknumber} || '';
+        my $itemstatisticvalue = $item->{statisticvalue} || '';
+        
+        #warn Data::Dumper::Dumper $item;
         $itemcallnumber =~ s/\&/\&amp\;/g;
-        $xml .= "<item><homebranch>$homebranch</homebranch><itemlocation>$itemlocation</itemlocation>" . "<status>$status</status>" . "<itemcallnumber>" . $itemcallnumber . "</itemcallnumber>" . "</item>";
-
+        $xml .= "<item>
+        <displayedstatus>$displayedstatus</displayedstatus>
+        <status>$status</status>
+        <itemnumber>$itemnumber</itemnumber>
+        <biblioitemnumber>$biblioitemnumber</biblioitemnumber>
+        <homebranch>$homebranch</homebranch>
+        <itembarcode>$itembarcode</itembarcode>
+        <itemprice>$itemprice</itemprice>
+        <itemstack>$itemstack</itemstack>
+        <itemdamaged>$itemdamaged</itemdamaged>
+        <itemonloan>$itemonloan</itemonloan>
+        <itemlost>$itemlost</itemlost>
+        <itemwthdrawn>$itemwthdrawn</itemwthdrawn>
+        <itemnotforloan>$itemnotforloan</itemnotforloan>
+        <itemcallnumber>$itemcallnumber</itemcallnumber>
+        <itemdescription>$itemdescription</itemdescription>
+        <itemlocation>$itemlocation</itemlocation>
+        <itemitype>$itemitype</itemitype>
+        <itembranchurl>$itembranchurl</itembranchurl>
+        <itemccode>$itemccode</itemccode>
+        <itemenumchron>$itemenumchron</itemenumchron>
+        <itemuri>$itemuri</itemuri>
+        <itemcopynumber>$itemcopynumber</itemcopynumber>
+        <itemitemnotes>$itemitemnotes</itemitemnotes>
+        <itemserialseq>$itemserialseq</itemserialseq>
+        <itempublisheddate>$itempublisheddate</itempublisheddate>
+        <itemdatedue>$itemdatedue</itemdatedue>
+        <itemimageurl>$itemimageurl</itemimageurl>
+        <itemreserves>$itemreserves</itemreserves>
+        <itemholdingbranch>$itemholdingbranch</itemholdingbranch>
+        <itemcn_source>$itemcn_source</itemcn_source>
+        <itemcn_sort>$itemcn_sort</itemcn_sort>
+        <itemmaterials>$itemmaterials</itemmaterials>
+        <itemstocknumber>$itemstocknumber</itemstocknumber>
+        <itemstatisticvalue>$itemstatisticvalue</itemstatisticvalue>
+        </item>";
     }
     $xml = "<items xmlns=\"http://www.koha.org/items\">" . $xml . "</items>";
     return $xml;

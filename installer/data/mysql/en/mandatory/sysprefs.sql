@@ -213,7 +213,8 @@ INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES
 ('OPACXSLTDetailsDisplay','','','Enable XSL stylesheet control over details page display on OPAC exemple : ../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACDetail.xsl','Free'),
 ('OPACXSLTResultsDisplay','','','Enable XSL stylesheet control over results page display on OPAC exemple : ../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACResults.xsl','Free'),
 ('IntranetXSLTDetailsDisplay','','','Enable XSL stylesheet control over details page display on Intranet exemple : ../koha-tmpl/intranet-tmpl/prog/en/xslt/MARC21slim2intranetDetail.xsl','Free'),
-('IntranetXSLTResultsDisplay','','','Enable XSL stylesheet control over results page display on Intranet exemple : ../koha-tmpl/intranet-tmpl/prog/en/xslt/MARC21slim2intranetResults.xsl','Free');
+('IntranetXSLTResultsDisplay','','','Enable XSL stylesheet control over results page display on Intranet exemple : ../koha-tmpl/intranet-tmpl/prog/en/xslt/MARC21slim2intranetResults.xsl','Free'),
+('OPACXSLTItemsDetailsDisplay','','','Enable XSL stylesheet control over items on details page display on OPAC exemple : ../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACItemsDetail.xsl','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AdvancedSearchTypes','itemtypes','itemtypes|ccode','Select which set of fields comprise the Type limit in the advanced search','Choice');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AllowOnShelfHolds', '0', '', 'Allow hold requests to be placed on items that are not on loan', 'YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AllowHoldsOnDamagedItems', '1', '', 'Allow hold requests to be placed on damaged items', 'YesNo');
