@@ -45,14 +45,12 @@ SetMemberInfosInTemplate( $borrowernumber, $template );
 my $precedent_state = GetPrecedentStateByBorrower $borrowernumber;
 my $total_issues_today = GetTotalIssuesTodayByBorrower $borrowernumber;
 my $total_issues_returned_today = GetTotalIssuesReturnedTodayByBorrower $borrowernumber;
-my $actual_state = GetActualStateByBorrower $borrowernumber;
 
 $precedent_state = replace_key( $precedent_state );
 $total_issues_today = replace_key( $total_issues_today );
 $total_issues_returned_today = replace_key( $total_issues_returned_today );
-$actual_state = replace_key( $actual_state );
 
-my @datas = values %{merge( $precedent_state, $total_issues_today, $total_issues_returned_today, $actual_state )};
+my @datas = values %{merge( $precedent_state, $total_issues_today, $total_issues_returned_today )};
 
 my $fields = C4::Context->preference('StatisticsFields');
 my @keys = split '\|', $fields;

@@ -31,7 +31,6 @@ BEGIN {
         &GetTotalIssuesTodayByBorrower
         &GetTotalIssuesReturnedTodayByBorrower
         &GetPrecedentStateByBorrower
-        &GetActualStateByBorrower
     );
 }
 
@@ -85,17 +84,6 @@ sub GetPrecedentStateByBorrower {
     my $sth = $dbh->prepare($query);
     $sth->execute($borrowernumber);
     return $sth->fetchall_arrayref( {});
-}
-
-sub GetActualStateByBorrower {
-    my ($borrowernumber) = @_;
-    my $dbh   = C4::Context->dbh;
-
-    my $query = construct_query "actual_state", "FROM issues i, items it WHERE i.itemnumber=it.itemnumber AND i.borrowernumber=? AND DATE_FORMAT(i.returndate,'%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ";
-
-    my $sth = $dbh->prepare($query);
-    $sth->execute($borrowernumber);
-    return $sth->fetchall_arrayref( {} );
 }
 
 1;

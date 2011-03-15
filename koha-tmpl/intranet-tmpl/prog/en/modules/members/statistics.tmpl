@@ -79,11 +79,7 @@
                             <td>0</td>
                         <!-- /TMPL_IF -->
 
-                        <!-- TMPL_IF NAME='count_actual_state' -->
-                            <td><!-- TMPL_VAR NAME='count_actual_state' --></td>
-                        <!-- TMPL_ELSE -->
-                            <td>0</td>
-                        <!-- /TMPL_IF -->
+                        <td><!-- TMPL_VAR EXPR="count_precedent_state - count_total_issues_returned_today + count_total_issues_today" --></td>
 
                         <!-- TMPL_IF NAME='count_total_issues_today' -->
                             <td><!-- TMPL_VAR NAME='count_total_issues_today' --></td>
