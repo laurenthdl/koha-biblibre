@@ -82,6 +82,11 @@ if ( C4::Context->preference("OPACXSLTDetailsDisplay") ) {
     $template->param( 'XSLTBloc' => XSLTParse4Display( $biblionumber, $record, C4::Context->preference("OPACXSLTDetailsDisplay") ) );
 }
 
+# XSLT processing of some stuff
+if ( C4::Context->preference("OPACXSLTItemsDetailsDisplay") ) {
+    $template->param( 'XSLTItemsBloc' => XSLTParse4Display( $biblionumber, $record, C4::Context->preference("OPACXSLTItemsDetailsDisplay") ) );
+}
+
 $template->param( 'OPACShowCheckoutName' => C4::Context->preference("OPACShowCheckoutName") );
 
 # change back when ive fixed request.pl
