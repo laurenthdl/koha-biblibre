@@ -171,9 +171,9 @@ function export_submit(format) {
     }
     if (format == 'iso2709_995'){
         format = 'iso2709';
-        $("dont_export_item").val(0);
+        $("#dont_export_item").val(0);
     }else if (format == 'iso2709'){
-        $("dont_export_item").val(1);
+        $("#dont_export_item").val(1);
     }
     document.issues.action="/cgi-bin/koha/tools/export.pl";
     document.getElementById("export_format").value = format;
@@ -867,6 +867,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
     <fieldset class="action">
         <input type="submit" name="renew_checked" value="Renew or Return checked items" />
         <br/><br/>
+        Don't export fields : <input type="text" id="dont_export_fields" name="dont_export_fields" value="<!--TMPL_VAR NAME="dont_export_fields"-->" />
         <span id="exportmenuc">Export</span>
         <input type="hidden" name="op" value="export" />
         <input type="hidden" id="export_format" name="format" value="iso2709" />
