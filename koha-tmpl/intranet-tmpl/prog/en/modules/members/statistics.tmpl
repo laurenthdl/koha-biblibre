@@ -3,6 +3,14 @@
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#statistics").tablesorter({
+			sortList: [[0,0]],
+			headers: {}
+		});
+    });
+</script>
 </head>
 
 <body>
@@ -22,7 +30,7 @@
         <div class="yui-b">
             <div class="yui-g">
                 <h2>Statistics</h2>
-                <table>
+                <table id="statistics">
                 <thead>
                     <tr>
                     <!-- TMPL_LOOP NAME="column_name" -->
