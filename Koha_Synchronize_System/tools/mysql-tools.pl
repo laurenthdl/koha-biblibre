@@ -117,6 +117,7 @@ sub purge_mysql_log {
     open(FILE, $filename);
 
     $/ = $sep;
+    $\ = $sep;
 
     my @tables     = ('borrowers', 'items', 'issues', 'old_issues', 'statistics', 'reserves', 'old_reserves', 'action_logs', 'borrower_attributes');
     my @operations = ('INSERT INTO', 'UPDATE', 'DELETE FROM');
@@ -126,8 +127,8 @@ sub purge_mysql_log {
         for my $op (@operations){
             for my $table (@tables) {
                 if ( $line =~ /$op $table( |\n)/ ) {
-                    print $line;
-                    #print substr($line, 0, length($line) - 7);
+                    #print $line;
+                    print substr($line, 0, length($line) - length($/));
                 }
             }
         }
