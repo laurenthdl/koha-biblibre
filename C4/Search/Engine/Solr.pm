@@ -479,7 +479,6 @@ sub IndexRecord {
         }
     }
     $sc->add( \@recordpush );
-    $sc->_solr->optimize;
 }
 
     
