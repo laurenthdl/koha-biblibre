@@ -41,6 +41,7 @@ sub plugin_javascript {
     my ( $dbh, $record, $tagslib, $field_number, $tabloop ) = @_;
     my $res = "
         <script type='text/javascript'>
+         \$('#$field_number').attr('readonly','readonly');
             function Focus$field_number() {
                 return 1;
             }
