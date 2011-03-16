@@ -38,6 +38,7 @@ use C4::Biblio;
 use C4::Items;
 use C4::Koha;
 use C4::Circulation;
+use C4::IssuingRules;
 use C4::Dates qw/format_date/;
 use C4::Members;
 use C4::Search;		# enabled_staff_search_views
@@ -143,8 +144,8 @@ if ($cardnumber) {
     my $number_reserves =
       GetReserveCount( $borrowerinfo->{'borrowernumber'} );
 
-    if ( $number_reserves > C4::Context->preference('maxreserves') ) {
-		$warnings = 1;
+    if ( not CanBookBeReserved( $borrowerinfo->{borrowernumber}, $input->param('biblionumber') ) ) {
+ 		$warnings = 1;
         $maxreserves = 1;
     }
 
@@ -152,7 +153,7 @@ if ($cardnumber) {
     my $expiry_date = $borrowerinfo->{dateexpiry};
     my $expiry = 0; # flag set if patron account has expired
     if ($expiry_date and $expiry_date ne '0000-00-00' and
-            Date_to_Days(split /-/,$date) > Date_to_Days(split /-/,$expiry_date)) {
+            Date_to_Days(split (/-/,$date)) > Date_to_Days(split (/-/,$expiry_date))) {
 		$messages = $expiry = 1;
     }
      
@@ -225,7 +226,7 @@ my $borrowerinfo = GetMemberDetails( 0, $cardnumber );
 my @biblionumbers = ();
 my $biblionumbers = $input->param('biblionumbers');
 if ($multihold) {
-    @biblionumbers = split '/', $biblionumbers;
+    @biblionumbers = split ('/', $biblionumbers);
 } else {
     push @biblionumbers, $input->param('biblionumber');
 }
@@ -251,8 +252,11 @@ foreach my $biblionumber (@biblionumbers) {
         if ( defined $res->{found} && $res->{found} eq 'W' ) {
             $count--;
         }
-
-        if ( defined $borrowerinfo && ($borrowerinfo->{borrowernumber} eq $res->{borrowernumber}) ) {
+        if ($res->{itemnumber} && not $res->{itemtype}){
+            $res->{itemtype}=GetItem($res->{itemnumber},$res->{biblionumber})->{itype};
+        }
+        next if CanHoldMultipleItems($res->{itemtype});
+        if ( defined $borrowerinfo && ($borrowerinfo->{borrowernumber} eq $res->{borrowernumber}) && !CanHoldMultipleItems($res->{itemtype}) ) {
             $warnings = 1;
             $alreadyreserved = 1;
             $biblioloopiter{warn} = 1;
@@ -420,24 +424,16 @@ foreach my $biblionumber (@biblionumbers) {
                     }
                 }
             }
-            
-            my $branch = C4::Circulation::_GetCircControlBranch($item, $borrowerinfo);
 
-            my $branchitemrule = GetBranchItemRule( $branch, $item->{'itype'} );
-            my $policy_holdallowed = 1;
-            
-            $item->{'holdallowed'} = $branchitemrule->{'holdallowed'};
-            
-            if ( $branchitemrule->{'holdallowed'} == 0 ||
-                 ( $branchitemrule->{'holdallowed'} == 1 && $borrowerinfo->{'branchcode'} ne $item->{'homebranch'} ) ) {
-                $policy_holdallowed = 0;
-            }
+            my $branchitemrule = GetIssuingRule( $borrowerinfo->{categorycode}, $item->{'itype'}, GetReservesControlBranch( $borrowerinfo, $item ) );
+            my $policy_holdrestricted = $branchitemrule->{'reservesallowed'};
+            $item->{'holdrestricted'} = $branchitemrule->{'holdrestricted'};
             
             if (IsAvailableForItemLevelRequest($itemnumber) and not $item->{cantreserve} and CanItemBeReserved($borrowerinfo->{borrowernumber}, $itemnumber) ) {
-                if ( not $policy_holdallowed and C4::Context->preference( 'AllowHoldPolicyOverride' ) ) {
+                if ( not $policy_holdrestricted and C4::Context->preference( 'AllowHoldPolicyOverride' ) ) {
                     $item->{override} = 1;
                     $num_override++;
-                } elsif ( $policy_holdallowed ) {
+                } elsif ( $policy_holdrestricted ) {
                     $item->{available} = 1;
                     $num_available++;
                 }
@@ -453,10 +449,17 @@ foreach my $biblionumber (@biblionumbers) {
             while (my $wait_hashref = $sth2->fetchrow_hashref) {
                 $item->{waitingdate} = format_date($wait_hashref->{waitingdate});
             }
+            
+            if ( BorrowerHasReserve( $borrowerinfo->{'borrowernumber'}, '', $itemnumber ) ) {
+              $item->{available} = 0;
+              $item->{override} = 0;
+            }
+            $item->{canholdmultiple}=CanHoldMultipleItems($item->{itype}) && $item->{available};
+	    $item->{cannothold}=!CanHoldMultipleItems($item->{itype});
+            
             push @{ $biblioitem->{itemloop} }, $item;
         }
-        
-        if ( $num_override == scalar( @{ $biblioitem->{itemloop} } ) ) { # That is, if all items require an override
+        if ( $num_override > 0) { 
             $template->param( override_required => 1 );
         } elsif ( $num_available == 0 ) {
             $template->param( none_available => 1 );
@@ -478,6 +481,9 @@ foreach my $biblionumber (@biblionumbers) {
             $a_found cmp $b_found; 
         } @$reserves ) {
         my %reserve;
+
+        $reserve{'reservenumber'}   = $res->{'reservenumber'};
+
         my @optionloop;
         for ( my $i = 1 ; $i <= $totalcount ; $i++ ) {
             push(
