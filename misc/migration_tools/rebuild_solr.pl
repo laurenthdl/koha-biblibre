@@ -19,12 +19,13 @@ if ( C4::Context->preference("SearchEngine") ne 'Solr' ) {
 
 #Setup
 
-my ( $reset, $number, $recordtype, $biblionumber, $want_help );
+my ( $reset, $number, $recordtype, $biblionumber, $optimize, $want_help );
 GetOptions(
     'r'   => \$reset,
     'n:s' => \$number,
     't:s' => \$recordtype,
     'w' => \$biblionumber,
+    'o'   => \$optimize,
     'h|help' => \$want_help,
 );
 my $debug = C4::Context->preference("DebugLevel");
@@ -41,11 +42,15 @@ if ($reset){
   }
 }
 
-
 if (defined $biblionumber){
     &IndexBiblio($biblionumber);
 } elsif  (defined $recordtype) {
     &IndexData;
+    &Optimize;
+}
+
+if ($optimize) {
+    &Optimize;
 }
 
 #Functions
@@ -92,6 +97,11 @@ sub ResetCommand {
     my $urlreturns = get $solrurl.$deleteurl;
 }
 
+sub Optimize {
+    my $sc = C4::Search::Engine::Solr::GetSolrConnection;
+    $sc->_solr->optimize;
+}
+
 sub CountAllDocs {
     my $queryurl = "/select/?q=*:*";
     my $urlreturns = get $solrurl.$queryurl;
@@ -118,6 +128,8 @@ Parameters:
     -n "100,2"              index 2 records after 100th (101 and 102)
 
     -w 101                  index biblio with biblionumber equals 101
+
+    -o                      launch optimize command at the end of indexing
 
     --help or -h            show this message.
 _USAGE_
