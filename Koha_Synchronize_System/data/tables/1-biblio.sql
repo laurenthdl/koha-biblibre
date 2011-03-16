@@ -37,7 +37,7 @@ CREATE TABLE `biblio` (
   `abstract` mediumtext,
   PRIMARY KEY (`biblionumber`),
   KEY `blbnoidx` (`biblionumber`)
-) ENGINE=InnoDB AUTO_INCREMENT=126748 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

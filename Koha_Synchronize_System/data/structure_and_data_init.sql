@@ -103,7 +103,7 @@ CREATE TABLE `action_logs` (
   `info` text,
   PRIMARY KEY (`action_id`),
   KEY `timestamp` (`timestamp`,`user`)
-) ENGINE=InnoDB AUTO_INCREMENT=287256 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -511,7 +511,7 @@ CREATE TABLE `auth_header` (
   `marcxml` longtext NOT NULL,
   PRIMARY KEY (`authid`),
   KEY `origincode` (`origincode`)
-) ENGINE=InnoDB AUTO_INCREMENT=139472 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -662,7 +662,7 @@ CREATE TABLE `biblio` (
   `abstract` mediumtext,
   PRIMARY KEY (`biblionumber`),
   KEY `blbnoidx` (`biblionumber`)
-) ENGINE=InnoDB AUTO_INCREMENT=126748 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -734,7 +734,7 @@ CREATE TABLE `biblioitems` (
   KEY `isbn` (`isbn`),
   KEY `publishercode` (`publishercode`),
   CONSTRAINT `biblioitems_ibfk_1` FOREIGN KEY (`biblionumber`) REFERENCES `biblio` (`biblionumber`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=126748 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -928,7 +928,7 @@ CREATE TABLE `borrowers` (
   KEY `guarantorid` (`guarantorid`),
   CONSTRAINT `borrowers_ibfk_1` FOREIGN KEY (`categorycode`) REFERENCES `categories` (`categorycode`),
   CONSTRAINT `borrowers_ibfk_2` FOREIGN KEY (`branchcode`) REFERENCES `branches` (`branchcode`)
-) ENGINE=InnoDB AUTO_INCREMENT=572 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2209,7 +2209,7 @@ CREATE TABLE `items` (
   CONSTRAINT `items_ibfk_1` FOREIGN KEY (`biblioitemnumber`) REFERENCES `biblioitems` (`biblioitemnumber`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `items_ibfk_2` FOREIGN KEY (`homebranch`) REFERENCES `branches` (`branchcode`) ON UPDATE CASCADE,
   CONSTRAINT `items_ibfk_3` FOREIGN KEY (`holdingbranch`) REFERENCES `branches` (`branchcode`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=159843 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

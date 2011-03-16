@@ -10,7 +10,7 @@ SPECIFICS_TABLES_DIR="data/tables";
 DIFF_SERVER_DIR="data/server";
 DIFF_CLIENT_DIR="data/client";
 
-echo "Create databases in progress...";
+echo "DROP/CREATE databases in progress...";
 mysql -u $USER -p$PWD < data/create_database.sql;
 
 echo "creation init database in progress...";
@@ -29,6 +29,7 @@ for file in $SPECIFICS_TABLES_DIR/*.sql; do
         mysql -u $USER -p$PWD $DATABASE_INIT < $file;
         mysql -u $USER -p$PWD $DATABASE_SERVER < $file;
         mysql -u $USER -p$PWD $DATABASE_CLIENT < $file;
+echo "l";
     fi
 done
 
