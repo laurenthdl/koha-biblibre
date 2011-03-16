@@ -1,0 +1,28 @@
+Utilisation de Koha avec Solr: Guide Technique - Installation v0.1
+Claire Hernandez <claire.hernandez@biblibre.com>
+30/12/2010 
+
+%!target : doku
+%!encoding: UTF-8
+%!outfile: generated/solr_03_techguide_01_install-fr.doku
+
+Documentation disponible sur http://descartes.biblibre.com/solr/install/solr_03_techguide_01_install-fr.html
+
+= Serveur Z3950  = 
+
+
+== Présentation ==
+
+
+
+== Installation et lancement du serveur ==
+
+``` perl src/C4/RPN2Solr/lib/RPN2Solr.pm -f src/etc/zebraconf.xml &> ~var/log/logzebrasolr &
+
+Tester son bon fonctionnement (pour exemple):
+``` 
+yaz-client localhost:9998/biblios
+f jean
+```
+
+

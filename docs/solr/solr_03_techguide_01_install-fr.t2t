@@ -168,5 +168,9 @@ Pistes pour améliorer votre installation :
 - avoir http://solr.core1.localhost au lieu de http://localhost:8080/solr/core1/
 - Sécuriser les 2 urls "/update et /admin" pour que personne ne puisse s'y connecter de l'extérieur
 - avoir un cronjob qui lance la commande "optimize" toutes les nuits sur le service
+```
+vim /etc/cron.d/solr
+15 0-23/1  * * *   root    /home/koha/src/misc/migration_tools/rebuild_solr.pl -o
+```
 - avoir un système de backup de l'index (etc/solr/data) un index peut être restauré par simple recopie du dossier
 
