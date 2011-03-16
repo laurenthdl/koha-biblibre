@@ -629,7 +629,7 @@ if ( !defined( $data{'dateenrolled'} ) or $data{'dateenrolled'} eq '' ) {
 }
 if ( $op eq 'duplicate' ) {
     $data{'dateenrolled'} = C4::Dates->today('iso');
-    $data{'dateexpiry'} = GetExpiryDate( $data{'categorycode'}, $data{'dateenrolled'} );
+    $data{'dateexpiry'} = "";
 }
 if ( C4::Context->preference('uppercasesurnames') ) {
     $data{'surname'}     = uc( $data{'surname'} );

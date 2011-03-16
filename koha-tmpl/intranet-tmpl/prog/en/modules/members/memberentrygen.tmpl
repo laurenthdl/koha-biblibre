@@ -270,7 +270,7 @@
                     <label for="initials">
                 <!-- /TMPL_IF-->
                 Initials: </label>
-                <input type="text" id="initials" name="initials" size="20"  value="<!-- TMPL_VAR NAME="initials" -->"<!--TMPL_IF NAME="opduplicate"--> onclick="this.value=''"<!-- /TMPL_IF --> />	
+                <input type="text" id="initials" name="initials" size="20"  value="<!--TMPL_UNLESS NAME="opduplicate"--><!-- TMPL_VAR NAME="initials" --><!-- /TMPL_UNLESS -->" />	
                 <!-- TMPL_IF NAME="mandatoryinitials" --><span class="required">Required</span><!-- /TMPL_IF -->
             </li>
         <!-- /TMPL_UNLESS -->
