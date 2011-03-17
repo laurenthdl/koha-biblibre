@@ -178,12 +178,10 @@ my $issueinformation;
 my $itemnumber;
 my $biblio;
 my $barcode     = $query->param('barcode');
-my @barcodes     = $query->param('barcodes');
 my $exemptfine  = $query->param('exemptfine');
 my $dropboxmode = $query->param('dropboxmode');
 my $dotransfer  = $query->param('dotransfer');
 my $override    = $query->param('override');
-my $exporttype  = $query->param('exporttype');
 my $calendar    = C4::Calendar->new( branchcode => $userenv_branch );
 
 #dropbox: get last open day (today - 1)
@@ -629,27 +627,6 @@ if ($itemnumber) {
             collectionBranch               => GetBranchName($collectionBranch),
         );
     }
-}
-
-if ($exporttype) {
-    my $delimiter = ":";
-    if ($exporttype eq "win") {
-        $delimiter = "\r\n";
-    }
-    elsif ($exporttype eq "unix") {
-        $delimiter = "\n";
-    }
-    binmode( STDOUT, ":utf8" );
-    print $query->header(
-        -type       => 'application/octet-stream',
-        -charset    => 'utf-8',
-        -attachment => "koha_checkin_barcode_export"
-    );
-    warn "exporttype".$exporttype;
-    warn Data::Dumper::Dumper (@barcodes);
-    my $content = join($delimiter,@barcodes);
-    print $content;
-    exit;
 }
 
 # actually print the page!
