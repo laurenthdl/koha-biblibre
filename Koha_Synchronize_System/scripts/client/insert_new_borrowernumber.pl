@@ -12,8 +12,12 @@ my $user     = "root";
 my $passwd   = "root";
 my $help     = "";
 
+my $mysqldump_cmd = "/usr/bin/mysqldump";
+my $dump_filename = "/tmp/borrowers.sql":
+
 my $kss_infos_table = "kss_infos";
-my $max_id_fieldname = "old_max_id";
+my $max_borrowers_fieldname = "max_old_borrowers";
+my $max_issues_fieldname = "max_old_issues";
 
 GetOptions(
     'help|?'       => \$help,
@@ -29,11 +33,11 @@ my $dbh = DBI->connect( "DBI:mysql:dbname=$database;host=$hostname;", $user, $pa
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set NAMES 'utf8'");
 
-$dbh->do("DROP TABLE IF EXISTS kss_match_id");
-$dbh->do("CREATE TABLE kss_match_id(borrowernumber INT(11), cardnumber VARCHAR(16))");
+$dbh->do("DROP TABLE IF EXISTS kss_match_borrowers");
+$dbh->do("CREATE TABLE kss_match_borrowers(borrowernumber INT(11), cardnumber VARCHAR(16))");
+$dbh->do("INSERT INTO kss_match_borrowers(borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM borrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_borrowers_fieldname')");
 
-$dbh->do("INSERT INTO kss_match_id(borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM borrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_id_fieldname')");
-
+qx{$mysqldump_cmd --no-create-db --no-create-infoi -u $user -p$passwd $database borrowers > $dump_filename};
 
 __END__
 

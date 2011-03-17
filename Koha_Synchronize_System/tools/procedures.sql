@@ -11,27 +11,27 @@ BEGIN
     PREPARE stmt FROM @select_next_id;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
-    -- INSERT INTO kss_infos(variable, value) VALUES ("next_id", next_id);
     ALTER TABLE borrowers AUTO_INCREMENT = next_id;
 
-    CREATE TABLE kss_tmp_matching_borrowernumber(old INT(11), new INT(11));
+    CREATE TABLE kss_tmp_matching_borrowers(old INT(11), new INT(11));
 
 END;
 //
 
-DROP PROCEDURE IF EXISTS `PROC_UPDATE_BORROWERNUMBER` //
-CREATE PROCEDURE `PROC_UPDATE_BORROWERNUMBER` (
-    IN client_db_name VARCHAR(255),
+DROP PROCEDURE IF EXISTS `PROC_UPDATE_ID` //
+CREATE PROCEDURE `PROC_UPDATE_ID` (
+    IN table_name VARCHAR(255),
     IN new_id INT(11),
     IN cardnumber VARCHAR(16)
 )
 BEGIN
     DECLARE old_id INT(11);
-    SELECT old_max_id FROM kss_infos WHERE `cardnumber`=cardnumber INTO old_id;
-    INSERT INTO kss_tmp_matching_borrowernumber(old, new) VALUES(old_id, new_id);
+    IF table_name = 'borrowers' THEN
+        SELECT old_max_id FROM kss_tmp_matching_borrowers WHERE `cardnumber`=cardnumber INTO old_id;
+        INSERT INTO kss_tmp_matching_borrowers(old, new) VALUES(old_id, new_id);
+    END IF;
 END;
 //
-
 
 DROP PROCEDURE IF EXISTS `PROC_GET_NEW_ID` //
 CREATE PROCEDURE `PROC_GET_NEW_ID` (
@@ -41,7 +41,9 @@ CREATE PROCEDURE `PROC_GET_NEW_ID` (
 )
 BEGIN
     IF table_name = 'borrowers' THEN
-        SELECT new FROM kss_tmp_matching_borrowernumber WHERE old=old_id INTO new_id;
+        SELECT new FROM kss_tmp_matching_borrowers WHERE old=old_id INTO new_id;
+    ELSE
+        SELECT old_id INTO new_id;
     END IF;
 END;
 //
