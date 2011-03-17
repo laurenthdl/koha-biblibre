@@ -461,14 +461,7 @@ if ( C4::Context->preference("OPACAmazonEnabled") ) {
 
 #Electre stuff
 if(C4::Context->preference("OpacElectreImage")){
-	my $ElectreImage=GetElectreImage($biblionumber);
-	if(defined($ElectreImage) and $ElectreImage ne '' and $ElectreImage ne '0'){
-		$template->param( 'ElectreImage' => $ElectreImage );
-		$template->param( 'OpacElectreImage' => 1 );
-	}
-	else{
-		$template->param( 'OpacElectreImage' => 0 );
-	}
+	$template->param( 'OpacElectreImage' => 1 );
 }
 else{
 	$template->param( 'OpacElectreImage' => 0 );
@@ -478,6 +471,12 @@ if(C4::Context->preference("OpacElectreQuatriemeXml")){
 	if(defined($ElectreQuatriemeXml) and $ElectreQuatriemeXml ne '' and $ElectreQuatriemeXml ne '0'){
 		$template->param( 'ElectreQuatriemeXml' => $ElectreQuatriemeXml );
 		$template->param( 'OpacElectreQuatriemeXml' => 1 );
+		if(C4::Context->preference("OpacElectreDisplayOnTab")){
+			$template->param( 'OpacElectreDisplayOnTab' => 1 );
+		}
+		else{
+			$template->param( 'OpacElectreDisplayOnTab' => 0 );
+		}
 	}
 	else{
 		$template->param( 'OpacElectreQuatriemeXml' => 0 );
@@ -488,9 +487,16 @@ else{
 }
 if(C4::Context->preference("OpacElectreResume")){
 	my $ElectreResume=GetElectreResume($biblionumber);
+	#my $ElectreResume="test";
 	if(defined($ElectreResume) and $ElectreResume ne '' and $ElectreResume ne '0'){
 		$template->param( 'ElectreResume' => $ElectreResume );
 		$template->param( 'OpacElectreResume' => 1 );
+		if(C4::Context->preference("OpacElectreDisplayOnTab")){
+			$template->param( 'OpacElectreDisplayOnTab' => 1 );
+		}
+		else{
+			$template->param( 'OpacElectreDisplayOnTab' => 0 );
+		}
 	}
 	else{
 		$template->param( 'OpacElectreResume' => 0 );
