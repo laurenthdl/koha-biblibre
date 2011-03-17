@@ -53,6 +53,7 @@ if ( $input->param('borrowernumber') ) {
 my $order = $input->param('order') || 'date_due desc';
 my $limit = $input->param('limit');
 
+
 if ($limit) {
     if ( $limit eq 'full' ) {
         $limit = 0;
@@ -61,6 +62,7 @@ if ($limit) {
     $limit = 50;
 }
 my ($issues) = GetAllIssues( $borrowernumber, $order, $limit );
+
 
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     {   template_name   => "members/readingrec.tmpl",
@@ -73,6 +75,9 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 );
 
 my @loop_reading;
+my @barcodes;
+my $today = C4::Dates->new();
+$today = $today->output("iso");
 
 foreach my $issue ( @{$issues} ) {
     my %line;
@@ -92,6 +97,24 @@ foreach my $issue ( @{$issues} ) {
     $line{location}        = $issue->{'location'};
     $line{ccode}           = $issue->{'ccode'};
     push( @loop_reading, \%line );
+    if (($input->param('op') eq 'export_barcodes') and ($today eq $issue->{'returndate'})) {
+        push( @barcodes, $issue->{'barcode'} );
+    }
+}
+
+if ($input->param('op') eq 'export_barcodes') {
+    my $borrowercardnumber = GetMember( borrowernumber => $borrowernumber )->{'cardnumber'} ;
+    my $delimiter = ":";
+    $delimiter = "\n";
+    binmode( STDOUT, ":utf8" );
+    print $input->header(
+        -type       => 'application/octet-stream',
+        -charset    => 'utf-8',
+        -attachment => "$today-$borrowercardnumber-checkinexport.txt"
+    );
+    my $content = join($delimiter,@barcodes);
+    print $content;
+    exit;
 }
 
 if ( $data->{'category_type'} eq 'C' ) {

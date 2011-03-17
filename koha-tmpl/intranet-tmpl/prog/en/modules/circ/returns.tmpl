@@ -414,10 +414,8 @@ function Dopop(link) {
 		</ul>
             <!-- /TMPL_IF -->
 </div>
-
 <!-- /TMPL_IF -->
 <!-- TMPL_IF Name="riloop" -->
-    <form method="post" action="/cgi-bin/koha/circ/returns.pl" >
     <h2>Checked-In items</h2>
     <table>
 	<tr><th>Due Date</th><th>Title and Author</th>	<th>Barcode (Type)</th><th>Home Branch</th><th>Holding Branch</th><th>Location</th><th>Callnumber</th><th>Patron</th><th>Note</th></tr>
@@ -436,7 +434,6 @@ function Dopop(link) {
                     <!-- TMPL_VAR Name="itemtitle" escape="html" --></a>
 			<!-- TMPL_VAR Name="itemauthor" --></td>
             <td><a href="/cgi-bin/koha/catalogue/moredetail.pl?biblionumber=<!-- TMPL_VAR NAME="itembiblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#item<!-- TMPL_VAR NAME="itemnumber" -->"><!-- TMPL_VAR Name="barcode" --></a>
-            <input type="hidden" name="barcodes" value="<!-- TMPL_VAR Name="barcode" -->" />
             <!-- TMPL_IF name="itemtype"-->(<!-- TMPL_VAR Name="itemtype" -->) <!-- /TMPL_IF --><!-- TMPL_IF Name="ccode"-->(<!-- TMPL_VAR Name="ccode" -->)<!-- /TMPL_IF --></td>
             <td><!-- TMPL_VAR NAME="homebranch" --></td>
             <td><!-- TMPL_VAR NAME="holdingbranch" --></td>
@@ -452,18 +449,7 @@ function Dopop(link) {
             </td>
            </tr>
         <!-- /TMPL_LOOP -->
-    </table>
-
-    <fieldset>
-	<legend>Export</legend>
-        <input type=radio name="exporttype" value="unix"> Unix end line
-        <input type=radio name="exporttype" value="win"> Windows end line
-        <input type="submit" class="export" value="Create barcode file" />
-    </fieldset>
-    </form>
-
-
-</div>
+    </table></div>
 <!-- /TMPL_IF -->
 
 
