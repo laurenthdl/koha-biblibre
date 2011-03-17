@@ -29,7 +29,7 @@ use C4::Auth;
 use C4::Output;
 use C4::Members;
 use C4::Branch;
-use List::MoreUtils qw/any/;
+use List::MoreUtils qw/any uniq/;
 
 use C4::Dates qw/format_date/;
 
@@ -112,7 +112,7 @@ if ($input->param('op') eq 'export_barcodes') {
         -charset    => 'utf-8',
         -attachment => "$today-$borrowercardnumber-checkinexport.txt"
     );
-    my $content = join($delimiter,@barcodes);
+    my $content = join($delimiter, uniq(@barcodes));
     print $content;
     exit;
 }
