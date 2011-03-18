@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+package Koha_Synchronize_System::kss;
+
 use Modern::Perl;
 use DBI;
 use Data::Dumper;
@@ -48,30 +50,30 @@ $log->info("BEGIN");
 
 eval {
 
-    $log->info("=== Vérification de l'existence d'au moins un fichier de diff binaire ===");
-    my @diff_bin = qx{ls -1 $diff_logbin_dir};
-    if ( scalar( @diff_bin ) > 0 ) {
-        $log_info(scalar( @diff_bin) . " fichiers binaires trouvés");
-    } else {
-        $log_info("Aucun fichier binaire trouvé, rien ne sert de continuer !");
-        die "Aucun fichier binaire trouvé, rien ne sert de continuer !";
-    } 
-
-    $log->info("=== Sauvegarde de la base du serveur ===");
-    my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
-    $log->info("=== Dump en cours dans $dump_filename ===");
-    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
-
-    $log->info("=== Récupération des nouveaux ids remontés par le client ===");
-    my @dump_id = qx{ls -1 $dump_id_dir};
-    for my $file ( @dump_id ) {
-        $log->info("$file trouvé, insertion en cours...");
-        qx{$mysql_cmd -u $user, -p$passwd $db_server < $file};
-    }
-
-    $log->info("=== Extraction des fichiers binaires de log sql ===");
-    extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
-    
+#    $log->info("=== Vérification de l'existence d'au moins un fichier de diff binaire ===");
+#    my @diff_bin = qx{ls -1 $diff_logbin_dir};
+#    if ( scalar( @diff_bin ) > 0 ) {
+#        $log_info(scalar( @diff_bin) . " fichiers binaires trouvés");
+#    } else {
+#        $log_info("Aucun fichier binaire trouvé, rien ne sert de continuer !");
+#        die "Aucun fichier binaire trouvé, rien ne sert de continuer !";
+#    } 
+#
+#    $log->info("=== Sauvegarde de la base du serveur ===");
+#    my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
+#    $log->info("=== Dump en cours dans $dump_filename ===");
+#    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
+#
+#    $log->info("=== Récupération des nouveaux ids remontés par le client ===");
+#    my @dump_id = qx{ls -1 $dump_id_dir};
+#    for my $file ( @dump_id ) {
+#        $log->info("$file trouvé, insertion en cours...");
+#        qx{$mysql_cmd -u $user, -p$passwd $db_server < $file};
+#    }
+#
+#    $log->info("=== Extraction des fichiers binaires de log sql ===");
+#    extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
+#    
     my @files = qx{ls -1 $diff_logtxt_dir};
     $log->info("=== Digestion des requêtes ===");
     $log->info(scalar( @files ) . " fichiers trouvés");
