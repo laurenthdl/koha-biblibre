@@ -195,16 +195,16 @@ sub accept_borrower {
 	    $_ = $userid;
 	    next;
 	}
-	unless ( $userid ~~ $_ ) {
-	    warn "userid $_ don't match authentication credential $userid";
-	    return 0;
-	}
+#	unless ( $userid ~~ $_ ) {
+#	    warn "userid $_ don't match authentication credential $userid";
+#	    return 0;
+#	}
     }
 
-    my $id = ( GetMember( userid => $userid ) || {} )->{borrowernumber}
+    my ($id) = exists_local( $userid ) 
 	or debug_msg "$userid is newcommer";
 
-    my $newcommer = not defined $id;
+    my $newcommer = not $id;
 
     # for ($$ldap{dry_run}) {
     #     if ( $_ && not /no/) {
@@ -501,7 +501,7 @@ sub ldap_entry_2_hash ($$) {
 sub exists_local($) {
     my $arg    = shift;
     my $dbh    = C4::Context->dbh;
-    my $select = "SELECT borrowernumber,cardnumber,userid,password FROM borrowers ";
+    my $select = "SELECT borrowers.borrowernumber,cardnumber,userid,borrowers.password FROM borrowers ";
 
     my $sth = $dbh->prepare("$select WHERE userid=?");    # was cardnumber=?
     $sth->execute($arg);
@@ -511,6 +511,11 @@ sub exists_local($) {
     $sth = $dbh->prepare("$select WHERE cardnumber=?");
     $sth->execute($arg);
     $debug and printf STDERR "Cardnumber '$arg' exists_local? %s\n", $sth->rows;
+    ( $sth->rows == 1 ) and return $sth->fetchrow;
+
+    $sth = $dbh->prepare("$select JOIN borrower_attributes USING (borrowernumber) WHERE attribute=?");
+    $sth->execute($arg);
+    $debug and printf STDERR "attribute '$arg' exists_local? %s\n", $sth->rows;
     ( $sth->rows == 1 ) and return $sth->fetchrow;
     return 0;
 }

@@ -57,7 +57,7 @@ our $supelecTypePersonne =
 { categorycode => 
     {qw/
     personnel	PSUPELEC
-    personnel-cdd	PERSLABO
+    personnel-cdd	PSUPELEC
     personnel-ext	PERSLABO
     vacataire	VAC
     eleve	ETU
