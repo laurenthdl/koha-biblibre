@@ -40,6 +40,10 @@
     <!-- TMPL_IF NAME="CAN_user_tools_batch_upload_patron_images" -->
 	<li><a href="/cgi-bin/koha/tools/picture-upload.pl">Upload patron images</a></li>
     <!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="CAN_user_tools_kss" -->
+        <li><a href="/cgi-bin/koha/tools/kss.pl">Koha Synchronize System</a></li>
+    <!-- /TMPL_IF -->
+
 </ul>
 <h5>Catalog</h5>
 <ul>

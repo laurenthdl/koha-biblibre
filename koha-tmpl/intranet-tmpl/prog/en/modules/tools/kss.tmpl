@@ -1,0 +1,62 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" --><title>Koha &rsaquo; Tools &rsaquo; Koha Synchronize System</title><!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript">
+//<![CDATA[
+     $(document).ready(function() {
+        $('#ksstabs > ul').tabs();
+     });
+//]]>
+</script>
+
+</head>
+
+<body>
+	<!-- TMPL_INCLUDE NAME="header.inc" -->
+	<!-- TMPL_INCLUDE NAME="cat-search.inc" -->
+
+	<div id="breadcrumbs">
+		<a href="/cgi-bin/koha/mainpage.pl">Home</a>
+		&rsaquo; <a href="/cgi-bin/koha/tools/tools-home.pl">Tools</a>
+		&rsaquo; Koha Synchronize System
+	</div>
+
+	<div id="doc3" class="yui-t2">
+		<div id="bd">
+			<div id="yui-main">
+				<div class="yui-b">
+<div id="ksstabs" class="toptabs">
+    <ul>
+	<li><a href="kss.pl#home">Home</a></li>
+	<li><a href="kss.pl#stom">Slave to master</a></li>
+	<li><a href="kss.pl#mtos">Master to slave</a></li>
+    </ul>
+	<div id="home">
+	    <h3>Home</h3>
+	    <ul>
+		<li>Last slave update:</li>
+		<li>Last master update:</li>
+	    </ul>
+
+    </div>
+    <div id="stom">
+	    <h3>Slave to master</h3>
+	    <ul>
+		<li>Last synchronization:</li>
+		<li>Messages:</li>
+	    </ul>
+    </div>
+    <div id="mtos">
+	    <h3>Master to slave</h3>
+	    <ul>
+		<li>Last synchronization:</li>
+		<li>Messages:</li>
+	    </ul>
+	        
+    </div>
+</div>
+			</div>
+			</div>
+		    <div class="yui-b noprint">
+        <!-- TMPL_INCLUDE NAME="tools-menu.inc" -->
+    </div>
+	</div>
+	<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
