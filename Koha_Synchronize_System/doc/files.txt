@@ -1,0 +1,51 @@
+
+./data: # répertoire des données (pour tests)
+    client  # données côté client
+    create_database.sql  # script de création des bdd
+    server  # données serveur
+    sql.tar  # useless
+    structure_and_data_init.sql  # Tronc communs
+    structure_cg55.sql  # useless (structure uniquement)
+    tables # répertoire des tables spécifiques
+
+./data/client:
+000002-add_update_users_issues-reserves.sql # insertion du diff client
+ids  # répertoire des ids remontés par le client
+logbin  # répertoire des logs binaires remontés par le client
+logtxt  # répertoire des logs au format txt après purge
+logtxt_full  # répertoire des logs (correspondant aux logs binaires)
+mysql-txt.000002 # Useless
+
+./data/client/ids: # répertoire des ids remontés par le client
+
+./data/client/logbin: 
+mysql-bin.000002
+
+./data/client/logtxt:
+mysql-bin.000002
+
+./data/client/logtxt_full:
+mysql-bin.000002
+
+./data/server: # données diff server
+000001-add_update_users_issues.sql  mysql-txt.000001
+
+./data/tables: # tables spécifiques
+1-biblio.sql  2-biblioitems.sql  3-borrowers.sql  4-borrower_attributes.sql  5-items.sql
+
+./scripts: # Scripts à jouer côté client (et serveur ?)
+client  server
+
+./scripts/client:
+insert_new_borrowernumber.pl  # script à jouer côté client pour récupérer les nouvelles données (table niveau 1)
+insert_new_borrowernumber.txt # aide
+
+./scripts/server:
+
+./tools: # scripts principaux
+generate_before_after_sql_script.pl # génération dynamique des triggers
+kss.pl # THE script
+mysql.pm  # tools mysql
+mysql-tools.pl  # old mysql.pm
+procedures.sql  # procédures pour le merge
+
