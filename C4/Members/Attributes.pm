@@ -117,14 +117,14 @@ my $matching_records = C4::Members::Attributes::SearchIdMatchingAttribute($filte
 
 sub SearchIdMatchingAttribute {
     my $filter = shift;
-	my $finalfilter=$$filter[0];
+    my $finalfilter=(ref($filter) eq "ARRAY"?$$filter[0]:$filter);
     my $dbh   = C4::Context->dbh();
     my $query = qq{
 SELECT borrowernumber
 FROM borrower_attributes
 JOIN borrower_attribute_types USING (code)
 WHERE staff_searchable = 1
-AND attribute like "%$finalfilter%"};
+AND attribute  like "%$finalfilter%"};
     my $sth = $dbh->prepare_cached($query);
     $sth->execute();
     return $sth->fetchall_arrayref;
