@@ -128,10 +128,32 @@ sub get_level {
 
 }
 
+sub replace_with_new_id {
+    my $string = shift;
+    my $table_name = shift;
+    my $field = shift;
+    my $dbh = shift;
+
+    if ( $string =~ /$field\s*=\s*\'{0,1}([^']*)\'{0,1}/ ) {
+        $dbh->do("CALL PROC_GET_NEW_ID (\"$table_name.$field\", $1, \@new_id);");
+        my @value = $dbh->selectrow_array("SELECT \@new_id;");
+
+        my $new_id = $value[0];
+
+        $string =~ s/$field\s*=\s*\'{0,1}([^']*)\'{0,1}/$field = '$new_id'/;
+    }
+
+    return $string;
+}
+
 sub insert_diff_file {
     my $file = shift;
     my $log = shift;
     chomp $file;
+
+    my $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
+    $dbh->{'mysql_enable_utf8'} = 1;
+    $dbh->do("set NAMES 'utf8'");
 
     open( FILE, $file ) or die "Le fichier $file ne peut être lu";
 
@@ -140,16 +162,35 @@ sub insert_diff_file {
 
 
     while ( my $query = <FILE> ) {
+        my $r;
+        my $table_name;
         $query =~ s/^\n//; # 1er caractère est un retour chariot
         if ( $query =~ /^INSERT INTO (\S+)/ ) {
-            my $level = get_level $1;
+            # Nothing todo
         } elsif ( $query =~ /^UPDATE (\S+)/ ) {
-            my $level = get_level $1;
+            $table_name = $1;
+            my $level = get_level $table_name;
+            if ( $level == 1 ) {
+                if ( $table_name eq 'borrowers' ) {
+                    $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                }
+            } elsif ( $level == 2 ) {
+                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+            }
         } elsif ( $query =~ /^DELETE FROM (\S+)/ ) {
+            $table_name = $1;
             my $level = get_level $1;
+            if ( $level == 1 ) {
+                # Nothing todo
+            } elsif ( $level == 2 ) {
+                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                $r = $query;
+            }
+
         } else {
             $log->warning("This query is not parsed : ###$query###");
         }
+        $log && $log->info( $r );
     }
 
     close( FILE );
