@@ -37,7 +37,7 @@ $dbh->do("DROP TABLE IF EXISTS kss_match_borrowers");
 $dbh->do("CREATE TABLE kss_match_borrowers(borrowernumber INT(11), cardnumber VARCHAR(16))");
 $dbh->do("INSERT INTO kss_match_borrowers(borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM borrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_borrowers_fieldname')");
 
-qx{$mysqldump_cmd --no-create-db --no-create-infoi -u $user -p$passwd $database borrowers > $dump_filename};
+qx{$mysqldump_cmd --no-create-db --no-create-info -u $user -p$passwd $database borrowers > $dump_filename};
 
 __END__
 

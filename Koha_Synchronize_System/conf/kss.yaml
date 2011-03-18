@@ -1,0 +1,12 @@
+# kss configuration parameters
+
+datatest:
+        db_client: koha_devkss_client
+        db_server: koha_devkss_server
+        db_merge: koha_devkss_merge
+        mysql_cmd: /usr/bin/mysql
+        mysqlbinlog_cmd: /usr/bin/mysqlbinlog
+        mysqldump_cmd: /usr/bin/mysqldump
+        hostname: localhost
+        user: test
+        passwd: test
