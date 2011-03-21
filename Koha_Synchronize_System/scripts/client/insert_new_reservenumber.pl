@@ -7,6 +7,8 @@ use Getopt::Long;
 use Pod::Usage;
 use YAML;
 
+use C4::Context;
+
 my $koha_dir = C4::Context->config('intranetdir');
 
 my $kss_dir = "$koha_dir/Koha_Synchronize_System";
@@ -20,7 +22,7 @@ my $passwd   = $$conf{databases_infos}{passwd};
 my $help     = "";
 
 my $mysqldump_cmd = $$conf{databases_infos}{mysqldump};
-my $dump_filename = $$conf{datas_path}{dump_reserves_filename}
+my $dump_filename = $$conf{datas_path}{dump_reserves_filename};
 
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 my $max_borrowers_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
@@ -43,7 +45,7 @@ $dbh->do("set NAMES 'utf8'");
 
 $dbh->do("DROP TABLE IF EXISTS " . $matching_table_prefix . " reserves");
 $dbh->do("CREATE TABLE " . $matching_table_prefix . "reserves(reservenumber INT(11), borrowernumber INT(11), biblionumber INT(11), reservedate DATE)");
-$dbh->do("INSERT INTO " . $matching_table_pretif . "reserves(reservenumber, borrowernumber, biblionumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, reservedate FROM reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_resernumber_fieldname')");
+$dbh->do("INSERT INTO " . $matching_table_prefix . "reserves(reservenumber, borrowernumber, biblionumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, reservedate FROM reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_resernumber_fieldname')");
 
 qx{$mysqldump_cmd --no-create-db --no-create-info -u $user -p$passwd $database reserves > $dump_filename};
 
