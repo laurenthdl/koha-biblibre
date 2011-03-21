@@ -7,6 +7,9 @@ use YAML;
 use DBI;
 use C4::Context;
 use C4::SQLHelper;
+use Switch;
+use Koha_Synchronize_System::tools::kss;
+
 
 plan 'no_plan';
 
@@ -44,20 +47,40 @@ sub setUp {
 
 }
 
+#table-01 = simple insert
+#table-02 = simple update
+#table-03 = simple delete
+# > 04 = scenarii "addissue" "return"...
 sub processQueries {
     my $queriesdir = "$curdir/t/unitdiff";
     my @files = qx{ls -1 $queriesdir};
     for my $file ( @files ) {
-        # call insert_diff_file ($file)...
-        
-        # dummy try 
+
+        #?!?
+        #qx{../scripts/client/insert_new_borrowernumber.pl};
+        #my $borrfile = "$curdir/tools/procedures.sql";
+        #qx{$mysql_cmd -u $user -p$passwd $db_server < $$conf{datas_path}{dump_borrowers_filename}  };
+
         my $filefull = "$queriesdir/$file";
         warn "file:$filefull";
         qx{$mysql_cmd -u $user -p$passwd $db_server < $filefull};
 
-        is (&findInData ("borrowers", { 'cardnumber' => "10000267", 'surname' => "COLLIN" }), 1 , "test1");
-        is (&findInData ("borrowers", { 'cardnumber' => "424242", 'surname' => "John Carmack" }) ,0, "test3");
+        Koha_Synchronize_System::tools::kss::insert_diff_file ($filefull);
+
+        switch ($file) {
+          case "01-insertborrower.sql" { &testinsertborrower01 }
+          else                         { warn 'default case'; &testdefault}
+        }
     }
+}
+
+sub testdefault {
+    is (&findInData ("borrowers", { 'cardnumber' => "10000267", 'surname' => "COLLIN" }), 1 , "test1");
+    is (&findInData ("borrowers", { 'cardnumber' => "424242", 'surname' => "John Carmack" }) ,0, "test3");
+}
+
+sub testinsertborrower01 {
+warn "test";
 }
 
 sub findInData {

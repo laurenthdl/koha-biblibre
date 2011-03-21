@@ -6,6 +6,7 @@ use Data::Dumper;
 use Getopt::Long;
 use Pod::Usage;
 use YAML;
+use C4::Context;
 
 use C4::Context;
 

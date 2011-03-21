@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-package Koha_Synchronize_System::kss;
+package Koha_Synchronize_System::tools::kss;
 
 use Modern::Perl;
 use DBI;
