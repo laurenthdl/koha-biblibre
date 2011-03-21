@@ -42,23 +42,44 @@ BEGIN
     PREPARE stmt FROM \@select_next_id;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
+    INSERT INTO $kss_infos_table(variable, value) VALUES ("borrowernumber", next_id);
+
+    CREATE TABLE $kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
+    SET \@select_next_id = CONCAT('SELECT MAX(reservenumber) + 1 FROM ', server_db_name, '.reserves INTO next_id');
+    PREPARE stmt FROM \@select_next_id;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+    INSERT INTO $kss_infos_table(variable, value) VALUES ("reservenumber", next_id);
 END;
 //};
 
-
-
-push @proc_str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_ID` //};
-push @proc_str, qq{CREATE PROCEDURE `PROC_UPDATE_ID` (
-    IN field_name VARCHAR(255),
+push @proc_str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_BORROWERNUMBER` //};
+push @proc_str, qq{CREATE PROCEDURE `PROC_UPDATE_BORROWERNUMBER` (
     IN new_id INT(11),
-    IN cardnumber VARCHAR(16)
+    IN cardnumber INT(11)
 )
 BEGIN
     DECLARE old_id INT(11);
-    IF field_name = 'borrowers.borrowernumber' THEN
-        SELECT old_max_id FROM } . $matching_table_prefix . qq{borrowers WHERE `cardnumber`=cardnumber INTO old_id;
-        INSERT INTO } . $matching_table_prefix . qq{borrowers(old, new) VALUES(old_id, new_id);
-    END IF;
+    SELECT old_max_id FROM } . $matching_table_prefix . qq{borrowers WHERE `cardnumber`=cardnumber INTO old_id;
+    INSERT INTO } . $matching_table_prefix . qq{borrowers(old, new) VALUES(old_id, new_id);
+END;
+//};
+
+push @proc_str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_RESERVENUMBER` //};
+push @proc_str, qq{CREATE PROCEDURE `PROC_UPDATE_RESERVENUMBER` (
+    IN new_id INT(11),
+    IN borrowernumber INT(11),
+    IN biblionumber INT(11),
+    IN reservedate DATE
+)
+BEGIN
+    DECLARE old_id INT(11);
+    SELECT old_max_id FROM } . $matching_table_prefix . qq{reserves
+        WHERE `borrowernumber`=borrowernumber
+            AND `biblionumber`=biblionumber
+            AND `reservedate`=reservedate
+        INTO old_id;
+    INSERT INTO } . $matching_table_prefix . qq{borrowers(old, new) VALUES(old_id, new_id);
 END;
 //};
 
@@ -71,6 +92,9 @@ push @proc_str, qq{CREATE PROCEDURE `PROC_GET_NEW_ID` (
 BEGIN
     IF field_name LIKE "\%.borrowernumber" THEN
         SELECT `new` FROM } . $matching_table_prefix . qq{borrowers WHERE `old`=old_id INTO new_id;
+        IF new_id IS NULL THEN
+            SELECT old_id INTO new_id;
+        END IF;
     ELSE
         SELECT old_id INTO new_id;
     END IF;

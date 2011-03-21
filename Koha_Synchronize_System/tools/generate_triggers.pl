@@ -67,7 +67,9 @@ while ( my ($table, $infos) = each %$level1_tables ) {
     push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
     push @trigger_str, "CREATE TRIGGER `TRG_AFT_INS_$table` AFTER INSERT ON `$table`";
     push @trigger_str, "  FOR EACH ROW BEGIN";
-    push @trigger_str, "    CALL PROC_UPDATE_ID($table.$$infos{primary_key}, NEW.$$infos{primary_key}, NEW.cardnumber);";
+    if ( $table eq "borrowers" ) {
+        push @trigger_str, "    CALL PROC_UPDATE_BORROWERNUMBER(NEW.borrowernumber, NEW.cardnumber);";
+    }
     push @trigger_str, "  END;";
     push @trigger_str, "//";
 
@@ -90,8 +92,8 @@ while ( my ($table, $hash) = each %$level2_tables ) {
     # Trigger insert
     # Insertion de l'enregistrement avec remplacement des clés étrangères
     # qui pointent vers des clés primaires des tables de niveau  1
-    push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_INS_$table` //";
-    push @trigger_str, "CREATE TRIGGER `TRG_INS_$table` BEFORE INSERT ON `$table`";
+    push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
+    push @trigger_str, "CREATE TRIGGER `TRG_BEF_INS_$table` BEFORE INSERT ON `$table`";
     push @trigger_str, "  FOR EACH ROW BEGIN";
     push @trigger_str, "    DECLARE tmp_id INT(11);";
         while (my ($field, $ref) = each %$hash) {
@@ -102,6 +104,15 @@ while ( my ($table, $hash) = each %$level2_tables ) {
         }
     push @trigger_str, "  END;";
     push @trigger_str, "//";
+
+    if ( $table eq "reserves" ) {
+        push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_reserves` //";
+        push @trigger_str, "CREATE TRIGGER `TRG_AFT_INS_reserves` AFTER INSERT ON `reserves`";
+        push @trigger_str, "  FOR EACH ROW BEGIN";
+        push @trigger_str, "    CALL PROC_UPDATE_RESERVENUMBER(NEW.reservenumber, NEW.borrowernumber, NEW.reservedate);";
+        push @trigger_str, "  END;";
+        push @trigger_str, "//";
+    }
 
 }
 

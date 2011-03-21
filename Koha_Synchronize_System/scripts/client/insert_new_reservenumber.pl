@@ -20,7 +20,7 @@ my $passwd   = $$conf{databases_infos}{passwd};
 my $help     = "";
 
 my $mysqldump_cmd = $$conf{databases_infos}{mysqldump};
-my $dump_filename = $$conf{datas_path}{dump_borrowers_filename}
+my $dump_filename = $$conf{datas_path}{dump_reserves_filename}
 
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 my $max_borrowers_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
@@ -41,22 +41,22 @@ my $dbh = DBI->connect( "DBI:mysql:dbname=$database;host=$hostname;", $user, $pa
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set NAMES 'utf8'");
 
-$dbh->do("DROP TABLE IF EXISTS " . $matching_table_prefix . " borrowers");
-$dbh->do("CREATE TABLE " . $matching_table_prefix . "borrowers(borrowernumber INT(11), cardnumber VARCHAR(16))");
-$dbh->do("INSERT INTO " . $matching_table_pretif . "borrowers(borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM borrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_borrowers_fieldname')");
+$dbh->do("DROP TABLE IF EXISTS " . $matching_table_prefix . " reserves");
+$dbh->do("CREATE TABLE " . $matching_table_prefix . "reserves(reservenumber INT(11), borrowernumber INT(11), biblionumber INT(11), reservedate DATE)");
+$dbh->do("INSERT INTO " . $matching_table_pretif . "reserves(reservenumber, borrowernumber, biblionumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, reservedate FROM reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_resernumber_fieldname')");
 
-qx{$mysqldump_cmd --no-create-db --no-create-info -u $user -p$passwd $database borrowers > $dump_filename};
+qx{$mysqldump_cmd --no-create-db --no-create-info -u $user -p$passwd $database reserves > $dump_filename};
 
 __END__
 
 =head1 NAME
 
-insert_new_borrowernumber - insert last borrowernumber in kss_infos table
+insert_new_reservenumbe - insert last reservenumber in kss_infos table
 
 
 =head1 SYNOPSIS
 
-insert_new_borrowernumber.pl [options]
+insert_new_reservenumber.pl [options]
 
 Options:
 
@@ -102,6 +102,6 @@ Set list of fields separated by a coma
 
 =head1 DESCRIPTION
 
-B<insert_new_borrowernumber> insert last borrowernumber in kss_infos table
+B<insert_new_reservenumber> insert last reservenumber in kss_infos table
 
 =cut

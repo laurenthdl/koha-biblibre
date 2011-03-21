@@ -35,4 +35,10 @@ which_cmd:
 datas_path:
         dump_id: data/client/dump_id
         backup_server: data/server/bak
-        dump_borroweres_filename: /tmp/borroweres.sql
+        dump_borrowers_filename: /tmp/borroweres.sql
+        dump_reserves_filename: /tmp/reserves.sql
+
+tools_path:
+        generate_triggers: tools/generate_triggers.pl
+        generate_procedures: tools/generate_procedures.pl
+

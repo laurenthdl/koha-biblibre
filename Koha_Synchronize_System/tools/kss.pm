@@ -15,29 +15,33 @@ use C4::Logguer qw(:DEFAULT $log_kss);
 
 use Koha_Synchronize_System::tools::mysql;
 
+my $log                   = $log_kss;
+
 my $koha_dir = C4::Context->config('intranetdir');
 
-my $kss_dir = "$koha_dir/Koha_Synchronize_System";
+my $kss_dir = "$koha_dir/Koha_Synchronize_System/";
 
-my $conf = YAML::LoadFile("$kss_dir/conf/kss.yaml");
-my $db_client             = $$conf{databases_infos}{db_client};
-my $db_server             = $$conf{databases_infos}{db_server};
-my $diff_logbin_dir       = $$conf{mysql_log}{diff_logbin_dir};
-my $diff_logtxt_full_dir  = $$conf{mysql_log}{diff_logtxt_full_dir};
-my $diff_logtxt_dir       = $$conf{mysql_log}{diff_logtxt_dir};
-my $mysql_cmd             = $$conf{databases_infos}{mysql};
-my $mysqlbinlog_cmd       = $$conf{databases_infos}{mysqlbinlog};
-my $mysqldump_cmd         = $$conf{databases_infos}{mysqldump};
-my $hostname              = $$conf{databases_infos}{hostname};
-my $user                  = $$conf{databases_infos}{user};
-my $passwd                = $$conf{databases_infos}{passwd};
-my $help                  = "";
-my $log = $log_kss;
-my $dump_id_dir           = $$conf{datas_path}{dump_id};
-my $dump_db_server_dir    = $$conf{datas_path}{backup_server};
+my $conf                     = YAML::LoadFile("$kss_dir/conf/kss.yaml");
+my $db_client                = $$conf{databases_infos}{db_client};
+my $db_server                = $$conf{databases_infos}{db_server};
+my $diff_logbin_dir          = $$conf{mysql_log}{diff_logbin_dir};
+my $diff_logtxt_full_dir     = $$conf{mysql_log}{diff_logtxt_full_dir};
+my $diff_logtxt_dir          = $$conf{mysql_log}{diff_logtxt_dir};
+my $mysql_cmd                = $$conf{databases_infos}{mysql};
+my $mysqlbinlog_cmd          = $$conf{databases_infos}{mysqlbinlog};
+my $mysqldump_cmd            = $$conf{databases_infos}{mysqldump};
+my $hostname                 = $$conf{databases_infos}{hostname};
+my $user                     = $$conf{databases_infos}{user};
+my $passwd                   = $$conf{databases_infos}{passwd};
+my $help                     = "";
+my $dump_id_dir              = $$conf{datas_path}{dump_id};
+my $dump_db_server_dir       = $$conf{datas_path}{backup_server};
 
-my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
-my $max_borrowers_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
+my $generate_triggers_path   = $kss_dir . $$conf{tools_path}{generate_triggers};
+my $generate_procedures_path = $kss_dir . $$conf{tools_path}{generate_procedures};
+
+my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
+my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
 
 GetOptions(
     'help|?'       => \$help,
@@ -52,28 +56,54 @@ pod2usage(1) if $help;
 
 $log->info("BEGIN");
 
+sub diff_files_exists {
+    my $dir = shift;
+    my $log = shift;
+
+    my @diff_bin = qx{ls -1 $dir};
+    if ( scalar( @diff_bin ) > 0 ) {
+        $log && $log->info(scalar( @diff_bin) . " fichiers binaires trouvés");
+        return 1;
+    }
+
+    $log && $log->info("Aucun fichier binaire trouvé, rien ne sert de continuer !");
+    die "Aucun fichier binaire trouvé, rien ne sert de continuer !";
+
+    return 0;
+}
+
+sub insert_new_ids {
+    my ($mysql_cmd, $user, $pwd, $db_name, $id_dir, $log) = @_;
+    my @dump_id = qx{ls -1 $id_dir};
+    for my $file ( @dump_id ) {
+        $log && $log->info("$file trouvé, insertion en cours...");
+        qx{$mysql_cmd -u $user, -p$pwd $db_name < $file};
+    }
+}
+
+sub insert_proc_and_triggers {
+    my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+    qx{$generate_triggers_path > /tmp/triggers.sql};
+    qx{$mysql_cmd -u $user, -p$pwd $db_name < /tmp/triggers.sql};
+    qx{$generate_procedures_path > /tmp/procedures.sql};
+    qx{$mysql_cmd -u $user, -p$pwd $db_name < /tmp/procedures.sql};
+}
+
 eval {
 
     $log->info("=== Vérification de l'existence d'au moins un fichier de diff binaire ===");
-    my @diff_bin = qx{ls -1 $diff_logbin_dir};
-    if ( scalar( @diff_bin ) > 0 ) {
-        $log_info(scalar( @diff_bin) . " fichiers binaires trouvés");
-    } else {
-        $log_info("Aucun fichier binaire trouvé, rien ne sert de continuer !");
-        die "Aucun fichier binaire trouvé, rien ne sert de continuer !";
-    }
+    diff_files_exists $diff_logbin_dir, $log;
 
     $log->info("=== Sauvegarde de la base du serveur ===");
     my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
     $log->info("=== Dump en cours dans $dump_filename ===");
     qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
 
-    $log->info("=== Récupération des nouveaux ids remontés par le client ===");
-    my @dump_id = qx{ls -1 $dump_id_dir};
-    for my $file ( @dump_id ) {
-        $log->info("$file trouvé, insertion en cours...");
-        qx{$mysql_cmd -u $user, -p$passwd $db_server < $file};
-    }
+    $log->info("=== Insertion des nouveaux ids remontés par le client ===");
+    insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
+
+    $log->info("=== Génération et insertion en base des triggers et procédures stockées ===");
+    insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
 
     $log->info("=== Extraction des fichiers binaires de log sql ===");
     extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
@@ -85,7 +115,9 @@ eval {
         insert_diff_file ("$diff_logtxt_dir\/$file", $log);
     }
 
-    # À la fin du script, penser à insérer les nouveaux id dans kss_infos pour le client
+    # À la fin du script :
+    #  - insérer les nouveaux id dans kss_infos pour le client
+    #  - supprimer les triggers et procédures stockées
 };
 
 if ( $@ ) {
@@ -172,16 +204,25 @@ sub insert_diff_file {
         my $table_name;
         $query =~ s/^\n//; # 1er caractère est un retour chariot
         if ( $query =~ /^INSERT INTO (\S+)/ ) {
-            # Nothing todo
+            $table_name = $1;
+            my $level = get_level $table_name;
+            if ( $level == 1 ) {
+                # Nothing todo
+            } elsif ( $level == 2 ) {
+                # For INSERT old_issues SELECT * FROM issues WHERE borrowernumber=xxx [...] format
+                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+            }
         } elsif ( $query =~ /^UPDATE (\S+)/ ) {
             $table_name = $1;
             my $level = get_level $table_name;
             if ( $level == 1 ) {
                 if ( $table_name eq 'borrowers' ) {
                     $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                    $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
                 }
             } elsif ( $level == 2 ) {
                 $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
             }
         } elsif ( $query =~ /^DELETE FROM (\S+)/ ) {
             $table_name = $1;
@@ -190,6 +231,7 @@ sub insert_diff_file {
                 # Nothing todo
             } elsif ( $level == 2 ) {
                 $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
                 $r = $query;
             }
 
