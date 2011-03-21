@@ -15,12 +15,13 @@ databases_infos:
         db_client: koha_devkss_client
         db_server: koha_devkss_server
         hostname: localhost
-        user: test
-        passwd: test
+        user: root
+        passwd: root
         kss_infos_table: kss_infos
         max_borrowers_fieldname: max_old_borrowers
         max_issues_fieldname: max_old_issues
         matching_table_prefix: kss_tmp_matching_
+        matching_table_ids: kss_tmp_ids
 
 mysql_log:
         diff_logbin_dir: data/client/logbin
@@ -33,9 +34,9 @@ which_cmd:
         mysqldump: /usr/bin/mysqldump
 
 datas_path:
-        dump_id: data/client/dump_id
+        dump_id: data/client/ids
         backup_server: data/server/bak
-        dump_borrowers_filename: /tmp/borroweres.sql
+        dump_borrowers_filename: /tmp/borrowers.sql
         dump_reserves_filename: /tmp/reserves.sql
 
 tools_path:

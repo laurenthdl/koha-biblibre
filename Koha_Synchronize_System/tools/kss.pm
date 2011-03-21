@@ -27,9 +27,9 @@ my $db_server                = $$conf{databases_infos}{db_server};
 my $diff_logbin_dir          = $$conf{mysql_log}{diff_logbin_dir};
 my $diff_logtxt_full_dir     = $$conf{mysql_log}{diff_logtxt_full_dir};
 my $diff_logtxt_dir          = $$conf{mysql_log}{diff_logtxt_dir};
-my $mysql_cmd                = $$conf{databases_infos}{mysql};
-my $mysqlbinlog_cmd          = $$conf{databases_infos}{mysqlbinlog};
-my $mysqldump_cmd            = $$conf{databases_infos}{mysqldump};
+my $mysql_cmd                = $$conf{which_cmd}{mysql};
+my $mysqlbinlog_cmd          = $$conf{which_cmd}{mysqlbinlog};
+my $mysqldump_cmd            = $$conf{which_cmd}{mysqldump};
 my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
@@ -75,18 +75,41 @@ sub diff_files_exists {
 sub insert_new_ids {
     my ($mysql_cmd, $user, $pwd, $db_name, $id_dir, $log) = @_;
     my @dump_id = qx{ls -1 $id_dir};
+
+    $log && $log->info(scalar(@dump_id) . " Fichiers trouvés");
     for my $file ( @dump_id ) {
-        $log && $log->info("$file trouvé, insertion en cours...");
-        qx{$mysql_cmd -u $user, -p$pwd $db_name < $file};
+        $log && $log->info("Insertion de $file en cours...");
+        qx{$mysql_cmd -u $user -p$pwd $db_name < $file};
     }
 }
 
 sub insert_proc_and_triggers {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
-    qx{$generate_triggers_path > /tmp/triggers.sql};
-    qx{$mysql_cmd -u $user, -p$pwd $db_name < /tmp/triggers.sql};
-    qx{$generate_procedures_path > /tmp/procedures.sql};
-    qx{$mysql_cmd -u $user, -p$pwd $db_name < /tmp/procedures.sql};
+    eval {
+        qx{$generate_triggers_path > /tmp/triggers.sql};
+        qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/triggers.sql};
+        qx{$generate_procedures_path > /tmp/procedures.sql};
+        qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/procedures.sql};
+    };
+
+    if ( $@ ) {
+        die $@;
+    }
+}
+
+sub delete_proc_and_triggers {
+    my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+    eval {
+        qx{$generate_triggers_path > /tmp/del_triggers.sql};
+        qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_triggers.sql};
+        qx{$generate_procedures_path > /tmp/del_procedures.sql};
+        qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_procedures.sql};
+    };
+
+    if ( $@ ) {
+        die $@;
+    }
+
 }
 
 eval {
@@ -97,13 +120,16 @@ eval {
     $log->info("=== Sauvegarde de la base du serveur ===");
     my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
     $log->info("=== Dump en cours dans $dump_filename ===");
-    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
-
-    $log->info("=== Insertion des nouveaux ids remontés par le client ===");
-    insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
+#    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
 
     $log->info("=== Génération et insertion en base des triggers et procédures stockées ===");
     insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+
+    $log->info("=== Préparation de la base de données ===");
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS();"};
+
+    $log->info("=== Insertion des nouveaux ids remontés par le client ===");
+    insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
 
     $log->info("=== Extraction des fichiers binaires de log sql ===");
     extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
@@ -112,12 +138,18 @@ eval {
     $log->info("=== Digestion des requêtes ===");
     $log->info(scalar( @files ) . " fichiers trouvés");
     for my $file ( @files ) {
+        $log && $log->info("Traitement de $file en cours...");
         insert_diff_file ("$diff_logtxt_dir\/$file", $log);
     }
 
+    $log->info("=== Purge des tables temporaires ===");
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_END_KSS();"};
+
+    $log->info("=== Suppression en base des triggers et procédures stockées ===");
+    delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+
     # À la fin du script :
     #  - insérer les nouveaux id dans kss_infos pour le client
-    #  - supprimer les triggers et procédures stockées
 };
 
 if ( $@ ) {
@@ -199,8 +231,10 @@ sub insert_diff_file {
     $/ = $sep;
 
 
+    #$dbh->do(qq{DELIMITER $sep});
     while ( my $query = <FILE> ) {
         my $r;
+        my @warnings;
         my $table_name;
         $query =~ s/^\n//; # 1er caractère est un retour chariot
         if ( $query =~ /^INSERT INTO (\S+)/ ) {
@@ -232,13 +266,22 @@ sub insert_diff_file {
             } elsif ( $level == 2 ) {
                 $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
                 $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
-                $r = $query;
             }
 
         } else {
             $log->warning("This query is not parsed : ###$query###");
         }
-        $log && $log->info( $r );
+        $log && $log->info( $query );
+
+        $dbh->do($query);
+
+        @warnings = $dbh->selectrow_array(qq{show warnings $sep});
+
+        if ( @warnings ) {
+            $log && $log->error($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
+        } else {
+            $log && $log->info(" <<< OK >>>")
+        }
     }
 
     close( FILE );

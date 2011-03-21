@@ -2,9 +2,13 @@
 
 use Modern::Perl;
 use Data::Dumper;
+use Getopt::Long;
 use YAML;
 
 use C4::Context;
+
+my $action = "create";
+GetOptions( 'action=s' => \$action );
 
 my $koha_dir = C4::Context->config('intranetdir');
 
@@ -55,65 +59,105 @@ my $level2_tables = {
 };
 
 
-my @trigger_str;
 
+
+my @trigger_str;
 push @trigger_str, "DELIMITER //";
 
-# Gestion des tables de niveau 1
-while ( my ($table, $infos) = each %$level1_tables ) {
-
-    # Trigger insert
-    # Met à jour la table de correspondance des ids
-    push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
-    push @trigger_str, "CREATE TRIGGER `TRG_AFT_INS_$table` AFTER INSERT ON `$table`";
-    push @trigger_str, "  FOR EACH ROW BEGIN";
-    if ( $table eq "borrowers" ) {
-        push @trigger_str, "    CALL PROC_UPDATE_BORROWERNUMBER(NEW.borrowernumber, NEW.cardnumber);";
-    }
-    push @trigger_str, "  END;";
-    push @trigger_str, "//";
-
-    # Trigger delete
-    # supprime l'enregistrement qui doit être supprimé et génère une erreur sur le delete courant
-    push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
-    push @trigger_str, "CREATE TRIGGER `TRG_BEF_DEL_$table` BEFORE DELETE ON `$table`";
-    push @trigger_str, "  FOR EACH ROW BEGIN";
-    push @trigger_str, "    CALL PROC_DELETE_FROM($table.$$infos{primary_key}, OLD.$$infos{primary_key});";
-    push @trigger_str, "    SELECT 'a' INTO \@tmp;";      # Generate error
-    push @trigger_str, "    SELECT 'b', 'c' INTO \@tmp;"; # mysql can't stop trigger normally
-    push @trigger_str, "  END;";
-    push @trigger_str, "//";
-
+if ( $action eq "create" ) {
+    push @trigger_str, create_triggers()
+} elsif ( $action eq "drop" ) {
+    push @trigger_str, drop_triggers()
+} else {
+    die "Cette action n'est pas attendue";
 }
 
-# Gestion des tables de niveau 2
-while ( my ($table, $hash) = each %$level2_tables ) {
+sub create_triggers {
 
-    # Trigger insert
-    # Insertion de l'enregistrement avec remplacement des clés étrangères
-    # qui pointent vers des clés primaires des tables de niveau  1
-    push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
-    push @trigger_str, "CREATE TRIGGER `TRG_BEF_INS_$table` BEFORE INSERT ON `$table`";
-    push @trigger_str, "  FOR EACH ROW BEGIN";
-    push @trigger_str, "    DECLARE tmp_id INT(11);";
-        while (my ($field, $ref) = each %$hash) {
-            my ($table_referer, $field_referer) = split /\./, $ref;
-            push @trigger_str, "    CALL PROC_GET_NEW_ID(" . $table_referer . "." . $field_referer . ", NEW.$field, \@tmp_id);";
-            push @trigger_str, "    SELECT \@tmp_id INTO tmp_id;";
-            push @trigger_str, "    SET NEW.$field = tmp_id;";
+    my @str;
+    # Gestion des tables de niveau 1
+    while ( my ($table, $infos) = each %$level1_tables ) {
+
+        # Trigger insert
+        # Met à jour la table de correspondance des ids
+        push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
+        push @str, "CREATE TRIGGER `TRG_AFT_INS_$table` AFTER INSERT ON `$table`";
+        push @str, "  FOR EACH ROW BEGIN";
+        if ( $table eq "borrowers" ) {
+            push @str, "    CALL PROC_UPDATE_BORROWERNUMBER(NEW.borrowernumber, NEW.cardnumber);";
         }
-    push @trigger_str, "  END;";
-    push @trigger_str, "//";
+        push @str, "  END;";
+        push @str, "//";
 
-    if ( $table eq "reserves" ) {
-        push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_reserves` //";
-        push @trigger_str, "CREATE TRIGGER `TRG_AFT_INS_reserves` AFTER INSERT ON `reserves`";
-        push @trigger_str, "  FOR EACH ROW BEGIN";
-        push @trigger_str, "    CALL PROC_UPDATE_RESERVENUMBER(NEW.reservenumber, NEW.borrowernumber, NEW.reservedate);";
-        push @trigger_str, "  END;";
-        push @trigger_str, "//";
+        # Trigger delete
+        # supprime l'enregistrement qui doit être supprimé et génère une erreur sur le delete courant
+        push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
+        push @str, "CREATE TRIGGER `TRG_BEF_DEL_$table` BEFORE DELETE ON `$table`";
+        push @str, "  FOR EACH ROW BEGIN";
+        push @str, "    CALL PROC_DELETE_FROM(\"$table.$$infos{primary_key}\", OLD.$$infos{primary_key});";
+        push @str, "    SELECT 'a' INTO \@tmp;";      # Generate error
+        push @str, "    SELECT 'b', 'c' INTO \@tmp;"; # mysql can't stop trigger normally
+        push @str, "  END;";
+        push @str, "//";
+
     }
 
+    # Gestion des tables de niveau 2
+    while ( my ($table, $hash) = each %$level2_tables ) {
+
+        # Trigger insert
+        # Insertion de l'enregistrement avec remplacement des clés étrangères
+        # qui pointent vers des clés primaires des tables de niveau  1
+        push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
+        push @str, "CREATE TRIGGER `TRG_BEF_INS_$table` BEFORE INSERT ON `$table`";
+        push @str, "  FOR EACH ROW BEGIN";
+        push @str, "    DECLARE tmp_id INT(11);";
+            while (my ($field, $ref) = each %$hash) {
+                my ($table_referer, $field_referer) = split /\./, $ref;
+                push @str, "    CALL PROC_GET_NEW_ID(\"" . $table_referer . "." . $field_referer . "\", NEW.$field, \@tmp_id);";
+                push @str, "    SELECT \@tmp_id INTO tmp_id;";
+                push @str, "    SET NEW.$field = tmp_id;";
+            }
+        push @str, "  END;";
+        push @str, "//";
+
+        if ( $table eq "reserves" ) {
+            push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_reserves` //";
+            push @str, "CREATE TRIGGER `TRG_AFT_INS_reserves` AFTER INSERT ON `reserves`";
+            push @str, "  FOR EACH ROW BEGIN";
+            push @str, "    CALL PROC_UPDATE_RESERVENUMBER(NEW.reservenumber, NEW.borrowernumber, NEW.biblionumber, NEW.reservedate);";
+            push @str, "  END;";
+            push @str, "//";
+        }
+
+    }
+
+    return @str;
+}
+
+sub drop_triggers {
+    my @str;
+
+    # Gestion des tables de niveau 1
+    while ( my ($table, $infos) = each %$level1_tables ) {
+
+        push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
+
+        push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
+
+    }
+
+    # Gestion des tables de niveau 2
+    while ( my ($table, $hash) = each %$level2_tables ) {
+
+        push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
+
+        if ( $table eq "reserves" ) {
+            push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_reserves` //";
+        }
+
+    }
+    return @str;
 }
 
 print join "\n", @trigger_str ;
