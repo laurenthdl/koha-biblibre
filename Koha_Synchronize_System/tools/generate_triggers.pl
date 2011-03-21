@@ -2,11 +2,19 @@
 
 use Modern::Perl;
 use Data::Dumper;
+use YAML;
 
-my $matching_table_prefix = "kss_tmp_matching_";
-my $kss_info_table = "kss_info";
-my $server_db_name = "koha_devkss_server";
-my $client_db_name = "koha_devkss_client";
+use C4::Context;
+
+my $koha_dir = C4::Context->config('intranetdir');
+
+my $kss_dir = "$koha_dir/Koha_Synchronize_System";
+
+my $conf = YAML::LoadFile("$kss_dir/conf/kss.yaml");
+my $matching_table_prefix = $$conf{databases_infos}{matching_table_prefix};
+my $client_db_name = $$conf{databases_infos}{db_client};
+my $server_db_name = $$conf{databases_infos}{db_server};
+my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 
 my $level1_tables = {
     'borrowers' => {
@@ -83,7 +91,7 @@ while ( my ($table, $hash) = each %$level2_tables ) {
     # Insertion de l'enregistrement avec remplacement des clés étrangères
     # qui pointent vers des clés primaires des tables de niveau  1
     push @trigger_str, "DROP TRIGGER IF EXISTS `TRG_INS_$table` //";
-    push @trigger_str, "CREATE TRIGGER `TRG_DEL_$table` BEFORE INSERT ON `$table`";
+    push @trigger_str, "CREATE TRIGGER `TRG_INS_$table` BEFORE INSERT ON `$table`";
     push @trigger_str, "  FOR EACH ROW BEGIN";
     push @trigger_str, "    DECLARE tmp_id INT(11);";
         while (my ($field, $ref) = each %$hash) {

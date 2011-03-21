@@ -14,7 +14,7 @@ CREATE TRIGGER `TRG_BEF_DEL_borrowers` BEFORE DELETE ON `borrowers`
   END;
 //
 DROP TRIGGER IF EXISTS `TRG_INS_issues` //
-CREATE TRIGGER `TRG_DEL_issues` BEFORE INSERT ON `issues`
+CREATE TRIGGER `TRG_INS_issues` BEFORE INSERT ON `issues`
   FOR EACH ROW BEGIN
     DECLARE tmp_id INT(11);
     CALL PROC_GET_NEW_ID(items.itemnumber, NEW.itemnumber, @tmp_id);
@@ -26,7 +26,7 @@ CREATE TRIGGER `TRG_DEL_issues` BEFORE INSERT ON `issues`
   END;
 //
 DROP TRIGGER IF EXISTS `TRG_INS_old_reserves` //
-CREATE TRIGGER `TRG_DEL_old_reserves` BEFORE INSERT ON `old_reserves`
+CREATE TRIGGER `TRG_INS_old_reserves` BEFORE INSERT ON `old_reserves`
   FOR EACH ROW BEGIN
     DECLARE tmp_id INT(11);
     CALL PROC_GET_NEW_ID(items.itemnumber, NEW.itemnumber, @tmp_id);
@@ -41,7 +41,7 @@ CREATE TRIGGER `TRG_DEL_old_reserves` BEFORE INSERT ON `old_reserves`
   END;
 //
 DROP TRIGGER IF EXISTS `TRG_INS_old_issues` //
-CREATE TRIGGER `TRG_DEL_old_issues` BEFORE INSERT ON `old_issues`
+CREATE TRIGGER `TRG_INS_old_issues` BEFORE INSERT ON `old_issues`
   FOR EACH ROW BEGIN
     DECLARE tmp_id INT(11);
     CALL PROC_GET_NEW_ID(items.itemnumber, NEW.itemnumber, @tmp_id);
@@ -53,7 +53,7 @@ CREATE TRIGGER `TRG_DEL_old_issues` BEFORE INSERT ON `old_issues`
   END;
 //
 DROP TRIGGER IF EXISTS `TRG_INS_borrower_attributes` //
-CREATE TRIGGER `TRG_DEL_borrower_attributes` BEFORE INSERT ON `borrower_attributes`
+CREATE TRIGGER `TRG_INS_borrower_attributes` BEFORE INSERT ON `borrower_attributes`
   FOR EACH ROW BEGIN
     DECLARE tmp_id INT(11);
     CALL PROC_GET_NEW_ID(borrower.borrowernumber, NEW.borrowernumber, @tmp_id);
@@ -62,7 +62,7 @@ CREATE TRIGGER `TRG_DEL_borrower_attributes` BEFORE INSERT ON `borrower_attribut
   END;
 //
 DROP TRIGGER IF EXISTS `TRG_INS_action_logs` //
-CREATE TRIGGER `TRG_DEL_action_logs` BEFORE INSERT ON `action_logs`
+CREATE TRIGGER `TRG_INS_action_logs` BEFORE INSERT ON `action_logs`
   FOR EACH ROW BEGIN
     DECLARE tmp_id INT(11);
     CALL PROC_GET_NEW_ID(borrowers.borrowernumber, NEW.user, @tmp_id);
@@ -71,7 +71,7 @@ CREATE TRIGGER `TRG_DEL_action_logs` BEFORE INSERT ON `action_logs`
   END;
 //
 DROP TRIGGER IF EXISTS `TRG_INS_statistics` //
-CREATE TRIGGER `TRG_DEL_statistics` BEFORE INSERT ON `statistics`
+CREATE TRIGGER `TRG_INS_statistics` BEFORE INSERT ON `statistics`
   FOR EACH ROW BEGIN
     DECLARE tmp_id INT(11);
     CALL PROC_GET_NEW_ID(borrowers.borrowernumber, NEW.borrowernumber, @tmp_id);
@@ -80,7 +80,7 @@ CREATE TRIGGER `TRG_DEL_statistics` BEFORE INSERT ON `statistics`
   END;
 //
 DROP TRIGGER IF EXISTS `TRG_INS_reserves` //
-CREATE TRIGGER `TRG_DEL_reserves` BEFORE INSERT ON `reserves`
+CREATE TRIGGER `TRG_INS_reserves` BEFORE INSERT ON `reserves`
   FOR EACH ROW BEGIN
     DECLARE tmp_id INT(11);
     CALL PROC_GET_NEW_ID(items.itemnumber, NEW.itemnumber, @tmp_id);

@@ -9,36 +9,40 @@ use Getopt::Long;
 use Pod::Usage;
 use DateTime;
 use POSIX qw(strftime);
+use YAML;
 
 use C4::Logguer qw(:DEFAULT $log_kss);
 
 use Koha_Synchronize_System::tools::mysql;
 
-my $db_client             = "koha_devkss_client";
-my $db_server             = "koha_devkss_server";
-my $db_merge              = "koha_devkss_merge";
-my $diff_logbin_dir       = "../data/client/logbin";
-my $diff_logtxt_full_dir  = "../data/client/logtxt_full";
-my $diff_logtxt_dir       = "../data/client/logtxt";
-my $mysql_cmd             = "/usr/bin/mysql";
-my $mysqlbinlog_cmd       = "/usr/bin/mysqlbinlog";
-my $mysqldump_cmd         = "/usr/bin/mysqldump";
-my $hostname              = "localhost";
-my $user                  = "root";
-my $passwd                = "root";
+my $koha_dir = C4::Context->config('intranetdir');
+
+my $kss_dir = "$koha_dir/Koha_Synchronize_System";
+
+my $conf = YAML::LoadFile("$kss_dir/conf/kss.yaml");
+my $db_client             = $$conf{databases_infos}{db_client};
+my $db_server             = $$conf{databases_infos}{db_server};
+my $diff_logbin_dir       = $$conf{mysql_log}{diff_logbin_dir};
+my $diff_logtxt_full_dir  = $$conf{mysql_log}{diff_logtxt_full_dir};
+my $diff_logtxt_dir       = $$conf{mysql_log}{diff_logtxt_dir};
+my $mysql_cmd             = $$conf{databases_infos}{mysql};
+my $mysqlbinlog_cmd       = $$conf{databases_infos}{mysqlbinlog};
+my $mysqldump_cmd         = $$conf{databases_infos}{mysqldump};
+my $hostname              = $$conf{databases_infos}{hostname};
+my $user                  = $$conf{databases_infos}{user};
+my $passwd                = $$conf{databases_infos}{passwd};
 my $help                  = "";
 my $log = $log_kss;
-my $dump_id_dir           = "../data/client/dump_id";
-my $dump_db_server_dir    = "../data/server/bak";
+my $dump_id_dir           = $$conf{datas_path}{dump_id};
+my $dump_db_server_dir    = $$conf{datas_path}{backup_server};
 
-my $kss_infos_table = "kss_infos";
-my $max_borrowers_fieldname = "max_old_borrowers";
+my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
+my $max_borrowers_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
 
 GetOptions(
     'help|?'       => \$help,
     'db_client=s'  => \$db_client,
     'db_server=s'  => \$db_server,
-    'db_merge=s'   => \$db_merge,
     'hostname=s'   => \$hostname,
     'user=s'       => \$user,
     'passwd=s'     => \$passwd,
@@ -50,30 +54,30 @@ $log->info("BEGIN");
 
 eval {
 
-#    $log->info("=== Vérification de l'existence d'au moins un fichier de diff binaire ===");
-#    my @diff_bin = qx{ls -1 $diff_logbin_dir};
-#    if ( scalar( @diff_bin ) > 0 ) {
-#        $log_info(scalar( @diff_bin) . " fichiers binaires trouvés");
-#    } else {
-#        $log_info("Aucun fichier binaire trouvé, rien ne sert de continuer !");
-#        die "Aucun fichier binaire trouvé, rien ne sert de continuer !";
-#    } 
-#
-#    $log->info("=== Sauvegarde de la base du serveur ===");
-#    my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
-#    $log->info("=== Dump en cours dans $dump_filename ===");
-#    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
-#
-#    $log->info("=== Récupération des nouveaux ids remontés par le client ===");
-#    my @dump_id = qx{ls -1 $dump_id_dir};
-#    for my $file ( @dump_id ) {
-#        $log->info("$file trouvé, insertion en cours...");
-#        qx{$mysql_cmd -u $user, -p$passwd $db_server < $file};
-#    }
-#
-#    $log->info("=== Extraction des fichiers binaires de log sql ===");
-#    extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
-#    
+    $log->info("=== Vérification de l'existence d'au moins un fichier de diff binaire ===");
+    my @diff_bin = qx{ls -1 $diff_logbin_dir};
+    if ( scalar( @diff_bin ) > 0 ) {
+        $log_info(scalar( @diff_bin) . " fichiers binaires trouvés");
+    } else {
+        $log_info("Aucun fichier binaire trouvé, rien ne sert de continuer !");
+        die "Aucun fichier binaire trouvé, rien ne sert de continuer !";
+    }
+
+    $log->info("=== Sauvegarde de la base du serveur ===");
+    my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
+    $log->info("=== Dump en cours dans $dump_filename ===");
+    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
+
+    $log->info("=== Récupération des nouveaux ids remontés par le client ===");
+    my @dump_id = qx{ls -1 $dump_id_dir};
+    for my $file ( @dump_id ) {
+        $log->info("$file trouvé, insertion en cours...");
+        qx{$mysql_cmd -u $user, -p$passwd $db_server < $file};
+    }
+
+    $log->info("=== Extraction des fichiers binaires de log sql ===");
+    extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
+
     my @files = qx{ls -1 $diff_logtxt_dir};
     $log->info("=== Digestion des requêtes ===");
     $log->info(scalar( @files ) . " fichiers trouvés");

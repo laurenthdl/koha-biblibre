@@ -5,19 +5,26 @@ use DBI;
 use Data::Dumper;
 use Getopt::Long;
 use Pod::Usage;
+use YAML;
 
-my $database = "koha_devkss_client";
-my $hostname = "localhost";
-my $user     = "root";
-my $passwd   = "root";
+my $koha_dir = C4::Context->config('intranetdir');
+
+my $kss_dir = "$koha_dir/Koha_Synchronize_System";
+
+my $conf = YAML::LoadFile("$kss_dir/conf/kss.yaml");
+
+my $database = $$conf{databases_infos}{db_client};
+my $hostname = $$conf{databases_infos}{hostname};
+my $user     = $$conf{databases_infos}{user};
+my $passwd   = $$conf{databases_infos}{passwd};
 my $help     = "";
 
-my $mysqldump_cmd = "/usr/bin/mysqldump";
-my $dump_filename = "/tmp/borrowers.sql":
+my $mysqldump_cmd = $$conf{databases_infos}{mysqldump};
+my $dump_filename = $$conf{datas_path}{dump_borroweres_filename}
 
-my $kss_infos_table = "kss_infos";
-my $max_borrowers_fieldname = "max_old_borrowers";
-my $max_issues_fieldname = "max_old_issues";
+my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
+my $max_borrowers_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
+my $max_issues_fieldname = $$conf{databases_infos}{max_issues_fieldname};
 
 GetOptions(
     'help|?'       => \$help,

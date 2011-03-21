@@ -1,13 +1,12 @@
 DELIMITER //
-
 DROP PROCEDURE IF EXISTS `PROC_ID_KSS_INFOS` //
+DROP PROCEDURE IF EXISTS `PROC_INIT_KSS_INFOS` //
 CREATE PROCEDURE `PROC_INIT_KSS_INFOS` (
 )
 BEGIN
-    CREATE TABLE kss_tmp_matching_borrowers(old INT(11), new INT(11));
+    CREATE TABLE kss_tmp_matching_(old INT(11), new INT(11));
 END;
 //
-
 DROP PROCEDURE IF EXISTS `PROC_INIT_KSS_INFOS` //
 CREATE PROCEDURE `PROC_INIT_KSS_INFOS` (
     IN server_db_name VARCHAR(255)
@@ -15,15 +14,12 @@ CREATE PROCEDURE `PROC_INIT_KSS_INFOS` (
 BEGIN
     DECLARE next_id INT(11);
     CREATE TABLE kss_infos (variable VARCHAR(255) , value VARCHAR(255));
-    SET @select_next_id = CONCAT("SELECT MAX(borrowernumber) + 1 FROM ", server_db_name, ".borrowers INTO next_id");
+    SET @select_next_id = CONCAT('SELECT MAX(borrowernumber) + 1 FROM ', server_db_name, '.borrowers INTO next_id');
     PREPARE stmt FROM @select_next_id;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
 END;
 //
-
-
-
 DROP PROCEDURE IF EXISTS `PROC_UPDATE_ID` //
 CREATE PROCEDURE `PROC_UPDATE_ID` (
     IN field_name VARCHAR(255),
@@ -38,7 +34,6 @@ BEGIN
     END IF;
 END;
 //
-
 DROP PROCEDURE IF EXISTS `PROC_GET_NEW_ID` //
 CREATE PROCEDURE `PROC_GET_NEW_ID` (
     IN field_name VARCHAR(255),
@@ -53,8 +48,6 @@ BEGIN
     END IF;
 END;
 //
-
-
 DROP PROCEDURE IF EXISTS `PROC_DELETE_FROM` //
 CREATE PROCEDURE `PROC_DELETE_FROM` (
     IN field_name VARCHAR(255),
@@ -69,7 +62,6 @@ BEGIN
     END IF;
 END;
 //
-
 DROP PROCEDURE IF EXISTS `PROC_UPDATE` //
 CREATE PROCEDURE `PROC_UPDATE` (
     IN field_name VARCHAR(255),
@@ -84,4 +76,3 @@ BEGIN
     END IF;
 END;
 //
-
