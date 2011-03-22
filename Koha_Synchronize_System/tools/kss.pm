@@ -24,9 +24,9 @@ my $kss_dir = "$koha_dir/Koha_Synchronize_System/";
 my $conf                     = YAML::LoadFile("$kss_dir/conf/kss.yaml");
 my $db_client                = $$conf{databases_infos}{db_client};
 my $db_server                = $$conf{databases_infos}{db_server};
-my $diff_logbin_dir          = $$conf{mysql_log}{diff_logbin_dir};
-my $diff_logtxt_full_dir     = $$conf{mysql_log}{diff_logtxt_full_dir};
-my $diff_logtxt_dir          = $$conf{mysql_log}{diff_logtxt_dir};
+my $diff_logbin_dir          = $kss_dir . $$conf{mysql_log}{diff_logbin_dir};
+my $diff_logtxt_full_dir     = $kss_dir . $$conf{mysql_log}{diff_logtxt_full_dir};
+my $diff_logtxt_dir          = $kss_dir . $$conf{mysql_log}{diff_logtxt_dir};
 my $mysql_cmd                = $$conf{which_cmd}{mysql};
 my $mysqlbinlog_cmd          = $$conf{which_cmd}{mysqlbinlog};
 my $mysqldump_cmd            = $$conf{which_cmd}{mysqldump};
@@ -34,8 +34,8 @@ my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $help                     = "";
-my $dump_id_dir              = $$conf{datas_path}{dump_id};
-my $dump_db_server_dir       = $$conf{datas_path}{backup_server};
+my $dump_id_dir              = $kss_dir . $$conf{datas_path}{dump_id};
+my $dump_db_server_dir       = $kss_dir . $$conf{datas_path}{backup_server};
 
 my $generate_triggers_path   = $kss_dir . $$conf{tools_path}{generate_triggers};
 my $generate_procedures_path = $kss_dir . $$conf{tools_path}{generate_procedures};
@@ -54,7 +54,6 @@ GetOptions(
 
 pod2usage(1) if $help;
 
-$log->info("BEGIN");
 
 sub diff_files_exists {
     my $dir = shift;
@@ -112,48 +111,54 @@ sub delete_proc_and_triggers {
 
 }
 
-eval {
+if ( not caller ) {
+    $log->info("BEGIN");
+    eval {
 
-    $log->info("=== Vérification de l'existence d'au moins un fichier de diff binaire ===");
-    diff_files_exists $diff_logbin_dir, $log;
+        $log->info("=== Vérification de l'existence d'au moins un fichier de diff binaire ===");
+    #    diff_files_exists $diff_logbin_dir, $log;
 
-    $log->info("=== Sauvegarde de la base du serveur ===");
-    my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
-    $log->info("=== Dump en cours dans $dump_filename ===");
-#    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
+        $log->info("=== Sauvegarde de la base du serveur ===");
+        my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
+        $log->info("=== Dump en cours dans $dump_filename ===");
+    #    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
 
-    $log->info("=== Génération et insertion en base des triggers et procédures stockées ===");
-    insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+        $log->info("=== Génération et insertion en base des triggers et procédures stockées ===");
+        insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
 
-    $log->info("=== Préparation de la base de données ===");
-    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS();"};
+        $log->info("=== Préparation de la base de données ===");
+    #    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS();"};
 
-    $log->info("=== Insertion des nouveaux ids remontés par le client ===");
-    insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
+        $log->info("=== Insertion des nouveaux ids remontés par le client ===");
+        insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
 
-    $log->info("=== Extraction des fichiers binaires de log sql ===");
-    extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
+        $log->info("=== Extraction des fichiers binaires de log sql ===");
+        extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
 
-    my @files = qx{ls -1 $diff_logtxt_dir};
-    $log->info("=== Digestion des requêtes ===");
-    $log->info(scalar( @files ) . " fichiers trouvés");
-    for my $file ( @files ) {
-        $log && $log->info("Traitement de $file en cours...");
-        insert_diff_file ("$diff_logtxt_dir\/$file", $log);
+        my @files = qx{ls -1 $diff_logtxt_dir};
+        $log->info("=== Digestion des requêtes ===");
+        $log->info(scalar( @files ) . " fichiers trouvés");
+        for my $file ( @files ) {
+            $log && $log->info("Traitement de $file en cours...");
+            insert_diff_file ("$diff_logtxt_dir\/$file", $log);
+        }
+
+        $log->info("=== Purge des tables temporaires ===");
+        qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_END_KSS();"};
+
+        $log->info("=== Suppression en base des triggers et procédures stockées ===");
+        delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+
+        # À la fin du script :
+        #  - insérer les nouveaux id dans kss_infos pour le client
+    };
+
+    if ( $@ ) {
+        $log->error($@);
     }
 
-    $log->info("=== Purge des tables temporaires ===");
-    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_END_KSS();"};
+    $log->info("END");
 
-    $log->info("=== Suppression en base des triggers et procédures stockées ===");
-    delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
-
-    # À la fin du script :
-    #  - insérer les nouveaux id dans kss_infos pour le client
-};
-
-if ( $@ ) {
-    $log->error($@);
 }
 
 sub extract_and_purge_mysqllog {
@@ -228,6 +233,7 @@ sub insert_diff_file {
     open( FILE, $file ) or die "Le fichier $file ne peut être lu";
 
     my $sep = "/*!*/;";
+    my $oldsep = $/;
     $/ = $sep;
 
 
@@ -285,7 +291,7 @@ sub insert_diff_file {
     }
 
     close( FILE );
-}
 
-$log->info("END");
+    $/ = $oldsep;
+}
 
