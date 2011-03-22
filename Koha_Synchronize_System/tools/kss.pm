@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 package Koha_Synchronize_System::tools::kss;
 
 use Modern::Perl;
@@ -98,7 +96,8 @@ sub insert_proc_and_triggers {
 
 sub prepare_database {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
-    qx{$mysql_cmd -u $user -p$passwd $db_namer -e "CALL PROC_INIT_KSS();"};
+    qx{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_INIT_KSS();"};
+
 }
 
 sub delete_proc_and_triggers {
@@ -299,4 +298,4 @@ sub insert_diff_file {
 
     $/ = $oldsep;
 }
-
+1;

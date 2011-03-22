@@ -22,7 +22,7 @@ my $user     = $$conf{databases_infos}{user};
 my $passwd   = $$conf{databases_infos}{passwd};
 my $help     = "";
 
-my $mysqldump_cmd = $$conf{databases_infos}{mysqldump};
+my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
 my $dump_filename = $$conf{datas_path}{dump_borrowers_filename};
 
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
@@ -44,11 +44,11 @@ my $dbh = DBI->connect( "DBI:mysql:dbname=$database;host=$hostname;", $user, $pa
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set NAMES 'utf8'");
 
-$dbh->do("DROP TABLE IF EXISTS " . $matching_table_prefix . " borrowers");
+$dbh->do("DROP TABLE IF EXISTS " . $matching_table_prefix . "borrowers");
 $dbh->do("CREATE TABLE " . $matching_table_prefix . "borrowers(borrowernumber INT(11), cardnumber VARCHAR(16))");
 $dbh->do("INSERT INTO " . $matching_table_prefix . "borrowers(borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM borrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_borrowers_fieldname')");
 
-qx{$mysqldump_cmd --no-create-db --no-create-info -u $user -p$passwd $database borrowers > $dump_filename};
+qx{$mysqldump_cmd -u $user -p$passwd $database borrowers > $dump_filename};
 
 __END__
 

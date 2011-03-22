@@ -59,23 +59,16 @@ sub create_procedures {
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_INIT_KSS_INFOS` //};
 
     push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS_INFOS` (
-        IN server_db_name VARCHAR(255)
     )
     BEGIN
         DECLARE next_id INT(11);
         CREATE TABLE $kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
-        SET \@select_next_id = CONCAT('SELECT MAX(borrowernumber) + 1 FROM ', server_db_name, '.borrowers INTO next_id');
-        PREPARE stmt FROM \@select_next_id;
-        EXECUTE stmt;
-        DEALLOCATE PREPARE stmt;
-        INSERT INTO $kss_infos_table(variable, value) VALUES ("borrowernumber", next_id);
 
-        CREATE TABLE $kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
-        SET \@select_next_id = CONCAT('SELECT MAX(reservenumber) + 1 FROM ', server_db_name, '.reserves INTO next_id');
-        PREPARE stmt FROM \@select_next_id;
-        EXECUTE stmt;
-        DEALLOCATE PREPARE stmt;
-        INSERT INTO $kss_infos_table(variable, value) VALUES ("reservenumber", next_id);
+        SELECT MAX(borrowernumber) + 1 FROM borrowers INTO next_id;
+        INSERT INTO $kss_infos_table (variable, value) VALUES ("borrowernumber", next_id);
+
+        SELECT MAX(reservenumber) + 1 FROM reserves INTO next_id;
+        INSERT INTO $kss_infos_table (variable, value) VALUES ("reservenumber", next_id);
     END;
     //};
 

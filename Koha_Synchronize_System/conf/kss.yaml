@@ -19,7 +19,7 @@ databases_infos:
         passwd: root
         kss_infos_table: kss_infos
         max_borrowers_fieldname: max_old_borrowers
-        max_issues_fieldname: max_old_issues
+        max_reserves_fieldname: max_old_reserves
         matching_table_prefix: kss_tmp_matching_
         matching_table_ids: kss_tmp_ids
 
