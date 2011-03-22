@@ -42,4 +42,9 @@ datas_path:
 tools_path:
         generate_triggers: tools/generate_triggers.pl
         generate_procedures: tools/generate_procedures.pl
+cron:
+        cronfile: /home/koha/sites/dev/var/spool/cron/koha
+        cronpidfile: /home/koha/sites/dev/var/run/cronscheduler.pid
+        serverhost: 192.168.0.252
+        executiontime: 2200
 

@@ -32,6 +32,8 @@
 	<div id="home">
 	    <h3>Home</h3>
 	    <ul>
+		<li>Connection test: <!-- TMPL_IF NAME="pingresult" -->success<!-- TMPL_ELSE -->failed<!-- /TMPL_IF --></li>
+		<li>Next update: <!-- TMPL_IF NAME="execution_time" --><!-- TMPL_VAR NAME="execution_time" --><!-- TMPL_ELSE -->none<!-- /TMPL_IF --></li>
 		<li>Last slave update:</li>
 		<li>Last master update:</li>
 	    </ul>

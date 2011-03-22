@@ -41,9 +41,16 @@ use C4::Context;
 use C4::Output;
 use CGI;
 use C4::Koha;
+use Schedule::Cron;
+use YAML;
+use Net::Ping;
+use C4::Scheduler;
+use POSIX qw(strftime);
+
 
 my $input = new CGI;
 my $dbh   = C4::Context->dbh;
+my $conf  = YAML::LoadFile('../Koha_Synchronize_System/conf/kss.yaml');
 
 # open template
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -55,5 +62,27 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
         debug           => 1,
     }
 );
+
+# Trying to reach the server
+my $ping = Net::Ping->new();
+my $pingresult = $ping->ping($conf->{'cron'}->{'serverhost'});
+$template->param(pingresult => $pingresult);
+
+# If connection test is ok, let's schedule an automatic execution
+if ($pingresult) {
+
+    my $command = 'ls';
+    my $date = strftime "%Y%m%d", localtime;
+    $date .= $conf->{'cron'}->{'executiontime'};
+    # TODO : use tomorrow's date if scheduled after midnight
+    my $jobs = get_at_jobs();
+    # Deleting next sync if it already has been scheduled
+    remove_at_job_by_tag($command);
+    # Scheduling next execution
+    my $jobid = add_at_job( $date, $command ) ;
+    # Show execution time to the user
+    $template->param(execution_time => $date) if ($jobid);
+
+}
 
 output_html_with_http_headers $input, $cookie, $template->output;
