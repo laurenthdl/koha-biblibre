@@ -96,6 +96,11 @@ sub insert_proc_and_triggers {
     }
 }
 
+sub prepare_database {
+    my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+    qx{$mysql_cmd -u $user -p$passwd $db_namer -e "CALL PROC_INIT_KSS();"};
+}
+
 sub delete_proc_and_triggers {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
     eval {
@@ -127,7 +132,7 @@ if ( not caller ) {
         insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
 
         $log->info("=== Préparation de la base de données ===");
-    #    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS();"};
+        prepare_database $mysql_cmd, $user, $passwd, $db_server, $log;
 
         $log->info("=== Insertion des nouveaux ids remontés par le client ===");
         insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
