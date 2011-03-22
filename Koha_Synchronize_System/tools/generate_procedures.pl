@@ -40,7 +40,7 @@ sub create_procedures {
     push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS` (
     )
     BEGIN
-        CREATE TABLE } . $matching_table_prefix . qq{borrowernumber(old INT(11), cardnumber INT(11));
+        CREATE TABLE } . $matching_table_prefix . qq{borrowers(borrowernumber INT(11), cardnumber INT(11));
         CREATE TABLE } . $matching_table_prefix . qq{reserves(reservenumber INT(11), borrowernumber INT(11), biblionumber INT(11), reservedate DATE);
         CREATE TABLE $matching_table_ids (table_name VARCHAR(255), old INT(11), new INT(11));
     END;
@@ -50,7 +50,7 @@ sub create_procedures {
     push @str, qq{CREATE PROCEDURE `PROC_END_KSS` (
     )
     BEGIN
-        DROP TABLE } . $matching_table_prefix . qq{borrowernumber;
+        DROP TABLE } . $matching_table_prefix . qq{borrowers;
         DROP TABLE } . $matching_table_prefix . qq{reserves;
         DROP TABLE $matching_table_ids;
     END;
@@ -132,7 +132,7 @@ sub create_procedures {
     BEGIN
         DECLARE new_id INT(11);
         IF field_name = 'borrowers.borrowernumber' THEN
-            CALL PROC_GET_NEW_ID(field_name, id, \@new_id);
+            CALL PROC_GET_NEW_ID("borrowers.borrowernumber", id, \@new_id);
             SELECT \@new_id INTO new_id;
             DELETE FROM borrowers WHERE borrowernumber=new_id;
         END IF;
@@ -147,7 +147,7 @@ sub create_procedures {
     BEGIN
         DECLARE new_id INT(11);
         IF field_name = 'borrowers.borrowernumber' THEN
-            CALL PROC_GET_NEW_ID(field_name, id, \@new_id);
+            CALL PROC_GET_NEW_ID("borrowers.borrowernumber", id, \@new_id);
             SELECT \@new_id INTO new_id;
             DELETE FROM borrowers WHERE borrowernumber=new_id;
         END IF;

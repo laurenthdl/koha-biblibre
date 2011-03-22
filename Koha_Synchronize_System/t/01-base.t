@@ -8,6 +8,9 @@ use DBI;
 use C4::Context;
 use C4::SQLHelper;
 use Koha_Synchronize_System::tools::kss;
+use C4::Logguer qw(:DEFAULT $log_kss);
+
+my $log = $log_kss;
 
 plan 'no_plan';
 
@@ -22,27 +25,24 @@ my $db_server = $conf->{'datatest'}->{'db_server'};
 my $hostname = $conf->{'datatest'}->{'hostname'};
 my $dump_id_dir = $curdir . $conf->{'datas_path'}->{'dump_id'};
 my $dbh = DBI->connect("DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd); 
-
+$dbh->{'mysql_enable_utf8'} = 1;
+$dbh->do("set NAMES 'utf8'");
 warn "\nINFOS: hostname:$hostname - user:$user - pass:$passwd - db:$db_server";
 
 &setUp;
 &checkBefore;
 &processQueries;
+&clean;
 
 # init bases client + serveur
 sub setUp {
-    warn ">>>init";
     # 1- init (structure, diffs)
     #qx {./init.sh};
 
-    warn ">>>other";
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server; 
-    warn ">>>other2";
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS_INFOS();" } ;
-    warn ">>>other3";
     Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server; 
-    warn ">>>other4";
-    Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir; 
+    Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
 }
 
 #table-01 = simple insert
@@ -51,55 +51,57 @@ sub setUp {
 # > 04 = more complex scenarii "addissue" "return"...
 sub processQueries {
     my $queriesdir = "$curdir/t/unitdiff";
-    my @files = qx{ls -1 $queriesdir};
-    for my $file ( @files ) {
-        chomp $file;
 
-        #?!?
-        #qx{../scripts/client/insert_new_borrowernumber.pl};
-        #my $borrfile = "$curdir/tools/procedures.sql";
-        #qx{$mysql_cmd -u $user -p$passwd $db_server < $$conf{datas_path}{dump_borrowers_filename}  };
+    my @files = (
+        {filename => "borrower-01-insert.sql",  func =>            "testborrower01insert"},
+    {filename => "borrower-02-update.sql", func =>             "testborrower02update" },
+    {filename => "borrower-03-delete.sql", func =>             "testborrower03delete" },
+#    {filename => "borrower_attributes-01-insert.sql", func =>  "testborrower_attributes01insert" },
+#    {filename => "issue-01-insert.sql", func =>                "testissue01insert" },
+#    {filename => "issue-02-update.sql", func =>                "testissue02update" },
+#    {filename => "issue-03-delete.sql", func =>                "testissue03delete" },
+#    {filename => "issue-04-addissue.sql", func =>              "testissue04addissue" },
+#    {filename => "issue-05-return.sql", func =>                "testissue05return" },
+#    {filename => "issue-06-renewal.sql", func =>               "issue06renewal" },
+#    {filename => "items-02-update.sql", func =>                "testitems02update" },
+#    {filename => "old_issues-04-newoldissue.sql", func =>      "testold_issues04newoldissue" },
+#    {filename => "reserves-04-addissue.sql", func =>           "testreserves04addissue" },
+#    {filename => "reserves-05-holding.sql", func =>            "testreserves05holding" },
+#    {filename => "statistics-01-insert.sql", func =>           "teststatistics01insert" },
+
+    );
+    for my $hash ( @files ) {
+        my $file = $$hash{filename};
+        my $func = $$hash{func};
 
         my $filefull = "$queriesdir/$file";
-        warn "file:$filefull";
-        qx{$mysql_cmd -u $user -p$passwd $db_server < $filefull};
-
-        Koha_Synchronize_System::tools::kss::insert_diff_file ($filefull);
-
-        given ($file) {
-          when ("borrower-01-insert.sql")            { &testborrower01insert }
-#          when ("borrower-02-update.sql")            { &testborrower02update }
-#          when ("borrower-03-delete.sql")            { &testborrower03delete }
-#          when ("borrower_attributes-01-insert.sql") { &testborrower_attributes01insert }
-#          when ("issue-01-insert.sql")               { &testissue01insert }
-#          when ("issue-02-update.sql")               { &testissue02update }
-#          when ("issue-03-delete.sql")               { &testissue03delete }
-#          when ("issue-04-addissue.sql")             { &testissue04addissue }
-#          when ("issue-05-return.sql")               { &testissue05return }
-#          when ("issue-06-renewal.sql")              { &issue06renewal }
-#          when ("items-02-update.sql")               { &testitems02update }
-#          when ("old_issues-04-newoldissue.sql")     { &testold_issues04newoldissue }
-#          when ("reserves-04-addissue.sql")          { &testreserves04addissue }
-#          when ("reserves-05-holding.sql")           { &testreserves05holding }
-#          when ("statistics-01-insert.sql")          { &teststatistics01insert }
-          default                                    { warn 'default case'; &testdefault }
-        }
-        last;
+        Koha_Synchronize_System::tools::kss::insert_diff_file ($filefull, $dbh);
+        no strict "refs";
+        &{ $func }
 
     }
 }
 
 sub checkBefore {
     my $oldborrower =  { 'borrowernumber' => "86"
-      , 'cardnumber' => "1000955"
-      , 'surname' => "ABAINVILLE(Mairie)"
+      , 'cardnumber' => "10000955"
+      , 'surname' => "ABAINVILLE (Mairie)"
       , 'dateexpiry' => "2017-01-15"
       , 'password' => "kDPg4wXyR8DDyA0MeEjIsw"
     };
     is (&findInData ("borrowers", $oldborrower), 1, 'borrower 86 modified by testborrower02update');
+
+    $oldborrower = { 'borrowernumber' => '50'};
+    is (&findInData ("borrowers", $oldborrower), 1, 'borrower 50 deleted by testborrower03delete');
+
+
     
 }
 
+sub clean {
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_END_KSS();"};
+    Koha_Synchronize_System::tools::kss::delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+}
 sub testdefault {
     is (&findInData ("borrowers", { 'cardnumber' => "10000267", 'surname' => "COLLIN" }), 1 , "default exists");
     is (&findInData ("borrowers", { 'cardnumber' => "424242", 'surname' => "John Carmack" }) ,0, "default exists");
@@ -110,21 +112,27 @@ sub testborrower01insert {
       'cardnumber' => "42424242", 
       'surname' => "John Carmack", 
       'branchcode' => 'BDM'};
+  $log->info("INSERT");
     is (&findInData ("borrowers", $expected), 1 , "new borrower John Carmack");
 }
 
 sub testborrower02update {
     my $expected = { 
       'borrowernumber' => "86"
-      , 'cardnumber' => "1000955"
+      , 'cardnumber' => "10000955"
       , 'password' => "ZAZZPmpdgdmbT19nxSYXeA" #3rd query
       , 'dateexpiry' => "2012-03-12" # 2nd query
       , 'surname' => "modif client sur état précédent"}; # 1st query
     is (&findInData ("borrowers", $expected), 1 , "update borrower 86");
-    
 }
 
-sub testborrower03delete {}
+sub testborrower03delete {
+    my $selected = { 
+      'borrowernumber' => "50"
+    };
+    is (&findInData ("borrowers", $selected), 0 , "delete borrower 50");
+}
+
 sub testborrower_attributes01insert {
     my $bn = "100";
     my $expected1 = {borrowernumber => $bn, code => "CANTON", attribute => "canton_client"};

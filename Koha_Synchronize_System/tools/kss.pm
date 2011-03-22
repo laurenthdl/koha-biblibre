@@ -75,8 +75,9 @@ sub insert_new_ids {
 
     $log && $log->info(scalar(@dump_id) . " Fichiers trouvés");
     for my $file ( @dump_id ) {
+        chomp $file;
         $log && $log->info("Insertion de $file en cours...");
-        qx{$mysql_cmd -u $user -p$pwd $db_name < $file};
+        qx{$mysql_cmd -u $user -p$pwd $db_name < $id_dir/$file};
     }
 }
 
@@ -143,6 +144,7 @@ if ( not caller ) {
         $log->info("=== Digestion des requêtes ===");
         $log->info(scalar( @files ) . " fichiers trouvés");
         for my $file ( @files ) {
+            chomp $file;
             $log && $log->info("Traitement de $file en cours...");
             insert_diff_file ("$diff_logtxt_dir\/$file", $log);
         }
@@ -227,12 +229,15 @@ sub replace_with_new_id {
 
 sub insert_diff_file {
     my $file = shift;
+    my $dbh = shift;
     my $log = shift;
     chomp $file;
 
-    my $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
-    $dbh->{'mysql_enable_utf8'} = 1;
-    $dbh->do("set NAMES 'utf8'");
+    if (not $dbh) {
+        $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
+        $dbh->{'mysql_enable_utf8'} = 1;
+        $dbh->do("set NAMES 'utf8'");
+    }
 
     open( FILE, $file ) or die "Le fichier $file ne peut être lu";
 
@@ -279,7 +284,7 @@ sub insert_diff_file {
             }
 
         } else {
-            $log->warning("This query is not parsed : ###$query###");
+            $log && $log->warning("This query is not parsed : ###$query###");
         }
         $log && $log->info( $query );
 
