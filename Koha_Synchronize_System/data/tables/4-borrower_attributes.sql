@@ -16,23 +16,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `borrower_attributes`
+-- Clean and truncate
 --
 
-DROP TABLE IF EXISTS `borrower_attributes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `borrower_attributes` (
-  `borrowernumber` int(11) NOT NULL,
-  `code` varchar(10) NOT NULL,
-  `attribute` varchar(64) DEFAULT NULL,
-  `password` varchar(64) DEFAULT NULL,
-  KEY `borrowernumber` (`borrowernumber`),
-  KEY `code_attribute` (`code`,`attribute`),
-  CONSTRAINT `borrower_attributes_ibfk_1` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `borrower_attributes_ibfk_2` FOREIGN KEY (`code`) REFERENCES `borrower_attribute_types` (`code`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+TRUNCATE TABLE `borrower_attributes`;
 
 --
 -- Dumping data for table `borrower_attributes`

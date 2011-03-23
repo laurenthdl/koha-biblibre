@@ -16,65 +16,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `items`
+-- Clean and truncate
 --
 
-DROP TABLE IF EXISTS `items`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `items` (
-  `itemnumber` int(11) NOT NULL AUTO_INCREMENT,
-  `biblionumber` int(11) NOT NULL DEFAULT '0',
-  `biblioitemnumber` int(11) NOT NULL DEFAULT '0',
-  `barcode` varchar(20) DEFAULT NULL,
-  `dateaccessioned` date DEFAULT NULL,
-  `booksellerid` mediumtext,
-  `homebranch` varchar(10) DEFAULT NULL,
-  `price` decimal(8,2) DEFAULT NULL,
-  `replacementprice` decimal(8,2) DEFAULT NULL,
-  `replacementpricedate` date DEFAULT NULL,
-  `datelastborrowed` date DEFAULT NULL,
-  `datelastseen` date DEFAULT NULL,
-  `stack` tinyint(1) DEFAULT NULL,
-  `notforloan` tinyint(1) NOT NULL DEFAULT '0',
-  `damaged` tinyint(1) NOT NULL DEFAULT '0',
-  `itemlost` tinyint(1) NOT NULL DEFAULT '0',
-  `wthdrawn` tinyint(1) NOT NULL DEFAULT '0',
-  `itemcallnumber` varchar(255) DEFAULT NULL,
-  `issues` smallint(6) DEFAULT NULL,
-  `renewals` smallint(6) DEFAULT NULL,
-  `reserves` smallint(6) DEFAULT NULL,
-  `restricted` tinyint(1) DEFAULT NULL,
-  `itemnotes` mediumtext,
-  `holdingbranch` varchar(10) DEFAULT NULL,
-  `paidfor` mediumtext,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `location` varchar(80) DEFAULT NULL,
-  `permanent_location` varchar(80) DEFAULT NULL,
-  `onloan` date DEFAULT NULL,
-  `cn_source` varchar(10) DEFAULT NULL,
-  `cn_sort` varchar(30) DEFAULT NULL,
-  `ccode` varchar(10) DEFAULT NULL,
-  `materials` varchar(10) DEFAULT NULL,
-  `uri` varchar(255) DEFAULT NULL,
-  `itype` varchar(10) DEFAULT NULL,
-  `more_subfields_xml` longtext,
-  `enumchron` varchar(80) DEFAULT NULL,
-  `copynumber` varchar(32) DEFAULT NULL,
-  `stocknumber` varchar(32) DEFAULT NULL,
-  `statisticvalue` varchar(80) DEFAULT NULL,
-  PRIMARY KEY (`itemnumber`),
-  UNIQUE KEY `itembarcodeidx` (`barcode`),
-  KEY `itembinoidx` (`biblioitemnumber`),
-  KEY `itembibnoidx` (`biblionumber`),
-  KEY `homebranch` (`homebranch`),
-  KEY `holdingbranch` (`holdingbranch`),
-  KEY `itemsstocknumberidx` (`stocknumber`),
-  CONSTRAINT `items_ibfk_1` FOREIGN KEY (`biblioitemnumber`) REFERENCES `biblioitems` (`biblioitemnumber`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `items_ibfk_2` FOREIGN KEY (`homebranch`) REFERENCES `branches` (`branchcode`) ON UPDATE CASCADE,
-  CONSTRAINT `items_ibfk_3` FOREIGN KEY (`holdingbranch`) REFERENCES `branches` (`branchcode`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+TRUNCATE TABLE `items`;
 
 --
 -- Dumping data for table `items`

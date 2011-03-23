@@ -16,29 +16,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `biblio`
+-- Clean and truncate
 --
 
-DROP TABLE IF EXISTS `biblio`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `biblio` (
-  `biblionumber` int(11) NOT NULL AUTO_INCREMENT,
-  `frameworkcode` varchar(4) NOT NULL DEFAULT '',
-  `author` mediumtext,
-  `title` mediumtext,
-  `unititle` mediumtext,
-  `notes` mediumtext,
-  `serial` tinyint(1) DEFAULT NULL,
-  `seriestitle` mediumtext,
-  `copyrightdate` smallint(6) DEFAULT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `datecreated` date NOT NULL,
-  `abstract` mediumtext,
-  PRIMARY KEY (`biblionumber`),
-  KEY `blbnoidx` (`biblionumber`)
-) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+TRUNCATE TABLE `biblio`;
 
 --
 -- Dumping data for table `biblio`
