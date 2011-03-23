@@ -251,7 +251,6 @@ sub insert_diff_file {
     while ( my $query = <FILE> ) {
         my $r;
         next if length($query) <= 1;
-        $log->info("length=".length($query));
         my @warnings;
         my $table_name;
         $query =~ s/^\n//; # 1er caractère est un retour chariot

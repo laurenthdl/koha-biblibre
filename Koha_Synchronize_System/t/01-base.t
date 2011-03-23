@@ -53,15 +53,14 @@ sub processQueries {
     my $queriesdir = "$curdir/t/unitdiff";
 
     my @files = (
-        {filename => "borrower-01-insert.sql",  func =>            "testborrower01insert"},
-    {filename => "borrower-02-update.sql", func =>             "testborrower02update" },
-    {filename => "borrower-03-delete.sql", func =>             "testborrower03delete" },
-#    {filename => "borrower_attributes-01-insert.sql", func =>  "testborrower_attributes01insert" },
-#    {filename => "issue-01-insert.sql", func =>                "testissue01insert" },
-#    {filename => "issue-02-update.sql", func =>                "testissue02update" },
-#    {filename => "issue-03-delete.sql", func =>                "testissue03delete" },
-#    {filename => "issue-04-addissue.sql", func =>              "testissue04addissue" },
-#    {filename => "issue-05-return.sql", func =>                "testissue05return" },
+        {filename => "borrower-01-insert.sql",              func => "testborrower01insert"},
+        {filename => "borrower-02-update.sql",              func => "testborrower02update" },
+        {filename => "borrower-03-delete.sql",              func => "testborrower03delete" },
+        {filename => "borrower_attributes-01-insert.sql",   func => "testborrower_attributes01insert" },
+        {filename => "issue-01-insert.sql",                 func => "testissue01insert" },
+        {filename => "issue-02-update.sql",                 func => "testissue02update" },
+        {filename => "issue-04-addissue.sql",               func => "testissue04addissue" },
+        {filename => "issue-05-return.sql",                 func => "testissue05return" },
 #    {filename => "issue-06-renewal.sql", func =>               "issue06renewal" },
 #    {filename => "items-02-update.sql", func =>                "testitems02update" },
 #    {filename => "old_issues-04-newoldissue.sql", func =>      "testold_issues04newoldissue" },
@@ -134,24 +133,81 @@ sub testborrower03delete {
 }
 
 sub testborrower_attributes01insert {
-    my $bn = "100";
+    my $bn = "51";
     my $expected1 = {borrowernumber => $bn, code => "CANTON", attribute => "canton_client"};
     is (&findInData ("borrower_attributes", $expected1), 1 , "update borrower_attributes 100 CANTON");
     my $expected2 = {borrowernumber => $bn, code => "HORAIRES", attribute => "horaires_client"};
-    is (&findInData ("borrowers_attributes", $expected2), 1 , "update borrower_attributes 100 HORAIRES");
+    is (&findInData ("borrower_attributes", $expected2), 1 , "update borrower_attributes 100 HORAIRES");
     my $expected3 = {borrowernumber => $bn, code => "TOURNEE", attribute => "tournee_client"};
-    is (&findInData ("borrowers_attributes", $expected3), 1 , "update borrower_attributes 100 TOURNEE");
+    is (&findInData ("borrower_attributes", $expected3), 1 , "update borrower_attributes 100 TOURNEE");
 }
-sub testissue01insert {}
-sub testissue02update {}
-sub testissue03delete {}
-sub testissue04addissue {}
-sub testissue05return {}
-sub issue06renewal {}
+sub testissue01insert {
+    my $bn = "52";
+    
+    my $expected = {borrowernumber => $bn, itemnumber => '153', issuedate => '2011-03-15', date_due => '2011-03-25', branchcode => 'BDM'};
+    is (&findInData ("issues", $expected), 1 , "insert issues 153 for borrowers 52");
+    
+    $expected = {borrowernumber => $bn, itemnumber => '275', issuedate => '2011-03-15', date_due => '2011-03-25', branchcode => 'BDM'};
+    is (&findInData ("issues", $expected), 1 , "insert issues 275 for borrowers 52");
+}
+
+sub testissue02update {
+    my $bn = "52";
+    
+    my $expected = {borrowernumber => $bn, itemnumber => '275', issuedate => '2011-03-15', date_due => '2011-04-04', branchcode => 'BDM', renewals => '1', lastreneweddate => '2011-03-15'};
+    is (&findInData ("issues", $expected), 1 , "update issues 275 for borrowers 52");
+}
+
+sub testissue04addissue {
+    my $bn = "53";
+    my $in = "101";
+    
+    my $expected = {borrowernumber => $bn, itemnumber => $in, issuedate => '2011-03-11', date_due => '2011-04-01', branchcode => 'BDM'};
+    is (&findInData ("issues", $expected), 1, "issue04 insert issues : items 101 for borrowers 53");
+    
+    $expected = {itemnumber => $in, issues => '2', datelastborrowed => '2011-03-11', onloan => '2011-04-01', holdingbranch => 'BDM', itemlost => '0', datelastseen => '2011-03-11'};
+    is (&findInData ("items", $expected), 1, "issue04 update items 101 for borrowers 53");
+
+    $expected = {branch => 'BDM', type => 'issue', value => '0.0000', other => '', itemnumber => $in, itemtype => 'PG', borrowernumber => $bn};
+    is (&findInData ("statistics", $expected), 1, "issue04 insert statistics for items 101 and borrowers 53");
+}
+
+sub testissue05return {
+    my $bn = "53";
+    my $in = "101";
+    
+    # How test UPDATE issues with returndate=now() ? cf gdoc
+
+    my $expected = {borrowernumber => $bn, itemnumber => $in, issuedate => '2011-03-11', date_due => '2011-04-01', branchcode => 'BDM'};
+    is (&findInData ("old_issues", $expected), 1, "issue04 insert old_issues : items $in for borrowers $bn");
+
+    $expected = {borrowernumber => $bn, itemnumber => $in};
+    is (&findInData ("issues", $expected), 0, "issue05 delete issues : items $in for borrowers $bn");
+
+    $expected = {itemnumber => $in, renewals => '0', datelastseen => '2011-03-11', itemlost => '0'};
+    is (&findInData ("issues", $expected), 0, "issue05 delete issues : items $in for borrowers $bn");
+
+
+    $expected = {branch => 'BDM', type => 'return', value => '0.0000', other => '', itemnumber => $in, borrowernumber => $bn};
+    is (&findInData ("statistics", $expected), 1, "issue05 insert statistics for items $in and borrowers $bn");
+}
+
+sub issue06renewal {
+    my $bn = "54";
+    my $in = "102";
+
+    my $expected = {borrowernumber => $bn, itemnumber => $in, date_due => '2011-04-01', renewals => '1', lastreneweddate => '2011-03-11'};
+    is (&findInData ("old_issues", $expected), 1, "issue06 update issues : items $in for borrowers $bn");
+}
+
 sub testitems02update {}
+
 sub testold_issues04newoldissue {}
+
 sub testreserves04addissue {}
+
 sub testreserves05holding {}
+
 sub teststatistics01insert {}
 
 sub findInData {

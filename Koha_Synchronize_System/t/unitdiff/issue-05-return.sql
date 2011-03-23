@@ -1,13 +1,19 @@
-UPDATE issues SET returndate= now()  WHERE  borrowernumber = '11730'  AND itemnumber = '181880';
+UPDATE issues SET returndate= now()  WHERE  borrowernumber = '53'  AND itemnumber = '101'
+/*!*/;
 INSERT INTO old_issues SELECT * FROM issues
-                                WHERE borrowernumber = '11730'
-                                AND itemnumber = '181880';
+                                WHERE borrowernumber = '53'
+                                AND itemnumber = '101'
+/*!*/;
 DELETE FROM issues
-WHERE borrowernumber = '11730'
-AND itemnumber = '181880';
-UPDATE items SET itemnumber='181880',renewals='0',onloan=NULL WHERE itemnumber='181880';
-UPDATE items SET itemnumber='181880',datelastseen='2011-03-11',itemlost='0' WHERE itemnumber='181880';
+WHERE borrowernumber = '53'
+AND itemnumber = '101'
+/*!*/;
+UPDATE items SET itemnumber='101',renewals='0',onloan=NULL WHERE itemnumber='101'
+/*!*/;
+UPDATE items SET itemnumber='101',datelastseen='2011-03-11',itemlost='0' WHERE itemnumber='101'
+/*!*/;
 INSERT INTO statistics
 (datetime, branch, type, value,
 other, itemnumber, itemtype, borrowernumber, proccode)
-      VALUES (now(),'MEDIAT','return','0','','181880',NULL,'11730',NULL);
+      VALUES (now(),'BDM','return','0','','101',NULL,'53',NULL)
+/*!*/;
