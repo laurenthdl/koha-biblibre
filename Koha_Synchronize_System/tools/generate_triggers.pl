@@ -91,14 +91,16 @@ sub create_triggers {
 
         # Trigger delete
         # supprime l'enregistrement qui doit être supprimé et génère une erreur sur le delete courant
-        push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
-        push @str, "CREATE TRIGGER `TRG_BEF_DEL_$table` BEFORE DELETE ON `$table`";
-        push @str, "  FOR EACH ROW BEGIN";
-        push @str, "    CALL PROC_DELETE_FROM(\"$table.$$infos{primary_key}\", OLD.$$infos{primary_key});";
-        push @str, "    SELECT 'a' INTO \@tmp;";      # Generate error
-        push @str, "    SELECT 'b', 'c' INTO \@tmp;"; # mysql can't stop trigger normally
-        push @str, "  END;";
-        push @str, "//";
+        # Can't update table 'borrowers' in stored function/trigger because it is already used by statement which invoked this stored function/trigger. 
+        # error mysql ...
+        #push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
+        #push @str, "CREATE TRIGGER `TRG_BEF_DEL_$table` BEFORE DELETE ON `$table`";
+        #push @str, "  FOR EACH ROW BEGIN";
+        #push @str, "    CALL PROC_DELETE_FROM(\"$table.$$infos{primary_key}\", OLD.$$infos{primary_key});";
+        #push @str, "    SELECT 'a' INTO \@tmp;";      # Generate error
+        #push @str, "    SELECT 'b', 'c' INTO \@tmp;"; # mysql can't stop trigger normally
+        #push @str, "  END;";
+        #push @str, "//";
 
     }
 

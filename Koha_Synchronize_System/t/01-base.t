@@ -37,7 +37,7 @@ warn "\nINFOS: hostname:$hostname - user:$user - pass:$passwd - db:$db_server";
 # init bases client + serveur
 sub setUp {
     # 1- init (structure, diffs)
-    #qx {./init.sh};
+    qx {./init.sh};
 
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server; 
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS_INFOS();" } ;
@@ -75,7 +75,7 @@ sub processQueries {
         my $func = $$hash{func};
 
         my $filefull = "$queriesdir/$file";
-        Koha_Synchronize_System::tools::kss::insert_diff_file ($filefull, $dbh);
+        Koha_Synchronize_System::tools::kss::insert_diff_file ($filefull, $dbh, $log);
         no strict "refs";
         &{ $func }
 

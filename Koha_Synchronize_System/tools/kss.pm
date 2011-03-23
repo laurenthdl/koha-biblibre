@@ -216,6 +216,7 @@ sub replace_with_new_id {
     my $dbh = shift;
 
     if ( $string =~ /$field\s*=\s*\'{0,1}([^']*)\'{0,1}/ ) {
+        $log->info("CALL PROC_GET_NEW_ID (\"$table_name.$field\", $1, \@new_id);");
         $dbh->do("CALL PROC_GET_NEW_ID (\"$table_name.$field\", $1, \@new_id);");
         my @value = $dbh->selectrow_array("SELECT \@new_id;");
 
@@ -249,6 +250,8 @@ sub insert_diff_file {
     #$dbh->do(qq{DELIMITER $sep});
     while ( my $query = <FILE> ) {
         my $r;
+        next if length($query) <= 1;
+        $log->info("length=".length($query));
         my @warnings;
         my $table_name;
         $query =~ s/^\n//; # 1er caractère est un retour chariot
@@ -273,19 +276,25 @@ sub insert_diff_file {
                 $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
                 $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
             }
-        } elsif ( $query =~ /^DELETE FROM (\S+)/ ) {
+        } elsif ( $query =~ /^DELETE\s+FROM\s+(\S+)/ ) {
             $table_name = $1;
             my $level = get_level $1;
             if ( $level == 1 ) {
-                # Nothing todo
+                if ( $table_name eq 'borrowers' ) {
+                    $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                    $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
+                }
             } elsif ( $level == 2 ) {
                 $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
                 $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
             }
 
+
         } else {
             $log && $log->warning("This query is not parsed : ###$query###");
+            next;
         }
+
         $log && $log->info( $query );
 
         $dbh->do($query);

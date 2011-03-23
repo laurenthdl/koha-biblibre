@@ -8,4 +8,3 @@ WHERE borrowernumber='86'
 /*!*/;
 UPDATE borrowers SET password = 'ZAZZPmpdgdmbT19nxSYXeA' WHERE borrowernumber='86'
 /*!*/;
-
