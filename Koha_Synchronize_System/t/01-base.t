@@ -37,7 +37,8 @@ warn "\nINFOS: hostname:$hostname - user:$user - pass:$passwd - db:$db_server";
 # init bases client + serveur
 sub setUp {
     # 1- init (structure, diffs)
-    qx {./init.sh};
+    #qx {./init.sh};
+    qx {./init_srv.sh};
 
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server; 
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS_INFOS();" } ;
@@ -143,19 +144,22 @@ sub testborrower_attributes01insert {
 }
 sub testissue01insert {
     my $bn = "52";
+    my $in = "153";
     
-    my $expected = {borrowernumber => $bn, itemnumber => '153', issuedate => '2011-03-15', date_due => '2011-03-25', branchcode => 'BDM'};
-    is (&findInData ("issues", $expected), 1 , "insert issues 153 for borrowers 52");
+    my $expected = {borrowernumber => $bn, itemnumber => $in, issuedate => '2011-03-15', date_due => '2011-03-25', branchcode => 'BDM'};
+    is (&findInData ("issues", $expected), 1 , "insert issues $in for borrowers $bn");
     
-    $expected = {borrowernumber => $bn, itemnumber => '275', issuedate => '2011-03-15', date_due => '2011-03-25', branchcode => 'BDM'};
-    is (&findInData ("issues", $expected), 1 , "insert issues 275 for borrowers 52");
+    $in = "275";
+    $expected = {borrowernumber => $bn, itemnumber => $in, issuedate => '2011-03-15', date_due => '2011-03-25', branchcode => 'BDM'};
+    is (&findInData ("issues", $expected), 1 , "insert issues $in for borrowers $bn");
 }
 
 sub testissue02update {
     my $bn = "52";
+    my $in = "275";
     
-    my $expected = {borrowernumber => $bn, itemnumber => '275', issuedate => '2011-03-15', date_due => '2011-04-04', branchcode => 'BDM', renewals => '1', lastreneweddate => '2011-03-15'};
-    is (&findInData ("issues", $expected), 1 , "update issues 275 for borrowers 52");
+    my $expected = {borrowernumber => $bn, itemnumber => $in, issuedate => '2011-03-15', date_due => '2011-04-04', branchcode => 'BDM', renewals => '1', lastreneweddate => '2011-03-15'};
+    is (&findInData ("issues", $expected), 1 , "update issues $in for borrowers $bn");
 }
 
 sub testissue04addissue {
@@ -163,13 +167,13 @@ sub testissue04addissue {
     my $in = "101";
     
     my $expected = {borrowernumber => $bn, itemnumber => $in, issuedate => '2011-03-11', date_due => '2011-04-01', branchcode => 'BDM'};
-    is (&findInData ("issues", $expected), 1, "issue04 insert issues : items 101 for borrowers 53");
+    is (&findInData ("issues", $expected), 1, "issue04 insert issues : items $in for borrowers $bn");
     
     $expected = {itemnumber => $in, issues => '2', datelastborrowed => '2011-03-11', onloan => '2011-04-01', holdingbranch => 'BDM', itemlost => '0', datelastseen => '2011-03-11'};
-    is (&findInData ("items", $expected), 1, "issue04 update items 101 for borrowers 53");
+    is (&findInData ("items", $expected), 1, "issue04 update items $in for borrowers $bn");
 
     $expected = {branch => 'BDM', type => 'issue', value => '0.0000', other => '', itemnumber => $in, itemtype => 'PG', borrowernumber => $bn};
-    is (&findInData ("statistics", $expected), 1, "issue04 insert statistics for items 101 and borrowers 53");
+    is (&findInData ("statistics", $expected), 1, "issue04 insert statistics for items $in and borrowers $bn");
 }
 
 sub testissue05return {

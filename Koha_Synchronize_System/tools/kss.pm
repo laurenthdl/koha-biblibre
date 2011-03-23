@@ -104,9 +104,9 @@ sub prepare_database {
 sub delete_proc_and_triggers {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
     eval {
-        qx{$generate_triggers_path > /tmp/del_triggers.sql};
+        qx{$generate_triggers_path -action=drop > /tmp/del_triggers.sql};
         qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_triggers.sql};
-        qx{$generate_procedures_path > /tmp/del_procedures.sql};
+        qx{$generate_procedures_path -action=drop > /tmp/del_procedures.sql};
         qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_procedures.sql};
     };
 
