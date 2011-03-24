@@ -37,9 +37,10 @@ warn "\nINFOS: hostname:$hostname - user:$user - pass:$passwd - db:$db_server";
 # init bases client + serveur
 sub setUp {
     # 1- init (structure, diffs)
-    #qx {./init.sh};
+    warn ">>>setup init_srv";
     qx {./init_srv.sh};
 
+    warn ">>>setup triggers";
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server; 
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS_INFOS();" } ;
     Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server; 
@@ -63,9 +64,9 @@ sub processQueries {
         {filename => "issue-04-addissue.sql",               func => "testissue04addissue" },
         {filename => "issue-05-return.sql",                 func => "testissue05return" },
         {filename => "issue-06-renewal.sql",                func => "issue06renewal" },
-#    {filename => "items-02-update.sql", func =>                "testitems02update" },
-#    {filename => "old_issues-04-newoldissue.sql", func =>      "testold_issues04newoldissue" },
-#    {filename => "reserves-04-addissue.sql", func =>           "testreserves04addissue" },
+        {filename => "items-02-update.sql",                 func => "testitems02update" },
+        {filename => "old_issues-04-newoldissue.sql",       func => "testold_issues04newoldissue" },
+#        {filename => "reserves-04-addissue.sql",            func => "testreserves04addissue" },
 #    {filename => "reserves-05-holding.sql", func =>            "testreserves05holding" },
 #    {filename => "statistics-01-insert.sql", func =>           "teststatistics01insert" },
 
@@ -94,8 +95,15 @@ sub checkBefore {
     $oldborrower = { 'borrowernumber' => '50'};
     is (&findInData ("borrowers", $oldborrower), 1, 'borrower 50 deleted by testborrower03delete');
 
+    my $bn = "52"; my $in = "275";
+    my $issuebeforerenew = {borrowernumber => $bn, itemnumber => $in};
+    is (&findInData ("issues", $issuebeforerenew), 0 , "issue $in don't exists before issue06");
+   
+    $in = "153";
+    my $itembeforeupdate = {itemnumber => $in, holdingbranch => 'BDM', itemlost => '0', onloan => '2012-04-30', datelastseen => '2011-02-18'};
+    is (&findInData ("items", $itembeforeupdate), 1 , "item $in before item02");
 
-    
+
 }
 
 sub clean {
@@ -195,6 +203,10 @@ sub testissue05return {
 
     $expected = {branch => 'BDM', type => 'return', value => '0.0000', other => '', itemnumber => $in, borrowernumber => $bn};
     is (&findInData ("statistics", $expected), 1, "issue05 insert statistics for items $in and borrowers $bn");
+
+    $expected = {borrowernumber => "100", itemnumber => '301'};
+    is (&findInData ("old_issues", $expected), 0, "old_issues-04 with borrowernumber 100 in 301 doesn't exist yet");
+    is (&findInData ("issues", $expected), 1, "old_issues-04 with borrowernumber 100 in 301 exist in issues table");
 }
 
 sub issue06renewal {
@@ -205,9 +217,17 @@ sub issue06renewal {
     is (&findInData ("issues", $expected), 1, "issue06 update issues : items $in for borrowers $bn");
 }
 
-sub testitems02update {}
+sub testitems02update {
+    my $in = "153";
+    my $expected = {itemnumber => $in, issues => '1', datelastborrowed => '2011-03-15', holdingbranch => 'BDM', itemlost => '0', onloan => '2011-03-25', datelastseen => '2011-03-15'};
+    is (&findInData ("items", $expected), 1, "item02 update items : items $in ");
+}
 
-sub testold_issues04newoldissue {}
+sub testold_issues04newoldissue {
+    my $expected = {borrowernumber => "100", itemnumber => '301'};
+    is (&findInData ("old_issues", $expected), 1, "old_issues-04 with borrowernumber 100 in 301 exists");
+    is (&findInData ("issues", $expected), 0, "old_issues-04 with borrowernumber 100 in 301 is remove from issues table");
+}
 
 sub testreserves04addissue {}
 
