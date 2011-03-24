@@ -66,6 +66,7 @@ sub processQueries {
         {filename => "issue-06-renewal.sql",                func => "issue06renewal" },
         {filename => "items-02-update.sql",                 func => "testitems02update" },
         {filename => "old_issues-04-newoldissue.sql",       func => "testold_issues04newoldissue" },
+        {filename => "reserves-02-update.sql",              func => "testreserves02update" },
 #        {filename => "reserves-04-addissue.sql",            func => "testreserves04addissue" },
 #    {filename => "reserves-05-holding.sql", func =>            "testreserves05holding" },
 #    {filename => "statistics-01-insert.sql", func =>           "teststatistics01insert" },
@@ -103,6 +104,12 @@ sub checkBefore {
     my $itembeforeupdate = {itemnumber => $in, holdingbranch => 'BDM', itemlost => '0', onloan => '2012-04-30', datelastseen => '2011-02-18'};
     is (&findInData ("items", $itembeforeupdate), 1 , "item $in before item02");
 
+    #reserves-04-addissue
+    my $reservebeforeupdate = {reservenumber => "2", borrowernumber => "79", priority => "1", biblionumber => "9740"};
+    is (&findInData ("reserves", $reservebeforeupdate), 1 , "reserve before reserves-02-update");
+    $reservebeforeupdate = {reservenumber => "3", borrowernumber => "23", priority => "2", biblionumber => "9740"};
+    is (&findInData ("reserves", $reservebeforeupdate), 1 , "reserve before reserves-02-update");
+     
 
 }
 
@@ -227,6 +234,13 @@ sub testold_issues04newoldissue {
     my $expected = {borrowernumber => "100", itemnumber => '301'};
     is (&findInData ("old_issues", $expected), 1, "old_issues-04 with borrowernumber 100 in 301 exists");
     is (&findInData ("issues", $expected), 0, "old_issues-04 with borrowernumber 100 in 301 is remove from issues table");
+}
+
+sub testreserves02update {
+    my $reserveafterupdate = {reservenumber => "2", borrowernumber => "79", priority => "2", biblionumber => "9740"};
+    is (&findInData ("reserves", $reserveafterupdate), 1 , "reserve 79 after reserves-02-update");
+    $reserveafterupdate = {reservenumber => "3", borrowernumber => "23", priority => "1", biblionumber => "9740"};
+    is (&findInData ("reserves", $reserveafterupdate), 1 , "reserve 23 after reserves-02-update");
 }
 
 sub testreserves04addissue {}
