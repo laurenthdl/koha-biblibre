@@ -24,6 +24,10 @@ my $level1_tables = {
     'borrowers' => {
         'primary_key' => 'borrowernumber',
         'second_primary_key' => 'cardnumber'
+    },
+    'deletedborrowers' => {
+        'primary_key' => 'borrowernumber',
+        'second_primary_key' => 'cardnumber'
     }
     #'items' => 'biblioitemnumber', # replace itemnumber
 };
@@ -72,6 +76,8 @@ if ( $action eq "create" ) {
     die "Cette action n'est pas attendue";
 }
 
+push @trigger_str, "DELIMITER ;";
+
 sub create_triggers {
 
     my @str;
@@ -85,6 +91,19 @@ sub create_triggers {
         push @str, "  FOR EACH ROW BEGIN";
         if ( $table eq "borrowers" ) {
             push @str, "    CALL PROC_UPDATE_BORROWERNUMBER(NEW.borrowernumber, NEW.cardnumber);";
+        }
+        push @str, "  END;";
+        push @str, "//";
+
+
+        push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
+        push @str, "CREATE TRIGGER `TRG_BEF_INS_$table` BEFORE INSERT ON `$table`";
+        push @str, "  FOR EACH ROW BEGIN";
+        if ( $table eq "deletedborrowers" ) {
+            push @str, "    DECLARE tmp_id INT(11);";
+            push @str, "    CALL PROC_GET_NEW_ID(\"borrower.borrowernumber\", NEW.borrowernumber, \@tmp_id);";
+            push @str, "    SELECT \@tmp_id INTO tmp_id;";
+            push @str, "    SET NEW.borrowernumber = tmp_id;";
         }
         push @str, "  END;";
         push @str, "//";

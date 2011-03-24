@@ -893,6 +893,7 @@ CREATE TABLE `borrowers` (
   `gonenoaddress` tinyint(1) DEFAULT NULL,
   `gonenoaddresscomment` varchar(255) DEFAULT NULL,
   `lost` tinyint(1) DEFAULT NULL,
+  `lostcomment` varchar(255) DEFAULT NULL,
   `debarred` date DEFAULT NULL,
   `debarredcomment` varchar(255) DEFAULT NULL,
   `contactname` mediumtext,

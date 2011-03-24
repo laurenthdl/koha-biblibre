@@ -196,7 +196,7 @@ sub extract_and_purge_mysqllog {
 sub get_level {
     my $table_name = shift;
 
-    my @tables_level1 = ('borrowers', 'items');
+    my @tables_level1 = ('borrowers', 'deletedborrowers', 'items');
     my @tables_level2 = ('issues', 'old_issues', 'statistics', 'reserves', 'old_reserves', 'action_logs', 'borrower_attributes');
 
     if ( grep { $_ eq $table_name } @tables_level1 ) {

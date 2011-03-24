@@ -34,13 +34,15 @@ if ( $action eq "create" ) {
     die "Cette action n'est pas attendue";
 }
 
+push @proc_str, qq{DELIMITER ;};
+
 sub create_procedures {
     my @str;
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_INIT_KSS` //};
     push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS` (
     )
     BEGIN
-        CREATE TABLE } . $matching_table_prefix . qq{borrowers(borrowernumber INT(11), cardnumber INT(11));
+        CREATE TABLE } . $matching_table_prefix . qq{borrowers(borrowernumber INT(11), cardnumber VARCHAR(16));
         CREATE TABLE } . $matching_table_prefix . qq{reserves(reservenumber INT(11), borrowernumber INT(11), biblionumber INT(11), reservedate DATE);
         CREATE TABLE $matching_table_ids (table_name VARCHAR(255), old INT(11), new INT(11));
     END;
@@ -62,24 +64,24 @@ sub create_procedures {
     )
     BEGIN
         DECLARE next_id INT(11);
-        CREATE TABLE $kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
+        CREATE TABLE $client_db_name.$kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
 
         SELECT MAX(borrowernumber) + 1 FROM borrowers INTO next_id;
-        INSERT INTO $kss_infos_table (variable, value) VALUES ("borrowernumber", next_id);
+        INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("borrowernumber", next_id);
 
         SELECT MAX(reservenumber) + 1 FROM reserves INTO next_id;
-        INSERT INTO $kss_infos_table (variable, value) VALUES ("reservenumber", next_id);
+        INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("reservenumber", next_id);
     END;
     //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_BORROWERNUMBER` //};
     push @str, qq{CREATE PROCEDURE `PROC_UPDATE_BORROWERNUMBER` (
         IN new_id INT(11),
-        IN cardnumber INT(11)
+        IN cardout VARCHAR(16)
     )
     BEGIN
         DECLARE old_id INT(11);
-        SELECT borrowernumber FROM } . $matching_table_prefix . qq{borrowers WHERE `cardnumber`=cardnumber INTO old_id;
+        SELECT borrowernumber FROM } . $matching_table_prefix . qq{borrowers WHERE `cardnumber` LIKE cardout INTO old_id;
         INSERT INTO $matching_table_ids (table_name, old, new) VALUES("borrowers", old_id, new_id);
     END;
     //};

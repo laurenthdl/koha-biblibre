@@ -47,6 +47,7 @@ $dbh->do("set NAMES 'utf8'");
 $dbh->do("DROP TABLE IF EXISTS " . $matching_table_prefix . "borrowers");
 $dbh->do("CREATE TABLE " . $matching_table_prefix . "borrowers(borrowernumber INT(11), cardnumber VARCHAR(16))");
 $dbh->do("INSERT INTO " . $matching_table_prefix . "borrowers(borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM borrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_borrowers_fieldname')");
+$dbh->do("INSERT INTO " . $matching_table_prefix . "borrowers(borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM deletedborrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_borrowers_fieldname')");
 
 qx{$mysqldump_cmd -u $user -p$passwd $database borrowers > $dump_filename};
 
