@@ -34,7 +34,6 @@ my $passwd                   = $$conf{databases_infos}{passwd};
 my $help                     = "";
 my $dump_id_dir              = $kss_dir . $$conf{datas_path}{dump_id};
 my $dump_db_server_dir       = $kss_dir . $$conf{datas_path}{backup_server};
-
 my $generate_triggers_path   = $kss_dir . $$conf{tools_path}{generate_triggers};
 my $generate_procedures_path = $kss_dir . $$conf{tools_path}{generate_procedures};
 
@@ -97,7 +96,7 @@ sub insert_proc_and_triggers {
 
 sub prepare_database {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
-    qx{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_INIT_KSS();"};
+    qx{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_KSS_START();"};
 
 }
 
@@ -115,6 +114,18 @@ sub delete_proc_and_triggers {
     }
 
 }
+
+sub clean {
+    my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+
+    $log->info(" - Purge des tables temporaires");
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_KSS_END();"};
+
+    $log->info(" - Suppression en base des triggers et procédures stockées");
+    delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+
+}
+
 
 if ( not caller ) {
     $log->info("BEGIN");
@@ -149,11 +160,9 @@ if ( not caller ) {
             insert_diff_file ("$diff_logtxt_dir\/$file", $log);
         }
 
-        $log->info("=== Purge des tables temporaires ===");
-        qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_END_KSS();"};
 
-        $log->info("=== Suppression en base des triggers et procédures stockées ===");
-        delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+        $log->info("=== Cleaning ... ===");
+        clean $mysql_cmd, $user, $passwd, $db_server, $log;
 
         # À la fin du script :
         #  - insérer les nouveaux id dans kss_infos pour le client
@@ -301,7 +310,10 @@ sub insert_diff_file {
         @warnings = $dbh->selectrow_array(qq{show warnings $sep});
 
         if ( @warnings ) {
-            $log && $log->error($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
+            #if ( $warnings[0] ne 'Note' ) {
+                $log && $log->error($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
+                $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
+                #}
         } else {
             $log && $log->info(" <<< OK >>>")
         }

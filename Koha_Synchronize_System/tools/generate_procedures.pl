@@ -21,6 +21,9 @@ my $matching_table_ids = $$conf{databases_infos}{matching_table_ids};
 my $client_db_name = $$conf{databases_infos}{db_client};
 my $server_db_name = $$conf{databases_infos}{db_server};
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
+my $kss_logs_table = $$conf{databases_infos}{kss_logs_table};
+my $kss_errors_table = $$conf{databases_infos}{kss_errors_table};
+my $kss_sql_errors_table = $$conf{databases_infos}{kss_sql_errors_table};
 
 my @proc_str;
 
@@ -42,14 +45,55 @@ sub create_procedures {
     push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS` (
     )
     BEGIN
-        CREATE TABLE } . $matching_table_prefix . qq{borrowers(borrowernumber INT(11), cardnumber VARCHAR(16));
-        CREATE TABLE } . $matching_table_prefix . qq{reserves(reservenumber INT(11), borrowernumber INT(11), biblionumber INT(11), reservedate DATE);
-        CREATE TABLE $matching_table_ids (table_name VARCHAR(255), old INT(11), new INT(11));
+        CREATE TABLE } . $matching_table_prefix . qq{borrowers(
+            borrowernumber INT(11), 
+            cardnumber VARCHAR(16)
+        )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        CREATE TABLE } . $matching_table_prefix . qq{reserves(
+            reservenumber INT(11),
+            borrowernumber INT(11),
+            biblionumber INT(11),
+            reservedate DATE
+        )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+        CREATE TABLE $matching_table_ids (
+            table_name VARCHAR(255),
+            old INT(11),
+            new INT(11)
+        )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+        CREATE TABLE IF NOT EXISTS $kss_logs_table (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `progress` int(11) ,
+          `status` text ,
+          `start_time` TIMESTAMP  NOT NULL DEFAULT NOW(),
+          `end_time` TIMESTAMP ,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        CREATE TABLE IF NOT EXISTS $kss_errors_table (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `kss_id` int(11) NOT NULL,
+          `error` text NOT NULL,
+          `message` text NULL,
+          CONSTRAINT `ksserr_ksslogs` FOREIGN KEY (`kss_id`) REFERENCES `kss_logs` (`id`) ON DELETE CASCADE,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        CREATE TABLE IF NOT EXISTS $kss_sql_errors_table (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `kss_id` int(11) NOT NULL,
+          `error` text NOT NULL,
+          `query` text NULL,
+          CONSTRAINT `ksssql_ksslogs` FOREIGN KEY (`kss_id`) REFERENCES `kss_logs` (`id`) ON DELETE CASCADE,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     END;
     //};
 
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_END_KSS` //};
-    push @str, qq{CREATE PROCEDURE `PROC_END_KSS` (
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_CLEAN_KSS` //};
+    push @str, qq{CREATE PROCEDURE `PROC_CLEAN_KSS` (
     )
     BEGIN
         DROP TABLE } . $matching_table_prefix . qq{borrowers;
@@ -58,9 +102,9 @@ sub create_procedures {
     END;
     //};
 
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_INIT_KSS_INFOS` //};
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_CREATE_KSS_INFOS` //};
 
-    push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS_INFOS` (
+    push @str, qq{CREATE PROCEDURE `PROC_CREATE_KSS_INFOS` (
     )
     BEGIN
         DECLARE next_id INT(11);
@@ -156,12 +200,72 @@ sub create_procedures {
     END;
     //};
 
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_START` //};
+    push @str, qq{CREATE PROCEDURE `PROC_KSS_START` (
+    )
+    BEGIN
+        CALL PROC_INIT_KSS();
+        INSERT INTO $kss_logs_table (`progress`, `status`, `start_time`) VALUES (0, "Starting...", NOW());
+    END;
+    //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_END` //};
+    push @str, qq{CREATE PROCEDURE `PROC_KSS_END` (
+    )
+    BEGIN
+        UPDATE $kss_logs_table SET `end_time` = NOW(), `status` = "End !" WHERE `id` = (SELECT MAX(id) from (select id from $kss_logs_table) as id );
+        CALL PROC_CLEAN_KSS();
+    END;
+    //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_SET_STATUS` //};
+    push @str, qq{CREATE PROCEDURE `PROC_SET_STATUS` (
+        IN status TEXT
+    )
+    BEGIN
+        UPDATE $kss_logs_table SET `status` = "status !" WHERE `id` = (SELECT MAX(id) from (select id from $kss_logs_table) as id );
+    END;
+    //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_ERROR` //};
+    push @str, qq{CREATE PROCEDURE `PROC_ADD_ERROR` (
+        IN error TEXT,
+        IN message TEXT
+    )
+    BEGIN
+        INSERT INTO $kss_errors_table (`kss_id`, `error`, `message`) VALUES (
+            ( SELECT MAX(`id`) FROM $kss_logs_table ),
+            error,
+            message
+        );
+    END;
+    //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_SQL_ERROR` //};
+    push @str, qq{CREATE PROCEDURE `PROC_ADD_SQL_ERROR` (
+        IN error TEXT,
+        IN query TEXT
+    )
+    BEGIN
+        INSERT INTO $kss_sql_errors_table (`kss_id`, `error`, `query`) VALUES (
+            ( SELECT MAX(`id`) FROM $kss_logs_table ),
+            error,
+            query
+        );
+    END;
+    //};
+
     return @str;
 }
 
 sub drop_procedures {
     my @str;
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_INIT_KSS_INFOS` //};
+    
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_INIT_KSS` //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_CLEAN_KSS` //};
+    
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_CREATE_KSS_INFOS` //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_BORROWERNUMBER` //};
 
@@ -172,6 +276,16 @@ sub drop_procedures {
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_DELETE_FROM` //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE` //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_END` //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_START` //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_SET_STATUS` //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_ERROR` //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_SQL_ERROR` //};
 
     return @str;
 }

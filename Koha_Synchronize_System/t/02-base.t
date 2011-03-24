@@ -42,7 +42,7 @@ sub setUp {
     qx{./init_srv.sh};
 
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server; 
-    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS_INFOS();" } ;
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_CREATE_KSS_INFOS();" } ;
     Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server; 
 
     # Not possible in test, it's too late......
@@ -103,8 +103,7 @@ sub checkBefore {
 }
 
 sub clean {
-    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_END_KSS();"};
-    Koha_Synchronize_System::tools::kss::delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+    Koha_Synchronize_System::tools::kss::clean $mysql_cmd, $user, $passwd, $db_server, $log;
 }
 
 sub testborrower01insert {

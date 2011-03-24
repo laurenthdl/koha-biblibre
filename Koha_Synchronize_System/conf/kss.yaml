@@ -18,6 +18,9 @@ databases_infos:
         user: root
         passwd: root
         kss_infos_table: kss_infos
+        kss_logs_table: kss_logs
+        kss_errors_table: kss_errors
+        kss_sql_errors_table: kss_sql_errors
         max_borrowers_fieldname: max_old_borrowers
         max_reserves_fieldname: max_old_reserves
         matching_table_prefix: kss_tmp_matching_
