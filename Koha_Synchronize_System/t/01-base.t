@@ -62,7 +62,7 @@ sub processQueries {
         {filename => "issue-02-update.sql",                 func => "testissue02update" },
         {filename => "issue-04-addissue.sql",               func => "testissue04addissue" },
         {filename => "issue-05-return.sql",                 func => "testissue05return" },
-#    {filename => "issue-06-renewal.sql", func =>               "issue06renewal" },
+        {filename => "issue-06-renewal.sql",                func => "issue06renewal" },
 #    {filename => "items-02-update.sql", func =>                "testitems02update" },
 #    {filename => "old_issues-04-newoldissue.sql", func =>      "testold_issues04newoldissue" },
 #    {filename => "reserves-04-addissue.sql", func =>           "testreserves04addissue" },
@@ -102,6 +102,7 @@ sub clean {
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_END_KSS();"};
     Koha_Synchronize_System::tools::kss::delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
 }
+
 sub testdefault {
     is (&findInData ("borrowers", { 'cardnumber' => "10000267", 'surname' => "COLLIN" }), 1 , "default exists");
     is (&findInData ("borrowers", { 'cardnumber' => "424242", 'surname' => "John Carmack" }) ,0, "default exists");
@@ -142,6 +143,7 @@ sub testborrower_attributes01insert {
     my $expected3 = {borrowernumber => $bn, code => "TOURNEE", attribute => "tournee_client"};
     is (&findInData ("borrower_attributes", $expected3), 1 , "update borrower_attributes 100 TOURNEE");
 }
+
 sub testissue01insert {
     my $bn = "52";
     my $in = "153";
@@ -191,7 +193,6 @@ sub testissue05return {
     $expected = {itemnumber => $in, renewals => '0', datelastseen => '2011-03-11', itemlost => '0'};
     is (&findInData ("issues", $expected), 0, "issue05 delete issues : items $in for borrowers $bn");
 
-
     $expected = {branch => 'BDM', type => 'return', value => '0.0000', other => '', itemnumber => $in, borrowernumber => $bn};
     is (&findInData ("statistics", $expected), 1, "issue05 insert statistics for items $in and borrowers $bn");
 }
@@ -201,7 +202,7 @@ sub issue06renewal {
     my $in = "102";
 
     my $expected = {borrowernumber => $bn, itemnumber => $in, date_due => '2011-04-01', renewals => '1', lastreneweddate => '2011-03-11'};
-    is (&findInData ("old_issues", $expected), 1, "issue06 update issues : items $in for borrowers $bn");
+    is (&findInData ("issues", $expected), 1, "issue06 update issues : items $in for borrowers $bn");
 }
 
 sub testitems02update {}

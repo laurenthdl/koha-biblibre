@@ -8,8 +8,8 @@ datatest:
         mysqlbinlog_cmd: /usr/bin/mysqlbinlog
         mysqldump_cmd: /usr/bin/mysqldump
         hostname: localhost
-        user: test
-        passwd: test
+        user: root
+        passwd: root
 
 databases_infos:
         db_client: koha_devkss_client

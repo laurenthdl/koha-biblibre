@@ -2,9 +2,9 @@ INSERT INTO issues
                   (borrowernumber, itemnumber,issuedate, date_due, branchcode)
               VALUES ('54','102','2011-03-11','2011-04-01','BDM')
 /*!*/;
-UPDATE items SET itemnumber='102', issues='2',datelastborrowed='2011-03-11',holdingbranch='BDM',itemlost='0',onloan='2011-04-01' WHERE itemnumber='101'
+UPDATE items SET itemnumber='102', issues='2',datelastborrowed='2011-03-11',holdingbranch='BDM',itemlost='0',onloan='2011-04-01' WHERE itemnumber='102'
 /*!*/;
-UPDATE items SET itemnumber='102',datelastseen='2011-03-11',itemlost='0' WHERE itemnumber='101'
+UPDATE items SET itemnumber='102',datelastseen='2011-03-11',itemlost='0' WHERE itemnumber='102'
 /*!*/;
 INSERT INTO statistics
       (datetime, branch, type, value,
