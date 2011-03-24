@@ -69,7 +69,7 @@ sub processQueries {
         {filename => "reserves-02-update.sql",              func => "testreserves02update" },
 #        {filename => "reserves-04-addissue.sql",            func => "testreserves04addissue" },
 #    {filename => "reserves-05-holding.sql", func =>            "testreserves05holding" },
-#    {filename => "statistics-01-insert.sql", func =>           "teststatistics01insert" },
+        {filename => "statistics-01-insert.sql", func =>           "teststatistics01insert" },
 
     );
     for my $hash ( @files ) {
@@ -247,7 +247,12 @@ sub testreserves04addissue {}
 
 sub testreserves05holding {}
 
-sub teststatistics01insert {}
+sub teststatistics01insert {
+    my $stat = {branch => "BDM", type => "renew", borrowernumber => "100", itemnumber => "287"};
+    is (&findInData ("statistics", $stat), 1 , "add stats statistics-01-insert.sql");
+    $stat = {branch => "BDM", type => "issue", borrowernumber => "100", itemnumber => "275"};
+    is (&findInData ("statistics", $stat), 1 , "add stats statistics-01-insert.sql");
+}
 
 sub findInData {
     my ($table, $data, $out) = @_;
