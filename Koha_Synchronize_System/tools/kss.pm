@@ -13,8 +13,6 @@ use C4::Logguer qw(:DEFAULT $log_kss);
 
 use Koha_Synchronize_System::tools::mysql;
 
-my $log                   = $log_kss;
-
 my $conf                     = get_conf();
 my $kss_dir                  = $$conf{path}{kss_dir};
 my $db_client                = $$conf{databases_infos}{db_client};
@@ -140,56 +138,6 @@ sub clean {
 
 }
 
-
-if ( not caller ) {
-    $log->info("BEGIN");
-    eval {
-
-        $log->info("=== Vérification de l'existence d'au moins un fichier de diff binaire ===");
-    #    diff_files_exists $diff_logbin_dir, $log;
-
-        $log->info("=== Sauvegarde de la base du serveur ===");
-        my $dump_filename = $dump_db_server_dir . "/" . strftime "%Y-%m-%d_%H:%M:%S", localtime;
-        $log->info("=== Dump en cours dans $dump_filename ===");
-    #    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
-
-        $log->info("=== Génération et insertion en base des triggers et procédures stockées ===");
-        insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
-
-        $log->info("=== Préparation de la base de données ===");
-        prepare_database $mysql_cmd, $user, $passwd, $db_server, $log;
-
-        $log->info("=== Insertion des nouveaux ids remontés par le client ===");
-        insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
-
-        $log->info("=== Extraction des fichiers binaires de log sql ===");
-        extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
-
-        my @files = qx{ls -1 $diff_logtxt_dir};
-        $log->info("=== Digestion des requêtes ===");
-        $log->info(scalar( @files ) . " fichiers trouvés");
-        for my $file ( @files ) {
-            chomp $file;
-            $log && $log->info("Traitement de $file en cours...");
-            insert_diff_file ("$diff_logtxt_dir\/$file", $log);
-        }
-
-
-        $log->info("=== Cleaning ... ===");
-        clean $mysql_cmd, $user, $passwd, $db_server, $log;
-
-        # À la fin du script :
-        #  - insérer les nouveaux id dans kss_infos pour le client
-    };
-
-    if ( $@ ) {
-        $log->error($@);
-    }
-
-    $log->info("END");
-
-}
-
 sub extract_and_purge_mysqllog {
     my $bindir  = shift;
     my $fulldir = shift;
@@ -239,7 +187,6 @@ sub replace_with_new_id {
     my $dbh = shift;
 
     if ( $string =~ /$field\s*=\s*\'{0,1}([^']*)\'{0,1}/ ) {
-        $log->info("CALL PROC_GET_NEW_ID (\"$table_name.$field\", $1, \@new_id);");
         $dbh->do("CALL PROC_GET_NEW_ID (\"$table_name.$field\", $1, \@new_id);");
         my @value = $dbh->selectrow_array("SELECT \@new_id;");
 
@@ -249,6 +196,21 @@ sub replace_with_new_id {
     }
 
     return $string;
+}
+
+sub log_error {
+    my $error = shift;
+    my $message = shift;
+    my $dbh = shift;
+
+    if (not $dbh) {
+        $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
+        $dbh->{'mysql_enable_utf8'} = 1;
+        $dbh->do("set NAMES 'utf8'");
+    }
+
+    $dbh->do(qq{CALL PROC_ADD_ERROR("} . $dbh->quote($$error) . qq{", "} . $dbh->quote($message) . qq{");});
+
 }
 
 sub insert_diff_file {
@@ -270,7 +232,6 @@ sub insert_diff_file {
     $/ = $sep;
 
 
-    #$dbh->do(qq{DELIMITER $sep});
     while ( my $query = <FILE> ) {
         my $r;
         next if length($query) <= 1;
