@@ -169,9 +169,6 @@ INSERT INTO old_reserves
             SELECT * FROM reserves
             WHERE reservenumber     = '3'
 /*!*/;
-INSERT INTO old_reserves ()
-            VALUES ()
-/*!*/;
 DELETE FROM reserves
             WHERE  reservenumber   = '3'
 /*!*/;
