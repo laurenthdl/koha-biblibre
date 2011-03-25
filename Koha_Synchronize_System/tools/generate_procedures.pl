@@ -54,6 +54,7 @@ sub create_procedures {
             reservenumber INT(11),
             borrowernumber INT(11),
             biblionumber INT(11),
+            itemnumber iNT(11),
             reservedate DATE
         )ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
@@ -135,6 +136,7 @@ sub create_procedures {
         IN new_id INT(11),
         IN borrowernumber INT(11),
         IN biblionumber INT(11),
+        IN itemnumber INT(11),
         IN reservedate DATE
     )
     BEGIN
@@ -142,6 +144,7 @@ sub create_procedures {
         SELECT reservenumber FROM } . $matching_table_prefix . qq{reserves
             WHERE `borrowernumber`=borrowernumber
                 AND `biblionumber`=biblionumber
+                AND `itemnumber`=itemnumber
                 AND `reservedate`=reservedate
             INTO old_id;
         INSERT INTO $matching_table_ids (table_name, old, new) VALUES("reserves", old_id, new_id);
