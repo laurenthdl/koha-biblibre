@@ -44,7 +44,8 @@ sub launch {
 
     my %table_fields = (
         'borrowers', 'borrowernumber',
-        'items'   , 'itemnumber'
+        'items'   , 'itemnumber',
+        'reserves', 'reservenumber'
     );
 
     given ( $action ) {
@@ -69,7 +70,7 @@ sub launch {
 
 
 sub show_references {
-    my $tables;
+    my $tables = shift;
     my $table_field = shift;
     my $dbh = shift;
     while ( my ($t, $f) = each %$table_field ) {
