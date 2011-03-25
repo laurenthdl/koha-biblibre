@@ -271,6 +271,7 @@ sub insert_diff_file {
             } elsif ( $level == 2 ) {
                 # For INSERT old_issues SELECT * FROM issues WHERE borrowernumber=xxx [...] format
                 $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
             }
         } elsif ( $query =~ /^UPDATE (\S+)/ ) {
             $table_name = $1;
@@ -310,10 +311,10 @@ sub insert_diff_file {
         @warnings = $dbh->selectrow_array(qq{show warnings $sep});
 
         if ( @warnings ) {
-            #if ( $warnings[0] ne 'Note' ) {
+            if ( $warnings[0] ne 'Note' ) {
                 $log && $log->error($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
                 $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
-                #}
+            }
         } else {
             $log && $log->info(" <<< OK >>>")
         }

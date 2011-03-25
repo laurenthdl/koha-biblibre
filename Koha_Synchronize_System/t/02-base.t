@@ -30,9 +30,11 @@ $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set NAMES 'utf8'");
 warn "\nINFOS: hostname:$hostname - user:$user - pass:$passwd - db:$db_server";
 
-&setUp;
-&checkBefore;
-&processQueries;
+eval {
+    &setUp;
+    &checkBefore;
+    &processQueries;
+};
 &clean;
 
 # init bases client + serveur
@@ -48,15 +50,23 @@ sub setUp {
     # Not possible in test, it's too late......
     #Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
 
-    my $insert = qq{INSERT INTO } . $matching_table_prefix . qq{borrowers(borrowernumber, cardnumber) VALUES ('100', "42424242");};
+    my $insert = qq{INSERT INTO } . $matching_table_prefix . qq{borrowers(borrowernumber, cardnumber) VALUES ("100", "42424242");};
     qx{$mysql_cmd -u $user -p$passwd $db_server -e '$insert'} ;
 
-    $insert = qq{INSERT INTO } . $matching_table_prefix . qq{borrowers(borrowernumber, cardnumber) VALUES ('101', "01010101");};
-$log->info($insert);
+    $insert = qq{INSERT INTO } . $matching_table_prefix . qq{borrowers(borrowernumber, cardnumber) VALUES ("101", "01010101");};
     qx{$mysql_cmd -u $user -p$passwd $db_server -e '$insert'} ;
 
-    #$insert = "INSERT INTO " . $matching_table_prefix . "reserves(reservenumber, borrowernumber, biblionumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, reservedate FROM reserves WHERE reservenumber > 99;";
-    #qx{$mysql_cmd -u $user -p$passwd $db_server -e $insert} ;
+    $insert = qq{INSERT INTO } . $matching_table_prefix . qq{reserves(reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) VALUES (2, 50, 1234, NULL, "2011-03-24");};
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e '$insert'} ;
+
+    $insert = qq{INSERT INTO } . $matching_table_prefix . qq{reserves(reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) VALUES (3, 100, 124, NULL, "2011-03-24");};
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e '$insert'} ;
+
+    $insert = qq{INSERT INTO } . $matching_table_prefix . qq{reserves(reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) VALUES (4, 100, 125, NULL, "2011-03-24");};
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e '$insert'} ;
+
+    $insert = qq{INSERT INTO } . $matching_table_prefix . qq{reserves(reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) VALUES (5, 100, 126, NULL, "2011-03-24");};
+    qx{$mysql_cmd -u $user -p$passwd $db_server -e '$insert'} ;
 
 }
 
@@ -77,11 +87,10 @@ sub processQueries {
         {filename => "issue-04-addissue.sql",               func => "testissue04addissue" },
         {filename => "issue-05-return.sql",                 func => "testissue05return" },
         {filename => "issue-06-renewal.sql",                func => "issue06renewal" },
-#    {filename => "items-02-update.sql", func =>                "testitems02update" },
-#    {filename => "old_issues-04-newoldissue.sql", func =>      "testold_issues04newoldissue" },
-#    {filename => "reserves-04-addissue.sql", func =>           "testreserves04addissue" },
-#    {filename => "reserves-05-holding.sql", func =>            "testreserves05holding" },
-#    {filename => "statistics-01-insert.sql", func =>           "teststatistics01insert" },
+        {filename => "old_issues-04-newoldissue.sql",       func => "testold_issues04newoldissue" },
+        {filename => "reserves-01-insert.sql",              func => "testreserves01insert" },
+        {filename => "reserves-06-newoldreserve.sql",       func => "testreserves06newoldreserve" },
+        {filename => "statistics-01-insert.sql",            func => "teststatistics01insert" },
 
     );
     for my $hash ( @files ) {
@@ -212,15 +221,67 @@ sub issue06renewal {
     is (&findInData ("issues", $expected), 1, "issue06 update issues : items $in for borrowers $bn");
 }
 
-sub testitems02update {}
+sub testold_issues04newoldissue {
+    my $old_bn = "100";
+    my $bn = "102";
+    my $in = "123";
 
-sub testold_issues04newoldissue {}
+    my $expected = {borrowernumber => $bn, itemnumber => $in};
+    is (&findInData ("old_issues", $expected), 1, "old_issues-04 with borrowernumber $old_bn / $bn in $in exists");
+    is (&findInData ("issues", $expected), 0, "old_issues-04 with borrowernumber $old_bn / $bn in $in is remove from issues table");
+}
 
-sub testreserves04addissue {}
+sub testreserves01insert {
+    my $prev_old_rn = "2";
+    my $prev_rn = "4";
+    my $prev_bn = "50";
+    my $prev_bibn = "1234";
 
-sub testreserves05holding {}
+    my $old_rn = "3";
+    my $rn = "5";
+    my $old_bn = "100";
+    my $bn = "102";
+    my $bibn = "124";
 
-sub teststatistics01insert {}
+    my $expected = {reservenumber => $prev_rn, borrowernumber => $prev_bn, biblionumber => $prev_bibn, reservedate => '2011-03-24'};
+    is (&findInData ("reserves", $expected), 1, "reserves-01 previous borrower $prev_bn with biblionumber $prev_bibn");
+
+    $expected = {reservenumber => $rn, borrowernumber => $bn, biblionumber => $bibn, reservedate => '2011-03-24'};
+    is (&findInData ("reserves", $expected), 1, "reserves-01 new borrower $old_bn / $bn with biblionumber $bibn");
+
+}
+
+sub testreserves06newoldreserve {
+    my $old_rn1 = "4";
+    my $rn1 = "6";
+    my $old_rn2 = "5";
+    my $rn2 = "7";
+    my $old_bn = "100";
+    my $bn = "102";
+    my $bibn1 = "125";
+    my $bibn2 = "126";
+
+    my $expected = {reservenumber => $rn1, borrowernumber => $bn, biblionumber => $bibn1, reservedate => '2011-03-24'};
+    is (&findInData ("reserves", $expected), 0, "reserves-04 (in reserves) borrower $bn with biblionumber $bibn1 (ID $old_rn1 / $rn1)");
+
+    $expected = {reservenumber => $rn1, borrowernumber => $bn, biblionumber => $bibn1, reservedate => '2011-03-24'};
+    is (&findInData ("old_reserves", $expected), 1, "reserves-04 (in reserves) borrower $bn with biblionumber $bibn1 (ID $old_rn1 / $rn1)");
+
+    $expected = {reservenumber => $rn2, borrowernumber => $bn, biblionumber => $bibn2, reservedate => '2011-03-24'};
+    is (&findInData ("reserves", $expected), 1, "reserves-04 (in reserves) borrower $bn with biblionumber $bibn2 (ID $old_rn2 / $rn2) (once more)");
+}
+
+sub teststatistics01insert {
+    my $old_bn = "100";
+    my $bn = "102";
+    my $in1 = "287";
+    my $in2 = "275";
+
+    my $stat = {branch => "BDM", type => "renew", borrowernumber => $bn, itemnumber => $in1};
+    is (&findInData ("statistics", $stat), 1 , "add stats renew for $in1");
+    $stat = {branch => "BDM", type => "issue", borrowernumber => $bn, itemnumber => $in2};
+    is (&findInData ("statistics", $stat), 1 , "add stats issue for $in2");
+}
 
 sub findInData {
     my ($table, $data, $out) = @_;

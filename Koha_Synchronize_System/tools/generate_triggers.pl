@@ -146,7 +146,10 @@ sub create_triggers {
             push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_reserves` //";
             push @str, "CREATE TRIGGER `TRG_AFT_INS_reserves` AFTER INSERT ON `reserves`";
             push @str, "  FOR EACH ROW BEGIN";
-            push @str, "    CALL PROC_UPDATE_RESERVENUMBER(NEW.reservenumber, NEW.borrowernumber, NEW.biblionumber, NEW.itemnumber, NEW.reservedate);";
+            push @str, "    DECLARE old_id INT(11);";
+            push @str, "    CALL PROC_GET_OLD_ID(\"reserves.borrowernumber\", NEW.borrowernumber, \@old_id);";
+            push @str, "    SELECT \@old_id INTO old_id;";
+            push @str, "    CALL PROC_UPDATE_RESERVENUMBER(NEW.reservenumber, old_id, NEW.biblionumber, NEW.itemnumber, NEW.reservedate);";
             push @str, "  END;";
             push @str, "//";
         }

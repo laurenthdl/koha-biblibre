@@ -46,6 +46,7 @@ $dbh->do("set NAMES 'utf8'");
 $dbh->do("DROP TABLE IF EXISTS " . $matching_table_prefix . "reserves");
 $dbh->do("CREATE TABLE " . $matching_table_prefix . "reserves(reservenumber INT(11), borrowernumber INT(11), biblionumber INT(11), itemnumber INT(11), reservedate DATE)");
 $dbh->do("INSERT INTO " . $matching_table_prefix . "reserves(reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, itemnumber, reservedate FROM reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_reserves_fieldname')");
+$dbh->do("INSERT INTO " . $matching_table_prefix . "reserves(reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, itemnumber, reservedate FROM old_reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_reserves_fieldname')");
 
 qx{$mysqldump_cmd -u $user -p$passwd $database reserves > $dump_filename};
 

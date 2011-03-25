@@ -45,11 +45,6 @@ sub create_procedures {
     push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS` (
     )
     BEGIN
-        CREATE TABLE } . $matching_table_prefix . qq{borrowers(
-            borrowernumber INT(11), 
-            cardnumber VARCHAR(16)
-        )ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
         CREATE TABLE } . $matching_table_prefix . qq{reserves(
             reservenumber INT(11),
             borrowernumber INT(11),
@@ -104,17 +99,16 @@ sub create_procedures {
     //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_CREATE_KSS_INFOS` //};
-
     push @str, qq{CREATE PROCEDURE `PROC_CREATE_KSS_INFOS` (
     )
     BEGIN
         DECLARE next_id INT(11);
         CREATE TABLE $client_db_name.$kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
 
-        SELECT MAX(borrowernumber) + 1 FROM borrowers INTO next_id;
+        SELECT MAX(GREATEST(o.borrowernumber, b.borrowernumber)) + 1 FROM deletedborrowers o, borrowers b INTO next_id;
         INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("borrowernumber", next_id);
-
-        SELECT MAX(reservenumber) + 1 FROM reserves INTO next_id;
+        
+        SELECT MAX(GREATEST(o.reservenumber, r.reservenumber)) + 1 FROM old_reserves o, reserves r INTO next_id;
         INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("reservenumber", next_id);
     END;
     //};
@@ -134,19 +128,29 @@ sub create_procedures {
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_RESERVENUMBER` //};
     push @str, qq{CREATE PROCEDURE `PROC_UPDATE_RESERVENUMBER` (
         IN new_id INT(11),
-        IN borrowernumber INT(11),
-        IN biblionumber INT(11),
-        IN itemnumber INT(11),
-        IN reservedate DATE
+        IN bn INT(11),
+        IN bibn INT(11),
+        IN itemn INT(11),
+        IN rd DATE
     )
     BEGIN
         DECLARE old_id INT(11);
-        SELECT reservenumber FROM } . $matching_table_prefix . qq{reserves
-            WHERE `borrowernumber`=borrowernumber
-                AND `biblionumber`=biblionumber
-                AND `itemnumber`=itemnumber
-                AND `reservedate`=reservedate
-            INTO old_id;
+        IF itemn IS NULL THEN
+            SELECT reservenumber FROM } . $matching_table_prefix . qq{reserves
+                WHERE `borrowernumber`=bn
+                    AND `biblionumber`=bibn
+                    AND `itemnumber` IS NULL
+                    AND `reservedate`=rd
+                INTO old_id;
+        ELSE
+            SELECT reservenumber FROM } . $matching_table_prefix . qq{reserves
+                WHERE `borrowernumber`=bn
+                    AND `biblionumber`=bibn
+                    AND `itemnumber`=itemn
+                    AND `reservedate`=rd
+                INTO old_id;
+        END IF;
+
         INSERT INTO $matching_table_ids (table_name, old, new) VALUES("reserves", old_id, new_id);
     END;
     //};
@@ -167,29 +171,52 @@ sub create_procedures {
                 SELECT old_id INTO new_id;
             END IF;
         ELSE
-            SELECT old_id INTO new_id;
+            IF field_name LIKE "\%.reservenumber" THEN
+                SELECT COUNT(`new`) FROM kss_tmp_ids WHERE `table_name`="reserves" AND `old`=old_id INTO nb;
+                IF nb != 0 THEN
+                    SELECT `new` FROM $matching_table_ids WHERE `table_name`="reserves" AND `old`=old_id INTO new_id;
+                ELSE 
+                    SELECT old_id INTO new_id;
+                END IF;
+            ELSE
+                SELECT old_id INTO new_id;
+            END IF;
         END IF;
     END;
     //};
 
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_GET_OLD_ID` //};
+    push @str, qq{CREATE PROCEDURE `PROC_GET_OLD_ID` (
+        IN field_name VARCHAR(255),
+        IN new_id INT(11),
+        OUT old_id INT(11)
+    )
+    BEGIN
+        DECLARE nb INT;
+        IF field_name LIKE "\%.borrowernumber" THEN
+            SELECT COUNT(`old`) FROM kss_tmp_ids WHERE `table_name`="borrowers" AND `new`=new_id INTO nb;
+            IF nb != 0 THEN
+                SELECT `old` FROM $matching_table_ids WHERE `table_name`="borrowers" AND `new`=new_id INTO old_id;
+            ELSE 
+                SELECT new_id INTO old_id;
+            END IF;
+        ELSE
+            IF field_name LIKE "\%.reservenumber" THEN
+                SELECT COUNT(`old`) FROM kss_tmp_ids WHERE `table_name`="reserves" AND `new`=new_id INTO nb;
+                IF nb != 0 THEN
+                    SELECT `old` FROM $matching_table_ids WHERE `table_name`="reserves" AND `new`=new_id INTO old_id;
+                ELSE 
+                    SELECT new_id INTO old_id;
+                END IF;
+            ELSE
+                SELECT new_id INTO old_id;
+            END IF;
+        END IF;
+    END;
+    //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_DELETE_FROM` //};
     push @str, qq{CREATE PROCEDURE `PROC_DELETE_FROM` (
-        IN field_name VARCHAR(255),
-        IN id INT(11)
-    )
-    BEGIN
-        DECLARE new_id INT(11);
-        IF field_name = 'borrowers.borrowernumber' THEN
-            CALL PROC_GET_NEW_ID("borrowers.borrowernumber", id, \@new_id);
-            SELECT \@new_id INTO new_id;
-            DELETE FROM borrowers WHERE borrowernumber=new_id;
-        END IF;
-    END;
-    //};
-
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE` //};
-    push @str, qq{CREATE PROCEDURE `PROC_UPDATE` (
         IN field_name VARCHAR(255),
         IN id INT(11)
     )
@@ -276,9 +303,9 @@ sub drop_procedures {
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_GET_NEW_ID` //};
 
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_DELETE_FROM` //};
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_GET_OLD_ID` //};
 
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE` //};
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_DELETE_FROM` //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_END` //};
 
