@@ -1031,27 +1031,6 @@ sub CancelReserve {
         ";
         $sth = $dbh->prepare($query);
         $sth->execute( $reservenumber );
-        my $holditem = $sth->fetchrow_hashref;
-        my $insert_fields = '';
-        my $value_fields = '';
-        foreach my $column ('borrowernumber','reservedate','biblionumber','constrainttype','branchcode','notificationdate','reminderdate','cancellationdate','reservenotes','priority','found','itemnumber','waitingdate','expirationdate') {
-          if (defined($holditem->{$column})) {
-            if (length($insert_fields)) {
-              $insert_fields .= ",$column";
-              $value_fields .= ",\'$holditem->{$column}\'";
-            }
-            else {
-              $insert_fields .= "$column";
-              $value_fields .= "\'$holditem->{$column}\'";
-            }
-          }
-        }
-        $query = qq/
-            INSERT INTO old_reserves ($insert_fields)
-            VALUES ($value_fields)
-        /;
-        $sth = $dbh->prepare($query);
-        $sth->execute();
         $query = "
             DELETE FROM reserves
             WHERE  reservenumber   = ?
@@ -1093,28 +1072,6 @@ sub CancelReserve {
         /;
         $sth = $dbh->prepare($query);
         $sth->execute( $reservenumber );
-        my $holditem = $sth->fetchrow_hashref;
-
-        my $insert_fields = '';
-        my $value_fields = '';
-        foreach my $column ('borrowernumber','reservedate','biblionumber','constrainttype','branchcode','notificationdate','reminderdate','cancellationdate','reservenotes','priority','found','itemnumber','waitingdate','expirationdate') {
-          if (defined($holditem->{$column})) {
-            if (length($insert_fields)) {
-              $insert_fields .= ",$column";
-              $value_fields .= ",\'$holditem->{$column}\'";
-            }
-            else {
-              $insert_fields .= "$column";
-              $value_fields .= "\'$holditem->{$column}\'";
-            }
-          }
-        }
-        $query = qq/
-            INSERT INTO old_reserves ($insert_fields)
-            VALUES ($value_fields)
-        /;
-        $sth = $dbh->prepare($query);
-        $sth->execute();
 
         $query = qq/
             DELETE FROM reserves
