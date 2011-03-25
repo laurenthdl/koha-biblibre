@@ -45,6 +45,11 @@ sub create_procedures {
     push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS` (
     )
     BEGIN
+        CREATE TABLE } . $matching_table_prefix . qq{borrowers(
+            borrowernumber INT(11),
+            cardnumber VARCHAR(16)
+        )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
         CREATE TABLE } . $matching_table_prefix . qq{reserves(
             reservenumber INT(11),
             borrowernumber INT(11),
@@ -99,6 +104,7 @@ sub create_procedures {
     //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_CREATE_KSS_INFOS` //};
+
     push @str, qq{CREATE PROCEDURE `PROC_CREATE_KSS_INFOS` (
     )
     BEGIN

@@ -14,16 +14,14 @@ my $log = $log_kss;
 
 plan 'no_plan';
 
-my $koha_dir = C4::Context->config('intranetdir');
-my $curdir = "$koha_dir/Koha_Synchronize_System/";
-
-my $conf = YAML::LoadFile("$curdir/conf/kss.yaml");
+my $conf = Koha_Synchronize_System::tools::kss::get_conf();
+my $curdir = $$conf{path}{kss_dir};
 my $mysql_cmd = $conf->{'datatest'}->{'mysql_cmd'};
 my $user = $conf->{'datatest'}->{'user'};
 my $passwd = $conf->{'datatest'}->{'passwd'};
 my $db_server = $conf->{'datatest'}->{'db_server'};
 my $hostname = $conf->{'datatest'}->{'hostname'};
-my $dump_id_dir = $curdir . $conf->{'datas_path'}->{'dump_id'};
+my $dump_id_dir = $conf->{'path'}->{'dump_id'};
 my $matching_table_prefix = $$conf{databases_infos}{matching_table_prefix};
 my $dbh = DBI->connect("DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd); 
 $dbh->{'mysql_enable_utf8'} = 1;

@@ -15,16 +15,13 @@ use Koha_Synchronize_System::tools::mysql;
 
 my $log                   = $log_kss;
 
-my $koha_dir = C4::Context->config('intranetdir');
-
-my $kss_dir = "$koha_dir/Koha_Synchronize_System/";
-
-my $conf                     = YAML::LoadFile("$kss_dir/conf/kss.yaml");
+my $conf                     = get_conf();
+my $kss_dir                  = $$conf{path}{kss_dir};
 my $db_client                = $$conf{databases_infos}{db_client};
 my $db_server                = $$conf{databases_infos}{db_server};
-my $diff_logbin_dir          = $kss_dir . $$conf{mysql_log}{diff_logbin_dir};
-my $diff_logtxt_full_dir     = $kss_dir . $$conf{mysql_log}{diff_logtxt_full_dir};
-my $diff_logtxt_dir          = $kss_dir . $$conf{mysql_log}{diff_logtxt_dir};
+my $diff_logbin_dir          = $$conf{path}{diff_logbin_dir};
+my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
+my $diff_logtxt_dir          = $$conf{path}{diff_logtxt_dir};
 my $mysql_cmd                = $$conf{which_cmd}{mysql};
 my $mysqlbinlog_cmd          = $$conf{which_cmd}{mysqlbinlog};
 my $mysqldump_cmd            = $$conf{which_cmd}{mysqldump};
@@ -32,10 +29,10 @@ my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $help                     = "";
-my $dump_id_dir              = $kss_dir . $$conf{datas_path}{dump_id};
-my $dump_db_server_dir       = $kss_dir . $$conf{datas_path}{backup_server};
-my $generate_triggers_path   = $kss_dir . $$conf{tools_path}{generate_triggers};
-my $generate_procedures_path = $kss_dir . $$conf{tools_path}{generate_procedures};
+my $dump_id_dir              = $$conf{path}{dump_id};
+my $dump_db_server_dir       = $$conf{path}{backup_server};
+my $generate_triggers_path   = $$conf{path}{generate_triggers};
+my $generate_procedures_path = $$conf{path}{generate_procedures};
 
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
@@ -51,6 +48,22 @@ GetOptions(
 
 pod2usage(1) if $help;
 
+sub get_conf {
+    my $koha_dir = C4::Context->config('intranetdir');
+    my $kss_dir = "$koha_dir/Koha_Synchronize_System/";
+    my $yaml = YAML::LoadFile("$kss_dir/conf/kss.yaml");
+    my $conf = {%$yaml};
+
+    my $paths = $$conf{path};
+    while ( my ($key, $path) = each %$paths ) {
+        if ( $key ne 'kss_root' ) {
+            $$conf{path}{$key} = $kss_dir . $$conf{path}{$key};
+        }
+    }
+    $$conf{path}{kss_dir} = $kss_dir;
+
+    return $conf;
+}
 
 sub diff_files_exists {
     my $dir = shift;
@@ -82,10 +95,11 @@ sub insert_new_ids {
 
 sub insert_proc_and_triggers {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+    my $conf = get_conf();
     eval {
-        qx{$generate_triggers_path > /tmp/triggers.sql};
+        qx{$$conf{path}{generate_triggers} > /tmp/triggers.sql};
         qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/triggers.sql};
-        qx{$generate_procedures_path > /tmp/procedures.sql};
+        qx{$$conf{path}{generate_procedures} > /tmp/procedures.sql};
         qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/procedures.sql};
     };
 
@@ -103,9 +117,9 @@ sub prepare_database {
 sub delete_proc_and_triggers {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
     eval {
-        qx{$generate_triggers_path -action=drop > /tmp/del_triggers.sql};
+        qx{$$conf{path}{generate_triggers} -action=drop > /tmp/del_triggers.sql};
         qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_triggers.sql};
-        qx{$generate_procedures_path -action=drop > /tmp/del_procedures.sql};
+        qx{$$conf{path}{generate_procedures} -action=drop > /tmp/del_procedures.sql};
         qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_procedures.sql};
     };
 

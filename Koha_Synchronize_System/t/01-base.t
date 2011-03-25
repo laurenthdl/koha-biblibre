@@ -13,17 +13,15 @@ use C4::Logguer qw(:DEFAULT $log_kss);
 my $log = $log_kss;
 
 plan 'no_plan';
-
-my $koha_dir = C4::Context->config('intranetdir');
-my $curdir = "$koha_dir/Koha_Synchronize_System/";
-
-my $conf = YAML::LoadFile("$curdir/conf/kss.yaml");
+my $conf = Koha_Synchronize_System::tools::kss::get_conf();
+my $curdir = $$conf{path}{kss_dir};
 my $mysql_cmd = $conf->{'datatest'}->{'mysql_cmd'};
 my $user = $conf->{'datatest'}->{'user'};
 my $passwd = $conf->{'datatest'}->{'passwd'};
 my $db_server = $conf->{'datatest'}->{'db_server'};
 my $hostname = $conf->{'datatest'}->{'hostname'};
-my $dump_id_dir = $curdir . $conf->{'datas_path'}->{'dump_id'};
+my $dump_id_dir = $conf->{'path'}->{'dump_id'};
+my $matching_table_prefix = $$conf{databases_infos}{matching_table_prefix};
 my $dbh = DBI->connect("DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd); 
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set NAMES 'utf8'");
@@ -37,10 +35,8 @@ warn "\nINFOS: hostname:$hostname - user:$user - pass:$passwd - db:$db_server";
 # init bases client + serveur
 sub setUp {
     # 1- init (structure, diffs)
-    warn ">>>setup init_srv";
     qx {./init_srv.sh};
 
-    warn ">>>setup triggers";
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server; 
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_CREATE_KSS_INFOS();" } ;
     Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server; 
