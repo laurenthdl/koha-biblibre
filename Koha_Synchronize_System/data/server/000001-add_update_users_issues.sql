@@ -127,15 +127,15 @@ UPDATE reserves
                     found = 'W',
                     waitingdate=now(),
                     itemnumber = '235'
-        WHERE reservenumber = '1'
+        WHERE reservenumber = '3'
 /*!*/;
 UPDATE reserves
         SET    priority = 0 , itemnumber = '235' 
-        WHERE  reservenumber='1'
+        WHERE  reservenumber='3'
 /*!*/;
 UPDATE reserves
             SET    priority = 0
-            WHERE reservenumber = '1'
+            WHERE reservenumber = '3'
               AND found ='W'
 /*!*/;
 UPDATE reserves
@@ -149,7 +149,7 @@ UPDATE reserves
                     found = 'W',
                     waitingdate=now(),
                     itemnumber = '235'
-        WHERE reservenumber = '1'
+        WHERE reservenumber = '3'
 /*!*/;
 UPDATE reserves SET lowestPriority = NOT lowestPriority
          WHERE biblionumber = '9913'
@@ -163,17 +163,17 @@ UPDATE reserves
             SET    cancellationdate = now(),
                    found            = Null,
                    priority         = 0
-            WHERE  reservenumber   = '1'
+            WHERE  reservenumber   = '3'
 /*!*/;
 INSERT INTO old_reserves
             SELECT * FROM reserves
-            WHERE reservenumber     = '1'
+            WHERE reservenumber     = '3'
 /*!*/;
 INSERT INTO old_reserves ()
             VALUES ()
 /*!*/;
 DELETE FROM reserves
-            WHERE  reservenumber   = '1'
+            WHERE  reservenumber   = '3'
 /*!*/;
 UPDATE reserves
 	SET priority = priority-1

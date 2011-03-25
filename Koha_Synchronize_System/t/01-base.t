@@ -105,9 +105,9 @@ sub checkBefore {
     is (&findInData ("items", $itembeforeupdate), 1 , "item $in before item02");
 
     #reserves-04-addissue
-    my $reservebeforeupdate = {reservenumber => "2", borrowernumber => "79", priority => "1", biblionumber => "9740"};
+    my $reservebeforeupdate = {reservenumber => "1", borrowernumber => "79", priority => "1", biblionumber => "9740"};
     is (&findInData ("reserves", $reservebeforeupdate), 1 , "reserve before reserves-02-update");
-    $reservebeforeupdate = {reservenumber => "3", borrowernumber => "23", priority => "2", biblionumber => "9740"};
+    $reservebeforeupdate = {reservenumber => "2", borrowernumber => "23", priority => "2", biblionumber => "9740"};
     is (&findInData ("reserves", $reservebeforeupdate), 1 , "reserve before reserves-02-update");
      
 
@@ -236,9 +236,9 @@ sub testold_issues04newoldissue {
 }
 
 sub testreserves02update {
-    my $reserveafterupdate = {reservenumber => "2", borrowernumber => "79", priority => "2", biblionumber => "9740"};
+    my $reserveafterupdate = {reservenumber => "1", borrowernumber => "79", priority => "2", biblionumber => "9740"};
     is (&findInData ("reserves", $reserveafterupdate), 1 , "reserve 79 after reserves-02-update");
-    $reserveafterupdate = {reservenumber => "3", borrowernumber => "23", priority => "1", biblionumber => "9740"};
+    $reserveafterupdate = {reservenumber => "2", borrowernumber => "23", priority => "1", biblionumber => "9740"};
     is (&findInData ("reserves", $reserveafterupdate), 1 , "reserve 23 after reserves-02-update");
 }
 

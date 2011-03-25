@@ -37,9 +37,6 @@ LOCK TABLES `reserves` WRITE;
 
 INSERT INTO reserves (borrowernumber,biblionumber,reservedate,branchcode,constrainttype, priority,reservenotes,itemnumber,found,waitingdate,expirationdate) VALUES ('79','9740','2011-03-24','BDM','a', '1','',NULL,NULL,NULL,NULL);
 
-INSERT INTO reserves (borrowernumber,biblionumber,reservedate,branchcode,constrainttype, priority,reservenotes,itemnumber,found,waitingdate,expirationdate) VALUES ('79','9740','2011-03-24','BDM','a', '1','',NULL,NULL,NULL,NULL);
-
 INSERT INTO reserves (borrowernumber,biblionumber,reservedate,branchcode,constrainttype,priority,reservenotes,itemnumber,found,waitingdate,expirationdate) VALUES ('23','9740','2011-03-24','BDM','a', '2','',NULL,NULL,NULL,NULL);
--- INSERT INTO reserves VALUES ('79','9740','2011-03-24','BDM','a', '1','',NULL,NULL,NULL,NULL), ('23','9740','2011-03-24','BDM','a', '2','',NULL,NULL,NULL,NULL);
 
 UNLOCK TABLES;
