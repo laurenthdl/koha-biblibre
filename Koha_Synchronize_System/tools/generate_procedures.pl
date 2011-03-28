@@ -24,7 +24,8 @@ my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 my $kss_logs_table = $$conf{databases_infos}{kss_logs_table};
 my $kss_errors_table = $$conf{databases_infos}{kss_errors_table};
 my $kss_sql_errors_table = $$conf{databases_infos}{kss_sql_errors_table};
-
+my $max_old_borrowernumber_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
+my $max_old_reservenumber_fieldname = $$conf{databases_infos}{max_reserves_fieldname};
 my @proc_str;
 
 push @proc_str, qq{DELIMITER //};
@@ -112,10 +113,10 @@ sub create_procedures {
         CREATE TABLE $client_db_name.$kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
 
         SELECT MAX(GREATEST(o.borrowernumber, b.borrowernumber)) + 1 FROM deletedborrowers o, borrowers b INTO next_id;
-        INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("borrowernumber", next_id);
+        INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("$max_old_borrowernumber_fieldname", next_id);
         
         SELECT MAX(GREATEST(o.reservenumber, r.reservenumber)) + 1 FROM old_reserves o, reserves r INTO next_id;
-        INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("reservenumber", next_id);
+        INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("$max_old_reservenumber_fieldname", next_id);
     END;
     //};
 

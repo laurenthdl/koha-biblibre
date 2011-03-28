@@ -20,7 +20,7 @@ my $user = $conf->{'datatest'}->{'user'};
 my $passwd = $conf->{'datatest'}->{'passwd'};
 my $db_server = $conf->{'datatest'}->{'db_server'};
 my $hostname = $conf->{'datatest'}->{'hostname'};
-my $dump_id_dir = $conf->{'path'}->{'dump_id'};
+my $dump_id_dir = $conf->{'path'}->{'dump_ids'};
 my $matching_table_prefix = $$conf{databases_infos}{matching_table_prefix};
 my $dbh = DBI->connect("DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd); 
 $dbh->{'mysql_enable_utf8'} = 1;
@@ -35,12 +35,13 @@ warn "\nINFOS: hostname:$hostname - user:$user - pass:$passwd - db:$db_server";
 # init bases client + serveur
 sub setUp {
     # 1- init (structure, diffs)
-    qx {./init_srv.sh};
+    qx{./init.sh};
+    #qx{./init_srv.sh};
 
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server; 
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_CREATE_KSS_INFOS();" } ;
     Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server; 
-    Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
+    #Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log; # not use in test1
 }
 
 #table-01 = simple insert
@@ -61,10 +62,8 @@ sub processQueries {
         {filename => "issue-05-return.sql",                 func => "testissue05return" },
         {filename => "issue-06-renewal.sql",                func => "issue06renewal" },
         {filename => "items-02-update.sql",                 func => "testitems02update" },
-        {filename => "old_issues-04-newoldissue.sql",       func => "testold_issues04newoldissue" },
         {filename => "reserves-02-update.sql",              func => "testreserves02update" },
-#        {filename => "reserves-04-addissue.sql",            func => "testreserves04addissue" },
-#    {filename => "reserves-05-holding.sql", func =>            "testreserves05holding" },
+        {filename => "reserves-04-addissue.sql",            func => "testreserves04addissue" },
         {filename => "statistics-01-insert.sql", func =>           "teststatistics01insert" },
 
     );
@@ -206,9 +205,6 @@ sub testissue05return {
     $expected = {branch => 'BDM', type => 'return', value => '0.0000', other => '', itemnumber => $in, borrowernumber => $bn};
     is (&findInData ("statistics", $expected), 1, "issue05 insert statistics for items $in and borrowers $bn");
 
-    $expected = {borrowernumber => "100", itemnumber => '301'};
-    is (&findInData ("old_issues", $expected), 0, "old_issues-04 with borrowernumber 100 in 301 doesn't exist yet");
-    is (&findInData ("issues", $expected), 1, "old_issues-04 with borrowernumber 100 in 301 exist in issues table");
 }
 
 sub issue06renewal {
@@ -223,12 +219,6 @@ sub testitems02update {
     my $in = "153";
     my $expected = {itemnumber => $in, issues => '1', datelastborrowed => '2011-03-15', holdingbranch => 'BDM', itemlost => '0', onloan => '2011-03-25', datelastseen => '2011-03-15'};
     is (&findInData ("items", $expected), 1, "item02 update items : items $in ");
-}
-
-sub testold_issues04newoldissue {
-    my $expected = {borrowernumber => "100", itemnumber => '301'};
-    is (&findInData ("old_issues", $expected), 1, "old_issues-04 with borrowernumber 100 in 301 exists");
-    is (&findInData ("issues", $expected), 0, "old_issues-04 with borrowernumber 100 in 301 is remove from issues table");
 }
 
 sub testreserves02update {

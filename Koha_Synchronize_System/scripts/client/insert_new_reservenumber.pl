@@ -7,13 +7,9 @@ use Getopt::Long;
 use Pod::Usage;
 use YAML;
 
-use C4::Context;
+use Koha_Synchronize_System::tools::kss;
 
-my $koha_dir = C4::Context->config('intranetdir');
-
-my $kss_dir = "$koha_dir/Koha_Synchronize_System";
-
-my $conf = YAML::LoadFile("$kss_dir/conf/kss.yaml");
+my $conf = Koha_Synchronize_System::tools::kss::get_conf();
 
 my $database = $$conf{databases_infos}{db_client};
 my $hostname = $$conf{databases_infos}{hostname};
@@ -22,7 +18,7 @@ my $passwd   = $$conf{databases_infos}{passwd};
 my $help     = "";
 
 my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
-my $dump_filename = $$conf{datas_path}{dump_reserves_filename};
+my $dump_filename = $$conf{path}{dump_ids} . '/reserves.sql';
 
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 my $max_reserves_fieldname = $$conf{databases_infos}{max_reserves_fieldname};
@@ -43,12 +39,14 @@ my $dbh = DBI->connect( "DBI:mysql:dbname=$database;host=$hostname;", $user, $pa
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set NAMES 'utf8'");
 
-$dbh->do("DROP TABLE IF EXISTS " . $matching_table_prefix . "reserves");
-$dbh->do("CREATE TABLE " . $matching_table_prefix . "reserves(reservenumber INT(11), borrowernumber INT(11), biblionumber INT(11), itemnumber INT(11), reservedate DATE)");
-$dbh->do("INSERT INTO " . $matching_table_prefix . "reserves(reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, itemnumber, reservedate FROM reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_reserves_fieldname')");
-$dbh->do("INSERT INTO " . $matching_table_prefix . "reserves(reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, itemnumber, reservedate FROM old_reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_reserves_fieldname')");
+my $reserves_matching = $matching_table_prefix . 'reserves';
 
-qx{$mysqldump_cmd -u $user -p$passwd $database reserves > $dump_filename};
+$dbh->do("DROP TABLE IF EXISTS $reserves_matching");
+$dbh->do("CREATE TABLE $reserves_matching (reservenumber INT(11), borrowernumber INT(11), biblionumber INT(11), itemnumber INT(11), reservedate DATE) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+$dbh->do("INSERT INTO $reserves_matching (reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, itemnumber, reservedate FROM reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_reserves_fieldname')");
+$dbh->do("INSERT INTO $reserves_matching (reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, itemnumber, reservedate FROM old_reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_reserves_fieldname')");
+
+qx{$mysqldump_cmd -u $user -p$passwd $database $reserves_matching > $dump_filename};
 
 __END__
 

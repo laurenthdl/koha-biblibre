@@ -27,7 +27,6 @@ my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $help                     = "";
-my $dump_id_dir              = $$conf{path}{dump_id};
 my $dump_db_server_dir       = $$conf{path}{backup_server};
 my $generate_triggers_path   = $$conf{path}{generate_triggers};
 my $generate_procedures_path = $$conf{path}{generate_procedures};

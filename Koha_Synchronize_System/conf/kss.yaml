@@ -21,8 +21,8 @@ databases_infos:
         kss_logs_table: kss_logs
         kss_errors_table: kss_errors
         kss_sql_errors_table: kss_sql_errors
-        max_borrowers_fieldname: max_old_borrowers
-        max_reserves_fieldname: max_old_reserves
+        max_borrowers_fieldname: max_old_borrowernumber
+        max_reserves_fieldname: max_old_reservenumber
         matching_table_prefix: kss_tmp_matching_
         matching_table_ids: kss_tmp_ids
 
@@ -33,15 +33,13 @@ which_cmd:
 
 path:
         kss_root: Koha_Synchronize_System
-        dump_id: data/client/ids
-        backup_server: data/server/bak
-        dump_borrowers_filename: tmp/borrowers.sql
-        dump_reserves_filename: tmp/reserves.sql
+        dump_ids: data/client/ids/
+        backup_server: data/server/bak/
         generate_triggers: tools/generate_triggers.pl
         generate_procedures: tools/generate_procedures.pl
-        diff_logbin_dir: data/client/logbin
-        diff_logtxt_full_dir: data/client/logtxt_full
-        diff_logtxt_dir: data/client/logtxt
+        diff_logbin_dir: data/client/logbin/
+        diff_logtxt_full_dir: data/client/logtxt_full/
+        diff_logtxt_dir: data/client/logtxt/
 cron:
         cronfile: /home/koha/sites/dev/var/spool/cron/koha
         cronpidfile: /home/koha/sites/dev/var/run/cronscheduler.pid

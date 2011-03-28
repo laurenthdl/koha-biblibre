@@ -1,7 +1,7 @@
 #!/bin/bash
 
-USER="test";
-PWD="test";
+USER="root";
+PWD="root";
 DATABASE_SERVER="koha_devkss_server";
 DATABASE_CLIENT="koha_devkss_client";
 STRUCTURE_AND_DATA_FILE="data/structure_and_data_init.sql";
@@ -26,3 +26,4 @@ for file in $DIFF_SERVER_DIR/*.sql; do
         mysql -u $USER -p$PWD $DATABASE_SERVER < $file;
     fi
 done
+
