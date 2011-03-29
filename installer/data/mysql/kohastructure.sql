@@ -1956,6 +1956,7 @@ CREATE TABLE `z3950servers` (
   `position` enum('primary','secondary','') NOT NULL default 'primary',
   `type` enum('zed','opensearch') NOT NULL default 'zed',
   `encoding` text default NULL,
+  `xslt` varchar(255) default NULL,
   `description` text NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
