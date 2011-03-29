@@ -23,6 +23,7 @@ my $dbh = DBI->connect("DBI:mysql:dbname=$db_server;host=$hostname;", $user, $pa
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set NAMES 'utf8'");
 
+warn "You must delete manually $statistics_table table";
 &setUp;
 &processQueries;
 &clean;

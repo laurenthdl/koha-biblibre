@@ -82,12 +82,15 @@ sub insert_new_ids {
     my ($mysql_cmd, $user, $pwd, $db_name, $id_dir, $log) = @_;
     my @dump_id = qx{ls -1 $id_dir};
 
-    $log && $log->info(scalar(@dump_id) . " Fichiers trouvés");
+    my $nb_files = scalar(@dump_id);
+    qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS("Insert new ids ($nb_files files found", 0);"};
+    $log && $log->info("$nb_files Fichiers trouvés");
     for my $file ( @dump_id ) {
         chomp $file;
         $log && $log->info("Insertion de $file en cours...");
         qx{$mysql_cmd -u $user -p$pwd $db_name < $id_dir/$file};
     }
+    qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS("Insert new ids ($nb_files files found", 1);"};
 }
 
 sub insert_proc_and_triggers {
@@ -150,6 +153,7 @@ sub extract_and_purge_mysqllog {
     my @files = qx{ls -1 $bindir};
     for my $file ( @files ) {
         chomp $file;
+        qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS("Extract and purge file $file, 0);"};
         $log && $log->info("--- Traitement du fichier $file ---");
         my $bin_filepath = "$bindir\/$file";
         my $full_output_filepath = "$fulldir\/$file";
@@ -159,6 +163,7 @@ sub extract_and_purge_mysqllog {
         
         $log && $log->info("Purge vers $output_filepath");
         Koha_Synchronize_System::tools::mysql::purge_mysql_log ($full_output_filepath, $output_filepath);
+        qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS("Extract and purge file $file, 1);"};
     }
     return 0;
 }
@@ -231,6 +236,8 @@ sub insert_diff_file {
     $/ = $sep;
 
 
+    qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS("Processing file $file, 0);"};
+
     while ( my $query = <FILE> ) {
         my $r;
         next if length($query) <= 1;
@@ -295,6 +302,8 @@ sub insert_diff_file {
     }
 
     close( FILE );
+
+    qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS("Processing file $file, 1);"};
 
     $/ = $oldsep;
 }

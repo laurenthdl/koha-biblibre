@@ -25,6 +25,7 @@ my $kss_logs_table = $$conf{databases_infos}{kss_logs_table};
 my $kss_errors_table = $$conf{databases_infos}{kss_errors_table};
 my $kss_sql_errors_table = $$conf{databases_infos}{kss_sql_errors_table};
 my $kss_statistics_table = $$conf{databases_infos}{kss_statistics_table};
+my $kss_status_table = $$conf{databases_infos}{kss_status_table};
 my $max_old_borrowernumber_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
 my $max_old_reservenumber_fieldname = $$conf{databases_infos}{max_reserves_fieldname};
 my @proc_str;
@@ -75,6 +76,15 @@ sub create_procedures {
           PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+        CREATE TABLE IF NOT EXISTS $kss_status_table (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `kss_id` int(11) NOT NULL,
+          `status` text ,
+          `start_time` TIMESTAMP  NOT NULL DEFAULT NOW() ,
+          `end_time` TIMESTAMP ,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
         CREATE TABLE IF NOT EXISTS $kss_errors_table (
           `id` int(11) NOT NULL AUTO_INCREMENT,
           `kss_id` int(11) NOT NULL,
@@ -119,9 +129,11 @@ sub create_procedures {
     push @str, qq{CREATE PROCEDURE `PROC_CLEAN_KSS` (
     )
     BEGIN
+        CALL PROC_UPDATE_STATUS('Cleaning...', 0);
         DROP TABLE } . $matching_table_prefix . qq{borrowers;
         DROP TABLE } . $matching_table_prefix . qq{reserves;
         DROP TABLE $matching_table_ids;
+        CALL PROC_UPDATE_STATUS('Cleaning...', 1);
     END;
     //};
 
@@ -131,13 +143,15 @@ sub create_procedures {
     )
     BEGIN
         DECLARE next_id INT(11);
-        CREATE TABLE $client_db_name.$kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
+        CALL PROC_UPDATE_STATUS('Creating $kss_infos_table table...', 0);
+        CREATE TABLE IF NOT EXISTS $client_db_name.$kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
 
         SELECT MAX(GREATEST(o.borrowernumber, b.borrowernumber)) + 1 FROM deletedborrowers o, borrowers b INTO next_id;
         INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("$max_old_borrowernumber_fieldname", next_id);
         
         SELECT MAX(GREATEST(o.reservenumber, r.reservenumber)) + 1 FROM old_reserves o, reserves r INTO next_id;
         INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("$max_old_reservenumber_fieldname", next_id);
+        CALL PROC_UPDATE_STATUS('Creating $kss_infos_table table...', 1);
     END;
     //};
 
@@ -276,12 +290,20 @@ sub create_procedures {
     END;
     //};
 
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_SET_STATUS` //};
-    push @str, qq{CREATE PROCEDURE `PROC_SET_STATUS` (
-        IN status TEXT
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_STATUS` //};
+    push @str, qq{CREATE PROCEDURE `PROC_UPDATE_STATUS` (
+        IN current_status TEXT,
+        IN state INT(1)
     )
     BEGIN
-        UPDATE $kss_logs_table SET `status` = "status !" WHERE `id` = (SELECT MAX(id) from (select id from $kss_logs_table) as id );
+        IF state = 0 THEN
+            INSERT INTO $kss_status_table (`kss_id`, `status`) VALUES (
+                ( SELECT MAX(`id`) FROM $kss_logs_table ),
+                current_status);
+            UPDATE $kss_logs_table SET `status` = current_status WHERE `id` = (SELECT MAX(id) from (select id from $kss_logs_table) as id );
+        ELSE
+            UPDATE $kss_status_table SET `end_time`=NOW() WHERE `status`=current_status AND `kss_id` = (SELECT MAX(id) from $kss_logs_table);
+        END IF;
     END;
     //};
 
@@ -356,7 +378,7 @@ sub drop_procedures {
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_START` //};
 
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_SET_STATUS` //};
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_STATUS` //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_ERROR` //};
 

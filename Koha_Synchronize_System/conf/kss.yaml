@@ -22,6 +22,7 @@ databases_infos:
         kss_errors_table: kss_errors
         kss_sql_errors_table: kss_sql_errors
         kss_statistics_table: kss_statistics
+        kss_status_table: kss_status
         max_borrowers_fieldname: max_old_borrowernumber
         max_reserves_fieldname: max_old_reservenumber
         matching_table_prefix: kss_tmp_matching_
