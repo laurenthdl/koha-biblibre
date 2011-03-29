@@ -133,11 +133,19 @@ sub create_triggers {
         push @str, "CREATE TRIGGER `TRG_BEF_INS_$table` BEFORE INSERT ON `$table`";
         push @str, "  FOR EACH ROW BEGIN";
         push @str, "    DECLARE tmp_id INT(11);";
+        push @str, "    DECLARE count_error INT(11);";
             while (my ($field, $ref) = each %$hash) {
                 my ($table_referer, $field_referer) = split /\./, $ref;
                 push @str, "    CALL PROC_GET_NEW_ID(\"" . $table_referer . "." . $field_referer . "\", NEW.$field, \@tmp_id);";
                 push @str, "    SELECT \@tmp_id INTO tmp_id;";
                 push @str, "    SET NEW.$field = tmp_id;";
+                if  ( $table eq 'issues' and $field_referer eq 'itemnumber' ) {
+                    push @str, "    SELECT COUNT(*) FROM issues WHERE itemnumber=NEW.itemnumber INTO count_error;";
+                    push @str, "    IF count_error > 0 THEN";
+                    push @str, "        CALL PROC_ADD_ERROR('Issue already onloan', CONCAT('Issue ', NEW.itemnumber, ' is already onloan by another borrower'));";
+                    push @str, "    END IF;";
+
+                }
             }
         push @str, "  END;";
         push @str, "//";
