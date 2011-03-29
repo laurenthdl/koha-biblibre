@@ -150,9 +150,28 @@ sub create_triggers {
             push @str, "    CALL PROC_GET_OLD_ID(\"reserves.borrowernumber\", NEW.borrowernumber, \@old_id);";
             push @str, "    SELECT \@old_id INTO old_id;";
             push @str, "    CALL PROC_UPDATE_RESERVENUMBER(NEW.reservenumber, old_id, NEW.biblionumber, NEW.itemnumber, NEW.reservedate);";
+            push @str, "    CALL PROC_ADD_STATISTIC('reserve', NEW.itemnumber, NEW.biblionumber);";
             push @str, "  END;";
             push @str, "//";
         }
+
+        if ( $table eq "issues" or $table eq "old_issues" ) {
+            my $type = "";
+            if ( $table eq "issues" ) {
+                $type = "issue";
+            } elsif ( $table eq "old_issues" ) {
+                $type = "return";
+            } else {
+                next;
+            }
+            push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
+            push @str, "CREATE TRIGGER `TRG_AFT_INS_$table` AFTER INSERT ON `$table`";
+            push @str, "  FOR EACH ROW BEGIN";
+            push @str, "    CALL PROC_ADD_STATISTIC('$type', NEW.itemnumber, 0);";
+            push @str, "  END;";
+            push @str, "//";
+        }
+
 
     }
 

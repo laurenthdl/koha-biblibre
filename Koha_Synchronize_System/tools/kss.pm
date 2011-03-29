@@ -129,10 +129,10 @@ sub delete_proc_and_triggers {
 sub clean {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
 
-    $log->info(" - Purge des tables temporaires");
+    $log && $log->info(" - Purge des tables temporaires");
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_KSS_END();"};
 
-    $log->info(" - Suppression en base des triggers et procédures stockées");
+    $log && $log->info(" - Suppression en base des triggers et procédures stockées");
     delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
 
 }

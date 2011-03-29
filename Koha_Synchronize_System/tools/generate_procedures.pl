@@ -24,6 +24,7 @@ my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 my $kss_logs_table = $$conf{databases_infos}{kss_logs_table};
 my $kss_errors_table = $$conf{databases_infos}{kss_errors_table};
 my $kss_sql_errors_table = $$conf{databases_infos}{kss_sql_errors_table};
+my $kss_statistics_table = $$conf{databases_infos}{kss_statistics_table};
 my $max_old_borrowernumber_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
 my $max_old_reservenumber_fieldname = $$conf{databases_infos}{max_reserves_fieldname};
 my @proc_str;
@@ -91,6 +92,26 @@ sub create_procedures {
           CONSTRAINT `ksssql_ksslogs` FOREIGN KEY (`kss_id`) REFERENCES `kss_logs` (`id`) ON DELETE CASCADE,
           PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        CREATE TABLE IF NOT EXISTS $kss_sql_errors_table (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `kss_id` int(11) NOT NULL,
+          `error` text NOT NULL,
+          `query` text NULL,
+          CONSTRAINT `ksssql_ksslogs` FOREIGN KEY (`kss_id`) REFERENCES `kss_logs` (`id`) ON DELETE CASCADE,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        CREATE TABLE IF NOT EXISTS $kss_statistics_table (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `kss_id` int(11) NOT NULL,
+          `variable` VARCHAR(255) NOT NULL,
+          `itemnumber` INT(11) NULL,
+          `biblionumber` INT(11) NULL,
+          CONSTRAINT `kssstats_ksslogs` FOREIGN KEY (`kss_id`) REFERENCES `kss_logs` (`id`) ON DELETE CASCADE,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
     END;
     //};
 
@@ -292,6 +313,23 @@ sub create_procedures {
     END;
     //};
 
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_STATISTIC` //};
+    push @str, qq{CREATE PROCEDURE `PROC_ADD_STATISTIC` (
+        IN stat_type VARCHAR(255),
+        IN itemnumber INT(11),
+        IN biblionumber INT(11)
+    )
+    BEGIN
+        INSERT INTO $kss_statistics_table (`kss_id`, `variable`, `itemnumber`, `biblionumber`) VALUES (
+            ( SELECT MAX(id) FROM $kss_logs_table ),
+            stat_type,
+            itemnumber,
+            biblionumber
+        );
+    END;
+    //};
+
     return @str;
 }
 
@@ -323,6 +361,8 @@ sub drop_procedures {
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_ERROR` //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_SQL_ERROR` //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_STATISTIC` //};
 
     return @str;
 }
