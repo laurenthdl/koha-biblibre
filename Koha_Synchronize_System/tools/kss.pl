@@ -44,7 +44,7 @@ eval {
 #    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
 
     $log->info("=== Génération et insertion en base des triggers et procédures stockées ===");
-    Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+    Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server, $log;
 
     $log->info("=== Préparation de la base de données ===");
     Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server, $log;

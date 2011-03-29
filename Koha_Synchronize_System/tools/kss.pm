@@ -91,13 +91,13 @@ sub insert_new_ids {
 }
 
 sub insert_proc_and_triggers {
-    my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+    my ($user, $pwd, $db_name, $log) = @_;
     my $conf = get_conf();
     eval {
         qx{$$conf{path}{generate_triggers} > /tmp/triggers.sql};
-        qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/triggers.sql};
+        qx{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/triggers.sql};
         qx{$$conf{path}{generate_procedures} > /tmp/procedures.sql};
-        qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/procedures.sql};
+        qx{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/procedures.sql};
     };
 
     if ( $@ ) {
