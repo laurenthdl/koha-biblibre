@@ -55,7 +55,6 @@ BEGIN {
       &GetAuthorisedValueCategories
       &GetKohaAuthorisedValues
       &GetKohaAuthorisedValuesFromField
-      &GetAuthorisedValueByCode
       &GetKohaImageurlFromAuthorisedValues
       &GetAuthValCode
       &GetNormalizedUPC
