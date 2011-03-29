@@ -28,8 +28,7 @@ my $level1_tables = {
     'deletedborrowers' => {
         'primary_key' => 'borrowernumber',
         'second_primary_key' => 'cardnumber'
-    }
-    #'items' => 'biblioitemnumber', # replace itemnumber
+    },
 };
 
 my $level2_tables = {
@@ -62,6 +61,10 @@ my $level2_tables = {
     }
 };
 
+my $unauthorized_tables = {
+    items => "DELETE,INSERT",
+    biblioitems => "DELETE,INSERT"
+};
 
 
 
@@ -108,18 +111,6 @@ sub create_triggers {
         push @str, "  END;";
         push @str, "//";
 
-        # Trigger delete
-        # supprime l'enregistrement qui doit être supprimé et génère une erreur sur le delete courant
-        # Can't update table 'borrowers' in stored function/trigger because it is already used by statement which invoked this stored function/trigger. 
-        # error mysql ...
-        #push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
-        #push @str, "CREATE TRIGGER `TRG_BEF_DEL_$table` BEFORE DELETE ON `$table`";
-        #push @str, "  FOR EACH ROW BEGIN";
-        #push @str, "    CALL PROC_DELETE_FROM(\"$table.$$infos{primary_key}\", OLD.$$infos{primary_key});";
-        #push @str, "    SELECT 'a' INTO \@tmp;";      # Generate error
-        #push @str, "    SELECT 'b', 'c' INTO \@tmp;"; # mysql can't stop trigger normally
-        #push @str, "  END;";
-        #push @str, "//";
 
     }
 
@@ -135,30 +126,30 @@ sub create_triggers {
         push @str, "    DECLARE tmp_id INT(11);";
         push @str, "    DECLARE count_error INT(11);";
         push @str, "    DECLARE new_priority SMALLINT(6);";
-            while (my ($field, $ref) = each %$hash) {
-                my ($table_referer, $field_referer) = split /\./, $ref;
-                push @str, "    CALL PROC_GET_NEW_ID(\"" . $table_referer . "." . $field_referer . "\", NEW.$field, \@tmp_id);";
-                push @str, "    SELECT \@tmp_id INTO tmp_id;";
-                push @str, "    SET NEW.$field = tmp_id;";
-                if  ( $table eq 'issues' and $field_referer eq 'itemnumber' ) {
-                    push @str, "    SELECT COUNT(*) FROM issues WHERE itemnumber=NEW.itemnumber INTO count_error;";
-                    push @str, "    IF count_error > 0 THEN";
-                    push @str, "        CALL PROC_ADD_ERROR('Issue already onloan', CONCAT('Issue ', NEW.itemnumber, ' is already onloan by another borrower'));";
-                    push @str, "    END IF;";
-                }
-            }
-            if ( $table eq 'reserves' ) {
-                push @str, "    IF NEW.itemnumber IS NULL THEN";
-                push @str, "        SELECT MAX(priority) FROM reserves WHERE biblionumber=NEW.biblionumber INTO new_priority;";
-                push @str, "    ELSE";
-                push @str, "        SELECT MAX(priority) FROM reserves WHERE itemnumber=NEW.itemnumber INTO new_priority;";
+        while (my ($field, $ref) = each %$hash) {
+            my ($table_referer, $field_referer) = split /\./, $ref;
+            push @str, "    CALL PROC_GET_NEW_ID(\"" . $table_referer . "." . $field_referer . "\", NEW.$field, \@tmp_id);";
+            push @str, "    SELECT \@tmp_id INTO tmp_id;";
+            push @str, "    SET NEW.$field = tmp_id;";
+            if  ( $table eq 'issues' and $field_referer eq 'itemnumber' ) {
+                push @str, "    SELECT COUNT(*) FROM issues WHERE itemnumber=NEW.itemnumber INTO count_error;";
+                push @str, "    IF count_error > 0 THEN";
+                push @str, "        CALL PROC_ADD_ERROR('Issue already onloan', CONCAT('Issue ', NEW.itemnumber, ' is already onloan by another borrower'));";
                 push @str, "    END IF;";
-                push @str, "    IF new_priority IS NOT NULL AND new_priority <= NEW.priority THEN";
-                push @str, "        SET NEW.priority = new_priority + 1;";
-                push @str, "        CALL PROC_ADD_ERROR('Reserve already exist', CONCAT('Reserve for biblionumber=', NEW.biblionumber, ' AND itemnumber=', IFNULL(NEW.itemnumber, 'NULL'), ' already exist. Set priority to ', NEW.priority));";
-                push @str, "    END IF;";
-                push @str, "    ";
             }
+        }
+        if ( $table eq 'reserves' ) {
+            push @str, "    IF NEW.itemnumber IS NULL THEN";
+            push @str, "        SELECT MAX(priority) FROM reserves WHERE biblionumber=NEW.biblionumber INTO new_priority;";
+            push @str, "    ELSE";
+            push @str, "        SELECT MAX(priority) FROM reserves WHERE itemnumber=NEW.itemnumber INTO new_priority;";
+            push @str, "    END IF;";
+            push @str, "    IF new_priority IS NOT NULL AND new_priority <= NEW.priority THEN";
+            push @str, "        SET NEW.priority = new_priority + 1;";
+            push @str, "        CALL PROC_ADD_ERROR('Reserve already exist', CONCAT('Reserve for biblionumber=', NEW.biblionumber, ' AND itemnumber=', IFNULL(NEW.itemnumber, 'NULL'), ' already exist. Set priority to ', NEW.priority));";
+            push @str, "    END IF;";
+            push @str, "    ";
+        }
         push @str, "  END;";
         push @str, "//";
 
@@ -192,7 +183,39 @@ sub create_triggers {
             push @str, "//";
         }
 
+    }
 
+    # Gestion des tables contenant des opérations interdites
+    while ( my ($table, $operations) = each %$unauthorized_tables ) {
+        for my $op ( split(',', $operations) ) {
+            if ( $op eq 'DELETE' ) {
+                # Trigger delete
+                # Génère une erreur sur les deletes non authorisés
+                push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
+                push @str, "CREATE TRIGGER `TRG_BEF_DEL_$table` BEFORE DELETE ON `$table`";
+                push @str, "  FOR EACH ROW BEGIN";
+                push @str, "    SELECT 'a' INTO \@tmp;";      # Generate error
+                push @str, "    SELECT 'b', 'c' INTO \@tmp;"; # mysql can't stop trigger normally
+                push @str, "  END;";
+                push @str, "//";
+            }elsif ( $op eq 'INSERT' ) {
+                push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
+                push @str, "CREATE TRIGGER `TRG_BEF_INS_$table` BEFORE INSERT ON `$table`";
+                push @str, "  FOR EACH ROW BEGIN";
+                push @str, "    SELECT 'a' INTO \@tmp;";      # Generate error
+                push @str, "    SELECT 'b', 'c' INTO \@tmp;"; # mysql can't stop trigger normally
+                push @str, "  END;";
+                push @str, "//";
+            }elsif ( $op eq 'UPDATE' ) {
+                push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_UPD_$table` //";
+                push @str, "CREATE TRIGGER `TRG_BEF_UPD_$table` BEFORE UPDATE ON `$table`";
+                push @str, "  FOR EACH ROW BEGIN";
+                push @str, "    SELECT 'a' INTO \@tmp;";      # Generate error
+                push @str, "    SELECT 'b', 'c' INTO \@tmp;"; # mysql can't stop trigger normally
+                push @str, "  END;";
+                push @str, "//";
+            }
+        }
     }
 
     return @str;
@@ -220,6 +243,19 @@ sub drop_triggers {
         }
 
     }
+
+    while ( my ($table, $operations) = each %$unauthorized_tables ) {
+        for my $op ( split(',', $operations) ) {
+            if ( $op eq 'DELETE' ) {
+                push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
+            }elsif ( $op eq 'INSERT' ) {
+                push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
+            }elsif ( $op eq 'UPDATE' ) {
+                push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_UPD_$table` //";
+            }
+        }
+    }
+
     return @str;
 }
 

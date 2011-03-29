@@ -297,10 +297,15 @@ sub insert_diff_file {
         @warnings = $dbh->selectrow_array(qq{show warnings $sep});
 
         if ( @warnings ) {
-            if ( $warnings[0] ne 'Note' ) {
+            if ( ( $table_name eq 'biblioitems' or $table_name eq 'items' ) and $warnings[0] eq 'Error' and $warnings[1] eq '1222' ) {
+                $log && $log->error($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
+                $log && $log->error("This query was ignored. It try to modify $table_name table");
+                $dbh->do("CALL PROC_ADD_ERROR('Unauthorized query', 'A query was ignored. It try to modify $table_name table');");
+            } elsif ( $warnings[0] ne 'Note' ) {
                 $log && $log->error($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
                 $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
             }
+
         } else {
             $log && $log->info(" <<< OK >>>")
         }

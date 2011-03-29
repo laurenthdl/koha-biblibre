@@ -55,7 +55,7 @@ sub processQueries {
         {filename => "warnings-01-issue_already_onloan.sql", func => "test_issue_already_onloan"},
         {filename => "warnings-02-issue_returned_twice.sql", func => "test_issue_returned_twice"},
         {filename => "warnings-03-reserve_twice_on_same_itemnumber.sql", func => "test_reserve_twice_on_samedi_itemnumber"},
-
+        {filename => "warnings-04-unauthorized_query.sql", func => "test_unauthorized_query"},
     );
     for my $hash ( @files ) {
         my $file = $$hash{filename};
@@ -69,6 +69,14 @@ sub processQueries {
 }
 
 sub checkBefore {
+    my $expected = {
+        itemnumber => 32
+    };
+    is (&findInData ("items", $expected), 1 , "itemnumber exists");
+    $expected = {
+        biblioitemnumber => 32
+    };
+    is (&findInData ("biblioitems", $expected), 1 , "biblioitemnumber exists");
 }
 
 sub clean {
@@ -150,6 +158,29 @@ sub test_reserve_twice_on_samedi_itemnumber {
         'error' => 'Reserve already exist',
         'message' => "Reserve for biblionumber=$bibn AND itemnumber=$in already exist. Set priority to 2"};
     is (&findInData ($kss_errors_table, $expected), 1 , "reserve warning for biblionumber $bibn and borrower $bn is present in reserves table with priority 2");
+}
+
+sub test_unauthorized_query {
+    warn "Next errors (DBD::mysql::db) are 'normal'";
+    my $expected = {
+        itemnumber => 32
+    };
+    is (&findInData ("items", $expected), 1 , "itemnumber exists");
+    $expected = {
+        biblioitemnumber => 32
+    };
+    is (&findInData ("biblioitems", $expected), 1 , "biblioitemnumber exists");
+    
+    $expected = { 
+        'error' => 'Unauthorized query',
+        'message' => "A query was ignored. It try to modify items table"};
+    is (&findInData ($kss_errors_table, $expected), 1 , "items warning. We can't modify this table");
+
+    $expected = { 
+        'error' => 'Unauthorized query',
+        'message' => "A query was ignored. It try to modify biblioitems table"};
+    is (&findInData ($kss_errors_table, $expected), 1 , "biblioitems warning. We can't modify this table");
+
 }
 
 sub findInData {
