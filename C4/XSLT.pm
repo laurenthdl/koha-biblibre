@@ -136,8 +136,8 @@ sub XSLTParse4Display {
 
     # grab the XML, run it through our stylesheet, push it out to the browser
     my $record = transformMARCXML4XSLT( $biblionumber, $orig_record );
-	my $itemsimageurl = GetKohaImageurlFromAuthorisedValues( "CCODE", $orig_record->subfield("099", "t")) || '';
-	my $logoxml = "<logo>" . $itemsimageurl . "</logo>\n";
+    my $itemsimageurl = GetKohaImageurlFromAuthorisedValues( "CCODE", $orig_record->subfield("099", "t")) || '';
+    my $logoxml = "<logo>" . $itemsimageurl . "</logo>\n";
     #return $record->as_formatted();
     my $itemsxml  = buildKohaItemsNamespace($biblionumber);
     my $xmlrecord = $record->as_xml( C4::Context->preference('marcflavour') );
@@ -182,11 +182,13 @@ sub buildKohaItemsNamespace {
     my $xml            = '';
     for my $item (@items) {
         my $status;
-		my $displayedstatus;
+        my $displayedstatus;
         my ( $transfertwhen, $transfertfrom, $transfertto ) = C4::Circulation::GetTransfers( $item->{itemnumber} );
 
         my ( $reservestatus, $reserveitem ) = C4::Reserves::CheckReserves( $item->{itemnumber} );
-
+        if ( C4::Context->preference('hidelostitems') and $item->{itemlost} ) {
+            next;
+        }
         if (   $itemtypes->{ $item->{itype} }->{notforloan}
             || $item->{notforloan}
             || $item->{onloan}
@@ -223,27 +225,78 @@ sub buildKohaItemsNamespace {
         } else {
             $status = "available"; $displayedstatus = "Available";
         }
-        my $homebranch = $branches->{ $item->{homebranch} }->{'branchname'};
-        my $itemcallnumber = $item->{itemcallnumber} || '';
+        
         my $itemnumber = $item->{itemnumber} || '';
+        my $biblioitemnumber = $item->{biblioitemnumber} || '';
+        my $homebranch = $branches->{ $item->{homebranch} }->{'branchname'};
+        my $itembarcode = $item->{barcode} || '';
+        my $itemprice = $item->{price} || '';
+        my $itemstack = $item->{stack} || '';
+        my $itemdamaged = $item->{damaged} || '';
+        my $itemonloan = $item->{onloan} || '';
+        my $itemlost = $item->{itemlost} || '';
+        my $itemwthdrawn = $item->{wthdrawn} || '';
+        my $itemnotforloan = $item->{notforloan} || '';
+        my $itemcallnumber = $item->{itemcallnumber} || '';
         my $itemdescription = $item->{description} || '';
         my $itemlocation = GetAuthorisedValueByCode( "LOC", $item->{location}) || '';
         my $itemitype = $item->{itype} || '';
         my $itembranchurl = $item->{branchurl} || '';
         my $itemccode = $item->{ccode} || '';
         my $itemenumchron = $item->{enumchron} || '';
-		my $itemuri = $item->{uri} || '';
-		my $itemcopynumber = $item->{copynumber} || '';
-		my $itemitemnotes = $item->{itemnotes} || '';
-		my $itemserialseq = $item->{serialseq} || '';
-		my $itempublisheddate = $item->{publisheddate} || '';
-		my $itemdatedue = format_date( $item->{datedue} ) || '';
-		my $itemimageurl = getitemtypeimagelocation( 'opac', $itemtypes->{$itemitype}->{'imageurl'} ) || '';
-		
+        my $itemuri = $item->{uri} || '';
+        my $itemcopynumber = $item->{copynumber} || '';
+        my $itemitemnotes = $item->{itemnotes} || '';
+        my $itemserialseq = $item->{serialseq} || '';
+        my $itempublisheddate = format_date( $item->{publisheddate} ) || '';
+        my $itemdatedue = format_date( $item->{datedue} ) || '';
+        my $itemimageurl = getitemtypeimagelocation( 'opac', $itemtypes->{$itemitype}->{'imageurl'} ) || '';
+        my $itemreserves = $item->{reserves} || '';
+        my $itemholdingbranch = $branches->{ $item->{holdingbranch} }->{'branchname'} || '';
+        my $itemcn_source = $item->{cn_source} || '';
+        my $itemcn_sort = $item->{cn_sort} || '';
+        my $itemmaterials = $item->{materials} || '';
+        my $itemstocknumber = $item->{stocknumber} || '';
+        my $itemstatisticvalue = $item->{statisticvalue} || '';
+        
         #warn Data::Dumper::Dumper $item;
         $itemcallnumber =~ s/\&/\&amp\;/g;
-        $xml .= "<item><itemnumber>$itemnumber</itemnumber><itemimageurl>$itemimageurl</itemimageurl><itemdatedue>$itemdatedue</itemdatedue><itempublisheddate>$itempublisheddate</itempublisheddate><itemserialseq>$itemserialseq</itemserialseq><itemitemnotes>$itemitemnotes</itemitemnotes><itemcopynumber>$itemcopynumber</itemcopynumber><itemuri>$itemuri</itemuri><itemenumchron>$itemenumchron</itemenumchron><itemccode>$itemccode</itemccode><itembranchurl>$itembranchurl</itembranchurl><itemitype>$itemitype</itemitype><displayedstatus>$displayedstatus</displayedstatus><itemlocation>$itemlocation</itemlocation><itemdescription>$itemdescription</itemdescription><homebranch>$homebranch</homebranch>" . "<status>$status</status>" . "<itemcallnumber>" . $itemcallnumber . "</itemcallnumber>" . "</item>";
-
+        $xml .= "<item>
+        <displayedstatus>$displayedstatus</displayedstatus>
+        <status>$status</status>
+        <itemnumber>$itemnumber</itemnumber>
+        <biblioitemnumber>$biblioitemnumber</biblioitemnumber>
+        <homebranch>$homebranch</homebranch>
+        <itembarcode>$itembarcode</itembarcode>
+        <itemprice>$itemprice</itemprice>
+        <itemstack>$itemstack</itemstack>
+        <itemdamaged>$itemdamaged</itemdamaged>
+        <itemonloan>$itemonloan</itemonloan>
+        <itemlost>$itemlost</itemlost>
+        <itemwthdrawn>$itemwthdrawn</itemwthdrawn>
+        <itemnotforloan>$itemnotforloan</itemnotforloan>
+        <itemcallnumber>$itemcallnumber</itemcallnumber>
+        <itemdescription>$itemdescription</itemdescription>
+        <itemlocation>$itemlocation</itemlocation>
+        <itemitype>$itemitype</itemitype>
+        <itembranchurl>$itembranchurl</itembranchurl>
+        <itemccode>$itemccode</itemccode>
+        <itemenumchron>$itemenumchron</itemenumchron>
+        <itemuri>$itemuri</itemuri>
+        <itemcopynumber>$itemcopynumber</itemcopynumber>
+        <itemitemnotes>$itemitemnotes</itemitemnotes>
+        <itemserialseq>$itemserialseq</itemserialseq>
+        <itempublisheddate>$itempublisheddate</itempublisheddate>
+        <itemdatedue>$itemdatedue</itemdatedue>
+        <itemimageurl>$itemimageurl</itemimageurl>
+        <itemreserves>$itemreserves</itemreserves>
+        <itemholdingbranch>$itemholdingbranch</itemholdingbranch>
+        <itemcn_source>$itemcn_source</itemcn_source>
+        <itemcn_sort>$itemcn_sort</itemcn_sort>
+        <itemmaterials>$itemmaterials</itemmaterials>
+        <itemstocknumber>$itemstocknumber</itemstocknumber>
+        <itemstatisticvalue>$itemstatisticvalue</itemstatisticvalue>
+        </item>";
     }
     $xml = "<items xmlns=\"http://www.koha.org/items\">" . $xml . "</items>";
     return $xml;
