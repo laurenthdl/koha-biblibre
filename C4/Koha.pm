@@ -57,7 +57,6 @@ BEGIN {
       &GetAuthorisedValueLib
       &GetKohaAuthorisedValues
       &GetKohaAuthorisedValuesFromField
-      &GetAuthorisedValueByCode
       &GetKohaImageurlFromAuthorisedValues
       &GetAuthValCode
       &GetNormalizedUPC
