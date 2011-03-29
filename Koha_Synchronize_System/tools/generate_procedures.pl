@@ -285,8 +285,8 @@ sub create_procedures {
     push @str, qq{CREATE PROCEDURE `PROC_KSS_END` (
     )
     BEGIN
-        UPDATE $kss_logs_table SET `end_time` = NOW(), `status` = "End !" WHERE `id` = (SELECT MAX(id) from (select id from $kss_logs_table) as id );
         CALL PROC_CLEAN_KSS();
+        UPDATE $kss_logs_table SET `end_time` = NOW(), `status` = "End !" WHERE `id` = (SELECT MAX(id) from (select id from $kss_logs_table) as id );
     END;
     //};
 
