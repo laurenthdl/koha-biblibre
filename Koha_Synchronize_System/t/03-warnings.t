@@ -53,6 +53,8 @@ sub processQueries {
 
     my @files = (
         {filename => "warnings-01-issue_already_onloan.sql", func => "test_issue_already_onloan"},
+        {filename => "warnings-02-issue_returned_twice.sql", func => "test_issue_returned_twice"},
+        {filename => "warnings-03-reserve_twice_on_same_itemnumber.sql", func => "test_reserve_twice_on_samedi_itemnumber"},
 
     );
     for my $hash ( @files ) {
@@ -87,7 +89,67 @@ sub test_issue_already_onloan {
     $expected = { 
         'error' => 'Issue already onloan',
         'message' => 'Issue 130 is already onloan by another borrower'};
-    is (&findInData ($kss_errors_table, $expected), 1 , "new issues 130 raise an error in $kss_errors_table table");
+    is (&findInData ($kss_errors_table, $expected), 1 , "new issue 130 raise an error in $kss_errors_table table");
+}
+
+sub test_issue_returned_twice {
+    my $bn = 32;
+    my $in = 131;
+    my $expected = {
+        borrowernumber => $bn,
+        itemnumber => $in
+    };
+    is (&findInData ("issues", $expected), 0 , "issue 131 is not present in issues table");
+    is (&findInData ("old_issues", $expected), 1 , "issue 131 is present in old_issues table");
+
+}
+
+sub test_reserve_twice_on_samedi_itemnumber {
+    my $bn = 33;
+    my $bibn = 31;
+    my $expected = {
+        borrowernumber => $bn,
+        biblionumber => $bibn,
+        priority => 1
+    };
+    is (&findInData ("reserves", $expected), 1 , "reserve for biblionumber $bibn and borrower $bn is present in reserves table with priority 1");
+
+    $bn = 34;
+    $expected = {
+        borrowernumber => $bn,
+        biblionumber => $bibn,
+        priority => 2
+    };
+    is (&findInData ("reserves", $expected), 1 , "reserve for biblionumber $bibn and borrower $bn is present in reserves table with priority 2");
+    $expected = { 
+        'error' => 'Reserve already exist',
+        'message' => "Reserve for biblionumber=$bibn AND itemnumber=NULL already exist. Set priority to 2"};
+    is (&findInData ($kss_errors_table, $expected), 1 , "reserve warning for biblionumber $bibn and borrower $bn is present in reserves table with priority 2");
+
+    $bn = 35;
+    $bibn = 9754;
+    my $in = 31;
+    $expected = {
+        borrowernumber => $bn,
+        biblionumber => $bibn,
+        priority => 1
+    };
+    is (&findInData ("reserves", $expected), 1 , "reserve for itemnumber $in and borrower $bn is present in reserves table with priority 1");
+
+    $bn = 36;
+    $bibn = 9754;
+    $in = 31;
+    $expected = {
+        borrowernumber => $bn,
+        biblionumber => $bibn,
+        priority => 2
+    };
+    is (&findInData ("reserves", $expected), 1 , "reserve for itemnumber $in and borrower $bn is present in reserves table with priority 2");
+
+    $expected = { 
+        'error' => 'Reserve already exist',
+        'message' => "Reserve for biblionumber=$bibn AND itemnumber=$in already exist. Set priority to 2"};
+    is (&findInData ($kss_errors_table, $expected), 1 , "reserve warning for biblionumber $bibn and borrower $bn is present in reserves table with priority 2");
 }
 
 sub findInData {

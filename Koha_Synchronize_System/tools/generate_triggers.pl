@@ -134,6 +134,7 @@ sub create_triggers {
         push @str, "  FOR EACH ROW BEGIN";
         push @str, "    DECLARE tmp_id INT(11);";
         push @str, "    DECLARE count_error INT(11);";
+        push @str, "    DECLARE new_priority SMALLINT(6);";
             while (my ($field, $ref) = each %$hash) {
                 my ($table_referer, $field_referer) = split /\./, $ref;
                 push @str, "    CALL PROC_GET_NEW_ID(\"" . $table_referer . "." . $field_referer . "\", NEW.$field, \@tmp_id);";
@@ -144,8 +145,19 @@ sub create_triggers {
                     push @str, "    IF count_error > 0 THEN";
                     push @str, "        CALL PROC_ADD_ERROR('Issue already onloan', CONCAT('Issue ', NEW.itemnumber, ' is already onloan by another borrower'));";
                     push @str, "    END IF;";
-
                 }
+            }
+            if ( $table eq 'reserves' ) {
+                push @str, "    IF NEW.itemnumber IS NULL THEN";
+                push @str, "        SELECT MAX(priority) FROM reserves WHERE biblionumber=NEW.biblionumber INTO new_priority;";
+                push @str, "    ELSE";
+                push @str, "        SELECT MAX(priority) FROM reserves WHERE itemnumber=NEW.itemnumber INTO new_priority;";
+                push @str, "    END IF;";
+                push @str, "    IF new_priority IS NOT NULL AND new_priority <= NEW.priority THEN";
+                push @str, "        SET NEW.priority = new_priority + 1;";
+                push @str, "        CALL PROC_ADD_ERROR('Reserve already exist', CONCAT('Reserve for biblionumber=', NEW.biblionumber, ' AND itemnumber=', IFNULL(NEW.itemnumber, 'NULL'), ' already exist. Set priority to ', NEW.priority));";
+                push @str, "    END IF;";
+                push @str, "    ";
             }
         push @str, "  END;";
         push @str, "//";
