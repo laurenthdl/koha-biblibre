@@ -23,6 +23,7 @@ databases_infos:
         kss_sql_errors_table: kss_sql_errors
         kss_statistics_table: kss_statistics
         kss_status_table: kss_status
+        kss_md5_table: kss_md5
         max_borrowers_fieldname: max_old_borrowernumber
         max_reserves_fieldname: max_old_reservenumber
         matching_table_prefix: kss_tmp_matching_
@@ -35,13 +36,20 @@ which_cmd:
 
 path:
         kss_root: Koha_Synchronize_System
-        dump_ids: data/client/ids/
-        backup_server: data/server/bak/
+        dump_ids: data/server/ids/
+        backup_server: data/server/backup/
         generate_triggers: tools/generate_triggers.pl
         generate_procedures: tools/generate_procedures.pl
-        diff_logbin_dir: data/client/logbin/
-        diff_logtxt_full_dir: data/client/logtxt_full/
-        diff_logtxt_dir: data/client/logtxt/
+        diff_logbin_dir: data/server/logbin/
+        diff_logtxt_full_dir: data/server/logtxt_full/
+        diff_logtxt_dir: data/server/logtxt/
+        kss_server_home: data/server
+        server_inbox: data/server/inbox
+        server_outbox: data/server/outbox
+        kss_client_home: data/client
+        client_inbox: data/client/inbox
+        client_outbox: data/client/outbox
+
 cron:
         serverhost: 192.168.0.252
         executiontime: 2200

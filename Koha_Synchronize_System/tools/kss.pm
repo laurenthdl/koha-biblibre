@@ -9,6 +9,7 @@ use DateTime;
 use POSIX qw(strftime);
 use YAML;
 use C4::Context;
+use Digest::MD5;
 
 use C4::Logguer qw(:DEFAULT $log_kss);
 
@@ -66,6 +67,53 @@ sub get_conf {
     return $conf;
 }
 
+sub get_dbh {
+    my $host = shift || 'server';
+
+    my $conf = get_conf();
+    my $db_server = $$conf{databases_infos}{db_server};
+    my $db_client = $$conf{databases_infos}{db_client};
+    my $hostname = $$conf{databases_infos}{hostname};
+    my $user = $$conf{databases_infos}{user};
+    my $passwd = $$conf{databases_infos}{passwd};
+    
+    my $dbh;
+    if ( $host eq 'server' ) {
+        $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
+    } elsif ( $host eq 'client' ) {
+        $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
+    }
+
+    $dbh->{'mysql_enable_utf8'} = 1;
+    $dbh->do("set NAMES 'utf8'");
+
+    return $dbh;
+
+}
+
+sub get_archives {
+    my $conf = get_conf;
+    my $dir = $$conf{path}{server_inbox};
+
+    my @files = qx{ls -1 $dir/*.tar.gz};
+    return \@files;
+}
+
+sub backup_server_db {
+    my $log = shift;
+    my $conf = get_conf;
+
+    my $user     = $$conf{databases_infos}{user};
+    my $passwd   = $$conf{databases_infos}{passwd};
+    my $db_server = $$conf{databases_infos}{db_server};
+    my $dump_db_server_dir = $$conf{path}{backup_server};
+    my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
+
+    my $dump_filename = $dump_db_server_dir . "/" . ( strftime "%Y-%m-%d_%H:%M:%S", localtime );
+    $log->info("Dump en cours dans $dump_filename");
+    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
+}
+
 sub diff_files_exists {
     my $dir = shift;
     my $log = shift;
@@ -76,8 +124,8 @@ sub diff_files_exists {
         return 1;
     }
 
-    $log && $log->info("Aucun fichier binaire trouvé, rien ne sert de continuer !");
-    die "Aucun fichier binaire trouvé, rien ne sert de continuer !";
+    $log && $log->info("Aucun fichier binaire trouvé dans cette archive, rien ne sert de continuer !");
+    die "Aucun fichier binaire trouvé dans cette archive, rien ne sert de continuer !";
 
     return 0;
 }
@@ -132,6 +180,16 @@ sub delete_proc_and_triggers {
     }
 
 }
+sub clean_fs {
+
+    my $conf = get_conf();
+
+    qx{rm -f $$conf{path}{diff_logbin_dir}/*};
+    qx{rm -f $$conf{path}{diff_logtxt_full_dir}/*};
+    qx{rm -f $$conf{path}{diff_logtxt_dir}/*};
+    qx{rm -f $$conf{path}{dump_ids}/*};
+
+}
 
 sub clean {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
@@ -144,27 +202,64 @@ sub clean {
 
 }
 
+sub prepare_next_iteration {
+    my $log = shift;
+    my $dbh = shift || get_dbh;
+
+    $dbh->do("CALL PROC_CREATE_KSS_INFOS()");
+}
+
+sub set_current_db_available {
+    my $log = shift;
+    my $conf = get_conf;
+
+    my $outbox   = $$conf{path}{server_outbox};
+    my $hostname = $$conf{databases_infos}{hostname};
+    my $user     = $$conf{databases_infos}{user};
+    my $passwd   = $$conf{databases_infos}{passwd};
+    my $db_server = $$conf{databases_infos}{db_server};
+
+    $log && $log->info("=== Préparation pour la prochaine itération ===");
+    Koha_Synchronize_System::tools::kss::prepare_next_iteration $log;
+
+    $log && $log->info("=== Dump de la nouvelle base ===");
+    my $dump_filename = $outbox . "/" . strftime ( "%Y-%m-%d_%H:%M:%S", localtime ) . ".sql";
+    $log && $log->info("Dump en cours dans $dump_filename");
+    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
+}
+
 sub extract_and_purge_mysqllog {
     my $bindir  = shift;
     my $fulldir = shift;
     my $txtdir  = shift;
     my $log     = shift;
+    my $dbh = shift || get_dbh('server');
 
     if ( not -d $bindir ) {
         die "Le répertoire des logs binaires mysql ($bindir) n'existe pas !";
     }
     
     my $conf = get_conf();
-    my $pwd = $$conf{databases_infos}{passwd};
-    my $user = $$conf{databases_infos}{user};
-    my $db_name = $$conf{databases_infos}{db_server};
 
     my @files = qx{ls -1 $bindir};
     for my $file ( @files ) {
         chomp $file;
-        qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS\('Extract and purge file $file', 0\);"};
+        $dbh->do("CALL PROC_UPDATE_STATUS\('Extract and purge file $file', 0\);");
         $log && $log->info("--- Traitement du fichier $file ---");
+
         my $bin_filepath = "$bindir\/$file";
+        open(FILE, $bin_filepath);
+        my $ctx = Digest::MD5->new;
+        $ctx->addfile(*FILE);
+        my $md5 = $ctx->hexdigest;
+        close(FILE);
+
+        $dbh->do("CALL PROC_ADD_MD5\('$md5', \@already_exists\);");
+        my @already_exists = $dbh->selectrow_array("SELECT \@already_exists;");
+        if ( $already_exists[0] ) {
+            die ("This file already added !");
+        }
+
         my $full_output_filepath = "$fulldir\/$file";
         my $output_filepath = "$txtdir\/$file";
         $log && $log->info("Extraction vers $full_output_filepath");
@@ -172,7 +267,7 @@ sub extract_and_purge_mysqllog {
         
         $log && $log->info("Purge vers $output_filepath");
         Koha_Synchronize_System::tools::mysql::purge_mysql_log ($full_output_filepath, $output_filepath);
-        qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS\('Extract and purge file $file', 1\);"};
+        $dbh->do("CALL PROC_UPDATE_STATUS\('Extract and purge file $file', 1\);");
     }
     return 0;
 }
@@ -248,15 +343,9 @@ sub replace_with_new_id {
 sub log_error {
     my $error = shift;
     my $message = shift;
-    my $dbh = shift;
+    my $dbh = shift || get_dbh;
 
-    if (not $dbh) {
-        $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
-        $dbh->{'mysql_enable_utf8'} = 1;
-        $dbh->do("set NAMES 'utf8'");
-    }
-
-    $dbh->do(qq{CALL PROC_ADD_ERROR("} . $dbh->quote($$error) . qq{", "} . $dbh->quote($message) . qq{");});
+    $dbh->do(qq{CALL PROC_ADD_ERROR("} . $dbh->quote($error) . qq{", "} . $dbh->quote($message) . qq{");});
 
 }
 
@@ -278,8 +367,8 @@ sub insert_diff_file {
     my $oldsep = $/;
     $/ = $sep;
 
-
-    $dbh->do("CALL PROC_UPDATE_STATUS('Processing file $file', 0);");
+   
+   $dbh->do("CALL PROC_UPDATE_STATUS('Processing file $file', 0);");
 
     while ( my $query = <FILE> ) {
         my $r;

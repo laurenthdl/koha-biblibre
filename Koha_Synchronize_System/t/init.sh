@@ -9,7 +9,7 @@ SPECIFICS_TABLES_DIR="data/tables";
 DIFF_SERVER_DIR="diff/server";
 DIFF_CLIENT_DIR="diff/client";
 SCRIPT_CLIENT_DIR="scripts/client";
-DATA_CLIENT_IDS="data/client/ids";
+DATA_CLIENT_IDS="data/server/ids";
 
 echo "DROP/CREATE databases in progress...";
 mysql -u $USER -p$PWD < data/create_database.sql;

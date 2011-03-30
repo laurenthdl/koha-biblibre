@@ -7,9 +7,9 @@ DATABASE_CLIENT="koha_devkss_client";
 STRUCTURE_AND_DATA_FILE="data/structure_and_data_init.sql";
 SPECIFICS_TABLES_DIR="data/tables";
 DIFF_SERVER_DIR="data/server";
-DIFF_CLIENT_DIR="data/client";
+DIFF_CLIENT_DIR="data/server";
 SCRIPT_CLIENT_DIR="scripts/client";
-DATA_CLIENT_IDS="data/client/ids";
+DATA_CLIENT_IDS="data/server/ids";
 
 echo "Insert specifics tables...";
 for file in $SPECIFICS_TABLES_DIR/*.sql; do

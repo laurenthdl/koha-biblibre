@@ -26,6 +26,7 @@ my $kss_errors_table = $$conf{databases_infos}{kss_errors_table};
 my $kss_sql_errors_table = $$conf{databases_infos}{kss_sql_errors_table};
 my $kss_statistics_table = $$conf{databases_infos}{kss_statistics_table};
 my $kss_status_table = $$conf{databases_infos}{kss_status_table};
+my $kss_md5_table = $$conf{databases_infos}{kss_md5_table};
 my $max_old_borrowernumber_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
 my $max_old_reservenumber_fieldname = $$conf{databases_infos}{max_reserves_fieldname};
 my @proc_str;
@@ -69,13 +70,13 @@ sub create_procedures {
         
         CREATE TABLE IF NOT EXISTS $kss_logs_table (
           `id` int(11) NOT NULL AUTO_INCREMENT,
-	  `hostname` varchar(255),
+          `hostname` varchar(255),
           `progress` int(11) ,
           `status` text ,
           `start_time` TIMESTAMP  NOT NULL DEFAULT NOW(),
           `end_time` TIMESTAMP ,
           PRIMARY KEY (`id`),
-	  INDEX ( `hostname` )
+          INDEX ( `hostname` )
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
         CREATE TABLE IF NOT EXISTS $kss_status_table (
@@ -124,6 +125,14 @@ sub create_procedures {
           PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+        CREATE TABLE IF NOT EXISTS $kss_md5_table (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `kss_id` int(11) NOT NULL,
+          `md5` VARCHAR(50) NOT NULL,
+          CONSTRAINT `kssmd5_ksslogs` FOREIGN KEY (`kss_id`) REFERENCES `kss_logs` (`id`) ON DELETE CASCADE,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
     END;
     //};
 
@@ -146,7 +155,11 @@ sub create_procedures {
     BEGIN
         DECLARE next_id INT(11);
         CALL PROC_UPDATE_STATUS('Creating $kss_infos_table table...', 0);
-        CREATE TABLE IF NOT EXISTS $client_db_name.$kss_infos_table (variable VARCHAR(255) , value VARCHAR(255));
+        DROP TABLE $client_db_name.$kss_infos_table;
+        CREATE TABLE IF NOT EXISTS $client_db_name.$kss_infos_table (
+            variable VARCHAR(255), 
+            value VARCHAR(255)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
         SELECT MAX(GREATEST(o.borrowernumber, b.borrowernumber)) + 1 FROM deletedborrowers o, borrowers b INTO next_id;
         INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("$max_old_borrowernumber_fieldname", next_id);
@@ -354,6 +367,25 @@ sub create_procedures {
     END;
     //};
 
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_MD5` //};
+    push @str, qq{CREATE PROCEDURE `PROC_ADD_MD5` (
+        IN checksum VARCHAR(50),
+        OUT r INT(1)
+    )
+    BEGIN
+        DECLARE count_md5 INTEGER;
+        SELECT COUNT(`md5`) FROM $kss_md5_table WHERE `md5` LIKE checksum INTO count_md5;
+        IF count_md5 = 0 THEN
+            INSERT INTO $kss_md5_table (`kss_id`, `md5`) VALUES (
+                ( SELECT MAX(id) FROM $kss_logs_table ),
+                checksum
+            );
+            SET r = 0;
+        ELSE
+            SET r = 1;
+        END IF;
+    END;
+    //};
     return @str;
 }
 
@@ -387,6 +419,8 @@ sub drop_procedures {
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_SQL_ERROR` //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_STATISTIC` //};
+
+    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_MD5` //};
 
     return @str;
 }
