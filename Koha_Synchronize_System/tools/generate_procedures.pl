@@ -289,10 +289,11 @@ sub create_procedures {
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_START` //};
     push @str, qq{CREATE PROCEDURE `PROC_KSS_START` (
+        IN hn VARCHAR(255)
     )
     BEGIN
         CALL PROC_INIT_KSS();
-        INSERT INTO $kss_logs_table (`hostname`, `progress`, `status`, `start_time`) VALUES ("myhostname", 0, "Starting...", NOW());
+        INSERT INTO $kss_logs_table (`hostname`, `progress`, `status`, `start_time`) VALUES (hn, 0, "Starting...", NOW());
     END;
     //};
 

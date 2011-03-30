@@ -34,7 +34,7 @@ sub setUp {
 
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server;
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_CREATE_KSS_INFOS();" } ;
-    Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server; 
+    Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server, "host_test"; 
 }
 
 sub processQueries {

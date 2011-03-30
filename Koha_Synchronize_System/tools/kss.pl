@@ -60,10 +60,14 @@ eval {
         $cmd = "mv $inbox/logbin/* $diff_logbin_dir/";
         @r = qx{$cmd};
 
+        $cmd = "cat $inbox/hostname";
+        @r = qx{$cmd};
+        my $client_hostname = $r[0];
+
         Koha_Synchronize_System::tools::kss::diff_files_exists $diff_logbin_dir, $log;
 
         $log->info("== Préparation de la base de données ==");
-        Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server, $log;
+        Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server, $client_hostname, $log;
 
         $log->info("== Insertion des nouveaux ids remontés par le client ==");
         Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;

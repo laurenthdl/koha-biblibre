@@ -161,8 +161,8 @@ sub insert_proc_and_triggers {
 }
 
 sub prepare_database {
-    my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
-    qx{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_KSS_START();"};
+    my ($mysql_cmd, $user, $pwd, $db_name, $client_hostname,  $log) = @_;
+    qx{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_KSS_START('$client_hostname');"};
 
 }
 
@@ -188,6 +188,7 @@ sub clean_fs {
     qx{rm -f $$conf{path}{diff_logtxt_full_dir}/*};
     qx{rm -f $$conf{path}{diff_logtxt_dir}/*};
     qx{rm -f $$conf{path}{dump_ids}/*};
+    qx{rm -f $$conf{path}{server_inbox}/hostname};
 
 }
 
