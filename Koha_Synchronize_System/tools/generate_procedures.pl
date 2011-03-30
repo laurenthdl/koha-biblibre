@@ -69,11 +69,13 @@ sub create_procedures {
         
         CREATE TABLE IF NOT EXISTS $kss_logs_table (
           `id` int(11) NOT NULL AUTO_INCREMENT,
+	  `hostname` varchar(255),
           `progress` int(11) ,
           `status` text ,
           `start_time` TIMESTAMP  NOT NULL DEFAULT NOW(),
           `end_time` TIMESTAMP ,
-          PRIMARY KEY (`id`)
+          PRIMARY KEY (`id`),
+	  INDEX ( `hostname` )
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
         CREATE TABLE IF NOT EXISTS $kss_status_table (
@@ -277,7 +279,7 @@ sub create_procedures {
     )
     BEGIN
         CALL PROC_INIT_KSS();
-        INSERT INTO $kss_logs_table (`progress`, `status`, `start_time`) VALUES (0, "Starting...", NOW());
+        INSERT INTO $kss_logs_table (`hostname`, `progress`, `status`, `start_time`) VALUES ("myhostname", 0, "Starting...", NOW());
     END;
     //};
 

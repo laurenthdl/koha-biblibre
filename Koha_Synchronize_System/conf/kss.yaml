@@ -43,8 +43,7 @@ path:
         diff_logtxt_full_dir: data/client/logtxt_full/
         diff_logtxt_dir: data/client/logtxt/
 cron:
-        cronfile: /home/koha/sites/dev/var/spool/cron/koha
-        cronpidfile: /home/koha/sites/dev/var/run/cronscheduler.pid
         serverhost: 192.168.0.252
         executiontime: 2200
+        master: 1
 

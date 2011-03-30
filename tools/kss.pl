@@ -45,15 +45,16 @@ use YAML;
 use Net::Ping;
 use C4::Scheduler;
 use POSIX qw(strftime);
+use Koha_Synchronize_System::tools::kss;
 
 
 my $input       = new CGI;
 my $dbh         = C4::Context->dbh;
 my $CONFIG_NAME = $ENV{'KOHA_CONF'};
-my $base        = C4::Context->config('intranetdir');
-my $ksspath     = '../Koha_Synchronize_System/';
-my $conf        = YAML::LoadFile($ksspath . 'conf/kss.yaml');
 my $manual      = $input->param('manual');
+
+# Getting conf
+my $conf = Koha_Synchronize_System::tools::kss::get_conf();
 
 # open template
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -66,6 +67,23 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     }
 );
 
+# Are we a master or a slave?
+my $master = $$conf{cron}{master};
+$template->param('master' => $master);
+
+# Getting last execution log
+my $last_log_result = Koha_Synchronize_System::tools::kss::get_last_log($dbh);
+foreach (keys %$last_log_result) {
+    $template->param('last_log_' . $_ => $last_log_result->{$_});
+}
+
+# Getting last execution status
+my $last_status_result = Koha_Synchronize_System::tools::kss::get_last_status($dbh);
+$template->param(last_status_loop => $last_status_result);
+
+# Getting last execution errors
+my $last_errors_result = Koha_Synchronize_System::tools::kss::get_last_errors($dbh);
+$template->param(last_errors_loop => $last_errors_result);
 
 # Trying to reach the server
 my $ping = Net::Ping->new();
@@ -76,9 +94,9 @@ $template->param(pingresult => $pingresult);
 if ($pingresult) {
 
     my $options = '';
-    my $scheduledcommand = "EXPORT KOHA_CONF=\"$CONFIG_NAME\"; " . $base . "/Koha_Synchronize_System/tools/kss.pl $options";
-    my $manualcommand = $ksspath . 'tools/kss.pl ' . $options;
-    #my $manualcommand = $base . '/Koha_Synchronize_System/tools/kss.pl ' . $options;
+    my $scheduledcommand = "EXPORT KOHA_CONF=\"$CONFIG_NAME\"; " . $$conf{path}{kss_dir} . "tools/kss.pl $options";
+    my $manualcommand = "perl " . $$conf{path}{kss_dir} . 'tools/kss.pl ' . $options;
+
     # Deleting next sync if it already has been scheduled
     remove_at_job_by_tag($scheduledcommand);
 

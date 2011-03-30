@@ -8,6 +8,7 @@ use Pod::Usage;
 use DateTime;
 use POSIX qw(strftime);
 use YAML;
+use C4::Context;
 
 use C4::Logguer qw(:DEFAULT $log_kss);
 
@@ -32,6 +33,9 @@ my $generate_triggers_path   = $$conf{path}{generate_triggers};
 my $generate_procedures_path = $$conf{path}{generate_procedures};
 
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
+my $kss_status_table         = $$conf{databases_infos}{kss_status_table};
+my $kss_logs_table           = $$conf{databases_infos}{kss_logs_table};
+my $kss_errors_table         = $$conf{databases_infos}{kss_errors_table};
 my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
 
 GetOptions(
@@ -188,6 +192,40 @@ sub get_level {
     }
 
 }
+
+sub get_last_log {
+    my $dbh = shift;
+    my $query = "SELECT * from $kss_logs_table ORDER BY id DESC LIMIT 1";
+    my $sth = $dbh->prepare($query);
+    $sth->execute;
+    return $sth->fetchrow_hashref;
+}
+
+sub get_last_errors {
+    my $dbh = shift;
+    return _get_last_table($dbh, $kss_errors_table);
+}
+
+sub get_last_status {
+    my $dbh = shift;
+    return _get_last_table($dbh, $kss_status_table);
+}
+
+
+sub _get_last_table {
+    my $dbh = shift;
+    my $table = shift;
+
+    # Getting last id
+    my $tmpres = get_last_log($dbh);
+    my $last = $tmpres->{'id'};
+
+    my $query = "SELECT * from $table WHERE kss_id=? ORDER BY id DESC";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($last);
+    return $sth->fetchall_arrayref({});
+}
+
 
 sub replace_with_new_id {
     my $string = shift;
