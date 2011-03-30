@@ -26,7 +26,7 @@ use C4::Biblio;
 use C4::AuthoritiesMarc::MARC21;
 use C4::AuthoritiesMarc::UNIMARC;
 use C4::Charset;
-use List::MoreUtils qw/none first_index/;
+use List::MoreUtils qw/any none first_index/;
 use C4::Debug;
 use C4::Search::Query;
 require C4::Search;
@@ -1177,51 +1177,67 @@ sub merge {
             foreach my $field ($marcrecord->field($tagfield)){
                 my $update;           
                 my $tag=$field->tag();          
-		my @newsubfields;
-		my %indexes;
-		#get to next field if no subfield
-		my @localsubfields = $field->subfields();
-		my $index_9_auth =0;
-		my $found =0;
-		for my $subf (@localsubfields) {
-		#			$debug && warn Data::Dumper::Dumper($subf);
-			if (($subf->[0] eq "9") and ($subf->[1] == $mergefrom))
-			{
-			    $found=1;
-			    $debug && warn "found $mergefrom ".$subf->[1];
-			    last;
-			}
-			$index_9_auth++;
-		};
-		#$debug && warn "$index_9_auth $#localsubfields $found";
-		next if ($index_9_auth >= $#localsubfields and !$found);
-		#Get the next $9 subfield
-		my $nextindex_9 =0;
-		for my $subf (@localsubfields[$index_9_auth + 1 .. $#localsubfields]){
-			last if ($subf->[0] =~ /[12456789]/); 
-			$nextindex_9++;
-		};
-		#Change the first tag if required
-		# That is : change the first tag ($a) to what it is in the biblio record
-		# Since some composed authorities will place the $a into $x or $y
-		my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
-		$debug && warn @tags;
-		if (defined $tags[0]->[0] and $tags[0]->[0] ne "a"){
-		    for my $record (@record_to){
-		       if ($record->[0] eq "a"){
-			 $record->[0] =$tags[0]->[0];
-			 last;
-		       }
-		    }
-		}
-		#$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
-		# Replace in local subfields the subfields related to recordfrom with data from record_to
-	        splice(@localsubfields,$index_9_auth,$nextindex_9 + 1,([9,$mergeto],@record_to));
-		#$debug && warn "after splice ".Data::Dumper::Dumper(@localsubfields);
-		#very nice api for MARC::Record
-		# It seems that some elements localsubfields can be undefined so skip them
-          	@newsubfields=map{(defined $_?@$_:())}@localsubfields;
-		#filter to subfields which are not in the subfield
+                my @newsubfields;
+                my %indexes;
+                #get to next field if no subfield
+                my @localsubfields = $field->subfields();
+                my $index_9_auth =0;
+                my $found =0;
+                for my $subf (@localsubfields) {
+                #			$debug && warn Data::Dumper::Dumper($subf);
+                    if (($subf->[0] eq "9") and ($subf->[1] == $mergefrom))
+                    {
+                        $found=1;
+                        $debug && warn "found $mergefrom ".$subf->[1];
+                        last;
+                    }
+                    $index_9_auth++;
+                }
+
+                #$debug && warn "$index_9_auth $#localsubfields $found";
+
+                next if ($index_9_auth >= $#localsubfields and !$found);
+                #Get the next $9 subfield
+
+                my $index=0;
+                for my $subf (@localsubfields[0 .. $index_9_auth]) {
+                    if (any {$subf->[0] eq $_->[0] and $subf->[1] eq $_->[1]} @record_from )
+                    {
+                        $debug && warn "found $subf->[0] ".$subf->[1];
+                        splice @localsubfields,$index,1;
+                        $index_9_auth--;
+                    }
+                    else {
+                        $index++;
+                    }
+                }
+
+                my $nextindex_9 =0;
+                for my $subf (@localsubfields[$index_9_auth + 1 .. $#localsubfields]){
+                    last if ($subf->[0] =~ /[12456789]/); 
+                    $nextindex_9++;
+                };
+                #Change the first tag if required
+                # That is : change the first tag ($a) to what it is in the biblio record
+                # Since some composed authorities will place the $a into $x or $y
+                my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
+                $debug && warn @tags;
+                if (defined $tags[0]->[0] and $tags[0]->[0] ne "a"){
+                    for my $record (@record_to){
+                       if ($record->[0] eq "a"){
+                     $record->[0] =$tags[0]->[0];
+                     last;
+                       }
+                    }
+                }
+                #$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
+                # Replace in local subfields the subfields related to recordfrom with data from record_to
+                splice(@localsubfields,$index_9_auth,$nextindex_9 + 1,([9,$mergeto],@record_to));
+                #$debug && warn "after splice ".Data::Dumper::Dumper(@localsubfields);
+                #very nice api for MARC::Record
+                # It seems that some elements localsubfields can be undefined so skip them
+                @newsubfields=map{(defined $_?@$_:())}@localsubfields;
+                #filter to subfields which are not in the subfield
                 my $field_to=MARC::Field->new(($tag_to?$tag_to:$tag),$field->indicator(1),$field->indicator(2),@newsubfields);
                 $marcrecord->delete_field($field);
                 $marcrecord->insert_fields_ordered($field_to);            
