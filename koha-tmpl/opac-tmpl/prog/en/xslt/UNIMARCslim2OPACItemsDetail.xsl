@@ -13,10 +13,10 @@
 	    <!--  count items:displayedstatus where value = Available : <xsl:value-of select="count(//items:displayedstatus[text()='Available'])" /> -->
 	    <!--  count syspref Version : <xsl:value-of select="count(//marc:syspref[@name='Version'])" /> -->
 	    <!--  if at least on items:displayedstatus with Available value exist : <xsl:if test="count(//items:displayedstatus[text()='Available'])">TH</xsl:if>-->
-	<!-- th itemnumber --
-	    <th>itemnumber</th>
-	<!-- th biblioitemnumber --
-	    <th>biblioitemnumber</th>
+	<!-- th itemnumber 
+	    <th>itemnumber</th> -->
+	<!-- th biblioitemnumber 
+	    <th>biblioitemnumber</th> -->
 	<!-- th Item type -->
 	    <xsl:if test="//marc:syspref[@name='item-level_itypes']"><xsl:if test="//marc:syspref[@name='item-level_itypes'][text()!='0']">
 	    <th>Item type</th>
@@ -49,42 +49,42 @@
 		<xsl:if test="count(//items:itemprice[text()])"><th>price</th></xsl:if>
 	<!-- th stack -->
 		<xsl:if test="count(//items:itemstack[text()])"><th>stack</th></xsl:if>
-	<!-- th notforloan --
-		<xsl:if test="count(//items:itemnotforloan[text()])"><th>notforloan</th></xsl:if><!-- also managed with Status -->
-	<!-- th damaged --
-		<xsl:if test="count(//items:itemdamaged[text()])"><th>damaged</th></xsl:if><!-- also managed with Status -->
-	<!-- th on loan --
-		<xsl:if test="count(//items:itemonloan[text()])"><th>on loan</th></xsl:if><!-- also managed with Status -->
-	<!-- th lost --
-		<xsl:if test="count(//items:itemlost[text()])"><th>lost</th></xsl:if><!-- also managed with Status -->
-	<!-- th wthdrawn --
-		<xsl:if test="count(//items:itemwthdrawn[text()])"><th>wthdrawn</th></xsl:if><!-- also managed with Status -->
-	<!-- th reserves --
-		<xsl:if test="count(//items:itemreserves[text()])"><th>reserves</th></xsl:if>
-	<!-- th holdingbranch --
-		<xsl:if test="count(//items:itemholdingbranch[text()])"><th>holdingbranch</th></xsl:if>
-	<!-- th itype --
-		<xsl:if test="count(//items:itemitype[text()])"><th>itype</th></xsl:if>
-	<!-- th cn_source --
-		<xsl:if test="count(//items:itemcn_source[text()])"><th>cn_source</th></xsl:if>
-	<!-- th cn_sort --
-		<xsl:if test="count(//items:itemcn_sort[text()])"><th>cn_sort</th></xsl:if>
-	<!-- th materials --
-		<xsl:if test="count(//items:itemmaterials[text()])"><th>materials</th></xsl:if>
-	<!-- th stocknumber --
-		<xsl:if test="count(//items:itemstocknumber[text()])"><th>stocknumber</th></xsl:if>
-	<!-- th statisticvalue --
-		<xsl:if test="count(//items:itemstatisticvalue[text()])"><th>statisticvalue</th></xsl:if>
+	<!-- th notforloan 
+		<xsl:if test="count(//items:itemnotforloan[text()])"><th>notforloan</th></xsl:if> --><!-- also managed with Status -->
+	<!-- th damaged 
+		<xsl:if test="count(//items:itemdamaged[text()])"><th>damaged</th></xsl:if> --><!-- also managed with Status -->
+	<!-- th on loan 
+		<xsl:if test="count(//items:itemonloan[text()])"><th>on loan</th></xsl:if> --><!-- also managed with Status -->
+	<!-- th lost 
+		<xsl:if test="count(//items:itemlost[text()])"><th>lost</th></xsl:if> --><!-- also managed with Status -->
+	<!-- th wthdrawn 
+		<xsl:if test="count(//items:itemwthdrawn[text()])"><th>wthdrawn</th></xsl:if> --><!-- also managed with Status -->
+	<!-- th reserves 
+		<xsl:if test="count(//items:itemreserves[text()])"><th>reserves</th></xsl:if> -->
+	<!-- th holdingbranch 
+		<xsl:if test="count(//items:itemholdingbranch[text()])"><th>holdingbranch</th></xsl:if> -->
+	<!-- th itype 
+		<xsl:if test="count(//items:itemitype[text()])"><th>itype</th></xsl:if> -->
+	<!-- th cn_source 
+		<xsl:if test="count(//items:itemcn_source[text()])"><th>cn_source</th></xsl:if> -->
+	<!-- th cn_sort 
+		<xsl:if test="count(//items:itemcn_sort[text()])"><th>cn_sort</th></xsl:if> -->
+	<!-- th materials 
+		<xsl:if test="count(//items:itemmaterials[text()])"><th>materials</th></xsl:if> -->
+	<!-- th stocknumber 
+		<xsl:if test="count(//items:itemstocknumber[text()])"><th>stocknumber</th></xsl:if> -->
+	<!-- th statisticvalue 
+		<xsl:if test="count(//items:itemstatisticvalue[text()])"><th>statisticvalue</th></xsl:if> -->
 <!-- thead end -->
 	    </tr></thead>
 	    <tbody>
 		<xsl:for-each select="//items:item">
 			<tr>
 <!-- tr start -->
-	<!-- td itemnumber --
-			<td><xsl:value-of select="items:itemnumber"/></td>
-	<!-- td biblioitemnumber --
-			<td><xsl:value-of select="items:biblioitemnumber"/></td>
+	<!-- td itemnumber 
+			<td><xsl:value-of select="items:itemnumber"/></td> -->
+	<!-- td biblioitemnumber 
+			<td><xsl:value-of select="items:biblioitemnumber"/></td> -->
 	<!-- td Item type -->
 			<xsl:if test="//marc:syspref[@name='item-level_itypes']"><xsl:if test="//marc:syspref[@name='item-level_itypes'][text()!='0']">
 			<td>
@@ -155,45 +155,45 @@
 	<!-- td stack -->
 			<xsl:if test="count(//items:itemstack[text()])">
 			<td><xsl:if test="items:itemstack[text()]"><xsl:value-of select="items:itemstack"/></xsl:if></td></xsl:if>
-	<!-- td notforloan --
+	<!-- td notforloan 
 			<xsl:if test="count(//items:itemnotforloan[text()])">
-			<td><xsl:if test="items:itemnotforloan[text()]"><xsl:value-of select="items:itemnotforloan"/></xsl:if></td></xsl:if><!-- also managed with Status -->
-	<!-- td damaged --
+			<td><xsl:if test="items:itemnotforloan[text()]"><xsl:value-of select="items:itemnotforloan"/></xsl:if></td></xsl:if> --><!-- also managed with Status -->
+	<!-- td damaged 
 			<xsl:if test="count(//items:itemdamaged[text()])">
-			<td><xsl:if test="items:itemdamaged[text()]">damaged</xsl:if></td></xsl:if><!-- also managed with Status -->
-	<!-- td on loan --
+			<td><xsl:if test="items:itemdamaged[text()]">damaged</xsl:if></td></xsl:if> --><!-- also managed with Status -->
+	<!-- td on loan 
 			<xsl:if test="count(//items:itemonloan[text()])">
-			<td><xsl:if test="items:itemonloan[text()]"><xsl:value-of select="items:itemonloan"/></xsl:if></td></xsl:if><!-- also managed with Status -->
-	<!-- td item lost --
+			<td><xsl:if test="items:itemonloan[text()]"><xsl:value-of select="items:itemonloan"/></xsl:if></td></xsl:if> --><!-- also managed with Status -->
+	<!-- td item lost 
 			<xsl:if test="count(//items:itemlost[text()])">
-			<td><xsl:if test="items:itemlost[text()]"><xsl:value-of select="items:itemlost"/></xsl:if></td></xsl:if><!-- also managed with Status -->
-	<!-- td wthdrawn --
+			<td><xsl:if test="items:itemlost[text()]"><xsl:value-of select="items:itemlost"/></xsl:if></td></xsl:if> --><!-- also managed with Status -->
+	<!-- td wthdrawn 
 			<xsl:if test="count(//items:itemwthdrawn[text()])">
-			<td><xsl:if test="items:itemwthdrawn[text()]"><xsl:value-of select="items:itemwthdrawn"/></xsl:if></td></xsl:if><!-- also managed with Status -->
-	<!-- td reserves --
+			<td><xsl:if test="items:itemwthdrawn[text()]"><xsl:value-of select="items:itemwthdrawn"/></xsl:if></td></xsl:if> --><!-- also managed with Status -->
+	<!-- td reserves 
 			<xsl:if test="count(//items:itemreserves[text()])">
-			<td><xsl:if test="items:itemreserves[text()]"><xsl:value-of select="items:itemreserves"/></xsl:if></td></xsl:if>
-	<!-- td holdingbranch --
+			<td><xsl:if test="items:itemreserves[text()]"><xsl:value-of select="items:itemreserves"/></xsl:if></td></xsl:if> -->
+	<!-- td holdingbranch 
 			<xsl:if test="count(//items:itemholdingbranch[text()])">
-			<td><xsl:if test="items:itemholdingbranch[text()]"><xsl:value-of select="items:itemholdingbranch"/></xsl:if></td></xsl:if>
-	<!-- td itype --
+			<td><xsl:if test="items:itemholdingbranch[text()]"><xsl:value-of select="items:itemholdingbranch"/></xsl:if></td></xsl:if> -->
+	<!-- td itype 
 			<xsl:if test="count(//items:itemitype[text()])">
-			<td><xsl:if test="items:itemitype[text()]"><xsl:value-of select="items:itemitype"/></xsl:if></td></xsl:if>
-	<!-- td cn_source --
+			<td><xsl:if test="items:itemitype[text()]"><xsl:value-of select="items:itemitype"/></xsl:if></td></xsl:if> -->
+	<!-- td cn_source 
 			<xsl:if test="count(//items:itemcn_source[text()])">
-			<td><xsl:if test="items:itemcn_source[text()]"><xsl:value-of select="items:itemcn_source"/></xsl:if></td></xsl:if>
-	<!-- td cn_sort --
+			<td><xsl:if test="items:itemcn_source[text()]"><xsl:value-of select="items:itemcn_source"/></xsl:if></td></xsl:if> -->
+	<!-- td cn_sort 
 			<xsl:if test="count(//items:itemcn_sort[text()])">
-			<td><xsl:if test="items:itemcn_sort[text()]"><xsl:value-of select="items:itemcn_sort"/></xsl:if></td></xsl:if>
-	<!-- td materials --
+			<td><xsl:if test="items:itemcn_sort[text()]"><xsl:value-of select="items:itemcn_sort"/></xsl:if></td></xsl:if> -->
+	<!-- td materials 
 			<xsl:if test="count(//items:itemmaterials[text()])">
-			<td><xsl:if test="items:itemmaterials[text()]"><xsl:value-of select="items:itemmaterials"/></xsl:if></td></xsl:if>
-	<!-- td stocknumber --
+			<td><xsl:if test="items:itemmaterials[text()]"><xsl:value-of select="items:itemmaterials"/></xsl:if></td></xsl:if> -->
+	<!-- td stocknumber 
 			<xsl:if test="count(//items:itemstocknumber[text()])">
-			<td><xsl:if test="items:itemstocknumber[text()]"><xsl:value-of select="items:itemstocknumber"/></xsl:if></td></xsl:if>
-	<!-- td statisticvalue --
+			<td><xsl:if test="items:itemstocknumber[text()]"><xsl:value-of select="items:itemstocknumber"/></xsl:if></td></xsl:if> -->
+	<!-- td statisticvalue 
 			<xsl:if test="count(//items:itemstatisticvalue[text()])">
-			<td><xsl:if test="items:itemstatisticvalue[text()]"><xsl:value-of select="items:itemstatisticvalue"/></xsl:if></td></xsl:if>
+			<td><xsl:if test="items:itemstatisticvalue[text()]"><xsl:value-of select="items:itemstatisticvalue"/></xsl:if></td></xsl:if> -->
 <!-- tr end -->
 			</tr>
 		</xsl:for-each>
