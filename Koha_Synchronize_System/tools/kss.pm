@@ -246,6 +246,7 @@ sub insert_diff_file {
     while ( my $query = <FILE> ) {
         my $r;
         next if length($query) <= 1;
+        my @errors;
         my @warnings;
         my $table_name;
         $query =~ s/^\n//; # 1er caractère est un retour chariot
@@ -294,18 +295,22 @@ sub insert_diff_file {
 
         $dbh->do($query);
 
-        @warnings = $dbh->selectrow_array(qq{show warnings $sep});
+        @errors = $dbh->selectrow_array(qq{SHOW ERRORS $sep});
+        @warnings = $dbh->selectrow_array(qq{SHOW WARNINGS $sep});
 
-        if ( @warnings ) {
-            if ( ( $table_name eq 'biblioitems' or $table_name eq 'items' ) and $warnings[0] eq 'Error' and $warnings[1] eq '1222' ) {
-                $log && $log->error($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
+        if ( @errors ) {
+	    $log && $log->error($errors[0] . ':' . $errors[1] . ' => ' . $errors[2]);
+            if ( ( $table_name eq 'biblioitems' or $table_name eq 'items' ) and $errors[0] eq 'Error' and $errors[1] eq '1222' ) {
                 $log && $log->error("This query was ignored. It try to modify $table_name table");
                 $dbh->do("CALL PROC_ADD_ERROR('Unauthorized query', 'A query was ignored. It try to modify $table_name table');");
-            } elsif ( $warnings[0] ne 'Note' ) {
-                $log && $log->error($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
-                $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
+            } else {
+                $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $errors[0] . ":" . $errors[1] . " => " . $errors[2] . "\", " . $dbh->quote($query) . ");");
             }
-
+        } elsif ( @warnings ) {
+	    if ( $warnings[0] ne 'Note' ) {
+                $log && $log->warning($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
+                $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
+	    }
         } else {
             $log && $log->info(" <<< OK >>>")
         }
