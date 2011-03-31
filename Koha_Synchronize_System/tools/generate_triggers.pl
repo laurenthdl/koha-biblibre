@@ -229,7 +229,7 @@ sub drop_triggers {
 
         push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
 
-        push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_DEL_$table` //";
+        push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
 
     }
 
@@ -238,9 +238,7 @@ sub drop_triggers {
 
         push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
 
-        if ( $table eq "reserves" ) {
-            push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_reserves` //";
-        }
+        push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
 
     }
 
