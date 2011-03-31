@@ -182,10 +182,17 @@ $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "($titleindex:les AND $titleindex:maudits) AND a NOT ($authorindex:andre AND $authorindex:besson)";
 is($got, $expected, qq{Test BuildIndexString complex});
 
-BEGIN { $tests += 1 } # Test BuildIndexString with expression
+BEGIN { $tests += 2 } # Test BuildIndexString with expression
 @$operands = ("monde","histoire","(VIDEO OR LIVRE OR POUET)" );
 @$indexes = ("all_fields", "all_fields", "itype");
 @$operators = ("AND", "AND");
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "monde AND histoire AND str_itype:(VIDEO OR LIVRE OR POUET)";
+is($got, $expected, qq{Test BuildIndexString with expression in operand});
+
+@$operands = ("monde","histoire","(VIDEO)" );
+@$indexes = ("all_fields", "all_fields", "itype");
+@$operators = ("AND", "AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "monde AND histoire AND str_itype:(VIDEO)";
 is($got, $expected, qq{Test BuildIndexString with expression in operand});
