@@ -5263,7 +5263,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.06.00.064";
+$DBversion = "3.02.00.064";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectreLogin', '', 'Login for Electre ws',NULL,'free')");
     $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectrePassw', '', 'Password for Electre ws',NULL,'free')");
