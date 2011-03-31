@@ -97,7 +97,8 @@ sub BuildTokenString {
     my $r;
 
     if ($index ne 'all_fields' && $index ne ''){
-        if ( $string =~ / / ) {
+        # Operand can contains an expression in brackets
+        if ( $string =~ / / and not ( $string =~ /^\(.*\)$/ and ( $string =~ / OR / or $string =~ / AND / or $string =~ / NOT / ) ) ) {
             my @dqs; #double-quoted string
             while ( $string =~ /"(?:[^"\\]++|\\.)*+"/g ) {
                 push @dqs, $&;

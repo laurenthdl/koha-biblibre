@@ -173,11 +173,19 @@ is($got, $expected, qq{Test BuildIndexString with ("le crépuscule" "des maudits
 @$operators = ();
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = qq{($titleindex:"le crépuscule" AND $titleindex:"des maudits" AND $titleindex:mot)};
-is($got, $expected, qq{Test BuildIndexString with ("le crépuscule" des maudits)});
+is($got, $expected, qq{Test BuildIndexString with ("le crépuscule" mot "des maudits")});
 
 @$operands = (qq{les maudits}, qq{a}, qq{andre besson}); # With 'More options'
 @$indexes = ("title", "all_fields", "author");
 @$operators = ("AND", "NOT");
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "($titleindex:les AND $titleindex:maudits) AND a NOT ($authorindex:andre AND $authorindex:besson)";
-is($got, $expected, qq{Test BuildIndexString});
+is($got, $expected, qq{Test BuildIndexString complex});
+
+BEGIN { $tests += 1 } # Test BuildIndexString with expression
+@$operands = ("monde","histoire","(VIDEO OR LIVRE OR POUET)" );
+@$indexes = ("all_fields", "all_fields", "itype");
+@$operators = ("AND", "AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "monde AND histoire AND str_itype:(VIDEO OR LIVRE OR POUET)";
+is($got, $expected, qq{Test BuildIndexString with expression in operand});
