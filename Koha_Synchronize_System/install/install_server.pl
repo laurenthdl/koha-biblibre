@@ -54,5 +54,5 @@ qx{chown -R $username:$username $kss_home};
 print "/!\ Changer le mot de passe pour l'utilisateur $username\n";
 
 print "=== Mise à disposition du client de la base de données du serveur ===";
-Koha_Synchronize_System::tools::kss::set_new_db_available $log;
+Koha_Synchronize_System::tools::kss::set_current_db_available $log;
 

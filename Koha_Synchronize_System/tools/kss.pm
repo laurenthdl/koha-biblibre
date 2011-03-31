@@ -225,14 +225,17 @@ sub set_current_db_available {
     my $user     = $$conf{databases_infos}{user};
     my $passwd   = $$conf{databases_infos}{passwd};
     my $db_server = $$conf{databases_infos}{db_server};
+    my $remote_dump_filepath = $$conf{path}{server_dump_filepath};
 
     $log && $log->info("=== Préparation pour la prochaine itération ===");
     Koha_Synchronize_System::tools::kss::prepare_next_iteration $log;
 
     $log && $log->info("=== Dump de la nouvelle base ===");
-    my $dump_filename = $outbox . "/" . strftime ( "%Y-%m-%d_%H:%M:%S", localtime ) . ".sql";
-    $log && $log->info("Dump en cours dans $dump_filename");
-    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
+    my $dump_filepath = $outbox . "/" . strftime ( "%Y-%m-%d_%H:%M:%S", localtime ) . ".sql";
+    $log && $log->info("Dump en cours dans $dump_filepath");
+    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filepath};
+    $log && $log->info("Copie dans le fichier partagé au client ($remote_dump_filepath)");
+    qx{cp $dump_filepath $remote_dump_filepath};
 }
 
 sub extract_and_purge_mysqllog {

@@ -33,6 +33,8 @@ which_cmd:
         mysql: /usr/bin/mysql
         mysqlbinlog: /usr/bin/mysqlbinlog
         mysqldump: /usr/bin/mysqldump
+        scp: /usr/bin/scp
+        ssh-copy-id: /usr/bin/ssh-copy-id
 
 path:
         kss_root: Koha_Synchronize_System
@@ -49,6 +51,8 @@ path:
         kss_client_home: data/client
         client_inbox: data/client/inbox
         client_outbox: data/client/outbox
+        server_dump_filepath: data/server/outbox/last.sql
+        client_dump_filepath: data/client/inbox/last.sql
 
 cron:
         serverhost: 192.168.0.252
