@@ -11,7 +11,13 @@ use YAML;
 use C4::Context;
 use Digest::MD5;
 
-use C4::Logguer qw(:DEFAULT $log_kss);
+# Is this script called from cgi?
+my $is_cgi = exists $ENV{'GATEWAY_INTERFACE'};
+
+# Using C4::Logguer only is the script is called from commandline
+if (!$is_cgi) {
+   eval 'use C4::Logguer qw(:DEFAULT $log_kss)';
+}
 
 use Koha_Synchronize_System::tools::mysql;
 
