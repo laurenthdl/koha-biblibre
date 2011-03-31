@@ -5269,11 +5269,13 @@ $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,optio
 
 $DBversion = "3.02.00.064";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(
-        "INSERT INTO `systempreferences` (variable,value,options,explanation,type)
-         VALUES('OPACXSLTItemsDetailsDisplay','','','Enable XSL stylesheet control over items on details page display on OPAC exemple : ../koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACItemsDetail.xsl','Free')"
-    );
-    print "Upgrade to $DBversion done (added new syspref: OPACXSLTItemsDetailsDisplay)\n";
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectreLogin', '', 'Login for Electre ws',NULL,'free')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectrePassw', '', 'Password for Electre ws',NULL,'free')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreImage', '0', 'if ON, enable cover displaying from Electre ws',NULL,'YesNo')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreScaledImage', '1', 'if ON, enable scaling of cover from Electre ws',NULL,'YesNo')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreQuatriemeXml', '0', 'if ON, enable outside back cover displaying from Electre ws',NULL,'YesNo')");
+    $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('OpacElectreResume', '0', 'if ON, enable resume displaying from Electre ws',NULL,'YesNo')");
+    print "Upgrade to $DBversion done (Adding OpacElectre sysprefs)\n";
     SetVersion($DBversion);
 }
 
