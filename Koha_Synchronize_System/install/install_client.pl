@@ -18,6 +18,7 @@ my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $dump_id_dir              = $$conf{path}{dump_ids};
+my $backup_dir               = $$conf{path}{client_backup}
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $kss_home                 = $$conf{path}{kss_client_home};
 my $inbox                    = $$conf{path}{client_inbox};
@@ -41,7 +42,7 @@ my $username = "kss";
 print "Création de l'utilisateur $username\n";
 my $pwd = crypt("kss", "kss");
 eval {
-    qx{useradd --home $kss_home --create-home $username --password $pwd};
+    qx{useradd --home $kss_home --create-home --password $pwd --group mysql $username};
 };
 if ( $@ ) {
     print "Can't create user kss";
@@ -50,8 +51,10 @@ if ( $@ ) {
 
 qx{$mkdir_cmd -p $inbox};
 qx{$mkdir_cmd -p $outbox};
+qx{$mkdir_cmd -p $backup_dir};
 qx{$chown_cmd -R $username:$username $inbox};
 qx{$chown_cmd -R $username:$username $outbox};
+qx{$chown_cmd -R $username:$username $backup_dir};
 
 print "Génération de la clé ssh...\n";
 

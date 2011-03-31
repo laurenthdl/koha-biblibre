@@ -31,7 +31,7 @@ my $username = "kss";
 print "Création de l'utilisateur $username\n";
 my $pwd = crypt("kss", "kss");
 eval {
-    qx{useradd --home $kss_home --create-home $username --password $pwd};
+    qx{useradd --home $kss_home --create-home --password $pwd $username};
 };
 if ( $@ ) {
     print "Can't create user kss";

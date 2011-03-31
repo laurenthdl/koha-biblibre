@@ -18,8 +18,6 @@ my $passwd   = $$conf{databases_infos}{passwd};
 my $help     = "";
 
 my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
-my $dump_filename = $$conf{path}{dump_ids} . '/reserves.sql';
-
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 my $max_reserves_fieldname = $$conf{databases_infos}{max_reserves_fieldname};
 my $max_issues_fieldname = $$conf{databases_infos}{max_issues_fieldname};
@@ -46,7 +44,7 @@ $dbh->do("CREATE TABLE $reserves_matching (reservenumber INT(11), borrowernumber
 $dbh->do("INSERT INTO $reserves_matching (reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, itemnumber, reservedate FROM reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_reserves_fieldname')");
 $dbh->do("INSERT INTO $reserves_matching (reservenumber, borrowernumber, biblionumber, itemnumber, reservedate) SELECT reservenumber, borrowernumber, biblionumber, itemnumber, reservedate FROM old_reserves WHERE reservenumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_reserves_fieldname')");
 
-qx{$mysqldump_cmd -u $user -p$passwd $database $reserves_matching > $dump_filename};
+print qx{$mysqldump_cmd -u $user -p$passwd $database $reserves_matching};
 
 __END__
 

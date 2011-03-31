@@ -8,17 +8,9 @@ use Pod::Usage;
 use DateTime;
 use POSIX qw(strftime);
 use YAML;
-use C4::Context;
 use Digest::MD5;
-
-# Is this script called from cgi?
-my $is_cgi = exists $ENV{'GATEWAY_INTERFACE'};
-
-# Using C4::Logguer only is the script is called from commandline
-if (!$is_cgi) {
-   eval 'use C4::Logguer qw(:DEFAULT $log_kss)';
-}
-
+use Cwd;
+use C4::Context;
 use Koha_Synchronize_System::tools::mysql;
 
 my $conf                     = get_conf();
@@ -116,8 +108,81 @@ sub backup_server_db {
     my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
 
     my $dump_filename = $dump_db_server_dir . "/" . ( strftime "%Y-%m-%d_%H:%M:%S", localtime );
-    $log->info("Dump en cours dans $dump_filename");
+    $log && $log->info("Dump en cours dans $dump_filename");
     qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
+}
+
+sub backup_client_logbin {
+    my $log = shift;
+    my $conf = get_conf;
+    my $service_cmd = $$conf{which_cmd}{service};
+    my $hostname_cmd = $$conf{which_cmd}{hostname};
+    my $mkdir_cmd = $$conf{which_cmd}{mkdir};
+    my $cp_cmd = $$conf{which_cmd}{cp};
+    my $rm_cmd = $$conf{which_cmd}{rm};
+    my $mv_cmd = $$conf{which_cmd}{mv};
+    my $tar_cmd = $$conf{which_cmd}{tar};
+    my $outbox = $$conf{path}{client_outbox};
+    my $bakdir = $$conf{path}{client_backup};
+    my $logdir = $$conf{abspath}{client_logbin};
+    
+#    eval {
+#        qx{$service_cmd mysql stop};
+#    };
+#    if ( $? != 0 ) {
+#        die "Can't stop mysql";
+#    }
+#    
+    my $id = strftime "%Y-%m-%d_%H-%M-%S", localtime;
+    my $dirname = $outbox . "/" . $id;
+    eval {
+        qx{$mkdir_cmd $dirname/logbin -p};
+        qx{$mkdir_cmd $dirname/ids -p};
+    };
+    if ( $? != 0 ) {
+        die "Can't create directory for backup";
+    }
+    qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
+    qx{$rm_cmd -f $logdir/mysql-bin.*};
+#    eval {
+#        qx{$service_cmd mysql start};
+#    };
+#    if ( $? != 0 ) {
+#        die "Can't start mysql";
+#     
+
+    my $cwd = getcwd;
+    eval {
+        qx{$hostname_cmd -f > $dirname/hostname};
+        generate_ids_files("$dirname/ids");
+        chdir $dirname;
+        qx{$tar_cmd zcvf $id.tar.gz logbin ids hostname};
+        qx{$mv_cmd $id.tar.gz $outbox};
+    };
+    if ( $@ ) {
+        die $@;
+    }
+
+    chdir $cwd;
+
+    qx{$mv_cmd $dirname $bakdir};
+
+}
+
+sub generate_ids_files {
+    my $outdir = shift;
+    my $conf = get_conf;
+    my $scripts_dir = $$conf{path}{client_scripts_ids};
+    my $perl_cmd = $$conf{which_cmd}{perl};
+
+    my @scripts = qx{ls -1 $scripts_dir/*.pl};
+    for my $script ( @scripts ) {
+        chomp $script;
+        my $filename = $script;
+        $filename =~ s#.*/([^/]*).pl#$1#;
+        my $filepath = $outdir . '/' . $filename . '.sql';
+        qx{$perl_cmd $script > $filepath};
+    }
 }
 
 sub diff_files_exists {
@@ -167,7 +232,7 @@ sub insert_proc_and_triggers {
 }
 
 sub prepare_database {
-    my ($mysql_cmd, $user, $pwd, $db_name, $client_hostname,  $log) = @_;
+    my ($mysql_cmd, $user, $pwd, $db_name, $client_hostname, $log) = @_;
     qx{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_KSS_START('$client_hostname');"};
 
 }
@@ -250,12 +315,18 @@ sub extract_and_purge_mysqllog {
     }
     
     my $conf = get_conf();
+    my $file_cmd = $$conf{which_cmd}{file};
 
     my @files = qx{ls -1 $bindir};
     for my $file ( @files ) {
         chomp $file;
-        $dbh->do("CALL PROC_UPDATE_STATUS\('Extract and purge file $file', 0\);");
         $log && $log->info("--- Traitement du fichier $file ---");
+        my $r = qx{$file_cmd $file};
+        if ( not $r =~ /MySQL replication log/ ) {
+            $log && $log->info("Ce fichier n'est pas un fichier de log sql, il ne peut être géré");
+            next;
+        }
+        $dbh->do("CALL PROC_UPDATE_STATUS\('Extract and purge file $file', 0\);");
 
         my $bin_filepath = "$bindir\/$file";
         open(FILE, $bin_filepath);

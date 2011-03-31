@@ -33,8 +33,21 @@ which_cmd:
         mysql: /usr/bin/mysql
         mysqlbinlog: /usr/bin/mysqlbinlog
         mysqldump: /usr/bin/mysqldump
+        cp: /bin/cp
+        rm: /bin/rm
+        mv: /bin/mv
         scp: /usr/bin/scp
         ssh-copy-id: /usr/bin/ssh-copy-id
+        service: /etc/init.d/services
+        hostname: /bin/hostname
+        mkdir: /bin/mkdir
+        chown: /bin/chown
+        useradd: /usr/sbin/useradd
+        ssh-keygen: /usr/bin/ssh-keygen
+        file: /usr/bin/file
+        perl: /usr/bin/perl
+        tar: /bin/tar
+
 
 path:
         kss_root: Koha_Synchronize_System
@@ -45,14 +58,19 @@ path:
         diff_logbin_dir: data/server/logbin/
         diff_logtxt_full_dir: data/server/logtxt_full/
         diff_logtxt_dir: data/server/logtxt/
-        kss_server_home: data/server
-        server_inbox: data/server/inbox
-        server_outbox: data/server/outbox
-        kss_client_home: data/client
-        client_inbox: data/client/inbox
-        client_outbox: data/client/outbox
+        kss_server_home: data/server/
+        server_inbox: data/server/inbox/
+        server_outbox: data/server/outbox/
+        kss_client_home: data/client/
+        client_inbox: data/client/inbox/
+        client_outbox: data/client/outbox/
         server_dump_filepath: data/server/outbox/last.sql
         client_dump_filepath: data/client/inbox/last.sql
+        client_scripts_ids: scripts/client/
+        client_backup: backup/client/
+
+abspath:
+        client_logbin: /var/log/mysql
 
 cron:
         serverhost: 192.168.0.252

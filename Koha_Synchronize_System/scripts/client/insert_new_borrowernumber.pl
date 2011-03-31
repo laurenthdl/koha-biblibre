@@ -18,8 +18,6 @@ my $passwd   = $$conf{databases_infos}{passwd};
 my $help     = "";
 
 my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
-my $dump_filename = $$conf{path}{dump_ids} . '/borrowers.sql';
-
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 my $max_borrowers_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
 my $max_issues_fieldname = $$conf{databases_infos}{max_issues_fieldname};
@@ -46,7 +44,7 @@ $dbh->do("CREATE TABLE $borrowers_matching (borrowernumber INT(11), cardnumber V
 $dbh->do("INSERT INTO $borrowers_matching (borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM borrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_borrowers_fieldname')");
 $dbh->do("INSERT INTO $borrowers_matching (borrowernumber, cardnumber) SELECT borrowernumber, cardnumber FROM deletedborrowers WHERE borrowernumber > (SELECT value FROM $kss_infos_table WHERE variable='$max_borrowers_fieldname')");
 
-qx{$mysqldump_cmd -u $user -p$passwd $database $borrowers_matching > $dump_filename};
+print qx{$mysqldump_cmd -u $user -p$passwd $database $borrowers_matching};
 
 __END__
 
