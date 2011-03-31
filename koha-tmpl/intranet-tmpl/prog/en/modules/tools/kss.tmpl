@@ -63,6 +63,32 @@
 		</li>
 	    </ul>
 	    <h4>Last synchronisation details:</h4>
+	    <!-- TMPL_IF NAME="stats_loop" -->
+		<!-- TMPL_LOOP NAME="stats_loop" -->
+		<h5>Client "<!-- TMPL_VAR NAME="client" -->":</h5>
+		    <!-- TMPL_IF NAME="stats" -->
+			<table>
+			    <thead>
+				<tr>
+				    <th>Issues</th>
+				    <th>Reserves</th>
+				    <th>Returns</th>
+				</tr>
+			    </thead>
+			    <tbody>
+			    <!-- TMPL_LOOP NAME="stats" -->
+				<tr>
+				    <td><!-- TMPL_VAR NAME="issue" --></td>
+				    <td><!-- TMPL_VAR NAME="reserve" --></td>
+				    <td><!-- TMPL_VAR NAME="return" --></td>
+				</tr>
+			    <!-- /TMPL_LOOP -->
+			    </tbody>
+			</table>
+		    <!-- /TMPL_IF -->
+		<!-- /TMPL_LOOP -->
+	    <!-- /TMPL_IF -->
+
 	    <!-- TMPL_IF NAME="last_status_loop" -->
 		<table>
 		    <caption>Status log:</caption>
@@ -115,6 +141,25 @@
 		<li><a href="/cgi-bin/koha/tools/kss.pl?manual=1#mtos">Launch manual execution</a></li>
 		<!-- TMPL_IF NAME="manualoutput" --><li>Manual execution output : <br /><pre><!-- TMPL_VAR NAME="manualoutput" --></pre></li><!-- /TMPL_IF -->
 	    </ul>
+	    <h4>Last synchronisation details for <!-- TMPL_VAR NAME="hostname" -->:</h4>
+		<table>
+		    <caption>Statistics:</caption>
+		    <thead>
+			<tr>
+			    <th>Issues</th>
+			    <th>Reserves</th>
+			    <th>Returns</th>
+			</tr>
+		    </thead>
+		    <tbody>
+			<tr>
+			    <td><!-- TMPL_VAR NAME="last_stats_issue" --></td>
+			    <td><!-- TMPL_VAR NAME="last_stats_reserve" --></td>
+			    <td><!-- TMPL_VAR NAME="last_stats_return" --></td>
+			</tr>
+		    </tbody>
+		</table>
+
     </div>
     <!-- /TMPL_IF -->
 </div>

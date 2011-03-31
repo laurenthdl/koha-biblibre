@@ -85,6 +85,29 @@ $template->param(last_status_loop => $last_status_result);
 my $last_errors_result = Koha_Synchronize_System::tools::kss::get_last_errors($dbh);
 $template->param(last_errors_loop => $last_errors_result);
 
+# If we are a master, we gather the stats for all the clients
+if ($master) {
+   my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh);
+   # Preparing loop
+   my @stats_loop;
+   foreach (keys %{$stats}) {
+	my @innerloop;
+	push @innerloop, $stats->{$_};
+	push @stats_loop, { client => $_, stats => \@innerloop };	
+   }
+   $template->param(stats_loop => \@stats_loop);
+} else {
+    # And if we are a slave, we only gather our own stats
+    my $hostname = qx{hostname -f};
+    $hostname =~ s/\s$//;
+    $template->param("hostname" => $hostname);
+    my $last_stats_result = Koha_Synchronize_System::tools::kss::get_stats_by_host($dbh, $hostname);
+    foreach (keys %$last_stats_result) {
+	$template->param('last_stats_' . $_ => $last_stats_result->{$_});
+    }
+
+}
+
 # Trying to reach the server
 my $ping = Net::Ping->new();
 my $pingresult = $ping->ping($conf->{'cron'}->{'serverhost'});

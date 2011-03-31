@@ -35,6 +35,7 @@ my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $kss_status_table         = $$conf{databases_infos}{kss_status_table};
 my $kss_logs_table           = $$conf{databases_infos}{kss_logs_table};
 my $kss_errors_table         = $$conf{databases_infos}{kss_errors_table};
+my $kss_statistics_table     = $$conf{databases_infos}{kss_statistics_table};
 my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
 
 GetOptions(
@@ -371,10 +372,23 @@ sub get_level {
 
 sub get_last_log {
     my $dbh = shift;
-    my $query = "SELECT * from $kss_logs_table ORDER BY id DESC LIMIT 1";
+    my $hostname = shift;
+
+    my $query = "SELECT * from $kss_logs_table";
+    $query .= " WHERE hostname=?" if ($hostname); 
+    $query .= " ORDER BY id DESC LIMIT 1";
+    my $sth = $dbh->prepare($query);
+    ($hostname) ? $sth->execute($hostname) : $sth->execute;
+    return $sth->fetchrow_hashref;
+}
+
+# Return last execution ids for each client
+sub get_last_ids {
+    my $dbh = shift;
+    my $query = "SELECT MAX(id), hostname from $kss_logs_table GROUP BY hostname ORDER BY hostname";
     my $sth = $dbh->prepare($query);
     $sth->execute;
-    return $sth->fetchrow_hashref;
+    return $sth->fetchall_arrayref();
 }
 
 sub get_last_errors {
@@ -402,6 +416,40 @@ sub _get_last_table {
     return $sth->fetchall_arrayref({});
 }
 
+
+sub get_stats_by_host {
+    my $dbh = shift;
+    my $host = shift;
+
+    my $results;
+
+    # Getting last id for a given hostname
+    my $tmpres = get_last_log($dbh, $host);
+    my $last = $tmpres->{'id'};
+
+    for (qw(issue return reserve)) {
+	my $query = "SELECT COUNT(*) from $kss_statistics_table WHERE variable=? and kss_id=?";
+	my $sth = $dbh->prepare($query);
+	$sth->execute($_, $last);
+	my $count = $sth->fetchrow_arrayref;
+	$results->{$_} = $count->[0];
+    }
+    return $results;
+}
+
+sub get_stats {
+    my $dbh = shift;
+
+    my $results;
+
+    # Getting last ids for each client
+    my $ids = get_last_ids($dbh);
+    foreach (@{$ids}) {
+	$results->{$_->[1]} = get_stats_by_host($dbh, $_->[1]);
+    }
+    return $results;
+
+}
 
 sub replace_with_new_id {
     my $string = shift;
