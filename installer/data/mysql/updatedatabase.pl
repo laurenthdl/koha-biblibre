@@ -5000,6 +5000,15 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.063";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    UPDATE `z3950servers` SET db='TOUT-ANA1-UTF8', name='CATALOGUE BNF', syntax='1.2.840.10003.5.1' WHERE host='z3950.bnf.fr';
+    });
+    print "Upgrade to $DBversion done (Adds New Config for CATALOGUE BNF in z3950servers)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
