@@ -134,7 +134,7 @@ sub create_triggers {
             if  ( $table eq 'issues' and $field_referer eq 'itemnumber' ) {
                 push @str, "    SELECT COUNT(*) FROM issues WHERE itemnumber=NEW.itemnumber INTO count_error;";
                 push @str, "    IF count_error > 0 THEN";
-                push @str, "        CALL PROC_ADD_ERROR('Issue already onloan', CONCAT('Issue ', NEW.itemnumber, ' is already onloan by another borrower'));";
+                push @str, "        CALL PROC_ADD_ERROR('Item already onloan', CONCAT('Item ', NEW.itemnumber, ' is already onloan by another borrower'));";
                 push @str, "    END IF;";
             }
         }

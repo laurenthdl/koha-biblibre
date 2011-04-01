@@ -155,7 +155,7 @@ sub create_procedures {
     BEGIN
         DECLARE next_id INT(11);
         CALL PROC_UPDATE_STATUS('Creating $kss_infos_table table...', 0);
-        DROP TABLE $client_db_name.$kss_infos_table;
+        DROP TABLE IF EXISTS $client_db_name.$kss_infos_table;
         CREATE TABLE IF NOT EXISTS $client_db_name.$kss_infos_table (
             variable VARCHAR(255), 
             value VARCHAR(255)

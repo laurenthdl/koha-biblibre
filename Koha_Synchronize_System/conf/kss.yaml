@@ -15,7 +15,7 @@ databases_infos:
         db_client: koha_devkss_client
         db_server: koha_devkss_server
         hostname: localhost
-        user: root
+        user: root 
         passwd: root
         kss_infos_table: kss_infos
         kss_logs_table: kss_logs
@@ -52,7 +52,8 @@ which_cmd:
 path:
         kss_root: Koha_Synchronize_System
         dump_ids: data/server/ids/
-        backup_server: data/server/backup/
+        backup_server_db: data/server/backup/db/
+        backup_server_diff: data/server/backup/diff/
         generate_triggers: tools/generate_triggers.pl
         generate_procedures: tools/generate_procedures.pl
         diff_logbin_dir: data/server/logbin/
@@ -75,5 +76,5 @@ abspath:
 cron:
         serverhost: 192.168.0.252
         executiontime: 2200
-        master: 1
+        master: 1 
 

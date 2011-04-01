@@ -27,7 +27,8 @@ my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $help                     = "";
-my $dump_db_server_dir       = $$conf{path}{backup_server};
+my $dump_db_server_dir       = $$conf{path}{backup_server_db};
+my $backup_diff_server       = $$conf{path}{backup_server_diff};
 my $generate_triggers_path   = $$conf{path}{generate_triggers};
 my $generate_procedures_path = $$conf{path}{generate_procedures};
 
@@ -105,7 +106,7 @@ sub backup_server_db {
     my $user     = $$conf{databases_infos}{user};
     my $passwd   = $$conf{databases_infos}{passwd};
     my $db_server = $$conf{databases_infos}{db_server};
-    my $dump_db_server_dir = $$conf{path}{backup_server};
+    my $dump_db_server_dir = $$conf{path}{backup_server_db};
     my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
 
     my $dump_filename = $dump_db_server_dir . "/" . ( strftime "%Y-%m-%d_%H:%M:%S", localtime );
@@ -196,7 +197,6 @@ sub diff_files_exists {
         return 1;
     }
 
-    $log && $log->info("Aucun fichier binaire trouvé dans cette archive, rien ne sert de continuer !");
     die "Aucun fichier binaire trouvé dans cette archive, rien ne sert de continuer !";
 
     return 0;
@@ -235,7 +235,6 @@ sub insert_proc_and_triggers {
 sub prepare_database {
     my ($mysql_cmd, $user, $pwd, $db_name, $client_hostname, $log) = @_;
     qx{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_KSS_START('$client_hostname');"};
-
 }
 
 sub delete_proc_and_triggers {
@@ -261,6 +260,11 @@ sub clean_fs {
     qx{rm -f $$conf{path}{diff_logtxt_dir}/*};
     qx{rm -f $$conf{path}{dump_ids}/*};
     qx{rm -f $$conf{path}{server_inbox}/hostname};
+    qx{rm -Rf $$conf{path}{server_inbox}/ids};
+    qx{rm -Rf $$conf{path}{server_inbox}/logbin};
+    qx{mv $$conf{path}{server_inbox}/*.tar.gz $$conf{path}{backup_server_diff}};
+
+    my $dir = $$conf{path}{server_inbox};
 
 }
 
@@ -316,20 +320,20 @@ sub extract_and_purge_mysqllog {
     }
     
     my $conf = get_conf();
-    my $file_cmd = $$conf{which_cmd}{file};
+    my $file_cmd             = $$conf{which_cmd}{file};
 
     my @files = qx{ls -1 $bindir};
     for my $file ( @files ) {
         chomp $file;
+        my $bin_filepath = "$bindir\/$file";
         $log && $log->info("--- Traitement du fichier $file ---");
-        my $r = qx{$file_cmd $file};
+        my $r = qx{$file_cmd $bin_filepath};
         if ( not $r =~ /MySQL replication log/ ) {
             $log && $log->info("Ce fichier n'est pas un fichier de log sql, il ne peut être géré");
             next;
         }
         $dbh->do("CALL PROC_UPDATE_STATUS\('Extract and purge file $file', 0\);");
 
-        my $bin_filepath = "$bindir\/$file";
         open(FILE, $bin_filepath);
         my $ctx = Digest::MD5->new;
         $ctx->addfile(*FILE);
@@ -339,7 +343,9 @@ sub extract_and_purge_mysqllog {
         $dbh->do("CALL PROC_ADD_MD5\('$md5', \@already_exists\);");
         my @already_exists = $dbh->selectrow_array("SELECT \@already_exists;");
         if ( $already_exists[0] ) {
-            die ("This file already added !");
+            $log && $log->warning("This file already added !");
+            log_error("This file already added !", "Le Fichier binaire de log $file a déjà été inséré lors d'une précédente mise à jour");
+	    next;
         }
 
         my $full_output_filepath = "$fulldir\/$file";

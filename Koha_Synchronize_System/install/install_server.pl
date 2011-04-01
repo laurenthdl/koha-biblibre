@@ -18,7 +18,8 @@ my $diff_logbin_dir          = $$conf{path}{diff_logbin_dir};
 my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
 my $diff_logtxt_dir          = $$conf{path}{diff_logtxt_dir};
 my $dump_id_dir              = $$conf{path}{dump_ids};
-my $dump_db_server_dir       = $$conf{path}{backup_server};
+my $dump_db_server_dir       = $$conf{path}{backup_server_db};
+my $backup_server_diff       = $$conf{path}{backup_server_diff};
 my $inbox                    = $$conf{path}{server_inbox};
 my $outbox                   = $$conf{path}{server_outbox};
 
@@ -45,6 +46,7 @@ qx{mkdir -p $diff_logtxt_full_dir};
 qx{mkdir -p $diff_logtxt_dir};
 qx{mkdir -p $dump_id_dir};
 qx{mkdir -p $dump_db_server_dir};
+qx{mkdir -p $backup_server_diff};
 
 qx{chown -R $username:$username $inbox};
 qx{chown -R $username:$username $outbox};

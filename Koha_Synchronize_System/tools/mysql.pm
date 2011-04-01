@@ -134,7 +134,7 @@ sub purge_mysql_log {
     $/ = $sep;
     $\ = $sep;
 
-    my @tables     = ('borrowers', 'items', 'issues', 'old_issues', 'statistics', 'reserves', 'old_reserves', 'action_logs', 'borrower_attributes');
+    my @tables     = ('borrowers', 'items', 'biblioitems', 'issues', 'old_issues', 'statistics', 'reserves', 'old_reserves', 'action_logs', 'borrower_attributes');
     my @operations = ('INSERT INTO', 'UPDATE', 'DELETE FROM');
 
     while ( my $line = <FILE> ) {

@@ -22,7 +22,6 @@ my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $dump_id_dir              = $$conf{path}{dump_ids};
-my $dump_db_server_dir       = $$conf{path}{backup_server};
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $inbox                    = $$conf{path}{server_inbox};
 my $outbox                    = $$conf{path}{server_outbox};
@@ -61,6 +60,7 @@ eval {
         $cmd = "cat $inbox/hostname";
         @r = qx{$cmd};
         my $client_hostname = $r[0];
+	chomp $client_hostname;
 
         Koha_Synchronize_System::tools::kss::diff_files_exists $diff_logbin_dir, $log;
 
@@ -71,14 +71,7 @@ eval {
         Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
 
         $log->info("== Extraction des fichiers binaires de log sql ==");
-        eval {
-            Koha_Synchronize_System::tools::kss::extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
-        };
-        if ( $@ ) {
-            my $err = $@;
-            Koha_Synchronize_System::tools::kss::log_error($err, "Le Fichier binaire de log $archive a déjà été inséré lors d'une précédente mise à jour");
-            $log->error($err);
-        }
+	Koha_Synchronize_System::tools::kss::extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
 
         my @files = qx{ls -1 $diff_logtxt_dir};
         $log->info("== Digestion des requêtes ==");
@@ -86,7 +79,7 @@ eval {
         for my $file ( @files ) {
             chomp $file;
             $log && $log->info("Traitement de $file en cours...");
-            Koha_Synchronize_System::tools::kss::insert_diff_file ("$diff_logtxt_dir\/$file", undef, $log);
+	    Koha_Synchronize_System::tools::kss::insert_diff_file ("$diff_logtxt_dir\/$file", undef, $log);
         }
 
         $log->info("== Suppression des fichiers utilisés ==");
