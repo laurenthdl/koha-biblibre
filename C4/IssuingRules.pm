@@ -22,8 +22,19 @@ use warnings;
 use C4::Context;
 use C4::Koha;
 use C4::SQLHelper qw( SearchInTable InsertInTable UpdateInTable DeleteInTable );
-use Memoize;
+eval {
+   my $servers = C4::Context->config('memcached_servers');
+   if ($servers) {
+      require Memoize::Memcached;
+      import Memoize::Memcached qw(memoize_memcached);
+      my $memcached = {
+             servers    => [$servers],
+             key_prefix => C4::Context->config('memcached_namespace') || 'koha',
+      };
+      memoize_memcached( 'GetIssuingRule',        memcached => $memcached, expire_time => 600000 );    #cache for 10 minutes
+   }
 
+};
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 BEGIN {
@@ -75,7 +86,6 @@ The values in the returned hashref are inherited from a more generic rules if un
 
 =cut
 #Caching GetIssuingRule
-memoize('GetIssuingRule');
 
 sub GetIssuingRule {
     my ( $categorycode, $itemtype, $branchcode ) = @_;

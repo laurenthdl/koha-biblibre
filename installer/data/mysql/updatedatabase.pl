@@ -4234,6 +4234,17 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = 'XXX';
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("ALTER TABLE issuingrules ADD holdspickupdelay int(11) default NULL");
+    $dbh->do("ALTER TABLE issuingrules ADD renewalperiod int(11) default NULL");
+    $dbh->do("ALTER TABLE issuingrules ADD allowonshelfholds tinyint(1) default NULL");
+    $dbh->do("ALTER TABLE issuingrules ADD holdrestricted tinyint(1) default NULL");
+    print "Upgrade to $DBversion done (Add missing columns in issuingrules table)\n";
+    SetVersion ($DBversion);
+}
+
+
 =head1 FUNCTIONS
 
 =head2 DropAllForeignKeys($table)

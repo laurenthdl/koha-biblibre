@@ -65,8 +65,6 @@ my @category_loop = C4::Category->all;
 # Get the item types list
 my @itemtypes = C4::ItemType->all;
 
-while (my $row = $sth2->fetchrow_hashref) {
-}
 if ( $op eq 'delete' ) {
     DelIssuingRule({
         branchcode   => $branchcode,
@@ -144,7 +142,7 @@ for my $rule ( @issuingrules ) {
 }
 
 
-$template->param(default_rules => ($defaults ? 1 : 0));
+$template->param(default_rules => ($branchcode eq '*' ? 1 : 0));
 
 $template->param(
     categoryloop  => \@category_loop,

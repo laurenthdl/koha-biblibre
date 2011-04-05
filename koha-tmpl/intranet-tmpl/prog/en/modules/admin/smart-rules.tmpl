@@ -1,13 +1,18 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Administration &rsaquo; Circulation and Fine Rules</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+
 <link href="/content/ui-lightness/jquery-ui-1.8.1.custom.css" rel="stylesheet" />
 <script src="/scripts/jquery-ui-1.8.1.custom.min.js" type="text/javascript"></script>
-<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="/intranet-tmpl/prog/en/lib/jquery/plugins/jquery.uitablefilter.js"></script>
+<script type="text/javascript" src="/intranet-tmpl/prog/en/lib/jquery/plugins/ui.tabs.js"></script>
+<script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jquery.jeditable.js" type="text/javascript" charset="utf-8"></script>
+
+<link rel="stylesheet" type="text/css" href="/intranet-tmpl/prog/en/lib/jquery/plugins/ui.tabs.css" />
 
 <script type="text/javascript">
 //<![CDATA[
-$(document).ready(function() {
-        jQuery.editable.addInputType('datepicker', {
+        $.editable.addInputType('datepicker', {
         element: function(settings, original) {
      
             var input = jQuery('<input size=10 />');
@@ -39,6 +44,7 @@ $(document).ready(function() {
             return (input);
         }
         });
+$(document).ready(function() {
         $('#selectlibrary').find("input:submit").hide();
         $('#branchcode').change(function() {
                 $('#selectlibrary').submit();
@@ -100,8 +106,7 @@ $(document).ready(function() {
                 type: 'datepicker',
                 onblur: 'submit',
                 tooltip: _("Click to edit....")
-            });
-
+        });
         // Inline editor
         var editor = false;
         $('#smartrules>tbody>tr>td.editable').click(function() {
@@ -178,8 +183,8 @@ $(document).ready(function() {
                                     case 'triple':
                                         switch ( result ) {
                                             case '' : td.text('');    break;
-                                            case '1': td.text(_('Yes')); break;
-                                            case '0': td.text(_('No'));  break;
+                                            case '1': td.text('Yes'); break;
+                                            case '0': td.text('No');  break;
                                         }
                                         break;
                                     case 'datecompare':
