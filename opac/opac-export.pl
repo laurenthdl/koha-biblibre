@@ -45,8 +45,9 @@ if ( $op eq "export" ) {
                 $marc = changeEncoding( $marc, "MARC", "MARC21", "MARC-8" );
                 $marc = $marc->as_usmarc();
             } elsif ( $format =~ /utf8/ ) {
+				C4::Charset::SetUTF8Flag($marc,1);
+				$marc = $marc->as_usmarc();
 
-                #default
             }
             print $query->header(
                 -type       => 'application/octet-stream',
