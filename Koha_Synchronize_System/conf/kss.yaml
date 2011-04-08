@@ -12,7 +12,7 @@ datatest:
         passwd: root
 
 databases_infos:
-        db_client: koha_devkss_client
+        db_client: koha_clientkss
         db_server: koha_devkss_server
         hostname: localhost
         user: root 
@@ -38,7 +38,7 @@ which_cmd:
         mv: /bin/mv
         scp: /usr/bin/scp
         ssh-copy-id: /usr/bin/ssh-copy-id
-        service: /etc/init.d/services
+        service: invoke-rc.d
         hostname: /bin/hostname
         mkdir: /bin/mkdir
         chown: /bin/chown
@@ -65,16 +65,16 @@ path:
         kss_client_home: data/client/
         client_inbox: data/client/inbox/
         client_outbox: data/client/outbox/
-        server_dump_filepath: data/server/outbox/last.sql
         client_dump_filepath: data/client/inbox/last.sql
-        client_scripts_ids: scripts/client/
+        client_scripts_ids: scripts/client/ids/
         client_backup: backup/client/
 
 abspath:
         client_logbin: /var/log/mysql
+        server_dump_filepath: /home/jonathan/workspace/versions/koha_master/Koha_Synchronize_System/data/server/outbox/last.sql
 
 cron:
-        serverhost: 192.168.0.252
+        serverhost: 192.168.1.33
         executiontime: 2200
-        master: 1 
+        master: 0
 

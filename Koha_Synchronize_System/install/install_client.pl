@@ -18,13 +18,13 @@ my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $dump_id_dir              = $$conf{path}{dump_ids};
-my $backup_dir               = $$conf{path}{client_backup}
+my $backup_dir               = $$conf{path}{client_backup};
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $kss_home                 = $$conf{path}{kss_client_home};
 my $inbox                    = $$conf{path}{client_inbox};
 my $outbox                   = $$conf{path}{client_outbox};
 my $ip_server                = $$conf{cron}{serverhost};
-my $remote_dump_filepath     = $$conf{path}{server_dump_filepath};
+my $remote_dump_filepath     = $$conf{abspath}{server_dump_filepath};
 my $local_dump_filepath      = $$conf{path}{client_dump_filepath};
 
 if ( $< ne "0" ) {
@@ -55,6 +55,8 @@ qx{$mkdir_cmd -p $backup_dir};
 qx{$chown_cmd -R $username:$username $inbox};
 qx{$chown_cmd -R $username:$username $outbox};
 qx{$chown_cmd -R $username:$username $backup_dir};
+qx{$mkdir_cmd -p $kss_home/.ssh};
+qx{$chown_cmd -R $username:$username $kss_home/.ssh};
 
 print "Génération de la clé ssh...\n";
 
@@ -72,7 +74,7 @@ print "\n\nAppuyer sur entrée lorsque c'est réalisé\n";
 my $tmp = <>;
 
 print "\nRécupération du dump distant\n";
-qx{$scp_cmd $username\@ip_server:$remote_dump_filepath $local_dump_filepath};
+qx{$scp_cmd $username\@$ip_server:$remote_dump_filepath $local_dump_filepath};
 
 print "\nInsertion dans la base de données locale\n";
 qx{$mysql_cmd -u $user -p$passwd $db_client < $local_dump_filepath};

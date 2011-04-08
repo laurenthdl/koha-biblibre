@@ -1,7 +1,0 @@
-script à exécuter côté client une fois que la journée est terminée.
-On ne veut pas les récupérer dans les logs binaires mysql (donc penser à les remonter indépendemment)
-
-Ils seront traités en premier,  côté merge.
-
-Dump de la table à remonter dans data/client/ids/reserves.sql
-

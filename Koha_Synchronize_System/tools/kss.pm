@@ -129,26 +129,52 @@ sub backup_client_logbin {
     my $logdir = $$conf{abspath}{client_logbin};
     
 #    eval { qx{$service_cmd mysql stop} };
+##    die $@ if $@;
+#
+#    my $id = strftime "%Y-%m-%d_%H-%M-%S", localtime;
+#    my $dirname = $outbox . "/" . $id;
+#    
+#    eval { qx{$mkdir_cmd $dirname/logbin -p} };
 #    die $@ if $@;
-
-    my $id = strftime "%Y-%m-%d_%H-%M-%S", localtime;
-    my $dirname = $outbox . "/" . $id;
-    
-    eval { qx{$mkdir_cmd $dirname/logbin -p} };
-    die $@ if $@;
-
-    eval { qx{$mkdir_cmd $dirname/ids -p} };
-    die $@ if $@;
-
-    eval { qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin} };
-    die $@ if $@;
-
-    eval { qx{$rm_cmd -f $logdir/mysql-bin.*} };
-    die $@ if $@;
-
-#    eval { qx{$service_cmd mysql start} };
+#
+#    eval { qx{$mkdir_cmd $dirname/ids -p} };
+#    die $@ if $@;
+#
+#    eval { qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin} };
+#    die $@ if $@;
+#
+#    eval { qx{$rm_cmd -f $logdir/mysql-bin.*} };
+#    die $@ if $@;
+#
+##    eval { qx{$service_cmd mysql start} };
 #    die $@ if $@;     
 
+    eval {
+        qx{$service_cmd mysql stop};
+    };
+    if ( $? != 0 ) {
+        die "Can't stop mysql";
+    }
+    
+    my $id = strftime "%Y-%m-%d_%H-%M-%S", localtime;
+    my $dirname = $outbox . "/" . $id;
+    eval {
+        qx{$mkdir_cmd $dirname/logbin -p};
+        qx{$mkdir_cmd $dirname/ids -p};
+    };
+    if ( $? != 0 ) {
+        die "Can't create directory for backup";
+    }
+    qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
+    qx{$rm_cmd -f $logdir/mysql-bin.*};
+
+    eval {
+        qx{$service_cmd mysql start};
+    };
+    if ( $? != 0 ) {
+        die "Can't start mysql";
+    }
+     
     my $cwd = getcwd;
     eval { qx{$hostname_cmd -f > $dirname/hostname} };
     die $@ if $@;
@@ -240,6 +266,7 @@ sub prepare_database {
 
 sub delete_proc_and_triggers {
     my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+    my $conf = get_conf();
     eval {
         qx{$$conf{path}{generate_triggers} -action=drop > /tmp/del_triggers.sql};
         qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_triggers.sql};
@@ -294,9 +321,8 @@ sub dump_available_db {
     my $user     = $$conf{databases_infos}{user};
     my $passwd   = $$conf{databases_infos}{passwd};
     my $db_server = $$conf{databases_infos}{db_server};
-    my $remote_dump_filepath = $$conf{path}{server_dump_filepath};
+    my $remote_dump_filepath = $$conf{abspath}{server_dump_filepath};
 
- 
     $log && $log->info("=== Dump de la nouvelle base ===");
     my $dump_filepath = $outbox . "/" . strftime ( "%Y-%m-%d_%H:%M:%S", localtime ) . ".sql";
     $log && $log->info("Dump en cours dans $dump_filepath");
