@@ -9,6 +9,7 @@
 <script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/jquery.jeditable.js" type="text/javascript" charset="utf-8"></script>
 <script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/jquery.jeditable.datepicker.js" type="text/javascript" charset="utf-8"></script>
 <script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/js/jquery.datePicker.js" type="text/javascript" charset="utf-8"></script>
+<script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/js/date.js" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" type="text/css" href="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/css/datePicker.css" />
 <link rel="stylesheet" type="text/css" href="/intranet-tmpl/prog/en/lib/jquery/plugins/ui.tabs.css" />
@@ -72,40 +73,59 @@ $(document).ready(function() {
             $('#nofilter').parent().attr('class',null);
         });
         $('.editabledatepicker').editable('/cgi-bin/koha/admin/smart-rules-service.pl', {
-             submitdata   : {branchcode   : $('#branchcode').val(),
-                            categorycode : $(this).parent('td').children('td.categorycode').children('span').text(),
-                            itemtype     : $(this).parent('td').children('td.itemtype').children('span').text()},
-             id           : 'varname' ,
-             name         : 'inputvalue',
-                type: 'datepicker',
-                onblur: 'submit',
-                tooltip: _("Click to edit....")
+             submitdata   : function(){
+                    return {
+                        branchcode   : $('#branchcode').val(),
+                        categorycode : $(this).parent().find('td.categorycode > span:first').text(),
+                        itemtype     : $(this).parent().find('td.itemtype > span:first').text(),
+                        varname      : $(this).attr('varname')
+                        };
+                    },
+            name         : 'inputvalue',
+            type: 'datepicker',
+            onblur: 'submit',
+            tooltip: _("Click to edit....")
         });
-        $('.datecompare').editable('/cgi-bin/koha/admin/smart-rules-service.pl', { 
-             submitdata   : {branchcode   : $('#branchcode').val(),
-                            categorycode : $(this).parent('td').children('td.categorycode').children('span').text(),
-                            itemtype     : $(this).parent('td').children('td.itemtype').children('span').text()},
+        $('.datecompare').editable('/cgi-bin/koha/admin/smart-rules-service.pl', {
+             submitdata   : function(){
+                    return {
+                        branchcode   : $('#branchcode').val(),
+                        categorycode : $(this).parent().find('td.categorycode > span:first').text(),
+                        itemtype     : $(this).parent().find('td.itemtype > span:first').text(),
+                        varname      : $(this).attr('varname')
+                        };
+                    },
              id           : 'varname' ,
              name         : 'inputvalue',
-             data   : " {'':'','1':"+_('After')+",'-1':"+_('Before')+",0:"+_('Exactly On')+"}",
+             data   : " {'':'','1':'After','-1':'Before',0:'Exactly On'}",
              type   : 'select',
              submit : 'OK'
          });
-        $('.editable').editable('/cgi-bin/koha/admin/smart-rules-service.pl', { 
-             submitdata   : {branchcode   : $('#branchcode').val(),
-                            categorycode : $(this).parent('td').children('td.categorycode').children('span').text(),
-                            itemtype     : $(this).parent('td').children('td.itemtype').children('span').text()},
+        $('.editable').editable('/cgi-bin/koha/admin/smart-rules-service.pl', {
+             submitdata   : function(){
+                    return {
+                        branchcode   : $('#branchcode').val(),
+                        categorycode : $(this).parent().find('td.categorycode > span:first').text(),
+                        itemtype     : $(this).parent().find('td.itemtype > span:first').text(),
+                        varname      : $(this).attr('varname')
+                        };
+                    },
              id           : 'varname' ,
              name         : 'inputvalue',
              submit : 'OK'
          });
-        $('.triple').editable('/cgi-bin/koha/admin/smart-rules-service.pl', { 
-             submitdata   : {branchcode   : $('#branchcode').val(),
-                            categorycode : $(this).parent().parent().children('td.categorycode').children('span').text(),
-                            itemtype     : $(this).parent().parent().children('td.itemtype').children('span').text()},
+        $('.triple').editable('/cgi-bin/koha/admin/smart-rules-service.pl', {
+             submitdata   : function(){
+                    return {
+                        branchcode   : $('#branchcode').val(),
+                        categorycode : $(this).parent().find('td.categorycode > span:first').text(),
+                        itemtype     : $(this).parent().find('td.itemtype > span:first').text(),
+                        varname      : $(this).attr('varname')
+                        };
+                    },
              id           : 'varname' ,
              name         : 'inputvalue',
-             data   : " {'':'','1':"+_('Yes')+",'0':"+_('No')+"}",
+             data   : " {'':'','1':'Yes','0':'No'}",
              type   : 'select',
              submit : 'OK'
          });
@@ -206,7 +226,7 @@ for="tobranch"><strong>Clone these rules to:</strong></label> <input type="hidde
                                         <!-- /TMPL_IF -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_maxissueqty" -->
-                                    <td class="maxissueqty editable issues herited">
+                                    <td class="maxissueqty editable issues herited" varname="maxissueqty">
                                     <!-- TMPL_ELSE -->
                                     <td class="issues">
                                     <!-- /TMPL_IF -->
@@ -217,86 +237,85 @@ for="tobranch"><strong>Clone these rules to:</strong></label> <input type="hidde
                                         <!-- /TMPL_IF -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_issuelength" -->
-                                    <td class="issuelength editable issues herited">
+                                    <td class="issuelength editable issues herited" varname="issuelength">
                                     <!-- TMPL_ELSE -->
-                                    <td class="issuelength editable issues">
-                                    <!-- /TMPL_IF -->
-                                    <!-- TMPL_VAR NAME="issuelength" -->
+                                    <td class="issuelength editable issues" varname="issuelength">
+                                    <!-- /TMPL_IF --><!-- TMPL_VAR NAME="issuelength" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_hardduedatecompare" -->
-                                    <td class="hardduedatecompare issues datecompare herited">
+                                    <td class="hardduedatecompare issues datecompare herited" varname="hardduedatecompare">
                                     <!-- TMPL_ELSE -->
-                                    <td class="hardduedatecompare issues datecompare">
+                                    <td class="hardduedatecompare issues datecompare" varname="hardduedatecompare">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="hardduedatecompare" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_hardduedate" -->
-                                    <td class="hardduedate editabledatepicker issues herited">
+                                    <td class="hardduedate editabledatepicker issues herited" varname="hardduedate">
                                     <!-- TMPL_ELSE -->
-                                    <td class="hardduedate editabledatepicker issues">
+                                    <td class="hardduedate editabledatepicker issues" varname="hardduedate">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="hardduedate" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_fine" -->
-                                    <td class="fine editable fines herited">
+                                    <td class="fine editable fines herited" varname="fine">
                                     <!-- TMPL_ELSE -->
-                                    <td class="fine editable fines">
+                                    <td class="fine editable fines" varname="fine">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="fine" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_chargeperiod" -->
-                                    <td class="chargeperiod editable fines herited">
+                                    <td class="chargeperiod editable fines herited" varname="chargeperiod">
                                     <!-- TMPL_ELSE -->
-                                    <td class="chargeperiod editable fines">
+                                    <td class="chargeperiod editable fines" varname="chargeperiod">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="chargeperiod" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_firstremind" -->
-                                    <td class="firstremind editable fines herited">
+                                    <td class="firstremind editable fines herited" varname="firstremind">
                                     <!-- TMPL_ELSE -->
-                                    <td class="firstremind editable fines">
+                                    <td class="firstremind editable fines" varname="firstremind">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="firstremind" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_finedays" -->
-                                    <td class="finedays editable fines herited">
+                                    <td class="finedays editable fines herited" varname="finedays">
                                     <!-- TMPL_ELSE -->
-                                    <td class="finedays editable fines">
+                                    <td class="finedays editable fines" varname="finedays">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="finedays" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_renewalsallowed" -->
-                                    <td class="renewalsallowed editable issues herited">
+                                    <td class="renewalsallowed editable issues herited" varname="renewalsallowed">
                                     <!-- TMPL_ELSE -->
-                                    <td class="renewalsallowed editable issues">
+                                    <td class="renewalsallowed editable issues" varname="renewalsallowed">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="renewalsallowed" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_renewalperiod" -->
-                                    <td class="renewalperiod editable issues herited">
+                                    <td class="renewalperiod editable issues herited" varname="renewalperiod">
                                     <!-- TMPL_ELSE -->
-                                    <td class="renewalperiod editable issues">
+                                    <td class="renewalperiod editable issues" varname="renewalperiod">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="renewalperiod" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_reservesallowed" -->
-                                    <td class="reservesallowed editable reserves herited">
+                                    <td class="reservesallowed editable reserves herited" varname="reservesallowed">
                                     <!-- TMPL_ELSE -->
-                                    <td class="reservesallowed editable reserves">
+                                    <td class="reservesallowed editable reserves" varname="reservesallowed">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="reservesallowed" -->
                                     </td>
                                      <!-- TMPL_IF NAME="herited_holdspickupdelay" -->
-                                    <td class="holdspickupdelay editable reserves herited">
+                                    <td class="holdspickupdelay editable reserves herited" varname="holdspickupdelay">
                                     <!--TMPL_ELSE-->
-                                    <td class="holdspickupdelay editable reserves">
+                                    <td class="holdspickupdelay editable reserves" varname="holdspickupdelay">
                                     <!--/TMPL_IF-->
                                     <!-- TMPL_VAR NAME="holdspickupdelay" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_allowonshelfholds" -->
-                                    <td class="allowonshelfholds reserves triple herited">
+                                    <td class="allowonshelfholds reserves triple herited" varname="allowonshelfholds">
                                     <!--TMPL_ELSE-->
-                                    <td class="allowonshelfholds reserves triple">
+                                    <td class="allowonshelfholds reserves triple" varname="allowonshelfholds">
 				    <!--/TMPL_IF-->
                                     <!-- TMPL_IF NAME="allowonshelfholds" -->
                                     Yes
@@ -305,9 +324,9 @@ for="tobranch"><strong>Clone these rules to:</strong></label> <input type="hidde
                                     <!--/TMPL_IF-->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_holdrestricted" -->
-                                    <td class="holdrestricted editable reserves boolean herited">
+                                    <td class="holdrestricted editable reserves boolean herited" varname="holdrestricted">
                                     <!--TMPL_ELSE-->
-                                     <td class="holdrestricted editable reserves boolean">
+                                     <td class="holdrestricted editable reserves boolean" varname="holdrestricted">
                                     <!--/TMPL_IF-->
                                     <!-- TMPL_IF NAME="holdrestricted" -->
                                     Yes
@@ -316,9 +335,9 @@ for="tobranch"><strong>Clone these rules to:</strong></label> <input type="hidde
                                     <!--/TMPL_IF-->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_rentaldiscount" -->
-                                    <td class="rentaldiscount editable issues herited">
+                                    <td class="rentaldiscount editable issues herited" varname="rentaldiscount">
                                     <!-- TMPL_ELSE -->
-                                    <td class="rentaldiscount editable issues">
+                                    <td class="rentaldiscount editable issues" varname="rentaldiscount">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="rentaldiscount" -->
                                     </td>
