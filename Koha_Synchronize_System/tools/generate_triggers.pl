@@ -20,6 +20,7 @@ my $client_db_name = $$conf{databases_infos}{db_client};
 my $server_db_name = $$conf{databases_infos}{db_server};
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 
+#First level tables
 my $level1_tables = {
     'borrowers' => {
         'primary_key' => 'borrowernumber',
@@ -31,6 +32,7 @@ my $level1_tables = {
     },
 };
 
+# Second level tables
 my $level2_tables = {
     'issues' => {
         'itemnumber' => 'items.itemnumber',
@@ -61,6 +63,7 @@ my $level2_tables = {
     }
 };
 
+# we don't want execute operation in theses tables
 my $unauthorized_tables = {
     items => "DELETE,INSERT",
     biblioitems => "DELETE,INSERT"
@@ -87,18 +90,8 @@ sub create_triggers {
     # Gestion des tables de niveau 1
     while ( my ($table, $infos) = each %$level1_tables ) {
 
-        # Trigger insert
-        # Met à jour la table de correspondance des ids
-        push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
-        push @str, "CREATE TRIGGER `TRG_AFT_INS_$table` AFTER INSERT ON `$table`";
-        push @str, "  FOR EACH ROW BEGIN";
-        if ( $table eq "borrowers" ) {
-            push @str, "    CALL PROC_UPDATE_BORROWERNUMBER(NEW.borrowernumber, NEW.cardnumber);";
-        }
-        push @str, "  END;";
-        push @str, "//";
-
-
+        # Trigger before insert
+        # Get new id if table deletedborrowers
         push @str, "DROP TRIGGER IF EXISTS `TRG_BEF_INS_$table` //";
         push @str, "CREATE TRIGGER `TRG_BEF_INS_$table` BEFORE INSERT ON `$table`";
         push @str, "  FOR EACH ROW BEGIN";
@@ -111,6 +104,17 @@ sub create_triggers {
         push @str, "  END;";
         push @str, "//";
 
+
+        # Trigger after insert
+        # Update temporary tables whose contains matching ids
+        push @str, "DROP TRIGGER IF EXISTS `TRG_AFT_INS_$table` //";
+        push @str, "CREATE TRIGGER `TRG_AFT_INS_$table` AFTER INSERT ON `$table`";
+        push @str, "  FOR EACH ROW BEGIN";
+        if ( $table eq "borrowers" ) {
+            push @str, "    CALL PROC_UPDATE_BORROWERNUMBER(NEW.borrowernumber, NEW.cardnumber);";
+        }
+        push @str, "  END;";
+        push @str, "//";
 
     }
 

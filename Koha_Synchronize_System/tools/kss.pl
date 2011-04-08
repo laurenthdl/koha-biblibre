@@ -49,16 +49,15 @@ eval {
         chomp $archive;
         $log->info("=== Gestion de l'archive $archive ===");
         $log->info(" - Extraction...");
-        my $cmd = "tar zxvf $archive -C $inbox";
-        my @r = qx{$cmd};
+        eval { "$tar_cmd zxvf $archive -C $inbox" };
+        die $@ if $@;
+
         $log->info(" - Déplacement des fichiers...");
-        $cmd = "mv $inbox/ids/*.sql $dump_id_dir/";
-        @r = qx{$cmd};
-        $cmd = "mv $inbox/logbin/* $diff_logbin_dir/";
-        @r = qx{$cmd};
+        $cmd = "$mv_cmd $inbox/ids/*.sql $dump_id_dir/";
+        $cmd = "$mv_cmd $inbox/logbin/* $diff_logbin_dir/";
 
         $cmd = "cat $inbox/hostname";
-        @r = qx{$cmd};
+        my @r = qx{$cmd};
         my $client_hostname = $r[0];
 	chomp $client_hostname;
 
@@ -98,6 +97,7 @@ if ( $@ ) {
 
     $log->error($@);
     Koha_Synchronize_System::tools::kss::log_error($@, "Erreur lors de l'exécution ...");
+
 }
 
 $log->info("END");

@@ -128,46 +128,47 @@ sub backup_client_logbin {
     my $bakdir = $$conf{path}{client_backup};
     my $logdir = $$conf{abspath}{client_logbin};
     
-#    eval {
-#        qx{$service_cmd mysql stop};
-#    };
-#    if ( $? != 0 ) {
-#        die "Can't stop mysql";
-#    }
-#    
+#    eval { qx{$service_cmd mysql stop} };
+#    die $@ if $@;
+
     my $id = strftime "%Y-%m-%d_%H-%M-%S", localtime;
     my $dirname = $outbox . "/" . $id;
-    eval {
-        qx{$mkdir_cmd $dirname/logbin -p};
-        qx{$mkdir_cmd $dirname/ids -p};
-    };
-    if ( $? != 0 ) {
-        die "Can't create directory for backup";
-    }
-    qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
-    qx{$rm_cmd -f $logdir/mysql-bin.*};
-#    eval {
-#        qx{$service_cmd mysql start};
-#    };
-#    if ( $? != 0 ) {
-#        die "Can't start mysql";
-#     
+    
+    eval { qx{$mkdir_cmd $dirname/logbin -p} };
+    die $@ if $@;
+
+    eval { qx{$mkdir_cmd $dirname/ids -p} };
+    die $@ if $@;
+
+    eval { qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin} };
+    die $@ if $@;
+
+    eval { qx{$rm_cmd -f $logdir/mysql-bin.*} };
+    die $@ if $@;
+
+#    eval { qx{$service_cmd mysql start} };
+#    die $@ if $@;     
 
     my $cwd = getcwd;
-    eval {
-        qx{$hostname_cmd -f > $dirname/hostname};
-        generate_ids_files("$dirname/ids");
-        chdir $dirname;
-        qx{$tar_cmd zcvf $id.tar.gz logbin ids hostname};
-        qx{$mv_cmd $id.tar.gz $outbox};
-    };
-    if ( $@ ) {
-        die $@;
-    }
+    eval { qx{$hostname_cmd -f > $dirname/hostname} };
+    die $@ if $@;
+    
+    eval { generate_ids_files("$dirname/ids") };
+    die $@ if $@;
+    
+    eval { chdir $dirname };
+    die $@ if $@;
+    
+    eval { qx{$tar_cmd zcvf $id.tar.gz logbin ids hostname} };
+    die $@ if $@;
+
+    eval { qx{$mv_cmd $id.tar.gz $outbox} };
+    die $@ if $@;
 
     chdir $cwd;
 
-    qx{$mv_cmd $dirname $bakdir};
+    eval { qx{$mv_cmd $dirname $bakdir} };
+    die $@ if $@;
 
 }
 
@@ -263,8 +264,6 @@ sub clean_fs {
     qx{rm -Rf $$conf{path}{server_inbox}/ids};
     qx{rm -Rf $$conf{path}{server_inbox}/logbin};
     qx{mv $$conf{path}{server_inbox}/*.tar.gz $$conf{path}{backup_server_diff}};
-
-    my $dir = $$conf{path}{server_inbox};
 
 }
 

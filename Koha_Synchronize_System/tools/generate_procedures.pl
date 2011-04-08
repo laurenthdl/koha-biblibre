@@ -45,6 +45,7 @@ push @proc_str, qq{DELIMITER ;};
 
 sub create_procedures {
     my @str;
+    # Initialize tables for kss
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_INIT_KSS` //};
     push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS` (
     )
@@ -136,6 +137,7 @@ sub create_procedures {
     END;
     //};
 
+    # Clean temporary table
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_CLEAN_KSS` //};
     push @str, qq{CREATE PROCEDURE `PROC_CLEAN_KSS` (
     )
@@ -148,8 +150,8 @@ sub create_procedures {
     END;
     //};
 
+    # Create informations contains last ids
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_CREATE_KSS_INFOS` //};
-
     push @str, qq{CREATE PROCEDURE `PROC_CREATE_KSS_INFOS` (
     )
     BEGIN
@@ -170,6 +172,7 @@ sub create_procedures {
     END;
     //};
 
+    # Call when new borrower is create
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_BORROWERNUMBER` //};
     push @str, qq{CREATE PROCEDURE `PROC_UPDATE_BORROWERNUMBER` (
         IN new_id INT(11),
@@ -182,6 +185,7 @@ sub create_procedures {
     END;
     //};
 
+    # Call when new reserve is create
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_RESERVENUMBER` //};
     push @str, qq{CREATE PROCEDURE `PROC_UPDATE_RESERVENUMBER` (
         IN new_id INT(11),
@@ -212,6 +216,7 @@ sub create_procedures {
     END;
     //};
 
+    # Returns new id for an old id (especially for borrowers and reserves table)
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_GET_NEW_ID` //};
     push @str, qq{CREATE PROCEDURE `PROC_GET_NEW_ID` (
         IN field_name VARCHAR(255),
@@ -242,6 +247,7 @@ sub create_procedures {
     END;
     //};
 
+    # Returns old id for a given new id
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_GET_OLD_ID` //};
     push @str, qq{CREATE PROCEDURE `PROC_GET_OLD_ID` (
         IN field_name VARCHAR(255),
@@ -272,21 +278,8 @@ sub create_procedures {
     END;
     //};
 
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_DELETE_FROM` //};
-    push @str, qq{CREATE PROCEDURE `PROC_DELETE_FROM` (
-        IN field_name VARCHAR(255),
-        IN id INT(11)
-    )
-    BEGIN
-        DECLARE new_id INT(11);
-        IF field_name = 'borrowers.borrowernumber' THEN
-            CALL PROC_GET_NEW_ID("borrowers.borrowernumber", id, \@new_id);
-            SELECT \@new_id INTO new_id;
-            DELETE FROM borrowers WHERE borrowernumber=new_id;
-        END IF;
-    END;
-    //};
 
+    # Call me when start KSS (init and log)
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_START` //};
     push @str, qq{CREATE PROCEDURE `PROC_KSS_START` (
         IN hn VARCHAR(255)
@@ -297,6 +290,7 @@ sub create_procedures {
     END;
     //};
 
+    # Call me when KSS is finished (clean and log)
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_END` //};
     push @str, qq{CREATE PROCEDURE `PROC_KSS_END` (
     )
@@ -306,6 +300,7 @@ sub create_procedures {
     END;
     //};
 
+    # Update new kss status (state=0 for begin and state=1 for end)
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_UPDATE_STATUS` //};
     push @str, qq{CREATE PROCEDURE `PROC_UPDATE_STATUS` (
         IN current_status TEXT,
@@ -323,6 +318,7 @@ sub create_procedures {
     END;
     //};
 
+    # Append an error in kss_error
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_ERROR` //};
     push @str, qq{CREATE PROCEDURE `PROC_ADD_ERROR` (
         IN error TEXT,
@@ -337,6 +333,7 @@ sub create_procedures {
     END;
     //};
 
+    # Append a sql error in kss_sql_error
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_SQL_ERROR` //};
     push @str, qq{CREATE PROCEDURE `PROC_ADD_SQL_ERROR` (
         IN error TEXT,
@@ -351,7 +348,7 @@ sub create_procedures {
     END;
     //};
 
-
+    # Add new statistics for issue, return and reserve
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_STATISTIC` //};
     push @str, qq{CREATE PROCEDURE `PROC_ADD_STATISTIC` (
         IN stat_type VARCHAR(255),
@@ -368,6 +365,8 @@ sub create_procedures {
     END;
     //};
 
+    # Add new MD5 logbin file
+    # return 1 if already exists
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_ADD_MD5` //};
     push @str, qq{CREATE PROCEDURE `PROC_ADD_MD5` (
         IN checksum VARCHAR(50),
@@ -406,8 +405,6 @@ sub drop_procedures {
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_GET_NEW_ID` //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_GET_OLD_ID` //};
-
-    push @str, qq{DROP PROCEDURE IF EXISTS `PROC_DELETE_FROM` //};
 
     push @str, qq{DROP PROCEDURE IF EXISTS `PROC_KSS_END` //};
 
