@@ -72,6 +72,8 @@ path:
 abspath:
         client_logbin: /var/log/mysql
         server_dump_filepath: /home/jonathan/workspace/versions/koha_master/Koha_Synchronize_System/data/server/outbox/last.sql
+        server_outbox: /home/jonathan/workspace/versions/koha_master/Koha_Synchronize_System/data/server/outbox/
+        server_inbox: /home/jonathan/workspace/versions/koha_master/Koha_Synchronize_System/data/server/inbox/
 
 cron:
         serverhost: 192.168.1.33
