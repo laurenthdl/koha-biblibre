@@ -1,0 +1,3 @@
+[submodule "koha-tmpl/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable"]
+	path = koha-tmpl/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable
+	url = https://github.com/tuupola/jquery_jeditable.git

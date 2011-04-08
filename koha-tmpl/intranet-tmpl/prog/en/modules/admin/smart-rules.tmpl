@@ -6,44 +6,15 @@
 <script src="/scripts/jquery-ui-1.8.1.custom.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="/intranet-tmpl/prog/en/lib/jquery/plugins/jquery.uitablefilter.js"></script>
 <script type="text/javascript" src="/intranet-tmpl/prog/en/lib/jquery/plugins/ui.tabs.js"></script>
-<script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jquery.jeditable.js" type="text/javascript" charset="utf-8"></script>
+<script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/jquery.jeditable.js" type="text/javascript" charset="utf-8"></script>
+<script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/jquery.jeditable.datepicker.js" type="text/javascript" charset="utf-8"></script>
+<script src="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/js/jquery.datePicker.js" type="text/javascript" charset="utf-8"></script>
 
+<link rel="stylesheet" type="text/css" href="/intranet-tmpl/prog/en/lib/jquery/plugins/jeditable/css/datePicker.css" />
 <link rel="stylesheet" type="text/css" href="/intranet-tmpl/prog/en/lib/jquery/plugins/ui.tabs.css" />
 
 <script type="text/javascript">
 //<![CDATA[
-        $.editable.addInputType('datepicker', {
-        element: function(settings, original) {
-     
-            var input = jQuery('<input size=10 />');
-     
-            // Catch the blur event on month change
-            settings.onblur = function(e) {
-            };
-     
-            input.datepicker({
-                dateFormat: 'yyyy-mm-dd',
-                onSelect: function(dateText, inst) {
-                        // you may want to remove this or
-                        // change it to
-                        // jQuery(this).submit();
-                        // see GamB's comments below
-                    jQuery(this).parents("form").submit();
-                },
-                onClose: function(dateText, inst) {
-                        // you may want to change this to
-                        // jQuery(this).submit();
-                        // see GamB's comments below
-                    jQuery(this).parents("form").submit();
-                }
-            });
-     
-            input.datepicker('option', 'showAnim', 'slide');
-     
-            jQuery(this).append(input);
-            return (input);
-        }
-        });
 $(document).ready(function() {
         $('#selectlibrary').find("input:submit").hide();
         $('#branchcode').change(function() {
@@ -100,115 +71,44 @@ $(document).ready(function() {
             $('#finesfilter').parent().attr('class',null);
             $('#nofilter').parent().attr('class',null);
         });
-        $('.editabledatepicker').editable(function(value, settings) {
-                return (value);
-            }, {
+        $('.editabledatepicker').editable('/cgi-bin/koha/admin/smart-rules-service.pl', {
+             submitdata   : {branchcode   : $('#branchcode').val(),
+                            categorycode : $(this).parent('td').children('td.categorycode').children('span').text(),
+                            itemtype     : $(this).parent('td').children('td.itemtype').children('span').text()},
+             id           : 'varname' ,
+             name         : 'inputvalue',
                 type: 'datepicker',
                 onblur: 'submit',
                 tooltip: _("Click to edit....")
         });
-        // Inline editor
-        var editor = false;
-        $('#smartrules>tbody>tr>td.editable').click(function() {
-            if ( ! editor ) {
-                var td = $(this);
-                var tdvalue = td.text().trim();
-                td.text('');
-
-                var type;
-                if ( $.inArray('boolean', td.attr('class').split(' ')) != -1 ) { // If the td is boolean, we display a checkbox
-                    editor = $('<input id="inlineeditor" type="checkbox" /\>');
-                    editor.attr('checked', tdvalue == 'Yes' ? 'checked' : '');
-                    type = 'boolean';
-                } else if ( $.inArray('triple', td.attr('class').split(' ')) != -1 ) { // else if it is a triple, we display a listbox
-                    var selectedn = tdvalue ==  ''   ? 'selected="selected"' : '';
-                    var selected1 = tdvalue == 'Yes' ? 'selected="selected"' : '';
-                    var selected0 = tdvalue == 'No'  ? 'selected="selected"' : '';
-                    var str  = '<select id="inlineeditor">';
-                        str += '<option value=""  ' + selectedn + '></option>';
-                        str += '<option value="1" ' + selected1 + '>'+_('Yes')+'</option>';
-                        str += '<option value="0" ' + selected0 + '>'+_('No')+'</option>';
-                        str += '</select>';
-                    editor = $(str);
-                    type = 'triple';
-                } else if ( $.inArray('datecompare', td.attr('class').split(' ')) != -1 ) { // else if it is a datecompare, we display a listbox
-                    var selectedn = tdvalue ==  '-1'   ? 'selected="selected"' : '';
-                    var selected1 = tdvalue == '1' ? 'selected="selected"' : '';
-                    var selected0 = tdvalue == '0'  ? 'selected="selected"' : '';
-                    var str  = '<select id="inlineeditor">';
-                        str += '<option value="-1"  ' + selectedn + '>'+_('Before')+'</option>';
-                        str += '<option value="1" ' + selected1 + '>'+_('After')+'</option>';
-                        str += '<option value="0" ' + selected0 + '>'+_('Exactly On')+'</option>';
-                        str += '</select>';
-                    editor = $(str);
-                    type = 'triple';
-                } else { // else we display a textbox
-                    editor = $('<input id="inlineeditor" type="text" size="4" /\>');
-                    editor.attr('value', tdvalue);
-                }
-
-                editor.focus();
-
-                editor.keyup(function(e) {   // on press
-                    if ( e.keyCode == 13 ) { // enter
-
-                        // let's build the atomic rule
-                        var branchcode   = $('#branchcode').val();
-                        var categorycode = td.parent().children('td.categorycode').children('span').text();
-                        var itemtype     = td.parent().children('td.itemtype').children('span').text();
-                        var varname      = td.attr('class').split(' ')[0];
-                        var inputvalue;
-                        switch ( type ) {
-                            case 'boolean':
-                                inputvalue = editor.attr('checked') ? 1 : 0;
-                                break;
-                            default:
-                                inputvalue = editor.val();
-                                break;
-                        }
-
-                        // post it to the server
-                        $.ajax({
-                            url: '/cgi-bin/koha/admin/smart-rules-service.pl',
-                            type: "POST",
-                            async: false,
-                            data: "branchcode="+branchcode+"&categorycode="+categorycode+"&itemtype="+itemtype+"&varname="+varname+"&inputvalue="+inputvalue,
-                            success: function(result) {
-
-                                // repopulate the td with data
-                                switch ( type ) {
-                                    case 'boolean':
-                                        td.text(result == '1' ? _('Yes') : _('No'));
-                                        break;
-                                    case 'triple':
-                                        switch ( result ) {
-                                            case '' : td.text('');    break;
-                                            case '1': td.text('Yes'); break;
-                                            case '0': td.text('No');  break;
-                                        }
-                                        break;
-                                    case 'datecompare':
-                                        switch ( result ) {
-                                            case '-1' : td.text('Before');    break;
-                                            case '1': td.text('After'); break;
-                                            case '0': td.text('Exactly On');  break;
-                                        }
-                                        break;
-                                    default:
-                                        td.text(result);
-                                        break;
-                                }
-
-                                editor.remove();
-                                editor = false;
-                            }
-                        });
-                    }
-                });
-
-                td.append(editor);
-            }
-        });
+        $('.datecompare').editable('/cgi-bin/koha/admin/smart-rules-service.pl', { 
+             submitdata   : {branchcode   : $('#branchcode').val(),
+                            categorycode : $(this).parent('td').children('td.categorycode').children('span').text(),
+                            itemtype     : $(this).parent('td').children('td.itemtype').children('span').text()},
+             id           : 'varname' ,
+             name         : 'inputvalue',
+             data   : " {'':'','1':"+_('After')+",'-1':"+_('Before')+",0:"+_('Exactly On')+"}",
+             type   : 'select',
+             submit : 'OK'
+         });
+        $('.editable').editable('/cgi-bin/koha/admin/smart-rules-service.pl', { 
+             submitdata   : {branchcode   : $('#branchcode').val(),
+                            categorycode : $(this).parent('td').children('td.categorycode').children('span').text(),
+                            itemtype     : $(this).parent('td').children('td.itemtype').children('span').text()},
+             id           : 'varname' ,
+             name         : 'inputvalue',
+             submit : 'OK'
+         });
+        $('.triple').editable('/cgi-bin/koha/admin/smart-rules-service.pl', { 
+             submitdata   : {branchcode   : $('#branchcode').val(),
+                            categorycode : $(this).parent().parent().children('td.categorycode').children('span').text(),
+                            itemtype     : $(this).parent().parent().children('td.itemtype').children('span').text()},
+             id           : 'varname' ,
+             name         : 'inputvalue',
+             data   : " {'':'','1':"+_('Yes')+",'0':"+_('No')+"}",
+             type   : 'select',
+             submit : 'OK'
+         });
 });
 //]]>
 </script>
@@ -308,7 +208,7 @@ for="tobranch"><strong>Clone these rules to:</strong></label> <input type="hidde
                                     <!-- TMPL_IF NAME="herited_maxissueqty" -->
                                     <td class="maxissueqty editable issues herited">
                                     <!-- TMPL_ELSE -->
-                                    <td class="maxissueqty editable issues">
+                                    <td class="issues">
                                     <!-- /TMPL_IF -->
                                         <!-- TMPL_IF NAME="unlimited_maxissueqty" -->
                                             Unlimited
@@ -324,16 +224,16 @@ for="tobranch"><strong>Clone these rules to:</strong></label> <input type="hidde
                                     <!-- TMPL_VAR NAME="issuelength" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_hardduedatecompare" -->
-                                    <td class="hardduedatecompare editable issues datecompare herited">
+                                    <td class="hardduedatecompare issues datecompare herited">
                                     <!-- TMPL_ELSE -->
-                                    <td class="hardduedatecompare editable issues datecompare">
+                                    <td class="hardduedatecompare issues datecompare">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="hardduedatecompare" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_hardduedate" -->
-                                    <td class="hardduedate editable editabledatepicker issues herited">
+                                    <td class="hardduedate editabledatepicker issues herited">
                                     <!-- TMPL_ELSE -->
-                                    <td class="hardduedate editable editabledatepicker issues">
+                                    <td class="hardduedate editabledatepicker issues">
                                     <!-- /TMPL_IF -->
                                     <!-- TMPL_VAR NAME="hardduedate" -->
                                     </td>
@@ -394,9 +294,9 @@ for="tobranch"><strong>Clone these rules to:</strong></label> <input type="hidde
                                     <!-- TMPL_VAR NAME="holdspickupdelay" -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_allowonshelfholds" -->
-                                    <td class="allowonshelfholds editable reserves triple herited">
+                                    <td class="allowonshelfholds reserves triple herited">
                                     <!--TMPL_ELSE-->
-                                    <td class="allowonshelfholds editable reserves triple">
+                                    <td class="allowonshelfholds reserves triple">
 				    <!--/TMPL_IF-->
                                     <!-- TMPL_IF NAME="allowonshelfholds" -->
                                     Yes
@@ -464,22 +364,6 @@ for="tobranch"><strong>Clone these rules to:</strong></label> <input type="hidde
                                     </td>
                                 <td class="issues">
                                     <input type="text" size="10" name="hardduedate" value="<!-- TMPL_VAR NAME="hardduedate" -->" />
-                                    <!-- TMPL_INCLUDE NAME="date-format.inc" -->
-                                    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" alt="Show Calendar"  border="0" id="CalendarDueDate" style="cursor: pointer;"/>
-                                    <script language="JavaScript" type="text/javascript">
-                                         function refocus(calendar) {
-                                             document.getElementById('hardduedate').focus();
-                                             calendar.hide();
-                                         };
-                                         Calendar.setup(
-                                         {
-                                         inputField : "hardduedate",
-                                         ifFormat : "%m/%d/%Y",
-                                         button : "CalendarDueDate",
-                                         onClose: refocus
-                                         }
-                                         );
-                                     </script>
                                  </td>
                                 <td class="fines"><input name="fine" size="4" value="<!-- TMPL_VAR NAME="fine" -->"/></td>
                                 <td class="fines"><input name="chargeperiod" size="2" value="<!-- TMPL_VAR NAME="chargeperiod" -->"/></td>
