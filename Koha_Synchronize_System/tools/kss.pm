@@ -285,10 +285,10 @@ sub prepare_next_iteration {
     $dbh->do("CALL PROC_CREATE_KSS_INFOS()");
 }
 
-sub set_current_db_available {
+sub dump_available_db {
     my $log = shift;
-    my $conf = get_conf;
 
+    my $conf = get_conf;
     my $outbox   = $$conf{path}{server_outbox};
     my $hostname = $$conf{databases_infos}{hostname};
     my $user     = $$conf{databases_infos}{user};
@@ -296,9 +296,7 @@ sub set_current_db_available {
     my $db_server = $$conf{databases_infos}{db_server};
     my $remote_dump_filepath = $$conf{path}{server_dump_filepath};
 
-    $log && $log->info("=== Préparation pour la prochaine itération ===");
-    Koha_Synchronize_System::tools::kss::prepare_next_iteration $log;
-
+ 
     $log && $log->info("=== Dump de la nouvelle base ===");
     my $dump_filepath = $outbox . "/" . strftime ( "%Y-%m-%d_%H:%M:%S", localtime ) . ".sql";
     $log && $log->info("Dump en cours dans $dump_filepath");

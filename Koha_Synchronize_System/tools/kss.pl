@@ -70,7 +70,7 @@ eval {
         Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
 
         $log->info("== Extraction des fichiers binaires de log sql ==");
-	Koha_Synchronize_System::tools::kss::extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
+        Koha_Synchronize_System::tools::kss::extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
 
         my @files = qx{ls -1 $diff_logtxt_dir};
         $log->info("== Digestion des requêtes ==");
@@ -85,11 +85,15 @@ eval {
         Koha_Synchronize_System::tools::kss::clean_fs;
     }
 
-    $log->info("=== Mise à disposition du client de la nouvelle base de données ===");
-    Koha_Synchronize_System::tools::kss::set_current_db_available $log;
+    $log && $log->info("=== Préparation pour la prochaine itération ===");
+    Koha_Synchronize_System::tools::kss::prepare_next_iteration $log;
 
     $log->info("=== Cleaning ... ===");
     Koha_Synchronize_System::tools::kss::clean $mysql_cmd, $user, $passwd, $db_server, $log;
+
+    $log->info("=== Mise à disposition du client de la nouvelle base de données ===");
+    Koha_Synchronize_System::tools::kss::dump_available_db $log;
+
 
 };
 

@@ -17,7 +17,6 @@ my $kss_home                 = $$conf{path}{kss_server_home};
 my $diff_logbin_dir          = $$conf{path}{diff_logbin_dir};
 my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
 my $diff_logtxt_dir          = $$conf{path}{diff_logtxt_dir};
-my $dump_id_dir              = $$conf{path}{dump_ids};
 my $dump_db_server_dir       = $$conf{path}{backup_server_db};
 my $backup_server_diff       = $$conf{path}{backup_server_diff};
 my $inbox                    = $$conf{path}{server_inbox};
@@ -55,6 +54,11 @@ qx{chown -R $username:$username $kss_home};
 
 print "/!\ Changer le mot de passe pour l'utilisateur $username\n";
 
-print "=== Mise à disposition du client de la base de données du serveur ===";
-Koha_Synchronize_System::tools::kss::set_current_db_available $log;
+print "=== Mise à disposition du client de la base de données du serveur ===\n";
+print "Insertion des procedures\n";
+Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server;
+print "Préparation prochaine itération\n";
+Koha_Synchronize_System::tools::kss::prepare_next_iteration;
+print "Nettoyage\n";
+Koha_Synchronize_System::tools::kss::clean $mysql_cmd, $user, $passwd, $db_server;
 
