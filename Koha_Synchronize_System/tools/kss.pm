@@ -584,18 +584,21 @@ sub insert_diff_file {
         @warnings = $dbh->selectrow_array(qq{SHOW WARNINGS $sep});
 
         if ( @errors ) {
-	    $log && $log->error($errors[0] . ':' . $errors[1] . ' => ' . $errors[2]);
+            $log && $log->error($errors[0] . ':' . $errors[1] . ' => ' . $errors[2]);
             if ( ( $table_name eq 'biblioitems' or $table_name eq 'items' ) and $errors[0] eq 'Error' and $errors[1] eq '1222' ) {
-                $log && $log->error("This query was ignored. It try to modify $table_name table");
+                $log && $log->error("This query was ignored. It tries to modify $table_name table");
                 $dbh->do("CALL PROC_ADD_ERROR('Unauthorized query', 'A query was ignored. It try to modify $table_name table');");
+            } elsif ( ( $table_name eq 'issues' ) and $errors[0] eq 'Error' and $errors[1] eq '1452' and $errors[2] =~ /`issues_ibfk_2`/ ) {
+                $log && $log->error("This query tries to update a record with a item wich doesn't exist");
+                $dbh->do("CALL PROC_ADD_ERROR('Item missing', 'A quer¼y tries to update a record with an item wich doesn\\'t exist');");
             } else {
                 $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $errors[0] . ":" . $errors[1] . " => " . $errors[2] . "\", " . $dbh->quote($query) . ");");
             }
         } elsif ( @warnings ) {
-	    if ( $warnings[0] ne 'Note' ) {
-                $log && $log->warning($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
-                $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
-	    }
+            if ( $warnings[0] ne 'Note' ) {
+                    $log && $log->warning($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
+                    $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
+            }
         } else {
             $log && $log->info(" <<< OK >>>")
         }

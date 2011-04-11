@@ -56,6 +56,7 @@ sub processQueries {
         {filename => "warnings-02-issue_returned_twice.sql", func => "test_issue_returned_twice"},
         {filename => "warnings-03-reserve_twice_on_same_itemnumber.sql", func => "test_reserve_twice_on_samedi_itemnumber"},
         {filename => "warnings-04-unauthorized_query.sql", func => "test_unauthorized_query"},
+        {filename => "warnings-05-issues_on_missing_items.sql", func => "test_issues_on_missing_items"},
     );
     for my $hash ( @files ) {
         my $file = $$hash{filename};
@@ -95,9 +96,9 @@ sub test_issue_already_onloan {
     is (&findInData ("issues", $expected), 1 , "new issues 130 for borrower 31");
 
     $expected = { 
-        'error' => 'Issue already onloan',
-        'message' => 'Issue 130 is already onloan by another borrower'};
-    is (&findInData ($kss_errors_table, $expected), 1 , "new issue 130 raise an error in $kss_errors_table table");
+        'error' => 'Item already onloan',
+        'message' => 'Item 130 is already onloan by borrower with borrowernumber=30' };
+    is (&findInData ($kss_errors_table, $expected), 1 , "Issue on item 130 raise an error in $kss_errors_table table");
 }
 
 sub test_issue_returned_twice {
@@ -183,6 +184,18 @@ sub test_unauthorized_query {
 
 }
 
+sub test_issues_on_missing_items {
+    my $bn = "37";
+    my $in = "42424242";
+    my $expected = {
+        borrowernumber => $bn,
+        itemnumber => $in};
+    is (&findInData ("issues", $expected), 0 , "issue is missing");
+    $expected = {
+        'error' => 'Item missing',
+        'message' => "A quer¼y tries to update a record with an item wich doesn't exist"};
+    is (&findInData ($kss_errors_table, $expected), 1 , "items warning. We can't modify this table");
+}
 sub findInData {
     my ($table, $data, $out) = @_;
     my $results = C4::SQLHelper::SearchInTable ($table, $data, undef, undef, $out, undef, undef);

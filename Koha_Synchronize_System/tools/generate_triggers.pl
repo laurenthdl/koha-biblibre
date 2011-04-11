@@ -129,6 +129,7 @@ sub create_triggers {
         push @str, "  FOR EACH ROW BEGIN";
         push @str, "    DECLARE tmp_id INT(11);";
         push @str, "    DECLARE count_error INT(11);";
+        push @str, "    DECLARE borrowernumber_error INT(11);";
         push @str, "    DECLARE new_priority SMALLINT(6);";
         while (my ($field, $ref) = each %$hash) {
             my ($table_referer, $field_referer) = split /\./, $ref;
@@ -136,9 +137,9 @@ sub create_triggers {
             push @str, "    SELECT \@tmp_id INTO tmp_id;";
             push @str, "    SET NEW.$field = tmp_id;";
             if  ( $table eq 'issues' and $field_referer eq 'itemnumber' ) {
-                push @str, "    SELECT COUNT(*) FROM issues WHERE itemnumber=NEW.itemnumber INTO count_error;";
+                push @str, "    SELECT COUNT(*), borrowernumber FROM issues WHERE itemnumber=NEW.itemnumber INTO count_error, borrowernumber_error;";
                 push @str, "    IF count_error > 0 THEN";
-                push @str, "        CALL PROC_ADD_ERROR('Item already onloan', CONCAT('Item ', NEW.itemnumber, ' is already onloan by another borrower'));";
+                push @str, "        CALL PROC_ADD_ERROR('Item already onloan', CONCAT('Item ', NEW.itemnumber, ' is already onloan by borrower with borrowernumber=', borrowernumber_error));";
                 push @str, "    END IF;";
             }
         }
