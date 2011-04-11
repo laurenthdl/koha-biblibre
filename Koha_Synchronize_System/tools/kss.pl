@@ -14,6 +14,11 @@ use Koha_Synchronize_System::tools::kss;
 
 my $log = $log_kss;
 
+unless (flock(DATA, LOCK_EX|LOCK_NB)) {
+    $log->error( "$0 is already running. Exiting.\n");
+    exit(1);
+}
+
 my $conf                     = Koha_Synchronize_System::tools::kss::get_conf();
 my $kss_dir                  = $$conf{path}{kss_dir};
 my $db_server                = $$conf{databases_infos}{db_server};
