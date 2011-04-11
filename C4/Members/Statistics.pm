@@ -79,10 +79,15 @@ sub GetPrecedentStateByBorrower {
     my ($borrowernumber) = @_;
     my $dbh   = C4::Context->dbh;
 
-    my $query = construct_query "precedent_state", "FROM issues i, items it WHERE i.itemnumber=it.itemnumber AND i.borrowernumber=? AND DATE_FORMAT(i.issuedate,'%Y-%m-%d') < DATE_FORMAT(NOW(), '%Y-%m-%d') AND i.returndate is NULL ";
+    my $query = construct_query "precedent_state",
+        "FROM (
+            SELECT it.* FROM issues i, items it WHERE i.borrowernumber=? AND i.itemnumber=it.itemnumber AND i.issuedate<CURDATE()
+            UNION
+            SELECT it.* FROM old_issues oi, items it WHERE oi.borrowernumber=? AND oi.itemnumber=it.itemnumber AND oi.issuedate<CURDATE() AND oi.returndate=CURDATE()
+        ) tmp";     # alias is required by MySQL
 
     my $sth = $dbh->prepare($query);
-    $sth->execute($borrowernumber);
+    $sth->execute($borrowernumber, $borrowernumber);
     return $sth->fetchall_arrayref( {});
 }
 
