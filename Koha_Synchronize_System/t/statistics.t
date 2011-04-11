@@ -69,7 +69,7 @@ sub processQueries {
 }
 
 sub clean {
-    Koha_Synchronize_System::tools::kss::clean $mysql_cmd, $user, $passwd, $db_server;
+    Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server;
 }
 
 sub findInData {

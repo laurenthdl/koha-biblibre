@@ -9,7 +9,7 @@ use DateTime;
 use POSIX qw(strftime);
 use YAML;
 use Digest::MD5;
-use Cwd;
+use File::Path qw(make_path remove_tree);
 use C4::Context;
 use Koha_Synchronize_System::tools::mysql;
 
@@ -95,7 +95,7 @@ sub get_archives {
     my $conf = get_conf;
     my $dir = $$conf{path}{server_inbox};
 
-    my @files = qx{ls -1 $dir/*.tar.gz};
+    my @files = <$dir/*.tar.gz>;
     return \@files;
 }
 
@@ -111,7 +111,8 @@ sub backup_server_db {
 
     my $dump_filename = $dump_db_server_dir . "/" . ( strftime "%Y-%m-%d_%H:%M:%S", localtime );
     $log && $log->info("Dump en cours dans $dump_filename");
-    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename};
+
+    system( qq{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename} ) == 0 or die $!;
 }
 
 sub backup_client_logbin {
@@ -119,7 +120,6 @@ sub backup_client_logbin {
     my $conf = get_conf;
     my $service_cmd = $$conf{which_cmd}{service};
     my $hostname_cmd = $$conf{which_cmd}{hostname};
-    my $mkdir_cmd = $$conf{which_cmd}{mkdir};
     my $cp_cmd = $$conf{which_cmd}{cp};
     my $rm_cmd = $$conf{which_cmd}{rm};
     my $mv_cmd = $$conf{which_cmd}{mv};
@@ -128,73 +128,34 @@ sub backup_client_logbin {
     my $bakdir = $$conf{path}{client_backup};
     my $logdir = $$conf{abspath}{client_logbin};
     
-#    eval { qx{$service_cmd mysql stop} };
-##    die $@ if $@;
-#
-#    my $id = strftime "%Y-%m-%d_%H-%M-%S", localtime;
-#    my $dirname = $outbox . "/" . $id;
-#    
-#    eval { qx{$mkdir_cmd $dirname/logbin -p} };
-#    die $@ if $@;
-#
-#    eval { qx{$mkdir_cmd $dirname/ids -p} };
-#    die $@ if $@;
-#
-#    eval { qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin} };
-#    die $@ if $@;
-#
-#    eval { qx{$rm_cmd -f $logdir/mysql-bin.*} };
-#    die $@ if $@;
-#
-##    eval { qx{$service_cmd mysql start} };
-#    die $@ if $@;     
-
-    eval {
-        qx{$service_cmd mysql stop};
-    };
-    if ( $? != 0 ) {
-        die "Can't stop mysql";
-    }
+    system( qq{$service_cmd mysql stop} ) == 0 or die "Can't stop mysql ! ($!)";
     
-    my $id = strftime "%Y-%m-%d_%H-%M-%S", localtime;
-    my $dirname = $outbox . "/" . $id;
+    my $filename = strftime "%Y-%m-%d_%H-%M-%S", localtime;
+    my $dirname = $outbox . "/" . $filename;
     eval {
-        qx{$mkdir_cmd $dirname/logbin -p};
-        qx{$mkdir_cmd $dirname/ids -p};
+        make_path "$dirname/logbin";
+        make_path "$dirname/ids";
     };
-    if ( $? != 0 ) {
-        die "Can't create directory for backup";
-    }
-    qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
-    qx{$rm_cmd -f $logdir/mysql-bin.*};
+    die "Can't create directory for backup ($@)" if $@;
 
     eval {
-        qx{$service_cmd mysql start};
+        qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
+        qx{$rm_cmd -f $logdir/mysql-bin.*};
     };
-    if ( $? != 0 ) {
-        die "Can't start mysql";
-    }
+    die "Can't move mysql-bin ($@)" if $@;
+
+    system( qq{$service_cmd mysql start} ) == 0 or die "Can't start mysql ! ($!)";
      
-    my $cwd = getcwd;
-    eval { qx{$hostname_cmd -f > $dirname/hostname} };
-    die $@ if $@;
+    system( qq{$hostname_cmd -f > $dirname/hostname} ) == 0 or ($log && $log->warning("Can't get hostname from file ($!)"));
     
     eval { generate_ids_files("$dirname/ids") };
     die $@ if $@;
     
-    eval { chdir $dirname };
-    die $@ if $@;
-    
-    eval { qx{$tar_cmd zcvf $id.tar.gz logbin ids hostname} };
-    die $@ if $@;
+    system( qq{cd $dirname; $tar_cmd zcvf $filename.tar.gz logbin ids hostname} ) == 0 or die "Cant' extract archive ($!)";
 
-    eval { qx{$mv_cmd $id.tar.gz $outbox} };
-    die $@ if $@;
+    system( qq{cd $dirname; $mv_cmd $filename.tar.gz $outbox} ) == 0 or die "Can't move archive to outbox ($!)";
 
-    chdir $cwd;
-
-    eval { qx{$mv_cmd $dirname $bakdir} };
-    die $@ if $@;
+    system( qq{$mv_cmd $dirname $bakdir} ) == 0 or die "Can't move directory $dirname to backup dir $bakdir ($!)";
 
 }
 
@@ -204,13 +165,13 @@ sub generate_ids_files {
     my $scripts_dir = $$conf{path}{client_scripts_ids};
     my $perl_cmd = $$conf{which_cmd}{perl};
 
-    my @scripts = qx{ls -1 $scripts_dir/*.pl};
+    my @scripts = <$scripts_dir/*.pl>;
     for my $script ( @scripts ) {
         chomp $script;
         my $filename = $script;
         $filename =~ s#.*/([^/]*).pl#$1#;
         my $filepath = $outdir . '/' . $filename . '.sql';
-        qx{$perl_cmd $script > $filepath};
+        system( qq{$perl_cmd $script > $filepath} ) == 0 or die "Can't gererate file $filepath ($!)";
     }
 }
 
@@ -218,7 +179,7 @@ sub diff_files_exists {
     my $dir = shift;
     my $log = shift;
 
-    my @diff_bin = qx{ls -1 $dir};
+    my @diff_bin = <$dir/*>;
     if ( scalar( @diff_bin ) > 0 ) {
         $log && $log->info(scalar( @diff_bin) . " fichiers binaires trouvés");
         return 1;
@@ -230,55 +191,63 @@ sub diff_files_exists {
 }
 
 sub insert_new_ids {
-    my ($mysql_cmd, $user, $pwd, $db_name, $id_dir, $log) = @_;
-    my @dump_id = qx{ls -1 $id_dir};
+    my ($user, $pwd, $db_name, $id_dir, $log) = @_;
+    my @dump_id = <$id_dir/*>;
+
+    my $conf = get_conf();
+    my $mysql_cmd = $$conf{which_cmd}{mysql};
 
     my $nb_files = scalar(@dump_id);
-    qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS\('Insert new ids \($nb_files files found\)', 0\);"};
+    system( qq{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS\('Insert new ids \($nb_files files found\)', 0\);"} ) == 0 or ($log && $log->warning("Can't call PROC_UPDATE_STATUS ($!)"));
     $log && $log->info("$nb_files Fichiers trouvés");
+
     for my $file ( @dump_id ) {
         chomp $file;
         $log && $log->info("Insertion de $file en cours...");
-        qx{$mysql_cmd -u $user -p$pwd $db_name < $id_dir/$file};
+        system( qq{$mysql_cmd -u $user -p$pwd $db_name < $id_dir/$file} ) == 0 or die "Can't Insert file $id_dir/$file in $db_name DB ($!)";
     }
-    qx{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS\('Insert new ids \($nb_files files found\)', 1\);"};
+
+    system( qq{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS\('Insert new ids \($nb_files files found\)', 1\);"} ) == 0 or ($log && $log->warning("Can't call PROC_UPDATE_STATUS ($!)"));
 }
 
 sub insert_proc_and_triggers {
     my ($user, $pwd, $db_name, $log) = @_;
     my $conf = get_conf();
     eval {
-        qx{$$conf{path}{generate_triggers} > /tmp/triggers.sql};
-        qx{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/triggers.sql};
-        qx{$$conf{path}{generate_procedures} > /tmp/procedures.sql};
-        qx{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/procedures.sql};
+        system( qq{$$conf{path}{generate_triggers} > /tmp/triggers.sql} ) or die $!;
+        system( qq{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/triggers.sql} ) == 0 or die $!;
+        system( qq{$$conf{path}{generate_procedures} > /tmp/procedures.sql} ) == 0 or die $!;
+        system( qq{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/procedures.sql} ) == 0 or die $!;
     };
 
     if ( $@ ) {
-        die $@;
+        die "Can't generate triggers or procedures ($@)";
     }
 }
 
 sub prepare_database {
-    my ($mysql_cmd, $user, $pwd, $db_name, $client_hostname, $log) = @_;
-    qx{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_KSS_START('$client_hostname');"};
+    my ($user, $pwd, $db_name, $client_hostname, $log) = @_;
+
+    my $conf = get_conf();
+    my $mysql_cmd = $$conf{which_cmd}{mysql};
+    system( qq{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_KSS_START('$client_hostname');"} ) == 0 or die "Can't call PROC_KSS_START procedure ($!)";
 }
 
 sub delete_proc_and_triggers {
-    my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+    my ($user, $pwd, $db_name, $log) = @_;
     my $conf = get_conf();
     eval {
-        qx{$$conf{path}{generate_triggers} -action=drop > /tmp/del_triggers.sql};
-        qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_triggers.sql};
-        qx{$$conf{path}{generate_procedures} -action=drop > /tmp/del_procedures.sql};
-        qx{$mysql_cmd -u $user -p$pwd $db_name < /tmp/del_procedures.sql};
+        system( qq{$$conf{path}{generate_triggers} -action=drop> /tmp/del_triggers.sql} ) or die $!;
+        system( qq{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/del_triggers.sql} ) == 0 or die $!;
+        system( qq{$$conf{path}{generate_procedures} -action=drop> /tmp/del_procedures.sql} ) == 0 or die $!;
+        system( qq{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/del_procedures.sql} ) == 0 or die $!;
     };
 
     if ( $@ ) {
-        die $@;
+        die "Can't delete triggers or procedures ($@)";
     }
-
 }
+
 sub clean_fs {
 
     my $conf = get_conf();
@@ -295,13 +264,15 @@ sub clean_fs {
 }
 
 sub clean {
-    my ($mysql_cmd, $user, $pwd, $db_name, $log) = @_;
+    my ($user, $pwd, $db_name, $log) = @_;
 
+    my $conf = get_conf();
+    my $mysql_cmd = $$conf{which_cmd}{mysql};
     $log && $log->info(" - Purge des tables temporaires");
-    qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_KSS_END();"};
+    system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_KSS_END();"} ) == 0 or die "Can't call PROC_KSS_END ($!)";
 
     $log && $log->info(" - Suppression en base des triggers et procédures stockées");
-    delete_proc_and_triggers $mysql_cmd, $user, $passwd, $db_server, $log;
+    delete_proc_and_triggers $user, $passwd, $db_server, $log;
 
 }
 
@@ -326,9 +297,9 @@ sub dump_available_db {
     $log && $log->info("=== Dump de la nouvelle base ===");
     my $dump_filepath = $outbox . "/" . strftime ( "%Y-%m-%d_%H:%M:%S", localtime ) . ".sql";
     $log && $log->info("Dump en cours dans $dump_filepath");
-    qx{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filepath};
+    system( qq{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filepath} ) == 0 or die "Can't dump '$db_server' DB($!)";
     $log && $log->info("Copie dans le fichier partagé au client ($remote_dump_filepath)");
-    qx{cp $dump_filepath $remote_dump_filepath};
+    system( qq{cp $dump_filepath $remote_dump_filepath} ) == 0 or die "Can't copy dump file";
 }
 
 sub extract_and_purge_mysqllog {
@@ -345,12 +316,12 @@ sub extract_and_purge_mysqllog {
     my $conf = get_conf();
     my $file_cmd             = $$conf{which_cmd}{file};
 
-    my @files = qx{ls -1 $bindir};
+    my @files = <$bindir/*>;
     for my $file ( @files ) {
         chomp $file;
         my $bin_filepath = "$bindir\/$file";
         $log && $log->info("--- Traitement du fichier $file ---");
-        my $r = qx{$file_cmd $bin_filepath};
+        my $r = system( qq{$file_cmd $bin_filepath} );
         if ( not $r =~ /MySQL replication log/ ) {
             $log && $log->info("Ce fichier n'est pas un fichier de log sql, il ne peut être géré");
             next;
@@ -374,7 +345,7 @@ sub extract_and_purge_mysqllog {
         my $full_output_filepath = "$fulldir\/$file";
         my $output_filepath = "$txtdir\/$file";
         $log && $log->info("Extraction vers $full_output_filepath");
-        qx{$mysqlbinlog_cmd $bin_filepath > $full_output_filepath};
+        system( qq{$mysqlbinlog_cmd $bin_filepath > $full_output_filepath} ) == 0 or die "Can't extract mysql logbin with mysqlbinlog command ($!)";
         
         $log && $log->info("Purge vers $output_filepath");
         Koha_Synchronize_System::tools::mysql::purge_mysql_log ($full_output_filepath, $output_filepath);

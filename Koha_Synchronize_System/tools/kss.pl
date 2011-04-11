@@ -1,8 +1,11 @@
+#!/usr/bin/perl
+
 use Modern::Perl;
 use DBI;
 use Data::Dumper;
 use Getopt::Long;
 use Pod::Usage;
+use Fcntl qw(:flock);
 use YAML;
 
 use C4::Logguer qw(:DEFAULT $log_kss);
@@ -17,7 +20,6 @@ my $db_server                = $$conf{databases_infos}{db_server};
 my $diff_logbin_dir          = $$conf{path}{diff_logbin_dir};
 my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
 my $diff_logtxt_dir          = $$conf{path}{diff_logtxt_dir};
-my $mysql_cmd                = $$conf{which_cmd}{mysql};
 my $mv_cmd                   = $$conf{which_cmd}{mv};
 my $tar_cmd                  = $$conf{which_cmd}{tar};
 my $hostname                 = $$conf{databases_infos}{hostname};
@@ -27,7 +29,6 @@ my $dump_id_dir              = $$conf{path}{dump_ids};
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $inbox                    = $$conf{path}{server_inbox};
 my $outbox                   = $$conf{path}{server_outbox};
-
 
 $log->info("BEGIN");
 
@@ -51,39 +52,35 @@ eval {
         chomp $archive;
         $log->info("=== Gestion de l'archive $archive ===");
         $log->info(" - Extraction...");
-        print "$tar_cmd zxvf $archive -C $inbox";
-        eval { qx{ $tar_cmd zxvf $archive -C $inbox } };
-        die $@ if $@;
+        system( qq{ $tar_cmd zxvf $archive -C $inbox } ) == 0 or die $!;
 
         $log->info(" - Déplacement des fichiers...");
-        my $cmd = "$mv_cmd $inbox/ids/*.sql $dump_id_dir/";
-        my @r = qx{$cmd};
-        $cmd = "$mv_cmd $inbox/logbin/* $diff_logbin_dir/";
-        @r = qx{$cmd};
+        system( qq{$mv_cmd $inbox/ids/*.sql $dump_id_dir/} ) == 0 or die $!;
+        system( qq{$mv_cmd $inbox/logbin/* $diff_logbin_dir/} ) == 0 or die $!;
 
-        $cmd = "cat $inbox/hostname";
-        @r = qx{$cmd};
-        my $client_hostname = $r[0];
+        open HN, "$inbox/hostname";
+        my $client_hostname = <HN>;
+        close HN;
     	chomp $client_hostname;
 
         Koha_Synchronize_System::tools::kss::diff_files_exists $diff_logbin_dir, $log;
 
         $log->info("== Préparation de la base de données ==");
-        Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server, $client_hostname, $log;
+        Koha_Synchronize_System::tools::kss::prepare_database $user, $passwd, $db_server, $client_hostname, $log;
 
         $log->info("== Insertion des nouveaux ids remontés par le client ==");
-        Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
+        Koha_Synchronize_System::tools::kss::insert_new_ids $user, $passwd, $db_server, $dump_id_dir, $log;
 
         $log->info("== Extraction des fichiers binaires de log sql ==");
         Koha_Synchronize_System::tools::kss::extract_and_purge_mysqllog( $diff_logbin_dir, $diff_logtxt_full_dir, $diff_logtxt_dir, $log );
 
-        my @files = qx{ls -1 $diff_logtxt_dir};
+        my @files = <$diff_logtxt_dir/*>;
         $log->info("== Digestion des requêtes ==");
         $log->info(scalar( @files ) . " fichiers trouvés");
         for my $file ( @files ) {
             chomp $file;
             $log && $log->info("Traitement de $file en cours...");
-	    Koha_Synchronize_System::tools::kss::insert_diff_file ("$diff_logtxt_dir\/$file", undef, $log);
+            Koha_Synchronize_System::tools::kss::insert_diff_file ("$diff_logtxt_dir\/$file", undef, $log);
         }
 
         $log->info("== Suppression des fichiers utilisés ==");
@@ -94,7 +91,7 @@ eval {
     Koha_Synchronize_System::tools::kss::prepare_next_iteration $log;
 
     $log->info("=== Cleaning ... ===");
-    Koha_Synchronize_System::tools::kss::clean $mysql_cmd, $user, $passwd, $db_server, $log;
+    Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server, $log;
 
     $log->info("=== Mise à disposition du client de la nouvelle base de données ===");
     Koha_Synchronize_System::tools::kss::dump_available_db $log;
@@ -104,6 +101,8 @@ eval {
 
 if ( $@ ) {
 
+    $log->error("An error occured, try to clean...");
+    Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server, $log;
     $log->error($@);
     Koha_Synchronize_System::tools::kss::log_error($@, "Erreur lors de l'exécution ...");
 
@@ -111,3 +110,6 @@ if ( $@ ) {
 
 $log->info("END");
 
+__DATA__
+DO NOT REMOVE THIS DATA SECTION.
+USED BY LOCK SYSTEM.

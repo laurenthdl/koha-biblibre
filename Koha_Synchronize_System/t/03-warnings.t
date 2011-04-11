@@ -44,7 +44,7 @@ sub setUp {
 
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server; 
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_CREATE_KSS_INFOS();" } ;
-    Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server, "host_test"; 
+    Koha_Synchronize_System::tools::kss::prepare_database $user, $passwd, $db_server, "host_test"; 
 
 }
 
@@ -81,7 +81,7 @@ sub checkBefore {
 }
 
 sub clean {
-    Koha_Synchronize_System::tools::kss::clean $mysql_cmd, $user, $passwd, $db_server, $log;
+    Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server, $log;
 }
 
 sub test_issue_already_onloan {

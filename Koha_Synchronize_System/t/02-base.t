@@ -43,10 +43,10 @@ sub setUp {
 
     Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server; 
     qx{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_CREATE_KSS_INFOS();" } ;
-    Koha_Synchronize_System::tools::kss::prepare_database $mysql_cmd, $user, $passwd, $db_server, "host_test"; 
+    Koha_Synchronize_System::tools::kss::prepare_database $user, $passwd, $db_server, "host_test"; 
 
     # Not possible in test, it's too late......
-    #Koha_Synchronize_System::tools::kss::insert_new_ids $mysql_cmd, $user, $passwd, $db_server, $dump_id_dir, $log;
+    #Koha_Synchronize_System::tools::kss::insert_new_ids $user, $passwd, $db_server, $dump_id_dir, $log;
 
     my $insert = qq{INSERT INTO } . $matching_table_prefix . qq{borrowers(borrowernumber, cardnumber) VALUES ("100", "42424242");};
     qx{$mysql_cmd -u $user -p$passwd $db_server -e '$insert'} ;
@@ -110,7 +110,7 @@ sub checkBefore {
 }
 
 sub clean {
-    Koha_Synchronize_System::tools::kss::clean $mysql_cmd, $user, $passwd, $db_server, $log;
+    Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server, $log;
 }
 
 sub testborrower01insert {
