@@ -18,13 +18,15 @@ my $diff_logbin_dir          = $$conf{path}{diff_logbin_dir};
 my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
 my $diff_logtxt_dir          = $$conf{path}{diff_logtxt_dir};
 my $mysql_cmd                = $$conf{which_cmd}{mysql};
+my $mv_cmd                   = $$conf{which_cmd}{mv};
+my $tar_cmd                  = $$conf{which_cmd}{tar};
 my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $dump_id_dir              = $$conf{path}{dump_ids};
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $inbox                    = $$conf{path}{server_inbox};
-my $outbox                    = $$conf{path}{server_outbox};
+my $outbox                   = $$conf{path}{server_outbox};
 
 
 $log->info("BEGIN");
@@ -49,17 +51,20 @@ eval {
         chomp $archive;
         $log->info("=== Gestion de l'archive $archive ===");
         $log->info(" - Extraction...");
-        eval { "$tar_cmd zxvf $archive -C $inbox" };
+        print "$tar_cmd zxvf $archive -C $inbox";
+        eval { qx{ $tar_cmd zxvf $archive -C $inbox } };
         die $@ if $@;
 
         $log->info(" - Déplacement des fichiers...");
-        $cmd = "$mv_cmd $inbox/ids/*.sql $dump_id_dir/";
+        my $cmd = "$mv_cmd $inbox/ids/*.sql $dump_id_dir/";
+        my @r = qx{$cmd};
         $cmd = "$mv_cmd $inbox/logbin/* $diff_logbin_dir/";
+        @r = qx{$cmd};
 
         $cmd = "cat $inbox/hostname";
-        my @r = qx{$cmd};
+        @r = qx{$cmd};
         my $client_hostname = $r[0];
-	chomp $client_hostname;
+    	chomp $client_hostname;
 
         Koha_Synchronize_System::tools::kss::diff_files_exists $diff_logbin_dir, $log;
 

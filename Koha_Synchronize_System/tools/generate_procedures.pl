@@ -18,8 +18,6 @@ my $conf = YAML::LoadFile("$kss_dir/conf/kss.yaml");
 my $matching_table_prefix = $$conf{databases_infos}{matching_table_prefix};
 my $matching_table_ids = $$conf{databases_infos}{matching_table_ids};
 
-my $client_db_name = $$conf{databases_infos}{db_client};
-my $server_db_name = $$conf{databases_infos}{db_server};
 my $kss_infos_table = $$conf{databases_infos}{kss_infos_table};
 my $kss_logs_table = $$conf{databases_infos}{kss_logs_table};
 my $kss_errors_table = $$conf{databases_infos}{kss_errors_table};
@@ -157,17 +155,17 @@ sub create_procedures {
     BEGIN
         DECLARE next_id INT(11);
         CALL PROC_UPDATE_STATUS('Creating $kss_infos_table table...', 0);
-        DROP TABLE IF EXISTS $client_db_name.$kss_infos_table;
-        CREATE TABLE IF NOT EXISTS $client_db_name.$kss_infos_table (
+        DROP TABLE IF EXISTS $kss_infos_table;
+        CREATE TABLE IF NOT EXISTS $kss_infos_table (
             variable VARCHAR(255), 
             value VARCHAR(255)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-        SELECT MAX(GREATEST(o.borrowernumber, b.borrowernumber)) + 1 FROM deletedborrowers o, borrowers b INTO next_id;
-        INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("$max_old_borrowernumber_fieldname", next_id);
+        SELECT GREATEST(IFNULL(MAX(o.borrowernumber), 1), IFNULL(MAX(b.borrowernumber), 1)) + 1 FROM deletedborrowers o, borrowers b INTO next_id;
+        INSERT INTO $kss_infos_table (variable, value) VALUES ("$max_old_borrowernumber_fieldname", next_id);
         
-        SELECT MAX(GREATEST(o.reservenumber, r.reservenumber)) + 1 FROM old_reserves o, reserves r INTO next_id;
-        INSERT INTO $client_db_name.$kss_infos_table (variable, value) VALUES ("$max_old_reservenumber_fieldname", next_id);
+        SELECT GREATEST(IFNULL(MAX(o.reservenumber), 1), IFNULL(MAX(r.reservenumber), 1)) + 1 FROM old_reserves o, reserves r INTO next_id;
+        INSERT INTO $kss_infos_table (variable, value) VALUES ("$max_old_reservenumber_fieldname", next_id);
         CALL PROC_UPDATE_STATUS('Creating $kss_infos_table table...', 1);
     END;
     //};
