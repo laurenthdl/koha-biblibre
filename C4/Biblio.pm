@@ -1533,7 +1533,8 @@ sub GetMarcAuthors {
               if ( $marcflavour eq 'UNIMARC' and ( $authors_subfield->[0] =~ /4/ ) );
             my @this_link_loop = @link_loop;
             my $separator = C4::Context->preference("authoritysep") unless $count_auth == 0;
-            push @subfields_loop, { code => $subfieldcode, value => $value, link_loop => \@this_link_loop, separator => $separator } unless ( $authors_subfield->[0] eq '9' );
+            # ignore $9 and $6
+            push @subfields_loop, { code => $subfieldcode, value => $value, link_loop => \@this_link_loop, separator => $separator } unless ( $authors_subfield->[0] eq '9' or $authors_subfield->[0] eq '6' );
             $count_auth++;
         }
         push @marcauthors, { MARCAUTHOR_SUBFIELDS_LOOP => \@subfields_loop };
@@ -2450,6 +2451,40 @@ sub PrepareItemrecordDisplay {
                         -tabindex => '',
                         -multiple => 0,
                     );
+                } elsif ( $tagslib->{$tag}->{$subfield}->{value_builder} ) {
+                        # opening plugin
+                        my $plugin = C4::Context->intranetdir . "/cataloguing/value_builder/" . $tagslib->{$tag}->{$subfield}->{'value_builder'};
+                        if (do $plugin) {
+                            my $temp;
+                            my $extended_param = plugin_parameters( $dbh, $temp, $tagslib, $subfield_data{id}, undef );
+                            my ( $function_name, $javascript ) = plugin_javascript( $dbh, $temp, $tagslib, $subfield_data{id}, undef );
+                            $subfield_data{random}     = int(rand(1000000));    # why do we need 2 different randoms?
+                            my $index_subfield = int(rand(1000000));
+                            $subfield_data{id} = "tag_".$tag."_subfield_".$subfield."_".$index_subfield;
+                            $subfield_data{marc_value} = qq[<input tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255"
+                                onfocus="Focus$function_name($subfield_data{random}, '$subfield_data{id}');"
+                                 onblur=" Blur$function_name($subfield_data{random}, '$subfield_data{id}');" />
+                                <a href="#" class="buttonDot" onclick="Clic$function_name('$subfield_data{id}'); return false;" title="Tag Editor">...</a>
+                                $javascript];
+                        } else {
+                            warn "Plugin Failed: $plugin";
+                            $subfield_data{marc_value} = qq(<input tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255" />); # supply default input form
+                        }
+                }
+                elsif ( $tag eq '' ) {       # it's an hidden field
+                    $subfield_data{marc_value} = qq(<input type="hidden" tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255" value="$defaultvalue" />);
+                }
+                elsif ( $tagslib->{$tag}->{$subfield}->{'hidden'} ) {   # FIXME: shouldn't input type be "hidden" ?
+                    $subfield_data{marc_value} = qq(<input type="text" tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255" value="$defaultvalue" />);
+                }
+                elsif ( length($defaultvalue) > 100
+                            or (C4::Context->preference("marcflavour") eq "UNIMARC" and
+                                  300 <= $tag && $tag < 400 && $subfield eq 'a' )
+                            or (C4::Context->preference("marcflavour") eq "MARC21"  and
+                                  500 <= $tag && $tag < 600                     )
+                          ) {
+                    # oversize field (textarea)
+                    $subfield_data{marc_value} = qq(<textarea tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255">$defaultvalue</textarea>\n");
                 } else {
                     $subfield_data{marc_value} = "<input type=\"text\" name=\"field_value\" value=\"$defaultvalue\" size=\"50\" maxlength=\"255\" />";
                 }
@@ -2946,7 +2981,7 @@ sub _koha_marc_update_bib_ids {
         # drop old field and create new one...
         $old_field = $record->field($biblio_tag);
         $record->delete_field($old_field) if $old_field;
-        $record->append_fields($new_field);
+        $record->insert_fields_ordered($new_field);
 
         # deal with biblioitemnumber
         if ( $biblioitem_tag < 10 ) {
@@ -3389,7 +3424,7 @@ sub ModBiblioMarc {
         }
         substr( $string, 22, 6, "frey50" );
         unless ( $record->subfield( 100, "a" ) ) {
-            $record->insert_grouped_field( MARC::Field->new( 100, "", "", "a" => $string ) );
+            $record->insert_fields_ordered( MARC::Field->new( 100, "", "", "a" => $string ) );
         }
     }
     my $oldRecord;
@@ -3687,7 +3722,12 @@ sub GetMarcPrice {
     for my $field ( $record->field(@listtags) ) {
         for my $subfield_value  ($field->subfield($subfield)){
             #check value
-            return $subfield_value if ($subfield_value);
+            if ($subfield_value) {
+                 # in France, the cents separator is the , but sometimes, ppl use a .
+                 # in this case, the price will be x100 when unformatted ! Replace the . by a , to get a proper price calculation
+                $subfield_value =~ s/\./,/ if C4::Context->preference("CurrencyFormat") eq "FR";
+                return $subfield_value;
+            }
         }
     }
     return 0; # no price found

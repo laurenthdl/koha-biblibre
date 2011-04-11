@@ -324,8 +324,7 @@ sub transferbook {
     my ( $resfound, $resrec ) = CheckReserves($itemnumber);
     if ( $resfound and not $ignoreRs ) {
         $resrec->{'ResFound'} = $resfound;
-
-        #         $messages->{'ResFound'} = $resrec;
+        $messages->{'ResFound'} = $resrec;
         $dotransfer = 1;
     }
 
@@ -968,11 +967,11 @@ sub AddIssue {
                     # warn "Reserved";
                     # The item is reserved by someone else.
                     if ($cancelreserve) {    # cancel reserves on this item
-                        CancelReserve( 0, $res->{'itemnumber'}, $res->{'borrowernumber'} );
+                        CancelReserve( $res->{'reservenumber'} );
                     }
                 }
                 if ($cancelreserve) {
-                    CancelReserve( $res->{'biblionumber'}, 0, $res->{'borrowernumber'} );
+                    CancelReserve( $res->{'reservenumber'} );
                 } else {
 
                     # set waiting reserve to first in reserve queue as book isn't waiting now
@@ -1668,7 +1667,7 @@ sub _GetCircControlBranch {
     my $circcontrol = C4::Context->preference('CircControl');
     my $branch;
 
-    if ($circcontrol eq 'PickupLibrary' && C4::Context->userenv->{'branch'}) {
+    if (($circcontrol eq 'PickupLibrary') and (C4::Context->userenv and C4::Context->userenv->{'branch'} ) ) {
         $branch = C4::Context->userenv->{'branch'};
     } elsif ( $circcontrol eq 'PatronLibrary' ) {
         $branch = $borrower->{branchcode};
