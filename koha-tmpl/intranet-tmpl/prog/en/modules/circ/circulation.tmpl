@@ -26,20 +26,18 @@ $.tablesorter.addParser({
 
 		$("#issuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
 		dateFormat: 'uk',<!-- /TMPL_IF -->
-		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false},9:{sorter:false},10:{sorter:false}}
+		headers: { 1: { sorter: 'articles' },8:{sorter:false},9:{sorter:false},10:{sorter:false}}
 		});
 		$("#relissuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
 		dateFormat: 'uk',<!-- /TMPL_IF -->
 		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false},9:{sorter:false},10:{sorter:false}}
 		});
 
-		//FIXME: Sorting does not work when there are previous checkouts only
-		// (It works fine when there are only checkouts of the day, or both previous and today checkouts)
 		$("#issuest").bind("sortEnd",function() {
-		    $("#previous").parents("tr").remove();  // 'previous checkouts' header chokes table sorter
+		    $("#previous").parents("tr").css('display', 'none');  // 'previous checkouts' header chokes table sorter
 		});
 		$("#relissuest").bind("sortEnd",function() {
-		    $("#relprevious").parents("tr").remove();  // 'previous checkouts' header chokes table sorter
+		    $("#relprevious").parents("tr").css('display', 'none');  // 'previous checkouts' header chokes table sorter
 		});
 
 		$("#holdst").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
@@ -178,6 +176,9 @@ function export_submit(format) {
     document.issues.action="/cgi-bin/koha/tools/export.pl";
     document.getElementById("export_format").value = format;
     document.issues.submit();
+
+    /* Reset form action to its initial value */
+    document.issues.action="/cgi-bin/koha/reserve/renewscript.pl";
 };
 
 //]]>
@@ -756,7 +757,8 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
             <td/>
         </tr>
 		</tfoot>
-<!-- TMPL_IF NAME="todayissues" -->	<tbody>
+          <tbody>
+<!-- TMPL_IF NAME="todayissues" -->
 
     <!-- TMPL_LOOP NAME="todayissues" -->
     <!-- TMPL_IF NAME="__odd__" -->
@@ -808,6 +810,9 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
 
     </tr>
     <!-- /TMPL_LOOP --> <!-- /loop todayissues -->
+    <!-- TMPL_ELSE -->
+    <!-- Required for table sorter to work -->
+    <tr style="display:none"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <!-- /if todayissues --><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="previssues" -->
 <tr><th class="{sorter: false}" colspan="11"><a name="previous" id="previous"></a>Previous checkouts</th></tr>
@@ -946,9 +951,9 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
 <!--/if previssues --><!-- /TMPL_IF -->
       </tbody>
     </table>
-</form>
 <!-- /TMPL_IF --><!-- end displayrelissues --> 
 
+</form>
 </div>
 
 
