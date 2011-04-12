@@ -4,7 +4,6 @@ use Modern::Perl;
 use DBI;
 use Data::Dumper;
 use Getopt::Long;
-use Pod::Usage;
 use Fcntl qw(:flock);
 use YAML;
 
@@ -12,9 +11,26 @@ use C4::Logguer qw(:DEFAULT $log_kss);
 
 use Koha_Synchronize_System::tools::kss;
 
+my $status = "";
+my $help = "";
+GetOptions(
+        'status'   => \$status,
+    );
+
+if ( $status ) {
+    $status = get_status();
+    if ( $status ) {
+        print "$0 is running";
+        exit 1;
+    } else {
+        print "$0 is not running";
+    }
+    exit 0
+}
+
 my $log = $log_kss;
 
-unless (flock(DATA, LOCK_EX|LOCK_NB)) {
+if ( get_status() ) {
     $log->error( "$0 is already running. Exiting.\n");
     exit(1);
 }
@@ -120,6 +136,13 @@ if ( $@ ) {
 }
 
 $log->info("END");
+
+sub get_status {
+    unless ( flock(DATA, LOCK_EX|LOCK_NB) ) {
+        return 1;
+    }
+    return 0;
+}
 
 __DATA__
 DO NOT REMOVE THIS DATA SECTION.
