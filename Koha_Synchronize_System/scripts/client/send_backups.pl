@@ -50,7 +50,6 @@ for my $file ( @files ) {
             $log->debug("        local md5 : $md5_local");
             $log->debug("        remote md5: $md5_remote");
             $md5_remote = upload( $file );
-            qx{$ssh_cmd $username\@$ip_server $rm_cmd $inbox/$filename;};
         }
     }
 
