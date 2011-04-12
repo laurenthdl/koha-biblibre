@@ -71,40 +71,73 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 my $master = $$conf{cron}{master};
 $template->param('master' => $master);
 
-# Getting last execution log
-my $last_log_result = Koha_Synchronize_System::tools::kss::get_last_log($dbh);
-foreach (keys %$last_log_result) {
-    $template->param('last_log_' . $_ => $last_log_result->{$_});
-}
-
-# Getting last execution status
-my $last_status_result = Koha_Synchronize_System::tools::kss::get_last_status($dbh);
-$template->param(last_status_loop => $last_status_result);
-
-# Getting last execution errors
-my $last_errors_result = Koha_Synchronize_System::tools::kss::get_last_errors($dbh);
-$template->param(last_errors_loop => $last_errors_result);
-
-# If we are a master, we gather the stats for all the clients
+# If we are a master, we gather the informations for all the clients
 if ($master) {
    my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh);
    # Preparing loop
    my @stats_loop;
-   foreach (keys %{$stats}) {
+   foreach my $hostname (keys %{$stats}) {
 	my @innerloop;
-	push @innerloop, $stats->{$_};
-	push @stats_loop, { client => $_, stats => \@innerloop };	
+	push @innerloop, $stats->{$hostname};
+
+	my $last_status     = Koha_Synchronize_System::tools::kss::get_last_status($dbh, $hostname);
+	my $last_errors     = Koha_Synchronize_System::tools::kss::get_last_errors($dbh, $hostname);
+	my $last_sql_errors = Koha_Synchronize_System::tools::kss::get_last_sql_errors($dbh, $hostname);
+	my $last_log        = Koha_Synchronize_System::tools::kss::get_last_log($dbh, $hostname);
+	my ($stats_doctype,$stats_location) = Koha_Synchronize_System::tools::kss::get_stats_details($dbh, $hostname);
+
+	push @stats_loop, { 
+	    client         => $hostname, 
+	    stats          => \@innerloop, 
+	    status         => $last_status, 
+	    errors         => $last_errors, 
+	    stats_doctype  => $stats_doctype,
+	    stats_location => $stats_location,
+	    sql_errors     => $last_sql_errors,
+	    log_status     => $last_log->{'status'},
+	    log_start      => $last_log->{'start_time'},
+	    log_end        => $last_log->{'end_time'}
+        };	
    }
    $template->param(stats_loop => \@stats_loop);
+
 } else {
-    # And if we are a slave, we only gather our own stats
+    # And if we are a slave, we only gather our own informations
+
+    # What is our hostname?
     my $hostname = qx{hostname -f};
     $hostname =~ s/\s$//;
     $template->param("hostname" => $hostname);
+
+    # Getting stats
     my $last_stats_result = Koha_Synchronize_System::tools::kss::get_stats_by_host($dbh, $hostname);
     foreach (keys %$last_stats_result) {
 	$template->param('last_stats_' . $_ => $last_stats_result->{$_});
     }
+
+    # Getting detailled stats
+    my ($stats_doctype,$stats_location) = Koha_Synchronize_System::tools::kss::get_stats_details($dbh, $hostname);
+    $template->param(stats_doctype => $stats_doctype, stats_location => $stats_location);
+
+    # Getting last execution log
+    my $last_log_result = Koha_Synchronize_System::tools::kss::get_last_log($dbh, $hostname);
+    foreach (keys %$last_log_result) {
+	$template->param('last_log_' . $_ => $last_log_result->{$_});
+    }
+
+    # Getting last execution status
+    my $last_status_result = Koha_Synchronize_System::tools::kss::get_last_status($dbh, $hostname);
+    $template->param(last_status_loop => $last_status_result);
+
+    # Getting last execution errors
+    my $last_errors_result = Koha_Synchronize_System::tools::kss::get_last_errors($dbh, $hostname);
+    $template->param(last_errors_loop => $last_errors_result);
+
+    # Getting last sql errors
+    my $last_sql_errors_result = Koha_Synchronize_System::tools::kss::get_last_sql_errors($dbh, $hostname);
+    $template->param(last_sql_errors_loop => $last_sql_errors_result);
+
+
 
 }
 

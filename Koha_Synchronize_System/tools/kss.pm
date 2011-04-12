@@ -36,6 +36,7 @@ my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $kss_status_table         = $$conf{databases_infos}{kss_status_table};
 my $kss_logs_table           = $$conf{databases_infos}{kss_logs_table};
 my $kss_errors_table         = $$conf{databases_infos}{kss_errors_table};
+my $kss_sql_errors_table     = $$conf{databases_infos}{kss_sql_errors_table};
 my $kss_statistics_table     = $$conf{databases_infos}{kss_statistics_table};
 my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
 
@@ -370,6 +371,7 @@ sub get_level {
 
 }
 
+# Return last log (optionally for a given hostname)
 sub get_last_log {
     my $dbh = shift;
     my $hostname = shift;
@@ -391,23 +393,36 @@ sub get_last_ids {
     return $sth->fetchall_arrayref();
 }
 
+# Return last errors (optionally for a given hostname)
 sub get_last_errors {
     my $dbh = shift;
-    return _get_last_table($dbh, $kss_errors_table);
+    my $hostname = shift;
+    return _get_last_table($dbh, $kss_errors_table, $hostname);
 }
 
+# Return last status (optionally for a given hostname)
 sub get_last_status {
     my $dbh = shift;
-    return _get_last_table($dbh, $kss_status_table);
+    my $hostname = shift;
+    return _get_last_table($dbh, $kss_status_table, $hostname);
+}
+
+# Return last errors (optionally for a given hostname)
+sub get_last_sql_errors {
+    my $dbh = shift;
+    my $hostname = shift;
+    return _get_last_table($dbh, $kss_sql_errors_table, $hostname);
 }
 
 
+# Return last all last data from a given table (optionally for a given hostname)
 sub _get_last_table {
     my $dbh = shift;
     my $table = shift;
+    my $hostname = shift;
 
     # Getting last id
-    my $tmpres = get_last_log($dbh);
+    my $tmpres = get_last_log($dbh, $hostname);
     my $last = $tmpres->{'id'};
 
     my $query = "SELECT * from $table WHERE kss_id=? ORDER BY id DESC";
@@ -416,7 +431,7 @@ sub _get_last_table {
     return $sth->fetchall_arrayref({});
 }
 
-
+# Returns last statistics for a given host : number of issues, returns and reserves 
 sub get_stats_by_host {
     my $dbh = shift;
     my $host = shift;
@@ -437,6 +452,47 @@ sub get_stats_by_host {
     return $results;
 }
 
+# Returns detailled statistics for a given host : number of issues by itemtype and section
+sub get_stats_details {
+    my $dbh = shift;
+    my $hostname = shift;
+    my $doctyperesults;
+    my $locationresults;
+
+    # Getting last id for a given hostname
+    my $tmpres = get_last_log($dbh, $hostname);
+    my $last = $tmpres->{'id'};
+
+    # Getting itemnumbers from the last execution
+    my $query = "SELECT itemnumber from $kss_statistics_table WHERE variable=? AND kss_id=?";
+    my $sth = $dbh->prepare($query);
+    $sth->execute('issue', $last);
+    my @items;
+    while (my $res = $sth->fetchrow_array()) {
+	push @items, $res;
+    }
+    my $items_str = join(',', @items);
+    warn $items_str;
+
+    # Getting by ccode
+    #FIXME: Shouldn't be hardcoded
+    my $ccodes = C4::Koha::GetAuthorisedValues('CCODE');
+    foreach (@$ccodes) {
+	my $ccode = $_->{'authorised_value'};
+	my $query = "SELECT ccode AS doctype, count(itemnumber) AS value from items where ccode=? AND itemnumber IN ($items_str) HAVING COUNT(itemnumber) > 0";
+	my $sth = $dbh->prepare($query);
+	$sth->execute($ccode);
+	my $result = $sth->fetchrow_hashref();
+	push @$doctyperesults, $result if ($result);
+	
+	
+    }
+    # Getting by location
+    #FIXME: Todo
+    return ($doctyperesults,$locationresults);
+}
+
+# Return last statistics for all hosts
 sub get_stats {
     my $dbh = shift;
 
