@@ -129,6 +129,9 @@ sub backup_client_logbin {
     my $bakdir = $$conf{path}{client_backup};
     my $logdir = $$conf{abspath}{client_logbin};
     
+    eval { generate_ids_files("$dirname/ids") };
+    die $@ if $@;
+    
     system( qq{$service_cmd mysql stop} ) == 0 or die "Can't stop mysql ! ($!)";
     
     my $filename = strftime "%Y-%m-%d_%H-%M-%S", localtime;
@@ -148,9 +151,6 @@ sub backup_client_logbin {
     system( qq{$service_cmd mysql start} ) == 0 or die "Can't start mysql ! ($!)";
      
     system( qq{$hostname_cmd -f > $dirname/hostname} ) == 0 or ($log && $log->warning("Can't get hostname from file ($!)"));
-    
-    eval { generate_ids_files("$dirname/ids") };
-    die $@ if $@;
     
     system( qq{cd $dirname; $tar_cmd zcvf $filename.tar.gz logbin ids hostname} ) == 0 or die "Cant' extract archive ($!)";
 
