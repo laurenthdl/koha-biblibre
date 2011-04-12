@@ -42,17 +42,6 @@ my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
 my $alertmail                = $$conf{cron}{alertmail};
 my $smtpserver               = $$conf{cron}{smtpserver};
 
-GetOptions(
-    'help|?'       => \$help,
-    'db_client=s'  => \$db_client,
-    'db_server=s'  => \$db_server,
-    'hostname=s'   => \$hostname,
-    'user=s'       => \$user,
-    'passwd=s'     => \$passwd,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-
 sub get_conf {
     my $koha_dir = C4::Context->config('intranetdir');
     my $kss_dir = "$koha_dir/Koha_Synchronize_System/";
