@@ -30,7 +30,11 @@ use C4::Context;
 use C4::Breeding;
 use C4::Koha;
 use C4::Charset;
+use C4::Record;
 use ZOOM;
+use XML::LibXSLT;
+use XML::LibXML;
+
 
 my $input         = new CGI;
 my $dbh           = C4::Context->dbh;
@@ -58,6 +62,8 @@ my $database;
 my $port;
 my $marcdata;
 my @encoding;
+my @syntax;
+my @xslt;
 my @results;
 my $count;
 my $record;
@@ -174,6 +180,8 @@ if ( $op ne "do_search" ) {
             $serverhost[$s] = $server->{host};
             $servername[$s] = $server->{name};
             $encoding[$s]   = ( $server->{encoding} ? $server->{encoding} : "iso-5426" );
+            $syntax[$s]     = $server->{syntax};
+            $xslt[$s]       = $server->{xslt};
             $s++;
         }    ## while fetch
     }    # foreach
@@ -224,6 +232,39 @@ if ( $op ne "do_search" ) {
 ## In HEAD i change everything to UTF-8
                         # In rel2_2 i am not sure what encoding is so no character conversion is done here
 ##Add necessary encoding changes to here -TG
+
+			# If the syntax used by the z3950 server is different from our marcflavour,
+			# We use the xslt property (if defined) to transform the document
+			if ($syntax[$k] ne C4::Context->preference('marcflavour') and defined $xslt[$k]) {
+
+			    my $parser = XML::LibXML->new();
+			    my $xslt   = XML::LibXSLT->new();
+			    my $xmlrec = marc2marcxml($marcrecord, $encoding[$k], $syntax[$k]);
+#			    warn " -------------------------- xmlrec : $xmlrec";
+
+			    my $source = $parser->parse_string($xmlrec);
+#			    warn " -------------------------- source : " . $source->toString();
+
+			    my $style_doc = $parser->load_xml(location => $ENV{'DOCUMENT_ROOT'} .'/'. $xslt[$k], no_cdata => 1);
+#			    warn " --------------------------- style_doc : " . $style_doc->toString();
+			    XML::LibXSLT->debug_callback(sub { warn("XML::LibXSLT debug call back :".shift); });
+
+			    my $stylesheet = $xslt->parse_stylesheet($style_doc);
+#			    warn " -------------------------- stylesheet " . Data::Dumper::Dumper($stylesheet);
+			    
+			    my $results = eval { $stylesheet->transform($source) };
+			    if ($@) {
+				die "LibXSLT died with: $@\n";
+			    }
+
+#			    warn " -------------------------- result : " . $stylesheet->output_string($results) . Data::Dumper::Dumper($results);
+#			    warn " -------------------------- result : " . $stylesheet->output_as_bytes($results) ;
+
+
+
+			    
+			}
+
                         my $oldbiblio = TransformMarcToKoha( $dbh, $marcrecord, "" );
                         $oldbiblio->{isbn}   =~ s/ |-|\.//g,
                           $oldbiblio->{issn} =~ s/ |-|\.//g,
