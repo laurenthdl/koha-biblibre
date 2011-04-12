@@ -23,10 +23,6 @@ my $username = "kss";
 
 $log->info("Envoi des backups au serveur");
 
-$ip_server="localhost";
-$inbox="/home/jonathan/Bureau/toto";
-$username="jonathan";
-
 my @files = <$outbox/*.tar.gz>;
 for my $file ( @files ) {
     chomp $file;
