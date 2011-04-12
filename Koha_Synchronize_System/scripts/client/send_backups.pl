@@ -15,7 +15,9 @@ my $inbox                    = $$conf{abspath}{server_inbox};
 my $ip_server                = $$conf{cron}{serverhost};
 my $scp_cmd                  = $$conf{which_cmd}{scp};
 my $ssh_cmd                  = $$conf{which_cmd}{ssh};
-my $rm_cmd                  = $$conf{which_cmd}{rm};
+my $rm_cmd                   = $$conf{which_cmd}{rm};
+my $backup_dir               = $$conf{path}{client_backup};
+my $backup_delay             = $$conf{backup_delay}{client};
 
 my $username = "kss";
 
@@ -51,11 +53,16 @@ for my $file ( @files ) {
             qx{$ssh_cmd $username\@$ip_server $rm_cmd $inbox/$filename;};
         }
     }
+
+    delete_old_backup;
     
 }
 
 
-
+sub delete_old_backup {
+    $log->info("Suppression des anciens fichiers de backup");
+    system( qq{find $backup_dir -maxdepth 1 -mtime +$backup_delay -exec rm -R {} \\;} ) == 0 or $log->error("Can't delete old backup ($!)");
+}
 
 sub upload {
     my $file = shift;

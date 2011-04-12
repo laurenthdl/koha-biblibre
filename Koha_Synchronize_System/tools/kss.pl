@@ -34,6 +34,10 @@ my $dump_id_dir              = $$conf{path}{dump_ids};
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
 my $inbox                    = $$conf{path}{server_inbox};
 my $outbox                   = $$conf{path}{server_outbox};
+my $backup_server_db_dir     = $$conf{path}{backup_server_db};
+my $backup_server_diff_dir   = $$conf{path}{backup_server_diff};
+my $backup_delay_db          = $$conf{backup_delay}{server_db};
+my $backup_delay_diff        = $$conf{backup_delay}{server_diff};
 
 $log->info("BEGIN");
 
@@ -101,7 +105,9 @@ eval {
     $log->info("=== Mise à disposition du client de la nouvelle base de données ===");
     Koha_Synchronize_System::tools::kss::dump_available_db $log;
 
-
+    $log->info("=== Suppression des anciens fichiers de sauvegarde ===");
+    system( qq{find $backup_server_diff_dir -maxdepth 1 -mtime +$backup_delay_diff -name '*.tar.gz' -delete} ) == 0 or die "Can't delete old backup diff ($!)";
+    system( qq{find $backup_server_db_dir -maxdepth 1 -mtime +$backup_delay_db -exec rm -R {} \\;} ) == 0 or die "Can't delete old backup db ($!)";
 };
 
 if ( $@ ) {

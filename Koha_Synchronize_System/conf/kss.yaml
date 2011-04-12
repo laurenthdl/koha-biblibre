@@ -37,6 +37,7 @@ which_cmd:
         rm: /bin/rm
         mv: /bin/mv
         scp: /usr/bin/scp
+        ssh: /usr/bin/ssh
         ssh-copy-id: /usr/bin/ssh-copy-id
         service: invoke-rc.d
         hostname: /bin/hostname
@@ -67,14 +68,18 @@ path:
         client_outbox: data/client/outbox/
         client_dump_filepath: data/client/inbox/last.sql
         client_scripts_ids: scripts/client/ids/
-        client_backup: backup/client/
+        client_backup: data/client/backup/
 
 abspath:
         client_logbin: /var/log/mysql
-        server_dump_filepath: /home/jonathan/workspace/versions/koha_master/Koha_Synchronize_System/data/server/outbox/last.sql
-        server_outbox: /home/jonathan/workspace/versions/koha_master/Koha_Synchronize_System/data/server/outbox/
-        server_inbox: /home/jonathan/workspace/versions/koha_master/Koha_Synchronize_System/data/server/inbox/
+        server_dump_filepath: /home/koha/versions/koha_kss/Koha_Synchronize_System/data/server/outbox/last.sql
+        server_outbox: /home/koha/versions/koha_kss/Koha_Synchronize_System/data/server/outbox/
+        server_inbox: /home/koha/versions/koha_kss/Koha_Synchronize_System/data/server/inbox/
 
+backup_delay:
+        client: 30
+        server_db: 30
+        server_diff: 30
 cron:
         serverhost: 192.168.1.33
         executiontime: 2200
