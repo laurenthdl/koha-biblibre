@@ -1147,9 +1147,9 @@ sub merge {
         my $query = C4::Search::Query->normalSearch("an=$mergefrom");
         my $results = C4::Search::SimpleSearch($query);
 
-        $debug && warn scalar(@$results);
+        $debug && warn scalar(@{$results->{items}});
 
-        foreach my $rawrecord( @{$results->items} ) {
+        foreach my $rawrecord( @{$results->{items}} ) {
             my $marcrecord = GetMarcBiblio($rawrecord->{values}->{recordid});
             SetUTF8Flag($marcrecord);
             push @reccache, $marcrecord;
