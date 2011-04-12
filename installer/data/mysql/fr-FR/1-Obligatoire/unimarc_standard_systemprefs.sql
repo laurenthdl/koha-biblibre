@@ -282,5 +282,5 @@ INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES (
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadWebPath','','Le chemin vers le répertoire de stockage à partir de la racine de publication du serveur web pour le plugin upload.pl','','');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('BlockRenewWhenOverdue','0','Bloque les renouvellement quand en retard','','YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SolrAPI','http://localhost:8080/solr','','URL du service web Solr.','Free');
-INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Moteur de recherche','Choice');
+INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra|SolrIndexOff','Moteur de recherche','Choice');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numFacetsDisplay','100','Correspond au nombre maximum de facettes à afficher pour un index','','Integer')

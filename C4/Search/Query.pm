@@ -19,6 +19,7 @@ use Modern::Perl;
 use C4::Search::Query::Solr;
 use C4::Search::Query::Zebra;
 use C4::Context;
+use C4::Debug;
 
 =head1 NAME
 
@@ -154,7 +155,7 @@ sub getIndexName {
     my $search_engine = C4::Context->preference("SearchEngine");
 
     given ( $search_engine ) {
-        when ( 'Solr' ) {
+        when ( /Solr/ ) {
             return getSolrIndex($code);
         }
 
@@ -246,7 +247,7 @@ sub buildQuery {
             return C4::Search::Query::Zebra->buildQuery($indexes, $operands, $operators);
         }
 
-        when( 'Solr' ) {
+        when( /Solr/ ) {
             my $new_indexes;
             my $new_operands;
             my $idx;
@@ -272,12 +273,17 @@ sub normalSearch {
 
     my $search_engine = C4::Context->preference("SearchEngine");
 
+    if ($debug){
+        use YAML;
+        warn YAML::Dump($query);
+        warn YAML::Dump($class);
+    }
     given( $search_engine ) {
         when( 'Zebra' ) {
             return C4::Search::Query::Zebra->normalSearch($query);
         }
 
-        when( 'Solr' ) {
+        when( /Solr/ ) {
             return C4::Search::Query::Solr->normalSearch($query);
         }
     }

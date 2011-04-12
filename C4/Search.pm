@@ -2849,9 +2849,11 @@ sub GetDistinctValues {
 
 
 sub IndexRecord {
-    my $search = C4::Search::Engine->new();
-    $search->find_searchengine;
-    return $search->index(@_);
+    if (!(C4::Context->preference('SearchEngine')=~/IndexOff/i)){
+	my $search = C4::Search::Engine->new();
+	$search->find_searchengine;
+	return $search->index(@_);
+    }
 }
 
 
