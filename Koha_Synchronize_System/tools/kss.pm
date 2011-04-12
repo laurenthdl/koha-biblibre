@@ -37,7 +37,6 @@ my $kss_logs_table           = $$conf{databases_infos}{kss_logs_table};
 my $kss_errors_table         = $$conf{databases_infos}{kss_errors_table};
 my $kss_sql_errors_table     = $$conf{databases_infos}{kss_sql_errors_table};
 my $kss_statistics_table     = $$conf{databases_infos}{kss_statistics_table};
-my $kss_sql_errors_table     = $$conf{databases_infos}{kss_sql_errors_table};
 my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
 
 my $alertmail                = $$conf{cron}{alertmail};
@@ -432,11 +431,6 @@ sub get_last_errors {
     my $dbh = shift;
     my $hostname = shift;
     return _get_last_table($dbh, $kss_errors_table, $hostname);
-}
-
-sub get_last_sql_errors {
-    my $dbh = shift;
-    return _get_last_table($dbh, $kss_sql_errors_table);
 }
 
 
