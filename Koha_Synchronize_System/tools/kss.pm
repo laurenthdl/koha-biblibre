@@ -3,8 +3,6 @@ package Koha_Synchronize_System::tools::kss;
 use Modern::Perl;
 use DBI;
 use Data::Dumper;
-use Getopt::Long;
-use Pod::Usage;
 use DateTime;
 use POSIX qw(strftime);
 use YAML;
@@ -39,17 +37,6 @@ my $kss_errors_table         = $$conf{databases_infos}{kss_errors_table};
 my $kss_sql_errors_table     = $$conf{databases_infos}{kss_sql_errors_table};
 my $kss_statistics_table     = $$conf{databases_infos}{kss_statistics_table};
 my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
-
-GetOptions(
-    'help|?'       => \$help,
-    'db_client=s'  => \$db_client,
-    'db_server=s'  => \$db_server,
-    'hostname=s'   => \$hostname,
-    'user=s'       => \$user,
-    'passwd=s'     => \$passwd,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
 
 sub get_conf {
     my $koha_dir = C4::Context->config('intranetdir');
@@ -129,13 +116,13 @@ sub backup_client_logbin {
     my $bakdir = $$conf{path}{client_backup};
     my $logdir = $$conf{abspath}{client_logbin};
     
+    my $filename = strftime "%Y-%m-%d_%H-%M-%S", localtime;
+    my $dirname = $outbox . "/" . $filename;
     eval { generate_ids_files("$dirname/ids") };
     die $@ if $@;
     
     system( qq{$service_cmd mysql stop} ) == 0 or die "Can't stop mysql ! ($!)";
     
-    my $filename = strftime "%Y-%m-%d_%H-%M-%S", localtime;
-    my $dirname = $outbox . "/" . $filename;
     eval {
         make_path "$dirname/logbin";
         make_path "$dirname/ids";
