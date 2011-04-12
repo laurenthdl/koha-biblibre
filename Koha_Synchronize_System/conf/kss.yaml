@@ -84,4 +84,6 @@ cron:
         serverhost: 192.168.1.33
         executiontime: 2200
         master: 0
+        alertmail: __editme@mail.com__
+        smtpserver: __mail.editme.com__
 

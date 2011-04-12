@@ -6,6 +6,7 @@ use Data::Dumper;
 use DateTime;
 use POSIX qw(strftime);
 use YAML;
+use Mail::Sendmail;
 use Digest::MD5;
 use File::Path qw(make_path remove_tree);
 use C4::Context;
@@ -36,7 +37,22 @@ my $kss_logs_table           = $$conf{databases_infos}{kss_logs_table};
 my $kss_errors_table         = $$conf{databases_infos}{kss_errors_table};
 my $kss_sql_errors_table     = $$conf{databases_infos}{kss_sql_errors_table};
 my $kss_statistics_table     = $$conf{databases_infos}{kss_statistics_table};
+my $kss_sql_errors_table     = $$conf{databases_infos}{kss_sql_errors_table};
 my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
+
+my $alertmail                = $$conf{cron}{alertmail};
+my $smtpserver               = $$conf{cron}{smtpserver};
+
+GetOptions(
+    'help|?'       => \$help,
+    'db_client=s'  => \$db_client,
+    'db_server=s'  => \$db_server,
+    'hostname=s'   => \$hostname,
+    'user=s'       => \$user,
+    'passwd=s'     => \$passwd,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
 
 sub get_conf {
     my $koha_dir = C4::Context->config('intranetdir');
@@ -358,7 +374,25 @@ sub get_level {
 
 }
 
-# Return last log (optionally for a given hostname)
+
+=head2 get_last_log
+
+Return last log (optionally for a given hostname)
+
+Example:
+
+=over
+
+$VAR1 = {
+          'end_time' => '2011-04-01 15:52:10',
+          'status' => 'End !',
+          'progress' => '0',
+          'start_time' => '2011-04-01 15:52:02',
+          'hostname' => 'ns39793.ovh.net',
+          'id' => '9'
+        };
+
+=cut
 sub get_last_log {
     my $dbh = shift;
     my $hostname = shift;
@@ -380,14 +414,55 @@ sub get_last_ids {
     return $sth->fetchall_arrayref();
 }
 
-# Return last errors (optionally for a given hostname)
+=head2 get_last_errors
+
+Returns last errors recorded in kss_error table. During process, some functionnal errors can occurs. (optionally for a given hostname)
+=over
+Sample record:
+
+ {
+    'error' => 'Item already onloan',
+    'kss_id' => '9',
+    'id' => '24',
+    'message' => 'Item 179 is already onloan by another borrower'
+  },
+
+=cut
 sub get_last_errors {
     my $dbh = shift;
     my $hostname = shift;
     return _get_last_table($dbh, $kss_errors_table, $hostname);
 }
 
-# Return last status (optionally for a given hostname)
+sub get_last_sql_errors {
+    my $dbh = shift;
+    return _get_last_table($dbh, $kss_sql_errors_table);
+}
+
+
+=head2 get_last_status
+
+Returns last logs recorded in kss_logs table / last status (optionally for a given hostname)
+
+Status are:
+- Cleaning...
+- Creating kss_infos table...
+- Processing file [...]
+- Extract and purge file [...]
+- Insert new ids ([...] files found)
+
+=over
+Sample record:
+
+{
+  'end_time' => '2011-04-01 15:52:10',
+  'status' => 'End !',
+  'progress' => '0',
+  'start_time' => '2011-04-01 15:52:02',
+  'hostname' => 'ns39793.ovh.net',
+  'id' => '9'
+}
+=cut
 sub get_last_status {
     my $dbh = shift;
     my $hostname = shift;
@@ -402,7 +477,11 @@ sub get_last_sql_errors {
 }
 
 
-# Return last all last data from a given table (optionally for a given hostname)
+=head2 _get_last_table
+
+Return last all last data from a given table (optionally for a given hostname)
+
+=cut
 sub _get_last_table {
     my $dbh = shift;
     my $table = shift;
@@ -488,7 +567,7 @@ sub get_stats {
     # Getting last ids for each client
     my $ids = get_last_ids($dbh);
     foreach (@{$ids}) {
-	$results->{$_->[1]} = get_stats_by_host($dbh, $_->[1]);
+        $results->{$_->[1]} = get_stats_by_host($dbh, $_->[1]);
     }
     return $results;
 
@@ -624,4 +703,52 @@ sub insert_diff_file {
 
     $/ = $oldsep;
 }
+
+sub send_alert_mail {
+
+    my $dbh     = C4::Context->dbh;
+
+    my $last_log_result = Koha_Synchronize_System::tools::kss::get_last_log($dbh);
+    my $last_errors_result = Koha_Synchronize_System::tools::kss::get_last_errors($dbh);
+    my $last_sql_errors_result = Koha_Synchronize_System::tools::kss::get_last_sql_errors($dbh);
+    my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh);
+
+    my $title   = "Koha Synchronize System: Last synchronization ".($$last_log_result{'status'} eq "End !" ? "ends at $$last_log_result{'end_time'}" : "does not finished");
+    my $content;
+    $content .= "\nSummary for the last synchronization:\n";
+    $content .= scalar(@$last_errors_result) . " errors - " . scalar(@$last_sql_errors_result) . " sql errors";
+    $content .= "\nStats:\n";
+    foreach (keys %{$stats}) {
+        $content .= "- $_: $$stats{$_}{reserve} reserve(s) $$stats{$_}{return} return(s) $$stats{$_}{issue} issue(s) processed\n";
+    }
+
+    if (scalar($last_errors_result) != 0) {
+        $content .= "\nErrors to process:\n";
+        foreach (@$last_errors_result) {
+           $content .= "$$_{'error'} - $$_{'message'}\n";
+        }
+    }
+
+    if (scalar($last_sql_errors_result) != 0) {
+        $content .= "\nSql Errors to process:\n";
+        foreach (@$last_sql_errors_result) {
+           $content .= "$$_{'error'}\n";
+        }
+    }
+
+    my %mail    = (
+          To             => $alertmail,
+          From           => $alertmail,
+          Subject        => $title,
+          Message        => $content,
+          smtp           => $smtpserver,
+          'Content-Type' => 'text/plain; charset="utf8"',
+    );
+
+    sendmail(%mail) or die $Mail::Sendmail::error;
+
+    print "OK. Log says:\n", $Mail::Sendmail::log;
+
+}
+
 1;
