@@ -86,4 +86,8 @@ cron:
         master: 0
         alertmail: __editme@mail.com__
         smtpserver: __mail.editme.com__
+        jobtime_server_digest: "0 21 * * *"
+        jobtime_client_push: "0 21 * * *"
+        jobtime_client_pull: "0 23 * * *"
+        koha_conf: EDITME PATH_TO_KOHA_CONF
 

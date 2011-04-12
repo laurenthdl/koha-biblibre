@@ -64,6 +64,9 @@ qx{$ssh_keygen_cmd -t rsa -N "" -f $kss_home/.ssh/id_rsa};
 
 qx{$chown_cmd -R $username:$username $kss_home};
 
+print "=== Création des cronjobs ===\n";
+system( qq{perl $kss_home/tools/insert_or_update_crontab.pl --host=slave} ) == 0 or die "Can't insert crontab";
+
 # su kss
 $< = (getpwnam($username))[2];
 

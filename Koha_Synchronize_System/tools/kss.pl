@@ -24,9 +24,16 @@ if ( $status ) {
         exit 1;
     } else {
         print "$0 is not running";
+        sleep(15);
     }
     exit 0
 }
+
+
+
+exit 3;
+
+
 
 my $log = $log_kss;
 

@@ -55,6 +55,7 @@ sub get_conf {
         }
     }
     $$conf{path}{kss_dir} = $kss_dir;
+    $$conf{path}{koha_dir} = $koha_dir;
 
     return $conf;
 }
@@ -151,6 +152,30 @@ sub backup_client_logbin {
 
 }
 
+sub pull_new_db {
+    my $log = shift;
+    my $conf = get_conf;
+    my $ssh_cmd                 = $$conf{which_cmd}{ssh};
+    my $scp_cmd                 = $$conf{which_cmd}{scp};
+    my $mysql_cmd               = $$conf{which_cmd}{mysql};
+    my $ip_server               = $$conf{cron}{serverhost};
+    my $kss_dir                 = $$conf{path}{kss_dir};
+    my $remote_dump_filepath    = $$conf{abspath}{server_dump_filepath};
+    my $local_dump_filepath     = $$conf{path}{client_dump_filepath};
+    my $username = "kss";
+
+    $log && $log->info(" Vérification de la disponibilité d'un nouveau dump" );
+    my $status = qx{$ssh_cmd $username\@$ip_server perl $kss_dir/tools/kss.pl --status} or die "Can't connect to the server ($!)";
+    if ( $status == 1 ){
+        $log && $log->error("Le serveur est toujours en cours d'exécution, impossible de récupérer le dump actuellement");
+        return 1;
+    }
+    $log && $log->info( "Récupération du dump distant" );
+    system( qq{$scp_cmd $username\@$ip_server:$remote_dump_filepath $local_dump_filepath} ) == 0 or die "Can't get new db from server ($!)";
+
+    $log && $log->info( "Insertion dans la base de données locale" );
+    system( qq{$mysql_cmd -u $user -p$passwd $db_client < $local_dump_filepath} ) == 0 or die "Can't insert new dump ($!)";
+}
 sub generate_ids_files {
     my $outdir = shift;
     my $conf = get_conf;

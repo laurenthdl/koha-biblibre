@@ -52,6 +52,9 @@ qx{chown -R $username:$username $outbox};
 
 qx{chown -R $username:$username $kss_home};
 
+print "=== Création des cronjobs ===\n";
+system( qq{perl $kss_home/tools/insert_or_update_crontab.pl --host=master} ) == 0 or die "Can't insert crontab";
+
 print "/!\ Changer le mot de passe pour l'utilisateur $username\n";
 
 print "=== Mise à disposition du client de la base de données du serveur ===\n";
