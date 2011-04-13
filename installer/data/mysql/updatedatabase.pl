@@ -5261,6 +5261,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.014";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `permissions` (module_bit, code, description) VALUES (11, 'budget_manage_all', 'Add, modify and delete all budgets, even if budgets access is restricted')");
+    print "Upgrade to $DBversion done (Adds budget_manage_all permission)";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
