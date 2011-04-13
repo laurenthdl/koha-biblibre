@@ -358,13 +358,15 @@ my ( @budget_lines, %cell_hash, @lines, $nb_lines );
 foreach my $budget (@budgets) {
     my $budget_lock;
 
-    # check budget permission
-    if ( $period->{budget_period_locked} == 1 ) {
-        $budget_lock = 1;
-    } elsif ( $budget->{budget_permission} == 1 ) {
-        $budget_lock = 1 if $borrower_id != $budget->{'budget_owner_id'};
-    } elsif ( $budget->{budget_permission} == 2 ) {
-        $budget_lock = 1 if $borrower_branchcode ne $budget->{budget_branchcode};
+    unless ( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
+        # check budget permission
+        if ( $period->{budget_period_locked} == 1 ) {
+            $budget_lock = 1;
+        } elsif ( $budget->{budget_permission} == 1 ) {
+            $budget_lock = 1 if $borrower_id != $budget->{'budget_owner_id'};
+        } elsif ( $budget->{budget_permission} == 2 ) {
+            $budget_lock = 1 if $borrower_branchcode ne $budget->{budget_branchcode};
+        }
     }
 
     # allow hard-coded itemtype and branch planning

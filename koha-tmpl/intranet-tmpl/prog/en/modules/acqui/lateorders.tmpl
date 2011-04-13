@@ -97,7 +97,9 @@ $(document).ready(function() {
                  <p title="branch"><!-- TMPL_VAR name="branch" --></p>
             </td>
             <td>
+              <!-- TMPL_UNLESS NAME="budget_lock" -->
                 <input type="checkbox" name="claim_for" value="<!--TMPL_VAR Name="ordernumber" -->" />
+              <!-- /TMPL_UNLESS -->
             </td>
         </tr>
         <!-- /TMPL_LOOP -->

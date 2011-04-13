@@ -109,7 +109,7 @@ my $suggestion;
 
 my $budget_name;
 
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
     {   template_name   => "acqui/neworderempty.tmpl",
         query           => $input,
         type            => "intranet",
@@ -234,7 +234,12 @@ my $budget = GetBudget($budget_id);
 
 # build budget list
 my $budget_loop = [];
-my $budgets = GetBudgetHierarchy( q{}, $borrower->{branchcode}, $borrower->{borrowernumber} );
+my $budgets;
+if($staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
+    $budgets = GetBudgetHierarchy(undef, undef, undef);
+} else {
+    $budgets = GetBudgetHierarchy( q{}, $borrower->{branchcode}, $borrower->{borrowernumber} );
+}
 foreach my $r ( @{$budgets} ) {
     if ( !defined $r->{budget_amount} || $r->{budget_amount} == 0 ) {
         next;

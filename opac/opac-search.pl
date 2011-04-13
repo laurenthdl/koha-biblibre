@@ -262,14 +262,44 @@ if ($@ || $error) {
     exit;
 }
 
+# construct the param array
+my @indexes = $cgi->param('idx');
+my @operators = $cgi->param('op');
+my @operands = $cgi->param('q');
+my @avlists = $cgi->param('avlist');
+
+#clean operands array
+my$i;
+for ($i = $#indexes; $i >= 0; $i--) { #pas de for ($#indexes..0) :'(
+  splice @indexes,$i,1 if $i > $#operands;
+}
+
+my $operandsize = $#indexes;
 # Rebuild filters hash from GET data
 my @fil = $cgi->param('filters');
 my %filters;
+my @itypes; #contains operands for itype or ccode index
+my $itemtypename; # "itype" or "ccode"
 for ( @fil ) {
     my ($k, $v) = split ':', $_;
-    $filters{$k} = $v;
+    if (($k !~ m/itype/) && ($k !~ m/ccode/)) {
+        $filters{$k} = $v;
+    } else {
+        push @itypes, $v;
+        $itemtypename = $k;
+    }
 }
 $filters{'recordtype'} = 'biblio';
+
+# construct query as itype:(@itypes[0] OR @itypes[1]) - item type advanced search
+my $itype_val_str="";
+if (scalar(@itypes)!=0) {
+  push @operators, "AND";
+  $itype_val_str = join ' OR ', @itypes ;
+  $itype_val_str = "($itype_val_str)";
+  push @operands, $itype_val_str;
+  push @indexes, $itemtypename;
+}
 
 # This array is used to build facets GUI
 my @tplfilters;
@@ -282,19 +312,12 @@ while ( my ($k, $v) = each %filters) {
 }
 $template->param('filters' => \@tplfilters );
 
-# construct the param array
-my @indexes = $cgi->param('idx');
-my @operators = $cgi->param('op');
-my @operands = $cgi->param('q');
-my @avlists = $cgi->param('avlist');
-
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 
 #build search in authorised value list
 if ($params->{'avlist'}) {
    foreach my $i (@indexes) {
      my $val = _getAvlist ($i, $indexandavlist);
-     warn ">val:$val";
      if ($val ne '') {
        my $indexname = C4::Search::Query::getIndexName($i);
        my $value = shift (@avlists);
@@ -369,7 +392,8 @@ my @pager_params = map { {
     ind => 'filters',
     val => $_->{'ind'}.':"'.$_->{'val'}.'"'
 } } @tplfilters;
-push @pager_params, { ind => 'q'      , val => $cgi->param('q') };
+push @pager_params, map { { ind => 'q'      , val => $_ } } $cgi->param('q');
+push @pager_params, map { { ind => 'idx'      , val => $_ } } $cgi->param('idx');
 push @pager_params, { ind => 'sort_by', val => $sort_by };
 
 # Pager template params

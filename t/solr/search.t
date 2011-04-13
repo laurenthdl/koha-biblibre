@@ -132,24 +132,67 @@ $expected = "[* TO * ] NOT date_harvestdate:[* TO * ] AND (int_rflag:1 OR int_rf
 is($got, $expected, "Test alwaysMatches modifier and allrecords index in 'normal' search");
 
 
-BEGIN { $tests += 3 } # Test BuildIndexString (of many words in one operand string)
-@$operands = ("le crépuscule des maudits");
+BEGIN { $tests += 7 } # Test BuildIndexString (of many words in one operand string)
+@$operands = (qq{le crépuscule des maudits});
 @$indexes = ("title");
 @$operators = ();
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "($titleindex:le AND $titleindex:crépuscule AND $titleindex:des AND $titleindex:maudits)";
-is($got, $expected, "Test BuildIndexString");
+is($got, $expected, qq{Test BuildIndexString with (le crépuscule des maudits)});
 
-@$operands = ("maudits crépuscule");
+@$operands = (qq{maudits crépuscule});
 @$indexes = ("title");
 @$operators = ();
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "($titleindex:maudits AND $titleindex:crépuscule)";
-is($got, $expected, "Test BuildIndexString");
+is($got, $expected, qq{Test BuildIndexString with (maudits crépuscule)});
 
-@$operands = ("les maudits", "a", "andre besson"); # With 'More options'
+@$operands = (qq{"le crépuscule des maudits"});
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{($titleindex:"le crépuscule des maudits")};
+is($got, $expected, qq{Test BuildIndexString with ("le crépuscule des maudits")});
+
+@$operands = (qq{"le crépuscule" "des maudits"});
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{($titleindex:"le crépuscule" AND $titleindex:"des maudits")};
+is($got, $expected, qq{Test BuildIndexString with ("le crépuscule" "des maudits")});
+
+@$operands = (qq{"le crépuscule" "des maudits"});
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{($titleindex:"le crépuscule" AND $titleindex:"des maudits")};
+is($got, $expected, qq{Test BuildIndexString with ("le crépuscule" "des maudits")});
+
+@$operands = (qq{"le crépuscule" mot "des maudits"});
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{($titleindex:"le crépuscule" AND $titleindex:"des maudits" AND $titleindex:mot)};
+is($got, $expected, qq{Test BuildIndexString with ("le crépuscule" mot "des maudits")});
+
+@$operands = (qq{les maudits}, qq{a}, qq{andre besson}); # With 'More options'
 @$indexes = ("title", "all_fields", "author");
 @$operators = ("AND", "NOT");
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "($titleindex:les AND $titleindex:maudits) AND a NOT ($authorindex:andre AND $authorindex:besson)";
-is($got, $expected, "Test BuildIndexString");
+is($got, $expected, qq{Test BuildIndexString complex});
+
+BEGIN { $tests += 2 } # Test BuildIndexString with expression
+@$operands = ("monde","histoire","(VIDEO OR LIVRE OR POUET)" );
+@$indexes = ("all_fields", "all_fields", "itype");
+@$operators = ("AND", "AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "monde AND histoire AND str_itype:(VIDEO OR LIVRE OR POUET)";
+is($got, $expected, qq{Test BuildIndexString with expression in operand});
+
+@$operands = ("monde","histoire","(VIDEO)" );
+@$indexes = ("all_fields", "all_fields", "itype");
+@$operators = ("AND", "AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "monde AND histoire AND str_itype:(VIDEO)";
+is($got, $expected, qq{Test BuildIndexString with expression in operand});

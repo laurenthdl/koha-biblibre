@@ -60,6 +60,7 @@ use C4::Budgets;
 use C4::Bookseller;
 use C4::Biblio;
 use C4::Items;
+use C4::Members;
 use CGI;
 use C4::Output;
 use C4::Dates qw/format_date format_date_in_iso/;
@@ -131,7 +132,7 @@ if ( $input->param('format') eq "json" ) {
     exit;
 }
 
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
     {   template_name   => "acqui/parcel.tmpl",
         query           => $input,
         type            => "intranet",
@@ -266,6 +267,36 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     $line{suggestionid}         = $$suggestion{suggestionid};
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
     $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
+
+    # Check if user has permission to use budget
+    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
+        my $budget = GetBudget( $line{budget_id} );
+        my $period = GetBudgetPeriod( $budget->{budget_period_id} );
+        my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
+        my $user            = GetMemberDetails($borrower_id);
+        my $user_branchcode = $user->{'branchcode'};
+
+        if ( $$period{budget_period_locked} == 1 ) {
+            $line{budget_lock} = 1;
+
+        } elsif ( $budget->{budget_permission} == 1 ) {
+
+            if ( $borrower_id != $budget->{'budget_owner_id'} ) {
+                $line{budget_lock} = 1;
+            }
+
+            # check parent perms too
+            my $parents_perm = 0;
+            if ( $budget->{depth} > 0 ) {
+                $parents_perm = CheckBudgetParentPerm( $budget, $borrower_id );
+                delete $line{budget_lock} if $parents_perm == '1';
+            }
+        } elsif ( $budget->{budget_permission} == 2 ) {
+
+            $line{budget_lock} = 1 if $user_branchcode ne $budget->{budget_branchcode};
+        }
+    }
+        
     push @loop_orders, \%line if ( $i >= $startfrom and $i < $startfrom + $resultsperpage );
 }
 $freight = $totalfreight unless $freight;

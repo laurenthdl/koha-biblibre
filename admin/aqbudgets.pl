@@ -281,7 +281,7 @@ if ( $op eq 'add_form' ) {
         $budget->{'total_levels_spent'} = GetChildBudgetsSpent( $budget->{"budget_id"} );
 
         # PERMISSIONS
-        unless ( $staffflags->{'superlibrarian'} % 2 == 1 ) {
+        unless ( $staffflags->{'superlibrarian'} % 2 == 1  || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
 
             #IF NO PERMS, THEN DISABLE EDIT/DELETE
             unless ( $template->{param_map}->{'CAN_user_acquisition_budget_modify'} ) {
