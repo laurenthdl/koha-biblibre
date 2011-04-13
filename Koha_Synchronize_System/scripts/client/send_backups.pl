@@ -21,8 +21,10 @@ my $backup_delay             = $$conf{backup_delay}{client};
 
 my $username = "kss";
 
-$log->info("Envoi des backups au serveur");
+$log->info("Création du dernier backup");
+Koha_Synchronize_System::tools::kss::backup_client_logbin;
 
+$log->info("Envoi des backups au serveur");
 my @files = <$outbox/*.tar.gz>;
 for my $file ( @files ) {
     chomp $file;
