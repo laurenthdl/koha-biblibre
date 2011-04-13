@@ -22,18 +22,11 @@ if ( $status ) {
     if ( $status ) {
         print "$0 is running";
         exit 1;
-    } else {
-        print "$0 is not running";
-        sleep(15);
     }
+
+    print "$0 is not running";
     exit 0
 }
-
-
-
-exit 3;
-
-
 
 my $log = $log_kss;
 
@@ -95,7 +88,7 @@ eval {
         close HN;
     	chomp $client_hostname;
 
-        Koha_Synchronize_System::tools::kss::diff_files_exists $diff_logbin_dir, $log;
+        next if not Koha_Synchronize_System::tools::kss::diff_files_exists $diff_logbin_dir, $log );
 
         $log->info("== Préparation de la base de données ==");
         Koha_Synchronize_System::tools::kss::prepare_database $user, $passwd, $db_server, $client_hostname, $log;
