@@ -584,6 +584,7 @@ $template->param(
     'facets_loop'    => \@facets,
     'query'          => $params->{'q'},
     'searchdesc'     => $query_desc || $limit_desc,
+    'query_desc'     => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => C4::Context->preference('OPACnumSearchResults') || 20,
 );
