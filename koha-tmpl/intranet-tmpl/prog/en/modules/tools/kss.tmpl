@@ -2,7 +2,11 @@
 <script type="text/javascript">
 //<![CDATA[
      $(document).ready(function() {
-        $('#ksstabs > ul').tabs();
+	<!-- TMPL_IF NAME="display_cactions" -->
+	    $('#ksstabs > ul').tabs({selected:2});
+	<!-- TMPL_ELSE -->
+	    $('#ksstabs > ul').tabs();
+	<!-- /TMPL_IF -->
      });
 //]]>
 </script>
@@ -35,18 +39,17 @@
 	    <li><a href="kss.pl#cactions">Actions</a></li>
 	<!-- /TMPL_IF -->
     </ul>
-	<div id="home">
+
+    <!-- TMPL_IF NAME="master" -->
+    <div id="home">
 	    <h3>Home</h3>
 	    <ul>
 		<li>Connection test: <!-- TMPL_IF NAME="pingresult" -->success<!-- TMPL_ELSE -->failed<!-- /TMPL_IF --></li>
 		<li>Next update: <!-- TMPL_IF NAME="execution_time" --><!-- TMPL_VAR NAME="execution_time" --><!-- TMPL_ELSE -->none<!-- /TMPL_IF --></li>
-		<li>Last slave update:</li>
-		<li>Last master update:</li>
+		<li>Synchronization currently running: <!-- TMPL_IF NAME="KSS_already_running" -->yes<!-- TMPL_ELSE -->no<!-- /TMPL_IF -->
 	    </ul>
-
-
     </div>
-    <!-- TMPL_IF NAME="master" -->
+
     <div id="minfos">
 	    <h3>Master informations</h3>
 	    <h3>Last synchronisation details:</h3>
@@ -185,16 +188,26 @@
 	<h3>Master actions</h3>
 	    <ul>
 		<li>Manual sync with file : <br />
-		<form>
-		<label for "fileinput">Select a previously saved file:</label>
-		<input type="file" />
-		<input type="submit" />
+		<form action="/cgi-bin/koha/tools/kss.pl" enctype='multipart/form-data' method="POST">
+		    <label for "fileinput">Select a previously saved file:</label>
+		    <input type="file" name="backupfile" />
+		    <input type="submit" name="processbackup" />
 		</form>
 		</li>
 	    </ul>
 
     </div>
     <!-- TMPL_ELSE -->
+    <div id="home">
+	    <h3>Home</h3>
+	    <ul>
+		<li>Connection test: <!-- TMPL_IF NAME="pingresult" -->success<!-- TMPL_ELSE -->failed<!-- /TMPL_IF --></li>
+		<li>Next update: <!-- TMPL_IF NAME="execution_time" --><!-- TMPL_VAR NAME="execution_time" --><!-- TMPL_ELSE -->none<!-- /TMPL_IF --></li>
+		<li>Synchronization currently running: <!-- TMPL_IF NAME="KSS_already_running" -->yes<!-- TMPL_ELSE -->no<!-- /TMPL_IF -->
+	    </ul>
+    </div>
+
+
     <div id="cinfos">
 	    <h3>Client informations</h3>
 	    <h3>Last synchronisation details for <!-- TMPL_VAR NAME="hostname" -->:</h3>
@@ -326,8 +339,10 @@
     <div id="cactions">
 	<h3>Client actions</h3>
 	    <ul>
-		<li>Save current status</li>
-		<li><a href="/cgi-bin/koha/tools/kss.pl?manual=1#mtos">Launch manual execution</a></li>
+		<li><a href="/cgi-bin/koha/tools/kss.pl?save=1">Save current status</a></li>
+		<li><a href="/cgi-bin/koha/tools/kss.pl?manual=1">Launch manual execution</a></li>
+		<!-- TMPL_IF NAME="KSS_already_running" -->Could not launch manual execution: synchronization was already running!<!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="Server_unreachable"  -->Could not launch manual execution: server is not reachable!<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="manualoutput" --><li>Manual execution output : <br /><pre><!-- TMPL_VAR NAME="manualoutput" --></pre></li><!-- /TMPL_IF -->
 	    </ul>
     </div>

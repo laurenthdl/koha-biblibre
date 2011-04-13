@@ -45,6 +45,9 @@ use YAML;
 use Net::Ping;
 use C4::Scheduler;
 use POSIX qw(strftime);
+use File::Slurp qw(slurp);
+use File::Basename;
+
 use Koha_Synchronize_System::tools::kss;
 
 
@@ -55,6 +58,10 @@ my $manual      = $input->param('manual');
 
 # Getting conf
 my $conf = Koha_Synchronize_System::tools::kss::get_conf();
+my $kss_dir   = $$conf{path}{kss_dir};
+my $ip_server = $$conf{cron}{serverhost};
+my $ssh_cmd   = $$conf{which_cmd}{ssh}; 
+
 
 # open template
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -66,6 +73,17 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
         debug           => 1,
     }
 );
+
+# Is the server reachable?
+my $ping = Net::Ping->new();
+my $pingresult = $ping->ping($conf->{'cron'}->{'serverhost'});
+$template->param(pingresult => $pingresult);
+
+
+# Execution commands
+my $options = '';
+my $scheduledcommand = "EXPORT KOHA_CONF=\"$CONFIG_NAME\"; " . $$conf{path}{kss_dir} . "tools/kss.pl $options";
+my $manualcommand = "perl " . $$conf{path}{kss_dir} . 'tools/kss.pl ' . $options;
 
 # Are we a master or a slave?
 my $master = $$conf{cron}{master};
@@ -101,6 +119,15 @@ if ($master) {
    }
    $template->param(stats_loop => \@stats_loop);
 
+    # Actions
+
+    # Process backup file
+    if ($input->param("processbackup")) {
+	my $lfh = $input->upload('backupfile');
+
+    }
+
+
 } else {
     # And if we are a slave, we only gather our own informations
 
@@ -108,6 +135,11 @@ if ($master) {
     my $hostname = qx{hostname -f};
     $hostname =~ s/\s$//;
     $template->param("hostname" => $hostname);
+
+    # Check if synchro is already running
+    #my $return = system($manualcommand . " --status");
+    my $return = 0;
+    $template->param("KSS_already_running" => 1) if ($return == 1);
 
     # Getting stats
     my $last_stats_result = Koha_Synchronize_System::tools::kss::get_stats_by_host($dbh, $hostname);
@@ -138,20 +170,79 @@ if ($master) {
     $template->param(last_sql_errors_loop => $last_sql_errors_result);
 
 
+    # Actions
+
+    # Save the current state
+    if ($input->param("save")) {
+	my $command = "perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+	my @output = qx{$command};	
+
+	# Last line of output is the filename to send
+	my $file = pop(@output);
+	my $filename = basename($file);
+
+	# Sending file
+	print $input->header(
+	    -type                        => 'application/x-compressed',
+	    -'Content-Transfer-Encoding' => 'binary',
+	    -attachment                  => "$filename"
+	);
+	my $output = slurp($file); 
+	print $output;
+
+    }
+
+    # Launch manual execution
+    if ($input->param("manual")) {
+
+	if ($pingresult) {
+
+	    # Check if not already running
+	    #TODO
+	   # my $ssh_cmd                 = $$conf{which_cmd}{ssh}; 
+	   # my $command = "$ssh_cmd $ip_server perl $kss_dir/tools/kss.pl --status";
+	   # my $return = qx{$manualcommand};
+	    my $return = 0;
+	    if ($return == 1) {
+		$template->param("KSS_already_running" => 1);
+	    } else {
+
+		# Creating backup
+		my $command = "perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+		qx{$command};
+		
+		# Sending backup
+		$command = "perl " . $$conf{path}{kss_dir} . "scripts/client/send_backups.pl";
+		qx{$command};
+
+		# Executing remote kss.pl
+		$command = "$ssh_cmd $ip_server perl $kss_dir/tools/kss.pl";
+		qx{$command};
+
+		# Getting new database
+		$command = "perl " . $$conf{path}{kss_dir} . "scripts/client/pull_new_db.pl";
+		qx{$command};
+		
+
+	#	my @output = qx{$manualcommand . " &"};
+#		eval {system($manualcommand . " 2>&1 1>/dev/null &");}
+		#my $tmploutput = "Execution of $manualcommand : " . join('', @output);
+		#$template->param('manualoutput' => $tmploutput);
+	    }
+
+	} else {
+	    $template->param("Server_unreachable" => 1);
+	}
+
+	$template->param("display_cactions" => 1);
+    }
 
 }
 
-# Trying to reach the server
-my $ping = Net::Ping->new();
-my $pingresult = $ping->ping($conf->{'cron'}->{'serverhost'});
-$template->param(pingresult => $pingresult);
-
 # If connection test is ok
-if ($pingresult) {
+if (1 == 2) {
+#if ($pingresult) {
 
-    my $options = '';
-    my $scheduledcommand = "EXPORT KOHA_CONF=\"$CONFIG_NAME\"; " . $$conf{path}{kss_dir} . "tools/kss.pl $options";
-    my $manualcommand = "perl " . $$conf{path}{kss_dir} . 'tools/kss.pl ' . $options;
 
     # Deleting next sync if it already has been scheduled
     remove_at_job_by_tag($scheduledcommand);
@@ -159,9 +250,19 @@ if ($pingresult) {
     # And the user asked for a manual execution
     if ($manual == 1) {
 
-	my @output = qx{$manualcommand};
-	my $tmploutput = "Execution of $manualcommand : " . join('', @output);
-	$template->param('manualoutput' => $tmploutput);
+	# Check if not already running
+	#my $return = system($manualcommand . " --status");
+	my $return = 0;
+	if ($return == 1) {
+	    $template->param("KSS_already_running" => 1);
+	} else {
+
+#	my @output = qx{$manualcommand . " &"};
+	eval {system($manualcommand . " 2>&1 1>/dev/null &");}
+	#my $tmploutput = "Execution of $manualcommand : " . join('', @output);
+	#$template->param('manualoutput' => $tmploutput);
+	}
+
 
 
     # Or a scheduled execution
