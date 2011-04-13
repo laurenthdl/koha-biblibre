@@ -1,0 +1,61 @@
+# Mail translation for KSS
+msgid ""
+msgstr ""
+"Project-Id-Version: mail\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-04-13 16:18+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: tools/trad.pl:7
+msgid "TITLE_START"
+msgstr "Koha Synchronize System: Derniere synchronisation"
+
+#: tools/trad.pl:8
+msgid "TITLE_MIDDLE"
+msgstr "terminee le "
+
+#: tools/trad.pl:9
+msgid "TITLE_END"
+msgstr "ne s'est pas terminee"
+
+#: tools/trad.pl:10
+msgid "SUMMARY_H2"
+msgstr "Resume de la derniere synchronisation:"
+
+#: tools/trad.pl:11
+msgid "STATS_H2"
+msgstr "Statistiques:"
+
+#: tools/trad.pl:12
+msgid "RESERVES"
+msgstr "reserve(s) "
+
+#: tools/trad.pl:13
+msgid "RETURNS"
+msgstr "return(s) "
+
+#: tools/trad.pl:14
+msgid "ISSUES"
+msgstr "issue(s) "
+
+#: tools/trad.pl:15
+msgid "END_STATS"
+msgstr "traitees"
+
+#: tools/trad.pl:16
+msgid "ERRORS_H2"
+msgstr "Erreurs a traiter: "
+
+#: tools/trad.pl:17
+msgid "ERRORS"
+msgstr "erreurs "
+
+#: tools/trad.pl:18
+msgid "SQL_ERRORS"
+msgstr "erreurs sql"

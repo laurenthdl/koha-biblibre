@@ -42,6 +42,11 @@ my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
 my $alertmail                = $$conf{cron}{alertmail};
 my $smtpserver               = $$conf{cron}{smtpserver};
 
+# SetLocale and transkation with gettext
+use Locale::gettext;
+use POSIX;
+setlocale(LC_MESSAGES, "fr_FR");
+
 =head2 get_conf
 
 Return hashref contains all data in yaml config file.
@@ -829,6 +834,9 @@ sub get_stats {
 
 sub send_alert_mail {
 
+    my $d = Locale::gettext->domain('messages');
+    $d->dir("$kss_dir/locale/");
+
     my $dbh     = C4::Context->dbh;
 
     my $last_log_result = Koha_Synchronize_System::tools::kss::get_last_log($dbh);
@@ -836,24 +844,25 @@ sub send_alert_mail {
     my $last_sql_errors_result = Koha_Synchronize_System::tools::kss::get_last_sql_errors($dbh);
     my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh);
 
-    my $title   = "Koha Synchronize System: Last synchronization ".($$last_log_result{'status'} eq "End !" ? "ends at $$last_log_result{'end_time'}" : "does not finished");
+    my $title = $d->get("TITLE_START")." ";
+    $title .= $$last_log_result{'status'} eq "End !" ? $d->get("TITLE_MIDDLE")." $$last_log_result{'end_time'}" : $d->get("TITLE_END");
     my $content;
-    $content .= "\nSummary for the last synchronization:\n";
-    $content .= scalar(@$last_errors_result) . " errors - " . scalar(@$last_sql_errors_result) . " sql errors";
-    $content .= "\nStats:\n";
+    $content .= "\n".$d->get("SUMMARY_H2")."\n";
+    $content .= scalar(@$last_errors_result)." ".$d->get("ERRORS")." - " . scalar(@$last_sql_errors_result) . " ".$d->get("SQL_ERRORS");
+    $content .= "\n".$d->get("STATS_H2")."\n";
     foreach (keys %{$stats}) {
-        $content .= "- $_: $$stats{$_}{reserve} reserve(s) $$stats{$_}{return} return(s) $$stats{$_}{issue} issue(s) processed\n";
+        $content .= "- $_: ".$$stats{$_}{reserve}." ".$d->get("RESERVES")." ".$$stats{$_}{return}." ".$d->get("RETURNS")." ".$$stats{$_}{issue}." ".$d->get("ISSUES")." ".$d->get("END_STATS")."\n";
     }
 
     if (scalar($last_errors_result) != 0) {
-        $content .= "\nErrors to process:\n";
+        $content .= "\n".$d->get("ERRORS_H2")."\n";
         foreach (@$last_errors_result) {
            $content .= "$$_{'error'} - $$_{'message'}\n";
         }
     }
 
     if (scalar($last_sql_errors_result) != 0) {
-        $content .= "\nSql Errors to process:\n";
+        $content .= "\n";
         foreach (@$last_sql_errors_result) {
            $content .= "$$_{'error'}\n";
         }
