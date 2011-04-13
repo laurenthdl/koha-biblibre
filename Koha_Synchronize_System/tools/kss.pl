@@ -88,7 +88,7 @@ eval {
         close HN;
     	chomp $client_hostname;
 
-        next if not Koha_Synchronize_System::tools::kss::diff_files_exists $diff_logbin_dir, $log );
+        next if not Koha_Synchronize_System::tools::kss::diff_files_exists $diff_logbin_dir, $log;
 
         $log->info("== Préparation de la base de données ==");
         Koha_Synchronize_System::tools::kss::prepare_database $user, $passwd, $db_server, $client_hostname, $log;

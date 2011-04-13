@@ -42,6 +42,13 @@ my $max_borrowers_fieldname  = $$conf{databases_infos}{max_borrowers_fieldname};
 my $alertmail                = $$conf{cron}{alertmail};
 my $smtpserver               = $$conf{cron}{smtpserver};
 
+=head2 get_conf
+
+Return hashref contains all data in yaml config file.
+All paths in the path section are concatenate with the kss root.
+We manipulate absolute path.
+
+=cut
 sub get_conf {
     my $koha_dir = C4::Context->config('intranetdir');
     my $kss_dir = "$koha_dir/Koha_Synchronize_System/";
@@ -60,6 +67,10 @@ sub get_conf {
     return $conf;
 }
 
+=head2 get_dbh
+Returns a database handler with informations in config file.
+Argument must be 'server' or 'client'. By default, returns a handler to server
+=cut
 sub get_dbh {
     my $host = shift || 'server';
 
@@ -84,6 +95,15 @@ sub get_dbh {
 
 }
 
+
+#+--------------------------------------+
+#|          Server functions            +
+#+--------------------------------------+
+
+=head2 get_archives
+Returns arrayref of tar.gz files.
+We search in path:server_inbox section
+=cut
 sub get_archives {
     my $conf = get_conf;
     my $dir = $$conf{path}{server_inbox};
@@ -92,6 +112,9 @@ sub get_archives {
     return \@files;
 }
 
+=head2 backup_server_db
+Dumps the current DB
+=cut
 sub backup_server_db {
     my $log = shift;
     my $conf = get_conf;
@@ -108,90 +131,9 @@ sub backup_server_db {
     system( qq{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename} ) == 0 or die $!;
 }
 
-sub backup_client_logbin {
-    my $log = shift;
-    my $conf = get_conf;
-    my $service_cmd = $$conf{which_cmd}{service};
-    my $hostname_cmd = $$conf{which_cmd}{hostname};
-    my $cp_cmd = $$conf{which_cmd}{cp};
-    my $rm_cmd = $$conf{which_cmd}{rm};
-    my $mv_cmd = $$conf{which_cmd}{mv};
-    my $tar_cmd = $$conf{which_cmd}{tar};
-    my $outbox = $$conf{path}{client_outbox};
-    my $bakdir = $$conf{path}{client_backup};
-    my $logdir = $$conf{abspath}{client_logbin};
-    
-    my $filename = strftime "%Y-%m-%d_%H-%M-%S", localtime;
-    my $dirname = $outbox . "/" . $filename;
-    eval { generate_ids_files("$dirname/ids") };
-    die $@ if $@;
-    
-    system( qq{$service_cmd mysql stop} ) == 0 or die "Can't stop mysql ! ($!)";
-    
-    eval {
-        make_path "$dirname/logbin";
-        make_path "$dirname/ids";
-    };
-    die "Can't create directory for backup ($@)" if $@;
-
-    eval {
-        qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
-        qx{$rm_cmd -f $logdir/mysql-bin.*};
-    };
-    die "Can't move mysql-bin ($@)" if $@;
-
-    system( qq{$service_cmd mysql start} ) == 0 or die "Can't start mysql ! ($!)";
-     
-    system( qq{$hostname_cmd -f > $dirname/hostname} ) == 0 or ($log && $log->warning("Can't get hostname from file ($!)"));
-    
-    system( qq{cd $dirname; $tar_cmd zcvf $filename.tar.gz logbin ids hostname} ) == 0 or die "Cant' extract archive ($!)";
-
-    system( qq{cd $dirname; $mv_cmd $filename.tar.gz $outbox} ) == 0 or die "Can't move archive to outbox ($!)";
-
-    system( qq{$mv_cmd $dirname $bakdir} ) == 0 or die "Can't move directory $dirname to backup dir $bakdir ($!)";
-
-}
-
-sub pull_new_db {
-    my $log = shift;
-    my $conf = get_conf;
-    my $ssh_cmd                 = $$conf{which_cmd}{ssh};
-    my $scp_cmd                 = $$conf{which_cmd}{scp};
-    my $mysql_cmd               = $$conf{which_cmd}{mysql};
-    my $ip_server               = $$conf{cron}{serverhost};
-    my $kss_dir                 = $$conf{path}{kss_dir};
-    my $remote_dump_filepath    = $$conf{abspath}{server_dump_filepath};
-    my $local_dump_filepath     = $$conf{path}{client_dump_filepath};
-    my $username = "kss";
-
-    $log && $log->info(" Vérification de la disponibilité d'un nouveau dump" );
-    my $status = qx{$ssh_cmd $username\@$ip_server perl $kss_dir/tools/kss.pl --status} or die "Can't connect to the server ($!)";
-    if ( $status == 1 ){
-        $log && $log->error("Le serveur est toujours en cours d'exécution, impossible de récupérer le dump actuellement");
-        return 1;
-    }
-    $log && $log->info( "Récupération du dump distant" );
-    system( qq{$scp_cmd $username\@$ip_server:$remote_dump_filepath $local_dump_filepath} ) == 0 or die "Can't get new db from server ($!)";
-
-    $log && $log->info( "Insertion dans la base de données locale" );
-    system( qq{$mysql_cmd -u $user -p$passwd $db_client < $local_dump_filepath} ) == 0 or die "Can't insert new dump ($!)";
-}
-sub generate_ids_files {
-    my $outdir = shift;
-    my $conf = get_conf;
-    my $scripts_dir = $$conf{path}{client_scripts_ids};
-    my $perl_cmd = $$conf{which_cmd}{perl};
-
-    my @scripts = <$scripts_dir/*.pl>;
-    for my $script ( @scripts ) {
-        chomp $script;
-        my $filename = $script;
-        $filename =~ s#.*/([^/]*).pl#$1#;
-        my $filepath = $outdir . '/' . $filename . '.sql';
-        system( qq{$perl_cmd $script > $filepath} ) == 0 or die "Can't gererate file $filepath ($!)";
-    }
-}
-
+=head2 diff_files_exists
+Returns 1 if exists at least 1 binary log file else 0
+=cut
 sub diff_files_exists {
     my $dir = shift;
     my $log = shift;
@@ -207,6 +149,9 @@ sub diff_files_exists {
     return 0;
 }
 
+=head2 insert_new_ids
+Insert each sql dump file presents in $id_dir.
+=cut
 sub insert_new_ids {
     my ($user, $pwd, $db_name, $id_dir, $log) = @_;
     my @dump_id = <$id_dir/*>;
@@ -227,6 +172,10 @@ sub insert_new_ids {
     system( qq{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS\('Insert new ids \($nb_files files found\)', 1\);"} ) == 0 or ($log && $log->warning("Can't call PROC_UPDATE_STATUS ($!)"));
 }
 
+=head2 insert_proc_and_triggers
+Inserts All procedures and triggers in server database.
+Call me before kss
+=cut
 sub insert_proc_and_triggers {
     my ($user, $pwd, $db_name, $log) = @_;
     my $conf = get_conf();
@@ -242,6 +191,10 @@ sub insert_proc_and_triggers {
     }
 }
 
+=head2 prepare_database
+Call PROC_KSS_START procedure.
+It initializes tables and logs.
+=cut
 sub prepare_database {
     my ($user, $pwd, $db_name, $client_hostname, $log) = @_;
 
@@ -250,6 +203,9 @@ sub prepare_database {
     system( qq{$mysql_cmd -u $user -p$passwd $db_name -e "CALL PROC_KSS_START('$client_hostname');"} ) == 0 or die "Can't call PROC_KSS_START procedure ($!)";
 }
 
+=head2 insert_proc_and_triggers
+Drop All procedures and triggers in server database
+=cut
 sub delete_proc_and_triggers {
     my ($user, $pwd, $db_name, $log) = @_;
     my $conf = get_conf();
@@ -265,6 +221,10 @@ sub delete_proc_and_triggers {
     }
 }
 
+=head2 clean_fs
+Delete all temporary files.
+Call me when tar.gz processing is done
+=cut
 sub clean_fs {
 
     my $conf = get_conf();
@@ -280,6 +240,11 @@ sub clean_fs {
 
 }
 
+=head2 clean
+Call PROC_KSS_END procedure.
+Drop all temporary tables.
+Call me after kss.
+=cut
 sub clean {
     my ($user, $pwd, $db_name, $log) = @_;
 
@@ -293,6 +258,10 @@ sub clean {
 
 }
 
+=head2 prepare_next_iteration
+Call PPROC_CREATE_KSS_INFOS procedure.
+Get greatest borrowernumber and reservenumber. Its insert in kss_infos table.
+=cut
 sub prepare_next_iteration {
     my $log = shift;
     my $dbh = shift || get_dbh;
@@ -300,6 +269,9 @@ sub prepare_next_iteration {
     $dbh->do("CALL PROC_CREATE_KSS_INFOS()");
 }
 
+=head2 dump_available_db
+Dump new database and make it available in inbox for client.
+=cut
 sub dump_available_db {
     my $log = shift;
 
@@ -319,6 +291,11 @@ sub dump_available_db {
     system( qq{cp $dump_filepath $remote_dump_filepath} ) == 0 or die "Can't copy dump file";
 }
 
+
+=head2 extract_and_purge_mysqllog
+Extract mysql binary log files with mysqllogbin command and purge.
+At end, we have sql files contains only queries we want.
+=cut
 sub extract_and_purge_mysqllog {
     my $bindir  = shift;
     my $fulldir = shift;
@@ -371,6 +348,10 @@ sub extract_and_purge_mysqllog {
     return 0;
 }
 
+=head2 get_level
+Get table name level.
+Proccess is different fonctions of level.
+=cut
 sub get_level {
     my $table_name = shift;
 
@@ -385,6 +366,270 @@ sub get_level {
         return 2;
     }
 
+}
+
+=head2 replace_with_new_id
+Replace in a sql query old primary key with the new one.
+$string is a sql query
+=cut
+sub replace_with_new_id {
+    my $string = shift;
+    my $table_name = shift;
+    my $field = shift;
+    my $dbh = shift;
+
+    if ( $string =~ /$field\s*=\s*\'{0,1}([^']*)\'{0,1}/ ) {
+        $dbh->do("CALL PROC_GET_NEW_ID (\"$table_name.$field\", $1, \@new_id);");
+        my @value = $dbh->selectrow_array("SELECT \@new_id;");
+
+        my $new_id = $value[0];
+
+        # ex:
+        # borrowernumber= 42
+        # borrowernumber ='42'
+        $string =~ s/$field\s*=\s*\'{0,1}([^']*)\'{0,1}/$field = '$new_id'/;
+    }
+
+    return $string;
+}
+
+=head2 log_error
+log an error in kss errors table.
+$error and $message are string
+=cut
+sub log_error {
+    my $error = shift;
+    my $message = shift;
+    my $dbh = shift || get_dbh;
+
+    $dbh->do(qq{CALL PROC_ADD_ERROR("} . $dbh->quote($error) . qq{", "} . $dbh->quote($message) . qq{");});
+
+}
+
+=head2 insert_diff_file
+Insert a sql file which contains queries executed on client.
+$file must be a filepath
+=cut
+sub insert_diff_file {
+    my $file = shift;
+    my $dbh = shift;
+    my $log = shift;
+    chomp $file;
+
+    if (not $dbh) {
+        $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
+        $dbh->{'mysql_enable_utf8'} = 1;
+        $dbh->do("set NAMES 'utf8'");
+    }
+
+    open( FILE, $file ) or die "Le fichier $file ne peut être lu";
+
+    # Separator
+    my $sep = "/*!*/;";
+    my $oldsep = $/;
+    $/ = $sep;
+
+   
+    $dbh->do("CALL PROC_UPDATE_STATUS('Processing file $file', 0);");
+
+    # For each query
+    while ( my $query = <FILE> ) {
+        my $r;
+        next if length($query) <= 1; # It's not a valid query
+        my @errors;
+        my @warnings;
+        my $table_name;
+        $query =~ s/^\n//; # First character is a \n
+        if ( $query =~ /^INSERT INTO (\S+)/ ) { # INSERT QUERY
+            $table_name = $1;
+            my $level = get_level $table_name;
+            if ( $level == 1 ) {
+                # Nothing todo
+            } elsif ( $level == 2 ) {
+                # For INSERT old_issues SELECT * FROM issues WHERE borrowernumber=xxx [...] format
+                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
+            }
+        } elsif ( $query =~ /^UPDATE (\S+)/ ) { # UPDATE QUERY
+            $table_name = $1;
+            my $level = get_level $table_name;
+            if ( $level == 1 ) {
+                if ( $table_name eq 'borrowers' ) {
+                    $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                    $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
+                }
+            } elsif ( $level == 2 ) {
+                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
+            }
+        } elsif ( $query =~ /^DELETE\s+FROM\s+(\S+)/ ) { # DELETE QUERY
+            $table_name = $1;
+            my $level = get_level $table_name;
+            if ( $level == 1 ) {
+                if ( $table_name eq 'borrowers' ) {
+                    $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                    $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
+                }
+            } elsif ( $level == 2 ) {
+                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
+                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
+            }
+
+
+        } else {
+            $log && $log->warning("This query is not parsed : ###$query###");
+            next;
+        }
+
+        $log && $log->info( $query );
+
+        $dbh->do($query); # Execute the query
+
+        @errors = $dbh->selectrow_array(qq{SHOW ERRORS $sep}); # Get errors
+        @warnings = $dbh->selectrow_array(qq{SHOW WARNINGS $sep}); # Get warnings
+
+        if ( @errors ) { # Catch specifics errors
+            $log && $log->error($errors[0] . ':' . $errors[1] . ' => ' . $errors[2]);
+            if ( ( $table_name eq 'biblioitems' or $table_name eq 'items' ) and $errors[0] eq 'Error' and $errors[1] eq '1222' ) {
+                $log && $log->error("This query was ignored. It tries to modify $table_name table");
+                $dbh->do("CALL PROC_ADD_ERROR('Unauthorized query', 'A query was ignored. It try to modify $table_name table');");
+            } elsif ( ( $table_name eq 'issues' ) and $errors[0] eq 'Error' and $errors[1] eq '1452' and $errors[2] =~ /`issues_ibfk_2`/ ) {
+                $log && $log->error("This query tries to update a record with a item wich doesn't exist");
+                $dbh->do("CALL PROC_ADD_ERROR('Item missing', 'A quer¼y tries to update a record with an item wich doesn\\'t exist');");
+            } else {
+                $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $errors[0] . ":" . $errors[1] . " => " . $errors[2] . "\", " . $dbh->quote($query) . ");");
+            }
+        } elsif ( @warnings ) {
+            if ( $warnings[0] ne 'Note' ) {
+                    $log && $log->warning($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
+                    $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
+            }
+        } else {
+            $log && $log->info(" <<< OK >>>")
+        }
+    }
+
+    close( FILE );
+
+    $dbh->do("CALL PROC_UPDATE_STATUS('Processing file $file', 1);");
+
+    $/ = $oldsep;
+}
+
+#+--------------------------------------+
+#|          Client functions            +
+#+--------------------------------------+
+
+=head2 backup_client_logbin
+Create a new tar.gz file with binary mysql log (in /var/log/mysql), hostname and idsD
+=cut
+sub backup_client_logbin {
+    my $log = shift;
+
+    my $conf = get_conf;
+    my $service_cmd = $$conf{which_cmd}{service};
+    my $hostname_cmd = $$conf{which_cmd}{hostname};
+    my $cp_cmd = $$conf{which_cmd}{cp};
+    my $rm_cmd = $$conf{which_cmd}{rm};
+    my $mv_cmd = $$conf{which_cmd}{mv};
+    my $tar_cmd = $$conf{which_cmd}{tar};
+    my $outbox = $$conf{path}{client_outbox};
+    my $bakdir = $$conf{path}{client_backup};
+    my $logdir = $$conf{abspath}{client_logbin};
+    
+    # Generate a filename
+    my $filename = strftime "%Y-%m-%d_%H-%M-%S", localtime;
+    my $dirname = $outbox . "/" . $filename;
+
+    # Generate ids files
+    eval { generate_ids_files("$dirname/ids") };
+    die $@ if $@;
+    
+    # Stop mysql
+    system( qq{$service_cmd mysql stop} ) == 0 or die "Can't stop mysql ! ($!)";
+    
+    # Make directory logbin and ids
+    eval {
+        make_path "$dirname/logbin";
+        make_path "$dirname/ids";
+    };
+    die "Can't create directory for backup ($@)" if $@;
+
+    # Move binaries
+    eval {
+        qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
+        qx{$rm_cmd -f $logdir/mysql-bin.*};
+    };
+    die "Can't move mysql-bin ($@)" if $@;
+
+    # Start mysql
+    system( qq{$service_cmd mysql start} ) == 0 or die "Can't start mysql ! ($!)";
+
+    # Get hostname
+    system( qq{$hostname_cmd -f > $dirname/hostname} ) == 0 or ($log && $log->warning("Can't get hostname from file ($!)"));
+    
+    # Create archive
+    system( qq{cd $dirname; $tar_cmd zcvf $filename.tar.gz logbin ids hostname} ) == 0 or die "Can't create archive ($!)";
+
+    # Move archive to outbox dir
+    system( qq{cd $dirname; $mv_cmd $filename.tar.gz $outbox} ) == 0 or die "Can't move archive to outbox ($!)";
+
+    # Move directory to backup dir
+    system( qq{$mv_cmd $dirname $bakdir} ) == 0 or die "Can't move directory $dirname to backup dir $bakdir ($!)";
+
+}
+
+=head2 pull_new_db
+Get and insert new db from server
+=cut
+sub pull_new_db {
+    my $log = shift;
+
+    my $conf = get_conf;
+    my $ssh_cmd                 = $$conf{which_cmd}{ssh};
+    my $scp_cmd                 = $$conf{which_cmd}{scp};
+    my $mysql_cmd               = $$conf{which_cmd}{mysql};
+    my $ip_server               = $$conf{cron}{serverhost};
+    my $kss_dir                 = $$conf{path}{kss_dir};
+    my $remote_dump_filepath    = $$conf{abspath}{server_dump_filepath};
+    my $local_dump_filepath     = $$conf{path}{client_dump_filepath};
+    my $username = "kss";
+
+    # If kss.pl is running, we can't continue
+    $log && $log->info(" Vérification de la disponibilité d'un nouveau dump" );
+    my $status = qx{$ssh_cmd $username\@$ip_server perl $kss_dir/tools/kss.pl --status} or die "Can't connect to the server ($!)";
+    if ( $status == 1 ){
+        $log && $log->error("Le serveur est toujours en cours d'exécution, impossible de récupérer le dump actuellement");
+        return 1;
+    }
+
+    # Get remote dump
+    $log && $log->info( "Récupération du dump distant" );
+    system( qq{$scp_cmd $username\@$ip_server:$remote_dump_filepath $local_dump_filepath} ) == 0 or die "Can't get new db from server ($!)";
+
+    # Insert dump
+    $log && $log->info( "Insertion dans la base de données locale" );
+    system( qq{$mysql_cmd -u $user -p$passwd $db_client < $local_dump_filepath} ) == 0 or die "Can't insert new dump ($!)";
+}
+
+=head2 generate_ids_files
+Generate ids files.
+Execute .pl in scripts client directory to generate sql files.
+=cut
+sub generate_ids_files {
+    my $outdir = shift;
+    my $conf = get_conf;
+    my $scripts_dir = $$conf{path}{client_scripts_ids};
+    my $perl_cmd = $$conf{which_cmd}{perl};
+
+    my @scripts = <$scripts_dir/*.pl>;
+    for my $script ( @scripts ) {
+        chomp $script;
+        my $filename = $script;
+        $filename =~ s#.*/([^/]*).pl#$1#;
+        my $filepath = $outdir . '/' . $filename . '.sql';
+        system( qq{$perl_cmd $script > $filepath} ) == 0 or die "Can't gererate file $filepath ($!)";
+    }
 }
 
 
@@ -581,136 +826,6 @@ sub get_stats {
 
 }
 
-sub replace_with_new_id {
-    my $string = shift;
-    my $table_name = shift;
-    my $field = shift;
-    my $dbh = shift;
-
-    if ( $string =~ /$field\s*=\s*\'{0,1}([^']*)\'{0,1}/ ) {
-        $dbh->do("CALL PROC_GET_NEW_ID (\"$table_name.$field\", $1, \@new_id);");
-        my @value = $dbh->selectrow_array("SELECT \@new_id;");
-
-        my $new_id = $value[0];
-
-        $string =~ s/$field\s*=\s*\'{0,1}([^']*)\'{0,1}/$field = '$new_id'/;
-    }
-
-    return $string;
-}
-
-sub log_error {
-    my $error = shift;
-    my $message = shift;
-    my $dbh = shift || get_dbh;
-
-    $dbh->do(qq{CALL PROC_ADD_ERROR("} . $dbh->quote($error) . qq{", "} . $dbh->quote($message) . qq{");});
-
-}
-
-sub insert_diff_file {
-    my $file = shift;
-    my $dbh = shift;
-    my $log = shift;
-    chomp $file;
-
-    if (not $dbh) {
-        $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
-        $dbh->{'mysql_enable_utf8'} = 1;
-        $dbh->do("set NAMES 'utf8'");
-    }
-
-    open( FILE, $file ) or die "Le fichier $file ne peut être lu";
-
-    my $sep = "/*!*/;";
-    my $oldsep = $/;
-    $/ = $sep;
-
-   
-   $dbh->do("CALL PROC_UPDATE_STATUS('Processing file $file', 0);");
-
-    while ( my $query = <FILE> ) {
-        my $r;
-        next if length($query) <= 1;
-        my @errors;
-        my @warnings;
-        my $table_name;
-        $query =~ s/^\n//; # 1er caractère est un retour chariot
-        if ( $query =~ /^INSERT INTO (\S+)/ ) {
-            $table_name = $1;
-            my $level = get_level $table_name;
-            if ( $level == 1 ) {
-                # Nothing todo
-            } elsif ( $level == 2 ) {
-                # For INSERT old_issues SELECT * FROM issues WHERE borrowernumber=xxx [...] format
-                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
-                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
-            }
-        } elsif ( $query =~ /^UPDATE (\S+)/ ) {
-            $table_name = $1;
-            my $level = get_level $table_name;
-            if ( $level == 1 ) {
-                if ( $table_name eq 'borrowers' ) {
-                    $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
-                    $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
-                }
-            } elsif ( $level == 2 ) {
-                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
-                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
-            }
-        } elsif ( $query =~ /^DELETE\s+FROM\s+(\S+)/ ) {
-            $table_name = $1;
-            my $level = get_level $1;
-            if ( $level == 1 ) {
-                if ( $table_name eq 'borrowers' ) {
-                    $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
-                    $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
-                }
-            } elsif ( $level == 2 ) {
-                $query = replace_with_new_id ( $query, $table_name, 'borrowernumber', $dbh );
-                $query = replace_with_new_id ( $query, $table_name, 'reservenumber', $dbh );
-            }
-
-
-        } else {
-            $log && $log->warning("This query is not parsed : ###$query###");
-            next;
-        }
-
-        $log && $log->info( $query );
-
-        $dbh->do($query);
-
-        @errors = $dbh->selectrow_array(qq{SHOW ERRORS $sep});
-        @warnings = $dbh->selectrow_array(qq{SHOW WARNINGS $sep});
-
-        if ( @errors ) {
-            $log && $log->error($errors[0] . ':' . $errors[1] . ' => ' . $errors[2]);
-            if ( ( $table_name eq 'biblioitems' or $table_name eq 'items' ) and $errors[0] eq 'Error' and $errors[1] eq '1222' ) {
-                $log && $log->error("This query was ignored. It tries to modify $table_name table");
-                $dbh->do("CALL PROC_ADD_ERROR('Unauthorized query', 'A query was ignored. It try to modify $table_name table');");
-            } elsif ( ( $table_name eq 'issues' ) and $errors[0] eq 'Error' and $errors[1] eq '1452' and $errors[2] =~ /`issues_ibfk_2`/ ) {
-                $log && $log->error("This query tries to update a record with a item wich doesn't exist");
-                $dbh->do("CALL PROC_ADD_ERROR('Item missing', 'A quer¼y tries to update a record with an item wich doesn\\'t exist');");
-            } else {
-                $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $errors[0] . ":" . $errors[1] . " => " . $errors[2] . "\", " . $dbh->quote($query) . ");");
-            }
-        } elsif ( @warnings ) {
-            if ( $warnings[0] ne 'Note' ) {
-                    $log && $log->warning($warnings[0] . ':' . $warnings[1] . ' => ' . $warnings[2]);
-                    $dbh->do("CALL PROC_ADD_SQL_ERROR(\"" . $warnings[0] . ":" . $warnings[1] . " => " . $warnings[2] . "\", " . $dbh->quote($query) . ");");
-            }
-        } else {
-            $log && $log->info(" <<< OK >>>")
-        }
-    }
-
-    close( FILE );
-
-    $dbh->do("CALL PROC_UPDATE_STATUS('Processing file $file', 1);");
-
-    $/ = $oldsep;
-}
 
 sub send_alert_mail {
 
