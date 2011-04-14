@@ -291,4 +291,3 @@ my $z = new Net::Z3950::SimpleServer(
 );
 
 $z->launch_server("z3950-server", @ARGV) unless caller;
-

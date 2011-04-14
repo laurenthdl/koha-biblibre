@@ -42,6 +42,7 @@ use C4::Debug;
 
 my $input = new CGI;
 my $dbh   = C4::Context->dbh;
+my $sql_error = 0;
 
 my ( $template, $borrowernumber, $cookie, $staffflags ) = get_template_and_user(
     {   template_name   => "admin/aqbudgets.tmpl",
@@ -59,9 +60,9 @@ $template->param( cur => $cur->{symbol} );
 my $op = $input->param('op');
 
 # see if the user want to see all budgets or only owned ones
-my $show_mine = 1;                        #SHOW BY DEFAULT
+my $show_all  = 0;                        #SHOW BY DEFAULT
 my $show      = $input->param('show');    # SET TO 1, BY A FORM SUMBIT
-$show_mine = $input->param('show_mine') if $show == 1;
+$show_all     = $input->param('show_all') if $show == 1;
 
 # IF USER DOESNT HAVE PERM FOR AN 'ADD', THEN REDIRECT TO THE DEFAULT VIEW...
 if ( not defined $template->{param_map}->{'CAN_user_acquisition_budget_add_del'} && $op == 'add_form' ) {
@@ -80,7 +81,7 @@ my $budget_period_dropbox = $input->param('budget_period_dropbox');
 delete $$budget_hash{$_} foreach grep { /filter|^op$|show/ } keys %$budget_hash;
 my $filter_budgetbranch = $input->param('filter_budgetbranch');
 my $filter_budgetname   = $input->param('filter_budgetname');
-$template->param( notree => ( $filter_budgetbranch or $show_mine ) );
+$template->param( notree => ( $filter_budgetbranch or not $show_all ) );
 
 # ' ------- get periods stuff ------------------'
 # IF PERIODID IS DEFINED,  GET THE PERIOD - ELSE JUST GET THE ACTIVE PERIOD BY DEFAULT
@@ -98,14 +99,14 @@ my $user_branchcode = $user->{'branchcode'};
 $template->param(
     action      => $script_name,
     script_name => $script_name,
-    show_mine   => $show_mine,
+    show_all   => $show_all,
     $op || else => 1,
 );
 
 # retrieve branches
 my ( $budget, );
 
-my $branches = GetBranches($show_mine);
+my $branches = GetBranches(!$show_all);
 my @branchloop2;
 foreach my $thisbranch ( keys %$branches ) {
     my %row = (
@@ -125,8 +126,10 @@ if ( $op eq 'add_form' ) {
     # if no buget_id is passed then its an add
     #  pass the period_id to build the dropbox - because we only want to show  budgets from this period
     my $dropbox_disabled;
+    my $budgetusersid;
     if ( defined $budget_id ) {    ### MOD
-        $budget           = GetBudget($budget_id);
+        $budget          = GetBudget($budget_id);
+        $budgetusersid   = GetUsersFromBudget($budget_id);
         $dropbox_disabled = BudgetHasChildren($budget_id);
         my $borrower = &GetMember( borrowernumber => $budget->{budget_owner_id} );
         $budget->{budget_owner_name} = $borrower->{'firstname'} . ' ' . $borrower->{'surname'};
@@ -165,6 +168,22 @@ if ( $op eq 'add_form' ) {
         $row{selected} = 1 if $thisbranch eq $budget->{'budget_branchcode'};
         push @branchloop_select, \%row;
     }
+
+    #build user informations
+    my @budgetusersnames_loop;
+    my $borrowernumberslist;
+    foreach my $borrower (values(%$budgetusersid)) {
+        push @budgetusersnames_loop , {
+            name => $borrower->{'firstname'}.' '.$borrower->{'surname'},
+            id   => $borrower->{'borrowernumber'}
+            };
+        $borrowernumberslist .=  $borrower->{'borrowernumber'}.':';
+    }
+
+    $template->param (
+       budgetusersnames_loop => \@budgetusersnames_loop,
+       borrowernumberslist =>  $borrowernumberslist
+    );
 
     # populates the YUI planning button
     my $categories      = GetAuthorisedValueCategories();
@@ -218,14 +237,22 @@ if ( $op eq 'add_form' ) {
     # END $OP eq DELETE_CONFIRM
     # called by delete_confirm, used to effectively confirm deletion of data in DB
 } else {
+
     if ( $op eq 'delete_confirmed' ) {
         my $rc = DelBudget($budget_id);
     } elsif ( $op eq 'add_validate' ) {
+        my $status;
         if ( defined $$budget_hash{budget_id} ) {
-            ModBudget($budget_hash);
+            $status = ModBudget($budget_hash);
         } else {
-            AddBudget($budget_hash);
+            $status = AddBudget($budget_hash);
         }
+        $sql_error = "This fund name (or code) already exists" unless $status;
+        if (defined $$budget_hash{'budgetusersid'}){
+            my @budgetusersid = split (':',$budget_hash->{'budgetusersid'});
+            $status = ModUsersLinkedToBudget ($$budget_hash{budget_id}, @budgetusersid);
+        }
+
     }
     my $branches              = GetBranches();
     my $budget_period_dropbox = GetBudgetPeriodsDropbox( $$period{budget_period_id} );
@@ -235,7 +262,7 @@ if ( $op eq 'add_form' ) {
         %$period,
     );
 
-    my $moo = GetBudgetHierarchy( $$period{budget_period_id}, C4::Context->userenv->{branchcode}, $show_mine ? $borrower_id : '' );
+    my $moo = GetBudgetHierarchy( $$period{budget_period_id}, C4::Context->userenv->{branchcode}, $show_all ? '' : $borrower_id );
     my @budgets = @$moo;    #FIXME
 
     my $toggle = 0;
@@ -315,6 +342,7 @@ if ( $op eq 'add_form' ) {
         $budget->{"budget_owner_name"}     = $borrower->{'firstname'} . ' ' . $borrower->{'surname'};
         $budget->{"budget_borrowernumber"} = $borrower->{'borrowernumber'};
 
+
         #Make a list of parents of the bugdet
         my @budget_hierarchy;
         push @budget_hierarchy, { element_name => $budget->{"budget_name"}, element_id => $budget->{"budget_id"} };
@@ -344,6 +372,7 @@ if ( $op eq 'add_form' ) {
         period_alloc_total  => $num->format_price($period_alloc_total),
         base_spent_total    => $num->format_price($base_spent_total),
         branchloop          => \@branchloop2,
+        sql_error           => $sql_error,
     );
 
 }    #---- END $OP eq DEFAULT

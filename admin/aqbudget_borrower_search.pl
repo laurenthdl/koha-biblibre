@@ -107,8 +107,12 @@ if ($member) {
     }
 }
 
+my $type = $input->param('type');
+warn ">>>$type";
+
 $template->param(
     member      => $member,
+    type        => $type,
     numres      => $count2,
     resultsloop => \@resultsdata
 );

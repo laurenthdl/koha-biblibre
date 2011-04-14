@@ -39,6 +39,8 @@ our @EXPORT  = qw<
   &GetSuggestion
   &GetSuggestionByStatus
   &GetSuggestionFromBiblionumber
+  &GetSuggestionInfo
+  &GetSuggestionInfoFromBiblionumber
   &ModStatus
   &ModSuggestion
   &NewSuggestion
@@ -64,6 +66,8 @@ BEGIN {
       &ModSuggestion
       &ConnectSuggestionAndBiblio
       &GetSuggestionFromBiblionumber
+      &GetSuggestionInfo
+      &GetSuggestionInfoFromBiblionumber
       &ConnectSuggestionAndBiblio
       &DelSuggestion
       &GetSuggestion
@@ -240,13 +244,65 @@ sub GetSuggestionFromBiblionumber {
     my $query = q{
         SELECT suggestionid
         FROM   suggestions
-        WHERE  biblionumber=?
+        WHERE  biblionumber=? LIMIT 1
     };
     my $dbh = C4::Context->dbh;
     my $sth = $dbh->prepare($query);
     $sth->execute($biblionumber);
     my ($ordernumber) = $sth->fetchrow;
     return $ordernumber;
+}
+
+=head2 GetSuggestionInfo
+
+Get a suggestion and borrower's informations from it's suggestionid
+
+return :
+all informations (suggestion and borrower) of the suggestion which is related to the suggestionid given on input args.
+
+=cut
+
+sub GetSuggestionInfo {
+    my ($biblionumber) = @_;
+    my $query = qq{
+        SELECT suggestions.*,
+        U1.surname   AS surnamesuggestedby,
+        U1.firstname AS firstnamesuggestedby,
+        U1.borrowernumber AS borrnumsuggestedby
+        FROM suggestions
+        LEFT JOIN borrowers AS U1 ON suggestedby=U1.borrowernumber
+        WHERE suggestionid = ? LIMIT 1
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($biblionumber);
+    return $sth->fetchrow_hashref;
+}
+
+=head2 GetSuggestionInfoFromBiblionumber
+
+Get a suggestion and borrower's informations from it's biblionumber.
+
+return :
+all informations (suggestion and borrower) of the suggestion which is related to the biblionumber given on input args.
+
+=cut
+
+sub GetSuggestionInfoFromBiblionumber {
+    my ($biblionumber) = @_;
+    my $query = qq{
+        SELECT suggestions.*,
+        U1.surname   AS surnamesuggestedby,
+        U1.firstname AS firstnamesuggestedby,
+        U1.borrowernumber AS borrnumsuggestedby
+        FROM suggestions
+        LEFT JOIN borrowers AS U1 ON suggestedby=U1.borrowernumber
+        WHERE biblionumber = ? LIMIT 1
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($biblionumber);
+    return $sth->fetchrow_hashref;
 }
 
 =head2 GetSuggestionByStatus

@@ -175,16 +175,17 @@ sub AddBookseller {
                 contpos,   contphone,     contfax,    contaltphone,  contemail,
                 contnotes, active,        listprice,  invoiceprice,  gstreg,
                 listincgst,invoiceincgst,   discount,
-                notes
+                notes, clientnumber
             )
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?)
     ";
     my $sth = $dbh->prepare($query);
     $sth->execute(
         $data->{'name'},         $data->{'address1'},     $data->{'address2'},   $data->{'address3'},      $data->{'address4'}, $data->{'postal'},
         $data->{'phone'},        $data->{'fax'},          $data->{'url'},        $data->{'contact'},       $data->{'contpos'},  $data->{'contphone'},
         $data->{'contfax'},      $data->{'contaltphone'}, $data->{'contemail'},  $data->{'contnotes'},     $data->{'active'},   $data->{'listprice'},
-        $data->{'invoiceprice'}, $data->{'gstreg'},       $data->{'listincgst'}, $data->{'invoiceincgst'}, $data->{'discount'}, $data->{'notes'}
+        $data->{'invoiceprice'}, $data->{'gstreg'},       $data->{'listincgst'}, $data->{'invoiceincgst'}, $data->{'discount'}, $data->{'notes'},
+        $data->{'clientnumber'}
     );
 
     # return the id of this new supplier
@@ -225,7 +226,7 @@ sub ModBookseller {
             contphone=?,contfax=?,contaltphone=?,contemail=?,
             contnotes=?,active=?,listprice=?, invoiceprice=?,
             gstreg=?,listincgst=?,invoiceincgst=?,
-            discount=?, notes=?, gstrate=?
+            discount=?, notes=?, gstrate=?, clientnumber=?
         WHERE id=?
     ";
     my $sth = $dbh->prepare($query);
@@ -234,7 +235,7 @@ sub ModBookseller {
         $data->{'phone'},        $data->{'fax'},          $data->{'url'},        $data->{'contact'},       $data->{'contpos'},  $data->{'contphone'},
         $data->{'contfax'},      $data->{'contaltphone'}, $data->{'contemail'},  $data->{'contnotes'},     $data->{'active'},   $data->{'listprice'},
         $data->{'invoiceprice'}, $data->{'gstreg'},       $data->{'listincgst'}, $data->{'invoiceincgst'}, $data->{'discount'}, $data->{'notes'},
-        $data->{'gstrate'},      $data->{'id'}
+        $data->{'gstrate'},      $data->{'clientnumber'}, $data->{'id'}
     );
     $sth->finish;
 }

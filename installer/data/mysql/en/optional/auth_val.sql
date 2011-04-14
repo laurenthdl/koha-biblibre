@@ -51,3 +51,10 @@ INSERT INTO `authorised_values` (category, authorised_value, lib) VALUES ('MANUA
 
 -- custom borrower notes
 INSERT INTO `authorised_values` (category, authorised_value, lib) VALUES ('BOR_NOTES','ADDR','Address Notes');
+
+-- order status
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '0', 'New');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '1', 'Requested');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '2', 'Partial');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '3', 'Complete');
+INSERT INTO `authorised_values` ( `category`, `authorised_value`, `lib`) VALUES ( 'ORDRSTATUS', '4', 'Deleted');

@@ -131,7 +131,7 @@ if ( $op eq 'add_form' ) {
         loop      => \@loop_data,
         tablename => CGI::scrolling_list(
             -name     => 'tablename',
-            -values   => [ 'biblio', 'biblioitems', 'items', ],
+            -values   => [ 'biblio', 'biblioitems', 'items', 'aqorders'],
             -default  => $tablename,
             -size     => 1,
             -multiple => 0

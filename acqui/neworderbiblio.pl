@@ -64,6 +64,7 @@ use C4::Biblio;
 use C4::Auth;
 use C4::Output;
 use C4::Koha;
+use C4::Search::Query;
 
 my $input = new CGI;
 my $params = $input->Vars;

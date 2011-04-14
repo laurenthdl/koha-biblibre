@@ -154,6 +154,7 @@ CREATE TABLE `biblioitems` (
   `itemtype` varchar(10) default NULL,
   `isbn` varchar(30) default NULL,
   `issn` varchar(9) default NULL,
+  `ean` varchar(13) default NULL,
   `publicationyear` text,
   `publishercode` varchar(255) default NULL,
   `volumedate` date default NULL,
@@ -582,6 +583,7 @@ CREATE TABLE `deletedbiblioitems` (
   `itemtype` varchar(10) default NULL,
   `isbn` varchar(30) default NULL,
   `issn` varchar(9) default NULL,
+  `ean` varchar(13) default NULL,
   `publicationyear` text,
   `publishercode` varchar(255) default NULL,
   `volumedate` date default NULL,
@@ -2334,6 +2336,8 @@ CREATE TABLE `aqbasket` (
   `authorisedby` varchar(10) default NULL,
   `booksellerinvoicenumber` mediumtext,
   `basketgroupid` int(11),
+  `deliveryplace` varchar(10) default NULL,
+  `billingplace` varchar(10) default NULL,
   PRIMARY KEY  (`basketno`),
   KEY `booksellerid` (`booksellerid`),
   KEY `basketgroupid` (`basketgroupid`),
@@ -2381,6 +2385,7 @@ CREATE TABLE `aqbooksellers` (
   `gstrate` decimal(6,4) default NULL,
   `discount` float(6,4) default NULL,
   `fax` varchar(50) default NULL,
+  `clientnumber` VARCHAR(50) default NULL,
   PRIMARY KEY  (`id`),
   KEY `listprice` (`listprice`),
   KEY `invoiceprice` (`invoiceprice`),
@@ -2396,8 +2401,8 @@ DROP TABLE IF EXISTS `aqbudgets`;
 CREATE TABLE `aqbudgets` (
   `budget_id` int(11) NOT NULL auto_increment,
   `budget_parent_id` int(11) default NULL,
-  `budget_code` varchar(30) default NULL,
-  `budget_name` varchar(80) default NULL,
+  `budget_code` varchar(30) NOT NULL,
+  `budget_name` varchar(80) NOT NULL,
   `budget_branchcode` varchar(10) default NULL,
   `budget_amount` decimal(28,6) NULL default '0.00',
   `budget_encumb` decimal(28,6) NULL default '0.00',
@@ -2409,10 +2414,18 @@ CREATE TABLE `aqbudgets` (
   `sort2_authcat` varchar(80) default NULL,
   `budget_owner_id` int(11) default NULL,
   `budget_permission` int(1) default '0',
-  PRIMARY KEY  (`budget_id`)
+  PRIMARY KEY  (`budget_id`),
+  UNIQUE KEY `uniq_aqbudgets` (`budget_name`, `budget_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+DROP TABLE IF EXISTS `aqbudgetborrowers`;
+CREATE TABLE  `aqbudgetborrowers` (
+  `budget_id` int(11) NOT NULL,
+  `borrowernumber` int(11) NOT NULL,
+  PRIMARY KEY (`budget_id`,`borrowernumber`),
+  CONSTRAINT `aqbudgetborrowers_ibfk_1` FOREIGN KEY (`budget_id`) REFERENCES `aqbudgets` (`budget_id`),
+  CONSTRAINT `aqbudgetborrowers_ibfk_2` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 --
 -- Table structure for table `aqbudgetperiods`
 --
@@ -2424,12 +2437,13 @@ CREATE TABLE `aqbudgetperiods` (
   `budget_period_startdate` date NOT NULL,
   `budget_period_enddate` date NOT NULL,
   `budget_period_active` tinyint(1) default '0',
-  `budget_period_description` mediumtext,
+  `budget_period_description` varchar(255) NOT NULL,
   `budget_period_total` decimal(28,6),
   `budget_period_locked` tinyint(1) default NULL,
   `sort1_authcat` varchar(10) default NULL,
   `sort2_authcat` varchar(10) default NULL,
-  PRIMARY KEY  (`budget_period_id`)
+  PRIMARY KEY  (`budget_period_id`),
+  UNIQUE KEY `uniq_aqbudgetperiods` (`budget_period_description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2518,6 +2532,7 @@ CREATE TABLE `aqorders` (
   `sort1_authcat` varchar(10) default NULL,
   `sort2_authcat` varchar(10) default NULL,
   `uncertainprice` tinyint(1),
+  `parent_ordernumber` int(11) default NULL,
   PRIMARY KEY  (`ordernumber`),
   KEY `basketno` (`basketno`),
   KEY `biblionumber` (`biblionumber`),
@@ -2591,15 +2606,6 @@ CREATE TABLE `indexes` (
   PRIMARY KEY (`id`),
   UNIQUE (`code`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-T NULL,
-
-
-
-
-
-
 
 
 --

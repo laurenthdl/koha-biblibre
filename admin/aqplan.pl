@@ -228,6 +228,7 @@ if ( $op eq 'save' ) {
 }
 
 # ------------------------------------------------------------
+warn $authcat;
 if ( $authcat =~ m/^Asort/ ) {
 
     # ----------- copied from C4::Input::buildCGIsort()
@@ -352,7 +353,7 @@ my $CGIsepChoice = CGI::scrolling_list(
     -multiple => 0
 );
 
-my ( @budget_lines, %cell_hash );
+my ( @budget_lines, %cell_hash, @lines, $nb_lines );
 
 foreach my $budget (@budgets) {
     my $budget_lock;
@@ -432,7 +433,8 @@ foreach my $budget (@budgets) {
 
     # skip if active set , and spent == 0
     next if ( $show_active == '1' && ( $actual_spent == 0 ) );
-
+    @lines = @cells_line;
+    $nb_lines = scalar(@cells_line);
     push( @budget_lines, \%budget_line );
 }
 
@@ -444,6 +446,8 @@ if ( $output eq "file" ) {
 $template->param(
     authvals_row              => \@authvals_row,
     budget_lines              => \@budget_lines,
+    lines                     => \@lines,
+    lines_number              => $nb_lines,
     budget_period_description => $period->{'budget_period_description'},
     budget_period_locked      => $period->{'budget_period_locked'},
     budget_period_id          => $budget_period_id,

@@ -81,7 +81,9 @@ my $id = $query->param('id') || $query->param('supplierid');
 my @suppliers;
 
 if ($id) {
-    push @suppliers, GetBookSellerFromId($id);
+    my $bookseller = GetBookSellerFromId($id);
+    push @suppliers, $bookseller;
+    $template->param(active => 1) if ($bookseller->{active} == 1);
 } else {
     @suppliers = GetBookSeller($supplier);
 }
@@ -107,10 +109,16 @@ for ( my $i = 0 ; $i < $count ; $i++ ) {
     my $uid = GetMember( borrowernumber => $loggedinuser )->{userid} if $loggedinuser;
     for ( my $i2 = 0 ; $i2 < $ordcount ; $i2++ ) {
         if ( $orders->[$i2]{'authorisedby'} eq $loggedinuser || haspermission( $uid, { flagsrequired => { 'acquisition' => '*' } } ) ) {
+            my @orders = GetOrders( $orders->[$i2]{'basketno'} );
+            my $items_count= 0;
+            map (
+                $items_count += $_->{quantity}
+                , @orders);
             my %inner_line;
             $inner_line{basketno}     = $orders->[$i2]{'basketno'};
             $inner_line{basketname}   = $orders->[$i2]{'basketname'};
-            $inner_line{total}        = scalar GetOrders( $orders->[$i2]{'basketno'} );
+            $inner_line{biblio_count} = scalar @orders;
+            $inner_line{items_count}  = $items_count;
             $inner_line{authorisedby} = $orders->[$i2]{'authorisedby'};
             my $authby = GetMember( borrowernumber => $orders->[$i2]{'authorisedby'} );
             $inner_line{surname}        = $authby->{'firstname'};

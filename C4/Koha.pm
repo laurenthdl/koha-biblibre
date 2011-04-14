@@ -1140,7 +1140,6 @@ sub GetAuthorisedValueLib {
     $sth->fetchrow;
 }
 
-
 =head2 GetAuthorisedValueCategories
 
 $auth_categories = GetAuthorisedValueCategories();

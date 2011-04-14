@@ -107,7 +107,6 @@ for my $i ( @$indexloop ) {
         'selected' => $_ eq $i->{'avlist'},
     } } @avlists ];
 }
-warn Data::Dumper::Dumper($indexloop);
 
 $template->param(
     ressource_type    => $ressource_type,

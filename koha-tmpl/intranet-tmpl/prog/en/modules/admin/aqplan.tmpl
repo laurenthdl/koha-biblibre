@@ -16,6 +16,7 @@ Budget &amp; fund planning
 <script  src="<!-- TMPL_VAR NAME="yuipath" -->/yahoo-dom-event/yahoo-dom-event.js"  type="text/javascript"></script>
 
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/acq.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
 // ---------------------------------------------------------------------
@@ -75,6 +76,38 @@ YAHOO.util.Event.onAvailable("popmenu", function () {
 // oMenu.removeItem(2);   // TODO.....
 
 });
+
+$(document).ready(function() {
+	$.tablesorter.addParser({
+        id: 'amount',
+        is: function(s) {
+            return false;
+        },
+        format:	function(s) {
+            return s.replace(/ /g,"").replace(/,/g,"");
+        },
+        type: 'numeric'
+	});
+
+	$("#plan").tablesorter({
+        widgets : ['zebra'],
+        headers : {
+            1: {sorter: 'amount'},
+            <!-- TMPL_LOOP NAME="lines"	-->
+                <!-- TMPL_VAR EXPR="__counter__ + 1" -->: {sorter: 'amount'},
+            <!-- /TMPL_LOOP -->
+            <!-- TMPL_VAR EXPR="lines_number + 2" -->: {sorter: 'amount'},
+
+        },
+        textExtraction: function(node){
+            if ($(node).find('span.for_filter').length!=0){
+                return $(node).find('span.for_filter').text();
+            }
+            return node.innerHTML;
+        },
+     });
+});
+
 //]]>
 </script>
 
@@ -156,29 +189,30 @@ YAHOO.util.Event.onAvailable("popmenu", function () {
 
     <table id="plan" width="100%">
     <thead>
-    <tr>
-    <th>Fund name</th>
-    <th>Fund total</th>
+        <tr>
+            <th>Fund name#<!-- TMPL_VAR NAME="lines_number" -->#</th>
+            <th>Fund total</th>
 
-    <!-- TMPL_LOOP NAME="authvals_row" -->
-         <!-- TMPL_IF NAME="display" -->
-            <th id="<!-- TMPL_VAR NAME="code" -->"   style="text-align: center;"
+            <!-- TMPL_LOOP NAME="authvals_row" -->
+                <!-- TMPL_IF NAME="display" -->
+                    <th id="<!-- TMPL_VAR NAME="code" -->"   style="text-align: center;"
                         class="<!-- TMPL_VAR NAME='colnum' -->" >
-        <!-- TMPL_ELSE -->
-            <th id="<!-- TMPL_VAR NAME="code" -->"   style="text-align: center;
+                <!-- TMPL_ELSE -->
+                    <th id="<!-- TMPL_VAR NAME="code" -->"   style="text-align: center;
                             display:none;" 
                         class="<!-- TMPL_VAR NAME='colnum' -->" >
-        <!-- /TMPL_IF -->
+                <!-- /TMPL_IF -->
 
-    <!-- TMPL_VAR NAME="code" -->&nbsp;<span class="buttonPlus" onclick="delColumn('<!-- TMPL_VAR NAME="colnum" -->', '<!-- TMPL_VAR NAME="code" -->')"  > - &nbsp;</span></th>
+                <!-- TMPL_VAR NAME="code" -->&nbsp;<span class="buttonPlus" onclick="delColumn('<!-- TMPL_VAR NAME="colnum" -->', '<!-- TMPL_VAR NAME="code" -->')"  > - &nbsp;</span></th>
 
-    <!-- /TMPL_LOOP -->
+            <!-- /TMPL_LOOP -->
 
-    <th>Fund remaining</th>
+            <th>Fund remaining</th>
 
-    <th id='popmenu' style=" text-align: center;" >
-    <span id="add_popmenu_item" class="buttonPlus" > + </span></th>
-    </tr>
+            <th id='popmenu' style=" text-align: center;" >
+                <span id="add_popmenu_item" class="buttonPlus" > + </span>
+            </th>
+        </tr>
     </thead>
 
     <tbody>
@@ -190,10 +224,12 @@ YAHOO.util.Event.onAvailable("popmenu", function () {
             <!--/TMPL_IF -->
 
         <td align='left'><!-- TMPL_VAR NAME="budget_name_indent"--></td>
-        <td align='right'><span id='budget_tot_formatted_<!-- TMPL_VAR NAME="budget_id" -->'><!-- TMPL_VAR NAME="budget_amount_formatted"-->&nbsp;</span>
+        <td align='right'>
+            <span id='budget_tot_formatted_<!-- TMPL_VAR NAME="budget_id" -->' class='for_filter'><!-- TMPL_VAR NAME="budget_amount_formatted"-->&nbsp;</span>
 
-        <!-- NEXT DIV ELEMENT IS USED BY JS FOR CALC-ING AUTO-FILL AND ESTIMATED AMOUNTS -->
-        <div style="display:none;" id='budget_tot_<!-- TMPL_VAR NAME="budget_id" -->'><!-- TMPL_VAR NAME="budget_amount"--></div></td>
+            <!-- NEXT DIV ELEMENT IS USED BY JS FOR CALC-ING AUTO-FILL AND ESTIMATED AMOUNTS -->
+            <div style="display:none;" id='budget_tot_<!-- TMPL_VAR NAME="budget_id" -->'><!-- TMPL_VAR NAME="budget_amount"--></div>
+        </td>
 
         <!-- TMPL_LOOP NAME="lines"	-->
             <!-- TMPL_IF NAME="display" -->
@@ -201,53 +237,51 @@ YAHOO.util.Event.onAvailable("popmenu", function () {
             <!-- TMPL_ELSE -->
                 <td style="display:none;" class="<!-- TMPL_VAR NAME="colnum"-->">
             <!-- /TMPL_IF -->
-            <table class="invis" width="100%">
-                <tr>
-                    <!-- TMPL_IF Name="show_actual" -->
-                        <td   width="50%"  align="right" ><!-- TMPL_VAR NAME="actual_amount" --></td>
-                    <!--/TMPL_IF -->
-                <td align="right">
+            <div style="width:100%;">
+            <!-- TMPL_IF Name="show_actual" -->
+                <span style="width:50%; float:left; text-align:right;" ><!-- TMPL_VAR NAME="actual_amount" --></span>
+            <!--/TMPL_IF -->
+            <span style="width:auto; float: right; text-align: right;" class='for_filter'>
 
-                <!--TMPL_IF  Name="budget_lock" -->
-                    <!-- TMPL_VAR NAME="estimated_amount" -->&nbsp;
-                    <input type="hidden" style="text-align: right;"  name='<!-- TMPL_VAR NAME="cell_name"-->' value="<!-- TMPL_VAR NAME="estimated_amount" -->"   />
-                <!--TMPL_ELSE -->
-                    <input type="text" style="text-align: right;  width:90%; " size='6' name='<!-- TMPL_VAR NAME="cell_name"-->'  value="<!-- TMPL_VAR NAME="estimated_amount" -->"  id='budget_<!-- TMPL_VAR NAME="budget_id"--><!-- TMPL_VAR NAME="colnum"-->' class='plan_entry_<!-- TMPL_VAR NAME="budget_id"-->' onchange="calcTotalRow(this);" />
-                <!--/TMPL_IF -->
-
-                </td></tr>
-            </table>
+            <!--TMPL_IF  Name="budget_lock" -->
+                <!-- TMPL_VAR NAME="estimated_amount" -->&nbsp;
+                <input type="hidden" style="text-align: right;"  name='<!-- TMPL_VAR NAME="cell_name"-->' value="<!-- TMPL_VAR NAME="estimated_amount" -->"   />
+            <!--TMPL_ELSE -->
+                <input type="text" style="text-align: right;  width:90%; " size='6' name='<!-- TMPL_VAR NAME="cell_name"-->'  value="<!-- TMPL_VAR NAME="estimated_amount" -->"  id='budget_<!-- TMPL_VAR NAME="budget_id"--><!-- TMPL_VAR NAME="colnum"-->' class='plan_entry_<!-- TMPL_VAR NAME="budget_id"-->' onchange="calcTotalRow(this);" />
+            <!--/TMPL_IF -->
+            </span>
+            </div>
             </td>
         <!-- /TMPL_LOOP -->
 
         <td>
-        <table class="invis" width="100%">
-            <tr>
-       <!-- TMPL_IF Name="show_actual" -->
-            <!-- TMPL_IF NAME="act_negative" -->
-                <td width="50%" align="right" style="color: red;"> 
-            <!-- TMPL_ELSIF NAME="act_positive" -->
-                <td width="50%" align="right" style="color: green;"> 
-            <!-- TMPL_ELSE -->
-                <td width="50%" align="right">
-            <!--/TMPL_IF -->
-                    <!-- TMPL_VAR NAME="budget_act_remain"-->
-        <!-- TMPL_ELSE -->
-            <td width="50%" align="right">
-        <!-- /TMPL_IF -->
-            </td>
+            <div style="width:100%;">
+            <!-- TMPL_IF Name="show_actual" -->
+                <!-- TMPL_IF NAME="act_negative" -->
+                    <span style="color: red;   width:50%; float: left; text-align: right;">
+                <!-- TMPL_ELSIF NAME="act_positive" -->
+                    <span style="color: green; width:50%; float: left; text-align: right;">
+                <!-- TMPL_ELSE -->
+                    <span style="width:50%; float: left; text-align: right;">
+                <!--/TMPL_IF -->
+                
+                <!-- TMPL_VAR NAME="budget_act_remain"-->
 
-        <!-- TMPL_IF NAME="est_negative" -->
-            <td width="50%"    align="right"  style="color: red;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->'> 
-        <!-- TMPL_ELSIF NAME="est_positive" -->
-            <td width="50%"    align="right"  style="color: green;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->'> 
-        <!-- TMPL_ELSE -->
-            <td width="50%"    align="right" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->'> 
-        <!--/TMPL_IF --> 
-                <!-- TMPL_VAR NAME="budget_est_remain"-->&nbsp;    
-            </td>
-            </tr>
-        </table>
+                </span>
+            <!-- /TMPL_IF -->
+
+            <!-- TMPL_IF NAME="est_negative" -->
+                <span style="color: red; float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->' class='for_filter'>
+            <!-- TMPL_ELSIF NAME="est_positive" -->
+                <span style="color: green; float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->' class='for_filter'>
+            <!-- TMPL_ELSE -->
+                <span style="float: right; width:auto; text-align: right;" id='budget_est_<!-- TMPL_VAR NAME="budget_id"-->' class='for_filter'>
+            <!--/TMPL_IF -->
+
+            <!-- TMPL_VAR NAME="budget_est_remain"-->&nbsp;
+
+            </span>
+
         </td>
 
         <td align="center">

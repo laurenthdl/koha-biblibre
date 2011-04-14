@@ -1,6 +1,22 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions &rsaquo; Add order from a suggestion</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+$(document).ready(function() {
+    $("#accepted_suggestions").tablesorter({
+	    widgets : ['zebra'],    
+        headers: {
+            3: { sorter: false },            
+        }
+    });
+
+});
+
+//]]>
+</script>
+
 </head>
 <body>
 <!-- TMPL_INCLUDE NAME="header.inc" -->
@@ -16,14 +32,16 @@
 	
 <h1>Suggestions</h1>
     <!-- TMPL_IF NAME="suggestions_loop" -->
-	<table>
-        <tr>
-            <th>Suggestion</th>
-            <th>Suggested by</th>
-            <th>Accepted by</th>
-            <th>&nbsp;</th>
-        </tr>
-        
+	<table id="accepted_suggestions">
+        <thead>
+            <tr>
+                <th>Suggestion</th>
+                <th>Suggested by</th>
+                <th>Accepted by</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
         <!-- TMPL_LOOP NAME="suggestions_loop" -->
             <tr>
                 <td>
@@ -53,6 +71,7 @@
                 </td>
             </tr>
         <!-- /TMPL_LOOP -->
+        </tbody>
     </table><!-- TMPL_ELSE -->There are no outstanding (accepted) suggestions.<!-- /TMPL_IF -->
 </div>
 </div>

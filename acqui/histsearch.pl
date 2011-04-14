@@ -55,13 +55,26 @@ use C4::Output;
 use C4::Acquisition;
 use C4::Dates;
 use C4::Debug;
+use C4::Branch;
+use C4::Koha;
 
 my $input          = new CGI;
 my $title          = $input->param('title');
 my $author         = $input->param('author');
 my $name           = $input->param('name');
-my $from_placed_on = C4::Dates->new( $input->param('from') );
+my $ean            = $input->param('ean');
+my $isbn           = $input->param('isbn');
+my $budget         = $input->param('budget');
+my $invoicenumber  = $input->param('invoicenumber');
+my $branchcode     = $input->param('branchcode');
+my $orderstatus    = $input->param('orderstatus');
 my $to_placed_on   = C4::Dates->new( $input->param('to') );
+my $from_placed_on = C4::Dates->new( $input->param('from') );
+if ( not $input->param('from') ) {
+    # FIXME Beurk but we can't sent a Date::Calc to C4::Dates ?
+    # Add_Delta_YM(-1, 0, 0);
+    $$from_placed_on{dmy_arrayref}[5] -= 1;
+}
 
 my $dbh = C4::Context->dbh;
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -75,8 +88,37 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 );
 
 my $from_iso = C4::Dates->new( $input->param('from') )->output('iso') if $input->param('from');
-my $to_iso   = C4::Dates->new( $input->param('to') )->output('iso')   if $input->param('iso');
-my ( $order_loop, $total_qty, $total_price, $total_qtyreceived ) = &GetHistory( $title, $author, $name, $from_iso, $to_iso );
+my $to_iso   = C4::Dates->new( $input->param('to') )->output('iso')   if $input->param('to');
+my ( $order_loop, $total_qty, $total_price, $total_qtyreceived ) = &GetHistory( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $orderstatus, $from_iso, $to_iso );
+
+my $budgetperiods = C4::Budgets::GetBudgetPeriods;
+my $bp_loop = $budgetperiods;
+for my $bp ( @{$budgetperiods} ) {
+    my $hierarchy = C4::Budgets::GetBudgetHierarchy( $$bp{budget_period_id} );
+    for my $budget ( @{$hierarchy} ) {
+        $$budget{budget_display_name} = sprintf("%s", ">" x $$budget{depth} . $$budget{budget_name});
+    }
+    $$bp{hierarchy} = $hierarchy;
+}
+
+if ( not C4::Context->preference("IndependantBranches") ){
+    my $branches = GetBranches();
+    my @branchloop;
+    foreach my $thisbranch ( keys %$branches ) {
+        my %row = (
+            value      => $thisbranch,
+            branchname => $branches->{$thisbranch}->{'branchname'},
+        );
+        push @branchloop, \%row;
+    }
+    $template->param(
+        branchcode           => $branchcode,
+        display_branchcode   => !C4::Context->preference("IndependantBranches"),
+        branchloop          => \@branchloop
+    );
+}
+
+my $orderstatusloop = GetAuthorisedValues( "ORDRSTATUS" );
 
 $template->param(
     suggestions_loop         => $order_loop,
@@ -87,6 +129,11 @@ $template->param(
     title                    => $title,
     author                   => $author,
     name                     => $name,
+    ean                      => $ean,
+    isbn                     => $isbn,
+    bp_loop                  => $bp_loop,
+    invoicenumber            => $invoicenumber,
+    orderstatusloop          => $orderstatusloop,
     from_placed_on           => $from_placed_on->output('syspref'),
     to_placed_on             => $to_placed_on->output('syspref'),
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),

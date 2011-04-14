@@ -50,6 +50,7 @@ use warnings;
 use CGI;
 use C4::Context;
 use C4::Auth;
+use C4::Branch;
 use C4::Output;
 use C4::Acquisition qw/GetBasket NewBasket GetContracts ModBasketHeader/;
 use C4::Bookseller qw/GetBookSellerFromId/;
@@ -66,12 +67,14 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 );
 
 #parameters:
-my $booksellerid;
-$booksellerid = $input->param('booksellerid');
+my $booksellerid = $input->param('booksellerid');
 my $basketno = $input->param('basketno');
+my $branches = GetBranches;
+
 my $basket;
 my $op         = $input->param('op');
 my $is_an_edit = $input->param('is_an_edit');
+
 
 if ( $op eq 'add_form' ) {
     my @contractloop;
@@ -110,30 +113,92 @@ if ( $op eq 'add_form' ) {
         basketbooksellernote => $basket->{'booksellernote'},
         booksellername       => $bookseller->{'name'},
         booksellerid         => $booksellerid,
-        basketno             => $basketno
+        basketno             => $basketno,
+        deliveryplace        => $basket->{'deliveryplace'},
+        billingplace         => $basket->{'billingplace'}
     );
+
+    my $billingplace = $basket->{'billingplace'} || C4::Context->userenv->{"branch"};
+    my $deliveryplace = $basket->{'deliveryplace'} || C4::Context->userenv->{"branch"};
+
+    # Build the combobox to select the billing place
+    my @billingplaceloop;
+
+    # In case there's no branch selected
+    if ($billingplace eq "NO_LIBRARY_SET") {
+        my %row = (
+          value => "",
+          selected => 1,
+          branchname => "--",
+        );
+        push @billingplaceloop, \%row;
+    }
+
+    for ( sort keys %$branches ) {
+        my $selected = 1 if $_ eq $billingplace;
+        my %row = (
+            value      => $_,
+            selected   => $selected,
+            branchname => $branches->{$_}->{branchname},
+        );
+        push @billingplaceloop, \%row;
+    }
+    $template->param( billingplaceloop => \@billingplaceloop );
+
+    # Build the combobox to select the delivery place
+    my @deliveryplaceloop;
+
+    # In case there's no branch selected
+    if ($deliveryplace eq "NO_LIBRARY_SET") {
+        my %row = (
+          value => "",
+          selected => 1,
+          branchname => "--",
+        );
+        push @deliveryplaceloop, \%row;
+    }
+
+    for ( sort keys %$branches ) {
+        my $selected = 1 if $_ eq $deliveryplace;
+        my %row = (
+            value      => $_,
+            selected   => $selected,
+            branchname => $branches->{$_}->{branchname},
+        );
+        push @deliveryplaceloop, \%row;
+    }
+    $template->param( deliveryplaceloop => \@deliveryplaceloop );
 
     #End Edit
 } elsif ( $op eq 'add_validate' ) {
 
+    my $basketname = $input->param('basketname');
+    my $basketnote = $input->param('basketnote');
+    my $basketbooksellernote = $input->param('basketbooksellernote');
+    my $basketcontractnumber = $input->param('basketcontractnumber');
+    my $deliveryplace = $input->param('deliveryplace');
+    my $billingplace = $input->param('billingplace');
+
     #we are confirming the changes, save the basket
-    my $basketno;
     if ($is_an_edit) {
-        $basketno = $input->param('basketno');
         ModBasketHeader(
-            $input->param('basketno'),
-            $input->param('basketname'),
-            $input->param('basketnote'),
-            $input->param('basketbooksellernote'),
-            $input->param('basketcontractnumber')
+            $basketno,
+            $basketname,
+            $basketnote,
+            $basketbooksellernote,
+            $basketcontractnumber,
+            $deliveryplace,
+            $billingplace
         );
     } else {    #New basket
         $basketno = NewBasket(
             $booksellerid, $loggedinuser,
-            $input->param('basketname'),
-            $input->param('basketnote'),
-            $input->param('basketbooksellernote'),
-            $input->param('basketcontractnumber')
+            $basketname,
+            $basketnote,
+            $basketbooksellernote,
+            $basketcontractnumber,
+            $deliveryplace,
+            $billingplace
         );
     }
     print $input->redirect( 'basket.pl?basketno=' . $basketno );

@@ -1,6 +1,7 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Vendor <!-- TMPL_VAR name="bookselname" --></title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
 function confirm_deletion() {
@@ -15,6 +16,21 @@ if (f.company.value == "") {
 }
     f.submit();
 }
+
+$(document).ready(function() {
+    $("#supplier_contracts").tablesorter({
+	    widgets : ['zebra'],    
+	    headers: {
+            4: { sorter: false },
+        },
+        textExtraction: {
+            0: function(o) {
+        		return $('a',o).val();
+ 		   	},
+        }
+	}); 
+}); 
+
 //]]>
 </script>
 </head>
@@ -76,6 +92,9 @@ if (f.company.value == "") {
         <div class="yui-g">
         <fieldset class="rows">
             <legend>Ordering information</legend>
+            <ol><label for="clientnumber">Client number :</label>
+                <input type="text" size="40" id="clientnumber" name="clientnumber" value="<!-- TMPL_VAR NAME="clientnumber" -->" /></ol>
+
             <ol class="radio"><li><label for="activestatus" class="radio">Vendor is:</label>
                     <!-- TMPL_IF name="active" -->
                         <label for="activestatus">Active</label> <input type="radio" id="activestatus" name="status" value="1" checked="checked" />
@@ -173,6 +192,7 @@ if (f.company.value == "") {
         </div>
         <div id="supplier-ordering-information" class="yui-g">
         <h3>Ordering information</h3>
+            <p><strong>Client number: </strong><!-- TMPL_VAR NAME="clientnumber" --></p>
             <p><strong>Vendor is: </strong>
                     <!-- TMPL_IF name="active" -->
                         Active
@@ -197,16 +217,23 @@ if (f.company.value == "") {
         <!-- TMPL_IF name="contracts" -->
             <div id="supplier-contracts" class="yui-g">
                 <h2>Contract(s)</h2>
-                <table>
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Start date</th>
-                        <th scope="col">End date</th>
-                        <th scope="col" colspan="2">&nbsp; </th>
-                    </tr>
+                <table id='supplier_contracts'>
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Start date</th>
+                            <th scope="col">End date</th>
+                            <th scope="col" colspan="2">&nbsp; </th>
+                        </tr>
+                    </thead>
+                    <tbody>
                     <!-- TMPL_LOOP NAME="contracts" -->
-                        <!-- TMPL_IF NAME="__even__" --><tr class="highlight"><!-- TMPL_ELSE --><tr><!-- /TMPL_IF -->
+                        <!-- TMPL_IF NAME="__even__" -->
+                            <tr class="highlight">
+                        <!-- TMPL_ELSE -->
+                            <tr>
+                        <!-- /TMPL_IF -->
                         <td>
                             <a href="/cgi-bin/koha/admin/aqcontract.pl?op=add_form&amp;contractnumber=<!-- TMPL_VAR NAME="contractnumber" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->"><!-- TMPL_VAR NAME="contractname" --></a>
                         </td>
@@ -217,6 +244,7 @@ if (f.company.value == "") {
                         <td><a href="/cgi-bin/koha/admin/aqcontract.pl?op=delete_confirm&amp;contractnumber=<!-- TMPL_VAR NAME="contractnumber" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->">Delete</a></td>
                         </tr>
                     <!-- /TMPL_LOOP -->
+                    </tbody>
                 </table>
             </div>
         <!-- /TMPL_IF -->

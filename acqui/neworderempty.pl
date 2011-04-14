@@ -90,22 +90,22 @@ use C4::Search qw/FindDuplicate BiblioAddAuthorities/;
 #needed for z3950 import:
 use C4::ImportBatch qw/GetImportRecordMarc SetImportRecordStatus/;
 
-my $input           = new CGI;
-my $booksellerid    = $input->param('booksellerid');         # FIXME: else ERROR!
-my $budget_id       = $input->param('budget_id') || 0;       # FIXME: else ERROR!
-my $title           = $input->param('title');
-my $author          = $input->param('author');
-my $publicationyear = $input->param('publicationyear');
-my $bookseller      = GetBookSellerFromId($booksellerid);    # FIXME: else ERROR!
-my $ordernumber     = $input->param('ordernumber') || '';
-my $biblionumber    = $input->param('biblionumber');
-my $basketno        = $input->param('basketno');
-my $suggestionid    = $input->param('suggestionid');
-my $close           = $input->param('close');
-my $uncertainprice  = $input->param('uncertainprice');
-my $import_batch_id = $input->param('import_batch_id');      # if this is filled, we come from a staged file, and we will return here after saving the order !
+my $input             = new CGI;
+my $booksellerid      = $input->param('booksellerid');         # FIXME: else ERROR!
+my $budget_id         = $input->param('budget_id') || 0;       # FIXME: else ERROR!
+my $title             = $input->param('title');
+my $author            = $input->param('author');
+my $bookseller        = GetBookSellerFromId($booksellerid);    # FIXME: else ERROR!
+my $ordernumber       = $input->param('ordernumber') || '';
+my $biblionumber      = $input->param('biblionumber');
+my $basketno          = $input->param('basketno');
+my $suggestionid      = $input->param('suggestionid');
+my $close             = $input->param('close');
+my $uncertainprice    = $input->param('uncertainprice');
+my $import_batch_id   = $input->param('import_batch_id');      # if this is filled, we come from a staged file, and we will return here after saving the order !
 my $data;
 my $new = 'no';
+my $suggestion;
 
 my $budget_name;
 
@@ -191,6 +191,8 @@ if ( $ordernumber eq '' ) {    # create order
     $basketno     = $data2->{'basketno'};
     $booksellerid = $data2->{'booksellerid'};
 }
+
+$suggestion = GetSuggestionInfo($suggestionid) if $suggestionid;
 
 # get currencies (for change rates calcs if needed)
 my @rates = GetCurrencies();
@@ -319,6 +321,8 @@ $template->param(
     budget_name => $budget_name
 ) if ($close);
 
+warn Data::Dumper::Dumper($data);
+
 $template->param(
     existing    => $biblionumber,
     ordernumber => $ordernumber,
@@ -337,44 +341,47 @@ $template->param(
     closedate            => C4::Dates->new( $basket->{'closedate'}, 'iso' )->output,
 
     # order details
-    suggestionid     => $suggestionid,
-    biblionumber     => $biblionumber,
-    uncertainprice   => $data->{'uncertainprice'},
-    authorisedbyname => $borrower->{'firstname'} . " " . $borrower->{'surname'},
-    biblioitemnumber => $data->{'biblioitemnumber'},
-    discount_2dp     => sprintf( "%.2f", $bookseller->{'discount'} ),              # for display
-    discount         => $bookseller->{'discount'},
-    listincgst       => $bookseller->{'listincgst'},
-    invoiceincgst    => $bookseller->{'invoiceincgst'},
-    name             => $bookseller->{'name'},
-    cur_active_sym   => $cur->{'symbol'},
-    cur_active       => $cur->{'currency'},
-    currency         => $bookseller->{'listprice'} || $cur->{'currency'},          # eg: 'EUR'
-    loop_currencies  => \@loop_currency,
-    orderexists      => ( $new eq 'yes' ) ? 0 : 1,
-    title            => $data->{'title'},
-    author           => $data->{'author'},
-    publicationyear  => $data->{'publicationyear'},
-    budget_loop      => $budget_loop,
-    isbn             => $data->{'isbn'},
-    seriestitle      => $data->{'seriestitle'},
-    itemtypeloop  => \@itemtypes,
+    suggestionid         => $$suggestion{suggestionid},
+    surnamesuggestedby   => $$suggestion{surnamesuggestedby},
+    firstnamesuggestedby => $$suggestion{firstnamesuggestedby},
+    biblionumber         => $biblionumber,
+    uncertainprice       => $data->{'uncertainprice'},
+    authorisedbyname     => $borrower->{'firstname'} . " " . $borrower->{'surname'},
+    biblioitemnumber     => $data->{'biblioitemnumber'},
+    discount_2dp         => sprintf( "%.2f", $bookseller->{'discount'} ),              # for display
+    discount             => $bookseller->{'discount'},
+    editionstatement     => $data->{'editionstatement'},
+    listincgst           => $bookseller->{'listincgst'},
+    invoiceincgst        => $bookseller->{'invoiceincgst'},
+    name                 => $bookseller->{'name'},
+    cur_active_sym       => $cur->{'symbol'},
+    cur_active           => $cur->{'currency'},
+    currency             => $bookseller->{'listprice'} || $cur->{'currency'},          # eg: 'EUR'
+    loop_currencies      => \@loop_currency,
+    orderexists          => ( $new eq 'yes' ) ? 0 : 1,
+    title                => $data->{'title'},
+    author               => $data->{'author'},
+    publicationyear      => $data->{'publicationyear'},
+    budget_loop          => $budget_loop,
+    isbn                 => $data->{'isbn'},
+    ean                  => $data->{'ean'},
+    seriestitle          => $data->{'seriestitle'},
+    itemtypeloop         => \@itemtypes,
     collectiontitle      => $data->{'collectiontitle'},
-    quantity         => $data->{'quantity'},
-    quantityrec      => $data->{'quantity'},
-    rrp              => $data->{'rrp'},
-    listprice => sprintf( "%.2f", $data->{'listprice'} || $listprice ),
-    total => sprintf( "%.2f", ( $data->{'ecost'} || 0 ) * ( $data->{'quantity'} || 0 ) ),
-    ecost => $data->{'ecost'},
-    notes => $data->{'notes'},
-    publishercode => $data->{'publishercode'},
-    place => $data->{'place'},
-
-    import_batch_id => $import_batch_id,
+    quantity             => $data->{'quantity'},
+    quantityrec          => $data->{'quantity'},
+    rrp                  => $data->{'rrp'},
+    listprice            => sprintf( "%.2f", $data->{'listprice'} || $listprice ),
+    total                => sprintf( "%.2f", ( $data->{'ecost'} || 0 ) * ( $data->{'quantity'} || 0 ) ),
+    ecost                => $data->{'ecost'},
+    notes                => $data->{'notes'},
+    publishercode        => $data->{'publishercode'},
+    place                => $data->{'place'},
+    import_batch_id      => $import_batch_id,
 
     # CHECKME: gst-stuff needs verifing, mason.
-    gstrate => $bookseller->{'gstrate'} || C4::Context->preference("gist"),
-    gstreg => $bookseller->{'gstreg'},
+    gstrate              => $bookseller->{'gstrate'} || C4::Context->preference("gist"),
+    gstreg               => $bookseller->{'gstreg'},
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;

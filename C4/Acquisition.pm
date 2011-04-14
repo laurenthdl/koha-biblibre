@@ -28,6 +28,9 @@ use C4::Biblio;
 use C4::Debug;
 use C4::SQLHelper qw(InsertInTable);
 use C4::Items;
+use C4::Bookseller qw(GetBookSellerFromId);
+use Text::CSV::Encoded;
+use utf8;
 
 use Time::localtime;
 use HTML::Entities;
@@ -42,7 +45,7 @@ BEGIN {
     @ISA    = qw(Exporter);
     @EXPORT = qw(
       &GetBasket &NewBasket &CloseBasket &DelBasket &ModBasket
-      &GetBasketAsCSV
+      &GetBasketAsCSV &GetBasketGroupAsCSV
       &GetBasketsByBookseller &GetBasketsByBasketgroup
 
       &ModBasketHeader
@@ -61,6 +64,8 @@ BEGIN {
       &GetContracts &GetContract
 
       &GetItemnumbersFromOrder
+
+      &GetParentQuantity
     );
 }
 
@@ -177,7 +182,7 @@ The other parameters are optional, see ModBasketHeader for more info on them.
 # FIXME : this function seems to be unused.
 
 sub NewBasket {
-    my ( $booksellerid, $authorisedby, $basketname, $basketnote, $basketbooksellernote, $basketcontractnumber ) = @_;
+    my ( $booksellerid, $authorisedby, $basketname, $basketnote, $basketbooksellernote, $basketcontractnumber, $deliveryplace, $billingplace ) = @_;
     my $dbh   = C4::Context->dbh;
     my $query = "
         INSERT INTO aqbasket
@@ -188,7 +193,7 @@ sub NewBasket {
 
     #find & return basketno MYSQL dependant, but $dbh->last_insert_id always returns null :-(
     my $basket = $dbh->{'mysql_insertid'};
-    ModBasketHeader( $basket, $basketname || '', $basketnote || '', $basketbooksellernote || '', $basketcontractnumber || undef );
+    ModBasketHeader( $basket, $basketname || '', $basketnote || '', $basketbooksellernote || '', $basketcontractnumber || undef, $deliveryplace || undef, $billingplace || undef );
     return $basket;
 }
 
@@ -216,6 +221,15 @@ sub CloseBasket {
     ";
     my $sth = $dbh->prepare($query);
     $sth->execute($basketno);
+
+    my @orders = GetOrders($basketno);
+    foreach my $order (@orders) {
+        $query = "UPDATE aqorders SET orderstatus = 1
+                  WHERE ordernumber = ?;";
+        $sth = $dbh->prepare($query);
+        $sth->execute($order->{'ordernumber'});
+    }
+
 }
 
 #------------------------------------------------------------#
@@ -237,11 +251,12 @@ sub GetBasketAsCSV {
     my $basket     = GetBasket($basketno);
     my @orders     = GetOrders($basketno);
     my $contract   = GetContract( $basket->{'contractnumber'} );
-    my $csv        = Text::CSV->new();
+    my $csv        = Text::CSV::Encoded->new ({ encoding  => "utf8" });
+
     my $output;
 
     # TODO: Translate headers
-    my @headers = qw(contractname ordernumber line entrydate isbn author title publishercode collectiontitle notes quantity rrp);
+    my @headers = qw(contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp basketdeliveryplace basketbillingplace);
 
     $csv->combine(@headers);
     $output = $csv->string() . "\n";
@@ -251,8 +266,19 @@ sub GetBasketAsCSV {
         my @cols;
         my $bd = GetBiblioData( $order->{'biblionumber'} );
         push( @cols,
-            $contract->{'contractname'}, $order->{'ordernumber'},  $order->{'entrydate'}, $order->{'isbn'},     $bd->{'author'}, $bd->{'title'},
-            $bd->{'publishercode'},      $bd->{'collectiontitle'}, $order->{'notes'},     $order->{'quantity'}, $order->{'rrp'}, );
+            $contract->{'contractname'},
+            $order->{'ordernumber'},
+            $order->{'entrydate'},
+            $order->{'isbn'},
+            $bd->{'author'},
+            $bd->{'title'},
+            $bd->{'publishercode'},
+            $bd->{'collectiontitle'},
+            $order->{'notes'},
+            $order->{'quantity'},
+            $order->{'rrp'},
+            $basket->{'deliveryplace'},
+            $basket->{'billingplace'});
         push( @rows, \@cols );
     }
 
@@ -264,6 +290,62 @@ sub GetBasketAsCSV {
         $csv->combine(@$row);
         $output .= $csv->string() . "\n";
 
+    }
+
+    return $output;
+
+}
+
+=head3 GetBasketGroupAsCSV
+
+=over 4
+
+&GetBasketGroupAsCSV($basketgroupid);
+
+Export a basket group as CSV
+
+=back
+
+=cut
+
+sub GetBasketGroupAsCSV {
+    my ($basketgroupid) = @_;
+    my $baskets = GetBasketsByBasketgroup($basketgroupid);
+
+    # TODO: Translate headers
+    my @headers = qw(booksellername bookselleraddress booksellerpostal clientnumber contractnumber contractname ordernumber entrydate isbn author title publishercode collectiontitle notes quantity rrp basketgroupdeliveryplace basketgroupbillingplace);
+
+    my $csv = Text::CSV::Encoded->new ({ encoding  => "utf8" });
+
+    my $output;
+    $csv->combine(@headers);
+    $output = $csv->string() . "\n";
+
+    for my $basket (@$baskets) {
+        my @orders     = GetOrders( $$basket{basketno} );
+        my $contract   = GetContract( $$basket{contractnumber} );
+        my $bookseller = GetBookSellerFromId( $$basket{booksellerid} );
+        my $basketgroup = GetBasketgroup( $$basket{basketgroupid} );
+
+        my @rows;
+        foreach my $order (@orders) {
+            my @cols;
+            my $bd = GetBiblioData( $order->{'biblionumber'} );
+            #utf8::decode($bd->{'title'}) unless ( utf8::is_utf8($bd->{'title'}) ); # FIXME ?
+            push( @cols,
+                $bookseller->{name}, $bookseller->{address1}, $bookseller->{postal}, $bookseller->{clientnumber},
+                $contract->{contractnumber}, $contract->{contractname},
+                $order->{ordernumber},  $order->{entrydate}, $order->{isbn},
+                $bd->{author}, $bd->{title}, $bd->{publishercode}, $bd->{collectiontitle},
+                $order->{notes}, $order->{quantity}, $order->{rrp}, $basketgroup->{deliveryplace}, $basketgroup->{billingplace} );
+            push( @rows, \@cols );
+        }
+
+        foreach my $row (@rows) {
+            $csv->combine(@$row);
+            $output .= $csv->string() . "\n";
+
+        }
     }
 
     return $output;
@@ -389,6 +471,16 @@ sub ModBasket {
     my $dbh = C4::Context->dbh;
     my $sth = $dbh->prepare($query);
     $sth->execute(@params);
+
+    # set orders status = new
+    my @orders = GetOrders($basketinfo->{'basketno'});
+    foreach my $order (@orders) {
+        $query = "UPDATE aqorders SET orderstatus = 0
+                  WHERE ordernumber = ?;";
+        $sth = $dbh->prepare($query);
+        $sth->execute($order->{'ordernumber'});
+    }
+
     $sth->finish;
 }
 
@@ -398,7 +490,7 @@ sub ModBasket {
 
 =over 4
 
-&ModBasketHeader($basketno, $basketname, $note, $booksellernote, $contractnumber);
+&ModBasketHeader($basketno, $basketname, $note, $booksellernote, $contractnumber, $deliveryplace, $billingplace );
 
 Modifies a basket's header.
 
@@ -421,11 +513,11 @@ Modifies a basket's header.
 =cut
 
 sub ModBasketHeader {
-    my ( $basketno, $basketname, $note, $booksellernote, $contractnumber ) = @_;
-    my $query = "UPDATE aqbasket SET basketname=?, note=?, booksellernote=? WHERE basketno=?";
+    my ( $basketno, $basketname, $note, $booksellernote, $contractnumber, $deliveryplace, $billingplace) = @_;
+    my $query = "UPDATE aqbasket SET basketname=?, note=?, booksellernote=?, deliveryplace=?, billingplace=? WHERE basketno=?";
     my $dbh   = C4::Context->dbh;
     my $sth   = $dbh->prepare($query);
-    $sth->execute( $basketname, $note, $booksellernote, $basketno );
+    $sth->execute( $basketname, $note, $booksellernote, $deliveryplace, $billingplace, $basketno);
     if ($contractnumber) {
         my $query2 = "UPDATE aqbasket SET contractnumber=? WHERE basketno=?";
         my $sth2   = $dbh->prepare($query2);
@@ -504,7 +596,7 @@ Returns a reference to all baskets that belong to basketgroup $basketgroupid.
 
 sub GetBasketsByBasketgroup {
     my $basketgroupid = shift;
-    my $query         = "SELECT * FROM aqbasket
+    my $query         = "SELECT *, aqbasket.booksellerid as booksellerid FROM aqbasket
                 LEFT JOIN aqcontract USING(contractnumber) WHERE basketgroupid=?";
     my $dbh = C4::Context->dbh;
     my $sth = $dbh->prepare($query);
@@ -688,7 +780,7 @@ $basketgroup = &GetBasketgroup($basketgroupid);
 
 =over 2
 
-Returns a reference to the hash containing all infermation about the basketgroup.
+Returns a reference to the hash containing all information about the basketgroup.
 
 =back
 
@@ -985,6 +1077,7 @@ The following keys are used: "biblionumber", "title", "basketno", "quantity", "n
 
 sub NewOrder {
     my $orderinfo = shift;
+    my $parent_ordernumber = shift;
 #### ------------------------------
     my $dbh = C4::Context->dbh;
     my @params;
@@ -1004,6 +1097,7 @@ sub NewOrder {
         $orderinfo->{quantityreceived} = 0;
     }
 
+    $orderinfo->{parent_ordernumber} = $parent_ordernumber if $parent_ordernumber;
     my $ordernumber = InsertInTable( "aqorders", $orderinfo );
     return ( $orderinfo->{'basketno'}, $ordernumber );
 }
@@ -1215,6 +1309,7 @@ sub ModReceiveOrder {
                 , freight=?
                 , rrp=?
                 , quantity=?
+                , orderstatus=3
             WHERE biblionumber=? AND ordernumber=?" );
 
         $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $quantrec, $biblionumber, $ordernumber );
@@ -1226,12 +1321,13 @@ sub ModReceiveOrder {
         }
         $order->{'quantity'} -= $quantrec;
         $order->{'quantityreceived'} = 0;
-        my $newOrder = NewOrder($order);
+        $order->{'orderstatus'} = 2;
+        my $newOrder = NewOrder($order, $ordernumber);
     } else {
         $sth = $dbh->prepare(
             "update aqorders
                             set quantityreceived=?,datereceived=?,booksellerinvoicenumber=?,
-                                unitprice=?,freight=?,rrp=?
+                                unitprice=?,freight=?,rrp=?,orderstatus=3
                             where biblionumber=? and ordernumber=?"
         );
         $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $biblionumber, $ordernumber );
@@ -1278,7 +1374,7 @@ C<@results> is an array of references-to-hash with the following keys:
 
 sub SearchOrder {
 #### -------- SearchOrder-------------------------------
-    my ( $ordernumber, $search, $supplierid, $basket ) = @_;
+    my ( $ordernumber, $search, $ean, $supplierid, $basket ) = @_;
 
     my $dbh   = C4::Context->dbh;
     my @args  = ();
@@ -1296,6 +1392,10 @@ sub SearchOrder {
     if ($search) {
         $query .= " AND (biblio.title like ? OR biblio.author LIKE ? OR biblioitems.isbn like ?)";
         push @args, ( "%$search%", "%$search%", "%$search%" );
+    }
+    if ($ean) {
+        $query .= " AND biblioitems.ean = ?";
+        push @args, $ean;
     }
     if ($supplierid) {
         $query .= "AND aqbasket.booksellerid = ?";
@@ -1653,25 +1753,29 @@ returns:
 =cut
 
 sub GetHistory {
-    my ( $title, $author, $name, $from_placed_on, $to_placed_on ) = @_;
+    my ( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $orderstatus, $from_placed_on, $to_placed_on ) = @_;
     my @order_loop;
     my $total_qty         = 0;
     my $total_qtyreceived = 0;
     my $total_price       = 0;
 
     # don't run the query if there are no parameters (list would be too long for sure !)
-    if ( $title || $author || $name || $from_placed_on || $to_placed_on ) {
+    if ( $title || $author || $name || $ean || $isbn || $budget || $invoicenumber || $branchcode || $orderstatus || $from_placed_on || $to_placed_on ) {
+        my @query_params = ();
         my $dbh   = C4::Context->dbh;
         my $query = "
             SELECT
-                biblio.title,
-                biblio.author,
+                IFNULL(biblio.title,     deletedbiblio.title)     AS title,
+                IFNULL(biblio.author,    deletedbiblio.author)    AS author,
+                IFNULL(biblioitems.ean,  deletedbiblioitems.ean)  AS ean,
+                IFNULL(biblioitems.isbn, deletedbiblioitems.isbn) AS isbn,
                 aqorders.basketno,
-		aqbasket.basketname,
-		aqbasket.basketgroupid,
-		aqbasketgroups.name as groupname,
+                aqorders.booksellerinvoicenumber,
+                aqbasket.basketname,
+                aqbasket.basketgroupid,
+                aqbasketgroups.name as groupname,
                 aqbooksellers.name,
-		aqbasket.creationdate,
+                aqbasket.creationdate,
                 aqorders.datereceived,
                 aqorders.quantity,
                 aqorders.quantityreceived,
@@ -1679,42 +1783,81 @@ sub GetHistory {
                 aqorders.ordernumber,
                 aqorders.booksellerinvoicenumber as invoicenumber,
                 aqbooksellers.id as id,
-                aqorders.biblionumber
+                aqorders.biblionumber,
+                aqorders.orderstatus,
+                aqbudgets.budget_id AS budget,
+                aqbudgets.budget_name,
+                aqorders.branchcode,
+                aqorders.parent_ordernumber";
+        $query .= ", aqbudgets.budget_id AS budget" if defined $budget;
+        $query .= ", aqorders.branchcode " if ( not C4::Context->preference("IndependantBranches")  and defined $branchcode and $branchcode);
+        $query .= "
             FROM aqorders
             LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
-	    LEFT JOIN aqbasketgroups ON aqbasket.basketgroupid=aqbasketgroups.id
+            LEFT JOIN aqbasketgroups ON aqbasket.basketgroupid=aqbasketgroups.id
             LEFT JOIN aqbooksellers ON aqbasket.booksellerid=aqbooksellers.id
-            LEFT JOIN biblio ON biblio.biblionumber=aqorders.biblionumber";
+            LEFT JOIN biblio ON biblio.biblionumber=aqorders.biblionumber
+            LEFT JOIN biblioitems ON biblioitems.biblionumber=aqorders.biblionumber
+            LEFT JOIN deletedbiblio ON deletedbiblio.biblionumber=aqorders.biblionumber
+            LEFT JOIN deletedbiblioitems ON deletedbiblioitems.biblionumber=aqorders.biblionumber
+            LEFT JOIN aqbudgets ON aqorders.budget_id=aqbudgets.budget_id";
 
-        $query .= " LEFT JOIN borrowers ON aqbasket.authorisedby=borrowers.borrowernumber"
-          if ( C4::Context->preference("IndependantBranches") );
+        if ( C4::Context->preference("IndependantBranches") ) {
+            $query .= " LEFT JOIN borrowers ON aqbasket.authorisedby=borrowers.borrowernumber";
+        }
 
-        $query .= " WHERE (datecancellationprinted is NULL or datecancellationprinted='0000-00-00') ";
+        $query .= " WHERE 1 ";
 
-        my @query_params = ();
+        $query .= " AND (datecancellationprinted is NULL or datecancellationprinted='0000-00-00') " if $orderstatus ne '4';
 
-        if ( defined $title ) {
+
+        if ( $title) {
             $query .= " AND biblio.title LIKE ? ";
             $title =~ s/\s+/%/g;
             push @query_params, "%$title%";
         }
 
-        if ( defined $author ) {
+        if ( $author) {
             $query .= " AND biblio.author LIKE ? ";
             push @query_params, "%$author%";
         }
 
-        if ( defined $name ) {
+        if ( $name) {
             $query .= " AND aqbooksellers.name LIKE ? ";
             push @query_params, "%$name%";
         }
 
-        if ( defined $from_placed_on ) {
+        if ( $ean ) {
+            $query .= " AND biblioitems.ean = ? ";
+            push @query_params, "$ean";
+        }
+
+        if ( $isbn ) {
+            $query .= " AND biblioitems.isbn = ? ";
+            push @query_params, "$isbn";
+        }
+
+        if ( $budget ) {
+            $query .= " AND aqbudgets.budget_id = ? ";
+            push @query_params, "$budget";
+        }
+ 
+        if ( $invoicenumber ) {
+            $query .= " AND aqorders.booksellerinvoicenumber = ? ";
+            push @query_params, "$invoicenumber";
+        }
+
+        if ( defined $orderstatus and $orderstatus ne '') {
+            $query .= " AND aqorders.orderstatus = ? ";
+            push @query_params, "$orderstatus";
+        }
+
+        if ( $from_placed_on ) {
             $query .= " AND creationdate >= ? ";
             push @query_params, $from_placed_on;
         }
 
-        if ( defined $to_placed_on ) {
+        if ( $to_placed_on ) {
             $query .= " AND creationdate <= ? ";
             push @query_params, $to_placed_on;
         }
@@ -1725,6 +1868,9 @@ sub GetHistory {
                 $query .= " AND (borrowers.branchcode = ? OR borrowers.branchcode ='' ) ";
                 push @query_params, $userenv->{branch};
             }
+        } elsif ( defined $branchcode and $branchcode ) {
+            $query .= " AND aqorders.branchcode = ? ";
+            push @query_params, $branchcode;
         }
         $query .= " ORDER BY id";
         warn $query;
@@ -1740,6 +1886,7 @@ sub GetHistory {
             $total_qty         += $line->{'quantity'};
             $total_qtyreceived += $line->{'quantityreceived'};
             $total_price       += $line->{'quantity'} * $line->{'ecost'};
+            $line->{quantity} = GetParentQuantity($line->{parent_ordernumber});
         }
     }
     return \@order_loop, $total_qty, $total_price, $total_qtyreceived;
@@ -1845,6 +1992,33 @@ sub GetContract {
     $sth->execute($contractno);
     my $result = $sth->fetchrow_hashref;
     return $result;
+}
+
+=head3 GetParentQuantity
+
+=over 4
+
+$quantity = &GetParentQuantity($parent_ordernumber);
+
+Looks up the order's quantity that has ordernumber value $parent_ordernumber
+
+Returns a quantity
+
+=back
+
+=cut
+sub GetParentQuantity {
+    my ($parent_ordernumber) = @_;
+    my $dbh          = C4::Context->dbh;
+    my $query        = "
+        SELECT quantity
+        FROM   aqorders
+        WHERE  ordernumber = ?
+        ";
+
+    my $sth = $dbh->prepare($query);
+    $sth->execute($parent_ordernumber);
+    return $sth->fetchrow;
 }
 
 1;

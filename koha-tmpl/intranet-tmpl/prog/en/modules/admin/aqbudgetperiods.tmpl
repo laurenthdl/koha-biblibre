@@ -48,10 +48,29 @@
             }
     }
 	$(document).ready(function() {
+    	$.tablesorter.addParser({
+            id: 'amount',
+            is: function(s) {
+                return false;
+            },
+            format:	function(s) {
+                return s.replace(/ /g,"").replace(/,/g,"");
+            },
+            type: 'numeric'
+    	});
+
 		 $("#periodsh").tablesorter({
 	            widgets : ['zebra'],
 	            sortList: [[0,0]],
-	            headers:  {6:{sorter:false}}
+	            headers:  {
+                    5: {sorter: 'amount'},
+                    6: {sorter: false},
+                },
+                textExtraction: {
+                    1: function(o) {
+                        return $('a',o).val();
+         		   	},
+                }
 	     });
 	});
 </script>
@@ -125,6 +144,12 @@
 <div id="bd">
 <div id="yui-main">
 <div class="yui-b">
+
+<!-- TMPL_IF NAME="sql_error" -->
+    <div class="sql_error">
+        <!-- TMPL_VAR NAME="sql_error" -->
+    </div>
+<!-- /TMPL_IF -->
 
 <!-- TMPL_INCLUDE NAME="budgets-admin-toolbar.inc" -->
 
