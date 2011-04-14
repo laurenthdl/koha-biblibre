@@ -19,8 +19,8 @@ my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
 my $diff_logtxt_dir          = $$conf{path}{diff_logtxt_dir};
 my $dump_db_server_dir       = $$conf{path}{backup_server_db};
 my $backup_server_diff       = $$conf{path}{backup_server_diff};
-my $inbox                    = $$conf{path}{server_inbox};
-my $outbox                   = $$conf{path}{server_outbox};
+my $inbox                    = $$conf{abspath}{server_inbox};
+my $outbox                   = $$conf{abspath}{server_outbox};
 
 if ( $< ne "0" ) {
    print "You must logged in root";
@@ -53,7 +53,7 @@ qx{chown -R $username:$username $outbox};
 qx{chown -R $username:$username $kss_home};
 
 print "=== Création des cronjobs ===\n";
-system( qq{perl $kss_home/tools/insert_or_update_crontab.pl --host=master} ) == 0 or die "Can't insert crontab";
+system( qq{perl $kss_dir/tools/insert_or_update_crontab.pl --host=master} ) == 0 or die "Can't insert crontab";
 
 print "/!\ Changer le mot de passe pour l'utilisateur $username\n";
 
@@ -63,5 +63,5 @@ Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $d
 print "Préparation prochaine itération\n";
 Koha_Synchronize_System::tools::kss::prepare_next_iteration;
 print "Nettoyage\n";
-Koha_Synchronize_System::tools::kss::clean $mysql_cmd, $user, $passwd, $db_server;
+Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server;
 

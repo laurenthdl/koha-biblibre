@@ -272,7 +272,7 @@ sub insert_proc_and_triggers {
     my ($user, $pwd, $db_name, $log) = @_;
     my $conf = get_conf();
     eval {
-        system( qq{$$conf{path}{generate_triggers} > /tmp/triggers.sql} ) or die $!;
+        system( qq{$$conf{path}{generate_triggers} > /tmp/triggers.sql} ) == 0 or die $!;
         system( qq{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/triggers.sql} ) == 0 or die $!;
         system( qq{$$conf{path}{generate_procedures} > /tmp/procedures.sql} ) == 0 or die $!;
         system( qq{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/procedures.sql} ) == 0 or die $!;
