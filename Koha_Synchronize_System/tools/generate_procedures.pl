@@ -141,9 +141,9 @@ sub create_procedures {
     )
     BEGIN
         CALL PROC_UPDATE_STATUS('Cleaning...', 0);
-        DROP TABLE } . $matching_table_prefix . qq{borrowers;
-        DROP TABLE } . $matching_table_prefix . qq{reserves;
-        DROP TABLE $matching_table_ids;
+        DROP TABLE IF EXISTS } . $matching_table_prefix . qq{borrowers;
+        DROP TABLE IF EXISTS } . $matching_table_prefix . qq{reserves;
+        DROP TABLE IF EXISTS $matching_table_ids;
         CALL PROC_UPDATE_STATUS('Cleaning...', 1);
     END;
     //};

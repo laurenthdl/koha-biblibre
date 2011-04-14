@@ -136,93 +136,6 @@ sub backup_server_db {
     system( qq{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename} ) == 0 or die $!;
 }
 
-sub backup_client_logbin {
-    my $log = shift;
-    my $conf = get_conf;
-    my $service_cmd = $$conf{which_cmd}{service};
-    my $hostname_cmd = $$conf{which_cmd}{hostname};
-    my $cp_cmd = $$conf{which_cmd}{cp};
-    my $rm_cmd = $$conf{which_cmd}{rm};
-    my $mv_cmd = $$conf{which_cmd}{mv};
-    my $tar_cmd = $$conf{which_cmd}{tar};
-    my $outbox = $$conf{path}{client_outbox};
-    my $bakdir = $$conf{path}{client_backup};
-    my $logdir = $$conf{abspath}{client_logbin};
-    
-    my $filename = strftime "%Y-%m-%d_%H-%M-%S", localtime;
-    my $dirname = $outbox . "/" . $filename;
-    eval { generate_ids_files("$dirname/ids") };
-    die $@ if $@;
-    
-    system( qq{$service_cmd mysql stop} ) == 0 or die "Can't stop mysql ! ($!)";
-    
-    eval {
-        make_path "$dirname/logbin";
-        make_path "$dirname/ids";
-    };
-    die "Can't create directory for backup ($@)" if $@;
-
-    eval {
-        qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
-        qx{$rm_cmd -f $logdir/mysql-bin.*};
-    };
-    die "Can't move mysql-bin ($@)" if $@;
-
-    system( qq{$service_cmd mysql start} ) == 0 or die "Can't start mysql ! ($!)";
-     
-    system( qq{$hostname_cmd -f > $dirname/hostname} ) == 0 or ($log && $log->warning("Can't get hostname from file ($!)"));
-    
-    system( qq{cd $dirname; $tar_cmd zcvf $filename.tar.gz logbin ids hostname} ) == 0 or die "Cant' extract archive ($!)";
-
-    system( qq{cd $dirname; $mv_cmd $filename.tar.gz $outbox} ) == 0 or die "Can't move archive to outbox ($!)";
-
-    system( qq{$mv_cmd $dirname $bakdir} ) == 0 or die "Can't move directory $dirname to backup dir $bakdir ($!)";
-
-    print "$outbox$filename.tar.gz";
-
-}
-
-sub pull_new_db {
-    my $log = shift;
-    my $conf = get_conf;
-    my $ssh_cmd                 = $$conf{which_cmd}{ssh};
-    my $scp_cmd                 = $$conf{which_cmd}{scp};
-    my $mysql_cmd               = $$conf{which_cmd}{mysql};
-    my $ip_server               = $$conf{cron}{serverhost};
-    my $kss_dir                 = $$conf{path}{kss_dir};
-    my $remote_dump_filepath    = $$conf{abspath}{server_dump_filepath};
-    my $local_dump_filepath     = $$conf{path}{client_dump_filepath};
-    my $username = "kss";
-
-    $log && $log->info(" Vérification de la disponibilité d'un nouveau dump" );
-    my $status = qx{$ssh_cmd $username\@$ip_server perl $kss_dir/tools/kss.pl --status} or die "Can't connect to the server ($!)";
-    if ( $status == 1 ){
-        $log && $log->error("Le serveur est toujours en cours d'exécution, impossible de récupérer le dump actuellement");
-        return 1;
-    }
-    $log && $log->info( "Récupération du dump distant" );
-    system( qq{$scp_cmd $username\@$ip_server:$remote_dump_filepath $local_dump_filepath} ) == 0 or die "Can't get new db from server ($!)";
-
-    $log && $log->info( "Insertion dans la base de données locale" );
-    system( qq{$mysql_cmd -u $user -p$passwd $db_client < $local_dump_filepath} ) == 0 or die "Can't insert new dump ($!)";
-}
-sub generate_ids_files {
-    my $outdir = shift;
-    my $conf = get_conf;
-    my $scripts_dir = $$conf{path}{client_scripts_ids};
-    my $perl_cmd = $$conf{which_cmd}{perl};
-
-    my @scripts = <$scripts_dir/*.pl>;
-    for my $script ( @scripts ) {
-        chomp $script;
-        my $filename = $script;
-        $filename =~ s#.*/([^/]*).pl#$1#;
-        my $filepath = $outdir . '/' . $filename . '.sql';
-	system( qq{mkdir -p $outdir });
-        system( qq{$perl_cmd $script > $filepath} ) == 0 or die "Can't gererate file $filepath ($!)";
-    }
-}
-
 =head2 diff_files_exists
 Returns 1 if exists at least 1 binary log file else 0
 =cut
@@ -302,7 +215,7 @@ sub delete_proc_and_triggers {
     my ($user, $pwd, $db_name, $log) = @_;
     my $conf = get_conf();
     eval {
-        system( qq{$$conf{path}{generate_triggers} -action=drop> /tmp/del_triggers.sql} ) or die $!;
+        system( qq{$$conf{path}{generate_triggers} -action=drop> /tmp/del_triggers.sql} ) == 0 or die $!;
         system( qq{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/del_triggers.sql} ) == 0 or die $!;
         system( qq{$$conf{path}{generate_procedures} -action=drop> /tmp/del_procedures.sql} ) == 0 or die $!;
         system( qq{$$conf{which_cmd}{mysql} -u $user -p$pwd $db_name < /tmp/del_procedures.sql} ) == 0 or die $!;
