@@ -264,7 +264,7 @@ sub clean {
 }
 
 =head2 prepare_next_iteration
-Call PPROC_CREATE_KSS_INFOS procedure.
+Call PROC_CREATE_KSS_INFOS procedure.
 Get greatest borrowernumber and reservenumber. Its insert in kss_infos table.
 =cut
 sub prepare_next_iteration {

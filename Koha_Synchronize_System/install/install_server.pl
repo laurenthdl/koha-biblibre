@@ -13,6 +13,10 @@ my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $dump_id_dir              = $$conf{path}{dump_ids};
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
+my $matching_table_prefix    = $$conf{databases_infos}{matching_table_prefix};
+my $matching_table_ids       = $$conf{databases_infos}{matching_table_ids};
+my $max_old_borrowernumber_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
+my $max_old_reservenumber_fieldname = $$conf{databases_infos}{max_borrowers_fieldname};
 my $kss_home                 = $$conf{path}{kss_server_home};
 my $diff_logbin_dir          = $$conf{path}{diff_logbin_dir};
 my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
@@ -60,8 +64,17 @@ print "/!\ Changer le mot de passe pour l'utilisateur $username\n";
 print "=== Mise à disposition du client de la base de données du serveur ===\n";
 print "Insertion des procedures\n";
 Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server;
-print "Préparation prochaine itération\n";
-Koha_Synchronize_System::tools::kss::prepare_next_iteration;
-print "Nettoyage\n";
-Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server;
 
+print "Préparation de la base de données\n";
+system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "CALL PROC_INIT_KSS();"} );
+
+print "Préparation prochaine itération\n";
+system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "DROP TABLE IF EXISTS $kss_infos_table;"} );
+system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "CREATE TABLE IF NOT EXISTS $kss_infos_table ( variable VARCHAR(255), value VARCHAR(255) ) ENGINE=InnoDB DEFAULT CHARSET=utf8; "} );
+system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "INSERT INTO $kss_infos_table (variable, value) VALUES ('$max_old_borrowernumber_fieldname', (SELECT GREATEST(IFNULL(MAX(o.borrowernumber), 1), IFNULL(MAX(b.borrowernumber), 1)) + 1 FROM deletedborrowers o, borrowers b));"} );
+system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "INSERT INTO $kss_infos_table (variable, value) VALUES ('$max_old_reservenumber_fieldname', (SELECT GREATEST(IFNULL(MAX(o.reservenumber), 1), IFNULL(MAX(r.reservenumber), 1)) + 1 FROM old_reserves o, reserves r));"} );
+
+print "Nettoyage\n";
+system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "DROP TABLE IF EXISTS } . $matching_table_prefix . qq{borrowers;"} );
+system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "DROP TABLE IF EXISTS } . $matching_table_prefix . qq{reserves;"} );
+system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "DROP TABLE IF EXISTS $matching_table_ids;"} );

@@ -48,12 +48,12 @@ sub create_procedures {
     push @str, qq{CREATE PROCEDURE `PROC_INIT_KSS` (
     )
     BEGIN
-        CREATE TABLE } . $matching_table_prefix . qq{borrowers(
+        CREATE TABLE IF NOT EXISTS } . $matching_table_prefix . qq{borrowers(
             borrowernumber INT(11),
             cardnumber VARCHAR(16)
         )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-        CREATE TABLE } . $matching_table_prefix . qq{reserves(
+        CREATE TABLE IF NOT EXISTS } . $matching_table_prefix . qq{reserves(
             reservenumber INT(11),
             borrowernumber INT(11),
             biblionumber INT(11),
@@ -61,7 +61,7 @@ sub create_procedures {
             reservedate DATE
         )ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
-        CREATE TABLE $matching_table_ids (
+        CREATE TABLE IF NOT EXISTS $matching_table_ids (
             table_name VARCHAR(255),
             old INT(11),
             new INT(11)
