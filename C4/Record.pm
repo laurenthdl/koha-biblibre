@@ -875,7 +875,7 @@ sub marc2bibtex {
 	foreach my $mapping (keys %$mappings) {
 
 	    # We don't deal with document type right here
-	    next if $mapping eq "type";
+	    next if $mapping eq "bibtextype";
 
 	    # We get the field lists
 	    foreach (@{$mappings->{$mapping}}) {
@@ -905,7 +905,7 @@ sub marc2bibtex {
 	    }
 
 	}
-	$tex .= "\@" . $mappings->{'type'} . "{";
+	$tex .= "\@" . $mappings->{'bibtextype'} . "{";
 	$tex .= join( ",\n", $id, map { $bh{$_} ? qq(\t$_ = {$bh{$_}}) : () } keys %bh );
 	$tex .= "\n}\n";
 	warn $tex;

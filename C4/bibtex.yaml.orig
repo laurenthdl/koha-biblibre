@@ -6,9 +6,12 @@
 
 mapper: items.ccode
 # (we may want to use biblioitems.itype or biblioitems.ccode instead of items.ccode) 
+separator: ','
+default: "ARTICLE"
+
 
 "ARTICLE":
- type: article
+ bibtextype: article
  author:
    - 200$f
  title:
