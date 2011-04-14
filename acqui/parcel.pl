@@ -273,8 +273,6 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
         my $budget = GetBudget( $line{budget_id} );
         my $period = GetBudgetPeriod( $budget->{budget_period_id} );
         my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
-        my $user            = GetMemberDetails($borrower_id);
-        my $user_branchcode = $user->{'branchcode'};
 
         if ( $$period{budget_period_locked} == 1 ) {
             $line{budget_lock} = 1;
@@ -293,7 +291,7 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
             }
         } elsif ( $budget->{budget_permission} == 2 ) {
 
-            $line{budget_lock} = 1 if $user_branchcode ne $budget->{budget_branchcode};
+            $line{budget_lock} = 1 if C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode};
         }
     }
         

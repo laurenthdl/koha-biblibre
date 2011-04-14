@@ -245,8 +245,20 @@
         <!-- TMPL_ELSE -->
             <tr>
         <!-- /TMPL_UNLESS -->
-                <td class="basketfilterclass"><a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a></td>
-                <td class="orderfilterclass"><a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="supplierid" -->"><!-- TMPL_VAR NAME="ordernumber" --></a></td>
+                <td class="basketfilterclass">
+                  <!-- TMPL_IF NAME="budget_lock" -->
+                    <!-- TMPL_VAR NAME="basketno" -->
+                  <!-- TMPL_ELSE -->
+                    <a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a>
+                  <!-- /TMPL_IF -->
+                </td>
+                <td class="orderfilterclass">
+                  <!-- TMPL_IF NAME="budget_lock" -->
+                    <!-- TMPL_VAR NAME="ordernumber" -->
+                  <!-- TMPL_ELSE -->
+                    <a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="supplierid" -->"><!-- TMPL_VAR NAME="ordernumber" --></a>
+                  <!-- /TMPL_IF -->
+                </td>
                 <td class="summaryfilterclass">
                   <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html"--></a>
                 <!-- TMPL_IF NAME="author" --> by <!-- TMPL_VAR NAME="author" --><!--/TMPL_IF-->

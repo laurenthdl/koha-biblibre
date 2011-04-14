@@ -102,8 +102,6 @@ foreach (@lateorders) {
         my $budget = GetBudget( $order->{budget_id} );
         my $period = GetBudgetPeriod( $budget->{budget_period_id} );
         my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
-        my $user            = GetMemberDetails($borrower_id);
-        my $user_branchcode = $user->{'branchcode'};
 
         if ( $$period{budget_period_locked} == 1 ) {
             $_->{budget_lock} = 1;
@@ -118,7 +116,7 @@ foreach (@lateorders) {
                 delete $_->{budget_lock} if $parents_perm == '1';
             }
         } elsif ( $budget->{budget_permission} == 2 ) {
-            $_->{budget_lock} = 1 if $user_branchcode ne $budget->{budget_branchcode};
+            $_->{budget_lock} = 1 if C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode};
         }
     }
 
