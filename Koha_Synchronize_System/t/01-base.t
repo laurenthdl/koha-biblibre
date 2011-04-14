@@ -20,7 +20,7 @@ my $user = $conf->{'datatest'}->{'user'};
 my $passwd = $conf->{'datatest'}->{'passwd'};
 my $db_server = $conf->{'datatest'}->{'db_server'};
 my $hostname = $conf->{'datatest'}->{'hostname'};
-my $dump_id_dir = $conf->{'path'}->{'dump_ids'};
+my $dump_id_dir = $conf->{'abspath'}->{'dump_ids'};
 my $matching_table_prefix = $$conf{databases_infos}{matching_table_prefix};
 my $dbh = DBI->connect("DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd); 
 $dbh->{'mysql_enable_utf8'} = 1;

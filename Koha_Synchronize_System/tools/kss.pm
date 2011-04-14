@@ -16,9 +16,9 @@ my $conf                     = get_conf();
 my $kss_dir                  = $$conf{path}{kss_dir};
 my $db_client                = $$conf{databases_infos}{db_client};
 my $db_server                = $$conf{databases_infos}{db_server};
-my $diff_logbin_dir          = $$conf{path}{diff_logbin_dir};
-my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
-my $diff_logtxt_dir          = $$conf{path}{diff_logtxt_dir};
+my $diff_logbin_dir          = $$conf{abspath}{diff_logbin_dir};
+my $diff_logtxt_full_dir     = $$conf{abspath}{diff_logtxt_full_dir};
+my $diff_logtxt_dir          = $$conf{abspath}{diff_logtxt_dir};
 my $mysql_cmd                = $$conf{which_cmd}{mysql};
 my $mysqlbinlog_cmd          = $$conf{which_cmd}{mysqlbinlog};
 my $mysqldump_cmd            = $$conf{which_cmd}{mysqldump};
@@ -26,8 +26,8 @@ my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
 my $help                     = "";
-my $dump_db_server_dir       = $$conf{path}{backup_server_db};
-my $backup_diff_server       = $$conf{path}{backup_server_diff};
+my $dump_db_server_dir       = $$conf{abspath}{backup_server_db};
+my $backup_diff_server       = $$conf{abspath}{backup_server_diff};
 my $generate_triggers_path   = $$conf{path}{generate_triggers};
 my $generate_procedures_path = $$conf{path}{generate_procedures};
 
@@ -62,9 +62,7 @@ sub get_conf {
 
     my $paths = $$conf{path};
     while ( my ($key, $path) = each %$paths ) {
-        if ( $key ne 'kss_root' ) {
-            $$conf{path}{$key} = $kss_dir . $$conf{path}{$key};
-        }
+        $$conf{path}{$key} = $kss_dir . $$conf{path}{$key};
     }
     $$conf{path}{kss_dir} = $kss_dir;
     $$conf{path}{koha_dir} = $koha_dir;
@@ -111,7 +109,7 @@ We search in path:server_inbox section
 =cut
 sub get_archives {
     my $conf = get_conf;
-    my $dir = $$conf{path}{server_inbox};
+    my $dir = $$conf{abspath}{server_inbox};
 
     my @files = <$dir/*.tar.gz>;
     return \@files;
@@ -127,7 +125,7 @@ sub backup_server_db {
     my $user     = $$conf{databases_infos}{user};
     my $passwd   = $$conf{databases_infos}{passwd};
     my $db_server = $$conf{databases_infos}{db_server};
-    my $dump_db_server_dir = $$conf{path}{backup_server_db};
+    my $dump_db_server_dir = $$conf{abspath}{backup_server_db};
     my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
 
     my $dump_filename = $dump_db_server_dir . "/" . ( strftime "%Y-%m-%d_%H:%M:%S", localtime );
@@ -234,14 +232,14 @@ sub clean_fs {
 
     my $conf = get_conf();
 
-    qx{rm -f $$conf{path}{diff_logbin_dir}/*};
-    qx{rm -f $$conf{path}{diff_logtxt_full_dir}/*};
-    qx{rm -f $$conf{path}{diff_logtxt_dir}/*};
-    qx{rm -f $$conf{path}{dump_ids}/*};
-    qx{rm -f $$conf{path}{server_inbox}/hostname};
-    qx{rm -Rf $$conf{path}{server_inbox}/ids};
-    qx{rm -Rf $$conf{path}{server_inbox}/logbin};
-    qx{mv $$conf{path}{server_inbox}/*.tar.gz $$conf{path}{backup_server_diff}};
+    qx{rm -f $$conf{abspath}{diff_logbin_dir}/*};
+    qx{rm -f $$conf{abspath}{diff_logtxt_full_dir}/*};
+    qx{rm -f $$conf{abspath}{diff_logtxt_dir}/*};
+    qx{rm -f $$conf{abspath}{dump_ids}/*};
+    qx{rm -f $$conf{abspath}{server_inbox}/hostname};
+    qx{rm -Rf $$conf{abspath}{server_inbox}/ids};
+    qx{rm -Rf $$conf{abspath}{server_inbox}/logbin};
+    qx{mv $$conf{abspath}{server_inbox}/*.tar.gz $$conf{abspath}{backup_server_diff}};
 
 }
 
@@ -281,7 +279,7 @@ sub dump_available_db {
     my $log = shift;
 
     my $conf = get_conf;
-    my $outbox   = $$conf{path}{server_outbox};
+    my $outbox   = $$conf{abspath}{server_outbox};
     my $hostname = $$conf{databases_infos}{hostname};
     my $user     = $$conf{databases_infos}{user};
     my $passwd   = $$conf{databases_infos}{passwd};
@@ -538,8 +536,8 @@ sub backup_client_logbin {
     my $rm_cmd = $$conf{which_cmd}{rm};
     my $mv_cmd = $$conf{which_cmd}{mv};
     my $tar_cmd = $$conf{which_cmd}{tar};
-    my $outbox = $$conf{path}{client_outbox};
-    my $bakdir = $$conf{path}{client_backup};
+    my $outbox = $$conf{abspath}{client_outbox};
+    my $bakdir = $$conf{abspath}{client_backup};
     my $logdir = $$conf{abspath}{client_logbin};
     
     # Generate a filename
@@ -597,7 +595,7 @@ sub pull_new_db {
     my $ip_server               = $$conf{cron}{serverhost};
     my $kss_dir                 = $$conf{path}{kss_dir};
     my $remote_dump_filepath    = $$conf{abspath}{server_dump_filepath};
-    my $local_dump_filepath     = $$conf{path}{client_dump_filepath};
+    my $local_dump_filepath     = $$conf{abspath}{client_dump_filepath};
     my $username = "kss";
 
     # If kss.pl is running, we can't continue

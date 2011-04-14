@@ -10,13 +10,13 @@ use C4::Logguer qw(:DEFAULT $log_kss);
 
 my $log = $log_kss;
 my $conf                     = Koha_Synchronize_System::tools::kss::get_conf();
-my $outbox                   = $$conf{path}{client_outbox};
+my $outbox                   = $$conf{abspath}{client_outbox};
 my $inbox                    = $$conf{abspath}{server_inbox};
 my $ip_server                = $$conf{cron}{serverhost};
 my $scp_cmd                  = $$conf{which_cmd}{scp};
 my $ssh_cmd                  = $$conf{which_cmd}{ssh};
 my $rm_cmd                   = $$conf{which_cmd}{rm};
-my $backup_dir               = $$conf{path}{client_backup};
+my $backup_dir               = $$conf{abspath}{client_backup};
 my $backup_delay             = $$conf{backup_delay}{client};
 
 my $username = "kss";

@@ -52,29 +52,28 @@ which_cmd:
 
 path:
         kss_root: Koha_Synchronize_System
-        dump_ids: data/server/ids/
-        backup_server_db: data/server/backup/db/
-        backup_server_diff: data/server/backup/diff/
         generate_triggers: tools/generate_triggers.pl
         generate_procedures: tools/generate_procedures.pl
-        diff_logbin_dir: data/server/logbin/
-        diff_logtxt_full_dir: data/server/logtxt_full/
-        diff_logtxt_dir: data/server/logtxt/
-        kss_server_home: data/server/
-        server_inbox: data/server/inbox/
-        server_outbox: data/server/outbox/
-        kss_client_home: data/client/
-        client_inbox: data/client/inbox/
-        client_outbox: data/client/outbox/
-        client_dump_filepath: data/client/inbox/last.sql
         client_scripts_ids: scripts/client/ids/
-        client_backup: data/client/backup/
 
 abspath:
+        kss_server_home: /home/users/kss/
+        server_outbox: /home/users/kss/outbox/
+        server_dump_filepath: /home/users/kss/outbox/last.sql
+        server_inbox: /home/users/kss/inbox/
+        backup_server_db: /home/users/kss/backup/db/
+        backup_server_diff: /home/users/kss/backup/diff/
+        dump_ids: /home/users/kss/tmp/ids/
+        diff_logbin_dir: /home/users/kss/tmp/logbin/
+        diff_logtxt_full_dir: /home/users/kss/tmp/logtxt_full/
+        diff_logtxt_dir: /home/users/kss/tmp/logtxt/
+        kss_client_home: /home/users/kss/
+        client_inbox: /home/users/kss/inbox/
+        client_outbox: /home/users/kss/outbox/
+        client_dump_filepath: /home/users/kss/inbox/last.sql
+        client_backup: /home/users/kss/backup/
         client_logbin: /var/log/mysql
-        server_dump_filepath: /home/koha/versions/koha_kss/Koha_Synchronize_System/data/server/outbox/last.sql
-        server_outbox: /home/koha/versions/koha_kss/Koha_Synchronize_System/data/server/outbox/
-        server_inbox: /home/koha/versions/koha_kss/Koha_Synchronize_System/data/server/inbox/
+
 
 backup_delay:
         client: 30

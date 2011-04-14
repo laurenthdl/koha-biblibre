@@ -36,22 +36,21 @@ if ( get_status() ) {
 }
 
 my $conf                     = Koha_Synchronize_System::tools::kss::get_conf();
-my $kss_dir                  = $$conf{path}{kss_dir};
 my $db_server                = $$conf{databases_infos}{db_server};
-my $diff_logbin_dir          = $$conf{path}{diff_logbin_dir};
-my $diff_logtxt_full_dir     = $$conf{path}{diff_logtxt_full_dir};
-my $diff_logtxt_dir          = $$conf{path}{diff_logtxt_dir};
+my $diff_logbin_dir          = $$conf{abspath}{diff_logbin_dir};
+my $diff_logtxt_full_dir     = $$conf{abspath}{diff_logtxt_full_dir};
+my $diff_logtxt_dir          = $$conf{abspath}{diff_logtxt_dir};
 my $mv_cmd                   = $$conf{which_cmd}{mv};
 my $tar_cmd                  = $$conf{which_cmd}{tar};
 my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
-my $dump_id_dir              = $$conf{path}{dump_ids};
+my $dump_id_dir              = $$conf{abspath}{dump_ids};
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
-my $inbox                    = $$conf{path}{server_inbox};
-my $outbox                   = $$conf{path}{server_outbox};
-my $backup_server_db_dir     = $$conf{path}{backup_server_db};
-my $backup_server_diff_dir   = $$conf{path}{backup_server_diff};
+my $inbox                    = $$conf{abspath}{server_inbox};
+my $outbox                   = $$conf{abspath}{server_outbox};
+my $backup_server_db_dir     = $$conf{abspath}{backup_server_db};
+my $backup_server_diff_dir   = $$conf{abspath}{backup_server_diff};
 my $backup_delay_db          = $$conf{backup_delay}{server_db};
 my $backup_delay_diff        = $$conf{backup_delay}{server_diff};
 
