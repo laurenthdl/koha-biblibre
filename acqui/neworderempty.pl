@@ -86,6 +86,7 @@ use C4::Koha;
 use C4::Branch;         # GetBranches
 use C4::Members;
 use C4::Search qw/FindDuplicate BiblioAddAuthorities/;
+use C4::Charset;
 
 #needed for z3950 import:
 use C4::ImportBatch qw/GetImportRecordMarc SetImportRecordStatus/;
@@ -391,6 +392,7 @@ sub MARCfindbreeding {
     # remove the - in isbn, koha store isbn without any -
     if ($marc) {
         my $record = MARC::Record->new_from_usmarc($marc);
+        fix_unimarc_titles($record) if C4::Context->preference('marcflavour') eq "UNIMARC";
         my ( $isbnfield, $isbnsubfield ) = GetMarcFromKohaField( 'biblioitems.isbn', '' );
         if ( $record->field($isbnfield) ) {
             foreach my $field ( $record->field($isbnfield) ) {

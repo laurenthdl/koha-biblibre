@@ -41,6 +41,7 @@ BEGIN {
       SetMarcUnicodeFlag
       StripNonXmlChars
       nsb_clean
+      fix_unimarc_titles
     );
 }
 
@@ -1201,6 +1202,35 @@ sub nsb_clean {
     return($string) ;
 }
 
+=head2 fix_unimarc_titles
+
+=over 4
+
+fix_unimarc_titles($marcrecord);
+
+=back
+
+Fixes Unimarc titles
+
+=cut
+
+sub fix_unimarc_titles {
+    my $marc = shift;
+    for my $field ($marc->field('200'), $marc->field('225'), $marc->field('400'), $marc->field('410') ){
+        my $newfield;
+        for ($field->subfields()){
+           # remove SUDOC specific NSB NSE
+           $_->[1] =~ s/\x{98}|\x{9C}//g;
+           $_->[1] =~ s/\x{88}|\x{89}//g;
+           unless ($newfield) {
+               $newfield = MARC::Field->new($field->tag(), '', '', @$_);
+           }else{
+               $newfield->add_subfields(@$_);
+           }
+        }
+        $field->replace_with($newfield);
+    }
+}
 
 1;
 
