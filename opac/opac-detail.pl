@@ -394,11 +394,14 @@ if ( C4::Context->preference("OPACISBD") ) {
     $template->param( ISBD => 1 );
 }
 
+my $countcomments = scalar (@$reviews);
+
 $template->param(
     ITEM_RESULTS      => \@items,
     biblionumber      => $biblionumber,
     reviews           => $reviews,
-    loggedincommenter => $loggedincommenter
+    loggedincommenter => $loggedincommenter,
+    countcomments     => $countcomments,
 );
 
 # Lists
