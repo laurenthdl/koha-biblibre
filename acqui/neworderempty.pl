@@ -109,7 +109,7 @@ my $new = 'no';
 
 my $budget_name;
 
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
     {   template_name   => "acqui/neworderempty.tmpl",
         query           => $input,
         type            => "intranet",
@@ -232,11 +232,17 @@ my $budget = GetBudget($budget_id);
 
 # build budget list
 my $budget_loop = [];
-my $budgets = GetBudgetHierarchy( q{}, $borrower->{branchcode}, $borrower->{borrowernumber} );
+my $budgets = GetBudgetHierarchy(undef, undef, undef);
+
 foreach my $r ( @{$budgets} ) {
     if ( !defined $r->{budget_amount} || $r->{budget_amount} == 0 ) {
         next;
+    } elsif ( $r->{budget_permission} == 1 && $r->{budget_owner_id} != $borrower->{borrowernumber} ) {
+        next;
+    } elsif ( $r->{budget_permission} == 2 && defined $r->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode} ) {
+        next;
     }
+
     push @{$budget_loop},
       { b_id  => $r->{budget_id},
         b_txt => $r->{budget_name},

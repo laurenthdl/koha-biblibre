@@ -52,9 +52,11 @@ use C4::Context;
 use C4::Acquisition;
 use C4::Letters;
 use C4::Branch;    # GetBranches
+use C4::Budgets;
+use C4::Members;
 
 my $input = new CGI;
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
     {   template_name   => "acqui/lateorders.tmpl",
         query           => $input,
         type            => "intranet",
@@ -88,11 +90,36 @@ foreach ( keys %supplierlist ) {
 $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 
-my @lateorders = GetLateOrders( $delay, $supplierid, $branch );
+my @lateorders = GetLateOrders( $delay, undef, undef );
 
 my $total;
 foreach (@lateorders) {
     $total += $_->{subtotal};
+
+    # Check if user has permission to use budget
+    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
+        my $order = GetOrder( $_->{ordernumber} );
+        my $budget = GetBudget( $order->{budget_id} );
+        my $period = GetBudgetPeriod( $budget->{budget_period_id} );
+        my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
+
+        if ( $$period{budget_period_locked} == 1 ) {
+            $_->{budget_lock} = 1;
+        } elsif ( $budget->{budget_permission} == 1 ) {
+            if ( $borrower_id != $budget->{'budget_owner_id'} ) {
+                $_->{lock} = 1;
+            }
+            # check parent perms too
+            my $parents_perm = 0;
+            if ( $budget->{depth} > 0 ) {
+                $parents_perm = CheckBudgetParentPerm( $budget, $borrower_id );
+                delete $_->{budget_lock} if $parents_perm == '1';
+            }
+        } elsif ( $budget->{budget_permission} == 2 ) {
+            $_->{budget_lock} = 1 if C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode};
+        }
+    }
+
 }
 
 my @letters;
