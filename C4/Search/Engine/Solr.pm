@@ -485,7 +485,7 @@ sub IndexRecord {
 sub DeleteRecordIndex {
     my ( $recordtype, $id ) = @_;
     my $sc = GetSolrConnection;
-    $sc->remove( "${recordtype}_${id}" );
+    $sc->remove("id:${recordtype}_${id}");
 }
 
 #duplicate code with C4::Date::output('iso') ?
