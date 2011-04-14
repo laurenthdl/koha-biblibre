@@ -76,7 +76,7 @@ if ( $cur_format eq 'FR' ) {
 }
 my $status           = $query->param('status') || "ASKED";
 my $suggestions_count       = CountSuggestion($status);
-my $budget_arr = GetBudgetHierarchy( '', C4::Context->userenv->{"branch"}, $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'} );
+my $budget_arr = GetBudgetHierarchy( '', '', '' );
 
 my $total      = 0;
 my $totspent   = 0;
@@ -88,6 +88,29 @@ my $total_active        = 0;
 my $totspent_active     = 0;
 my $totordered_active   = 0;
 my $totavail_active     = 0;
+
+unless ( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
+    # Check permissions
+    my $i = 0;
+    while ($i < @$budget_arr) {
+        my $budget = $$budget_arr[$i];
+        if($budget->{budget_permission} == 1) {  # owner
+            if($budget->{budget_owner_id} != $user->{'borrowernumber'} ) {
+                splice @$budget_arr, $i, 1;
+            }
+        } elsif ($budget->{budget_permission} == 2) {   # library
+            if( C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
+                splice @$budget_arr, $i, 1;
+            }
+        } elsif ($budget->{budget_permission} == 3) {   # owner + users
+            my $users = GetUsersFromBudget($budget->{budget_id});
+            if( !defined $users->{$user->{borrowernumber}} && $budget->{budget_owner_id} != $user->{borrowernumber} ) {
+                splice @$budget_arr, $i, 1;
+            }
+        }
+        $i++;
+    }
+}
 
 foreach my $budget ( @$budget_arr ) {
     $budget->{budget_code_indent} =~ s/\ /\&nbsp\;/g;
