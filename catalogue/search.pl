@@ -183,30 +183,6 @@ if ( C4::Context->preference("marcflavour") eq "UNIMARC" ) {
     $template->param( 'UNIMARC' => 1 );
 }
 
-## URI Re-Writing
-# Deprecated, but preserved because it's interesting :-)
-# The same thing can be accomplished with mod_rewrite in
-# a more elegant way
-#
-#my $rewrite_flag;
-#my $uri = $cgi->url(-base => 1);
-#my $relative_url = $cgi->url(-relative=>1);
-#$uri.="/".$relative_url."?";
-#warn "URI:$uri";
-#my @cgi_params_list = $cgi->param();
-#my $url_params = $cgi->Vars;
-#
-#for my $each_param_set (@cgi_params_list) {
-#    $uri.= join "",  map "\&$each_param_set=".$_, split("\0",$url_params->{$each_param_set}) if $url_params->{$each_param_set};
-#}
-#warn "New URI:$uri";
-# Only re-write a URI if there are params or if it already hasn't been re-written
-#unless (($cgi->param('r')) || (!$cgi->param()) ) {
-#    print $cgi->redirect(     -uri=>$uri."&r=1",
-#                            -cookie => $cookie);
-#    exit;
-#}
-
 # load the branches
 my $branches = GetBranches();
 my @branch_loop;
@@ -273,13 +249,6 @@ $template->param( itemtypeloop => \@itemtypesloop );
 
 # The following should only be loaded if we're bringing up the advanced search template
 if ( $template_type eq 'advsearch' ) {
-
-    # load the servers (used for searching -- to do federated searching, etc.)
-    my $primary_servers_loop;    # = displayPrimaryServers();
-    $template->param( outer_servers_loop => $primary_servers_loop, );
-
-    my $secondary_servers_loop;
-    $template->param( outer_sup_servers_loop => $secondary_servers_loop, );
 
     # set the default sorting
     my $sort_by = $cgi->param('sort_by') || join(' ', grep { defined } ( 
@@ -356,8 +325,9 @@ if ( $template_type eq 'advsearch' ) {
 #  * returns paramater list as tied hash ref
 #  * we can edit the values by changing the key
 #  * multivalued CGI paramaters are returned as a packaged string separated by "\0" (null)
-my $sort_by = $cgi->param('sort_by') || join(' ', grep { defined } ( C4::Context->preference('OPACdefaultSortField')
-                                                                   , C4::Context->preference('OPACdefaultSortOrder') ) );
+my $sort_by = $cgi->param('sort_by') || join(' ', grep { defined } ( 
+        C4::Search::Query::getIndexName(C4::Context->preference('defaultSortField'))
+                                      , C4::Context->preference('defaultSortOrder') ) );
 my $sortloop = C4::Search::Engine::Solr::GetSortableIndexes('biblio');
 for ( @$sortloop ) { # because html template is stupid
     $_->{'asc_selected'}  = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' asc';
@@ -383,11 +353,8 @@ my $page             = $cgi->param('page') || 1;
 my $hits;
 my $expanded_facet = $params->{'expand'};
 
-# Define some global variables
-my ( $error, $query, $simple_query, $query_cgi, $query_desc, $limit, $limit_cgi, $limit_desc, $stopwords_removed, $query_type );
-
-if ($@ || $error) {
-    $template->param(query_error => $error.$@);
+if ($@) {
+    $template->param(query_error => $@);
     output_html_with_http_headers $cgi, $cookie, $template->output;
     exit;
 }
@@ -401,7 +368,7 @@ my @operands = $cgi->param('q');
 my @avlists = $cgi->param('avlist');
 
 #clean operands array
-my$i;
+my $i;
 for ($i = $#indexes; $i >= 0; $i--) { #pas de for ($#indexes..0) :'(
   splice @indexes,$i,1 if $i > $#operands;
 }
@@ -506,7 +473,7 @@ my @pager_params = map { {
     val => $_->{'ind'}.':"'.$_->{'val'}.'"'
 } } @tplfilters;
 push @pager_params, map { { ind => 'q'      , val => $_ } } @operands;
-push @pager_params, map { { ind => 'idx'      , val => $_ } } @indexes;
+push @pager_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @pager_params, map { { ind => 'op'     , val => $_ } } @operators;
 push @pager_params, { ind => 'sort_by', val => $sort_by };
 
@@ -579,11 +546,9 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
 $template->param(
     'total'          => $res->{'pager'}->{'total_entries'},
     'opacfacets'     => 1,
-    'search_error'   => $error,
     'SEARCH_RESULTS' => \@results,
     'facets_loop'    => \@facets,
     'query'          => $params->{'q'},
-    'searchdesc'     => $query_desc || $limit_desc,
     'query_desc'     => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => C4::Context->preference('OPACnumSearchResults') || 20,
