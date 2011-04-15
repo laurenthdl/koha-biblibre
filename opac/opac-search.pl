@@ -253,11 +253,8 @@ my $page             = $cgi->param('page') || 1;
 my $hits;
 my $expanded_facet = $params->{'expand'};
 
-# Define some global variables
-my ( $error, $query, $simple_query, $query_cgi, $query_desc, $limit, $limit_cgi, $limit_desc, $stopwords_removed, $query_type );
-
-if ($@ || $error) {
-    $template->param(query_error => $error.$@);
+if ($@) {
+    $template->param(query_error => $@);
     output_html_with_http_headers $cgi, $cookie, $template->output;
     exit;
 }
@@ -408,23 +405,6 @@ $template->param(
 );
 
 # populate results with records
-#my @results;
-#for ( @{ $res->items } ) {
-#    my $biblionumber = $_->{'values'}->{'recordid'};
-#    my $result = GetBiblio( $biblionumber );
-#    my $record = GetMarcBiblio( $biblionumber );
-#
-#    SetUTF8Flag( $record ) if $record;
-#
-#    if ( C4::Context->preference("OPACXSLTResultsDisplay") ) {
-#        $result->{'OPACXSLTResultsRecord'} = XSLTParse4Display( $biblionumber, $record, C4::Context->preference("OPACXSLTResultsDisplay") );
-#    }
-#
-#    push @results, $result;
-#}
-
-
-# populate results with records
 my @results;
 my $it = C4::Search::getItemTypes();
 my $subfieldstosearch = C4::Search::getSubfieldsToSearch();
@@ -488,12 +468,11 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
 $template->param(
     'total'          => $res->{'pager'}->{'total_entries'},
     'opacfacets'     => 1,
-    'search_error'   => $error,
     'SEARCH_RESULTS' => \@results,
     'facets_loop'    => \@facets,
     'query'          => $q,
     'query_desc'     => $q,
-    'searchdesc'     => $q || @tplfilters,
+    'searchdesc'     => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => $count,
     'countrss'       => $countRSS,

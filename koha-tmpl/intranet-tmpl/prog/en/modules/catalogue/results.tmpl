@@ -209,7 +209,7 @@ function GetZ3950Terms(){
                 <!-- TMPL_LOOP NAME="filters" -->
 	                <input type="hidden" name="filters" value="<!--TMPL_VAR NAME="ind"-->:&quot;<!--TMPL_VAR ESCAPE="HTML" NAME="val"-->&quot;" />
                 <!-- /TMPL_LOOP -->
-                <!-- TMPL_IF NAME="searchdesc" -->
+                <!-- TMPL_IF NAME="search_desc" -->
                     <!-- TMPL_LOOP NAME="QUERY_INPUTS"-->
                     <input type="hidden" name="<!-- TMPL_VAR ESCAPE=HTML NAME="input_name" -->" value="<!-- TMPL_VAR ESCAPE=HTML NAME="input_value" -->"/>
                     <!-- /TMPL_LOOP -->
@@ -250,7 +250,7 @@ function GetZ3950Terms(){
 				<span id="z3950searchc"><input type="button" id="z3950search" value="Z39.50 Search" onclick="PopupZ3950(); return false;" /></span>
 			</form>
             <h3>No results found</h3>
-        <!-- TMPL_IF NAME="searchdesc" -->
+        <!-- TMPL_IF NAME="search_desc" -->
             <p>
                 No results match your search <!-- TMPL_IF NAME="query_desc" -->for <span style="font-weight: bold;">'<!-- TMPL_VAR NAME="query_desc" ESCAPE="HTML"-->'</span><!-- /TMPL_IF --><!-- TMPL_IF NAME="limit_desc" -->&nbsp;with limit(s): <span style="font-weight: bold;">'<!-- TMPL_VAR NAME="limit_desc" -->'</span><!-- /TMPL_IF --><!-- TMPL_IF NAME="LibraryName" --> in <!-- TMPL_VAR NAME="LibraryName" --> Catalog<!-- /TMPL_IF -->.
             </p>
@@ -339,14 +339,14 @@ function GetZ3950Terms(){
                         <ul>
                         <!-- TMPL_LOOP NAME="facets" -->
                             <li>
-                                <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR NAME="searchdesc" --> and <!-- TMPL_VAR NAME="type_link_value" -->:<!-- TMPL_VAR NAME="facet_link_value" -->" title="<!-- TMPL_VAR NAME="facet_title_value" -->">
+                                <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR NAME="search_desc" --> and <!-- TMPL_VAR NAME="type_link_value" -->:<!-- TMPL_VAR NAME="facet_link_value" -->" title="<!-- TMPL_VAR NAME="facet_title_value" -->">
                                     <!-- TMPL_VAR NAME="facet_label_value" -->
                                 </a> (<!-- TMPL_VAR NAME="facet_count" -->)
                             </li>
                         <!-- /TMPL_LOOP -->
                         <!-- TMPL_IF NAME="expandable" -->
                             <li class="showmore">
-                                <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR NAME="searchdesc" -->&amp;expand=<!-- TMPL_VAR NAME="expand" -->#<!-- TMPL_VAR NAME="type_id" -->">
+                                <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR NAME="search_desc" -->&amp;expand=<!-- TMPL_VAR NAME="expand" -->#<!-- TMPL_VAR NAME="type_id" -->">
                                     Show More
                                 </a>
                             </li>
@@ -365,7 +365,7 @@ function GetZ3950Terms(){
 <!-- TMPL_INCLUDE NAME="page-numbers.inc" -->
             <div id="searchresults">
                 <form action="/cgi-bin/koha/catalogue/search.pl" method="get" name="bookbag_form" id="bookbag_form">
-                <!-- TMPL_IF NAME="searchdesc" -->
+                <!-- TMPL_IF NAME="search_desc" -->
                 <!-- TMPL_LOOP NAME="QUERY_INPUTS"-->
                 <input type="hidden" name="<!-- TMPL_VAR ESCAPE=HTML NAME="input_name" -->" value="<!-- TMPL_VAR ESCAPE=HTML NAME="input_value" -->"/>
                 <!-- /TMPL_LOOP -->

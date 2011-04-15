@@ -410,7 +410,6 @@ while ( my ($k, $v) = each %filters) {
     };
 }
 $template->param('filters' => \@tplfilters );
-
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 
 #build search in authorised value list
@@ -555,6 +554,7 @@ $template->param(
     'facets_loop'    => \@facets,
     'query'          => $params->{'q'},
     'query_desc'     => $q,
+    'search_desc'    => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => C4::Context->preference('OPACnumSearchResults') || 20,
 );
