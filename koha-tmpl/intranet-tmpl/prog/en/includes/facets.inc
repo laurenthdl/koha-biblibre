@@ -25,12 +25,12 @@
                 <!-- TMPL_LOOP NAME="values" -->
                 <li>
                     <!-- TMPL_IF NAME="active" -->
-                        <!-- TMPL_VAR NAME="value" -->
+                        <!-- TMPL_VAR NAME="lib" -->
                         (<!-- TMPL_VAR NAME="count" -->)
                         [<a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR ESCAPE="URL" NAME="query" --><!-- TMPL_LOOP NAME="filters" --><!-- TMPL_UNLESS EXPR="ind eq index && val eq value" -->&amp;filters=<!--TMPL_VAR ESCAPE="URL" NAME="ind"-->:&quot;<!--TMPL_VAR ESCAPE="URL" NAME="val"-->&quot;<!-- /TMPL_UNLESS --><!-- /TMPL_LOOP --><!-- TMPL_IF NAME="sort_by" -->&amp;sort_by=<!-- TMPL_VAR ESCAPE="URL" NAME="sort_by" --><!-- /TMPL_IF -->">x</a>]
                     <!-- TMPL_ELSE -->
                         <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR ESCAPE="URL" NAME="query" --><!-- TMPL_LOOP NAME="filters" --><!-- TMPL_UNLESS EXPR="ind eq index" -->&amp;filters=<!--TMPL_VAR ESCAPE="URL" NAME="ind"-->:&quot;<!--TMPL_VAR ESCAPE="URL" NAME="val"-->&quot;<!-- /TMPL_UNLESS --><!-- /TMPL_LOOP -->&amp;filters=<!--TMPL_VAR ESCAPE="URL" NAME="index"-->:&quot;<!-- TMPL_VAR ESCAPE="URL" NAME="value" -->&quot;<!-- TMPL_IF NAME="sort_by" -->&amp;sort_by=<!-- TMPL_VAR ESCAPE="URL" NAME="sort_by" --><!-- /TMPL_IF -->">
-                            <!-- TMPL_VAR NAME="value" -->
+                            <!-- TMPL_VAR NAME="lib" -->
                         </a>
                         (<!-- TMPL_VAR NAME="count" -->)
                     <!-- /TMPL_IF -->

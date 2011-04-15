@@ -528,7 +528,12 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
         for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
             my $value = $facet->[$i++];
             my $count = $facet->[$i];
+            my $lib = $value;
+            if ( $code eq 'ccode' ) {
+                $lib = GetAuthorisedValueLib $code, $value;
+            }
             push @values, {
+                'lib'     => $lib,
                 'value'   => $value,
                 'count'   => $count,
                 'active'  => $filters{$index} eq "\"$value\"", # TODO fails on diacritics
