@@ -48,11 +48,20 @@
             }
     }
 	$(document).ready(function() {
-		 $("#periodsh").tablesorter({
-	            widgets : ['zebra'],
-	            sortList: [[0,0]],
-	            headers:  {6:{sorter:false}}
-	     });
+        var tabs = $('#budgetsTabs > ul').tabs();
+        <!-- TMPL_IF NAME="tab" -->
+            tabs.tabs('select', <!-- TMPL_VAR NAME="tab" -->);
+        <!-- /TMPL_IF -->
+        $('#activeperiodst').tablesorter({
+            widgets :   ['zebra'],
+            sortList:   [[0,0]],
+            headers:    {6:{sorter:false}}
+        });
+        $('#inactiveperiodst').tablesorter({
+            widgets :   ['zebra'],
+            sortList:   [[2,1]],
+            headers:    {6:{sorter:false}}
+        });
 	});
 </script>
 
@@ -255,7 +264,16 @@
 <!-- TMPL_IF name="else" -->
     <h2>Budgets administration</h2>
     <!-- TMPL_IF name="cur" --><p><b>Currency = <!-- TMPL_VAR name="cur" --></b></p><!-- TMPL_ELSE --><div class="dialog alert"><h3>No active currency is defined</h3><p>Please <a href="/cgi-bin/koha/admin/currency.pl">specify an active currency</a>.</p></div><!-- /TMPL_IF -->
-    <table id="periodsh">
+
+<div id="budgetsTabs" class="toptabs">
+    <ul>
+        <li><a href="/cgi-bin/koha/admin/aqbudgetperiods.pl#active">Active Budgets</a></li>
+        <li><a href="/cgi-bin/koha/admin/aqbudgetperiods.pl#inactive">Inactive Budgets</a></li>
+    </ul>
+
+    <div id="active">
+        <h3>Active Budgets</h3>
+    <table id="activeperiodst">
     <thead>
 	    <tr>
 	        <th>Budget Name</th>
@@ -268,7 +286,7 @@
 	    </tr>
 	</thead>
 	<tbody>
-	    <!-- TMPL_LOOP name="period_loop" -->
+	    <!-- TMPL_LOOP name="period_active_loop" -->
 	        <!-- TMPL_IF NAME="__odd__" -->
 	            <tr>
 	        <!-- TMPL_ELSE -->
@@ -287,13 +305,56 @@
 	        </td>
 	        </tr>
 	    <!-- /TMPL_LOOP -->
-	    <!-- TMPL_UNLESS NAME="period_loop" -->
+	    <!-- TMPL_UNLESS NAME="period_active_loop" -->
     	<tr><td colspan="7">No budget</td></tr>
     	<!-- /TMPL_UNLESS -->
     </tbody>
     </table>
-    <div class="paginationBar"><!-- TMPL_VAR NAME="pagination_bar" --></div>
+    <div class="paginationBar"><!-- TMPL_VAR NAME="active_pagination_bar" --></div>
+    </div>
+    <div id="inactive">
+        <h3>Inactive Budgets</h3>
+    <table id="inactiveperiodst">
+    <thead>
+	    <tr>
+	        <th>Budget Name</th>
+	        <th>Start Date</th>
+	        <th>End Date</th>
+	        <th>Active</th>
+	        <th>Locked</th>
+	        <th>Total</th>
+	        <th>Actions</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    <!-- TMPL_LOOP name="period_inactive_loop" -->
+	        <!-- TMPL_IF NAME="__odd__" -->
+	            <tr>
+	        <!-- TMPL_ELSE -->
+	            <tr class="highlight">
+	        <!-- /TMPL_IF -->
+	        <td><a href="/cgi-bin/koha/admin/aqbudgets.pl?budget_period_id=<!-- TMPL_VAR name="budget_period_id" -->" title="View funds for <!-- TMPL_VAR name="budget_period_description" -->"><!-- TMPL_VAR name="budget_period_description" --></a></td>
+	        <td><!-- TMPL_VAR name="budget_period_startdate" --></td>
+	        <td><!-- TMPL_VAR name="budget_period_enddate" --></td>
+	        <td><!-- TMPL_IF name="budget_period_active" --><span style="color:green;">Active</span>&nbsp;<!-- TMPL_ELSE --><!-- /TMPL_IF --> </td>
+	        <td> <!-- TMPL_IF name="budget_period_locked" --><span style="color:green;">Locked</span>&nbsp;<!-- TMPL_ELSE --><!-- /TMPL_IF --> </td>
+	        <td align='right'><!-- TMPL_VAR NAME="budget_period_total" --></td>
+	        <td>
+	            <a href="<!-- TMPL_VAR name="script_name" -->?op=add_form&amp;budget_period_id=<!-- TMPL_VAR name="budget_period_id" escape="HTML" -->">Edit</a>
+	            <a href="<!-- TMPL_VAR name="script_name"-->?op=delete_confirm&amp;budget_period_id=<!-- TMPL_VAR name="budget_period_id" -->">Delete</a>
+	           	<a href="/cgi-bin/koha/admin/aqbudgets.pl?op=add_form&amp;budget_period_id=<!-- TMPL_VAR NAME="budget_period_id" -->">Add Fund</a>
+	        </td>
+	        </tr>
+	    <!-- /TMPL_LOOP -->
+	    <!-- TMPL_UNLESS NAME="period_inactive_loop" -->
+    	<tr><td colspan="7">No budget</td></tr>
+    	<!-- /TMPL_UNLESS -->
+    </tbody>
+    </table>
+    <div class="paginationBar"><!-- TMPL_VAR NAME="inactive_pagination_bar" --></div>
 <!-- /TMPL_IF -->
+    </div>
+</div>
 
 </div>
 </div>
