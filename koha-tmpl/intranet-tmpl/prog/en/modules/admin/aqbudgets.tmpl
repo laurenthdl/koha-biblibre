@@ -205,11 +205,12 @@
     <th colspan="2" style="text-align: left;" nowrap="nowrap">Period allocated <!--TMPL_IF NAME="budget_period_total" --><!-- TMPL_VAR NAME="budget_period_total"--><!-- /TMPL_IF -->  </th>
     <th nowrap="nowrap" class="data"> <!-- TMPL_VAR NAME="period_alloc_total"--></th>
     <th nowrap="nowrap"  class="data"> <!-- TMPL_VAR NAME="base_alloc_total"--></th>
+    <th>&nbsp;</th>
     <th class="data"><!-- TMPL_VAR NAME="base_spent_total"--></th>
     <th class="data"><!-- TMPL_VAR NAME="base_spent_total"--></th>
     <th class="data"><!-- TMPL_VAR NAME="base_remaining_total"--></th>
     <th class="tooltipcontent"></th>
-    <th></th>
+    <th>&nbsp;</th>
     </tr>
     </tfoot>
     <tbody>
@@ -223,17 +224,17 @@
 
     <td><!-- TMPL_VAR NAME="budget_code_indent" --></td>
     <td><!-- TMPL_VAR NAME="budget_name" --></td>
-    <td class="data"><!-- TMPL_VAR NAME="budget_amount_total" --></td>
-    <td class="data"><!-- TMPL_VAR NAME="budget_amount" --> </td>
-    <td class="data"><!-- TMPL_VAR NAME="budget_ordered" --> </td>
-    <td class="data"><!-- TMPL_VAR NAME="budget_spent" --> </td>
-    <td class="data"><!-- TMPL_VAR NAME="total_levels_spent" --></td>
+    <td class="data single-line"><!-- TMPL_VAR NAME="budget_amount_total" --></td>
+    <td class="data single-line"><!-- TMPL_VAR NAME="budget_amount" --> </td>
+    <td class="data single-line"><!-- TMPL_VAR NAME="budget_ordered" --></td>
+    <td class="data single-line"><!-- TMPL_VAR NAME="budget_spent" --> </td>
+    <td class="data single-line"><!-- TMPL_VAR NAME="total_levels_spent" --></td>
     <!-- TMPL_IF NAME="remaining_pos" -->
-        <td class="data" style="color: green;">
+        <td class="data single-line" style="color: green; ">
     <!-- TMPL_ELSIF NAME="remaining_neg" --> 
-        <td class="data" style="color: red;">
+        <td class="data single-line" style="color: red;">
     <!-- TMPL_ELSE -->
-        <td class="data">
+        <td class="data single-line">
     <!-- /TMPL_IF -->
             <!-- TMPL_VAR NAME="budget_remaining" --> </td>
 
@@ -256,7 +257,7 @@
         <td>
             <a href="/cgi-bin/koha/admin/aqbudgets.pl?op=add_form&amp;budget_id=<!-- TMPL_VAR NAME="budget_id" -->&amp;budget_period_id=<!-- TMPL_VAR NAME="budget_period_id" -->" >Edit</a>
             <a href="/cgi-bin/koha/admin/aqbudgets.pl?op=delete_confirm&amp;budget_id=<!-- TMPL_VAR NAME="budget_id" -->&amp;budget_period_id=<!-- TMPL_VAR NAME="budget_period_id" -->">Delete</a>
-            <a href="/cgi-bin/koha/admin/aqbudgets.pl?op=add_form&amp;budget_parent_id=<!-- TMPL_VAR NAME="budget_id" -->&amp;budget_period_id=<!-- TMPL_VAR NAME="budget_period_id" -->">Add Child Fund</a>
+            <a class="single-line" href="/cgi-bin/koha/admin/aqbudgets.pl?op=add_form&amp;budget_parent_id=<!-- TMPL_VAR NAME="budget_id" -->&amp;budget_period_id=<!-- TMPL_VAR NAME="budget_period_id" -->">Add Child Fund</a>
         </td>
     <!-- /TMPL_IF -->
     </tr>

@@ -122,10 +122,10 @@ $(document).ready(function()
             <th>Total</th>
             <th>&nbsp;</th>
             <th>&nbsp;</th>
-            <th align="right" ><span class="bu_active" style="display : none;"><!-- TMPL_VAR name="total" --></span><span class="bu_inactive" ><!-- TMPL_VAR name="total_active" --></span></th>
-            <th align="right" ><span class="bu_active" style="display : none;"><!-- TMPL_VAR name="totordered" --></span><span class="bu_inactive" ><!-- TMPL_VAR name="totordered_active" --></span></th>
-            <th align="right" ><span class="bu_active" style="display : none;"><!-- TMPL_VAR name="totspent" --></span><span class="bu_inactive" ><!-- TMPL_VAR name="totspent_active" --></span></th>
-            <th align="right" ><span class="bu_active" style="display : none;"><!-- TMPL_VAR name="totavail" --></span><span class="bu_inactive" ><!-- TMPL_VAR name="totavail_active" --></span></th>
+            <th align="right" class="single-line" ><span class="bu_active" style="display : none;"><!-- TMPL_VAR name="total" --></span><span class="bu_inactive" ><!-- TMPL_VAR name="total_active" --></span></th>
+            <th align="right" class="single-line" ><span class="bu_active" style="display : none;"><!-- TMPL_VAR name="totordered" --></span><span class="bu_inactive" ><!-- TMPL_VAR name="totordered_active" --></span></th>
+            <th align="right" class="single-line" ><span class="bu_active" style="display : none;"><!-- TMPL_VAR name="totspent" --></span><span class="bu_inactive" ><!-- TMPL_VAR name="totspent_active" --></span></th>
+            <th align="right" class="single-line" ><span class="bu_active" style="display : none;"><!-- TMPL_VAR name="totavail" --></span><span class="bu_inactive" ><!-- TMPL_VAR name="totavail_active" --></span></th>
         </tr>
         
         </tfoot>
@@ -143,10 +143,10 @@ $(document).ready(function()
                 <td align="center"><!-- TMPL_VAR name="budget_code" --></td>
                 <td align="center"><!-- TMPL_VAR name="budget_owner" --></td>
                 <td align="center"><!-- TMPL_VAR name="budget_branchname" --></td>
-                <td align="right" ><!-- TMPL_VAR name="budget_amount" --></td>
-                <td align="right" ><!-- TMPL_VAR name="budget_ordered" --></td>
-                <td align="right" ><!-- TMPL_VAR name="budget_spent" --></td>
-                <td align="right" ><!-- TMPL_VAR name="budget_avail" --></td>
+                <td align="right" class="single-line" ><!-- TMPL_VAR name="budget_amount" --></td>
+                <td align="right" class="single-line" ><!-- TMPL_VAR name="budget_ordered" --></td>
+                <td align="right" class="single-line" ><!-- TMPL_VAR name="budget_spent" --></td>
+                <td align="right" class="single-line" ><!-- TMPL_VAR name="budget_avail" --></td>
             
             </tr>
            <!--TMPL_ELSE -->
