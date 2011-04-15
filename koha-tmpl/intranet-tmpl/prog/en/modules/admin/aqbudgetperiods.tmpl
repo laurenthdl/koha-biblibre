@@ -279,7 +279,7 @@
 	        <td><!-- TMPL_VAR name="budget_period_enddate" --></td>
 	        <td><!-- TMPL_IF name="budget_period_active" --><span style="color:green;">Active</span>&nbsp;<!-- TMPL_ELSE --><!-- /TMPL_IF --> </td>
 	        <td> <!-- TMPL_IF name="budget_period_locked" --><span style="color:green;">Locked</span>&nbsp;<!-- TMPL_ELSE --><!-- /TMPL_IF --> </td>
-	        <td align='right'><!-- TMPL_VAR NAME="budget_period_total" --></td>
+	        <td align='right' class="single-line"><!-- TMPL_VAR NAME="budget_period_total" --></td>
 	        <td>
 	            <a href="<!-- TMPL_VAR name="script_name" -->?op=add_form&amp;budget_period_id=<!-- TMPL_VAR name="budget_period_id" escape="HTML" -->">Edit</a>
 	            <a href="<!-- TMPL_VAR name="script_name"-->?op=delete_confirm&amp;budget_period_id=<!-- TMPL_VAR name="budget_period_id" -->">Delete</a>
