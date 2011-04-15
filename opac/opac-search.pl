@@ -200,7 +200,7 @@ $template->param( itemtypeloop => \@itemtypesloop );
 if ( $template_type && $template_type eq 'advsearch' ) {
 
     # set the default sorting
-    my $default_sort_by = C4::Context->preference('OPACdefaultSortField') . "_" . C4::Context->preference('OPACdefaultSortOrder')
+    my $default_sort_by = C4::Search::Query::getIndexName(C4::Context->preference('OPACdefaultSortField')) . "_" . C4::Context->preference('OPACdefaultSortOrder')
       if ( C4::Context->preference('OPACdefaultSortField') && C4::Context->preference('OPACdefaultSortOrder') );
     $template->param( $default_sort_by => 1 );
 

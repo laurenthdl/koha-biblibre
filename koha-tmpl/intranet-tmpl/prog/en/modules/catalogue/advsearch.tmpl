@@ -48,30 +48,6 @@
 <div id="advanced-search">
 <h1>Advanced Search</h1>
 
-<!-- TMPL_IF NAME="outer_servers_loop" -->
-<!-- DATABASES -->
-
-<fieldset>
-        <legend>Select local databases</legend>
-                <!-- TMPL_LOOP NAME="local_servers_loop" -->
-<!-- TMPL_IF NAME="checked" --><input type="checkbox" id="<!-- TMPL_VAR NAME="id" -->" name="<!-- TMPL_VAR NAME="name" -->" checked="checked" value="<!-- TMPL_VAR NAME="value" -->" /><!-- TMPL_ELSE --><input type="checkbox" id="<!-- TMPL_VAR NAME="id" -->" name="<!-- TMPL_VAR NAME="name" -->" value="<!-- TMPL_VAR NAME="value" -->" /><!-- /TMPL_IF --><label for="<!-- TMPL_VAR NAME="id" -->"><img width="16" height="16" alt="<!-- TMPL_VAR NAME="id" -->" src="<!-- TMPL_VAR NAME="themelang" -->/img/<!-- TMPL_VAR NAME="icon" -->" /> <!-- TMPL_VAR NAME="label" --></label><!-- /TMPL_LOOP -->
-</fieldset>
-<!-- /DATABASES -->
-<!-- /TMPL_IF -->
-
-<!-- TMPL_IF NAME="outer_servers_loop" -->
-<!-- REMOTE DATABASES -->
-<fieldset>
-    <legend>Select remote databases:</legend>
-                <!-- TMPL_LOOP NAME="outer_servers_loop" -->
-                <!-- TMPL_IF NAME="checked" --><input type="checkbox" id="<!-- TMPL_VAR NAME="id" -->" name="<!-- TMPL_VAR NAME="name" -->" checked="checked" value="<!-- TMPL_VAR NAME="value" -->" /><!-- TMPL_ELSE --><input type="checkbox" id="<!-- TMPL_VAR NAME="id" -->" name="<!-- TMPL_VAR NAME="name" -->" value="<!-- TMPL_VAR NAME="value" -->" /><!-- /TMPL_IF -->
-<label for="<!-- TMPL_VAR NAME="id" -->"><img alt="<!-- TMPL_VAR NAME="id" -->" src="<!-- TMPL_VAR NAME="themelang" -->/images/<!-- TMPL_VAR NAME="icon" -->" /><!-- TMPL_VAR NAME="label" --></label>
-                <!-- /TMPL_LOOP -->
-    </fieldset>
-<!-- /REMOTE DATABASES -->
-<!-- /TMPL_IF -->
-
-
 <!-- BOOLEAN SEARCH OPTIONS -->
     <fieldset>
     <legend>Search For: </legend>
