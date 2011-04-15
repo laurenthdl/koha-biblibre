@@ -529,7 +529,10 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
             my $count = $facet->[$i];
             my $lib = $value;
             if ( $code eq 'ccode' ) {
-                $lib = GetAuthorisedValueLib $code, $value;
+                $lib = GetAuthorisedValueLib 'ccode', $value;
+            }
+            elsif ( $code eq 'holdingbranch' ) {
+                $lib = GetBranchName $value;
             }
             push @values, {
                 'lib'     => $lib,
