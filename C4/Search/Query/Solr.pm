@@ -50,7 +50,9 @@ sub buildQuery {
 
     # Foreach operands
     for my $kw (@$operands){
-        $kw =~ s/:/\\:/g;
+        $kw =~ s/(\w*\*)/\L$1\E/g; # Lower case on words with right truncation
+        $kw =~ s/(\s*\w*\?+\w*\s*)/\L$1\E/g; # Lower case on words contain wildcard ?
+        $kw =~ s/:/\\:/g; # escape colons
         # First element
         if ($i == 0){
             if ( (my @x = eval {@$indexes} ) == 0 ){
@@ -128,6 +130,9 @@ sub normalSearch {
     if ($query  eq '*:*'){
         return $query;
     }
+
+    $query =~ s/(\w*\*)/\L$1\E/g; # Lower case on words with right truncation
+    $query =~ s/(\s*\w*\?+\w*\s*)/\L$1\E/g; # Lower case on words contain wildcard ?
 
     $query =~ s/ : / \\: /g; # escape colons if " : "
     my $new_query = C4::Search::Query::splitToken($query);
