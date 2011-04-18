@@ -11,6 +11,7 @@
 
     function ownerRemove(f) {
         document.getElementById('budget_owner_name').innerHTML = '';
+        document.getElementById('budget_owner_id').value = '';
     }
 
     function Check(f) {
@@ -325,7 +326,7 @@
       <span  id="budget_owner_name">
         <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="budget_owner_id" -->"><!-- TMPL_VAR NAME="budget_owner_name" --></a>
       </span>
-
+      <input type="hidden" id="budget_owner_id" name="budget_owner_id" value="<!-- TMPL_VAR NAME="budget_owner_id" -->" />
       <!-- FIXME: hardcoded button positions :/ -->
       <input style="" type="button" id="edit_owner" value="Edit owner" onclick="ownerSearchPopup(); return false;" />
       <input style=""  type="button" id="remove_owner" value="Remove owner" onclick="ownerRemove(this.form); return false;" />

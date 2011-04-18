@@ -22,7 +22,7 @@ my $titleindex = C4::Search::Query::getIndexName("title");
 my $authorindex = C4::Search::Query::getIndexName("author");
 my $eanindex = C4::Search::Query::getIndexName("ean");
 
-BEGIN { $tests += 8 } # 'Normal' search
+BEGIN { $tests += 19 } # 'Normal' search
 @$operands[0] = "title:maudits"; # Solr indexes
 @$indexes = ();
 @$operators = ();
@@ -64,6 +64,61 @@ $q = "Mathématiques Analyse L3 : Cours complet"; # escape colon
 $got = C4::Search::Query->normalSearch($q);
 $expected = "Mathématiques Analyse L3 \\: Cours complet";
 is($got, $expected, "Test escape colon");
+
+$q = "Mathéma*"; # lc if wildcard
+$got = C4::Search::Query->normalSearch($q);
+$expected = "mathéma*";
+is($got, $expected, "Test lc if wildcard *");
+
+$q = "title:Mathéma*"; # lc if wildcard
+$got = C4::Search::Query->normalSearch($q);
+$expected = "$titleindex:mathéma*";
+is($got, $expected, "Test lc if wildcard *");
+
+$q = "Mathéma?"; # lc if wildcard
+$got = C4::Search::Query->normalSearch($q);
+$expected = "mathéma?";
+is($got, $expected, "Test lc if wildcard ?");
+
+$q = "title:Mathéma?"; # lc if wildcard
+$got = C4::Search::Query->normalSearch($q);
+$expected = "$titleindex:mathéma?";
+is($got, $expected, "Test lc if wildcard ?");
+
+$q = "Math?matiques"; # lc if wildcard
+$got = C4::Search::Query->normalSearch($q);
+$expected = "math?matiques";
+is($got, $expected, "Test lc if wildcard ?");
+
+$q = "?AthéMatiques"; # lc if wildcard
+$got = C4::Search::Query->normalSearch($q);
+$expected = "?athématiques";
+is($got, $expected, "Test lc if wildcard ?");
+
+$q = "Math?matiques AND Foo"; # lc if wildcard
+$got = C4::Search::Query->normalSearch($q);
+$expected = "math?matiques AND Foo";
+is($got, $expected, "Test lc if wildcard ?");
+
+$q = "Math?ma* AND Foo"; # lc if wildcards * and ?
+$got = C4::Search::Query->normalSearch($q);
+$expected = "math?ma* AND Foo";
+is($got, $expected, "Test lc if wildcards ? and *");
+
+$q = "Math?ma* AND title:Fo* AND BAR"; # lc if wildcards * and ?
+$got = C4::Search::Query->normalSearch($q);
+$expected = "math?ma* AND $titleindex:fo* AND BAR";
+is($got, $expected, "Test lc if wildcards ? and *");
+
+$q = "title:M?th?maTique AND Fo* AND ?A?"; # lc if wildcards * and ?
+$got = C4::Search::Query->normalSearch($q);
+$expected = "$titleindex:m?th?matique AND fo* AND ?a?";
+is($got, $expected, "Test lc if wildcards ? and *");
+
+$q = "M?th?maTiqu? AND Fo* AND ?A?"; # lc if wildcards * and ?
+$got = C4::Search::Query->normalSearch($q);
+$expected = "m?th?matiqu? AND fo* AND ?a?";
+is($got, $expected, "Test lc if wildcards ? and *");
 
 BEGIN { $tests += 8 } # Advanced search
 @$operands = ("maudits"); # Solr indexes
@@ -196,3 +251,82 @@ is($got, $expected, qq{Test BuildIndexString with expression in operand});
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "monde AND histoire AND str_itype:(VIDEO)";
 is($got, $expected, qq{Test BuildIndexString with expression in operand});
+
+BEGIN { $tests += 11 } # Test wildcard * and ?
+@$operands = ("Mathéma*");
+@$indexes = ();
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "mathéma*";
+is($got, $expected, qq{Test simple wildCard *});
+
+@$operands = ("Mathéma*");
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "$titleindex:mathéma*";
+is($got, $expected, qq{Test simple wildCard * (with index)});
+
+@$operands = ("Mathéma?");
+@$indexes = ();
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "mathéma?";
+is($got, $expected, qq{Test simple wildCard ?});
+
+@$operands = ("Mathéma?");
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "$titleindex:mathéma?";
+is($got, $expected, qq{Test simple wildCard ? (with index)});
+
+@$operands = ("Math?matiques");
+@$indexes = ();
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "math?matiques";
+is($got, $expected, qq{Test simple wildCard ?});
+
+@$operands = ("?AthéMat?ques");
+@$indexes = ();
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "?athémat?ques";
+is($got, $expected, qq{Test simple wildCard ? (x2)});
+
+@$operands = ("Math?matiques", "Foo");
+@$indexes = ("all_fields", "all_fields");
+@$operators = ("AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "math?matiques AND Foo";
+is($got, $expected, qq{Test simple wildCard ? with another operand});
+
+@$operands = ("Math?ma*", "Foo");
+@$indexes = ("all_fields", "all_fields");
+@$operators = ("AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "math?ma* AND Foo";
+is($got, $expected, qq{Test with wildCard ? and *});
+
+@$operands = ("Math?ma*", "Fo*", "BAR");
+@$indexes = ("all_fields", "title", "all_fields");
+@$operators = ("AND", "AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "math?ma* AND $titleindex:fo* AND BAR";
+is($got, $expected, qq{Test wildCard ? and * on multiples operands});
+
+@$operands = ("M?th?maTique", "Fo*", "?A?");
+@$indexes = ("title", "all_fields", "all_fields");
+@$operators = ("AND", "AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "$titleindex:m?th?matique AND fo* AND ?a?";
+is($got, $expected, qq{Test wildCard ? and * on multiples operands and positions});
+
+@$operands = ("M?th?maTiqu?", "Fo*", "?A?");
+@$indexes = ("all_fields", "all_fields", "all_fields");
+@$operators = ("AND", "AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "m?th?matiqu? AND fo* AND ?a?";
+is($got, $expected, qq{Test wildCard ? and * on multiples operands and positions});
+
