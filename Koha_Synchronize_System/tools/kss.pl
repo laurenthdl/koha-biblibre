@@ -76,7 +76,7 @@ eval {
         chomp $archive;
         $log->info("=== Gestion de l'archive $archive ===");
         $log->info(" - Extraction...");
-        system( qq{ $tar_cmd zxvf $archive -C $inbox } ) == 0 or die $!;
+        system( qq{ $tar_cmd zxvf $archive -C $inbox } ) == 0 or die qq{Can't extract archive $archive in $inbox dir ($?)};
 
         $log->info(" - Déplacement des fichiers...");
 
@@ -85,8 +85,8 @@ eval {
             $log->info("Pas de fichier binaire dans cette archive, next !");
             next;
         }
-        system( qq{$mv_cmd $inbox/ids/*.sql $dump_id_dir/} ) == 0 or die $!;
-        system( qq{$mv_cmd $inbox/logbin/* $diff_logbin_dir/} ) == 0 or die $!;
+        system( qq{$mv_cmd $inbox/ids/*.sql $dump_id_dir/} ) == 0 or die qq{Can't mv $inbox/ids/*.sql to $dump_id_dir/ ($?)};
+        system( qq{$mv_cmd $inbox/logbin/* $diff_logbin_dir/} ) == 0 or die qq{Can't mv $inbox/logbin/* to $diff_logbin_dir/ ($?)};
 
         open HN, "$inbox/hostname";
         my $client_hostname = <HN>;
