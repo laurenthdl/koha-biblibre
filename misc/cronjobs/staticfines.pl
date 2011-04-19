@@ -57,6 +57,7 @@ my @categories;
 my %catamounts;
 my @libraries;
 my $delay;
+my $borrowersalreadyapplied; # hashref of borrowers for whom we already applied the fine, so it's only applied once
 
 GetOptions(
     'h|help'      => \$help,
@@ -187,9 +188,10 @@ for ( my $i = 0 ; $i < scalar(@$data) ; $i++ ) {
 
     # Don't update the fine if today is a holiday.
     # This ensures that dropbox mode will remove the correct amount of fine.
-    if ( $mode eq 'production' and !$isHoliday ) {
+    if ( $mode eq 'production' and !$isHoliday and !$borrowersalreadyapplied->{$data->[$i]->{'borrowernumber'}}) {
 	$debug and warn "Updating fine for borrower " . $data->[$i]->{'borrowernumber'} . " with amount : $amount";
         UpdateFine( $data->[$i]->{'itemnumber'}, $data->[$i]->{'borrowernumber'}, $amount, $type, $due_str ) if ( $amount > 0 );
+	$borrowersalreadyapplied->{$data->[$i]->{'borrowernumber'}} = 1;
     }
     my @cells = ();
     push @cells, map { $borrower->{$_} } @borrower_fields;
