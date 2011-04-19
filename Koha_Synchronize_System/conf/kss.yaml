@@ -75,6 +75,7 @@ abspath:
         client_dump_filepath: /home/kss/inbox/last.sql
         client_backup: /home/kss/backup/
         client_logbin: /var/log/mysql
+        logfile_stderr: /home/jonathan/workspace/sites/koha_master/var/log/kss.log
 
 backup_delay:
         client: 30

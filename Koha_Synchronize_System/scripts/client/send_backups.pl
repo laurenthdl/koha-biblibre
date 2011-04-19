@@ -8,6 +8,11 @@ use File::Basename;
 use Koha_Synchronize_System::tools::kss;
 use C4::Logguer qw(:DEFAULT $log_kss);
 
+my $conf = Koha_Synchronize_System::tools::kss::get_conf();
+my $log_filepath = $$conf{abspath}{logfile_stderr};
+open(STDOUT, ">>$log_filepath");
+open(STDERR, ">>$log_filepath");
+
 my $log = $log_kss;
 my $conf                     = Koha_Synchronize_System::tools::kss::get_conf();
 my $outbox                   = $$conf{abspath}{client_outbox};

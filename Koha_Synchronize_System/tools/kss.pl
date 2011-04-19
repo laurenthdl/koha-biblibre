@@ -56,6 +56,10 @@ my $backup_delay_diff        = $$conf{backup_delay}{server_diff};
 
 $log->info("BEGIN");
 
+my $log_filepath = $$conf{abspath}{logfile_stderr};
+open(STDOUT, ">>$log_filepath");
+open(STDERR, ">>$log_filepath");
+
 eval {
 
     $log->info("=== Récupération des archives remontées par le client ===");
