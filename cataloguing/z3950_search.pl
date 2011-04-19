@@ -30,6 +30,7 @@ use C4::Context;
 use C4::Breeding;
 use C4::Koha;
 use C4::Charset;
+use Data::Pagination;
 use ZOOM;
 
 my $input         = new CGI;
@@ -66,7 +67,8 @@ my $errmsg;
 my @serverloop = ();
 my @serverhost;
 my @servername;
-my @breeding_loop = ();
+my @resultsloop = ();
+my @serverresults;
 
 my $DEBUG = 0;    # if set to 1, many debug message are send on syslog.
 
@@ -108,6 +110,11 @@ if ( $op ne "do_search" ) {
     my $s = 0;
     my $query;
     my $nterms;
+    my $pagesize = 20;
+    my @server_page;
+    for(my $i = 0; $i < @id; $i++){
+        $server_page[$i] = $input->param("server".$i."_page") || 1;
+    }
     if ( $isbn || $issn ) {
         $term = $isbn if ($isbn);
         $term = $issn if ($issn);
@@ -211,8 +218,11 @@ if ( $op ne "do_search" ) {
             my $numresults = $oResult[$k]->size();
             my $i;
             my $result = '';
+            my @serverresultsloop = ();
             if ( $numresults > 0 ) {
-                for ( $i = 0 ; $i < ( ( $numresults < 20 ) ? $numresults : 20 ) ; $i++ ) {
+                my $first = ( $server_page[$k] - 1 ) * $pagesize;
+                my $last = $first + ( ( $numresults - $first ) < $pagesize ? $numresults - $first : $pagesize );
+                for ( $i = $first ; $i < $last ; $i++ ) {
                     my $rec = $oResult[$k]->record($i);
                     if ($rec) {
                         my $marcrecord;
@@ -239,24 +249,57 @@ if ( $op ne "do_search" ) {
                         $row_data{edition}      = $oldbiblio->{editionstatement};
                         $row_data{breedingid}   = $breedingid;
                         $row_data{biblionumber} = $biblionumber;
-                        push( @breeding_loop, \%row_data );
+                        push( @serverresultsloop, \%row_data );
 
                     } else {
-                        push( @breeding_loop, { 'server' => $servername[$k], 'title' => join( ': ', $oConnection[$k]->error_x() ), 'breedingid' => -1, 'biblionumber' => -1 } );
+                        push( @serverresultsloop, { 'server' => $servername[$k], 'title' => join( ': ', $oConnection[$k]->error_x() ), 'breedingid' => -1, 'biblionumber' => -1 } );
                     }    # $rec
                 }
+                my $pager = Data::Pagination->new(
+                    $numresults,
+                    $pagesize,
+                    10,
+                    $server_page[$k]
+                );
+                my @pager_params = ();
+                push @pager_params, (
+                    { ind => 'op'   , val => 'do_search' },
+                    { ind => 'title', val => $title },
+                    { ind => 'isbn' , val => $isbn },
+                    { ind => 'lccall', val => $lccn },
+                    { ind => 'controlnumber', val => $controlnumber },
+                    { ind => 'srchany', val => $srchany },
+                    { ind => 'author', val => $author },
+                    { ind => 'subject', val => $subject },
+                    { ind => 'dewey', val => $dewey },
+                    { ind => 'stdid', val => $stdid },
+                    { ind => 'biblionumber', val => $biblionumber }
+                );
+                push @pager_params, map { { ind => 'id', val => $_ } } @id;
+                for( my $i = 0; $i < @oResult; $i++){
+                    push @pager_params, { ind => "server".$i."_page", val => $server_page[$i] } if ( $i != $k && $server_page[$i] != 1 );
+                }
+                push( @resultsloop, {
+                    server_id => "server$k",
+                    server_name => $servername[$k],
+                    previous_page => $pager->{prev_page},
+                    next_page => $pager->{next_page},
+                    PAGE_NUMBERS => [ map { { page => $_, current => $_ == $server_page[$k] } } @{ $pager->{'numbers_of_set'} } ],
+                    pager_params => \@pager_params,
+                    serverresultsloop => \@serverresultsloop
+                } );
             }    #$numresults
         }
     }    # if $k !=0
+
     $numberpending = $nremaining - 1;
     $template->param(
-        breeding_loop => \@breeding_loop,
+        resultsloop   => \@resultsloop,
         server        => $servername[$k],
         numberpending => $numberpending,
         biblionumber  => $biblionumber,
         errconn       => \@errconn
     );
-
     output_html_with_http_headers $input, $cookie, $template->output if $numberpending == 0;
 
     #  	print  $template->output  if $firstresult !=1;
