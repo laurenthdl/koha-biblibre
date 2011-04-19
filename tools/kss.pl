@@ -243,7 +243,10 @@ if ($master) {
 if (1 == 2) {
 #if ($pingresult) {
 
-
+#    my $options = '';
+#    my $scheduledcommand = "EXPORT KOHA_CONF=\"$CONFIG_NAME\"; " . $$conf{path}{kss_dir} . "tools/kss.pl $options";
+#    my $manualcommand = "perl " . $$conf{path}{kss_dir} . 'tools/kss.pl ' . $options;
+#
     # Deleting next sync if it already has been scheduled
     remove_at_job_by_tag($scheduledcommand);
 

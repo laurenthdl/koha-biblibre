@@ -8,15 +8,15 @@ datatest:
         mysqlbinlog_cmd: /usr/bin/mysqlbinlog
         mysqldump_cmd: /usr/bin/mysqldump
         hostname: localhost
-        user: root
-        passwd: root
+        user: koha
+        passwd: koha
 
 databases_infos:
-        db_client: koha_clientkss
-        db_server: koha_devkss_server
+        db_client: koha_devkss_client
+        db_server: koha_kss
         hostname: localhost
-        user: root 
-        passwd: root
+        user: koha 
+        passwd: 'koha'
         kss_infos_table: kss_infos
         kss_logs_table: kss_logs
         kss_errors_table: kss_errors
@@ -39,7 +39,7 @@ which_cmd:
         scp: /usr/bin/scp
         ssh: /usr/bin/ssh
         ssh-copy-id: /usr/bin/ssh-copy-id
-        service: invoke-rc.d
+        service: sudo /usr/bin/service
         hostname: /bin/hostname
         mkdir: /bin/mkdir
         chown: /bin/chown
@@ -63,6 +63,7 @@ abspath:
         server_inbox: /home/users/kss/inbox/
         backup_server_db: /home/users/kss/backup/db/
         backup_server_diff: /home/users/kss/backup/diff/
+        server_kss_pl_script: /home/users/kss/Koha_Synchronize_System/tools/kss.pl
         dump_ids: /home/users/kss/tmp/ids/
         diff_logbin_dir: /home/users/kss/tmp/logbin/
         diff_logtxt_full_dir: /home/users/kss/tmp/logtxt_full/
@@ -74,19 +75,18 @@ abspath:
         client_backup: /home/users/kss/backup/
         client_logbin: /var/log/mysql
 
-
 backup_delay:
         client: 30
         server_db: 30
         server_diff: 30
 cron:
-        serverhost: 192.168.1.33
+        serverhost: flaubert.biblibre.com
         executiontime: 2200
-        master: 0
-        alertmail: __editme@mail.com__
-        smtpserver: __mail.editme.com__
+        master: 1
+        alertmail: claire.hernandez@biblibre.com
+        smtpserver: mail.biblibre.com
         jobtime_server_digest: "0 21 * * *"
         jobtime_client_push: "0 21 * * *"
         jobtime_client_pull: "0 23 * * *"
-        koha_conf: EDITME PATH_TO_KOHA_CONF
+        koha_conf: /home/users/koha/sites/dev_kss_server/etc/koha-conf.xml
 

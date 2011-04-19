@@ -53,6 +53,9 @@ qx{mkdir -p $backup_server_diff};
 
 qx{chown -R $username:$username $inbox};
 qx{chown -R $username:$username $outbox};
+qx{chown -R $dump_id_dir};
+qx{chown -R $dump_db_server_dir};
+qx{chown -R $backup_server_diff};
 
 qx{chown -R $username:$username $kss_home};
 
@@ -62,6 +65,8 @@ system( qq{perl $kss_dir/tools/insert_or_update_crontab.pl --host=master} ) == 0
 print "/!\ Changer le mot de passe pour l'utilisateur $username\n";
 
 print "=== Mise à disposition du client de la base de données du serveur ===\n";
+print "Sauvegarde de la base du serveur");
+Koha_Synchronize_System::tools::kss::backup_server_db $log;
 print "Insertion des procedures\n";
 Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server;
 
@@ -80,3 +85,9 @@ system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "DROP TABLE IF EXISTS } .
 system( qq{$mysql_cmd -u $user -p$passwd $db_server -e "DROP TABLE IF EXISTS $matching_table_ids;"} );
 Koha_Synchronize_System::tools::kss::delete_proc_and_triggers $user, $passwd, $db_server;
 system( qq{rm -f /tmp/procedures /tmp/triggers /tmp/del_triggers /tmp/del_procedures} );
+print "Dump de la base de données et mise à disposition pour le client\n";
+Koha_Synchronize_System::tools::kss::dump_available_db;
+
+qx{chown -R $username:$username $outbox};
+print "Terminé\nPensez à installer le script 'service' et configurer le fichier de configuration mysql (my.cnf) afin de logguer les requêtes dans un log binaire\n";
+

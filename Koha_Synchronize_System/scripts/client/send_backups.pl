@@ -22,7 +22,13 @@ my $backup_delay             = $$conf{backup_delay}{client};
 my $username = "kss";
 
 $log->info("Création du dernier backup");
-Koha_Synchronize_System::tools::kss::backup_client_logbin;
+eval {
+    Koha_Synchronize_System::tools::kss::backup_client_logbin;
+};
+if ( $@ ) {
+    $log->error("Échec : $@");
+    die "Impossible de créer le nouveau backup $@";
+}
 
 $log->info("Envoi des backups au serveur");
 my @files = <$outbox/*.tar.gz>;
@@ -51,7 +57,7 @@ for my $file ( @files ) {
         }
     }
 
-    delete_old_backup;
+    delete_old_backup();
     
 }
 

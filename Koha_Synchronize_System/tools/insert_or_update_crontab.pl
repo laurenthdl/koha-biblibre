@@ -8,8 +8,6 @@ use Pod::Usage;
 use Fcntl qw(:flock);
 use YAML;
 
-use C4::Logguer qw(:DEFAULT $log_kss);
-
 use Koha_Synchronize_System::tools::kss;
 
 my $host;
@@ -49,8 +47,8 @@ EOF
 
     };
     when ( "slave" ) {
-        my $jobtime_push = $$conf{conf}{jobtime_client_push};
-        my $jobtime_pull = $$conf{conf}{jobtime_client_pull};
+        my $jobtime_push = $$conf{cron}{jobtime_client_push};
+        my $jobtime_pull = $$conf{cron}{jobtime_client_pull};
         open my $file, ">", "/etc/cron.d/kss" or die $!;
         print $file <<EOF
 SHELL=/bin/sh

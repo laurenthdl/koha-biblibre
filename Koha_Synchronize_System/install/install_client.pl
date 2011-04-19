@@ -17,15 +17,14 @@ my $ssh_keygen_cmd           = $$conf{which_cmd}{'ssh-keygen'};
 my $hostname                 = $$conf{databases_infos}{hostname};
 my $user                     = $$conf{databases_infos}{user};
 my $passwd                   = $$conf{databases_infos}{passwd};
-my $dump_id_dir              = $$conf{path}{dump_ids};
-my $backup_dir               = $$conf{path}{client_backup};
+my $backup_dir               = $$conf{abspath}{client_backup};
 my $kss_infos_table          = $$conf{databases_infos}{kss_infos_table};
-my $kss_home                 = $$conf{path}{kss_client_home};
-my $inbox                    = $$conf{path}{client_inbox};
-my $outbox                   = $$conf{path}{client_outbox};
+my $kss_home                 = $$conf{abspath}{kss_client_home};
+my $inbox                    = $$conf{abspath}{client_inbox};
+my $outbox                   = $$conf{abspath}{client_outbox};
 my $ip_server                = $$conf{cron}{serverhost};
 my $remote_dump_filepath     = $$conf{abspath}{server_dump_filepath};
-my $local_dump_filepath      = $$conf{path}{client_dump_filepath};
+my $local_dump_filepath      = $$conf{abspath}{client_dump_filepath};
 
 if ( $< ne "0" ) {
    print "You must logged in root";
@@ -65,7 +64,7 @@ qx{$ssh_keygen_cmd -t rsa -N "" -f $kss_home/.ssh/id_rsa};
 qx{$chown_cmd -R $username:$username $kss_home};
 
 print "=== Création des cronjobs ===\n";
-system( qq{perl $kss_home/tools/insert_or_update_crontab.pl --host=slave} ) == 0 or die "Can't insert crontab";
+system( qq{perl $kss_dir/tools/insert_or_update_crontab.pl --host=slave} ) == 0 or die "Can't insert crontab";
 
 # su kss
 $< = (getpwnam($username))[2];
@@ -81,3 +80,5 @@ qx{$scp_cmd $username\@$ip_server:$remote_dump_filepath $local_dump_filepath};
 
 print "\nInsertion dans la base de données locale\n";
 qx{$mysql_cmd -u $user -p$passwd $db_client < $local_dump_filepath};
+
+qx{$chown_cmd -R $username:$username $kss_home};

@@ -36,9 +36,15 @@ my $NORMAL_LOG_LEVEL   = 5;
 my $INFO_LOG_LEVEL     = 6;
 my $DEBUG_LOG_LEVEL    = 7;
 
-our $log_koha = C4::Logguer->new($KOHA_LOG_FILE, 7);
-our $log_opac = C4::Logguer->new($OPAC_LOG_FILE, 7);
-our $log_kss  = C4::Logguer->new($KSS_LOG_FILE, 7);
+if ( -w $KOHA_LOG_FILE ) {
+    our $log_koha = C4::Logguer->new($KOHA_LOG_FILE, 7);
+}
+if ( -w $OPAC_LOG_FILE) {
+    our $log_opac = C4::Logguer->new($OPAC_LOG_FILE, 7);
+}
+if ( -w $KSS_LOG_FILE ) {
+    our $log_kss  = C4::Logguer->new($KSS_LOG_FILE, 7);
+}
 
 use Data::Dumper;
 

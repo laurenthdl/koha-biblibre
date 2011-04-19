@@ -79,6 +79,12 @@ eval {
         system( qq{ $tar_cmd zxvf $archive -C $inbox } ) == 0 or die $!;
 
         $log->info(" - Déplacement des fichiers...");
+
+        my @logbin = <$inbox/logbin/*>;
+        if ( scalar( @logbin ) == 0 ) {
+            $log->info("Pas de fichier binaire dans cette archive, next !");
+            next;
+        }
         system( qq{$mv_cmd $inbox/ids/*.sql $dump_id_dir/} ) == 0 or die $!;
         system( qq{$mv_cmd $inbox/logbin/* $diff_logbin_dir/} ) == 0 or die $!;
 
@@ -104,7 +110,7 @@ eval {
         for my $file ( @files ) {
             chomp $file;
             $log && $log->info("Traitement de $file en cours...");
-            Koha_Synchronize_System::tools::kss::insert_diff_file ("$diff_logtxt_dir\/$file", undef, $log);
+            Koha_Synchronize_System::tools::kss::insert_diff_file ($file, undef, $log);
         }
 
         $log->info("== Suppression des fichiers utilisés ==");
@@ -128,9 +134,10 @@ eval {
 if ( $@ ) {
 
     $log->error("An error occured, try to clean...");
-    Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server, $log;
     $log->error($@);
     Koha_Synchronize_System::tools::kss::log_error($@, "Erreur lors de l'exécution ...");
+    Koha_Synchronize_System::tools::kss::clean_fs;
+    Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server, $log;
 
 }
 

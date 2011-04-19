@@ -9,6 +9,7 @@ use YAML;
 use Mail::Sendmail;
 use Digest::MD5;
 use File::Path qw(make_path remove_tree);
+use File::Basename;
 use C4::Context;
 use Koha_Synchronize_System::tools::mysql;
 
@@ -169,7 +170,7 @@ sub insert_new_ids {
     for my $file ( @dump_id ) {
         chomp $file;
         $log && $log->info("Insertion de $file en cours...");
-        system( qq{$mysql_cmd -u $user -p$pwd $db_name < $id_dir/$file} ) == 0 or die "Can't Insert file $id_dir/$file in $db_name DB ($!)";
+        system( qq{$mysql_cmd -u $user -p$pwd $db_name < $file} ) == 0 or die "Can't Insert file $file in $db_name DB ($!)";
     }
 
     system( qq{$mysql_cmd -u $user -p$pwd $db_name -e "CALL PROC_UPDATE_STATUS\('Insert new ids \($nb_files files found\)', 1\);"} ) == 0 or ($log && $log->warning("Can't call PROC_UPDATE_STATUS ($!)"));
@@ -316,16 +317,16 @@ sub extract_and_purge_mysqllog {
     my @files = <$bindir/*>;
     for my $file ( @files ) {
         chomp $file;
-        my $bin_filepath = "$bindir\/$file";
+	my $filename = basename($file);
         $log && $log->info("--- Traitement du fichier $file ---");
-        my $r = system( qq{$file_cmd $bin_filepath} );
+        my $r = qx{$file_cmd $file};
         if ( not $r =~ /MySQL replication log/ ) {
-            $log && $log->info("Ce fichier n'est pas un fichier de log sql, il ne peut être géré");
+            $log && $log->info("Ce fichier n'est pas un fichier de log sql, il ne peut être géré ($r)");
             next;
         }
         $dbh->do("CALL PROC_UPDATE_STATUS\('Extract and purge file $file', 0\);");
 
-        open(FILE, $bin_filepath);
+        open(FILE, $file);
         my $ctx = Digest::MD5->new;
         $ctx->addfile(*FILE);
         my $md5 = $ctx->hexdigest;
@@ -339,10 +340,10 @@ sub extract_and_purge_mysqllog {
 	    next;
         }
 
-        my $full_output_filepath = "$fulldir\/$file";
-        my $output_filepath = "$txtdir\/$file";
+        my $full_output_filepath = "$fulldir\/$filename";
+        my $output_filepath = "$txtdir\/$filename";
         $log && $log->info("Extraction vers $full_output_filepath");
-        system( qq{$mysqlbinlog_cmd $bin_filepath > $full_output_filepath} ) == 0 or die "Can't extract mysql logbin with mysqlbinlog command ($!)";
+        system( qq{$mysqlbinlog_cmd $file > $full_output_filepath} ) == 0 or die "Can't extract mysql logbin with mysqlbinlog command ($!)";
         
         $log && $log->info("Purge vers $output_filepath");
         Koha_Synchronize_System::tools::mysql::purge_mysql_log ($full_output_filepath, $output_filepath);
@@ -432,7 +433,6 @@ sub insert_diff_file {
     my $oldsep = $/;
     $/ = $sep;
 
-   
     $dbh->do("CALL PROC_UPDATE_STATUS('Processing file $file', 0);");
 
     # For each query
@@ -535,6 +535,7 @@ sub backup_client_logbin {
     my $cp_cmd = $$conf{which_cmd}{cp};
     my $rm_cmd = $$conf{which_cmd}{rm};
     my $mv_cmd = $$conf{which_cmd}{mv};
+    my $chown_cmd = $$conf{which_cmd}{chown};
     my $tar_cmd = $$conf{which_cmd}{tar};
     my $outbox = $$conf{abspath}{client_outbox};
     my $bakdir = $$conf{abspath}{client_backup};
@@ -560,8 +561,8 @@ sub backup_client_logbin {
 
     # Move binaries
     eval {
-        qx{$cp_cmd $logdir/mysql-bin.* $dirname/logbin};
-        qx{$rm_cmd -f $logdir/mysql-bin.*};
+        qx{sudo $mv_cmd $logdir/mysql-bin.* $dirname/logbin};
+        qx{sudo $chown_cmd kss:kss $dirname/logbin/* -R};
     };
     die "Can't move mysql-bin ($@)" if $@;
 
@@ -593,14 +594,14 @@ sub pull_new_db {
     my $scp_cmd                 = $$conf{which_cmd}{scp};
     my $mysql_cmd               = $$conf{which_cmd}{mysql};
     my $ip_server               = $$conf{cron}{serverhost};
-    my $kss_dir                 = $$conf{path}{kss_dir};
+    my $kss_pl_script           = $$conf{abspath}{server_kss_pl_script};
     my $remote_dump_filepath    = $$conf{abspath}{server_dump_filepath};
     my $local_dump_filepath     = $$conf{abspath}{client_dump_filepath};
     my $username = "kss";
 
     # If kss.pl is running, we can't continue
     $log && $log->info(" Vérification de la disponibilité d'un nouveau dump" );
-    my $status = qx{$ssh_cmd $username\@$ip_server perl $kss_dir/tools/kss.pl --status} or die "Can't connect to the server ($!)";
+    my $status = qx{$ssh_cmd $username\@$ip_server perl $kss_pl_script --status} or die "Can't connect to the server ($!)";
     if ( $status == 1 ){
         $log && $log->error("Le serveur est toujours en cours d'exécution, impossible de récupérer le dump actuellement");
         return 1;
@@ -625,6 +626,7 @@ sub generate_ids_files {
     my $scripts_dir = $$conf{path}{client_scripts_ids};
     my $perl_cmd = $$conf{which_cmd}{perl};
 
+    qx{mkdir -p $outdir};
     my @scripts = <$scripts_dir/*.pl>;
     for my $script ( @scripts ) {
         chomp $script;
