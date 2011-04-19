@@ -70,7 +70,7 @@ system( qq{perl $kss_dir/tools/insert_or_update_crontab.pl --host=slave} ) == 0 
 $< = (getpwnam($username))[2];
 
 print "/!\ Changer le mot de passe pour l'utilisateur $username\n";
-print "Éxécutez la commande suivante : \n$ssh_copy_id_cmd -i $kss_home/.ssh/id_rsa.pub $username\@$ip_server\n";
+print "Éxécutez la commande suivante en tant qu'utilisateur kss: \n$ssh_copy_id_cmd -i $kss_home/.ssh/id_rsa.pub $username\@$ip_server\n";
 
 print "\n\nAppuyer sur entrée lorsque c'est réalisé\n";
 my $tmp = <>;
@@ -82,3 +82,6 @@ print "\nInsertion dans la base de données locale\n";
 qx{$mysql_cmd -u $user -p$passwd $db_client < $local_dump_filepath};
 
 qx{$chown_cmd -R $username:$username $kss_home};
+
+print "\n\nCréer un fichier .bashrc (ou équivalent) afin d'exporter les variables KOHA_CONF et PERL5LIB\n";
+

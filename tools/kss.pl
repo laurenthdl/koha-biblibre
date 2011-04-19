@@ -83,7 +83,7 @@ $template->param(pingresult => $pingresult);
 # Execution commands
 my $options = '';
 my $scheduledcommand = "EXPORT KOHA_CONF=\"$CONFIG_NAME\"; " . $$conf{path}{kss_dir} . "tools/kss.pl $options";
-my $manualcommand = "perl " . $$conf{path}{kss_dir} . 'tools/kss.pl ' . $options;
+my $manualcommand = "sudo -u kss perl " . $$conf{path}{kss_dir} . 'tools/kss.pl ' . $options;
 
 # Are we a master or a slave?
 my $master = $$conf{cron}{master};
@@ -174,7 +174,7 @@ if ($master) {
 
     # Save the current state
     if ($input->param("save")) {
-	my $command = "perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+	my $command = "sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
 	my @output = qx{$command};	
 
 	# Last line of output is the filename to send
@@ -208,11 +208,11 @@ if ($master) {
 	    } else {
 
 		# Creating backup
-		my $command = "perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+		my $command = "sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
 		qx{$command};
 		
 		# Sending backup
-		$command = "perl " . $$conf{path}{kss_dir} . "scripts/client/send_backups.pl";
+		$command = "sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/send_backups.pl";
 		qx{$command};
 
 		# Executing remote kss.pl
@@ -220,7 +220,7 @@ if ($master) {
 		qx{$command};
 
 		# Getting new database
-		$command = "perl " . $$conf{path}{kss_dir} . "scripts/client/pull_new_db.pl";
+		$command = "sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/pull_new_db.pl";
 		qx{$command};
 		
 

@@ -15,8 +15,8 @@ databases_infos:
         db_client: koha_devkss_client
         db_server: koha_kss
         hostname: localhost
-        user: koha 
-        passwd: 'koha'
+        user: root 
+        passwd: 'root'
         kss_infos_table: kss_infos
         kss_logs_table: kss_logs
         kss_errors_table: kss_errors
@@ -33,6 +33,7 @@ which_cmd:
         mysql: /usr/bin/mysql
         mysqlbinlog: /usr/bin/mysqlbinlog
         mysqldump: /usr/bin/mysqldump
+        ls: /bin/ls
         cp: /bin/cp
         rm: /bin/rm
         mv: /bin/mv
@@ -63,16 +64,16 @@ abspath:
         server_inbox: /home/users/kss/inbox/
         backup_server_db: /home/users/kss/backup/db/
         backup_server_diff: /home/users/kss/backup/diff/
-        server_kss_pl_script: /home/users/kss/Koha_Synchronize_System/tools/kss.pl
+        server_kss_pl_script: /home/users/koha/versions/kss/Koha_Synchronize_System/tools/kss.pl
         dump_ids: /home/users/kss/tmp/ids/
         diff_logbin_dir: /home/users/kss/tmp/logbin/
         diff_logtxt_full_dir: /home/users/kss/tmp/logtxt_full/
         diff_logtxt_dir: /home/users/kss/tmp/logtxt/
-        kss_client_home: /home/users/kss/
-        client_inbox: /home/users/kss/inbox/
-        client_outbox: /home/users/kss/outbox/
-        client_dump_filepath: /home/users/kss/inbox/last.sql
-        client_backup: /home/users/kss/backup/
+        kss_client_home: /home/kss/
+        client_inbox: /home/kss/inbox/
+        client_outbox: /home/kss/outbox/
+        client_dump_filepath: /home/kss/inbox/last.sql
+        client_backup: /home/kss/backup/
         client_logbin: /var/log/mysql
 
 backup_delay:

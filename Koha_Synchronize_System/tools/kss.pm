@@ -532,6 +532,7 @@ sub backup_client_logbin {
     my $conf = get_conf;
     my $service_cmd = $$conf{which_cmd}{service};
     my $hostname_cmd = $$conf{which_cmd}{hostname};
+    my $ls_cmd = $$conf{which_cmd}{ls};
     my $cp_cmd = $$conf{which_cmd}{cp};
     my $rm_cmd = $$conf{which_cmd}{rm};
     my $mv_cmd = $$conf{which_cmd}{mv};
@@ -560,11 +561,12 @@ sub backup_client_logbin {
     die "Can't create directory for backup ($@)" if $@;
 
     # Move binaries
-    eval {
-        qx{sudo $mv_cmd $logdir/mysql-bin.* $dirname/logbin};
-        qx{sudo $chown_cmd kss:kss $dirname/logbin/* -R};
-    };
-    die "Can't move mysql-bin ($@)" if $@;
+    my @binfiles = qx{sudo $ls_cmd -1 $logdir | grep mysql-bin};
+    for my $binfile ( @binfiles ) {
+        chomp $binfile;
+        qx{sudo $mv_cmd $logdir/$binfile $dirname/logbin/};
+    }
+    qx{sudo $chown_cmd kss:kss $dirname/logbin -R};
 
     # Start mysql
     system( qq{$service_cmd mysql start} ) == 0 or die "Can't start mysql ! ($!)";
@@ -601,8 +603,8 @@ sub pull_new_db {
 
     # If kss.pl is running, we can't continue
     $log && $log->info(" Vérification de la disponibilité d'un nouveau dump" );
-    my $status = qx{$ssh_cmd $username\@$ip_server perl $kss_pl_script --status} or die "Can't connect to the server ($!)";
-    if ( $status == 1 ){
+    my $status = qx{$ssh_cmd $username\@$ip_server "source .zshrc; perl $kss_pl_script --status"} or die "Can't connect to the server ($!)";
+    if ( not $status =~ /is not running/ ){
         $log && $log->error("Le serveur est toujours en cours d'exécution, impossible de récupérer le dump actuellement");
         return 1;
     }

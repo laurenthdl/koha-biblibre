@@ -56,11 +56,9 @@ for my $file ( @files ) {
             $md5_remote = upload( $file );
         }
     }
-
-    delete_old_backup();
-    
 }
 
+delete_old_backup();
 
 sub delete_old_backup {
     $log->info("Suppression des anciens fichiers de backup");
