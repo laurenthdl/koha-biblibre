@@ -43,20 +43,22 @@ sub launch {
         $dbh->do("set NAMES 'utf8'");
     }
 
-    my $tables = $dbh->selectall_arrayref("SHOW tables;");
-
-    my %table_fields = (
-        'borrowers', 'borrowernumber',
-        'items'   , 'itemnumber',
-        'reserves', 'reservenumber'
-    );
 
     given ( $action ) {
         when ( 'show-references' ) {
+            my $tables = $dbh->selectall_arrayref("SHOW tables;");
+
+            my %table_fields = (
+                'borrowers', 'borrowernumber',
+                'items'   , 'itemnumber',
+                'reserves', 'reservenumber'
+            );
+
             show_references( $tables, \%table_fields, $dbh );
         }
         
         when ( 'show-fields' ) {
+            my $tables = $dbh->selectall_arrayref("SHOW tables;");
             show_fields( $tables, $fieldnames, $dbh );
         }
         
