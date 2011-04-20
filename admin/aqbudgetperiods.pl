@@ -71,8 +71,6 @@ my $sql_error = 0;
 #my $sort1_authcat = $input->param('sort1_authcat');
 #my $sort2_authcat = $input->param('sort2_authcat');
 
-my $activepagesize = 20;
-my $inactivepagesize = 20;
 $searchfield =~ s/\,//g;
 
 my ( $template, $borrowernumber, $cookie, $staff_flags ) = get_template_and_user(
@@ -170,46 +168,33 @@ elsif ( $op eq 'delete_confirmed' ) {
 # -------------------------------------------------------------------
 # display the list of budget periods
 
-my $activepage = $input->param('apage') || 1;
-my $inactivepage = $input->param('ipage') || 1;
 # Get active budget periods
 my $results = GetBudgetPeriods(
     {budget_period_active => 1},
     [{budget_period_description => 0}]
 );
-my $first = ( $activepage - 1 ) * $activepagesize;
-my $last = min( $first + $activepagesize - 1, scalar @{$results} - 1, );
 my @period_active_loop;
-foreach my $result ( @{$results}[ $first .. $last ] ) {
+foreach my $result ( @$results ) {
     my $budgetperiod = $result;
     FormatData($budgetperiod);
     $budgetperiod->{'budget_period_total'} = $num->format_price( $budgetperiod->{'budget_period_total'} );
     $budgetperiod->{budget_active} = 1;
     push( @period_active_loop, $budgetperiod );
 }
-my $url = "aqbudgetperiods.pl";
-$url .=  "?ipage=$inactivepage" if($inactivepage != 1);
-my $active_pagination_bar = pagination_bar ($url, getnbpages( scalar(@$results), $activepagesize), $activepage, "apage");
 
 # Get inactive budget periods
 $results = GetBudgetPeriods(
     {budget_period_active => 0},
     [{budget_period_enddate => 1}]
 );
-my $first = ( $inactivepage - 1 ) * $inactivepagesize;
-my $last = min( $first + $inactivepagesize - 1, scalar @{$results} - 1, );
 my @period_inactive_loop;
-foreach my $result ( @{$results}[ $first .. $last ] ) {
+foreach my $result ( @$results ) {
     my $budgetperiod = $result;
     FormatData($budgetperiod);
     $budgetperiod->{'budget_period_total'} = $num->format_price( $budgetperiod->{'budget_period_total'} );
     $budgetperiod->{budget_active} = 1;
     push( @period_inactive_loop, $budgetperiod );
 }
-$url = "aqbudgetperiods.pl?tab=2";
-$url .= "&apage=$activepage" if($activepage != 1);
-my $inactive_pagination_bar = pagination_bar ($url, getnbpages( scalar(@$results), $inactivepagesize), $inactivepage, "ipage");
-
 
 my $budget_period_dropbox = GetBudgetPeriodsDropbox();
 
@@ -217,8 +202,6 @@ $template->param(
     budget_period_dropbox => $budget_period_dropbox,
     period_active_loop    => \@period_active_loop,
     period_inactive_loop  => \@period_inactive_loop,
-    active_pagination_bar => $active_pagination_bar,
-    inactive_pagination_bar => $inactive_pagination_bar,
 );
 
 $template->param(

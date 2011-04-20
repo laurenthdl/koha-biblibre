@@ -4,6 +4,7 @@
 
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/js/acq.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.pager.js"></script>
 <script type="text/javascript">
 // #################################################################################
 // Javascript
@@ -76,6 +77,11 @@
                 },
             }
         });
+        $('#activeperiodst').tablesorterPager({
+            container: $('#activepager'),
+            size: 10,
+            positionFixed: false
+        });
         $('#inactiveperiodst').tablesorter({
             widgets :   ['zebra'],
             sortList:   [[2,1]],
@@ -88,6 +94,11 @@
                     return $('a',o).val();
                 },
             }
+        });
+        $('#inactiveperiodst').tablesorterPager({
+            container: $('#inactivepager'),
+            size: 10,
+            positionFixed: false
         });
 	});
 </script>
@@ -306,6 +317,20 @@
 
     <div id="active">
         <h3>Active Budgets</h3>
+    <div id="activepager">
+        <form>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/first.png" class="first"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/prev.png" class="prev"/>
+            <input type="text" class="pagedisplay"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/next.png" class="next"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/last.png" class="last"/>
+            <select class="pagesize">
+                <option value="10" selected="selected">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </form>
+    </div>
     <table id="activeperiodst">
     <thead>
 	    <tr>
@@ -343,10 +368,23 @@
     	<!-- /TMPL_UNLESS -->
     </tbody>
     </table>
-    <div class="paginationBar"><!-- TMPL_VAR NAME="active_pagination_bar" --></div>
     </div>
     <div id="inactive">
         <h3>Inactive Budgets</h3>
+    <div id="inactivepager">
+        <form>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/first.png" class="first"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/prev.png" class="prev"/>
+            <input type="text" class="pagedisplay"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/next.png" class="next"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/last.png" class="last"/>
+            <select class="pagesize">
+                <option value="10" selected="selected">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </form>
+    </div>
     <table id="inactiveperiodst">
     <thead>
 	    <tr>
@@ -384,7 +422,6 @@
     	<!-- /TMPL_UNLESS -->
     </tbody>
     </table>
-    <div class="paginationBar"><!-- TMPL_VAR NAME="inactive_pagination_bar" --></div>
 <!-- /TMPL_IF -->
     </div>
 </div>
