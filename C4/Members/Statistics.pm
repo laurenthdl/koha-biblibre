@@ -56,10 +56,15 @@ sub GetTotalIssuesTodayByBorrower {
     my ($borrowernumber) = @_;
     my $dbh   = C4::Context->dbh;
 
-    my $query = construct_query "total_issues_today", "FROM issues i, items it WHERE i.itemnumber=it.itemnumber AND i.borrowernumber=? AND DATE_FORMAT(i.issuedate, '%Y-%m-%d') = CURDATE() AND i.returndate IS NULL ";
+    my $query = construct_query "total_issues_today",
+        "FROM (
+            SELECT it.* FROM issues i, items it WHERE i.itemnumber=it.itemnumber AND i.borrowernumber=? AND i.issuedate = CURDATE()
+            UNION
+            SELECT it.* FROM old_issues oi, items it WHERE oi.itemnumber=it.itemnumber AND oi.borrowernumber=? AND oi.issuedate = CURDATE()
+        ) tmp";     # alias is required by MySQL
 
     my $sth = $dbh->prepare($query);
-    $sth->execute($borrowernumber);
+    $sth->execute($borrowernumber, $borrowernumber);
     return $sth->fetchall_arrayref( {} );
 }
 
