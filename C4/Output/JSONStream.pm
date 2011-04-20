@@ -69,7 +69,7 @@ sub param {
 sub output {
     my $self = shift;
 
-    return to_json( $self->{data} );
+    return to_json( $self->{data} ,{utf8=>1});
 }
 
 1;
