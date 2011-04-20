@@ -126,6 +126,7 @@
 			<caption>Status log:</caption>
 			<thead>
 			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
 				<th>status</th>
 				<th>start time</th>
 				<th>end time</th>
@@ -134,6 +135,7 @@
 			<tbody>
 			<!-- TMPL_LOOP NAME="status" -->
 			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
 				<td><!-- TMPL_VAR NAME="status" --></td>
 				<td><!-- TMPL_VAR NAME="start_time" --></td>
 				<td><!-- TMPL_VAR NAME="end_time" --></td>
@@ -147,6 +149,7 @@
 			<caption>Error log:</caption>
 			<thead>
 			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
 				<th>error</th>
 				<th>message</th>
 			    </tr>
@@ -154,6 +157,8 @@
 			<tbody>
 			<!-- TMPL_LOOP NAME="errors" -->
 			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
+				<!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
 				<td><!-- TMPL_VAR NAME="error" --></td>
 				<td><!-- TMPL_VAR NAME="message" --></td>
 			    </tr>
@@ -166,6 +171,7 @@
 			<caption>SQL Error log:</caption>
 			<thead>
 			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
 				<th>error</th>
 				<th>message</th>
 			    </tr>
@@ -276,6 +282,7 @@
 		    <caption>Status log:</caption>
 		    <thead>
 			<tr>
+			    <!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
 			    <th>status</th>
 			    <th>start time</th>
 			    <th>end time</th>
@@ -284,6 +291,7 @@
 		    <tbody>
 		    <!-- TMPL_LOOP NAME="last_status_loop" -->
 			<tr>
+			    <!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
 			    <td><!-- TMPL_VAR NAME="status" --></td>
 			    <td><!-- TMPL_VAR NAME="start_time" --></td>
 			    <td><!-- TMPL_VAR NAME="end_time" --></td>
@@ -297,6 +305,7 @@
 		    <caption>Error log:</caption>
 		    <thead>
 			<tr>
+			    <!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
 			    <th>error</th>
 			    <th>message</th>
 			</tr>
@@ -304,6 +313,7 @@
 		    <tbody>
 		    <!-- TMPL_LOOP NAME="last_errors_loop" -->
 			<tr>
+			    <!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
 			    <td><!-- TMPL_VAR NAME="error" --></td>
 			    <td><!-- TMPL_VAR NAME="message" --></td>
 			</tr>
@@ -316,6 +326,7 @@
 		    <caption>SQL Error log:</caption>
 		    <thead>
 			<tr>
+			    <!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
 			    <th>error</th>
 			    <th>message</th>
 			</tr>
@@ -323,6 +334,7 @@
 		    <tbody>
 		    <!-- TMPL_LOOP NAME="last_sql_errors_loop" -->
 			<tr>
+			    <!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
 			    <td><!-- TMPL_VAR NAME="error" --></td>
 			    <td><!-- TMPL_VAR NAME="query" --></td>
 			</tr>

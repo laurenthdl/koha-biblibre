@@ -51,6 +51,7 @@ use File::Basename;
 use Koha_Synchronize_System::tools::kss;
 
 
+my $debug       = 1;
 my $input       = new CGI;
 my $dbh         = C4::Context->dbh;
 my $CONFIG_NAME = $ENV{'KOHA_CONF'};
@@ -282,5 +283,5 @@ if (1 == 2) {
     }
 
 }
-
+$template->param("Debug" => $debug);
 output_html_with_http_headers $input, $cookie, $template->output;
