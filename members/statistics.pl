@@ -92,9 +92,9 @@ $template->param(
 
 sub replace_key {
     my $elt = shift;
-    my $r;
+    my $r = {};
     for my $hash ( @$elt ) {
-        my $photo;
+        my $photo = '';
         for my $k ( keys %$hash ) {
             if ( not $k =~ /count_/ ) {
                 my $v = $$hash{ $k };
@@ -109,7 +109,7 @@ sub replace_key {
 
 sub merge {
     my ( @hashes ) = @_;
-    my $merged;
+    my $merged = {};
     for my $hash (@hashes) {
         while ( my ($id, $subhash) = each %$hash ) {
             while ( my ($key, $val) = each %$subhash ) {
