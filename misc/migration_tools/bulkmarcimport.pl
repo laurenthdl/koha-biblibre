@@ -414,22 +414,31 @@ RECORD: while () {
                 my $source = $record->subfield( $sourcetag, $sourcesubfield );
                 printf( IDMAP "%s|%s\n", $source, $biblionumber );
             }
-        }
-
-        # create biblio, unless we already have it ( either match or isbn )
-        if ($biblionumber) {
-            eval { $biblioitemnumber = GetBiblioData($biblionumber)->{biblioitemnumber}; };
-            if ($update) {
-                ( !$test_parameter ) and eval { ( $biblionumber, $biblioitemnumber ) = ModBiblio( $record, $biblionumber, GetFrameworkcode($biblionumber) ) };
-                if ($@) {
-                    warn "ERROR: Edit biblio $biblionumber failed: $@\n";
-                    printlog( { id => $id || $originalid || $biblionumber, op => "update", status => "ERROR" } ) if ($logfile);
-                    next RECORD;
-                } else {
-                    printlog( { id => $id || $originalid || $biblionumber, op => "update", status => "ok" } ) if ($logfile);
-                }
-            } else {
-                printlog( { id => $id || $originalid || $biblionumber, op => "insert", status => "warning : already in database" } ) if ($logfile);
+            if ( $@ ) {
+                warn "ERROR: Adding biblio $biblionumber failed: $@\n";
+				printlog({id=>$id||$originalid||$biblionumber, op=>"insert",status=>"ERROR"}) if ($logfile);
+                next RECORD;
+            } 
+ 			else{
+				printlog({id=>$id||$originalid||$biblionumber, op=>"insert",status=>"ok"}) if ($logfile);
+			}
+            eval { ( $itemnumbers_ref, $errors_ref ) = AddItemBatchFromMarc( $record, $biblionumber, $biblioitemnumber, '' ); };
+            if ( $@ ) {
+                warn "ERROR: Adding items to bib $biblionumber failed: $@\n";
+				printlog({id=>$id||$originalid||$biblionumber, op=>"insertitem",status=>"ERROR"}) if ($logfile);
+                # if we failed because of an exception, assume that 
+                # the MARC columns in biblioitems were not set.
+                C4::Biblio::_strip_item_fields($record, '');
+                ModBiblioMarc( $record, $biblionumber, '' );
+                next RECORD;
+            } 
+ 			else{
+                C4::Biblio::_strip_item_fields($record, '');
+                ModBiblioMarc( $record, $biblionumber, '' ); # need to call because of defer_marc_save
+				printlog({id=>$id||$originalid||$biblionumber, op=>"insert",status=>"ok"}) if ($logfile);
+			}
+            if ($#{ $errors_ref } > -1) { 
+                report_item_errors($biblionumber, $errors_ref);
             }
         } else {
             if ($insert) {
