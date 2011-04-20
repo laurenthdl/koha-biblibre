@@ -145,7 +145,7 @@ sub purge_mysql_log {
     while ( my $line = <FILE> ) {
         for my $op (@operations){
             for my $table (@tables) {
-                if ( $line =~ /$op $table( |\n)/ ) {
+                if ( $line =~ /(^|\n)$op $table( |\n)/ ) {
                     print OUTPUT substr($line, 0, length($line) - length($/));
                 }
             }
