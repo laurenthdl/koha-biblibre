@@ -583,6 +583,7 @@ sub backup_client_logbin {
     # Move directory to backup dir
     system( qq{$mv_cmd $dirname $bakdir} ) == 0 or die "Can't move directory $dirname to backup dir $bakdir ($?)";
 
+    return "$outbox$filename.tar.gz";
 }
 
 =head2 pull_new_db

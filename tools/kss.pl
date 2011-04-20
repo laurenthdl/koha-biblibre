@@ -60,8 +60,12 @@ my $manual      = $input->param('manual');
 # Getting conf
 my $conf = Koha_Synchronize_System::tools::kss::get_conf();
 my $kss_dir   = $$conf{path}{kss_dir};
+my $koha_dir  = $$conf{path}{koha_dir};
 my $ip_server = $$conf{cron}{serverhost};
 my $ssh_cmd   = $$conf{which_cmd}{ssh}; 
+
+# Setting ENV
+my $COMMAND_EXPORT = "KOHA_CONF=\"$CONFIG_NAME\" PERL5LIB=\"$koha_dir\" ";
 
 
 # open template
@@ -175,22 +179,28 @@ if ($master) {
 
     # Save the current state
     if ($input->param("save")) {
-	my $command = "sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+	my $command = "$COMMAND_EXPORT sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+	$debug and warn "save command : $command";
 	my @output = qx{$command};	
 
 	# Last line of output is the filename to send
+	$debug and warn "save results : " . Data::Dumper::Dumper(@output);
 	my $file = pop(@output);
-	my $filename = basename($file);
+	if ($file) {
+	    my $filename = basename($file);
 
-	# Sending file
-	print $input->header(
-	    -type                        => 'application/x-compressed',
-	    -'Content-Transfer-Encoding' => 'binary',
-	    -attachment                  => "$filename"
-	);
-	my $output = slurp($file); 
-	print $output;
-
+	    # Sending file
+	    print $input->header(
+		-type                        => 'application/x-compressed',
+		-'Content-Transfer-Encoding' => 'binary',
+		-attachment                  => "$filename"
+	    );
+	    my $output = slurp($file); 
+	    print $output;
+	} else {
+	    $template->param("save_error" => 1);
+	    $template->param("display_cactions" => 1);
+	}
     }
 
     # Launch manual execution
