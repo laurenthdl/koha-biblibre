@@ -161,10 +161,10 @@ sub create_procedures {
             value VARCHAR(255)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-        SELECT GREATEST(IFNULL(MAX(o.borrowernumber), 1), IFNULL(MAX(b.borrowernumber), 1)) + 1 FROM deletedborrowers o, borrowers b INTO next_id;
+        SELECT GREATEST(IFNULL(MAX(o.borrowernumber), 0), IFNULL(MAX(b.borrowernumber), 0)) FROM deletedborrowers o, borrowers b INTO next_id;
         INSERT INTO $kss_infos_table (variable, value) VALUES ("$max_old_borrowernumber_fieldname", next_id);
         
-        SELECT GREATEST(IFNULL(MAX(o.reservenumber), 1), IFNULL(MAX(r.reservenumber), 1)) + 1 FROM old_reserves o, reserves r INTO next_id;
+        SELECT GREATEST(IFNULL(MAX(o.reservenumber), 0), IFNULL(MAX(r.reservenumber), 0)) FROM old_reserves o, reserves r INTO next_id;
         INSERT INTO $kss_infos_table (variable, value) VALUES ("$max_old_reservenumber_fieldname", next_id);
         CALL PROC_UPDATE_STATUS('Creating $kss_infos_table table...', 1);
     END;
