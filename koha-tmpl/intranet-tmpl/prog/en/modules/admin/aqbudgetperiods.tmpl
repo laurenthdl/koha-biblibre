@@ -4,6 +4,7 @@
 
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/js/acq.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.pager.js"></script>
 <script type="text/javascript">
 // #################################################################################
 // Javascript
@@ -47,13 +48,18 @@
                     alert(alertString2);
             }
     }
-	$(document).ready(function() {
-		 $("#periodsh").tablesorter({
-	            widgets : ['zebra'],
-	            sortList: [[0,0]],
-	            headers:  {6:{sorter:false}}
-	     });
-	});
+    $(document).ready(function() {
+        $("#periodsh").tablesorter({
+            widgets : ['zebra'],
+            sortList: [[0,0]],
+            headers:  {6:{sorter:false}}
+        })
+        $("#periodsh").tablesorterPager({
+            container: $("#pager"),
+            size: 10,
+            positionFixed: false
+        });
+    });
 </script>
 
 <title>
@@ -255,6 +261,20 @@
 <!-- TMPL_IF name="else" -->
     <h2>Budgets administration</h2>
     <!-- TMPL_IF name="cur" --><p><b>Currency = <!-- TMPL_VAR name="cur" --></b></p><!-- TMPL_ELSE --><div class="dialog alert"><h3>No active currency is defined</h3><p>Please <a href="/cgi-bin/koha/admin/currency.pl">specify an active currency</a>.</p></div><!-- /TMPL_IF -->
+    <div id="pager">
+        <form>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/first.png" class="first"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/prev.png" class="prev"/>
+            <input type="text" class="pagedisplay"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/next.png" class="next"/>
+            <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/last.png" class="last"/>
+            <select class="pagesize">
+                <option value="10" selected="selected">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </form>
+    </div>
     <table id="periodsh">
     <thead>
 	    <tr>
@@ -292,7 +312,6 @@
     	<!-- /TMPL_UNLESS -->
     </tbody>
     </table>
-    <div class="paginationBar"><!-- TMPL_VAR NAME="pagination_bar" --></div>
 <!-- /TMPL_IF -->
 
 </div>

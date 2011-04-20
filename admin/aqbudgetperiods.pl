@@ -69,7 +69,6 @@ my $budget_period_hashref = $input->Vars;
 #my $sort1_authcat = $input->param('sort1_authcat');
 #my $sort2_authcat = $input->param('sort2_authcat');
 
-my $pagesize = 20;
 $searchfield =~ s/\,//g;
 
 my ( $template, $borrowernumber, $cookie, $staff_flags ) = get_template_and_user(
@@ -165,15 +164,8 @@ elsif ( $op eq 'delete_confirmed' ) {
 # display the list of budget periods
 my $results = GetBudgetPeriods();
 $template->param( period_button_only => 1 ) unless (@$results);
-my $page = $input->param('page') || 1;
-my $first = ( $page - 1 ) * $pagesize;
-
-# if we are on the last page, the number of the last word to display
-# must not exceed the length of the results array
-my $last = min( $first + $pagesize - 1, scalar @{$results} - 1, );
-my $toggle = 0;
 my @period_loop;
-foreach my $result ( @{$results}[ $first .. $last ] ) {
+foreach my $result ( @$results ) {
     my $budgetperiod = $result;
     FormatData($budgetperiod);
     $budgetperiod->{'budget_period_total'} = $num->format_price( $budgetperiod->{'budget_period_total'} );
@@ -185,7 +177,6 @@ my $budget_period_dropbox = GetBudgetPeriodsDropbox();
 $template->param(
     budget_period_dropbox => $budget_period_dropbox,
     period_loop           => \@period_loop,
-    pagination_bar        => pagination_bar( "aqbudgetperiods.pl", getnbpages( scalar(@$results), $pagesize ), $page ),
 );
 
 $template->param( $op => 1 );
