@@ -602,7 +602,7 @@ sub pull_new_db {
     my $username = "kss";
 
     # If kss.pl is running, we can't continue
-    $log && $log->info(" Vérification de la disponibilité d'un nouveau dump" );
+    $log && $log->info( "Vérification de la disponibilité d'un nouveau dump" );
     my $status = qx{$ssh_cmd $username\@$ip_server "source .zshrc; perl $kss_pl_script --status"} or die "Can't connect to the server ($?)";
     if ( not $status =~ /is not running/ ){
         $log && $log->error("Le serveur est toujours en cours d'exécution, impossible de récupérer le dump actuellement");
@@ -616,6 +616,9 @@ sub pull_new_db {
     # Insert dump
     $log && $log->info( "Insertion dans la base de données locale" );
     system( qq{$mysql_cmd -u $user -p$passwd $db_client < $local_dump_filepath} ) == 0 or die "Can't insert new dump ($?)";
+    $log && $log->info( "Suppression des logs binaires (générés par l'insertion)" );
+    system( qq{$mysql_cmd -u $user -p$passwd $db_client -e "RESET MASTER;"} ) == 0 or die "Can't delete binaries logs inserted during insertion of dump ($?)";
+
 }
 
 =head2 generate_ids_files
