@@ -36,9 +36,12 @@ sub launch {
         pod2usage(1);
     }
 
-    my $dbh = DBI->connect( "DBI:mysql:dbname=$database;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
-    $dbh->{'mysql_enable_utf8'} = 1;
-    $dbh->do("set NAMES 'utf8'");
+    my $dbh;
+    if ( $action ne "purge-mysql-log" ) {
+        $dbh = DBI->connect( "DBI:mysql:dbname=$database;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
+        $dbh->{'mysql_enable_utf8'} = 1;
+        $dbh->do("set NAMES 'utf8'");
+    }
 
     my $tables = $dbh->selectall_arrayref("SHOW tables;");
 
