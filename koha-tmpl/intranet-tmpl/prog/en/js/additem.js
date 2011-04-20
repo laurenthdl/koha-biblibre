@@ -14,14 +14,18 @@ function cloneItemBlock(index) {
     NumTabIndex = parseInt(original.getAttribute('tabindex'));
     if(isNaN(NumTabIndex)) NumTabIndex = 0;
     clone.setAttribute('tabindex',NumTabIndex+1);
+
     var CloneButtonPlus;
     var CloneButtonMinus;
-  //  try{
-        CloneButtonPlus = clone.getElementsByTagName('a')[0];
-        CloneButtonPlus.setAttribute('onclick',"cloneItemBlock('" + index + random + "')");
-    CloneButtonMinus = clone.getElementsByTagName('a')[1];
-    CloneButtonMinus.setAttribute('onclick',"deleteItemBlock('" + index + random + "')");
-    CloneButtonMinus.setAttribute('style',"display:inline");
+    var aTags = clone.getElementsByTagName('a');
+    var i = 0;
+    while(aTags[i].getAttribute('name') != 'buttonPlus') i++;
+    CloneButtonPlus = aTags[i];
+    CloneButtonPlus.setAttribute('onclick', "cloneItemBlock('" + index + random + "')");
+    CloneButtonMinus = aTags[i+1];
+    CloneButtonMinus.setAttribute('onclick', "deleteItemBlock('" + index + random + "')");
+    CloneButtonMinus.style.display = 'inline';
+
     // change itemids of the clone
     var elems = clone.getElementsByTagName('input');
     for( i = 0 ; elems[i] ; i++ )
