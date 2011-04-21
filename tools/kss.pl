@@ -95,6 +95,10 @@ $template->param('master' => $master);
 
 # If we are a master, we gather the informations for all the clients
 if ($master) {
+
+    # Is kss already running on the server ? (from the server)
+    #TODO
+
    my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh);
    # Preparing loop
    my @stats_loop;
@@ -135,15 +139,18 @@ if ($master) {
 } else {
     # And if we are a slave, we only gather our own informations
 
+    # Is kss already running on the server?
+    my $runningcommand = $COMMAND_SUDO . $$conf{path}{kss_dir} . "scripts/client/remote_kss.pl --status";
+    my $result = qx{$runningcommand};
+    my $kssalreadyrunning = ($result =~ /not running$/) ? 0 : 1;
+    $template->param("KSS_already_running" => 1) if ($kssalreadyrunning);
+
+
     # What is our hostname?
     my $hostname = qx{hostname -f};
     $hostname =~ s/\s$//;
     $template->param("hostname" => $hostname);
 
-    # Check if synchro is already running
-    #my $return = system($manualcommand . " --status");
-    my $return = 0;
-    $template->param("KSS_already_running" => 1) if ($return == 1);
 
     # Getting stats
     my $last_stats_result = Koha_Synchronize_System::tools::kss::get_stats_by_host($dbh, $hostname);
@@ -208,14 +215,7 @@ if ($master) {
 	if ($pingresult) {
 
 	    # Check if not already running
-	    #TODO
-	   # my $ssh_cmd                 = $$conf{which_cmd}{ssh}; 
-	   # my $command = "$ssh_cmd $ip_server perl $kss_dir/tools/kss.pl --status";
-	   # my $return = qx{$manualcommand};
-	    my $return = 0;
-	    if ($return == 1) {
-		$template->param("KSS_already_running" => 1);
-	    } else {
+	    if ($kssalreadyrunning == 0) {
 
 		# Creating backup
 		my $command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
@@ -234,7 +234,8 @@ if ($master) {
 		$command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/pull_new_db.pl";
 		qx{$command};
 
-		$template->param("manualexecution" => "done");
+		$template->param("manualoutput" => "done");
+
 	    }
 
 	} else {
@@ -246,48 +247,5 @@ if ($master) {
 
 }
 
-# If connection test is ok
-if (1 == 2) {
-#if ($pingresult) {
-
-#    my $options = '';
-#    my $scheduledcommand = "EXPORT KOHA_CONF=\"$CONFIG_NAME\"; " . $$conf{path}{kss_dir} . "tools/kss.pl $options";
-#    my $manualcommand = "perl " . $$conf{path}{kss_dir} . 'tools/kss.pl ' . $options;
-#
-    # Deleting next sync if it already has been scheduled
-    remove_at_job_by_tag($scheduledcommand);
-
-    # And the user asked for a manual execution
-    if ($manual == 1) {
-
-	# Check if not already running
-	#my $return = system($manualcommand . " --status");
-	my $return = 0;
-	if ($return == 1) {
-	    $template->param("KSS_already_running" => 1);
-	} else {
-
-#	my @output = qx{$manualcommand . " &"};
-	eval {system($manualcommand . " 2>&1 1>/dev/null &");}
-	#my $tmploutput = "Execution of $manualcommand : " . join('', @output);
-	#$template->param('manualoutput' => $tmploutput);
-	}
-
-
-
-    # Or a scheduled execution
-    } else {
-
-	my $date = strftime "%Y%m%d", localtime;
-	$date .= $conf->{'cron'}->{'executiontime'};
-	# TODO : use tomorrow's date if scheduled after midnight
-	# Scheduling next execution
-	my $jobid = add_at_job( $date, $scheduledcommand ) ;
-	# Show execution time to the user
-	$template->param(execution_time => $date) if ($jobid);
-
-    }
-
-}
 $template->param("Debug" => $debug);
 output_html_with_http_headers $input, $cookie, $template->output;
