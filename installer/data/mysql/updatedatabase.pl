@@ -5789,6 +5789,12 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.016";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `aqorders` ADD `internalnotes` mediumtext AFTER `notes`");
+    print "Upgrade to $DBversion done (Add internalnotes field in aqorders table)";
+    SetVersion($DBversion);
+}
 
 =item DropAllForeignKeys($table)
 
