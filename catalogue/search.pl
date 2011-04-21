@@ -555,7 +555,7 @@ $template->param(
     'opacfacets'     => 1,
     'SEARCH_RESULTS' => \@results,
     'facets_loop'    => \@facets,
-    'query'          => $params->{'q'},
+    'query'          => $q,
     'query_desc'     => $q,
     'search_desc'    => $q,
     'availability'   => $filters{'int_availability'},
