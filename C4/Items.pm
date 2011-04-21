@@ -152,6 +152,11 @@ sub GetItem {
 		$sth->execute($data->{'biblionumber'});
 		($data->{'itype'}) = $sth->fetchrow_array;
 	}
+    if ( ( ! $data->{'itemtype'} ) and !(C4::Context->preference('item-level_itype'))) {
+        my $sth = $dbh->prepare("SELECT itemtype FROM biblioitems  WHERE biblionumber = ?");
+        $sth->execute($data->{'biblionumber'});
+        ($data->{'itemtype'}) = $sth->fetchrow_array;
+    }
     return $data;
 }    # sub GetItem
 
