@@ -110,6 +110,9 @@ function Check(ff) {
                                 <li><label for="contractdescription">Description</label> &nbsp;
                                         <input type="text" name="contractdescription" id="contractdescription" size="40" maxlength="80" value="<!-- TMPL_VAR NAME="contractdescription" -->" />
                                 </li>
+                                <li><label for="marketnumber">Market number</label> &nbsp;
+                                        <input type="text" name="marketnumber" id="marketnumber" size="15" maxlength="15" value="<!-- TMPL_VAR NAME="marketnumber" -->" />
+                                </li>
                                 <li><label for="contractstartdate" class="required">Start date *</label> &nbsp;
                                         <input type="text" name="contractstartdate" id="contractstartdate" value="<!-- TMPL_VAR NAME="contractstartdate" -->" maxlength="10"  size="10"/>
                                         <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="contractstartdate_button" alt="Show Calendar" />
@@ -204,6 +207,7 @@ function Check(ff) {
                         <tr>
                             <th scope="col">Name</th>
                             <th scope="col">Description</th>
+                            <th scope="col">Market number</th>
                             <th scope="col">Start date</th>
                             <th scope="col">End date</th>
                             <th scope="col" colspan="2">&nbsp; </th>
@@ -214,6 +218,7 @@ function Check(ff) {
                             <a href="<!-- TMPL_VAR NAME="script_name" -->?op=add_form&amp;contractnumber=<!-- TMPL_VAR NAME="contractnumber" -->"><!-- TMPL_VAR NAME="contractname" --></a>
                         </td>
                         <td><!-- TMPL_VAR NAME="contractdescription" --></td>
+                        <td style="text-align:right"><!-- TMPL_VAR NAME="marketnumber" --></td>
                         <td><!-- TMPL_VAR NAME="contractstartdate" --></td>
                         <td><!-- TMPL_VAR NAME="contractenddate" --></td>
                         <td><a href="<!-- TMPL_VAR NAME="script_name" -->?op=add_form&amp;contractnumber=<!-- TMPL_VAR NAME="contractnumber" -->&amp;booksellerid=<!-- TMPL_VAR name="booksellerid" -->">Edit</a></td>
