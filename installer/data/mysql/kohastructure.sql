@@ -2386,6 +2386,7 @@ CREATE TABLE `aqbooksellers` (
   `discount` float(6,4) default NULL,
   `fax` varchar(50) default NULL,
   `clientnumber` VARCHAR(50) default NULL,
+  `deliverytime` int default NULL,
   PRIMARY KEY  (`id`),
   KEY `listprice` (`listprice`),
   KEY `invoiceprice` (`invoiceprice`),
@@ -2475,6 +2476,7 @@ CREATE TABLE `aqcontract` (
   `contractname` varchar(50) default NULL,
   `contractdescription` mediumtext,
   `booksellerid` int(11) not NULL,
+  `marketnumber` int default NULL,
   PRIMARY KEY  (`contractnumber`),
   CONSTRAINT `booksellerid_fk1` FOREIGN KEY (`booksellerid`)
        REFERENCES `aqbooksellers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
