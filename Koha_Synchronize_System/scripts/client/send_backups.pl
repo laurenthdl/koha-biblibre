@@ -14,7 +14,6 @@ open(STDOUT, ">>$log_filepath");
 open(STDERR, ">>$log_filepath");
 
 my $log = $log_kss;
-my $conf                     = Koha_Synchronize_System::tools::kss::get_conf();
 my $outbox                   = $$conf{abspath}{client_outbox};
 my $inbox                    = $$conf{abspath}{server_inbox};
 my $ip_server                = $$conf{cron}{serverhost};

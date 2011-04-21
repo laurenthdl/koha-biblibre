@@ -62,11 +62,10 @@ my $conf = Koha_Synchronize_System::tools::kss::get_conf();
 my $kss_dir   = $$conf{path}{kss_dir};
 my $koha_dir  = $$conf{path}{koha_dir};
 my $ip_server = $$conf{cron}{serverhost};
-my $ssh_cmd   = $$conf{which_cmd}{ssh}; 
 
 # Setting ENV
 my $COMMAND_EXPORT = "KOHA_CONF=\"$CONFIG_NAME\" PERL5LIB=\"$koha_dir\" ";
-
+my $COMMAND_SUDO   = "sudo -u kss perl ";
 
 # open template
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -179,7 +178,7 @@ if ($master) {
 
     # Save the current state
     if ($input->param("save")) {
-	my $command = "$COMMAND_EXPORT sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+	my $command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
 	$debug and warn "save command : $command";
 	my @output = qx{$command};	
 
@@ -219,26 +218,23 @@ if ($master) {
 	    } else {
 
 		# Creating backup
-		my $command = "sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+		my $command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
+		$debug and warn "save command : $command";
 		qx{$command};
 		
 		# Sending backup
-		$command = "sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/send_backups.pl";
+		$command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/send_backups.pl";
 		qx{$command};
 
 		# Executing remote kss.pl
-		$command = "$ssh_cmd $ip_server perl $kss_dir/tools/kss.pl";
+		$command = $COMMAND_SUDO . $$conf{path}{kss_dir} . "scripts/client/remote_kss.pl"; 
 		qx{$command};
 
 		# Getting new database
-		$command = "sudo -u kss perl " . $$conf{path}{kss_dir} . "scripts/client/pull_new_db.pl";
+		$command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/pull_new_db.pl";
 		qx{$command};
-		
 
-	#	my @output = qx{$manualcommand . " &"};
-#		eval {system($manualcommand . " 2>&1 1>/dev/null &");}
-		#my $tmploutput = "Execution of $manualcommand : " . join('', @output);
-		#$template->param('manualoutput' => $tmploutput);
+		$template->param("manualexecution" => "done");
 	    }
 
 	} else {
