@@ -445,6 +445,9 @@ sub IndexRecord {
                         }
                     }
                 }
+                if ( not $index->{plugin} ) {
+                    @srt_values = @values;
+                }
             }
             @values = uniq (@values); #Removes duplicates
 
