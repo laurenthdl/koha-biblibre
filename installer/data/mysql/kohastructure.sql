@@ -2500,6 +2500,7 @@ CREATE TABLE `aqorders` (
   `cancelledby` varchar(10) default NULL,
   `datecancellationprinted` date default NULL,
   `notes` mediumtext,
+  `internalnotes` mediumtext,
   `supplierreference` mediumtext,
   `purchaseordernumber` mediumtext,
   `subscription` tinyint(1) default NULL,
