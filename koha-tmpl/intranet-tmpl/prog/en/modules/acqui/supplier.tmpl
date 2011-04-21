@@ -150,6 +150,8 @@ $(document).ready(function() {
             <li><label for="discount">Discount</label>
                 <input type="text" size="3" id="discount" name="discount" value="<!-- TMPL_VAR NAME="discount" -->" /> %</li>
             <!-- TMPL_IF NAME="GST" --><li><label for="gstrate">Tax rate</label><input type="text" name="gstrate" id="gstrate" size="5" value="<!-- TMPL_VAR name="gstrate" -->"/>%</li><!-- /TMPL_IF -->
+            <li><label for="deliverytime">Delivery time</label>
+                <input type="text" size="2" id="deliverytime" name="deliverytime" value="<!-- TMPL_VAR NAME="deliverytime" -->" />days</li>
             <li><label for="notes">Notes</label>
                 <textarea cols="40" rows="4" id="notes" name="notes" ><!-- TMPL_VAR NAME="notes" --></textarea></li></ol>			
             <!-- TMPL_UNLESS NAME="GST" -->
@@ -211,6 +213,8 @@ $(document).ready(function() {
                 <!-- TMPL_VAR NAME="discount" --> %</p>
             <!-- TMPL_IF NAME="GST" --><p><strong>Tax rate: </strong>
                 <!-- TMPL_VAR name="GST" -->%</p><!-- /TMPL_IF -->
+            <!-- TMPL_IF NAME="deliverytime" --><p><strong>Delivery time: </strong>
+                <!-- TMPL_VAR NAME="deliverytime" --> days</p><!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="notes" --><p><strong>Notes: </strong>
                 <!-- TMPL_VAR NAME="notes" --></p><!-- /TMPL_IF -->
         </div>

@@ -226,7 +226,7 @@ sub ModBookseller {
             contphone=?,contfax=?,contaltphone=?,contemail=?,
             contnotes=?,active=?,listprice=?, invoiceprice=?,
             gstreg=?,listincgst=?,invoiceincgst=?,
-            discount=?, notes=?, gstrate=?, clientnumber=?
+            discount=?, notes=?, gstrate=?, clientnumber=?, deliverytime=?
         WHERE id=?
     ";
     my $sth = $dbh->prepare($query);
@@ -235,7 +235,7 @@ sub ModBookseller {
         $data->{'phone'},        $data->{'fax'},          $data->{'url'},        $data->{'contact'},       $data->{'contpos'},  $data->{'contphone'},
         $data->{'contfax'},      $data->{'contaltphone'}, $data->{'contemail'},  $data->{'contnotes'},     $data->{'active'},   $data->{'listprice'},
         $data->{'invoiceprice'}, $data->{'gstreg'},       $data->{'listincgst'}, $data->{'invoiceincgst'}, $data->{'discount'}, $data->{'notes'},
-        $data->{'gstrate'},      $data->{'clientnumber'}, $data->{'id'}
+        $data->{'gstrate'},      $data->{'clientnumber'}, $data->{'deliverytime'}, $data->{'id'}
     );
     $sth->finish;
 }
