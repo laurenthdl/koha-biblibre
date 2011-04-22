@@ -452,7 +452,12 @@ sub IndexRecord {
             @values = uniq (@values); #Removes duplicates
 
             $solrrecord->set_value(       $index->{'type'}."_".$index->{'code'},    \@values);
-            $solrrecord->set_value("srt_".$index->{'type'}."_".$index->{'code'}, $srt_values[0]) if $index->{'sortable'} and @srt_values > 0;
+            if ($index->{'sortable'} and @srt_values > 0 and $index->{'code'}=~/title/){
+                $solrrecord->set_value("srt_".$index->{'type'}."_".$index->{'code'}, C4::Search::_remove_initial_stopwords($srt_values[0]));
+            } 
+            elsif ($index->{'sortable'} and @srt_values > 0){ 
+                $solrrecord->set_value("srt_".$index->{'type'}."_".$index->{'code'}, $srt_values[0]);
+            }
 
             # Add index str for facets if it's not exist
             if ( $index->{'faceted'} and @values > 0 and $index->{'type'} ne 'str' ) {

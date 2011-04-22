@@ -462,6 +462,18 @@ sub pazGetRecords {
 }
 
 # STOPWORDS
+sub _remove_initial_stopwords {
+    my ( $operand ) = @_;
+    my @stopwords_removed;
+       my $str_replace=join "|",keys %{ C4::Context->stopwords };
+       $debug && warn "$_ Dump($str_replace)";
+       $debug && warn "$_ Dump($operand)";
+       $operand =~ s/^($str_replace) //gi;
+    
+    return ( $operand );
+}
+
+# STOPWORDS
 sub _remove_stopwords {
     my ( $operand, $index ) = @_;
     my @stopwords_removed;
