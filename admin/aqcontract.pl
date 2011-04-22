@@ -68,7 +68,6 @@ if ( $op eq 'add_form' ) {
         contractdescription      => $$contract{contractdescription},
         contractstartdate        => format_date( $$contract{contractstartdate} ),
         contractenddate          => format_date( $$contract{contractenddate} ),
-        marketnumber             => $$contract{marketnumber},
         DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar,
     );
 
@@ -90,7 +89,6 @@ elsif ( $op eq 'add_validate' ) {
                 contractdescription => $input->param('contractdescription'),
                 booksellerid        => $input->param('booksellerid'),
                 contractnumber      => $input->param('contractnumber'),
-                marketnumber        => $input->param('marketnumber'),
             }
         );
     } else {
@@ -100,7 +98,6 @@ elsif ( $op eq 'add_validate' ) {
                 booksellerid        => $input->param('booksellerid'),
                 contractstartdate   => format_date_in_iso( $input->param('contractstartdate') ),
                 contractenddate     => format_date_in_iso( $input->param('contractenddate') ),
-                marketnumber        => $input->param('marketnumber'),
             }
         );
     }
@@ -123,7 +120,6 @@ elsif ( $op eq 'delete_confirm' ) {
         contractdescription => $$contract{contractdescription},
         contractstartdate   => format_date( $$contract{contractstartdate} ),
         contractenddate     => format_date( $$contract{contractenddate} ),
-        marketnumber        => $$contract{marketnumber},
     );
 
     # END $OP eq DELETE_CONFIRM

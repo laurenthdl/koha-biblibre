@@ -194,6 +194,9 @@
                 <!-- TMPL_IF name="closedate" -->
                 <form action="/cgi-bin/koha/acqui/basketgroup.pl" method="post">
                 <p>Closed on:  <!-- TMPL_VAR name="closedate" --></p>
+                <!-- TMPL_IF name="estimateddeliverydate" -->
+                    <p>Estimated delivery date: <!-- TMPL_VAR NAME="estimateddeliverydate" --></p>
+                <!-- /TMPL_IF -->
                 <!-- TMPL_IF name="basketgroups" -->
                     <p> Basket group: <select id="basketgroupid" name="basketgroupid">
                         <!-- TMPL_LOOP name="basketgroups" -->

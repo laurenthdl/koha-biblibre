@@ -2476,7 +2476,6 @@ CREATE TABLE `aqcontract` (
   `contractname` varchar(50) default NULL,
   `contractdescription` mediumtext,
   `booksellerid` int(11) not NULL,
-  `marketnumber` int default NULL,
   PRIMARY KEY  (`contractnumber`),
   CONSTRAINT `booksellerid_fk1` FOREIGN KEY (`booksellerid`)
        REFERENCES `aqbooksellers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE

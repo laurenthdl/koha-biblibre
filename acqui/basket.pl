@@ -31,6 +31,7 @@ use C4::Budgets;
 
 use C4::Bookseller;
 use C4::Dates qw/format_date/;
+use Date::Calc qw/Add_Delta_Days/;
 use C4::Debug;
 
 use C4::Members qw/GetMember/;    #needed for permissions checking for changing basketgroup of a basket
@@ -228,6 +229,14 @@ if ( $op eq 'delete_confirm' ) {
         }
         unshift( @$basketgroups, \%emptygroup );
     }
+    
+    # if the basket is closed, calculate estimated delivery date
+    my $estimateddeliverydate;
+    if( $basket->{closedate} ) {
+        my ($year, $month, $day) = ($basket->{closedate} =~ /(\d+)-(\d+)-(\d+)/);
+        ($year, $month, $day) = Add_Delta_Days($year, $month, $day, $bookseller->{deliverytime});
+        $estimateddeliverydate = "$year-$month-$day";
+    }
 
     # if new basket, pre-fill infos
     $basket->{creationdate} = ""            unless ( $basket->{creationdate} );
@@ -325,6 +334,7 @@ if ( $op eq 'delete_confirm' ) {
         authorisedby         => $basket->{authorisedby},
         authorisedbyname     => $basket->{authorisedbyname},
         closedate            => C4::Dates->new( $basket->{closedate}, 'iso' )->output,
+        estimateddeliverydate => C4::Dates->new( $estimateddeliverydate, 'iso' )->output,
         active               => $bookseller->{'active'},
         booksellerid         => $bookseller->{'id'},
         name                 => $bookseller->{'name'},
