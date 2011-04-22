@@ -13,12 +13,18 @@ function getAuthorisedValuesList (select) {
   if (avlist) {
     $.getJSON("/cgi-bin/koha/services/avservice.pl?op=get_av&index=" + index,
       function (data,status) {
-           var str = '<select name="avlist">';
+           var str = '<select name="q">';
            $.each(data.av, function(key, value) {
              str += "<option value="+ value.authorised_value +">"+ value.lib +"</option>";
           });
           str += "</select>";
+          $(select).parent().find('input[name="q"]:first').attr('disabled','disabled');
+          $(select).parent().find('input[name="q"]:first').hide();
           $(select).parent().find('.avlist').append(str);
     });
   } 
+  else {
+          $(select).parent().find('input[name="q"]:first').removeAttr('disabled');
+          $(select).parent().find('input[name="q"]:first').show();
+  }
 }
