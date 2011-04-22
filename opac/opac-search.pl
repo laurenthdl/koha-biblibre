@@ -155,32 +155,68 @@ my $itemtypes = GetItemTypes;
 #Give ability to search in authorised values
 my $indexandavlist = C4::Search::Engine::Solr::GetIndexesWithAvlist;
 
-my $itype_or_itemtype = C4::Context->preference("item-level_itypes") ? 'itype' : 'itemtype';
+# the index parameter is different for item-level itemtypes
+my $itype_or_itemtype = ( C4::Context->preference("item-level_itypes") ) ? 'itype' : 'itemtype';
 my @itemtypesloop;
-my $selected = 1;
 my $cnt;
 my $advanced_search_types = C4::Context->preference("AdvancedSearchTypes");
+my $itype_or_ccode;
+my @itypes = $cgi->param('itypes');
+my @indexes = $cgi->param('idx');
+my @operators = $cgi->param('op');
+my @operands = $cgi->param('q');
 
 if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
+    $itype_or_ccode = 'itype';
+} else {
+    $itype_or_ccode = 'ccode';
+}
+
+my $itype_indexname = C4::Search::Query::getIndexName($itype_or_ccode);
+# If @itypes exists, we delete idx, op and q in the corresponding arrays
+# => Advsearch of filter by itypes
+# Else we must push in @itypes values existing in @operands
+# => Facets, sort, pagination
+if ( @itypes ) {
+    for my $i (0..$#indexes){
+        if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
+            splice @indexes, $i, 1;
+            splice @operands, $i, 1;
+            splice @operators, $i - 1, 1;
+        }
+    }
+} else {
+    for my $i (0..$#indexes){
+        if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
+            $operands[$i] =~ m/\(([^\)]*)\)/;
+            push @itypes, map { $_ } split ' OR ', $1 ;
+        }
+    }
+}
+
+# Build itemtypesloop
+# Set selected itypes
+if ( $itype_or_ccode ) {
     foreach my $thisitemtype ( sort { $itemtypes->{$a}->{'description'} cmp $itemtypes->{$b}->{'description'} } keys %$itemtypes ) {
+        my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
             number      => $cnt++,
-            index       => C4::Search::Query::getIndexName('itype'),
+            index       => $itype_indexname,
             code        => $thisitemtype,
             selected    => $selected,
             description => $itemtypes->{$thisitemtype}->{'description'},
             count5      => $cnt % 4,
             imageurl    => getitemtypeimagelocation( 'opac', $itemtypes->{$thisitemtype}->{'imageurl'} ),
         );
-        $selected = 0;    # set to zero after first pass through
         push @itemtypesloop, \%row;
     }
 } else {
-    my $advsearchtypes = GetAuthorisedValues( $advanced_search_types, '', 'opac' );
-    for my $thisitemtype (@$advsearchtypes) {
+    my $advsearchtypes = GetAuthorisedValues($advanced_search_types);
+    for my $thisitemtype ( sort { $a->{'lib'} cmp $b->{'lib'} } @$advsearchtypes ) {
+        my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
             number      => $cnt++,
-            index       => C4::Search::Query::getIndexName('ccode'),
+            index       => $itype_indexname,
             code        => $thisitemtype->{authorised_value},
             selected    => $selected,
             description => $thisitemtype->{'lib'},
@@ -190,11 +226,11 @@ if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
         push @itemtypesloop, \%row;
     }
 }
-$template->param( itemtypeloop => \@itemtypesloop );
 
-# # load the itypes (Called item types in the template -- just authorized values for searching)
-# my ($itypecount,@itype_loop) = GetCcodes();
-# $template->param(itypeloop=>\@itype_loop,);
+$template->param(
+    itemtypeloop => \@itemtypesloop,
+    itemtypelib => C4::Search::Engine::Solr::GetIndexLabelFromCode( $itype_or_ccode ) # Lib for category
+);
 
 # The following should only be loaded if we're bringing up the advanced search template
 if ( $template_type && $template_type eq 'advsearch' ) {
@@ -239,116 +275,73 @@ if ( $template_type && $template_type eq 'advsearch' ) {
 
 ### OK, if we're this far, we're performing an actual search
 
-# Fetch the paramater list as a hash in scalar context:
-#  * returns paramater list as tied hash ref
-#  * we can edit the values by changing the key
-#  * multivalued CGI paramaters are returned as a packaged string separated by "\0" (null)
-my $params = $cgi->Vars;
-my $tag = $params->{tag};
-
 # Params that can only have one value
 my $count            = C4::Context->preference('OPACnumSearchResults') || 20;
 my $page             = $cgi->param('page') || 1;
 
-my $hits;
-my $expanded_facet = $params->{'expand'};
-
-if ($@) {
-    $template->param(query_error => $@);
-    output_html_with_http_headers $cgi, $cookie, $template->output;
-    exit;
-}
-
-# construct the param array
-my @indexes = $cgi->param('idx');
-my @operators = $cgi->param('op');
-my @operands = $cgi->param('q');
-my @avlists = $cgi->param('avlist');
-
 #clean operands array
-my$i;
-for ($i = $#indexes; $i >= 0; $i--) { #pas de for ($#indexes..0) :'(
+for (my $i = $#indexes; $i >= 0; $i--) {
   splice @indexes,$i,1 if $i > $#operands;
 }
 
-my $operandsize = $#indexes;
-# Rebuild filters hash from GET data
-my @fil = $cgi->param('filters');
-my %filters;
-my @itypes; #contains operands for itype or ccode index
-my $itemtypename; # "itype" or "ccode"
-for ( @fil ) {
-    my ($k, $v) = split ':', $_;
-    if (($k !~ m/itype/) && ($k !~ m/ccode/)) {
-        $filters{$k} = $v;
-    } else {
-        push @itypes, $v;
-        $itemtypename = $k;
-    }
-}
-$filters{'recordtype'} = 'biblio';
-
 # construct query as itype:(@itypes[0] OR @itypes[1]) - item type advanced search
 my $itype_val_str="";
-if (scalar(@itypes)!=0) {
-  push @operators, "AND";
-  $itype_val_str = join ' OR ', @itypes ;
-  $itype_val_str = "($itype_val_str)";
-  push @operands, $itype_val_str;
-  push @indexes, $itemtypename;
+if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
+    $itype_val_str = join ' OR ', @itypes ;
+    $itype_val_str = "($itype_val_str)";
+    if ( not @indexes ) {
+        $operands[0] .= " AND $itype_val_str";
+    } else {
+        push @operators, "AND";
+        push @operands, $itype_val_str;
+        push @indexes, $itype_or_ccode;
+    }
 }
 
+my %filters;
 # This array is used to build facets GUI
 my @tplfilters;
-while ( my ($k, $v) = each %filters) {
+for my $filter ( $cgi->param('filters') ) {
+    my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
+    $filters{$k} = $v;
     $v =~ s/"//g;
     push @tplfilters, {
         'ind' => $k,
         'val' => $v,
     };
 }
+$filters{recordtype} = 'biblio';
 $template->param('filters' => \@tplfilters );
 
-my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
-
-#build search in authorised value list
-if ($params->{'avlist'}) {
-   foreach my $i (@indexes) {
-     my $val = _getAvlist ($i, $indexandavlist);
-     if ($val ne '') {
-       my $indexname = C4::Search::Query::getIndexName($i);
-       my $value = shift (@avlists);
-       $q .= " $indexname:$value ";
-     }
-   }
-
-   sub _getAvlist {
-     my ($index, $indexandavlist) = @_;
-     foreach my $k (@$indexandavlist){
-       if ($k->{'code'} eq $index){
-         return $k->{'avlist'};
-       }
-     }
-   }
-}
 
 # append year limits if they exist
-if ( $params->{'limit-yr'} ) {
-    if ( $params->{'limit-yr'} =~ /\d{4}-\d{4}/ ) {
-        my ( $yr1, $yr2 ) = split( /-/, $params->{'limit-yr'} );
-        $q .= ' AND date_pubdate:["' . C4::Search::Engine::Solr::NormalizeDate($yr1) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate($yr2) . '"]';
-    } elsif ( $params->{'limit-yr'} =~ /-\d{4}/ ) {
-        $params->{'limit-yr'} =~ /-(\d{4})/;
-        $q .= ' AND date_pubdate:[* TO "' . C4::Search::Engine::Solr::NormalizeDate($1) . '"]';
-    } elsif ( $params->{'limit-yr'} =~ /\d{4}-/ ) {
-        $params->{'limit-yr'} =~ /(\d{4})-/;
-        $q .= ' AND date_pubdate:["' . C4::Search::Engine::Solr::NormalizeDate($1) . '" TO *]';
-    } elsif ( $params->{'limit-yr'} =~ /\d{4}/ ) {
-        $q .= ' AND date_pubdate:"' . C4::Search::Engine::Solr::NormalizeDate($params->{'limit-yr'}) . '"';
+my $limit_yr = $cgi->param('limit-yr');
+if ( $limit_yr ) {
+    my $op;
+    if ( $limit_yr =~ /\d{4}-\d{4}/ ) {
+        my ( $yr1, $yr2 ) = split( /-/, $limit_yr );
+        $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $yr1 ) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate( $yr2 ) . '"]';
+    } elsif ( $limit_yr =~ /-\d{4}/ ) {
+        $limit_yr =~ /-(\d{4})/;
+        $op = '[* TO "' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '"]';
+    } elsif ( $limit_yr =~ /\d{4}-/ ) {
+        $limit_yr =~ /(\d{4})-/;
+        $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '" TO *]';
+    } elsif ( $limit_yr =~ /\d{4}/ ) {
+        $op = '"' . C4::Search::Engine::Solr::NormalizeDate( $limit_yr ) . '"';
     } else {
         #FIXME: Should return a error to the user, incorect date format specified
     }
+    if ( not @indexes ) {
+        $operands[0] .= " AND $op";
+    } else {
+        push @operands, $op;
+        push @operators, 'AND';
+        push @indexes, "date_pubdate";
+    }
 }
+
+my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 
 # perform the search
 my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
@@ -384,15 +377,15 @@ my $pager = Data::Pagination->new(
     $page,
 );
 
-# This array is used to build pagination links
-my @pager_params = map { {
+# This array is used to build pagination, facets links and itypes, sort form
+my @follower_params = map { {
     ind => 'filters',
     val => $_->{'ind'}.':"'.$_->{'val'}.'"'
 } } @tplfilters;
-push @pager_params, map { { ind => 'q'      , val => $_ } } @operands;
-push @pager_params, map { { ind => 'idx'      , val => $_ } } @indexes;
-push @pager_params, map { { ind => 'op'     , val => $_ } } @operators;
-push @pager_params, { ind => 'sort_by', val => $sort_by };
+push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
+push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
+push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
+push @follower_params, { ind => 'sort_by', val => $sort_by };
 
 # Pager template params
 $template->param(
@@ -400,12 +393,11 @@ $template->param(
     next_page     => $pager->{'next_page'},
     PAGE_NUMBERS  => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
     current_page  => $page,
-    pager_params  => \@pager_params,
+    follower_params  => \@follower_params,
 );
 
 # populate results with records
 my @results;
-my $it = C4::Search::getItemTypes();
 my $subfieldstosearch = C4::Search::getSubfieldsToSearch();
 my $itemtag = C4::Search::getItemTag();
 my $b = C4::Search::getBranches();
@@ -417,23 +409,18 @@ for my $searchresult ( @{ $res->items } ) {
         $itemtypes, $subfieldstosearch, $itemtag, $b);
 
     my $display = 1;
-    if (lc($interface) eq "opac") {
-        if (C4::Context->preference('hidelostitems') or C4::Context->preference('hidenoitems')) {
-            if (C4::Context->preference('hidelostitems') and $biblio->{itemlostcount} >= $biblio->{items_count}) {
-                $display = 0;
-            }
-            if (C4::Context->preference('hidenoitems') and $biblio->{available_count} == 0) {
-                $display = 0;
-            }
+    if (C4::Context->preference('hidelostitems') or C4::Context->preference('hidenoitems')) {
+        if (C4::Context->preference('hidelostitems') and $biblio->{itemlostcount} >= $biblio->{items_count}) {
+            $display = 0;
         }
-        if ($display == 1) {
-            $biblio->{result_number} = ++$biblio->{shown};
-            push( @results, $biblio);
+        if (C4::Context->preference('hidenoitems') and $biblio->{available_count} == 0) {
+            $display = 0;
         }
-    } else {
-        push( @results, $biblio );
     }
-
+    if ($display == 1) {
+        $biblio->{result_number} = ++$biblio->{shown};
+        push( @results, $biblio);
+    }
 }
 
 # build facets
@@ -447,8 +434,13 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
             my $value = $facet->[$i++];
             my $count = $facet->[$i];
             utf8::encode($value);
-            
+            my $lib = $value;
+            if ( $code eq 'holdingbranch' ) {
+                $lib = GetBranchName $value;
+            }
+ 
             push @values, {
+                'lib'     => $lib,                
                 'value'   => $value,
                 'count'   => $count,
                 'active'  => $filters{$index} && $filters{$index} eq "\"$value\"",
