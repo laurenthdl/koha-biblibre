@@ -84,60 +84,11 @@ There are several types of queries needed in the process of search and retrieve:
 
 =over
 
-=item 1 $query - the fully-built query passed to zebra
-
-This is the most complex query that needs to be built. The original design goal 
-was to use a custom CCL2PQF query parser to translate an incoming CCL query into
-a multi-leaf query to pass to Zebra. It needs to be multi-leaf to allow field 
-weighting, koha-specific relevance ranking, and stemming. When I have a chance 
-I'll try to flesh out this section to better explain.
-
-This query incorporates query profiles that aren't compatible with most non-Zebra 
-Z39.50 targets to acomplish the field weighting and relevance ranking.
-
-=item 2 $simple_query - a simple query that doesn't contain the field weighting,
-stemming, etc., suitable to pass off to other search targets
-
-This query is just the user's query expressed in CCL CQL, or PQF for passing to a 
-non-zebra Z39.50 target (one that doesn't support the extended profile that Zebra does).
-
-=item 3 $query_cgi - passed to the template / saved for future refinements of 
-the query (by user)
-
-This is a simple string that completely expresses the query as a CGI string that
-can be used for future refinements of the query or as a part of a history feature.
-
-=item 4 $query_desc - Human search description - what the user sees in search
-feedback area
-
-This is a simple string that is human readable. It will contain '=', ',', etc.
-
-=back
-
-=head3 2. Perform the Search
-
-This section takes the query strings and performs searches on the named servers,
-including the Koha Zebra server, stores the results in a deeply nested object, 
-builds 'faceted results', and returns these objects.
-
-=head3 3. Build HTML
-
-The final major section of this script takes the objects collected thusfar and 
-builds the HTML for output to the template and user.
-
-=head3 Additional Notes
-
-Not yet completed...
-
 =cut
 
-use strict;    # always use
+use strict;
 
 #use warnings; FIXME - Bug 2505
-
-## STEP 1. Load things that are used in both search page and
-# results page and decide which template to load, operations
-# to perform, etc.
 
 ## load Koha modules
 use C4::Context;
@@ -165,7 +116,6 @@ my $template_name;
 my $template_type;
 if ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) ) {
     $template_name = 'catalogue/results.tmpl';
-    $template_type = 'results';
 } else {
     $template_name = 'catalogue/advsearch.tmpl';
     $template_type = 'advsearch';
@@ -229,6 +179,10 @@ if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
 }
 
 my $itype_indexname = C4::Search::Query::getIndexName($itype_or_ccode);
+# If @itypes exists, we delete idx, op and q in the corresponding arrays
+# => Advsearch of filter by itypes
+# Else we must push in @itypes values existing in @operands
+# => Facets, sort, pagination
 if ( @itypes ) {
     for my $i (0..$#indexes){
         if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
@@ -240,22 +194,14 @@ if ( @itypes ) {
 } else {
     for my $i (0..$#indexes){
         if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
-            warn $indexes[$i];
             $operands[$i] =~ m/\(([^\)]*)\)/;
             push @itypes, map { $_ } split ' OR ', $1 ;
         }
     }
 }
 
-#if ( not @itypes and not @indexes ) {
-#    my $indexname = C4::Search::Query::getIndexName( $itype_or_ccode );
-#    my $q = $cgi->param('q');
-#    $q =~ m/$indexname:\(([^\)]*)\)/;
-#    push @itypes, map { $_ } split ' OR ', $1 ;
-#    $q =~ s/ AND $indexname:([^)]*)//; 
-#    $q =~ s/$indexname:([^)]*)//; 
-#}
-
+# Build itemtypesloop
+# Set selected itypes
 if ( $itype_or_ccode ) {
     foreach my $thisitemtype ( sort { $itemtypes->{$a}->{'description'} cmp $itemtypes->{$b}->{'description'} } keys %$itemtypes ) {
         my $selected = grep {$_ eq $thisitemtype} @itypes;
@@ -287,25 +233,30 @@ if ( $itype_or_ccode ) {
     }
 }
 
+$template->param(
+    itemtypeloop => \@itemtypesloop,
+    itemtypelib => C4::Search::Engine::Solr::GetIndexLabelFromCode( $itype_or_ccode ) # Lib for category
+);
 
-$template->param( itemtypeloop => \@itemtypesloop );
-$template->param( itemtypelib => C4::Search::Engine::Solr::GetIndexLabelFromCode( $itype_or_ccode ) );
+# set the default sorting
+my $sort_by = $cgi->param('sort_by') || join(' ', grep { defined } ( 
+        C4::Search::Query::getIndexName(C4::Context->preference('defaultSortField'))
+                                      , C4::Context->preference('defaultSortOrder') ) );
+my $sortloop = C4::Search::Engine::Solr::GetSortableIndexes('biblio');
+for ( @$sortloop ) { # because html template is stupid
+    $_->{'asc_selected'}  = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' asc';
+    $_->{'desc_selected'} = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' desc';
+}
+
+$template->param(
+    'sort_by'  => $sort_by,
+    'sortloop' => $sortloop,
+);
 
 # The following should only be loaded if we're bringing up the advanced search template
 if ( $template_type eq 'advsearch' ) {
 
-    # set the default sorting
-    my $sort_by = $cgi->param('sort_by') || join(' ', grep { defined } ( 
-            C4::Search::Query::getIndexName(C4::Context->preference('defaultSortField'))
-            , C4::Context->preference('defaultSortOrder') ) );
-    my $sortloop = C4::Search::Engine::Solr::GetSortableIndexes('biblio');
-    for ( @$sortloop ) { # because html template is stupid
-        $_->{'asc_selected'}  = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' asc';
-        $_->{'desc_selected'} = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' desc';
-    }
-
     $template->param(
-        'sortloop' => $sortloop,
         $sort_by => 1
     );
 
@@ -364,25 +315,6 @@ if ( $template_type eq 'advsearch' ) {
 }
 
 ### OK, if we're this far, we're performing a search, not just loading the advanced search page
-
-# Fetch the paramater list as a hash in scalar context:
-#  * returns paramater list as tied hash ref
-#  * we can edit the values by changing the key
-#  * multivalued CGI paramaters are returned as a packaged string separated by "\0" (null)
-my $sort_by = $cgi->param('sort_by') || join(' ', grep { defined } ( 
-        C4::Search::Query::getIndexName(C4::Context->preference('defaultSortField'))
-                                      , C4::Context->preference('defaultSortOrder') ) );
-my $sortloop = C4::Search::Engine::Solr::GetSortableIndexes('biblio');
-for ( @$sortloop ) { # because html template is stupid
-    $_->{'asc_selected'}  = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' asc';
-    $_->{'desc_selected'} = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' desc';
-}
-
-$template->param(
-    'sort_by'  => $sort_by,
-    'sortloop' => $sortloop,
-);
-
 # Fetch the paramater list as a hash in scalar context:
 #  * returns paramater list as tied hash ref
 #  * we can edit the values by changing the key
@@ -394,22 +326,14 @@ my $tag = $params->{tag};
 my $count            = C4::Context->preference('OPACnumSearchResults') || 20;
 my $page             = $cgi->param('page') || 1;
 
-my $hits;
-my $expanded_facet = $params->{'expand'};
-
 if ($@) {
     $template->param(query_error => $@);
     output_html_with_http_headers $cgi, $cookie, $template->output;
     exit;
 }
 
-my @results;
-
-# perform the search
-
 #clean operands array
-my $i;
-for ($i = $#indexes; $i >= 0; $i--) { #pas de for ($#indexes..0) :'(
+for (my $i = $#indexes; $i >= 0; $i--) {
   splice @indexes,$i,1 if $i > $#operands;
 }
 
@@ -446,24 +370,20 @@ if ( $params->{'limit-yr'} ) {
         push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate($yr1) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate($yr2) . '"]';
         push @operators, 'AND';
         push @indexes, "date_pubdate";
-        #$q .= ' AND date_pubdate:["' . C4::Search::Engine::Solr::NormalizeDate($yr1) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate($yr2) . '"]';
     } elsif ( $params->{'limit-yr'} =~ /-\d{4}/ ) {
         $params->{'limit-yr'} =~ /-(\d{4})/;
         push @operands, '[* TO "' . C4::Search::Engine::Solr::NormalizeDate($1) . '"]';
         push @operators, 'AND';
         push @indexes, "date_pubdate";
-        #$q .= ' AND date_pubdate:[* TO "' . C4::Search::Engine::Solr::NormalizeDate($1) . '"]';
     } elsif ( $params->{'limit-yr'} =~ /\d{4}-/ ) {
         $params->{'limit-yr'} =~ /(\d{4})-/;
         push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate($1) . '" TO *]';
         push @operators, 'AND';
         push @indexes, "date_pubdate";
-        #$q .= ' AND date_pubdate:["' . C4::Search::Engine::Solr::NormalizeDate($1) . '" TO *]';
     } elsif ( $params->{'limit-yr'} =~ /\d{4}/ ) {
         push @operands, '"' . C4::Search::Engine::Solr::NormalizeDate($params->{'limit-yr'}) . '"';
         push @operators, 'AND';
         push @indexes, "date_pubdate";
-        #$q .= ' AND date_pubdate:"' . C4::Search::Engine::Solr::NormalizeDate($params->{'limit-yr'}) . '"';
     } else {
         #FIXME: Should return a error to the user, incorect date format specified
     }
@@ -508,7 +428,8 @@ my $pager = Data::Pagination->new(
     20,
     $page,
 );
-# This array is used to build pagination links
+
+# This array is used to build pagination, facets links and itypes, sort form
 my @follower_params = map { {
     ind => 'filters',
     val => $_->{'ind'}.':"'.$_->{'val'}.'"'
@@ -517,7 +438,6 @@ push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
 push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
 push @follower_params, { ind => 'sort_by', val => $sort_by };
-#warn Data::Dumper::Dumper \@follower_params;
 
 # Pager template params
 $template->param(
@@ -530,7 +450,6 @@ $template->param(
 
 # populate results with records
 my @results;
-my $itemtypes = C4::Search::getItemTypes();
 my $subfieldstosearch = C4::Search::getSubfieldsToSearch();
 my $itemtag = C4::Search::getItemTag();
 my $b = C4::Search::getBranches();
@@ -541,24 +460,7 @@ for my $searchresult ( @{ $res->items } ) {
     my $biblio = C4::Search::getItemsInfos($biblionumber, $interface,
         $itemtypes, $subfieldstosearch, $itemtag, $b);
 
-    my $display = 1;
-    if (lc($interface) eq "opac") {
-        if (C4::Context->preference('hidelostitems') or C4::Context->preference('hidenoitems')) {
-            if (C4::Context->preference('hidelostitems') and $biblio->{itemlostcount} >= $biblio->{items_count}) {
-                $display = 0;
-            }
-            if (C4::Context->preference('hidenoitems') and $biblio->{available_count} == 0) {
-                $display = 0;
-            }
-        }
-        if ($display == 1) {
-            $biblio->{result_number} = ++$biblio->{shown};
-            push( @results, $biblio);
-        }
-    } else {
-        push( @results, $biblio );
-    }
-
+    push( @results, $biblio );
 }
 
 # build facets
