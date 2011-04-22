@@ -1,0 +1,103 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Acquisitions &rsaquo; Transfer order</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript">
+//<![CDATA[
+
+//]]>
+</script>
+</head>
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+<!-- TMPL_INCLUDE NAME="acquisitions-search.inc" -->
+
+<div id="breadcrumbs">
+    <a href="/cgi-bin/koha/mainpage.pl">Home</a>
+    &rsaquo; <a href="/cgi-bin/koha/acqui/acqui-home.pl">Acquisitions</a>
+    &rsaquo; Transfer order
+</div>
+
+<div id="doc3" class="yui-t2">
+<div id="bd">
+<div id="yui-main">
+    <div class="yui-b">
+        <!-- Main content -->
+        <!-- TMPL_IF NAME="basketsloop" -->
+            <table>
+                <thead>
+                    <th>Basket (#)</th>
+                    <th>Created by</th>
+                    <th>Date</th>
+                    <th>&nbsp;</th>
+                </thead>
+                <tbody>
+                    <!-- TMPL_LOOP NAME="basketsloop" -->
+                        <td><!-- TMPL_VAR NAME="basketname" --> (#<!-- TMPL_VAR NAME="basketno" -->)</td>
+                        <td><!-- TMPL_VAR NAME="authorisedby" --></td>
+                        <td><!-- TMPL_VAR NAME="creationdate" --></td>
+                        <td><a href="transferorder.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->">Choose</a>
+                    <!-- /TMPL_LOOP --><!-- basketsloop -->
+                </tbody>
+            </table>
+        <!-- /TMPL_IF --><!-- basketsloop -->
+        <!-- TMPL_IF NAME="ordersloop" -->
+            <table>
+                <thead>
+                    <th>Order</th>
+                    <th>Summary</th>
+                    <th>&nbsp;</th>
+                </thead>
+                <tbody>
+                    <!-- TMPL_LOOP NAME="ordersloop" -->
+                        <td><a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->"><!-- TMPL_VAR NAME="ordernumber" --></a></td>
+                        <td>
+                            <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html"--></a>
+                            <!-- TMPL_IF NAME="author" --> by <!-- TMPL_VAR NAME="author" --><!--/TMPL_IF-->
+                            <!-- TMPL_IF NAME="isbn" --> &ndash; <!-- TMPL_VAR NAME="isbn" --><!--/TMPL_IF-->
+                            <!-- TMPL_IF NAME="publishercode" --><br />Publisher :<!-- TMPL_VAR NAME="publishercode" --><!--/TMPL_IF-->
+                        </td>
+                        <td><a href="transferorder.pl?bookselleridfrom=<!--TMPL_VAR NAME="bookselleridfrom" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->">Transfer</a></td>
+                    <!-- /TMPL_LOOP --><!-- ordersloop -->
+                </tbody>
+            </table>
+        <!-- /TMPL_IF --><!-- ordersloop -->
+        <!-- TMPL_IF NAME="query" -->
+        <!-- TMPL_IF NAME="booksellersloop" -->
+            <table>
+                <thead>
+                    <th>Name</th>
+                    <th>&nbsp;</th>
+                </thead>
+                <tbody>
+                    <!-- TMPL_LOOP NAME="booksellersloop" -->
+                        <td><!-- TMPL_VAR NAME="name" --></td>
+                        <td><a href="transferorder.pl?<!-- TMPL_IF NAME="bookselleridfrom" -->bookselleridto<!-- TMPL_ELSE -->bookselleridfrom<!-- /TMPL_IF -->=<!-- TMPL_VAR NAME="id" --><!-- TMPL_IF NAME="ordernumber" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" --><!-- /TMPL_IF -->">Choose</a></td>
+                    <!-- /TMPL_LOOP -->
+                </tbody>
+             </table>
+        <!-- TMPL_ELSE -->
+            <p>No results found.</p>
+        <!-- /TMPL_IF --><!-- booksellersloop -->
+        <!-- /TMPL_IF --><!-- query -->
+        <!-- TMPL_IF NAME="search_form" -->
+            <form method="get" action="transferorder.pl">
+                <!--  TMPL_IF NAME="ordernumber" -->
+                    <input type="hidden" name="ordernumber" value="<!-- TMPL_VAR NAME="ordernumber" -->" />
+                <!-- /TMPL_IF -->
+                <!-- TMPL_IF NAME="bookselleridfrom" -->
+                    <input type="hidden" name="bookselleridfrom" value="<!-- TMPL_VAR NAME="bookselleridfrom" -->" />
+                <!-- /TMPL_IF -->
+                <label for="query">Vendor:</label>
+                <input type="text" name="query" />
+                <input type="submit" value="Search" />
+            </form>
+        <!-- /TMPL_IF -->
+    </div>
+</div>
+
+<div class="yui-b">
+    <!-- TMPL_INCLUDE NAME="acquisitions-menu.inc" -->
+</div>
+</div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
