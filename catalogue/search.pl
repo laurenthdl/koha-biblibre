@@ -315,22 +315,10 @@ if ( $template_type eq 'advsearch' ) {
 }
 
 ### OK, if we're this far, we're performing a search, not just loading the advanced search page
-# Fetch the paramater list as a hash in scalar context:
-#  * returns paramater list as tied hash ref
-#  * we can edit the values by changing the key
-#  * multivalued CGI paramaters are returned as a packaged string separated by "\0" (null)
-my $params = $cgi->Vars;
-my $tag = $params->{tag};
 
 # Params that can only have one value
 my $count            = C4::Context->preference('OPACnumSearchResults') || 20;
 my $page             = $cgi->param('page') || 1;
-
-if ($@) {
-    $template->param(query_error => $@);
-    output_html_with_http_headers $cgi, $cookie, $template->output;
-    exit;
-}
 
 #clean operands array
 for (my $i = $#indexes; $i >= 0; $i--) {
@@ -364,24 +352,25 @@ $template->param('filters' => \@tplfilters );
 
 
 # append year limits if they exist
-if ( $params->{'limit-yr'} ) {
-    if ( $params->{'limit-yr'} =~ /\d{4}-\d{4}/ ) {
-        my ( $yr1, $yr2 ) = split( /-/, $params->{'limit-yr'} );
-        push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate($yr1) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate($yr2) . '"]';
+my $limit_yr = $cgi->param('limit-yr');
+if ( $limit_yr ) {
+    if ( $limit_yr =~ /\d{4}-\d{4}/ ) {
+        my ( $yr1, $yr2 ) = split( /-/, $limit_yr );
+        push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate( $yr1 ) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate( $yr2 ) . '"]';
         push @operators, 'AND';
         push @indexes, "date_pubdate";
-    } elsif ( $params->{'limit-yr'} =~ /-\d{4}/ ) {
-        $params->{'limit-yr'} =~ /-(\d{4})/;
-        push @operands, '[* TO "' . C4::Search::Engine::Solr::NormalizeDate($1) . '"]';
+    } elsif ( $limit_yr =~ /-\d{4}/ ) {
+        $limit_yr =~ /-(\d{4})/;
+        push @operands, '[* TO "' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '"]';
         push @operators, 'AND';
         push @indexes, "date_pubdate";
-    } elsif ( $params->{'limit-yr'} =~ /\d{4}-/ ) {
-        $params->{'limit-yr'} =~ /(\d{4})-/;
-        push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate($1) . '" TO *]';
+    } elsif ( $limit_yr =~ /\d{4}-/ ) {
+        $limit_yr =~ /(\d{4})-/;
+        push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '" TO *]';
         push @operators, 'AND';
         push @indexes, "date_pubdate";
-    } elsif ( $params->{'limit-yr'} =~ /\d{4}/ ) {
-        push @operands, '"' . C4::Search::Engine::Solr::NormalizeDate($params->{'limit-yr'}) . '"';
+    } elsif ( $limit_yr =~ /\d{4}/ ) {
+        push @operands, '"' . C4::Search::Engine::Solr::NormalizeDate( $limit_yr ) . '"';
         push @operators, 'AND';
         push @indexes, "date_pubdate";
     } else {
@@ -390,28 +379,6 @@ if ( $params->{'limit-yr'} ) {
 }
 
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
-
-#build search in authorised value list
-if ($params->{'avlist'}) {
-   foreach my $i (@indexes) {
-     my $val = _getAvlist ($i, $indexandavlist);
-     if ($val ne '') {
-       my $indexname = C4::Search::Query::getIndexName($i);
-       my $value = shift (@avlists);
-       $q .= " $indexname:$value ";
-     }
-   }
-
-   sub _getAvlist {
-     my ($index, $indexandavlist) = @_;
-     foreach my $k (@$indexandavlist){
-       if ($k->{'code'} eq $index){
-         return $k->{'avlist'};
-       }
-     }
-   }
-}
-
 
 my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
 C4::Context->preference("DebugLevel") eq '2' && warn "ProSolrSimpleSearch:q=$q:";
