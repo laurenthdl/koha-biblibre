@@ -249,7 +249,7 @@ if ( $op eq 'delete_confirm' ) {
     my $count   = scalar @results;
 
     my $gist = $bookseller->{gstrate} || C4::Context->preference("gist") || 0;
-    my $discount = $bookseller->{'discount'} / 100;
+    my $discount = $bookseller->{'discount'};
     my $total_rrp;         # RRP Total, its value will be assigned to $total_rrp_gsti or $total_rrp_gste depending of $bookseller->{'listincgst'}
     my $total_rrp_gsti;    # RRP Total, GST included
     my $total_rrp_gste;    # RRP Total, GST excluded
