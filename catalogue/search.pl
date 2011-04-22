@@ -165,7 +165,6 @@ my $itype_or_itemtype = ( C4::Context->preference("item-level_itypes") ) ? 'ityp
 my @itemtypesloop;
 my $cnt;
 my $advanced_search_types = C4::Context->preference("AdvancedSearchTypes");
-my @avlists = $cgi->param('avlist');
 my $itype_or_ccode;
 my @itypes = $cgi->param('itypes');
 my @indexes = $cgi->param('idx');
@@ -328,11 +327,15 @@ for (my $i = $#indexes; $i >= 0; $i--) {
 # construct query as itype:(@itypes[0] OR @itypes[1]) - item type advanced search
 my $itype_val_str="";
 if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
-    push @operators, "AND";
     $itype_val_str = join ' OR ', @itypes ;
     $itype_val_str = "($itype_val_str)";
-    push @operands, $itype_val_str;
-    push @indexes, $itype_or_ccode;
+    if ( not @indexes ) {
+        $operands[0] .= " AND $itype_val_str";
+    } else {
+        push @operators, "AND";
+        push @operands, $itype_val_str;
+        push @indexes, $itype_or_ccode;
+    }
 }
 
 my %filters;
@@ -354,27 +357,27 @@ $template->param('filters' => \@tplfilters );
 # append year limits if they exist
 my $limit_yr = $cgi->param('limit-yr');
 if ( $limit_yr ) {
+    my $op;
     if ( $limit_yr =~ /\d{4}-\d{4}/ ) {
         my ( $yr1, $yr2 ) = split( /-/, $limit_yr );
-        push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate( $yr1 ) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate( $yr2 ) . '"]';
-        push @operators, 'AND';
-        push @indexes, "date_pubdate";
+        $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $yr1 ) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate( $yr2 ) . '"]';
     } elsif ( $limit_yr =~ /-\d{4}/ ) {
         $limit_yr =~ /-(\d{4})/;
-        push @operands, '[* TO "' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '"]';
-        push @operators, 'AND';
-        push @indexes, "date_pubdate";
+        $op = '[* TO "' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '"]';
     } elsif ( $limit_yr =~ /\d{4}-/ ) {
         $limit_yr =~ /(\d{4})-/;
-        push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '" TO *]';
-        push @operators, 'AND';
-        push @indexes, "date_pubdate";
+        $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '" TO *]';
     } elsif ( $limit_yr =~ /\d{4}/ ) {
-        push @operands, '"' . C4::Search::Engine::Solr::NormalizeDate( $limit_yr ) . '"';
-        push @operators, 'AND';
-        push @indexes, "date_pubdate";
+        $op = '"' . C4::Search::Engine::Solr::NormalizeDate( $limit_yr ) . '"';
     } else {
         #FIXME: Should return a error to the user, incorect date format specified
+    }
+    if ( not @indexes ) {
+        $operands[0] .= " AND $op";
+    } else {
+        push @operands, $op;
+        push @operators, 'AND';
+        push @indexes, "date_pubdate";
     }
 }
 
@@ -439,6 +442,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
         for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
             my $value = $facet->[$i++];
             my $count = $facet->[$i];
+            utf8::encode($value);            
             my $lib = $value;
             if ( $code eq 'holdingbranch' ) {
                 $lib = GetBranchName $value;
@@ -447,7 +451,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
                 'lib'     => $lib,
                 'value'   => $value,
                 'count'   => $count,
-                'active'  => $filters{$index} eq "\"$value\"", # TODO fails on diacritics
+                'active'  => $filters{$index} && $filters{$index} eq "\"$value\"",
                 'filters' => \@tplfilters,
             };
         }
