@@ -103,7 +103,7 @@ $data{'invoiceincgst'} = $input->param('invoice_gst');
 
 #have to transform this into fraction so it's easier to use
 $data{'gstrate'}  = $input->param('gstrate') / 100;
-$data{'discount'} = $input->param('discount');
+$data{'discount'} = $input->param('discount') / 100;
 $data{'active'}   = $input->param('status');
 if ( $data{'name'} ) {
     if ( $data{'id'} ) {

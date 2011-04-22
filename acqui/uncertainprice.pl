@@ -99,7 +99,7 @@ if ( $op eq 'validate' ) {
         my $ordernumber      = $order->{ordernumber};
         my $order_as_from_db = GetOrder( $order->{ordernumber} );
         $order->{'listprice'}      = $input->param( 'price' . $ordernumber );
-        $order->{'ecost'}          = $input->param( 'price' . $ordernumber ) - ( ( $input->param( 'price' . $ordernumber ) / 100 ) * $bookseller->{'discount'} );
+        $order->{'ecost'}          = $input->param( 'price' . $ordernumber ) - ( $input->param( 'price' . $ordernumber ) * $bookseller->{'discount'} );
         $order->{'rrp'}            = $input->param( 'price' . $ordernumber );
         $order->{'quantity'}       = $input->param( 'qty' . $ordernumber );
         $order->{'uncertainprice'} = $input->param( 'uncertainprice' . $ordernumber );
