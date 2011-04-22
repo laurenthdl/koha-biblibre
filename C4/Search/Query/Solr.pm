@@ -52,7 +52,7 @@ sub buildQuery {
     for my $kw (@$operands){
         $kw =~ s/(\w*\*)/\L$1\E/g; # Lower case on words with right truncation
         $kw =~ s/(\s*\w*\?+\w*\s*)/\L$1\E/g; # Lower case on words contain wildcard ?
-        $kw =~ s/:/\\:/g; # escape colons
+        $kw =~ s/([^\\]):/$1\\:/g; # escape colons
         # First element
         if ($i == 0){
             if ( (my @x = eval {@$indexes} ) == 0 ){
@@ -100,7 +100,10 @@ sub BuildTokenString {
 
     if ($index ne 'all_fields' && $index ne ''){
         # Operand can contains an expression in brackets
-        if ( $string =~ / / and not ( $string =~ /^\(.*\)$/ and ( $string =~ / OR / or $string =~ / AND / or $string =~ / NOT / ) ) ) {
+        if (
+            $string =~ / /
+                and not ( $string =~ /^\(.*\)$/ and ( $string =~ / OR / or $string =~ / AND / or $string =~ / NOT / ) )
+                and not $string =~ /[.*TO.*]/ ) {
             my @dqs; #double-quoted string
             while ( $string =~ /"(?:[^"\\]++|\\.)*+"/g ) {
                 push @dqs, $&;

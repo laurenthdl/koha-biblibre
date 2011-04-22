@@ -22,7 +22,7 @@ my $titleindex = C4::Search::Query::getIndexName("title");
 my $authorindex = C4::Search::Query::getIndexName("author");
 my $eanindex = C4::Search::Query::getIndexName("ean");
 
-BEGIN { $tests += 19 } # 'Normal' search
+BEGIN { $tests += 20 } # 'Normal' search
 @$operands[0] = "title:maudits"; # Solr indexes
 @$indexes = ();
 @$operators = ();
@@ -64,6 +64,11 @@ $q = "Mathématiques Analyse L3 : Cours complet"; # escape colon
 $got = C4::Search::Query->normalSearch($q);
 $expected = "Mathématiques Analyse L3 \\: Cours complet";
 is($got, $expected, "Test escape colon");
+
+$q = "Mathématiques Analyse L3 \\: Cours complet"; # escape colon
+$got = C4::Search::Query->normalSearch($q);
+$expected = "Mathématiques Analyse L3 \\: Cours complet";
+is($got, $expected, "Test no escape colon if already escaped");
 
 $q = "Mathéma*"; # lc if wildcard
 $got = C4::Search::Query->normalSearch($q);
@@ -237,7 +242,7 @@ $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "($titleindex:les AND $titleindex:maudits) AND a NOT ($authorindex:andre AND $authorindex:besson)";
 is($got, $expected, qq{Test BuildIndexString complex});
 
-BEGIN { $tests += 2 } # Test BuildIndexString with expression
+BEGIN { $tests += 3 } # Test BuildIndexString with expression
 @$operands = ("monde","histoire","(VIDEO OR LIVRE OR POUET)" );
 @$indexes = ("all_fields", "all_fields", "itype");
 @$operators = ("AND", "AND");
@@ -250,6 +255,13 @@ is($got, $expected, qq{Test BuildIndexString with expression in operand});
 @$operators = ("AND", "AND");
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "monde AND histoire AND str_itype:(VIDEO)";
+is($got, $expected, qq{Test BuildIndexString with expression in operand});
+
+@$operands = ("crise","(OUVRAGE OR VIDEO)" );
+@$indexes = ("title", "itype");
+@$operators = ("AND", "AND");
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = "$titleindex:crise AND str_itype:(OUVRAGE OR VIDEO)";
 is($got, $expected, qq{Test BuildIndexString with expression in operand});
 
 BEGIN { $tests += 11 } # Test wildcard * and ?
@@ -330,3 +342,24 @@ $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "m?th?matiqu? AND fo* AND ?a?";
 is($got, $expected, qq{Test wildCard ? and * on multiples operands and positions});
 
+BEGIN { $tests += 3 } # [ TO ] format
+@$operands = (qq{["1900-01-01T00:00:00Z" TO "2011-01-01T00:00:00Z"]});
+@$indexes = ("pubdate");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{date_pubdate:["1900-01-01T00\\:00\\:00Z" TO "2011-01-01T00\\:00\\:00Z"]};
+is($got, $expected, qq{Test date with [ TO ] format});
+
+@$operands = (qq{[* TO *]});
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{$titleindex:[* TO *]};
+is($got, $expected, qq{Test [* TO *] format});
+
+@$operands = (qq{[* TO ZZ]});
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{$titleindex:[* TO ZZ]};
+is($got, $expected, qq{Test [* TO ZZ] format});
