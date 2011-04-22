@@ -205,18 +205,11 @@ function GetZ3950Terms(){
     <!-- TMPL_IF NAME="total" -->
         <div id="searchheader">
             <form action="/cgi-bin/koha/catalogue/search.pl" method="get" id="sortbyform">
-                <input type="hidden" name="q" value="<!-- TMPL_VAR ESCAPE="HTML" NAME="query" -->" />
-                <!-- TMPL_LOOP NAME="filters" -->
-	                <input type="hidden" name="filters" value="<!--TMPL_VAR NAME="ind"-->:&quot;<!--TMPL_VAR ESCAPE="HTML" NAME="val"-->&quot;" />
+                <!-- TMPL_LOOP NAME="follower_params" -->
+                    <!-- TMPL_UNLESS EXPR="ind eq 'sort_by'" -->
+                        <input type="hidden" name='<!-- TMPL_VAR ESCAPE="HTML" NAME="ind" -->' value='<!-- TMPL_VAR ESCAPE="HTML" NAME="val" -->' />
+                    <!-- /TMPL_UNLESS -->
                 <!-- /TMPL_LOOP -->
-                <!-- TMPL_IF NAME="search_desc" -->
-                    <!-- TMPL_LOOP NAME="QUERY_INPUTS"-->
-                    <input type="hidden" name="<!-- TMPL_VAR ESCAPE=HTML NAME="input_name" -->" value="<!-- TMPL_VAR ESCAPE=HTML NAME="input_value" -->"/>
-                    <!-- /TMPL_LOOP -->
-                    <!-- TMPL_LOOP NAME="LIMIT_INPUTS"-->
-                    <input type="hidden" name="<!-- TMPL_VAR ESCAPE=HTML NAME="input_name" -->" value="<!-- TMPL_VAR ESCAPE=HTML NAME="input_value" -->"/>
-                    <!-- /TMPL_LOOP -->
-                <!-- /TMPL_IF -->
                 <!-- RE-SORT START -->
                     <label for="sort_by">Sort By: </label>
                     <select id="sort_by" name="sort_by">
