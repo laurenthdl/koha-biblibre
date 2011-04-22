@@ -84,14 +84,15 @@ if( $basketno && $ordernumber) {
     $order->{basketno} = $basketno;
     $order->{internalnotes} = "Transfered from $booksellerfrom->{name} on $today";
     NewOrder($order);
-    print $input->redirect("/cgi-bin/koha/acqui/parcels.pl?supplierid=$bookselleridfrom");
-    exit;
-# Show open baskets for this bookseller
 } elsif ( $bookselleridto && $ordernumber) {
     my $order = GetOrder( $ordernumber );
     my $basketfrom = GetBasket( $order->{basketno} );
     my $booksellerfrom = GetBookSellerFromId( $basketfrom->{booksellerid} );
     $booksellerfromname = $booksellerfrom->{name};
+    print $input->redirect("cgi-bin/koha/acqui/parcels.pl?supplierid=$bookselleridfrom");
+    exit;
+# Show open baskets for this bookseller
+} elsif ( $bookselleridto && $ordernumber) {
     my $baskets = GetBasketsByBookseller( $bookselleridto );
     my $basketscount = scalar @$baskets;
     my @basketsloop = ();
