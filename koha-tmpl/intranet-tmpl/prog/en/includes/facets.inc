@@ -18,21 +18,23 @@
 	        <li>(related searches: <!-- TMPL_LOOP NAME="related" --><!-- TMPL_VAR NAME="related_search" --><!-- /TMPL_LOOP -->)</li>
 	        <!-- /TMPL_IF -->
 	    </li>
-        <li><!-- TMPL_VAR NAME="itemtypelib" -->
-            <form action="search.pl" method="get">
-                <!-- TMPL_LOOP NAME="follower_params" -->
-                    <input type="hidden" name="<!-- TMPL_VAR ESCAPE="HTML" NAME="ind" -->" value="<!-- TMPL_VAR ESCAPE="HTML" NAME="val" -->" />
-                <!-- /TMPL_LOOP -->
-                <ul>
-                    <!--TMPL_LOOP Name="itemtypeloop"-->
-                        <li>
-                            <input type="checkbox" name="itypes" value="<!-- TMPL_VAR NAME="code" -->" <!-- TMPL_IF EXPR="selected eq '1'" --> checked="checked" <!-- /TMPL_IF -->/>
-                            <!-- TMPL_VAR NAME="description" -->
-                        </li>
-                    <!--/TMPL_LOOP-->
-                </ul>
-                <input class="submit" type="submit" value="Filter !" />
-            </form>
+        <li><a href="#" id="expand_sign">[+]</a> <!-- TMPL_VAR NAME="itemtypelib" -->
+            <div id="itypes_form" style="display:none;">
+                <form action="search.pl" method="get">
+                    <!-- TMPL_LOOP NAME="follower_params" -->
+                        <input type="hidden" name="<!-- TMPL_VAR ESCAPE="HTML" NAME="ind" -->" value="<!-- TMPL_VAR ESCAPE="HTML" NAME="val" -->" />
+                    <!-- /TMPL_LOOP -->
+                    <ul>
+                        <!--TMPL_LOOP Name="itemtypeloop"-->
+                            <li>
+                                <input type="checkbox" name="itypes" value="<!-- TMPL_VAR NAME="code" -->" <!-- TMPL_IF EXPR="selected eq '1'" --> checked="checked" <!-- /TMPL_IF -->/>
+                                <!-- TMPL_VAR NAME="description" -->
+                            </li>
+                        <!--/TMPL_LOOP-->
+                    </ul>
+                    <input class="submit" type="submit" value="Filter !" />
+                </form>
+            </div>
         </li>
         <!-- TMPL_LOOP NAME="facets_loop" -->
         <li>

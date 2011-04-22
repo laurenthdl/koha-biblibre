@@ -21,8 +21,6 @@
 
   function advSearchPrepare () {
 
-//    $(".advsearch").each( function (this) {getAuthorisedValuesList(this)});
-//    $(".advsearch").load( function () {getAuthorisedValuesList($(this))});
     $(".advsearch").each( function () {getAuthorisedValuesList($(this))});
     <!-- TMPL_LOOP NAME="indexandavlist" -->
     $(".advsearch").find("option").each(function () {
