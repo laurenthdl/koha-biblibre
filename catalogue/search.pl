@@ -165,6 +165,7 @@ my $template_name;
 my $template_type;
 if ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) ) {
     $template_name = 'catalogue/results.tmpl';
+    $template_type = 'results';
 } else {
     $template_name = 'catalogue/advsearch.tmpl';
     $template_type = 'advsearch';
@@ -212,30 +213,70 @@ my $indexandavlist = C4::Search::Engine::Solr::GetIndexesWithAvlist;
 # the index parameter is different for item-level itemtypes
 my $itype_or_itemtype = ( C4::Context->preference("item-level_itypes") ) ? 'itype' : 'itemtype';
 my @itemtypesloop;
-my $selected = 1;
 my $cnt;
 my $advanced_search_types = C4::Context->preference("AdvancedSearchTypes");
+my @avlists = $cgi->param('avlist');
+my $itype_or_ccode;
+my @itypes = $cgi->param('itypes');
+my @indexes = $cgi->param('idx');
+my @operators = $cgi->param('op');
+my @operands = $cgi->param('q');
 
 if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
+    $itype_or_ccode = 'itype';
+} else {
+    $itype_or_ccode = 'ccode';
+}
+
+my $itype_indexname = C4::Search::Query::getIndexName($itype_or_ccode);
+if ( @itypes ) {
+    for my $i (0..$#indexes){
+        if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
+            splice @indexes, $i, 1;
+            splice @operands, $i, 1;
+            splice @operators, $i - 1, 1;
+        }
+    }
+} else {
+    for my $i (0..$#indexes){
+        if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
+            warn $indexes[$i];
+            $operands[$i] =~ m/\(([^\)]*)\)/;
+            push @itypes, map { $_ } split ' OR ', $1 ;
+        }
+    }
+}
+
+#if ( not @itypes and not @indexes ) {
+#    my $indexname = C4::Search::Query::getIndexName( $itype_or_ccode );
+#    my $q = $cgi->param('q');
+#    $q =~ m/$indexname:\(([^\)]*)\)/;
+#    push @itypes, map { $_ } split ' OR ', $1 ;
+#    $q =~ s/ AND $indexname:([^)]*)//; 
+#    $q =~ s/$indexname:([^)]*)//; 
+#}
+
+if ( $itype_or_ccode ) {
     foreach my $thisitemtype ( sort { $itemtypes->{$a}->{'description'} cmp $itemtypes->{$b}->{'description'} } keys %$itemtypes ) {
+        my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
             number      => $cnt++,
-            index       => C4::Search::Query::getIndexName('itype'),
+            index       => $itype_indexname,
             code        => $thisitemtype,
             selected    => $selected,
             description => $itemtypes->{$thisitemtype}->{'description'},
             count5      => $cnt % 4,
             imageurl    => getitemtypeimagelocation( 'intranet', $itemtypes->{$thisitemtype}->{'imageurl'} ),
         );
-        $selected = 0 if ($selected);
         push @itemtypesloop, \%row;
     }
 } else {
     my $advsearchtypes = GetAuthorisedValues($advanced_search_types);
     for my $thisitemtype ( sort { $a->{'lib'} cmp $b->{'lib'} } @$advsearchtypes ) {
+        my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
             number      => $cnt++,
-            index       => C4::Search::Query::getIndexName('ccode'),
+            index       => $itype_indexname,
             code        => $thisitemtype->{authorised_value},
             selected    => $selected,
             description => $thisitemtype->{'lib'},
@@ -245,7 +286,10 @@ if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
         push @itemtypesloop, \%row;
     }
 }
+
+
 $template->param( itemtypeloop => \@itemtypesloop );
+$template->param( itemtypelib => C4::Search::Engine::Solr::GetIndexLabelFromCode( $itype_or_ccode ) );
 
 # The following should only be loaded if we're bringing up the advanced search template
 if ( $template_type eq 'advsearch' ) {
@@ -310,7 +354,7 @@ if ( $template_type eq 'advsearch' ) {
     }
 
     if ( C4::Context->preference("AdvancedSearchContent") ne '' ) {
-	$template->param( AdvancedSearchContent => C4::Context->preference("AdvancedSearchContent") ); 
+        $template->param( AdvancedSearchContent => C4::Context->preference("AdvancedSearchContent") ); 
     }
 
     $template->param( virtualshelves => C4::Context->preference("virtualshelves") );
@@ -362,54 +406,69 @@ if ($@) {
 my @results;
 
 # perform the search
-my @indexes = $cgi->param('idx');
-my @operators = $cgi->param('op');
-my @operands = $cgi->param('q');
-my @avlists = $cgi->param('avlist');
 
 #clean operands array
 my $i;
 for ($i = $#indexes; $i >= 0; $i--) { #pas de for ($#indexes..0) :'(
   splice @indexes,$i,1 if $i > $#operands;
 }
-my $operandsize = $#indexes;
-
-# Rebuild filters hash from GET data
-my @fil = $cgi->param('filters');
-my %filters;
-my @itypes; #contains operands for itype or ccode index
-my $itemtypename; # "itype" or "ccode"
-for ( @fil ) {
-    my ($k, $v) = split ':', $_;
-    if (($k !~ m/itype/) && ($k !~ m/ccode/)) {
-        $filters{$k} = $v;
-    } else {
-        push @itypes, $v;
-        $itemtypename = $k;
-    }
-}
-$filters{'recordtype'} = 'biblio';
 
 # construct query as itype:(@itypes[0] OR @itypes[1]) - item type advanced search
 my $itype_val_str="";
-if (scalar(@itypes)!=0) {
-  push @operators, "AND";
-  $itype_val_str = join ' OR ', @itypes ;
-  $itype_val_str = "($itype_val_str)";
-  push @operands, $itype_val_str;
-  push @indexes, $itemtypename;
+if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
+    push @operators, "AND";
+    $itype_val_str = join ' OR ', @itypes ;
+    $itype_val_str = "($itype_val_str)";
+    push @operands, $itype_val_str;
+    push @indexes, $itype_or_ccode;
 }
 
+my %filters;
 # This array is used to build facets GUI
 my @tplfilters;
-while ( my ($k, $v) = each %filters) {
+for my $filter ( $cgi->param('filters') ) {
+    my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
+    $filters{$k} = $v;
     $v =~ s/"//g;
     push @tplfilters, {
         'ind' => $k,
         'val' => $v,
     };
 }
+$filters{recordtype} = 'biblio';
 $template->param('filters' => \@tplfilters );
+
+
+# append year limits if they exist
+if ( $params->{'limit-yr'} ) {
+    if ( $params->{'limit-yr'} =~ /\d{4}-\d{4}/ ) {
+        my ( $yr1, $yr2 ) = split( /-/, $params->{'limit-yr'} );
+        push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate($yr1) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate($yr2) . '"]';
+        push @operators, 'AND';
+        push @indexes, "date_pubdate";
+        #$q .= ' AND date_pubdate:["' . C4::Search::Engine::Solr::NormalizeDate($yr1) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate($yr2) . '"]';
+    } elsif ( $params->{'limit-yr'} =~ /-\d{4}/ ) {
+        $params->{'limit-yr'} =~ /-(\d{4})/;
+        push @operands, '[* TO "' . C4::Search::Engine::Solr::NormalizeDate($1) . '"]';
+        push @operators, 'AND';
+        push @indexes, "date_pubdate";
+        #$q .= ' AND date_pubdate:[* TO "' . C4::Search::Engine::Solr::NormalizeDate($1) . '"]';
+    } elsif ( $params->{'limit-yr'} =~ /\d{4}-/ ) {
+        $params->{'limit-yr'} =~ /(\d{4})-/;
+        push @operands, '["' . C4::Search::Engine::Solr::NormalizeDate($1) . '" TO *]';
+        push @operators, 'AND';
+        push @indexes, "date_pubdate";
+        #$q .= ' AND date_pubdate:["' . C4::Search::Engine::Solr::NormalizeDate($1) . '" TO *]';
+    } elsif ( $params->{'limit-yr'} =~ /\d{4}/ ) {
+        push @operands, '"' . C4::Search::Engine::Solr::NormalizeDate($params->{'limit-yr'}) . '"';
+        push @operators, 'AND';
+        push @indexes, "date_pubdate";
+        #$q .= ' AND date_pubdate:"' . C4::Search::Engine::Solr::NormalizeDate($params->{'limit-yr'}) . '"';
+    } else {
+        #FIXME: Should return a error to the user, incorect date format specified
+    }
+}
+
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 
 #build search in authorised value list
@@ -433,23 +492,6 @@ if ($params->{'avlist'}) {
    }
 }
 
-# append year limits if they exist
-if ( $params->{'limit-yr'} ) {
-    if ( $params->{'limit-yr'} =~ /\d{4}-\d{4}/ ) {
-        my ( $yr1, $yr2 ) = split( /-/, $params->{'limit-yr'} );
-        $q .= ' AND date_pubdate:["' . C4::Search::Engine::Solr::NormalizeDate($yr1) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate($yr2) . '"]';
-    } elsif ( $params->{'limit-yr'} =~ /-\d{4}/ ) {
-        $params->{'limit-yr'} =~ /-(\d{4})/;
-        $q .= ' AND date_pubdate:[* TO "' . C4::Search::Engine::Solr::NormalizeDate($1) . '"]';
-    } elsif ( $params->{'limit-yr'} =~ /\d{4}-/ ) {
-        $params->{'limit-yr'} =~ /(\d{4})-/;
-        $q .= ' AND date_pubdate:["' . C4::Search::Engine::Solr::NormalizeDate($1) . '" TO *]';
-    } elsif ( $params->{'limit-yr'} =~ /\d{4}/ ) {
-        $q .= ' AND date_pubdate:"' . C4::Search::Engine::Solr::NormalizeDate($params->{'limit-yr'}) . '"';
-    } else {
-        #FIXME: Should return a error to the user, incorect date format specified
-    }
-}
 
 my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
 C4::Context->preference("DebugLevel") eq '2' && warn "ProSolrSimpleSearch:q=$q:";
@@ -467,14 +509,15 @@ my $pager = Data::Pagination->new(
     $page,
 );
 # This array is used to build pagination links
-my @pager_params = map { {
+my @follower_params = map { {
     ind => 'filters',
     val => $_->{'ind'}.':"'.$_->{'val'}.'"'
 } } @tplfilters;
-push @pager_params, map { { ind => 'q'      , val => $_ } } @operands;
-push @pager_params, map { { ind => 'idx'    , val => $_ } } @indexes;
-push @pager_params, map { { ind => 'op'     , val => $_ } } @operators;
-push @pager_params, { ind => 'sort_by', val => $sort_by };
+push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
+push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
+push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
+push @follower_params, { ind => 'sort_by', val => $sort_by };
+#warn Data::Dumper::Dumper \@follower_params;
 
 # Pager template params
 $template->param(
@@ -482,7 +525,7 @@ $template->param(
     next_page     => $pager->{'next_page'},
     PAGE_NUMBERS  => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
     current_page  => $page,
-    pager_params  => \@pager_params,
+    follower_params  => \@follower_params,
 );
 
 # populate results with records
@@ -528,10 +571,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
             my $value = $facet->[$i++];
             my $count = $facet->[$i];
             my $lib = $value;
-            if ( $code eq 'ccode' ) {
-                $lib = GetAuthorisedValueLib 'ccode', $value;
-            }
-            elsif ( $code eq 'holdingbranch' ) {
+            if ( $code eq 'holdingbranch' ) {
                 $lib = GetBranchName $value;
             }
             push @values, {
