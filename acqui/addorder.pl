@@ -333,7 +333,7 @@ my $ordermodif;     # Is this an order modification?
             );
             my $record = MARC::Record::new_from_xml( $xml, 'UTF-8' );
             my ( $biblionumber, $bibitemnum, $itemnumber ) = AddItemFromMarc( $record, $$orderinfo{biblionumber} );
-            NewOrderItem( $itemnumber, $$orderinfo{ordernumber} );
+            NewOrderItem( $itemnumber, $$orderinfo{parent_ordernumber} );
 
         }
     }

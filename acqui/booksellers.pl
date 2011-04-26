@@ -117,7 +117,7 @@ for ( my $i = 0 ; $i < $count ; $i++ ) {
             my %inner_line;
             $inner_line{basketno}     = $orders->[$i2]{'basketno'};
             $inner_line{basketname}   = $orders->[$i2]{'basketname'};
-            $inner_line{biblio_count} = scalar @orders;
+            $inner_line{biblio_count} = GetBiblioCountByBasketno( $orders->[$i2]{'basketno'} );
             $inner_line{items_count}  = $items_count;
             $inner_line{authorisedby} = $orders->[$i2]{'authorisedby'};
             my $authby = GetMember( borrowernumber => $orders->[$i2]{'authorisedby'} );
