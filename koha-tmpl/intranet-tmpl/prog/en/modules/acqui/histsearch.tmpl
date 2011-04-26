@@ -156,28 +156,29 @@
 	<fieldset class="action"><input type="submit" value="Search" /></fieldset>
 	</form><!-- /TMPL_UNLESS -->
 	<!-- TMPL_IF NAME="suggestions_loop" --><h1>Search Results</h1>
-    <div id="acqui_histsearch">
-        <table id="orders">
+	<div id="acqui_histsearch">
+		<table id="orders">
             <thead>
-                <tr>
-		    <th>Parent order number</th>
-                    <th>Basket</th>
-                    <th>Basket group</th>
-                    <th>Invoice Number</th>
-                    <th>Summary</th>
-                    <th>Vendor</th>
+    			<tr>
+                    <th>Order line</th>
+		    		<th>Basket</th>
+			    	<th>Basket group</th>
+				    <th>Invoice Number</th>
+    				<th>Summary</th>
+	    			<th>Vendor</th>
                     <th>Budget</th>
                     <th>Branch</th>
-                    <th>Placed on</th>
-                    <th>Received on</th>
-                    <th>Quantity received/ordered</th>
-                    <th>Unit cost</th>
-                </tr>
+		    		<th>Placed on</th>
+			    	<th>Received on</th>
+				    <th>Quantity received</th>
+                    <th>pending order</th>
+	    			<th>Unit cost</th>
+		    	</tr>
             </thead>
 
-            <tbody>
-            <!-- TMPL_LOOP NAME="suggestions_loop" -->
-	    	<tr>
+            <tbody>			
+			<!-- TMPL_LOOP NAME="suggestions_loop" -->
+				<tr>
                     <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                     <td><!-- TMPL_VAR name="basketname" --> (<a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->"><!-- TMPL_VAR name="basketno" --></a>)</td>
             <td><!-- TMPL_VAR name="groupname" --> (<a href="basketgroup.pl?booksellerid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="basketgroupid" --></a>)</td>
@@ -189,18 +190,19 @@
                     </td>
                     <td><a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html" --></a>
                         <br /><!-- TMPL_VAR NAME="author" --></td>
-                    <td><a href="/cgi-bin/koha/acqui/supplier.pl?supplierid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR NAME="name" --></a></td>
+					<td><a href="/cgi-bin/koha/acqui/supplier.pl?supplierid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR NAME="name" --></a></td>
                     <td><!-- TMPL_VAR name="budget_name" --></td>
                     <td><!-- TMPL_VAR name="branchcode" --></td>
-                    <td><!-- TMPL_VAR name="creationdate" --></td>
-                    <td><!-- TMPL_VAR name="datereceived" --></td>
-                    <td><!-- TMPL_VAR name="quantityreceived" --> / <!-- TMPL_VAR name="quantity" --></td>
-                    <td><!-- TMPL_VAR name="ecost" --></td>
-                </tr>
-            <!-- /TMPL_LOOP -->
+					<td><!-- TMPL_VAR name="creationdate" --></td>
+					<td><!-- TMPL_VAR name="datereceived" --></td>
+					<td><!-- TMPL_VAR name="quantityreceived" --></td>
+					<td><!-- TMPL_VAR name="quantity" --></td>
+					<td><!-- TMPL_VAR name="ecost" --></td>
+				</tr>
+			<!-- /TMPL_LOOP -->
             </tbody>
-        </table>
-    </div><!-- TMPL_ELSE --><!-- /TMPL_IF -->
+		</table>
+	</div><!-- TMPL_ELSE --><!-- /TMPL_IF -->
 
 </div>
 </div>
