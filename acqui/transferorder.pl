@@ -121,10 +121,12 @@ if( $basketno && $ordernumber) {
     );
 # Search for booksellers to transfer from/to
 } else {
-    if( $query ) {
+    $op = '' unless $op;
+    if( $op eq "do_search" ) {
         my @booksellers = GetBookSeller($query);
         $template->param(
             query => $query,
+            do_search => 1,
             booksellersloop => \@booksellers,
         );
     } else {
