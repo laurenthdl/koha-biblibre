@@ -321,6 +321,47 @@ if ( $op eq 'delete_confirm' ) {
     my $gist_est       = $gist_rrp -       ( $gist_rrp * $discount );
     my $total_est_gste = $total_rrp_gste - ( $total_rrp_gste * $discount );
 
+    # Get cancelled orders
+    @results = GetCancelledOrders($basketno);
+    $count = scalar @results;
+    my @cancelledorders_loop;
+    for ( my $i = 0 ; $i < $count ; $i++ ) {
+        my $rrp = $results[$i]->{'listprice'};
+        my $qty = $results[$i]->{'quantity'} || 0;
+        if ( !defined $results[$i]->{quantityreceived} ) {
+            $results[$i]->{quantityreceived} = 0;
+        }
+
+        my $budget = GetBudget( $results[$i]->{'budget_id'} );
+        $rrp = ConvertCurrency( $results[$i]->{'currency'}, $rrp );
+
+        my $line_total = $qty * $results[$i]->{'ecost'};
+
+        my %line = %{ $results[$i] };
+
+        $line{basketno}       = $basketno;
+        $line{i}              = $i;
+        $line{budget_name}    = $budget->{budget_name};
+        $line{rrp}            = sprintf( "%.2f", $line{'rrp'} );
+        $line{ecost}          = sprintf( "%.2f", $line{'ecost'} );
+        $line{line_total}     = sprintf( "%.2f", $line_total );
+        $line{odd}            = $i % 2;
+        if ( $line{uncertainprice} ) {
+            $template->param( uncertainprices => 1 );
+            $line{rrp} .= ' (Uncertain)';
+        }
+        if ( $line{'title'} ) {
+            my $volume      = $results[$i]->{'volume'};
+            my $seriestitle = $results[$i]->{'seriestitle'};
+            $line{'title'} .= " / $seriestitle" if $seriestitle;
+            $line{'title'} .= " / $volume"      if $volume;
+        } else {
+            $line{'title'} = "Deleted bibliographic notice, can't find title.";
+        }
+        push @cancelledorders_loop, \%line;
+    }
+
+
     my $contract = &GetContract( $basket->{contractnumber} );
     my @orders   = GetOrders($basketno);
     $template->param(
@@ -340,7 +381,7 @@ if ( $op eq 'delete_confirm' ) {
         name                 => $bookseller->{'name'},
         entrydate            => C4::Dates->new( $results[0]->{'entrydate'}, 'iso' )->output,
         books_loop           => \@books_loop,
-        count                => $count,
+        cancelledorders_loop => \@cancelledorders_loop,
         gist_rate            => sprintf( "%.2f", $gist * 100 ) . '%',
         total_rrp_gste       => sprintf( "%.2f", $total_rrp_gste ),
         total_est_gste       => sprintf( "%.2f", $total_est_gste ),
