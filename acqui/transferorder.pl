@@ -93,6 +93,10 @@ if( $basketno && $ordernumber) {
     exit;
 # Show open baskets for this bookseller
 } elsif ( $bookselleridto && $ordernumber) {
+    my $order = GetOrder( $ordernumber );
+    my $basketfrom = GetBasket( $order->{basketno} );
+    my $booksellerfrom = GetBookSellerFromId( $basketfrom->{booksellerid} );
+    $booksellerfromname = $booksellerfrom->{name};
     my $baskets = GetBasketsByBookseller( $bookselleridto );
     my $basketscount = scalar @$baskets;
     my @basketsloop = ();
