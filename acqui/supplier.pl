@@ -113,7 +113,7 @@ if ( $op eq "display" ) {
         listincgst    => $booksellers[0]->{'listincgst'},
         invoiceincgst => $booksellers[0]->{'invoiceincgst'},
         gstrate       => $booksellers[0]->{'gstrate'} * 100,
-        discount      => $booksellers[0]->{'discount'},
+        discount      => sprintf("%.2f", $booksellers[0]->{'discount'}*100),
         deliverytime  => $booksellers[0]->{'deliverytime'},
         invoiceprice  => $booksellers[0]->{'invoiceprice'},
         listprice     => $booksellers[0]->{'listprice'},
