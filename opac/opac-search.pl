@@ -434,11 +434,17 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
             my $value = $facet->[$i++];
             my $count = $facet->[$i];
             utf8::encode($value);
-            my $lib = $value;
-            if ( $code eq 'holdingbranch' ) {
+            my $lib;
+            if ( $code =~/branch/ ) {
                 $lib = GetBranchName $value;
             }
- 
+            if ( $code =~/itype/ ) {
+                $lib = GetSupportName $value;
+            }
+            if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
+                $lib = GetAuthorisedValueLib $avlist,$value;
+            }
+            $lib ||=$value;
             push @values, {
                 'lib'     => $lib,                
                 'value'   => $value,
