@@ -6,12 +6,30 @@
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
+    $.tablesorter.addParser({
+        id: 'articles',
+        is: function(s) {return false;  },
+        format: function(s) { return s.toLowerCase().replace(/^(the|an|a) /,''); },
+        type: 'text'
+    });
 
 	$(document).ready(function(){
     var tabs = $("#results > ul").tabs();
     <!-- TMPL_IF NAME="tab" -->
         tabs.tabs("select", <!-- TMPL_VAR NAME="tab" -->);
     <!-- /TMPL_IF -->
+    <!-- TMPL_LOOP NAME="resultsloop" -->
+        $("#resultst<!-- TMPL_VAR NAME="server_id" -->").tablesorter({
+            widgets: ['zebra'],
+            sortList: [[0,0]],
+            headers: {
+                0: {sorter:false}, 
+                1: {sorter:'articles'},
+                7: {sorter:false},
+                8: {sorter:false}
+            }
+        });
+    <!-- /TMPL_LOOP -->
     $("#CheckAll").click(function(){
         $(".checkboxed").checkCheckboxes();
         return false;
@@ -122,7 +140,7 @@
                </div>
             <!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="serverresultsloop" -->
-            <table>
+            <table id="resultst<!-- TMPL_VAR NAME="server_id" -->">
                 <thead><tr>
                     <th>Server</th>
                     <th>Title</th>
@@ -138,14 +156,7 @@
                     <!-- TMPL_LOOP name="serverresultsloop" -->
                     <!-- TMPL_IF NAME="breedingid" -->
 	                <tr id="row<!-- TMPL_VAR NAME="breedingid" -->">
-	                    <td><!-- TMPL_VAR name="server" -->
-                            <div class="linktools">
-                                <a href="/cgi-bin/koha/catalogue/showmarc.pl?importid=<!-- TMPL_VAR NAME="breedingid" -->" rel="gb_page_center[600,500]">Preview MARC</a>
-                                <a href="/cgi-bin/koha/catalogue/showmarc.pl?viewas=card&amp;importid=<!-- TMPL_VAR NAME="breedingid" -->" rel="gb_page_center[600,500]">Preview Card</a>
-                                <a href="#" onclick="Import(<!-- TMPL_VAR NAME="breedingid" -->,0); return false">Import</a>
-                                <a href="#" onclick="closemenu();return false;" title="Close this menu"> X </a>
-                            </div>
-                        </td>
+	                    <td><!-- TMPL_VAR name="server" --></td>
                         <td><!-- TMPL_VAR NAME="title" --></td>
                         <td><!-- TMPL_VAR NAME="author" --></td>
                         <td><!-- TMPL_VAR NAME="date" --></td>
