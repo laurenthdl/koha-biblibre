@@ -23,6 +23,7 @@
     <div class="yui-b">
         <!-- Main content -->
         <!-- TMPL_IF NAME="basketsloop" -->
+            <h1>Baskets for <!-- TMPL_VAR NAME="booksellertoname" --></h1>
             <table>
                 <thead>
                     <th>Basket (#)</th>
@@ -33,7 +34,7 @@
                 <tbody>
                     <!-- TMPL_LOOP NAME="basketsloop" -->
                         <td><!-- TMPL_VAR NAME="basketname" --> (#<!-- TMPL_VAR NAME="basketno" -->)</td>
-                        <td><!-- TMPL_VAR NAME="authorisedby" --></td>
+                        <td><!-- TMPL_VAR NAME="createdby" --></td>
                         <td><!-- TMPL_VAR NAME="creationdate" --></td>
                         <td><a href="transferorder.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->">Choose</a>
                     <!-- /TMPL_LOOP --><!-- basketsloop -->
@@ -41,6 +42,7 @@
             </table>
         <!-- /TMPL_IF --><!-- basketsloop -->
         <!-- TMPL_IF NAME="ordersloop" -->
+            <h1>Orders for <!-- TMPL_VAR NAME="booksellerfromname" --></h1>
             <table>
                 <thead>
                     <th>Order</th>
@@ -62,6 +64,11 @@
             </table>
         <!-- /TMPL_IF --><!-- ordersloop -->
         <!-- TMPL_IF NAME="query" -->
+        <!-- TMPL_IF NAME="bookselleridfrom" -->
+            <h1>Choose a vendor to transfer to</h1>
+        <!-- TMPL_ELSE -->
+            <h1>Choose a vendor to transfer from</h1>
+        <!-- /TMPL_IF -->
         <!-- TMPL_IF NAME="booksellersloop" -->
             <table>
                 <thead>
@@ -80,6 +87,11 @@
         <!-- /TMPL_IF --><!-- booksellersloop -->
         <!-- /TMPL_IF --><!-- query -->
         <!-- TMPL_IF NAME="search_form" -->
+        <!-- TMPL_IF NAME="bookselleridfrom" -->
+            <h1>Search for a vendor to transfer to</h1>
+        <!-- TMPL_ELSE -->
+            <h1>Search for a vendor to transfer from</h1>
+        <!-- /TMPL_IF -->
             <form method="get" action="transferorder.pl">
                 <!--  TMPL_IF NAME="ordernumber" -->
                     <input type="hidden" name="ordernumber" value="<!-- TMPL_VAR NAME="ordernumber" -->" />
