@@ -26,7 +26,7 @@ use MARC::Record;
 use C4::Suggestions;
 use C4::Biblio;
 use C4::Debug;
-use C4::SQLHelper qw(InsertInTable);
+use C4::SQLHelper qw(InsertInTable UpdateInTable);
 use C4::Items;
 use C4::Bookseller qw(GetBookSellerFromId);
 use Text::CSV::Encoded;
@@ -65,7 +65,7 @@ BEGIN {
 
       &GetItemnumbersFromOrder
 
-      &GetParentQuantity
+      &GetBiblioCountByBasketno
     );
 }
 
@@ -1099,6 +1099,11 @@ sub NewOrder {
 
     $orderinfo->{parent_ordernumber} = $parent_ordernumber if $parent_ordernumber;
     my $ordernumber = InsertInTable( "aqorders", $orderinfo );
+    if ( not $parent_ordernumber ) {
+        $orderinfo->{parent_ordernumber} = $ordernumber;
+        $orderinfo->{ordernumber} = $ordernumber;
+        UpdateInTable( "aqorders", $orderinfo );
+    }
     return ( $orderinfo->{'basketno'}, $ordernumber );
 }
 
@@ -1886,7 +1891,6 @@ sub GetHistory {
             $total_qty         += $line->{'quantity'};
             $total_qtyreceived += $line->{'quantityreceived'};
             $total_price       += $line->{'quantity'} * $line->{'ecost'};
-            $line->{quantity} = GetParentQuantity($line->{parent_ordernumber});
         }
     }
     return \@order_loop, $total_qty, $total_price, $total_qtyreceived;
@@ -1994,32 +1998,34 @@ sub GetContract {
     return $result;
 }
 
-=head3 GetParentQuantity
+
+=head3 GetBiblioCountByBasketno
 
 =over 4
 
-$quantity = &GetParentQuantity($parent_ordernumber);
+$biblio_count = &GetBiblioCountByBasketno($basketno);
 
-Looks up the order's quantity that has ordernumber value $parent_ordernumber
+Looks up the biblio's count that has basketno value $basketno
 
 Returns a quantity
 
 =back
 
 =cut
-sub GetParentQuantity {
-    my ($parent_ordernumber) = @_;
+sub GetBiblioCountByBasketno {
+    my ($basketno) = @_;
     my $dbh          = C4::Context->dbh;
     my $query        = "
-        SELECT quantity
+        SELECT COUNT( DISTINCT( biblionumber ) )
         FROM   aqorders
-        WHERE  ordernumber = ?
+        WHERE  basketno = ?
+            AND (datecancellationprinted IS NULL OR datecancellationprinted='0000-00-00');
         ";
-
     my $sth = $dbh->prepare($query);
-    $sth->execute($parent_ordernumber);
+    $sth->execute($basketno);
     return $sth->fetchrow;
 }
+
 
 1;
 __END__
