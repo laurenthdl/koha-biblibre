@@ -28,6 +28,7 @@ use C4::Output;
 use C4::Context;
 use C4::Acquisition;
 use C4::Bookseller;
+use C4::Members;
 use C4::Dates qw/format_date_in_iso/;
 use Date::Calc qw/Today/;
 
@@ -51,6 +52,17 @@ my $basketno        = $input->param('basketno');
 my $op              = $input->param('op');
 my $query           = $input->param('query');
 
+my $booksellerfrom = GetBookSellerFromId($bookselleridfrom);
+my $booksellerfromname;
+if($booksellerfrom){
+    $booksellerfromname = $booksellerfrom->{name};
+}
+my $booksellerto = GetBookSellerFromId($bookselleridto);
+my $booksellertoname;
+if($booksellerto){
+    $booksellertoname = $booksellerto->{name};
+}
+
 # Transfer order and exit
 if( $basketno && $ordernumber) {
     my ($year, $month, $day) = Today();
@@ -72,7 +84,7 @@ if( $basketno && $ordernumber) {
     $order->{basketno} = $basketno;
     $order->{internalnotes} = "Transfered from $booksellerfrom->{name} on $today";
     NewOrder($order);
-    print $input->redirect("cgi-bin/koha/acqui/parcels.pl?supplierid=$bookselleridfrom");
+    print $input->redirect("/cgi-bin/koha/acqui/parcels.pl?supplierid=$bookselleridfrom");
     exit;
 # Show open baskets for this bookseller
 } elsif ( $bookselleridto && $ordernumber) {
@@ -82,6 +94,8 @@ if( $basketno && $ordernumber) {
     for( my $i = 0 ; $i < $basketscount ; $i++ ){
         my %line;
         %line = %{ $baskets->[$i] };
+        my $createdby = GetMember(borrowernumber => $line{authorisedby});
+        $line{createdby} = "$createdby->{surname}, $createdby->{firstname}";
         push @basketsloop, \%line unless $line{closedate};
     }
     $template->param(
@@ -117,7 +131,9 @@ if( $basketno && $ordernumber) {
 
 $template->param(
     bookselleridfrom    => $bookselleridfrom,
+    booksellerfromname  => $booksellerfromname,
     bookselleridto      => $bookselleridto,
+    booksellertoname    => $booksellertoname,
     ordernumber         => $ordernumber,
     basketno            => $basketno,
 );
