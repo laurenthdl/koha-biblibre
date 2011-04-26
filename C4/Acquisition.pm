@@ -1327,7 +1327,7 @@ sub ModReceiveOrder {
         $order->{'quantity'} -= $quantrec;
         $order->{'quantityreceived'} = 0;
         $order->{'orderstatus'} = 2;
-        my $newOrder = NewOrder($order, $ordernumber);
+        my $newOrder = NewOrder($order, $$order{parent_ordernumber});
     } else {
         $sth = $dbh->prepare(
             "update aqorders
