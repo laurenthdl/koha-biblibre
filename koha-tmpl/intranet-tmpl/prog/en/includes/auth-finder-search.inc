@@ -14,7 +14,7 @@ YAHOO.util.Event.onContentReady("header_search", function() {
 
         // authority_search
         this.authority_search_ds = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
-        this.authority_search_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=authority_search";
+        this.authority_search_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=authority_search&authtypecode=<!-- TMPL_VAR ESCAPE='URL' NAME="authtypecode" -->";
         this.authority_search_ds.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
         this.authority_search_ds.maxCacheEntries = 60;
         this.authority_search_ds.queryMatchSubset = false;
@@ -28,7 +28,7 @@ YAHOO.util.Event.onContentReady("header_search", function() {
 
         // main_heading
         this.main_heading_ds = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
-        this.main_heading_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=main_heading";
+        this.main_heading_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=main_heading&authtypecode=<!-- TMPL_VAR ESCAPE='URL' NAME="authtypecode" -->";
         this.main_heading_ds.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
         this.main_heading_ds.maxCacheEntries = 60;
         this.main_heading_ds.queryMatchSubset = false;
@@ -43,7 +43,7 @@ YAHOO.util.Event.onContentReady("header_search", function() {
 
         // all_headings
         this.all_headings_ds = new YAHOO.widget.DS_XHR("/cgi-bin/koha/authorities/ysearch.pl", ["\n", "\t"]);
-        this.all_headings_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=all_headings";
+        this.all_headings_ds.scriptQueryAppend = "orderby=<!-- TMPL_VAR NAME='name_index_name' --> asc&searchtype=all_headings&authtypecode=<!-- TMPL_VAR ESCAPE='URL' NAME="authtypecode" -->";
         this.all_headings_ds.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
         this.all_headings_ds.maxCacheEntries = 60;
         this.all_headings_ds.queryMatchSubset = false;
