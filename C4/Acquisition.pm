@@ -51,8 +51,8 @@ BEGIN {
       &GetBasketgroups &ReOpenBasketgroup
 
       &NewOrder &DelOrder &ModOrder &GetPendingOrders &GetOrder &GetOrders
-      &GetOrderNumber &GetLateOrders &GetOrderFromItemnumber
-      &SearchOrder &GetHistory &GetRecentAcqui
+      &GetCancelledOrders &GetOrderNumber &GetLateOrders
+      &GetOrderFromItemnumber &SearchOrder &GetHistory &GetRecentAcqui
       &ModReceiveOrder &ModOrderBiblioitemNumber
 
       &NewOrderItem &ModOrderItem
@@ -863,6 +863,31 @@ sub GetOrders {
             LEFT JOIN biblioitems      ON biblioitems.biblionumber =biblio.biblionumber
         WHERE   basketno=?
             AND (datecancellationprinted IS NULL OR datecancellationprinted='0000-00-00')
+    ";
+
+    $orderby = "biblioitems.publishercode,biblio.title" unless $orderby;
+    $query .= " ORDER BY $orderby";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($basketno);
+    my $results = $sth->fetchall_arrayref( {} );
+    $sth->finish;
+    return @$results;
+}
+
+sub GetCancelledOrders {
+    my ( $basketno, $orderby ) = @_;
+    my $dbh   = C4::Context->dbh;
+    my $query = "
+        SELECT biblio.*,biblioitems.*,
+                aqorders.*,
+                aqbudgets.*,
+                biblio.title
+        FROM    aqorders
+            LEFT JOIN aqbudgets        ON aqbudgets.budget_id = aqorders.budget_id
+            LEFT JOIN biblio           ON biblio.biblionumber = aqorders.biblionumber
+            LEFT JOIN biblioitems      ON biblioitems.biblionumber =biblio.biblionumber
+        WHERE   basketno=?
+            AND (datecancellationprinted IS NOT NULL AND datecancellationprinted <> '0000-00-00')
     ";
 
     $orderby = "biblioitems.publishercode,biblio.title" unless $orderby;
