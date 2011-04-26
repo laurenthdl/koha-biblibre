@@ -36,7 +36,7 @@
                         <td><!-- TMPL_VAR NAME="basketname" --> (#<!-- TMPL_VAR NAME="basketno" -->)</td>
                         <td><!-- TMPL_VAR NAME="createdby" --></td>
                         <td><!-- TMPL_VAR NAME="creationdate" --></td>
-                        <td><a href="transferorder.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->">Choose</a>
+                        <td><a href="transferorder.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->" onclick="return confirm('Do you want to transfer order <!-- TMPL_VAR NAME="ordernumber" --> from basket <!-- TMPL_VAR NAME="basketfromname" --> (<!-- TMPL_VAR NAME="booksellerfromname" -->) to basket <!-- TMPL_VAR NAME="basketname" --> (<!-- TMPL_VAR NAME="booksellertoname" -->) ?');">Choose</a>
                     <!-- /TMPL_LOOP --><!-- basketsloop -->
                 </tbody>
             </table>
@@ -77,8 +77,10 @@
                 </thead>
                 <tbody>
                     <!-- TMPL_LOOP NAME="booksellersloop" -->
+                      <tr>
                         <td><!-- TMPL_VAR NAME="name" --></td>
                         <td><a href="transferorder.pl?<!-- TMPL_IF NAME="bookselleridfrom" -->bookselleridto<!-- TMPL_ELSE -->bookselleridfrom<!-- /TMPL_IF -->=<!-- TMPL_VAR NAME="id" --><!-- TMPL_IF NAME="ordernumber" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" --><!-- /TMPL_IF -->">Choose</a></td>
+                      </tr>
                     <!-- /TMPL_LOOP -->
                 </tbody>
              </table>
