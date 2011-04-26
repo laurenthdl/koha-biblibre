@@ -33,10 +33,12 @@
                 </thead>
                 <tbody>
                     <!-- TMPL_LOOP NAME="basketsloop" -->
+                      <tr>
                         <td><!-- TMPL_VAR NAME="basketname" --> (#<!-- TMPL_VAR NAME="basketno" -->)</td>
                         <td><!-- TMPL_VAR NAME="createdby" --></td>
                         <td><!-- TMPL_VAR NAME="creationdate" --></td>
                         <td><a href="transferorder.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->" onclick="return confirm('Do you want to transfer order <!-- TMPL_VAR NAME="ordernumber" --> from basket <!-- TMPL_VAR NAME="basketfromname" --> (<!-- TMPL_VAR NAME="booksellerfromname" -->) to basket <!-- TMPL_VAR NAME="basketname" --> (<!-- TMPL_VAR NAME="booksellertoname" -->) ?');">Choose</a>
+                      </tr>
                     <!-- /TMPL_LOOP --><!-- basketsloop -->
                 </tbody>
             </table>
@@ -51,6 +53,7 @@
                 </thead>
                 <tbody>
                     <!-- TMPL_LOOP NAME="ordersloop" -->
+                      <tr>
                         <td><a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->"><!-- TMPL_VAR NAME="ordernumber" --></a></td>
                         <td>
                             <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html"--></a>
@@ -59,6 +62,7 @@
                             <!-- TMPL_IF NAME="publishercode" --><br />Publisher :<!-- TMPL_VAR NAME="publishercode" --><!--/TMPL_IF-->
                         </td>
                         <td><a href="transferorder.pl?bookselleridfrom=<!--TMPL_VAR NAME="bookselleridfrom" -->&ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->">Transfer</a></td>
+                      </tr>
                     <!-- /TMPL_LOOP --><!-- ordersloop -->
                 </tbody>
             </table>
