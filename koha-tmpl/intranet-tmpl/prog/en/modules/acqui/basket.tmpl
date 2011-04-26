@@ -408,6 +408,38 @@
                         <!-- /TMPL_IF -->
                     </tr>
                 <!-- /TMPL_LOOP -->
+                <!-- TMPL_LOOP NAME="cancelledorders_loop" -->
+                    <tr style="color:grey">
+                        <td>
+                            <p>
+                                <!-- TMPL_VAR NAME="title" ESCAPE="html" -->
+                                <!-- TMPL_IF NAME="author" -->by <!-- TMPL_VAR NAME="author" --><!-- /TMPL_IF -->
+                                <!-- TMPL_IF name="notes" --> <!--TMPL_VAR name="notes" --><!-- /TMPL_IF -->
+                                <!-- TMPL_IF name="isbn"--> - <!-- TMPL_VAR name="isbn" --><!-- /TMPL_IF -->
+                                <!-- TMPL_IF name="publishercode" -->, <!-- TMPL_VAR NAME="publishercode" --><!-- /TMPL_IF -->
+                                <!-- TMPL_IF name="publicationyear" -->, <!-- TMPL_VAR NAME="publicationyear" --><!-- /TMPL_IF -->
+                            </p>
+                            <!-- TMPL_IF NAME="internalnotes" -->
+                            <p><em><!-- TMPL_VAR NAME="internalnotes" --></em></p>
+                            <!-- /TMPL_IF -->
+                            </td>
+                        <td class="number"><!-- TMPL_VAR NAME="rrp" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="ecost" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="quantity" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="line_total" --></td>
+                        <td><!-- TMPL_VAR NAME="budget_name" --></td>
+                        <!-- TMPL_IF name="active" -->
+                            <!-- TMPL_UNLESS name="closedate" -->
+                            <td>
+                                <a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">Modify</a>
+                            </td>
+                            <td>
+                            <a href="javascript:confirm_delete_item(<!-- TMPL_VAR NAME="ordernumber" -->,<!-- TMPL_VAR NAME="biblionumber" -->)" class="button">Delete</a>
+                            </td>
+                            <!-- /TMPL_UNLESS -->
+                        <!-- /TMPL_IF -->
+                    </tr>
+                <!-- /TMPL_LOOP --><!-- cancelledorders_loop -->
                 </tbody>
             </table>
         <!-- TMPL_ELSE -->
