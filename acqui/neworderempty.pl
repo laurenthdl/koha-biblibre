@@ -237,12 +237,14 @@ my $budget_loop = [];
 my $budgets = GetBudgetHierarchy(undef, undef, undef);
 
 foreach my $r ( @{$budgets} ) {
-    if ( !defined $r->{budget_amount} || $r->{budget_amount} == 0 ) {
-        next;
-    } elsif ( $r->{budget_permission} == 1 && $r->{budget_owner_id} != $borrower->{borrowernumber} ) {
-        next;
-    } elsif ( $r->{budget_permission} == 2 && defined $r->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode} ) {
-        next;
+    unless($staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
+        if ( !defined $r->{budget_amount} || $r->{budget_amount} == 0 ) {
+            next;
+        } elsif ( $r->{budget_permission} == 1 && $r->{budget_owner_id} != $borrower->{borrowernumber} ) {
+            next;
+        } elsif ( $r->{budget_permission} == 2 && defined $r->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode} ) {
+            next;
+        }
     }
 
     push @{$budget_loop},

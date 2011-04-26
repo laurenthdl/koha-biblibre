@@ -76,7 +76,7 @@ if ( $cur_format eq 'FR' ) {
 }
 my $status           = $query->param('status') || "ASKED";
 my $suggestions_count       = CountSuggestion($status);
-my $budget_arr = GetBudgetHierarchy( '', '', '' );
+my $budget_arr = GetBudgetHierarchy( undef, undef, undef );
 
 my $total      = 0;
 my $totspent   = 0;
@@ -89,30 +89,19 @@ my $totspent_active     = 0;
 my $totordered_active   = 0;
 my $totavail_active     = 0;
 
-unless ( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
-    # Check permissions
-    my $i = 0;
-    while ($i < @$budget_arr) {
-        my $budget = $$budget_arr[$i];
-        if($budget->{budget_permission} == 1) {  # owner
-            if($budget->{budget_owner_id} != $user->{'borrowernumber'} ) {
-                splice @$budget_arr, $i, 1;
-            }
-        } elsif ($budget->{budget_permission} == 2) {   # library
-            if( C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
-                splice @$budget_arr, $i, 1;
-            }
-        } elsif ($budget->{budget_permission} == 3) {   # owner + users
-            my $users = GetUsersFromBudget($budget->{budget_id});
-            if( !defined $users->{$user->{borrowernumber}} && $budget->{budget_owner_id} != $user->{borrowernumber} ) {
-                splice @$budget_arr, $i, 1;
-            }
-        }
-        $i++;
-    }
-}
-
+my $borrower = GetMember ( borrowernumber => $loggedinuser );
+my @budgets_loop = ();
 foreach my $budget ( @$budget_arr ) {
+    unless($staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
+        if ( !defined $budget->{budget_amount} || $budget->{budget_amount} == 0 ) {
+            next;
+        } elsif ( $budget->{budget_permission} == 1 && $budget->{budget_owner_id} != $borrower->{borrowernumber} ) {
+            next;
+        } elsif ( $budget->{budget_permission} == 2 && defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
+            next;
+        }
+    }
+
     $budget->{budget_code_indent} =~ s/\ /\&nbsp\;/g;
 
     $budget->{'budget_branchname'} = GetBranchName( $budget->{'budget_branchcode'} );
@@ -150,11 +139,12 @@ foreach my $budget ( @$budget_arr ) {
     for my $field (qw( budget_amount budget_spent budget_ordered budget_avail )) {
         $budget->{$field} = $num_formatter->format_price( $budget->{$field} );
     }
+    push @budgets_loop, $budget;
 }
 
 $template->param(
     type        => 'intranet',
-    loop_budget => $budget_arr,
+    loop_budget => \@budgets_loop,
     branchname  => $branchname,
     total       => $num_formatter->format_price($total),
     totspent    => $num_formatter->format_price($totspent),
