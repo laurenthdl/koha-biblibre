@@ -18,6 +18,21 @@ function closemenu(){
 }
 $(document).ready(function(){
     $("#results > ul").tabs();
+    <!-- TMPL_IF NAME="tab" -->
+        tabs.tabs("select", <!-- TMPL_VAR NAME="tab" -->);
+    <!-- /TMPL_IF -->
+    <!-- TMPL_LOOP NAME="resultsloop" -->
+        $("#resultst<!-- TMPL_VAR NAME="server_id" -->").tablesorter({
+            widgets: ['zebra'],
+            sortList: [[1,0]],
+            headers: {
+                0: {sorter:false}, 
+                1: {sorter:'articles'},
+                7: {sorter:false},
+                8: {sorter:false}
+            }
+        });
+    <!-- /TMPL_LOOP -->
     $("#CheckAll").click(function(){
         $(".checkboxed").checkCheckboxes();
         return false;
@@ -140,7 +155,7 @@ tr.selected { background-color : #FFFFCC; } tr.selected td { background-color : 
                </div>
             <!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="serverresultsloop" -->
-            <table>
+            <table id="resultst<!-- TMPL_VAR NAME="server_id" -->">
                 <thead><tr>
                     <th>Server</th>
                     <th>Title</th>

@@ -50,6 +50,7 @@ my $stdid         = $input->param('stdid');
 my $srchany       = $input->param('srchany');
 my $random        = $input->param('random') || rand(1000000000);    # this var is not useful anymore just kept for rel2_2 compatibility
 my $op            = $input->param('op');
+my $tab           = $input->param('tab');
 my $numberpending;
 my $attr = '';
 my $term;
@@ -279,6 +280,7 @@ if ( $op ne "do_search" ) {
                 for( my $i = 0; $i < @oResult; $i++){
                     push @pager_params, { ind => "server".$i."_page", val => $server_page[$i] } if ( $i != $k && $server_page[$i] != 1 );
                 }
+                push @pager_params, {ind => "tab", val => $k };
                 push( @resultsloop, {
                     server_id => "server$k",
                     server_name => $servername[$k],
@@ -298,6 +300,7 @@ if ( $op ne "do_search" ) {
         server        => $servername[$k],
         numberpending => $numberpending,
         biblionumber  => $biblionumber,
+        tab           => $tab,
         errconn       => \@errconn
     );
     output_html_with_http_headers $input, $cookie, $template->output if $numberpending == 0;
