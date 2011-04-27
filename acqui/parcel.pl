@@ -290,8 +290,9 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
                 delete $line{budget_lock} if $parents_perm == '1';
             }
         } elsif ( $budget->{budget_permission} == 2 ) {
-
-            $line{budget_lock} = 1 if C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode};
+            if(defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ){
+                $line{budget_lock} = 1;
+            }
         } elsif ( $budget->{budget_permission} == 3) {
             my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
             if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){

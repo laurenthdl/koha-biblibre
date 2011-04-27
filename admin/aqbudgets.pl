@@ -305,7 +305,7 @@ if ( $op eq 'add_form' ) {
                     delete $budget->{'budget_lock'} if $parents_perm == '1';
                 }
             } elsif ( $budget->{budget_permission} == 2 ) {
-                if( $user_branchcode ne $budget->{budget_branchcode} ){
+                if( defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) ){
                     next if(!$show_all);
                     $budget->{'budget_lock'} = 1;
                 }
