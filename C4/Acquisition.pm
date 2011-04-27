@@ -1363,6 +1363,26 @@ sub ModReceiveOrder {
         $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $biblionumber, $ordernumber );
         $sth->finish;
     }
+
+    # Removing MARC order field if exists
+    # Do we have to remove order informations from the marc record?
+    my ($ordertag, $ordersubtag) = GetMarcFromKohaField('aqorders.ordernumber', 'ACQ');
+    if ($ordertag and $ordersubtag) {
+	# Getting record
+	my $record = GetMarcBiblio($biblionumber);
+	if ($record) {
+	    # Looking for the right field
+	    foreach ($record->field($ordertag)) {
+		if ($_->subfield($ordersubtag) eq $ordernumber) {
+		   $record->delete_field($_); 
+		}
+	    }
+	    # Applying changes
+	    ModBiblio($record, $biblionumber, 'ACQ'); 
+	}
+    }
+
+
     return $datereceived;
 }
 

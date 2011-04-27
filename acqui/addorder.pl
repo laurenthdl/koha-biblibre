@@ -219,6 +219,9 @@ my $ordermodif;     # Is this an order modification?
                 "aqorders.branchcode"         => $$orderinfo{branchcode} ? $$orderinfo{branchcode} : "",
                 "aqorders.quantity"           => $$orderinfo{quantity} ? $$orderinfo{quantity} : "",
                 "aqorders.listprice"          => $$orderinfo{listprice} ? $$orderinfo{listprice} : "",
+                "aqorders.uncertainprice"     => $$orderinfo{uncertainprice} ? $$orderinfo{uncertainprice} : "",
+                "aqorders.rrp"                => $$orderinfo{rrp} ? $$orderinfo{rrp} : "",
+                "aqorders.ecost"              => $$orderinfo{ecost} ? $$orderinfo{ecost} : "",
                 "aqorders.notes"              => $$orderinfo{notes} ? $$orderinfo{notes} : "",
                 "aqorders.supplierreference"  => $supplierreference ? $supplierreference : "",
             }
@@ -275,13 +278,11 @@ my $ordermodif;     # Is this an order modification?
 
 	    foreach ($record->field($ordertag)) {
 		# Looking for the matching one
-		warn $_->as_formatted;
-		#warn $osf . "field " . $_->subfield($osf) . " orderinfo " . $$orderinfo{ordernumber};
 		if ($_->subfield($ordersubtag) eq $$orderinfo{ordernumber}) {
 
 		    # Replacing or creating subfields
 		    my ($t, $st);
-		    for my $tablefield (qw/branchcode quantity listprice notes supplierreference/) {
+		    for my $tablefield (qw/branchcode quantity listprice uncertainprice rrp ecost notes supplierreference/) {
 			($t, $st) = GetMarcFromKohaField("aqorders.$tablefield", 'ACQ');
 			$_->update($st, $$orderinfo{$tablefield}) if ($$orderinfo{$tablefield});
 		    }
