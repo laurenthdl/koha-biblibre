@@ -366,6 +366,11 @@ foreach my $budget (@budgets) {
             $budget_lock = 1 if $borrower_id != $budget->{'budget_owner_id'};
         } elsif ( $budget->{budget_permission} == 2 ) {
             $budget_lock = 1 if $borrower_branchcode ne $budget->{budget_branchcode};
+        } elsif ( $budget->{budget_permission} == 3 ) {
+            my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
+            if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
+                $budget_lock = 1;
+            }
         }
     }
 

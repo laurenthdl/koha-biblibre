@@ -261,8 +261,7 @@ if ( $op eq 'add_form' ) {
         budget_id             => $budget_id,
         %$period,
     );
-
-    my $moo = GetBudgetHierarchy( $$period{budget_period_id}, C4::Context->userenv->{branchcode}, $show_all ? '' : $borrower_id );
+    my $moo = GetBudgetHierarchy( $$period{budget_period_id}, undef, undef );
     my @budgets = @$moo;    #FIXME
 
     my $toggle = 0;
@@ -295,6 +294,7 @@ if ( $op eq 'add_form' ) {
             } elsif ( $budget->{budget_permission} == 1 ) {
 
                 if ( $borrower_id != $budget->{'budget_owner_id'} ) {
+                    next if(!$show_all);
                     $budget->{'budget_lock'} = 1;
                 }
 
@@ -305,9 +305,17 @@ if ( $op eq 'add_form' ) {
                     delete $budget->{'budget_lock'} if $parents_perm == '1';
                 }
             } elsif ( $budget->{budget_permission} == 2 ) {
-
-                $budget->{'budget_lock'} = 1 if $user_branchcode ne $budget->{budget_branchcode};
-            }
+                if( $user_branchcode ne $budget->{budget_branchcode} ){
+                    next if(!$show_all);
+                    $budget->{'budget_lock'} = 1;
+                }
+            } elsif ( $budget->{budget_permission} == 3 ) {
+                my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
+                if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
+                    next if(!$show_all);
+                    $budget->{'budget_lock'} = 1;
+                }
+             }
         }    # ...SUPER_LIB END
 
         # if a budget search doesnt match, next

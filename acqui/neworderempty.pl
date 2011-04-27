@@ -244,6 +244,11 @@ foreach my $r ( @{$budgets} ) {
             next;
         } elsif ( $r->{budget_permission} == 2 && defined $r->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode} ) {
             next;
+        } elsif ( $r->{budget_permission} == 3 ) {
+            my $budgetusers = GetUsersFromBudget( $r->{budget_id} );
+            if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}) {
+                next;
+            }
         }
     }
 

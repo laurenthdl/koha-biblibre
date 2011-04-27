@@ -117,6 +117,11 @@ foreach (@lateorders) {
             }
         } elsif ( $budget->{budget_permission} == 2 ) {
             $_->{budget_lock} = 1 if C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode};
+        } elsif ( $budget->{budget_permission} == 3 ) {
+            my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
+            if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
+                $_->{budget_lock} = 1;
+            }
         }
     }
 
