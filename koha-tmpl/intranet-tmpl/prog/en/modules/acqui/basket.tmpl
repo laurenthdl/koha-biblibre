@@ -56,7 +56,6 @@
         $("#show_all_details").attr('checked', false);
         updateColumnsVisibility(false);
 
-
     });
 //]]>
 </script>
@@ -408,6 +407,27 @@
                         <!-- /TMPL_IF -->
                     </tr>
                 <!-- /TMPL_LOOP -->
+                </tbody>
+            </table>
+        <!-- TMPL_ELSE -->
+            <table>
+                <tr><td>Basket empty</td></tr>
+            </table>
+        <!-- /TMPL_IF -->
+        <!-- TMPL_IF NAME="cancelledorders_loop" -->
+            <h2>Cancelled Orders</h2>
+            <table id="cancelledorders">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>RRP</th>
+                        <th>Est.</th>
+                        <th>Qty.</th>
+                        <th>Total</th>
+                        <th>Fund</th>
+                    </tr>
+                </thead>
+
                 <!-- TMPL_LOOP NAME="cancelledorders_loop" -->
                     <tr style="color:grey">
                         <td>
@@ -428,23 +448,9 @@
                         <td class="number"><!-- TMPL_VAR NAME="quantity" --></td>
                         <td class="number"><!-- TMPL_VAR NAME="line_total" --></td>
                         <td><!-- TMPL_VAR NAME="budget_name" --></td>
-                        <!-- TMPL_IF name="active" -->
-                            <!-- TMPL_UNLESS name="closedate" -->
-                            <td>
-                                <a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">Modify</a>
-                            </td>
-                            <td>
-                            <a href="javascript:confirm_delete_item(<!-- TMPL_VAR NAME="ordernumber" -->,<!-- TMPL_VAR NAME="biblionumber" -->)" class="button">Delete</a>
-                            </td>
-                            <!-- /TMPL_UNLESS -->
-                        <!-- /TMPL_IF -->
                     </tr>
                 <!-- /TMPL_LOOP --><!-- cancelledorders_loop -->
                 </tbody>
-            </table>
-        <!-- TMPL_ELSE -->
-            <table>
-                <tr><td>Basket empty</td></tr>
             </table>
         <!-- /TMPL_IF -->
         <!-- TMPL_IF NAME="cancelledorders_loop" -->
