@@ -190,6 +190,8 @@
                 <!-- TMPL_IF NAME="basketcontractno" -->
                     <p>Contract name: <a href="../admin/aqcontract.pl?op=add_form&amp;contractnumber=<!-- TMPL_VAR NAME="basketcontractno" -->&amp;booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->"><!-- TMPL_VAR NAME="basketcontractname" --></a></p>
                 <!-- /TMPL_IF -->
+                <!-- TMPL_IF NAME="deliveryplace" --><p>Delivery place:  <!-- TMPL_VAR NAME="deliveryplace" --></p><!-- /TMPL_IF -->
+                <!-- TMPL_IF NAME="billingplace" --><p>Billing place:  <!-- TMPL_VAR NAME="billingplace" --></p><!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="authorisedbyname" --><p>Managed by:  <!-- TMPL_VAR NAME="authorisedbyname" --></p><!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="creationdate" --><p>Opened on:  <!-- TMPL_VAR NAME="creationdate" --></p><!-- /TMPL_IF -->
                 <!-- TMPL_IF name="closedate" -->
@@ -217,6 +219,8 @@
                 <!-- TMPL_ELSE -->
                     <a href="/cgi-bin/koha/acqui/basketgroup.pl?op=add&booksellerid=<!-- TMPL_VAR name="basketgroups" -->&basketgroupid=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="name" --></a>
                 <!-- /TMPL_IF -->
+                <!-- TMPL_IF NAME="basketgroupdeliveryplace" --><p>Basketgroup Delivery place:  <!-- TMPL_VAR NAME="basketgroupdeliveryplace" --></p><!-- /TMPL_IF -->
+                <!-- TMPL_IF NAME="basketgroupbillingplace" --><p>Basketgroup Billing place:  <!-- TMPL_VAR NAME="basketgroupbillingplace" --></p><!-- /TMPL_IF -->
                 <!-- /TMPL_IF -->
             </div>
         <!-- /TMPL_IF -->

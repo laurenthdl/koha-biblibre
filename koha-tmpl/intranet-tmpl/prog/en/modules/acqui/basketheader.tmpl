@@ -128,6 +128,7 @@ li.list2 {
                 <li>
                     <label for="billingplace">Billing Place:</label>
                     <select name="billingplace" id="billingplace">
+                        <option value="">undefined</option>
                         <!-- TMPL_LOOP name="billingplaceloop" -->
                         <option value="<!-- TMPL_VAR name="value" -->"<!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->>
                           <!--TMPL_VAR name="branchname" -->
@@ -138,6 +139,7 @@ li.list2 {
                 <li>
                     <label for="deliveryplace">Delivery  Place:</label>
                     <select name="deliveryplace" id="deliveryplace">
+                        <option value="">undefined</option>
                         <!-- TMPL_LOOP name="deliveryplaceloop" -->
                         <option value="<!-- TMPL_VAR name="value" -->"<!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->>
                           <!--TMPL_VAR name="branchname" -->

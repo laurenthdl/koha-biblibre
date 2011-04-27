@@ -129,6 +129,8 @@ if ( $op eq 'delete_confirm' ) {
         creationdate         => format_date( $basket->{creationdate} ),
         authorisedby         => $basket->{authorisedby},
         authorisedbyname     => $basket->{authorisedbyname},
+        deliveryplace        => $basket->{deliveryplace}||$basket->{freedeliveryplace},
+        billingplace         => $basket->{billingplace},
         closedate            => format_date( $basket->{closedate} ),
         active               => $bookseller->{'active'},
         booksellerid         => $bookseller->{'id'},
@@ -364,6 +366,14 @@ if ( $op eq 'delete_confirm' ) {
 
     my $contract = &GetContract( $basket->{contractnumber} );
     my @orders   = GetOrders($basketno);
+    if ($basket->{basketgroupid}){
+    	my $basketgroup   = GetBasketgroup($basket->{basketgroupid});
+	for my $key (keys %$basketgroup ){
+		$basketgroup->{"basketgroup$key"}=delete $basketgroup->{$key};
+	}
+	$template->param(%$basketgroup);
+    }
+    
     $template->param(
         basketno             => $basketno,
         basketname           => $basket->{'basketname'},
@@ -374,6 +384,8 @@ if ( $op eq 'delete_confirm' ) {
         creationdate         => C4::Dates->new( $basket->{creationdate}, 'iso' )->output,
         authorisedby         => $basket->{authorisedby},
         authorisedbyname     => $basket->{authorisedbyname},
+        deliveryplace        => $basket->{deliveryplace}||$basket->{freedeliveryplace},
+        billingplace         => $basket->{billingplace},
         closedate            => C4::Dates->new( $basket->{closedate}, 'iso' )->output,
         estimateddeliverydate => C4::Dates->new( $estimateddeliverydate, 'iso' )->output,
         active               => $bookseller->{'active'},
