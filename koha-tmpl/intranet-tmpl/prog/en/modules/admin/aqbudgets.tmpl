@@ -338,7 +338,7 @@
         <!-- TMPL_LOOP name="budgetusersnames_loop" -->
         <li id="<!-- TMPL_VAR name="id" -->">
           <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR name="id" -->"><!-- TMPL_VAR name="name" --></a> 
-          <a href="#" onclick="deleteUser(<!-- TMPL_VAR name='id' -->);return false;">X</a>
+          [<a style="text-decoration:none" href="#" onclick="deleteUser(<!-- TMPL_VAR name='id' -->);return false;">Delete user</a>]
         </li>
         <!-- /TMPL_LOOP -->
       </ul>

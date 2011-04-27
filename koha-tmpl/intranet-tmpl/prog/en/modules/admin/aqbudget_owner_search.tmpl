@@ -15,10 +15,10 @@ function returnOwner(ownerId, ownerName){
     var name = 'budget_<!-- TMPL_VAR NAME="type" -->_name';
     var id = 'budget_<!-- TMPL_VAR NAME="type" -->_id';
     if (type == 'user'){
-      top1.document.getElementById(name).innerHTML += "<li id=\""+ownerId+"\"><a href=\"/cgi-bin/koha/members/moremember.pl?borrowernumber="+ownerId+"\">"+ownerName+"</a> <a href=\"#\" onclick=\"deleteUser("+ownerId+");return false;\">X</a></li>";
+      top1.document.getElementById(name).innerHTML += "<li id=\""+ownerId+"\"><a href=\"/cgi-bin/koha/members/moremember.pl?borrowernumber="+ownerId+"\">"+ownerName+"</a> [<a style=\"text-decoration:none\" href=\"#\" onclick=\"deleteUser("+ownerId+");return false;\">Delete user</a>]</li>";
       top1.document.getElementById(id).value += ownerId+":";
     } else if (type == 'owner') {
-      top1.document.getElementById(name).innerHTML = ownerName;
+      top1.document.getElementById(name).innerHTML = "<a href=\"/cgi-bin/koha/members/moremember.pl?borrowernumber="+ownerId+"\">"+ownerName+"</a>";
       top1.document.getElementById(id).value = ownerId;
     } else {
       alert ('type is undefined');
