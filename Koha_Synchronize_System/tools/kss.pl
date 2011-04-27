@@ -5,16 +5,20 @@ use DBI;
 use Data::Dumper;
 use Getopt::Long;
 use Fcntl qw(:flock);
+use List::MoreUtils qw/none/;
+use File::Basename;
 use YAML;
 
 use C4::Logguer qw(:DEFAULT $log_kss);
 
 use Koha_Synchronize_System::tools::kss;
 
-my $status = "";
+my $status = ""; # Is kss already running?
+my @files;       # Only process specified file(s). Repeatable
 my $help = "";
 GetOptions(
-        'status'   => \$status,
+        's|status'   => \$status,
+	'f|file:s'     => \@files,
     );
 
 if ( $status ) {
@@ -78,7 +82,12 @@ eval {
 
     for my $archive ( @$tar_gz_files ) {
         chomp $archive;
+
         $log->info("=== Gestion de l'archive $archive ===");
+
+	$log->info(" - Pas de traitement de l'archive $archive du au passage d'arguments en ligne de commande") if (scalar(@files) > 0 and none { basename($archive) eq basename($_) } @files);
+	next if (scalar(@files) > 0 and none { basename($archive) eq basename($_) } @files);
+
         $log->info(" - Extraction...");
         system( qq{ $tar_cmd zxvf $archive -C $inbox } ) == 0 or die qq{Can't extract archive $archive in $inbox dir ($?)};
 

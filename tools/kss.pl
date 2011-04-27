@@ -83,12 +83,6 @@ my $ping = Net::Ping->new();
 my $pingresult = $ping->ping($conf->{'cron'}->{'serverhost'});
 $template->param(pingresult => $pingresult);
 
-
-# Execution commands
-my $options = '';
-my $scheduledcommand = "EXPORT KOHA_CONF=\"$CONFIG_NAME\"; " . $$conf{path}{kss_dir} . "tools/kss.pl $options";
-my $manualcommand = "sudo -u kss perl " . $$conf{path}{kss_dir} . 'tools/kss.pl ' . $options;
-
 # Are we a master or a slave?
 my $master = $$conf{cron}{master};
 $template->param('master' => $master);
@@ -131,7 +125,34 @@ if ($master) {
 
     # Process backup file
     if ($input->param("processbackup")) {
-	my $lfh = $input->upload('backupfile');
+
+	my $lightweight_fh = $input->upload('backupfile');
+        my $filename = $input->param('backupfile');
+	
+	# undef may be returned if it's not a valid file handle
+	if (defined $lightweight_fh) {
+	# Upgrade the handle to one compatible with IO::Handle:
+	    my $io_handle = $lightweight_fh->handle;
+	    open (OUTFILE,'>>', '/tmp/' . $filename);
+	    my $buffer;
+	    while (my $bytesread = $io_handle->read($buffer,1024)) {
+		print OUTFILE $buffer;
+	    }
+	    close (OUTFILE);
+
+	    # Moving from tmp to kss inbox
+	    my $command = qx|sudo -u kss $$conf{which_cmd}{cp} /tmp/$filename $$conf{abspath}{server_inbox}|;
+	    qx{$command};
+	    $command = qx|$$conf{which_cmd}{rm} /tmp/$filename|;
+	    qx{$command};
+
+	    # Processing the file
+	    my $command = qx|$COMMAND_EXPORT $COMMAND_SUDO $$conf{path}{kss_dir}tools/kss.pl --file $filename|; 
+	    qx{$command};
+
+      } else {
+	warn "error while getting uploaded file";
+      }
 
     }
 
