@@ -75,6 +75,7 @@ if ($member) {
         # if the member has 'acqui' permission set, then display to table.
         if (   $perms->{superlibrarian} == 1
             || $perms->{acquisition} == 1
+            || $subperms->{acquisition}->{'budget_manage_all'}
             || $subperms->{acquisition}->{'budget_manage'}
             || $subperms->{acquisition}->{'budget_modify'}
             || $subperms->{acquisition}->{'budget_add_del'} ) {
