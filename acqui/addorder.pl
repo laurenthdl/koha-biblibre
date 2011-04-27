@@ -222,6 +222,8 @@ my $ordermodif;     # Is this an order modification?
                 "aqorders.ecost"              => $$orderinfo{ecost} ? $$orderinfo{ecost} : "",
                 "aqorders.notes"              => $$orderinfo{notes} ? $$orderinfo{notes} : "",
                 "aqorders.supplierreference"  => $supplierreference ? $supplierreference : "",
+                "aqorders.sort1"              => $$orderinfo{sort1} ? $$orderinfo{sort1} : "",
+                "aqorders.sort2"              => $$orderinfo{sort2} ? $$orderinfo{sort2} : ""
             }
         );
 
@@ -280,7 +282,7 @@ my $ordermodif;     # Is this an order modification?
 
 		    # Replacing or creating subfields
 		    my ($t, $st);
-		    for my $tablefield (qw/branchcode quantity listprice uncertainprice rrp ecost notes supplierreference/) {
+		    for my $tablefield (qw/branchcode quantity listprice uncertainprice rrp ecost notes supplierreference sort1 sort2/) {
 			($t, $st) = GetMarcFromKohaField("aqorders.$tablefield", 'ACQ');
 			$_->update($st, $$orderinfo{$tablefield}) if ($$orderinfo{$tablefield});
 		    }
