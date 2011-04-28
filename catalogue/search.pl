@@ -454,7 +454,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
                 $lib = GetAuthorisedValueLib $avlist,$value;
             }
             $lib ||=$value;
-             push @values, {
+            push @values, {
                 'lib'     => $lib,
                 'value'   => $value,
                 'count'   => $count,
