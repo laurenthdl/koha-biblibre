@@ -91,10 +91,10 @@ else {
 }
 
 if ($parent_id) {
-    if ( ( $total > $sub_unalloc ) && $sub_unalloc ) {
+    if ( defined $sub_unalloc && ( $total > $sub_unalloc ) ) {
         $returncode = 1;
     }
-} elsif ( ( $total > $budget_period_unalloc ) && $budget_period_unalloc ) {
+} elsif ( defined $budget_period_unalloc && ( $total > $budget_period_unalloc ) ) {
     $returncode = 2;
 
 } else {
