@@ -365,7 +365,7 @@ foreach my $budget (@budgets) {
         } elsif ( $budget->{budget_permission} == 1 ) {
             $budget_lock = 1 if $borrower_id != $budget->{'budget_owner_id'};
         } elsif ( $budget->{budget_permission} == 2 ) {
-            if( defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) ){
+            if( defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
                 $budget_lock = 1;
             }
         } elsif ( $budget->{budget_permission} == 3 ) {
