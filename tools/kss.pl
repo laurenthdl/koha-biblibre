@@ -87,6 +87,14 @@ $template->param(pingresult => $pingresult);
 my $master = $$conf{cron}{master};
 $template->param('master' => $master);
 
+# Parse kss.pl --status to tell if kss is running
+sub is_kss_running {
+    my $kssreturn = shift;
+    my $return = -1;
+    $return = 1 if ($kssreturn =~ /is running$/);
+    $return = 0 if ($kssreturn =~ /not running$/);
+    return $return;
+}
 
 # ------
 # MASTER
@@ -96,7 +104,11 @@ $template->param('master' => $master);
 if ($master) {
 
     # Is kss already running on the server ? (from the server)
-    #TODO
+    my $command = $COMMAND_EXPORT . $COMMAND_SUDO .  $$conf{path}{kss_dir} . "tools/kss.pl --status";
+    my $result = qx{$command};
+    my $kssalreadyrunning = is_kss_running($result);
+    $template->param("KSS_already_running" => 1) if ($kssalreadyrunning);
+    $template->param("KSS_already_running_unknown" => 1) if ($kssalreadyrunning == -1);
 
    my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh);
    # Preparing loop
@@ -175,9 +187,9 @@ if ($master) {
     # Is kss already running on the server?
     my $runningcommand = $COMMAND_SUDO . $$conf{path}{kss_dir} . "scripts/client/remote_kss.pl --status";
     my $result = qx{$runningcommand};
-    my $kssalreadyrunning = ($result =~ /not running$/) ? 0 : 1;
+    my $kssalreadyrunning = is_kss_running($result);
     $template->param("KSS_already_running" => 1) if ($kssalreadyrunning);
-
+    $template->param("KSS_already_running_unknown" => 1) if ($kssalreadyrunning == -1);
 
     # What is our hostname?
     my $hostname = qx{hostname -f};
