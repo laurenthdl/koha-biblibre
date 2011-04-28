@@ -80,16 +80,16 @@
         <input type="text" id = "transl1" name="q" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
 <!-- /TMPL_IF -->
    <!-- TMPL_IF NAME="OpacAddMastheadLibraryPulldown" -->
-      <select name="limit" id="masthead_search" class="left" style="max-width:10em;width:10em;">
+      <select name="filters" id="masthead_search" class="left" style="max-width:10em;width:10em;">
          <option value="">All Libraries</option>
          <!-- TMPL_LOOP NAME="BranchesLoop" -->
-            <option <!-- TMPL_IF NAME="selected" -->SELECTED<!-- /TMPL_IF --> value="branch:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+            <option <!-- TMPL_IF NAME="selected" -->selected="selected"<!-- /TMPL_IF --> value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
          <!-- /TMPL_LOOP -->
       </select>
    <!-- TMPL_ELSE -->
       <!-- TMPL_UNLESS NAME="opac_limit_override" -->
           <!-- TMPL_IF name="mylibraryfirst" --> 
-               <input name="limit" value="branch:<!-- TMPL_VAR name="mylibraryfirst" -->" type="hidden" />
+               <input name="filters" value="<!-- TMPL_VAR NAME='holdingbranch' -->:<!-- TMPL_VAR name='mylibraryfirst' -->" type="hidden" />
           <!-- /TMPL_IF -->
        <!-- /TMPL_UNLESS -->
    <!-- /TMPL_IF -->
