@@ -87,6 +87,11 @@ $template->param(pingresult => $pingresult);
 my $master = $$conf{cron}{master};
 $template->param('master' => $master);
 
+
+# ------
+# MASTER
+# ------
+
 # If we are a master, we gather the informations for all the clients
 if ($master) {
 
@@ -150,12 +155,19 @@ if ($master) {
 	    my $command = qx|$COMMAND_EXPORT $COMMAND_SUDO $$conf{path}{kss_dir}tools/kss.pl --file $filename|; 
 	    qx{$command};
 
+	    $template->param("processbackupoutput" => "done");
+	    $template->param("display_actions" => 1);
+
       } else {
 	warn "error while getting uploaded file";
       }
 
     }
 
+
+# -----
+# SLAVE
+# -----
 
 } else {
     # And if we are a slave, we only gather our own informations
@@ -226,7 +238,7 @@ if ($master) {
 	    print $output;
 	} else {
 	    $template->param("save_error" => 1);
-	    $template->param("display_cactions" => 1);
+	    $template->param("display_actions" => 1);
 	}
     }
 
@@ -263,7 +275,7 @@ if ($master) {
 	    $template->param("Server_unreachable" => 1);
 	}
 
-	$template->param("display_cactions" => 1);
+	$template->param("display_actions" => 1);
     }
 
 }

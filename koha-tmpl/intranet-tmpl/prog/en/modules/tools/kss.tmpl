@@ -2,7 +2,7 @@
 <script type="text/javascript">
 //<![CDATA[
      $(document).ready(function() {
-	<!-- TMPL_IF NAME="display_cactions" -->
+	<!-- TMPL_IF NAME="display_actions" -->
 	    $('#ksstabs > ul').tabs({selected:2});
 	<!-- TMPL_ELSE -->
 	    $('#ksstabs > ul').tabs();
@@ -32,11 +32,11 @@
 	<!-- TMPL_IF NAME="master" -->
 	    <li><a href="kss.pl#home">Master Home</a></li>
 	    <li><a href="kss.pl#minfos">Infos</a></li>
-	    <li><a href="kss.pl#mactions">Actions</a></li>
+	    <li><a href="kss.pl#actions">Actions</a></li>
 	<!-- TMPL_ELSE -->
 	    <li><a href="kss.pl#home">Client Home</a></li>
 	    <li><a href="kss.pl#cinfos">Infos</a></li>
-	    <li><a href="kss.pl#cactions">Actions</a></li>
+	    <li><a href="kss.pl#actions">Actions</a></li>
 	<!-- /TMPL_IF -->
     </ul>
 
@@ -189,7 +189,7 @@
 	    <!-- /TMPL_IF -->
 
     </div>
-    <div id="mactions">
+    <div id="actions">
 	<h3>Master actions</h3>
 	    <ul>
 		<li>Manual sync with file : <br />
@@ -199,6 +199,7 @@
 		    <input type="submit" name="processbackup" />
 		</form>
 		</li>
+		<!-- TMPL_IF NAME="processbackupoutput" --><li>Manual sync with file output : <br /><pre><!-- TMPL_VAR NAME="processbackupoutput" --></pre></li><!-- /TMPL_IF -->
 	    </ul>
 
     </div>
@@ -346,7 +347,7 @@
 
 
     </div>
-    <div id="cactions">
+    <div id="actions">
 	<h3>Client actions</h3>
 	    <ul>
 		<li><a href="/cgi-bin/koha/tools/kss.pl?save=1">Save current status</a><!-- TMPL_IF NAME="save_error" -->: Unable to save current status<!-- /TMPL_IF --></li>
