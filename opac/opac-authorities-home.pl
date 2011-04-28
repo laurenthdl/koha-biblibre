@@ -78,9 +78,7 @@ if ( $op eq "do_search" ) {
         template_name     => "opac-authoritiessearchresultlist.tmpl",
         query             => $query,
         type              => 'opac',
-        authnotrequired   => 0,
-        flagsrequired     => { catalogue => 1 },
-        debug             => 1,
+        authnotrequired   => 1,
     } );
 
     $template->param(
@@ -128,8 +126,7 @@ if ( $op eq "do_search" ) {
         template_name   => "opac-authorities-home.tmpl",
         query           => $query,
         type            => 'opac',
-        authnotrequired => 0,
-        flagsrequired   => { catalogue => 1 },
+        authnotrequired => 1,
         debug           => 1,
     } );
 
