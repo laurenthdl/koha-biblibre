@@ -108,7 +108,7 @@ for ( my $i = 0 ; $i < $count ; $i++ ) {
     my @loop_basket;
     my $uid = GetMember( borrowernumber => $loggedinuser )->{userid} if $loggedinuser;
     for ( my $i2 = 0 ; $i2 < $ordcount ; $i2++ ) {
-        if ( $orders->[$i2]{'authorisedby'} eq $loggedinuser || haspermission( $uid, { 'acquisition' => '*'  } ) ) {
+        if ( $orders->[$i2]{'authorisedby'} eq $loggedinuser ) {
             my @orders = GetOrders( $orders->[$i2]{'basketno'} );
             my $items_count= 0;
             map (
