@@ -55,8 +55,8 @@ SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 PERL5LIB=$koha_dir
 KOHA_CONF=$koha_conf
-$jobtime_push kss perl $kss_dir/scripts/send_backups.pl
-$jobtime_pull kss perl $kss_dir/scripts/pull_db.pl
+$jobtime_push kss perl $kss_dir/scripts/client/send_backups.pl
+$jobtime_pull kss perl $kss_dir/scripts/client/pull_db.pl
 EOF
     };
     default {
