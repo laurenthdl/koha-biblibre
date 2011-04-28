@@ -65,7 +65,7 @@ use C4::Bookseller;
 use C4::Members qw/GetMember/;
 
 my $query = new CGI;
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
     {   template_name   => "acqui/booksellers.tmpl",
         query           => $query,
         type            => "intranet",
@@ -108,7 +108,7 @@ for ( my $i = 0 ; $i < $count ; $i++ ) {
     my @loop_basket;
     my $uid = GetMember( borrowernumber => $loggedinuser )->{userid} if $loggedinuser;
     for ( my $i2 = 0 ; $i2 < $ordcount ; $i2++ ) {
-        if ( $orders->[$i2]{'authorisedby'} eq $loggedinuser ) {
+        if ( $orders->[$i2]{'authorisedby'} eq $loggedinuser || $staff_flags->{'superlibrarian'} % 2 == 1 ) {
             my @orders = GetOrders( $orders->[$i2]{'basketno'} );
             my $items_count= 0;
             map (
