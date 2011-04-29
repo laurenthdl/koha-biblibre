@@ -466,14 +466,7 @@ if ( C4::Context->preference("OPACAmazonEnabled") ) {
 
 #Electre stuff
 if(C4::Context->preference("OpacElectreImage")){
-	my $ElectreImage=GetElectreImage($biblionumber);
-	if(defined($ElectreImage) and $ElectreImage ne '' and $ElectreImage ne '0'){
-		$template->param( 'ElectreImage' => $ElectreImage );
-		$template->param( 'OpacElectreImage' => 1 );
-	}
-	else{
-		$template->param( 'OpacElectreImage' => 0 );
-	}
+	$template->param( 'OpacElectreImage' => 1 );
 }
 else{
 	$template->param( 'OpacElectreImage' => 0 );
@@ -483,6 +476,12 @@ if(C4::Context->preference("OpacElectreQuatriemeXml")){
 	if(defined($ElectreQuatriemeXml) and $ElectreQuatriemeXml ne '' and $ElectreQuatriemeXml ne '0'){
 		$template->param( 'ElectreQuatriemeXml' => $ElectreQuatriemeXml );
 		$template->param( 'OpacElectreQuatriemeXml' => 1 );
+		if(C4::Context->preference("OpacElectreDisplayOnTab")){
+			$template->param( 'OpacElectreDisplayOnTab' => 1 );
+		}
+		else{
+			$template->param( 'OpacElectreDisplayOnTab' => 0 );
+		}
 	}
 	else{
 		$template->param( 'OpacElectreQuatriemeXml' => 0 );
@@ -491,19 +490,21 @@ if(C4::Context->preference("OpacElectreQuatriemeXml")){
 else{
 	$template->param( 'OpacElectreQuatriemeXml' => 0 );
 }
-if(C4::Context->preference("OpacElectreResume")){
-	my $ElectreResume=GetElectreResume($biblionumber);
-	if(defined($ElectreResume) and $ElectreResume ne '' and $ElectreResume ne '0'){
-		$template->param( 'ElectreResume' => $ElectreResume );
-		$template->param( 'OpacElectreResume' => 1 );
+if(C4::Context->preference("OpacElectreTdm")){
+	my $ElectreTdm=GetElectreTdm($biblionumber);
+	#my $ElectreTdm="test";
+	if(defined($ElectreTdm) and $ElectreTdm ne '' and $ElectreTdm ne '0'){
+		$template->param( 'ElectreTdm' => $ElectreTdm );
+		$template->param( 'OpacElectreTdm' => 1 );
 	}
 	else{
-		$template->param( 'OpacElectreResume' => 0 );
+		$template->param( 'OpacElectreTdm' => 0 );
 	}
 }
 else{
-	$template->param( 'OpacElectreResume' => 0 );
+	$template->param( 'OpacElectreTdm' => 0 );
 }
+
 
 #warn Data::Dumper::Dumper C4::Context->preference("OpacElectreImage");
 

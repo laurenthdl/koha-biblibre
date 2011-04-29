@@ -29,6 +29,8 @@ use MARC::File::USMARC;
 use MARC::File::XML;
 use C4::Biblio;
 use C4::Koha;
+use XML::LibXML;
+use XML::LibXSLT;
 
 use vars qw($VERSION @ISA @EXPORT);
 
@@ -42,7 +44,7 @@ BEGIN {
       &InitElectreSearch
       &GetElectreImage
       &GetElectreQuatriemeXml
-      &GetElectreResume
+      &GetElectreTdm
     );
 }
 
@@ -113,11 +115,18 @@ sub InitEanFromBiblionumber{
 }
 
 sub GetElectreImage{
-	my $biblionumber = shift;
+	my ($biblionumber,$initboolscaled) = @_;
 	my $ean = InitEanFromBiblionumber($biblionumber);
 	if($ean eq '0'){return '0';}
 	my $boolscaled;
-	if(C4::Context->preference("OpacElectreScaledImage")){$boolscaled="true";}else{$boolscaled="false";}
+	if ($initboolscaled and (($initboolscaled eq "true") or ($initboolscaled eq "false")))
+	{
+		$boolscaled=$initboolscaled;
+	}
+	else
+	{
+		if(C4::Context->preference("OpacElectreScaledImage")){$boolscaled="true";}else{$boolscaled="false";}
+	}
 	my $sessionToken=GetElectreSessionToken();
 	my $search=InitElectreSearch();
 	my %result_getImage=$search->getImage($sessionToken, $ean, $boolscaled);
@@ -134,14 +143,19 @@ sub GetElectreQuatriemeXml{
 	return encode('utf8', $result_getQuatriemeXml{'getQuatriemeXmlResult'});
 }
 
-sub GetElectreResume{
+sub GetElectreTdm{
 	my $biblionumber = shift;
 	my $ean = InitEanFromBiblionumber($biblionumber);
 	if($ean eq '0'){return '0';}
 	my $sessionToken=GetElectreSessionToken();
 	my $search=InitElectreSearch();
-	my %result_getResume = $search->getResume($sessionToken, $ean);
-	return encode('utf8', $result_getResume{'getResumeResult'});
+	my %result_getTdmXml = $search->getTdmXml($sessionToken, $ean);
+	my $xslt = XML::LibXSLT->new();
+	my $source = XML::LibXML->load_xml(string => encode('utf8', $result_getTdmXml{'getTdmXmlResult'}));
+	my $style_doc = XML::LibXML->load_xml(location=>'../koha-tmpl/opac-tmpl/prog/en/xslt/ElectreTdm.xsl', no_cdata=>1);
+	my $stylesheet = $xslt->parse_stylesheet($style_doc);
+	my $results = $stylesheet->transform($source);
+	return $stylesheet->output_as_bytes($results);
 }
 
 1;
