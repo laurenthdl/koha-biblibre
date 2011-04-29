@@ -151,7 +151,7 @@ $(document).ready(function() {
                     <label for="gst">Tax rate</label>
                     <select name="gstrate" id="gstrate">
                     <!-- TMPL_LOOP NAME="gst_values" -->
-                       <option value="<!-- TMPL_VAR NAME="option" -->"<!-- TMPL_IF EXPR="gstrate == gst" --> selected="selected"<!-- /TMPL_IF -->><!-- TMPL_VAR EXPR="sprintf('%.1f', option * 100)" --> %</option>
+                       <option value="<!-- TMPL_VAR NAME="option" -->"<!-- TMPL_IF EXPR="gstrate == option" --> selected="selected"<!-- /TMPL_IF -->><!-- TMPL_VAR EXPR="sprintf('%.1f', option * 100)" --> %</option>
                     <!-- /TMPL_LOOP -->
                     </select>
                 </li>
