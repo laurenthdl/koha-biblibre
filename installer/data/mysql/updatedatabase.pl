@@ -5821,6 +5821,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.018";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `aqorders` CHANGE COLUMN `gst` `gstrate` DECIMAL(6,4)  DEFAULT NULL");
+    print "Upgrade to $DBversion done (Change column name in aqorders gst --> gstrate)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
