@@ -85,13 +85,13 @@ my $datereceived = $input->param('datereceived');
 $datereceived = $datereceived ? C4::Dates->new( $datereceived, 'iso' ) : C4::Dates->new();
 
 my $bookseller = GetBookSellerFromId($supplierid);
-my $gst        = $input->param('gst') || $bookseller->{gstrate} || C4::Context->preference("gist") || 0;
 my $results    = SearchOrder( $ordernumber, $search );
 
 my $count = scalar @$results;
 my $order = GetOrder($ordernumber);
+my $gstrate = $order->{gstrate} || $bookseller->{gstrate} || C4::Context->preference("gist") || 0;
 
-my $date = @$results[0]->{'entrydate'};
+my $date = $order->{'entrydate'};
 
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     {   template_name   => "acqui/orderreceive.tmpl",
@@ -105,6 +105,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 
 # prepare the form for receiving
 if ( $count == 1 ) {
+    my $order = $order;
     if ( C4::Context->preference('AcqCreateItem') eq 'receiving' ) {
 
         # prepare empty item form
@@ -119,37 +120,52 @@ if ( $count == 1 ) {
         $template->param( items => \@itemloop );
     }
 
-    if ( @$results[0]->{'quantityreceived'} == 0 ) {
-        @$results[0]->{'quantityreceived'} = '';
-    }
-    if ( @$results[0]->{'unitprice'} == 0 ) {
-        @$results[0]->{'unitprice'} = '';
-    }
+    $order->{quantityreceived} = '' if $order->{quantityreceived} == 0;
+    $order->{unitprice} = '' if $order->{unitprice} == 0;
 
-    my $suggestion   = GetSuggestionInfoFromBiblionumber(@$results[0]->{'biblionumber'});
+    my $rrp;
+    my $ecost;
+    if ( $bookseller->{listincgst} ) {
+        if ( $bookseller->{invoiceincgst} ) {
+            $rrp = $order->{rrp};
+            $ecost = $order->{ecost};
+        } else {
+            $rrp = $order->{rrp} / ( 1 + $order->{gstrate} );
+            $ecost = $order->{ecost} / ( 1 + $order->{gstrate} );
+        }
+    } else {
+        if ( $bookseller->{invoiceincgst} ) {
+            $rrp = $order->{rrp} * ( 1 + $order->{gstrate} );
+            $ecost = $order->{ecost} * ( 1 + $order->{gstrate} );
+        } else {
+            $rrp = $order->{rrp};
+            $ecost = $order->{ecost};
+        }
+    }
+    my $suggestion   = GetSuggestionInfoFromBiblionumber($order->{'biblionumber'});
 
     $template->param(
         count                 => 1,
-        biblionumber          => @$results[0]->{'biblionumber'},
-        ordernumber           => @$results[0]->{'ordernumber'},
-        biblioitemnumber      => @$results[0]->{'biblioitemnumber'},
-        supplierid            => @$results[0]->{'booksellerid'},
+        biblionumber          => $order->{'biblionumber'},
+        ordernumber           => $order->{'ordernumber'},
+        biblioitemnumber      => $order->{'biblioitemnumber'},
+        supplierid            => $supplierid,
         freight               => $freight,
-        gst                   => $gst,
+        gstrate               => $gstrate,
         name                  => $bookseller->{'name'},
         date                  => format_date($date),
-        title                 => @$results[0]->{'title'},
-        author                => @$results[0]->{'author'},
-        copyrightdate         => @$results[0]->{'copyrightdate'},
-        isbn                  => @$results[0]->{'isbn'},
-        seriestitle           => @$results[0]->{'seriestitle'},
-        bookfund              => @$results[0]->{'bookfundid'},
-        quantity              => @$results[0]->{'quantity'},
-        quantityreceivedplus1 => @$results[0]->{'quantityreceived'} + 1,
-        quantityreceived      => @$results[0]->{'quantityreceived'},
-        rrp                   => @$results[0]->{'rrp'},
-        ecost                 => @$results[0]->{'ecost'},
-        unitprice             => @$results[0]->{'unitprice'},
+        title                 => $order->{'title'},
+        author                => $order->{'author'},
+        copyrightdate         => $order->{'copyrightdate'},
+        isbn                  => $order->{'isbn'},
+        seriestitle           => $order->{'seriestitle'},
+        bookfund              => $order->{'bookfundid'},
+        quantity              => $order->{'quantity'},
+        quantityreceivedplus1 => $order->{'quantityreceived'} + 1,
+        quantityreceived      => $order->{'quantityreceived'},
+        rrp                   => sprintf( "%.2f", $rrp ),
+        ecost                 => sprintf( "%.2f", $ecost ),
+        unitprice             => $order->{'unitprice'},
         invoice               => $invoice,
         datereceived          => $datereceived->output(),
         datereceived_iso      => $datereceived->output('iso'),
@@ -166,7 +182,7 @@ if ( $count == 1 ) {
         $line{invoice}      = $invoice;
         $line{datereceived} = $datereceived->output();
         $line{freight}      = $freight;
-        $line{gst}          = $gst;
+        $line{gstrate}      = $gstrate;
         $line{title}        = @$results[$i]->{'title'};
         $line{author}       = @$results[$i]->{'author'};
         $line{supplierid}   = $supplierid;
