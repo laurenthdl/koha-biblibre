@@ -1205,6 +1205,8 @@ sub ModReceiveOrder {
     my $order = $sth->fetchrow_hashref();
     $sth->finish();
 
+
+    # If there are still items to be received
     if ( $order->{quantity} > $quantrec ) {
         $sth = $dbh->prepare( "
             UPDATE aqorders
@@ -1226,7 +1228,39 @@ sub ModReceiveOrder {
         }
         $order->{'quantity'} -= $quantrec;
         $order->{'quantityreceived'} = 0;
-        my $newOrder = NewOrder($order);
+        my ($newOrder, $newordernumber) = NewOrder($order);
+
+	# Do we have to update order informations from the marc record?
+	my ($ordertag, $ordersubtag) = GetMarcFromKohaField('aqorders.ordernumber', 'ACQ');
+
+	# Updating MARC order field if exists
+	if ($ordertag and $ordersubtag) {
+	    warn "updating MARC";
+	    # Getting record
+	    my $record = GetMarcBiblio($biblionumber);
+	    if ($record) {
+		warn "updating Record";
+		foreach ($record->field($ordertag)) {
+		    if ($_->subfield($ordersubtag) eq $ordernumber) {
+		       # Updating ordernumber
+		       warn "updating ordernumber $ordernumber => $newordernumber";
+		       $_->update($ordersubtag => $newordernumber); 
+
+		       # Updating quantity
+		       my ($quantitytag, $quantitysubtag) = GetMarcFromKohaField('aqorders.quantity', 'ACQ');
+		       if ($quantitysubtag) {
+			    warn "updating quantity " . $order->{quantity};
+			    $_->update($quantitysubtag => $order->{quantity});
+		       }
+		    }
+		}
+
+		# Applying changes
+		ModBiblio($record, $biblionumber, 'ACQ'); 
+	    }	
+	}
+
+
     } else {
         $sth = $dbh->prepare(
             "update aqorders
@@ -1236,27 +1270,12 @@ sub ModReceiveOrder {
         );
         $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $biblionumber, $ordernumber );
         $sth->finish;
+
+	# Removing MARC order field if exists
+	DelMarcOrder($biblionumber, $ordernumber);
     }
 
-    # Removing MARC order field if exists
-    # Do we have to remove order informations from the marc record?
-    my ($ordertag, $ordersubtag) = GetMarcFromKohaField('aqorders.ordernumber', 'ACQ');
-    if ($ordertag and $ordersubtag) {
-	# Getting record
-	my $record = GetMarcBiblio($biblionumber);
-	if ($record) {
-	    # Looking for the right field
-	    foreach ($record->field($ordertag)) {
-		if ($_->subfield($ordersubtag) eq $ordernumber) {
-		   $record->delete_field($_); 
-		}
-	    }
-	    # Applying changes
-	    ModBiblio($record, $biblionumber, 'ACQ'); 
-	}
-    }
-
-
+    
     return $datereceived;
 }
 
@@ -1365,9 +1384,50 @@ sub DelOrder {
     $sth->execute( $bibnum, $ordernumber );
     $sth->finish;
 
+    # Removing MARC order field if exists
+    DelMarcOrder($bibnum, $ordernumber);
+
     my @itemnumbers = GetItemnumbersFromOrder( $ordernumber );
     C4::Items::DelItem( $dbh, $bibnum, $_ ) for @itemnumbers;
     DelBiblio(($bibnum)) if C4::Items::GetItemsCount( $bibnum ) == 0;
+}
+
+=head3 DelMarcOrder
+
+=over 4
+
+&DelMarcOrder($biblionumber, $ordernumber);
+
+Delete the order field from the MARC record. aqorders.ordernumber needs
+to be linked to a MARC field/subfield. The field is deleted if the value of
+the subfield containing the ordernumber matches the ordernumber given
+in parameter
+
+=back
+
+=cut
+
+sub DelMarcOrder {
+    my ($biblionumber, $ordernumber) = @_;
+
+    # Do we have to remove order informations from the marc record?
+    my ($ordertag, $ordersubtag) = GetMarcFromKohaField('aqorders.ordernumber', 'ACQ');
+
+    # Removing MARC order field if exists
+    if ($ordertag and $ordersubtag) {
+	# Getting record
+	my $record = GetMarcBiblio($biblionumber);
+	if ($record) {
+	    # Looking for the right field
+	    foreach ($record->field($ordertag)) {
+		if ($_->subfield($ordersubtag) eq $ordernumber) {
+		   $record->delete_field($_); 
+		}
+	    }
+	    # Applying changes
+	    ModBiblio($record, $biblionumber, 'ACQ'); 
+	}
+    }
 }
 
 =head2 FUNCTIONS ABOUT PARCELS
