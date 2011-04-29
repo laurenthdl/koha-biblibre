@@ -260,6 +260,12 @@
                             <th><!--TMPL_VAR NAME="totalgste" --></th>
                             <th/><th/>
                             <th><!--TMPL_VAR NAME="totalgsti" --></th>
+                            <th/>
+                            <!-- TMPL_IF name="active" -->
+                                <!-- TMPL_UNLESS name="closedate" -->
+                                    <th/><th/>
+                                <!-- /TMPL_UNLESS -->
+                            <!-- /TMPL_IF -->
                         </tr>
                     <!-- /TMPL_LOOP -->
                     <tr>
@@ -269,6 +275,12 @@
                         <th><!--TMPL_VAR NAME="total_gste" --></th>
                         <th/><th/>
                         <th><!--TMPL_VAR NAME="total_gsti" --></th>
+                        <th/>
+                        <!-- TMPL_IF name="active" -->
+                            <!-- TMPL_UNLESS name="closedate" -->
+                                <th/><th/>
+                            <!-- /TMPL_UNLESS -->
+                        <!-- /TMPL_IF -->
                     </tr>
                 </tfoot>
                 <tbody>

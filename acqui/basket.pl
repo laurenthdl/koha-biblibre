@@ -342,10 +342,7 @@ sub get_infos {
     }
     my $budget = GetBudget( $order->{'budget_id'} );
 
-    my $line_total = $qty * $order->{'ecost'};
-
     my %line = %{ $order };
-
     $line{order_received} = ( $qty == $order->{'quantityreceived'} );
     $line{basketno}       = $basketno;
     $line{budget_name}    = $budget->{budget_name};

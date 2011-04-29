@@ -73,7 +73,6 @@ my $bookseller = GetBookSellerFromId($supplierid);
 
 my $invoice = $input->param('invoice') || '';
 my $freight = $input->param('freight');
-my $gst     = $input->param('gst') || $bookseller->{gstrate} || C4::Context->preference("gist") || 0;
 my $datereceived =
   ( $input->param('op') eq 'new' )
   ? C4::Dates->new( $input->param('datereceived') )
@@ -88,6 +87,23 @@ my $resultsperpage = $input->param('resultsperpage');
 $resultsperpage = 20 unless ($resultsperpage);
 $startfrom      = 0  unless ($startfrom);
 
+sub get_ecost {
+    my $order = shift;
+    my $bookseller = shift;
+    if ( $bookseller->{listincgst} ) {
+        if ( $bookseller->{invoiceincgst} ) {
+            return $order->{ecost};
+        } else {
+            return $order->{ecost} / ( 1 + $order->{gstrate} );
+        }
+    } else {
+        if ( $bookseller->{invoiceincgst} ) {
+            return $order->{ecost} * ( 1 + $order->{gstrate} );
+        } else {
+            return $order->{ecost};
+        }
+    }
+}
 if ( $input->param('format') eq "json" ) {
     my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
         {   template_name   => "acqui/ajax.tmpl",
@@ -110,6 +126,7 @@ if ( $input->param('format') eq "json" ) {
     foreach my $order (@$orders) {
         if ( $order->{quantityreceived} < $order->{quantity} ) {
             my $data = {};
+            my $ecost = get_ecost( $order, $bookseller );
 
             $data->{basketno}     = $order->{basketno};
             $data->{ordernumber}  = $order->{ordernumber};
@@ -120,8 +137,8 @@ if ( $input->param('format') eq "json" ) {
             $data->{biblionumber} = $order->{biblionumber};
             $data->{freight}      = $order->{freight};
             $data->{quantity}     = $order->{quantity};
-            $data->{ecost}        = $order->{ecost};
-            $data->{ordertotal}   = sprintf( "%.2f", $order->{ecost} * $order->{quantity} );
+            $data->{ecost}        = sprintf( "%.2f", $ecost );
+            $data->{ordertotal}   = sprintf( "%.2f", $ecost * $order->{quantity} );
             push @datas, $data;
         }
     }
@@ -169,7 +186,6 @@ if ( $action eq "cancelorder" ) {
 
     # If there are no items left,
     if ( $itemcount eq 0 ) {
-
         # We delete the record
         $error_delbiblio = DelBiblio($biblionumber);
     }
@@ -200,7 +216,6 @@ if ( scalar(@rcv_err) ) {
 
 my $cfstr         = "%.2f";                                                             # currency format string -- could get this from currency table.
 my @parcelitems   = GetParcel( $supplierid, $invoice, $datereceived->output('iso') );
-my $countlines    = scalar @parcelitems;
 my $totalprice    = 0;
 my $totalfreight  = 0;
 my $totalquantity = 0;
@@ -208,20 +223,18 @@ my $total;
 my $tototal;
 my @loop_received = ();
 
-for ( my $i = 0 ; $i < $countlines ; $i++ ) {
-
-    #$total=($parcelitems[$i]->{'unitprice'} + $parcelitems[$i]->{'freight'}) * $parcelitems[$i]->{'quantityreceived'};   #weird, are the freight fees counted by book? (pierre)
-    $total = ( $parcelitems[$i]->{'unitprice'} ) * $parcelitems[$i]->{'quantityreceived'};    #weird, are the freight fees counted by book? (pierre)
-    $parcelitems[$i]->{'unitprice'} += 0;
+for my $item ( @parcelitems ) {
+    $total = ( $item->{'unitprice'} ) * $item->{'quantityreceived'};    #weird, are the freight fees counted by book? (pierre)
+    $item->{'unitprice'} += 0;
     my %line;
-    %line          = %{ $parcelitems[$i] };
+    %line          = %{ $item };
+    my $ecost = get_ecost( $order, $bookseller );
+    $line{ecost} = sprintf( "%.2f", $ecost );
     $line{invoice} = $invoice;
-    $line{gst}     = $gst;
     $line{total} = sprintf( $cfstr, $total );
     $line{supplierid} = $supplierid;
-    push @loop_received, \%line;
-    $totalprice += $parcelitems[$i]->{'unitprice'};
-    $line{unitprice} = sprintf( $cfstr, $parcelitems[$i]->{'unitprice'} );
+    $totalprice += $item->{'unitprice'};
+    $line{unitprice} = sprintf( $cfstr, $item->{'unitprice'} );
     my $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
     $line{suggestionid}         = $$suggestion{suggestionid};
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
@@ -230,12 +243,14 @@ for ( my $i = 0 ; $i < $countlines ; $i++ ) {
     #double FIXME - totalfreight is redefined later.
 
 # FIXME - each order in a  parcel holds the freight for the whole parcel. This means if you receive a parcel with items from multiple budgets, you'll see the freight charge in each budget..
-    if ( $i > 0 && $totalfreight != $parcelitems[$i]->{'freight'} ) {
+    if ( $i > 0 && $totalfreight != $item->{'freight'} ) {
         warn "FREIGHT CHARGE MISMATCH!!";
     }
-    $totalfreight = $parcelitems[$i]->{'freight'};
-    $totalquantity += $parcelitems[$i]->{'quantityreceived'};
+    $totalfreight = $item->{'freight'};
+    $totalquantity += $item->{'quantityreceived'};
     $tototal += $total;
+
+    push @loop_received, \%line;
 }
 
 my $pendingorders = GetPendingOrders($supplierid);
@@ -245,28 +260,48 @@ my $countpendings = scalar @$pendingorders;
 my ( $totalPunitprice, $totalPquantity, $totalPecost, $totalPqtyrcvd );
 my $ordergrandtotal;
 my @loop_orders = ();
+my @book_foot_loop;
+my %foot;
+my $total_quantity = 0;
+my $total_gste = 0;
+my $total_gsti = 0;
 for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     my %line;
     %line = %{ $pendingorders->[$i] };
+
+    my $ecost = get_ecost( $order, $bookseller );
     $line{quantity}         += 0;
     $line{quantityreceived} += 0;
     $line{unitprice}        += 0;
     $totalPunitprice        += $line{unitprice};
     $totalPquantity         += $line{quantity};
     $totalPqtyrcvd          += $line{quantityreceived};
-    $totalPecost            += $line{ecost};
-    $line{ecost}      = sprintf( "%.2f", $line{ecost} );
-    $line{ordertotal} = sprintf( "%.2f", $line{ecost} * $line{quantity} );
+    $totalPecost            += $ecost;
+    $line{ecost}      = sprintf( "%.2f", $ecost );
+    $line{ordertotal} = sprintf( "%.2f", $ecost * $line{quantity} );
     $line{unitprice}  = sprintf( "%.2f", $line{unitprice} );
     $line{invoice}    = $invoice;
-    $line{gst}        = $gst;
     $line{total}      = $total;
     $line{supplierid} = $supplierid;
-    $ordergrandtotal += $line{ecost} * $line{quantity};
+    $ordergrandtotal += $ecost * $line{quantity};
+
     my $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
     $line{suggestionid}         = $$suggestion{suggestionid};
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
     $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
+
+    $foot{$line{gstrate}}{gstrate} = $line{gstrate};
+    $foot{$line{gstrate}}{value} += $ecost * $order->{gstrate}};
+    $foot{$line{gstgsti}}{quantity}  +=$$line{quantity};
+    $total_quantity += $line{quantity};
+    $foot{$$line{gstgsti}}{totalgst} += $line{totalgste};
+    $total_gste += $line{totalgste};
+    $foot{$$line{gstgsti}}{totalgsti} += $line{totalgsti};
+    $total_gsti += $line{totalgsti};
+
+    push @book_foot_loop, map {
+        $_
+    } values %foot;
 
     # Check if user has permission to use budget
     unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
@@ -341,7 +376,6 @@ if ( $count > $resultsperpage ) {
     );
 }
 
-#$totalfreight=$freight;
 $tototal = $tototal + $freight;
 
 $template->param(
@@ -351,25 +385,24 @@ $template->param(
     formatteddatereceived => $datereceived->output(),
     name                  => $bookseller->{'name'},
     supplierid            => $supplierid,
-    gst                   => $gst,
     freight               => $freight,
     invoice               => $invoice,
-    countreceived         => $countlines,
     loop_received         => \@loop_received,
-    countpending          => $countpendings,
     loop_orders           => \@loop_orders,
     totalprice            => sprintf( $cfstr, $totalprice ),
     totalfreight          => $totalfreight,
     totalquantity         => $totalquantity,
     tototal               => sprintf( $cfstr, $tototal ),
     ordergrandtotal       => sprintf( $cfstr, $ordergrandtotal ),
-    gst                   => $gst,
-    grandtot              => sprintf( $cfstr, $tototal + $gst ),
+    grandtot              => sprintf( $cfstr, $tototal ), #+ $gstrate ),
     totalPunitprice       => sprintf( "%.2f", $totalPunitprice ),
     totalPquantity        => $totalPquantity,
     totalPqtyrcvd         => $totalPqtyrcvd,
     totalPecost           => sprintf( "%.2f", $totalPecost ),
     resultsperpage        => $resultsperpage,
+    total_quantity       => $total_quantity,
+    total_gste           => sprintf( "%.2f", $total_gste ),
+    total_gsti           => sprintf( "%.2f", $total_gsti ),
 );
 output_html_with_http_headers $input, $cookie, $template->output;
  
