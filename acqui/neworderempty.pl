@@ -391,7 +391,7 @@ $template->param(
     import_batch_id      => $import_batch_id,
 
     # CHECKME: gst-stuff needs verifing, mason.
-    gstrate              => $data->{'gstrate'} || $bookseller->{'gstrate'} || C4::Context->preference("gist"),
+    gstrate              => $data->{'gst'} || $bookseller->{'gstrate'} || C4::Context->preference("gist"),
     gstreg               => $bookseller->{'gstreg'},
 );
 
