@@ -54,21 +54,21 @@
 		<!-- TMPL_ELSE -->
         <option value="su">Subject</option>
 		<!-- /TMPL_IF -->
-		<!-- TMPL_IF NAME="ms_nb" -->
+	<!--	<!-- TMPL_IF NAME="ms_nb" -->
 		<option selected="selected" value="nb">ISBN</option>
 		<!-- TMPL_ELSE -->
 		<option value="nb">ISBN</option>
-		<!-- /TMPL_IF -->
+		<!-- /TMPL_IF -->-->
 		<!-- TMPL_IF NAME="ms_se" -->
         <option selected="selected" value="se">Series</option>
 		<!-- TMPL_ELSE -->
         <option value="se">Series</option>
 		<!-- /TMPL_IF -->
-		<!-- TMPL_IF NAME="ms_callnum" -->
+	<!--	<!-- TMPL_IF NAME="ms_callnum" -->
         <option selected="selected" value="callnum">Call Number</option>
 		<!-- TMPL_ELSE -->
         <option value="callnum">Call Number</option>
-		<!-- /TMPL_IF --></select>
+		<!-- /TMPL_IF --> --></select>
 <!-- TMPL_IF NAME="query" -->
         <input type="text" id = "transl1" name="q" value="<!-- TMPL_VAR ESCAPE="HTML" NAME="query" -->" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
 <!-- TMPL_ELSE -->
