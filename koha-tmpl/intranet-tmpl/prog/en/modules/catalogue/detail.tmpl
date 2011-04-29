@@ -194,14 +194,14 @@ function verify_images() {
             <tr>
                 <!-- TMPL_IF NAME="item-level_itypes" --><th>Item type</th><!-- /TMPL_IF -->
                 <th>Location</th>
-                <!-- TMPL_IF NAME="itemdata_ccode" --><th>Collection</th><!-- /TMPL_IF -->
+               <!-- <!-- TMPL_IF NAME="itemdata_ccode" --><th>Collection</th><!-- /TMPL_IF -->-->
                 <th>Call Number</th>
                 <th>Status</th>
                 <th>Last seen</th>
                 <th>Barcode</th>
                 <!-- TMPL_IF NAME="volinfo" --><th>Publication Details</th><!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="itemdata_uri" --><th>URL</th><!-- /TMPL_IF -->
-                <!-- TMPL_IF NAME="itemdata_copynumber" --><th>Copy No.</th><!-- /TMPL_IF -->
+               <!-- <!-- TMPL_IF NAME="itemdata_copynumber" --><th>Copy No.</th><!-- /TMPL_IF -->-->
 		<!-- TMPL_IF NAME="SpineLabelShowPrintOnBibDetails" --><th>Spine Label</th><!-- /TMPL_IF -->
             </tr>
             <!-- TMPL_LOOP NAME="itemloop" -->
@@ -220,7 +220,7 @@ function verify_images() {
                     <!-- /TMPL_IF -->
                     <td class="location"><!-- TMPL_UNLESS NAME="singlebranchmode" --><!-- TMPL_VAR NAME="branchname" --><!-- /TMPL_UNLESS --> <!-- TMPL_IF name="location" -->- <!-- /TMPL_IF --><!-- TMPL_VAR NAME="location" --> </td>
                     <!-- TMPL_IF NAME="itemdata_ccode" --><td><!-- TMPL_VAR name="ccode" --></td><!-- /TMPL_IF -->
-                    <td class="itemcallnumber"><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --></td>
+                    <td class="itemcallnumber"><!-- TMPL_IF NAME="itemdata_copynumber" --> <!-- TMPL_VAR NAME="copynumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="stocknumber" --> <!-- TMPL_VAR NAME="stocknumber" --><!-- /TMPL_IF --> <!--TMPL_IF             NAME="statisticvalue" --> <!-- TMPL_VAR NAME="statisticvalue" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="stack" --> <!-- TMPL_VAR         NAME="stack" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="materials" --> <!-- TMPL_VAR NAME="materials" --><!-- /TMPL_IF --></td>
                     <td class="status">
 
                 <!-- TMPL_IF name="datedue" -->
@@ -318,9 +318,9 @@ function verify_images() {
 				<!-- TMPL_IF NAME="itemdata_uri" -->
 					<td class="uri"><a href="<!-- TMPL_VAR NAME="uri" -->"><!-- TMPL_VAR NAME="uri" --></a></td>
 				<!-- /TMPL_IF -->
-				<!-- TMPL_IF NAME="itemdata_copynumber" -->
+			<!--	<!-- TMPL_IF NAME="itemdata_copynumber" -->
 					<td class="copynumber"><!-- TMPL_VAR NAME="copynumber" --></td>
-				<!-- /TMPL_IF -->
+				<!-- /TMPL_IF --> -->
                 <!-- TMPL_IF NAME="type" -->
                     <td><a href="/cgi-bin/koha/maint/catmaintain.pl?type=fixitemtype&amp;bi=<!-- TMPL_VAR NAME="biblioitemnumber" -->&amp;item=<!-- TMPL_VAR NAME="itemtype" -->">Fix Itemtype</a></td>
                 <!-- /TMPL_IF -->

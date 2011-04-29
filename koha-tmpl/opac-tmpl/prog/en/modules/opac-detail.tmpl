@@ -543,13 +543,13 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 	    <thead><tr>
 		<!-- TMPL_IF NAME="item-level_itypes" --><th>Item type</th><!-- /TMPL_IF -->
 		<th>Location</th>
-	    <!-- TMPL_IF NAME="itemdata_ccode" --><th>Collection</th><!-- /TMPL_IF -->
+	   <!-- <!-- TMPL_IF NAME="itemdata_ccode" --><th>Collection</th><!-- /TMPL_IF -->-->
 	    <th>Call Number</th>
 	    <!-- TMPL_IF NAME="itemdata_enumchron" --><th>Vol Info</th><!-- /TMPL_IF -->
 	    <!-- TMPL_IF NAME="itemdata_uri" --><th>URL</th><!-- /TMPL_IF -->
-	    <!-- TMPL_IF NAME="itemdata_copynumber" --><th>Copy</th><!-- /TMPL_IF -->
+	 <!--   <!-- TMPL_IF NAME="itemdata_copynumber" --><th>Copy</th><!-- /TMPL_IF -->-->
 		<th>Status</th>
-		<!-- TMPL_IF NAME="itemdata_itemnotes" --><th>Notes</th><!-- /TMPL_IF -->
+	<!--	<!-- TMPL_IF NAME="itemdata_itemnotes" --><th>Notes</th><!-- /TMPL_IF -->-->
 		<th>Date Due</th>
 		<!-- TMPL_IF NAME="itemdata_serialseq" --><th>Serial number</th><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_publisheddate" --><th>Publication date</th><!-- /TMPL_IF -->
@@ -558,13 +558,13 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 	    <!-- TMPL_LOOP NAME="ITEM_RESULTS" -->
 	    <tr><!-- TMPL_IF NAME="item-level_itypes" --><td><!-- TMPL_IF NAME="imageurl" --><img src="<!-- TMPL_VAR NAME="imageurl" -->" title="<!-- TMPL_VAR NAME="description" -->" alt="<!-- TMPL_VAR NAME="description" -->" /><!-- /TMPL_IF --> <!-- TMPL_VAR NAME="description" --></td><!-- /TMPL_IF -->
 		<td><!-- TMPL_UNLESS NAME="singleBranchMode" --><!-- TMPL_IF name="branchurl" --><a href="<!-- TMPL_VAR NAME="branchurl" -->"><!-- TMPL_VAR NAME="branchname" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branchname" --><!-- /TMPL_IF --><!-- /TMPL_UNLESS --> <!-- TMPL_VAR NAME="location_description" --> </td>
-		<!-- TMPL_IF NAME="itemdata_ccode" --><td><!-- TMPL_VAR NAME="ccode" --></td><!-- /TMPL_IF -->
-		<td><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="OPACShelfBrowser" -->(<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">Browse Shelf</a>)<!-- /TMPL_IF --></td>
+	<!--	<!-- TMPL_IF NAME="itemdata_ccode" --><td><!-- TMPL_VAR NAME="ccode" --></td><!-- /TMPL_IF -->-->
+		<td><!-- TMPL_IF NAME="itemdata_copynumber" --> <!-- TMPL_VAR NAME="copynumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="stocknumber" --> <!-- TMPL_VAR NAME="stocknumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="statisticvalue" --> <!-- TMPL_VAR NAME="statisticvalue" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="stack" --> <!-- TMPL_VAR NAME="stack" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --> <!--      TMPL_IF NAME="materials" --> <!-- TMPL_VAR NAME="materials" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="OPACShelfBrowser" -->(<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">Browse Shelf</a>)<!-- /TMPL_IF --></td>
 		<!-- TMPL_IF NAME="itemdata_enumchron" --><td><!-- TMPL_VAR NAME="enumchron" --></td><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_uri" --><td><a href="<!-- TMPL_VAR NAME="uri" -->"><!-- TMPL_VAR NAME="uri" --></a></td><!-- /TMPL_IF -->
-		<!-- TMPL_IF NAME="itemdata_copynumber" --><td><!-- TMPL_VAR NAME="copynumber" --></td><!-- /TMPL_IF -->
+	<!--	<!-- TMPL_IF NAME="itemdata_copynumber" --><td><!-- TMPL_VAR NAME="copynumber" --></td><!-- /TMPL_IF -->-->
 		<td><!-- TMPL_INCLUDE NAME="item-status.inc" --></td>
-		<!-- TMPL_IF NAME="itemdata_itemnotes" --><td><!-- TMPL_VAR NAME="itemnotes" --></td><!-- /TMPL_IF -->
+	<!--	<!-- TMPL_IF NAME="itemdata_itemnotes" --><td><!-- TMPL_VAR NAME="itemnotes" --></td><!-- /TMPL_IF -->-->
 		<td><!-- TMPL_VAR NAME="datedue" --></td>
 		<!-- TMPL_IF NAME="itemdata_serialseq" --><td><!-- TMPL_VAR Name="serialseq"--></td><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_publisheddate" --><td><!-- TMPL_VAR Name="publisheddate"--></td><!-- /TMPL_IF -->
