@@ -382,6 +382,8 @@ $template->param(
     quantityrec          => $data->{'quantity'},
     rrp                  => $data->{'rrp'},
     gst_values           => \@gst_auth_values,
+    gstrate              => $data->{'gstrate'} || $bookseller->{'gstrate'} || C4::Context->preference("gist"),
+    gstreg               => $bookseller->{'gstreg'},
     listprice            => sprintf( "%.2f", $data->{'listprice'} || $listprice ),
     total                => sprintf( "%.2f", ( $data->{'ecost'} || 0 ) * ( $data->{'quantity'} || 0 ) ),
     ecost                => $data->{'ecost'},
@@ -389,10 +391,6 @@ $template->param(
     publishercode        => $data->{'publishercode'},
     place                => $data->{'place'},
     import_batch_id      => $import_batch_id,
-
-    # CHECKME: gst-stuff needs verifing, mason.
-    gstrate              => $data->{'gst'} || $bookseller->{'gstrate'} || C4::Context->preference("gist"),
-    gstreg               => $bookseller->{'gstreg'},
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;

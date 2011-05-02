@@ -162,70 +162,69 @@ if ( $op eq "" ) {
             if ( C4::Context->preference("BiblioAddsAuthorities") ) {
                 my ( $countlinked, $countcreated ) = BiblioAddAuthorities( $marcrecord, $cgiparams->{'frameworkcode'} );
             }
-        } else {
-            SetImportRecordStatus( $biblio->{'import_record_id'}, 'imported' );
-        }
-        # 3rd add order
-        my $patron = C4::Members->GetMember( borrowernumber => $loggedinuser );
-        my $branch = C4::Branch->GetBranchDetail( $patron->{branchcode} );
-        my ($invoice);
-        # get quantity in the MARC record (1 if none)
-        my $quantity = GetMarcQuantity($marcrecord, C4::Context->preference('marcflavour')) || 1;
-        my %orderinfo = (
-            "biblionumber", $biblionumber, "basketno", $cgiparams->{'basketno'},
-            "quantity", $quantity, "branchcode", $branch, 
-            "booksellerinvoicenumber", $invoice, 
-            "budget_id", $budget_id, "uncertainprice", 1,
-            "sort1", $cgiparams->{'sort1'},"sort2", $cgiparams->{'sort2'},
-            "notes", $cgiparams->{'notes'}, "budget_id", $cgiparams->{'budget_id'},
-        );
-        # get the price if there is one.
-        # filter by storing only the 1st number
-        # we suppose the currency is correct, as we have no possibilities to get it.
-        my $price= GetMarcPrice($marcrecord, C4::Context->preference('marcflavour'));
-        if ($price){
-            $price = $num->unformat_number($price);
-        }
-        if ($price){
-            $orderinfo{'listprice'} = $price;
-            eval "use C4::Acquisition qw/GetBasket/;";
-            eval "use C4::Bookseller qw/GetBookSellerFromId/;";
-            my $basket     = GetBasket( $orderinfo{basketno} );
-            my $bookseller = GetBookSellerFromId( $basket->{booksellerid} );
-            my $gst        = $bookseller->{gstrate} || C4::Context->preference("gist") || 0;
-            $orderinfo{'unitprice'} = $orderinfo{listprice} - ( $orderinfo{listprice} * $bookseller->{discount} );
-            $orderinfo{'ecost'} = $orderinfo{unitprice};
-        } else {
-            $orderinfo{'listprice'} = 0;
-        }
-        $orderinfo{'rrp'} = $orderinfo{'listprice'};
+            # 3rd add order
+            my $patron = C4::Members->GetMember( borrowernumber => $loggedinuser );
+            my $branch = C4::Branch->GetBranchDetail( $patron->{branchcode} );
+            my ($invoice);
+            # get quantity in the MARC record (1 if none)
+            my $quantity = GetMarcQuantity($marcrecord, C4::Context->preference('marcflavour')) || 1;
+            my %orderinfo = (
+                "biblionumber", $biblionumber, "basketno", $cgiparams->{'basketno'},
+                "quantity", $quantity, "branchcode", $branch, 
+                "booksellerinvoicenumber", $invoice, 
+                "budget_id", $budget_id, "uncertainprice", 1,
+                "sort1", $cgiparams->{'sort1'},"sort2", $cgiparams->{'sort2'},
+                "notes", $cgiparams->{'notes'}, "budget_id", $cgiparams->{'budget_id'},
+            );
 
-        # remove uncertainprice flag if we have found a price in the MARC record
-        $orderinfo{uncertainprice} = 0 if $orderinfo{listprice};
-        my $basketno;
-        ( $basketno, $ordernumber ) = NewOrder( \%orderinfo );
+            # get the price if there is one.
+            # filter by storing only the 1st number
+            # we suppose the currency is correct, as we have no possibilities to get it.
+            my $price= GetMarcPrice($marcrecord, C4::Context->preference('marcflavour'));
+            if ($price){
+                $price = $num->unformat_number($price);
+            }
 
-        # 4th, add items if applicable
-        # parse the item sent by the form, and create an item just for the import_record_id we are dealing with
-        # this is not optimised, but it's working !
-        if ( C4::Context->preference('AcqCreateItem') eq 'ordering' ) {
-            my @tags         = $input->param('tag');
-            my @subfields    = $input->param('subfield');
-            my @field_values = $input->param('field_value');
-            my @serials      = $input->param('serial');
-            my @ind_tag   = $input->param('ind_tag');
-            my @indicator = $input->param('indicator');
-            my $item;
-            push @{ $item->{tags} },         $tags[0];
-            push @{ $item->{subfields} },    $subfields[0];
-            push @{ $item->{field_values} }, $field_values[0];
-            push @{ $item->{ind_tag} },      $ind_tag[0];
-            push @{ $item->{indicator} },    $indicator[0];
-            my $xml = TransformHtmlToXml( \@tags, \@subfields, \@field_values, \@ind_tag, \@indicator );
-            my $record = MARC::Record::new_from_xml( $xml, 'UTF-8' );
-            for (my $qtyloop=1;$qtyloop <=$quantity;$qtyloop++) {
-                my ( $biblionumber, $bibitemnum, $itemnumber ) = AddItemFromMarc( $record, $biblionumber );
-                NewOrderItem( $itemnumber, $ordernumber );
+            if ($price){
+                $orderinfo{'listprice'} = $price;
+                eval "use C4::Acquisition qw/GetBasket/;";
+                eval "use C4::Bookseller qw/GetBookSellerFromId/;";
+                my $basket     = GetBasket( $orderinfo{basketno} );
+                my $bookseller = GetBookSellerFromId( $basket->{booksellerid} );
+                $orderinfo{'unitprice'} = $orderinfo{listprice} - ( $orderinfo{listprice} * ( $bookseller->{discount} ) );
+                $orderinfo{'ecost'} = $orderinfo{unitprice};
+            } else {
+                $orderinfo{'listprice'} = 0;
+            }
+            $orderinfo{'rrp'} = $orderinfo{'listprice'};
+
+            # remove uncertainprice flag if we have found a price in the MARC record
+            $orderinfo{uncertainprice} = 0 if $orderinfo{listprice};
+            my $basketno;
+            ( $basketno, $ordernumber ) = NewOrder( \%orderinfo );
+
+            # 4th, add items if applicable
+            # parse the item sent by the form, and create an item just for the import_record_id we are dealing with
+            # this is not optimised, but it's working !
+            if ( C4::Context->preference('AcqCreateItem') eq 'ordering' ) {
+                my @tags         = $input->param('tag');
+                my @subfields    = $input->param('subfield');
+                my @field_values = $input->param('field_value');
+                my @serials      = $input->param('serial');
+                my @ind_tag   = $input->param('ind_tag');
+                my @indicator = $input->param('indicator');
+                my $item;
+                push @{ $item->{tags} },         $tags[0];
+                push @{ $item->{subfields} },    $subfields[0];
+                push @{ $item->{field_values} }, $field_values[0];
+                push @{ $item->{ind_tag} },      $ind_tag[0];
+                push @{ $item->{indicator} },    $indicator[0];
+                my $xml = TransformHtmlToXml( \@tags, \@subfields, \@field_values, \@ind_tag, \@indicator );
+                my $record = MARC::Record::new_from_xml( $xml, 'UTF-8' );
+                for (my $qtyloop=1;$qtyloop <=$quantity;$qtyloop++) {
+                    my ( $biblionumber, $bibitemnum, $itemnumber ) = AddItemFromMarc( $record, $biblionumber );
+                    NewOrderItem( $itemnumber, $ordernumber );
+                }
             }
         } else {
             SetImportRecordStatus( $biblio->{'import_record_id'}, 'imported' );
