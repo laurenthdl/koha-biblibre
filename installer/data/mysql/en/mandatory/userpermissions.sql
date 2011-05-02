@@ -16,6 +16,7 @@ INSERT INTO permissions (module_bit, code, description) VALUES
    (11, 'order_manage', 'Manage orders & basket'),
    (11, 'group_manage', 'Manage orders & basketgroups'),
    (11, 'order_receive', 'Manage orders & basket'),
+   (11, 'order_receive_all', 'Receive orders from any branch'),
    (11, 'budget_add_del', 'Add and delete budgets (but cant modify budgets)'),
    (11, 'budget_manage_all', 'Add, modify and delete all budgets, even if budgets access is restricted'),
    (13, 'edit_news', 'Write news for the OPAC and staff interfaces'),
