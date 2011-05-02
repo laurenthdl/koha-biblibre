@@ -15,7 +15,7 @@ function getAuthorisedValuesList (select) {
       function (data,status) {
            var str = '<select name="q">';
            $.each(data.av, function(key, value) {
-             str += "<option value="+ value.authorised_value +">"+ value.lib +"</option>";
+             str += "<option value=\""+ value.authorised_value +"\">"+ value.lib +"</option>";
           });
           str += "</select>";
           $(select).parent().find('input[name="q"]:first').attr('disabled','disabled');
