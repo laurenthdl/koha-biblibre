@@ -30,10 +30,10 @@
         $("#pendingt").tablesorter({
             widgets : ['zebra'],    
             headers: {
-                3: { sorter: false },
-                5: { sorter: 'amount' },
+                4: { sorter: false },
                 6: { sorter: 'amount' },
-                7: { sorter: false },
+                7: { sorter: 'amount' },
+                8: { sorter: false },
             },
             textExtraction: {
                 2: function(o) {
@@ -44,10 +44,10 @@
         $("#receivedt").tablesorter({
             widgets : ['zebra'],    
             headers: { 
-                3: { sorter: false },            
-                5: { sorter: 'amount' },
+                4: { sorter: false },
                 6: { sorter: 'amount' },
                 7: { sorter: 'amount' },
+                8: { sorter: 'amount' },
             },
             textExtraction: {
                 2: function(o) {
@@ -222,6 +222,7 @@
         <tr>
             <th>Basket</th>
             <th>Order</th>
+            <th>Order Line</th>
             <th>Summary</th>
     	    <th>View Record</th>
             <th>Quantity</th>  
@@ -231,7 +232,7 @@
         </tr>
     </thead>
 		<tfoot>
-            <tr><td colspan="4" class="total">TOTAL</td>
+            <tr><td colspan="5" class="total">TOTAL</td>
                 <td> <!-- TMPL_VAR NAME="totalPquantity" --> </td>
 				<td>&nbsp;</td>
                 <td><!-- TMPL_VAR NAME="ordergrandtotal" --></td>
@@ -259,6 +260,7 @@
                     <a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="supplierid" -->"><!-- TMPL_VAR NAME="ordernumber" --></a>
                   <!-- /TMPL_IF -->
                 </td>
+                <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                 <td class="summaryfilterclass">
                   <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html"--></a>
                 <!-- TMPL_IF NAME="author" --> by <!-- TMPL_VAR NAME="author" --><!--/TMPL_IF-->
@@ -320,6 +322,7 @@
         <th>Order Line</th>
 		<th>Basket</th>
 		<th>Order</th>
+        <th>Order Line</th>
 		<th>Summary</th>
 		<th>View Record</th>
 		<th>Quantity</th>  
@@ -330,7 +333,7 @@
 	</thead>
 <tfoot>
 	    <tr>
-		<td colspan="4" class="total">SUBTOTAL</td>
+		<td colspan="5" class="total">SUBTOTAL</td>
 		<td colspan="2">&nbsp;</td>
 		<td><!-- TMPL_VAR NAME="totalprice" --></td>
 		<td><!-- TMPL_VAR NAME="tototal" --></td>
@@ -338,7 +341,7 @@
 	      
 	    <!-- TMPL_IF NAME="totalfreight" -->
 		    <tr>
-			<td colspan="6">&nbsp;
+			<td colspan="7">&nbsp;
 			</td>
 			<td>Shipping</td>
 			<td><!-- TMPL_VAR NAME="totalfreight" --></td>
@@ -346,7 +349,7 @@
 	    <!-- /TMPL_IF -->
 	    <!-- TMPL_IF NAME="gst" -->
 		    <tr>
-			<td colspan="6">
+			<td colspan="7">
 				<p class="message">
 			    <b>HELP</b><br />
 		    	The total at the bottom of the page should be within a few cents of the total for the invoice.
@@ -357,7 +360,7 @@
 	    	</tr> 
 	    <!-- /TMPL_IF -->
 	    <tr>
-	    <td colspan="4" class="total">TOTAL</td>
+	    <td colspan="5" class="total">TOTAL</td>
 		<td><!-- TMPL_VAR NAME="totalquantity" --></td>
 		<td colspan="2">&nbsp;</td>
 		<td><!-- TMPL_VAR NAME="grandtot" --></td>
@@ -373,6 +376,7 @@
                 <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                 <td><a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a></td>
                 <td><a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="supplierid" -->"><!-- TMPL_VAR NAME="ordernumber" --></a></td>
+                <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                 <td>
                     <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" ESCAPE="html" --></a>
                     <!-- TMPL_IF NAME="author" --> / <!-- TMPL_VAR NAME="author" --><!--/TMPL_IF-->
