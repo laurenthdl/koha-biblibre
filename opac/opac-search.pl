@@ -301,7 +301,7 @@ if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
 my %filters;
 # This array is used to build facets GUI
 my @tplfilters;
-for my $filter ( $cgi->param('filters') ) {
+for my $filter ( grep {$_ ne ""} $cgi->param('filters') ) {
     my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
     $filters{$k} = $v;
     $v =~ s/"//g;
