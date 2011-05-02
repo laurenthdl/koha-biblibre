@@ -30,10 +30,10 @@
         $("#pendingt").tablesorter({
             widgets : ['zebra'],    
             headers: {
-                4: { sorter: false },
+                3: { sorter: false },
+                5: { sorter: 'amount' },
                 6: { sorter: 'amount' },
-                7: { sorter: 'amount' },
-                8: { sorter: false },
+                7: { sorter: false },
             },
             textExtraction: {
                 2: function(o) {
@@ -221,7 +221,6 @@
         <tr>
             <th>Basket</th>
             <th>Order</th>
-            <th>Order Line</th>
             <th>Summary</th>
     	    <th>View Record</th>
             <th>Quantity</th>  
@@ -247,7 +246,6 @@
                     <a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="supplierid" -->"><!-- TMPL_VAR NAME="ordernumber" --></a>
                   <!-- /TMPL_IF -->
                 </td>
-                <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                 <td class="summaryfilterclass">
                   <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html"--></a>
                 <!-- TMPL_IF NAME="author" --> by <!-- TMPL_VAR NAME="author" --><!--/TMPL_IF-->
