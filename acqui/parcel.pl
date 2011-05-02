@@ -104,6 +104,29 @@ sub get_ecost {
         }
     }
 }
+
+sub get_gste {
+    my $value = shift;
+    my $gstrate = shift;
+    my $bookseller = shift;
+    if ( $bookseller->{invoiceincgst} ) {
+        return $value / ( 1 + $gstrate );
+    } else {
+        return $value;
+    }
+}
+
+sub get_gst {
+    my $value = shift;
+    my $gstrate = shift;
+    my $bookseller = shift;
+    if ( $bookseller->{invoiceincgst} ) {
+        return $value / ( 1 + $gstrate ) * $gstrate;
+    } else {
+        return $value * ( 1 + $gstrate ) - $value;
+    }
+}
+
 if ( $input->param('format') eq "json" ) {
     my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
         {   template_name   => "acqui/ajax.tmpl",
@@ -222,36 +245,48 @@ my $totalquantity = 0;
 my $total;
 my $tototal;
 my @loop_received = ();
+my @book_foot_loop;
+my %foot;
+my $total_quantity = 0;
+my $total_gste = 0;
+my $total_gsti = 0;
 
 for my $item ( @parcelitems ) {
     $total = ( $item->{'unitprice'} ) * $item->{'quantityreceived'};    #weird, are the freight fees counted by book? (pierre)
     $item->{'unitprice'} += 0;
     my %line;
     %line          = %{ $item };
-    my $ecost = get_ecost( $order, $bookseller );
+    my $ecost = get_ecost( $item, $bookseller );
     $line{ecost} = sprintf( "%.2f", $ecost );
     $line{invoice} = $invoice;
     $line{total} = sprintf( $cfstr, $total );
     $line{supplierid} = $supplierid;
     $totalprice += $item->{'unitprice'};
     $line{unitprice} = sprintf( $cfstr, $item->{'unitprice'} );
+    my $gste = get_gste( $line{total}, $line{gstrate}, $bookseller );
+    my $gst = get_gst( $line{total}, $line{gstrate}, $bookseller );
+    $foot{$line{gstrate}}{gstrate} = $line{gstrate};
+    warn $line{gstrate};
+    $foot{$line{gstrate}}{value} += sprintf( "%.2f", $gst );
+    $total_quantity += $line{quantity};
+    $total_gste += $gste;
+    $total_gsti += $gste + $gst;
+
     my $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
     $line{suggestionid}         = $$suggestion{suggestionid};
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
     $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
 
-    #double FIXME - totalfreight is redefined later.
-
-# FIXME - each order in a  parcel holds the freight for the whole parcel. This means if you receive a parcel with items from multiple budgets, you'll see the freight charge in each budget..
-    if ( $i > 0 && $totalfreight != $item->{'freight'} ) {
-        warn "FREIGHT CHARGE MISMATCH!!";
-    }
     $totalfreight = $item->{'freight'};
     $totalquantity += $item->{'quantityreceived'};
     $tototal += $total;
 
     push @loop_received, \%line;
 }
+
+push @book_foot_loop, map {
+    $_
+} values %foot;
 
 my $pendingorders = GetPendingOrders($supplierid);
 my $countpendings = scalar @$pendingorders;
@@ -260,16 +295,12 @@ my $countpendings = scalar @$pendingorders;
 my ( $totalPunitprice, $totalPquantity, $totalPecost, $totalPqtyrcvd );
 my $ordergrandtotal;
 my @loop_orders = ();
-my @book_foot_loop;
-my %foot;
-my $total_quantity = 0;
-my $total_gste = 0;
-my $total_gsti = 0;
+
 for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     my %line;
     %line = %{ $pendingorders->[$i] };
 
-    my $ecost = get_ecost( $order, $bookseller );
+    my $ecost = get_ecost( $pendingorders->[$i], $bookseller );
     $line{quantity}         += 0;
     $line{quantityreceived} += 0;
     $line{unitprice}        += 0;
@@ -281,7 +312,7 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     $line{ordertotal} = sprintf( "%.2f", $ecost * $line{quantity} );
     $line{unitprice}  = sprintf( "%.2f", $line{unitprice} );
     $line{invoice}    = $invoice;
-    $line{total}      = $total;
+    #$line{total}      = $total;
     $line{supplierid} = $supplierid;
     $ordergrandtotal += $ecost * $line{quantity};
 
@@ -289,19 +320,6 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     $line{suggestionid}         = $$suggestion{suggestionid};
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
     $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
-
-    $foot{$line{gstrate}}{gstrate} = $line{gstrate};
-    $foot{$line{gstrate}}{value} += $ecost * $order->{gstrate}};
-    $foot{$line{gstgsti}}{quantity}  +=$$line{quantity};
-    $total_quantity += $line{quantity};
-    $foot{$$line{gstgsti}}{totalgst} += $line{totalgste};
-    $total_gste += $line{totalgste};
-    $foot{$$line{gstgsti}}{totalgsti} += $line{totalgsti};
-    $total_gsti += $line{totalgsti};
-
-    push @book_foot_loop, map {
-        $_
-    } values %foot;
 
     # Check if user has permission to use budget
     unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
@@ -332,6 +350,7 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
         
     push @loop_orders, \%line if ( $i >= $startfrom and $i < $startfrom + $resultsperpage );
 }
+
 $freight = $totalfreight unless $freight;
 
 my $count = $countpendings;
@@ -383,6 +402,7 @@ $template->param(
     invoice               => $invoice,
     loop_received         => \@loop_received,
     loop_orders           => \@loop_orders,
+    book_foot_loop        => \@book_foot_loop,
     totalprice            => sprintf( $cfstr, $totalprice ),
     totalfreight          => $totalfreight,
     totalquantity         => $totalquantity,

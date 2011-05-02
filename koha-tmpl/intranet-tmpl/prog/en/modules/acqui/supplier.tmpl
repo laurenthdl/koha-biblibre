@@ -223,7 +223,7 @@ $(document).ready(function() {
             <p><strong>Discount: </strong>
                 <!-- TMPL_VAR NAME="discount" --> %</p>
             <!-- TMPL_IF NAME="gstrate" --><p><strong>Tax rate: </strong>
-                <!-- TMPL_VAR name="gstrate" -->%</p><!-- /TMPL_IF -->
+                <!-- TMPL_VAR EXPR="sprintf('%.1f', gstrate*100)" -->%</p><!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="deliverytime" --><p><strong>Delivery time: </strong>
                 <!-- TMPL_VAR NAME="deliverytime" --> days</p><!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="notes" --><p><strong>Notes: </strong>
