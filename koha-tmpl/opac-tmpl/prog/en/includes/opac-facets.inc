@@ -3,6 +3,7 @@
 <div id="search-facets">
     <h4>Refine your search</h4>
     <ul>
+       <span style="display:none">
 	    <li>Availability
 	        <ul>
 	            <li>
@@ -36,6 +37,7 @@
                 </form>
             </div>
         </li>
+</span>
         <!-- TMPL_LOOP NAME="facets_loop" -->
         <li>
             <!-- TMPL_VAR NAME="label" -->
