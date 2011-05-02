@@ -156,7 +156,6 @@
 			<tbody>
 			<!-- TMPL_LOOP NAME="errors" -->
 			    <tr>
-				<!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
 				<!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
 				<td><!-- TMPL_VAR NAME="error" --></td>
 				<td><!-- TMPL_VAR NAME="message" --></td>
@@ -352,7 +351,8 @@
 	    <ul>
 		<li><a href="/cgi-bin/koha/tools/kss.pl?save=1">Save current status</a><!-- TMPL_IF NAME="save_error" -->: Unable to save current status<!-- /TMPL_IF --></li>
 		<li><a href="/cgi-bin/koha/tools/kss.pl?manual=1">Launch manual execution</a></li>
-		<!-- TMPL_IF NAME="KSS_already_running" -->Cannot launch manual execution: synchronization is already running!<!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="KSS_already_running_unknown" -->Warning: synchronization state is unknown!<!-- TMPL_ELSE -->
+		<!-- TMPL_IF NAME="KSS_already_running" -->Cannot launch manual execution: synchronization is already running!<!-- /TMPL_IF --><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="Server_unreachable"  -->Cannot launch manual execution: server is not reachable!<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="manualoutput" --><li>Manual execution output : <br /><pre><!-- TMPL_VAR NAME="manualoutput" --></pre></li><!-- /TMPL_IF -->
 	    </ul>

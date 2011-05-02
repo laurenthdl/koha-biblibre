@@ -802,7 +802,8 @@ sub get_stats_details {
 	push @items, $res;
     }
     my $items_str = join(',', @items);
-    warn $items_str;
+
+    return unless $items_str;
 
     # Getting by ccode
     #FIXME: Shouldn't be hardcoded
@@ -814,11 +815,21 @@ sub get_stats_details {
 	$sth->execute($ccode);
 	my $result = $sth->fetchrow_hashref();
 	push @$doctyperesults, $result if ($result);
-	
-	
     }
+
     # Getting by location
-    #FIXME: Todo
+    #FIXME: Shouldn't be hardcoded
+    my $sections = C4::Koha::GetAuthorisedValues('SECTION');
+    foreach (@$sections) {
+	my $section = $_->{'authorised_value'};
+	my $query = "SELECT location, count(itemnumber) AS value from items where location=? AND itemnumber IN ($items_str) HAVING COUNT(itemnumber) > 0";
+	warn $query;
+	my $sth = $dbh->prepare($query);
+	$sth->execute($section);
+	my $result = $sth->fetchrow_hashref();
+	push @$locationresults, $result if ($result);
+    }
+
     return ($doctyperesults,$locationresults);
 }
 
