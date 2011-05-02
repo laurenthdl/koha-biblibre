@@ -1347,7 +1347,7 @@ sub ModReceiveOrder {
 
         # create a new order for the remaining items, and set its bookfund.
         foreach my $orderkey ( "linenumber", "allocation" ) {
-            delete( $order->{'$orderkey'} );
+            delete( $order->{$orderkey} );
         }
         $order->{'quantity'} -= $quantrec;
         $order->{'quantityreceived'} = 0;
@@ -1538,6 +1538,7 @@ sub GetParcel {
                 aqorders.listprice,
                 aqorders.rrp,
                 aqorders.ecost,
+                aqorders.parent_ordernumber,
                 biblio.title
         FROM aqorders
         LEFT JOIN aqbasket ON aqbasket.basketno=aqorders.basketno
