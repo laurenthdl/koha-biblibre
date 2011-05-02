@@ -2525,7 +2525,7 @@ CREATE TABLE `aqorders` (
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `rrp` decimal(13,2) default NULL,
   `ecost` decimal(13,2) default NULL,
-  `gst` decimal(13,2) default NULL,
+  `gstrate` decimal(6,4) default NULL,
   `budget_id` int(11) NOT NULL,
   `budgetgroup_id` int(11) NOT NULL,
   `budgetdate` date default NULL,
