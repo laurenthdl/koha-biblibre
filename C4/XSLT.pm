@@ -130,7 +130,22 @@ sub getAuthorisedValues4MARCSubfields {
 }
 
 my $stylesheet;
-
+sub _buildfilename{
+   my ($interface,$xsl_suffix)=@_;
+   my $xslfile;
+   if ($interface eq 'intranet') {
+       $xslfile = C4::Context->config('intrahtdocs') . 
+                  "/prog/en/xslt/" .
+                  C4::Context->preference('marcflavour') .
+                  "slim2intranet$xsl_suffix.xsl";
+   } else {
+        $xslfile = C4::Context->config('opachtdocs') . 
+                  "/prog/en/xslt/" .
+                  C4::Context->preference('marcflavour') .
+                  "slim2OPAC$xsl_suffix.xsl";
+   }
+   return $xslfile;
+}
 sub XSLTParse4Display {
     my ( $biblionumber, $orig_record, $xslfilename ) = @_;
 
@@ -156,21 +171,15 @@ sub XSLTParse4Display {
     $parser->recover_silently(1);
 
     my $source = $parser->parse_string($xmlrecord);
-    unless ( $stylesheet->{$xslfilename} ) {
+    $debug and warn "$stylesheet, $interface,$xsl_suffix";
+    my $filename=_buildfilename($interface,$xsl_suffix);
+    if ( !$stylesheet or ($filename and !$stylesheet->{$filename})) {
         my $xslt = XML::LibXSLT->new();
-        my $style_doc;
-        if ( $xslfilename =~ /http:/ ) {
-            my $xsltstring = GetURI($xslfilename);
-            $style_doc = $parser->parse_string($xsltstring);
-        } else {
-            use Cwd;
-            $style_doc = $parser->parse_file($xslfilename);
-        }
-        $stylesheet->{$xslfilename} = $xslt->parse_stylesheet($style_doc);
+        my $style_doc = $parser->parse_file($filename);
+        $stylesheet->{$filename} = $xslt->parse_stylesheet($style_doc);
     }
-    my $results      = $stylesheet->{$xslfilename}->transform($source);
-    my $newxmlrecord = $stylesheet->{$xslfilename}->output_string($results);
-    #warn Data::Dumper::Dumper $xmlrecord;
+    my $results = $stylesheet->{$filename}->transform($source);
+    my $newxmlrecord = $stylesheet->{$filename}->output_string($results);
     return $newxmlrecord;
 }
 
