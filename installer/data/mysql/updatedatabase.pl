@@ -5796,21 +5796,21 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 $DBversion = "3.06.00.014";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT INTO `permissions` (module_bit, code, description) VALUES (11, 'budget_manage_all', 'Add, modify and delete all budgets, even if budgets access is restricted')");
-    print "Upgrade to $DBversion done (Adds budget_manage_all permission)";
+    print "Upgrade to $DBversion done (Adds budget_manage_all permission)\n";
     SetVersion($DBversion);
 }
 
 $DBversion = "3.06.00.015";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqbooksellers` ADD `deliverytime` INT DEFAULT NULL");
-    print "Upgrade to $DBversion done (Add deliverytime field in aqbooksellers table)";
+    print "Upgrade to $DBversion done (Add deliverytime field in aqbooksellers table)\n";
     SetVersion($DBversion);
 }
 
 $DBversion = "3.06.00.016";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqorders` ADD `internalnotes` mediumtext AFTER `notes`");
-    print "Upgrade to $DBversion done (Add internalnotes field in aqorders table)";
+    print "Upgrade to $DBversion done (Add internalnotes field in aqorders table)\n";
     SetVersion($DBversion);
 }
 
@@ -5825,6 +5825,14 @@ $DBversion = "3.06.00.018";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqorders` CHANGE COLUMN `gst` `gstrate` DECIMAL(6,4)  DEFAULT NULL");
     print "Upgrade to $DBversion done (Change column name in aqorders gst --> gstrate)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.019";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `permissions` (module_bit, code, description)
+        VALUES (11, 'order_receive_all', 'Receive orders from any branch')");
+    print "Upgrade to $DBversion done (Add order_receive_all permission)\n";
     SetVersion($DBversion);
 }
 
