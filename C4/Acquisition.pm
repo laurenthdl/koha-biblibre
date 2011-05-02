@@ -1092,7 +1092,7 @@ Else, the upcoming July 1st is used.
 
 =item defaults entrydate to Now
 
-The following keys are used: "biblionumber", "title", "basketno", "quantity", "notes", "biblioitemnumber", "rrp", "ecost", "gst", "unitprice", "subscription", "sort1", "sort2", "booksellerinvoicenumber", "listprice", "budgetdate", "purchaseordernumber", "branchcode", "booksellerinvoicenumber", "bookfundid".
+The following keys are used: "biblionumber", "title", "basketno", "quantity", "notes", "biblioitemnumber", "rrp", "ecost", "gstrate", "unitprice", "subscription", "sort1", "sort2", "booksellerinvoicenumber", "listprice", "budgetdate", "purchaseordernumber", "branchcode", "booksellerinvoicenumber", "bookfundid".
 
 =back
 
@@ -1539,6 +1539,7 @@ sub GetParcel {
                 aqorders.rrp,
                 aqorders.ecost,
                 aqorders.parent_ordernumber,
+                aqorders.gstrate,
                 biblio.title
         FROM aqorders
         LEFT JOIN aqbasket ON aqbasket.basketno=aqorders.basketno

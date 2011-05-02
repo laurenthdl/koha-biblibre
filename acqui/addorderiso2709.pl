@@ -189,7 +189,6 @@ if ( $op eq "" ) {
                 eval "use C4::Bookseller qw/GetBookSellerFromId/;";
                 my $basket     = GetBasket( $orderinfo{basketno} );
                 my $bookseller = GetBookSellerFromId( $basket->{booksellerid} );
-                my $gst        = $bookseller->{gstrate} || C4::Context->preference("gist") || 0;
                 $orderinfo{'unitprice'} = $orderinfo{listprice} - ( $orderinfo{listprice} * ( $bookseller->{discount} ) );
                 $orderinfo{'ecost'} = $orderinfo{unitprice};
             } else {

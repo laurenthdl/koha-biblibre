@@ -119,7 +119,7 @@ $(document).ready(function() {
                     </select></li>
             </ol>
             <ol class="radio">
-            <!-- TMPL_IF NAME="GST" --><li><label for="gstyes" class="radio">Tax Number Registered:</label>
+            <!-- TMPL_IF NAME="gstrate" --><li><label for="gstyes" class="radio">Tax Number Registered:</label>
                 <!-- TMPL_IF name="gstreg" -->
                     <label for="gstyes">Yes</label> <input type="radio" name="gst" id="gstyes" value="1" checked="checked" />
                     <label for="gstno">No</label> <input type="radio" name="gst" id="gstno" value="0" />
@@ -128,7 +128,7 @@ $(document).ready(function() {
                     <label for="gstno">No</label> <input type="radio" name="gst" id="gstno" value="0" checked="checked" />
                 <!-- /TMPL_IF --></li><!-- /TMPL_IF -->
             
-            <!-- TMPL_IF NAME="GST" --><li><label for="list_gstyes" class="radio">Ordering prices:</label>
+            <!-- TMPL_IF NAME="gstrate" --><li><label for="list_gstyes" class="radio">Ordering prices:</label>
                 <!-- TMPL_IF name="listincgst" -->
                     <label for="list_gstyes">Include tax</label> <input type="radio" id="list_gstyes" name="list_gst" value="1" checked="checked" />
                     <label for="list_gstno">Don't include tax</label> <input type="radio" id="list_gstno" name="list_gst" value="0" />
@@ -137,7 +137,7 @@ $(document).ready(function() {
                     <label for="list_gstno">Don't include tax</label> <input type="radio" id="list_gstno" name="list_gst" value="0" checked="checked" />
                 <!-- /TMPL_IF --></li><!-- /TMPL_IF -->
             
-            <!-- TMPL_IF NAME="GST" --><li><label for="invoice_gstyes" class="radio">Invoice prices:</label>
+            <!-- TMPL_IF NAME="gstrate" --><li><label for="invoice_gstyes" class="radio">Invoice prices:</label>
                 <!-- TMPL_IF name= "invoiceincgst" -->
                     <label for="invoice_gstyes">Include tax</label> <input type="radio" id="invoice_gstyes" name="invoice_gst" value="1" checked="checked" />
                     <label for="invoice_gstno">Don't include tax</label> <input type="radio" id="invoice_gstno" name="invoice_gst" value="0" />
@@ -147,14 +147,23 @@ $(document).ready(function() {
                 <!-- /TMPL_IF --></li><!-- /TMPL_IF -->
             </ol>
             <ol>
+                <li>
+                    <label for="gst">Tax rate</label>
+                    <select name="gstrate" id="gstrate">
+                    <!-- TMPL_LOOP NAME="gst_values" -->
+                       <option value="<!-- TMPL_VAR NAME="option" -->"<!-- TMPL_IF EXPR="gstrate == option" --> selected="selected"<!-- /TMPL_IF -->><!-- TMPL_VAR EXPR="sprintf('%.1f', option * 100)" --> %</option>
+                    <!-- /TMPL_LOOP -->
+                    </select>
+                </li>
+            </ol>
+            <ol>
             <li><label for="discount">Discount</label>
                 <input type="text" size="3" id="discount" name="discount" value="<!-- TMPL_VAR NAME="discount" -->" /> %</li>
-            <!-- TMPL_IF NAME="GST" --><li><label for="gstrate">Tax rate</label><input type="text" name="gstrate" id="gstrate" size="5" value="<!-- TMPL_VAR name="gstrate" -->"/>%</li><!-- /TMPL_IF -->
             <li><label for="deliverytime">Delivery time</label>
                 <input type="text" size="2" id="deliverytime" name="deliverytime" value="<!-- TMPL_VAR NAME="deliverytime" -->" />days</li>
             <li><label for="notes">Notes</label>
                 <textarea cols="40" rows="4" id="notes" name="notes" ><!-- TMPL_VAR NAME="notes" --></textarea></li></ol>			
-            <!-- TMPL_UNLESS NAME="GST" -->
+            <!-- TMPL_UNLESS NAME="gstrate" -->
                 <input type="hidden" name="gst" value="0" />
                 <input type="hidden" name="list_gst" value="0" />
                 <input type="hidden"  name="invoice_gst" value="0" />
@@ -203,16 +212,18 @@ $(document).ready(function() {
                     <!-- /TMPL_IF --></p>
             <p><strong>List Prices are: </strong><!--TMPL_VAR Name="listprice"--></p>
             <p><strong>Invoice Prices are: </strong><!--TMPL_VAR Name="invoiceprice"--></p>
-            <!-- TMPL_IF NAME="GST" --><p><strong>Tax Number Registered: </strong>
+            <!-- TMPL_IF NAME="gstrate" -->
+                <p><strong>Tax Number Registered: </strong>
                     <!-- TMPL_IF name="gstreg" -->Yes<!--TMPL_ELSE-->No<!-- /TMPL_IF --></p>
-            <p><strong>List Item Price Includes Tax: </strong>
+                <p><strong>List Item Price Includes Tax: </strong>
                     <!-- TMPL_IF name="listincgst" -->Yes<!--TMPL_ELSE-->No<!-- /TMPL_IF --></p>
-            <p><strong>Invoice Item Price Includes Tax: </strong>
-                    <!-- TMPL_IF name= "invoiceincgst" -->Yes<!--TMPL_ELSE-->No<!-- /TMPL_IF --></p><!-- /TMPL_IF -->
+                <p><strong>Invoice Item Price Includes Tax: </strong>
+                    <!-- TMPL_IF name= "invoiceincgst" -->Yes<!--TMPL_ELSE-->No<!-- /TMPL_IF --></p>
+            <!-- /TMPL_IF -->
             <p><strong>Discount: </strong>
                 <!-- TMPL_VAR NAME="discount" --> %</p>
-            <!-- TMPL_IF NAME="GST" --><p><strong>Tax rate: </strong>
-                <!-- TMPL_VAR name="GST" -->%</p><!-- /TMPL_IF -->
+            <!-- TMPL_IF NAME="gstrate" --><p><strong>Tax rate: </strong>
+                <!-- TMPL_VAR EXPR="sprintf('%.1f', gstrate*100)" -->%</p><!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="deliverytime" --><p><strong>Delivery time: </strong>
                 <!-- TMPL_VAR NAME="deliverytime" --> days</p><!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="notes" --><p><strong>Notes: </strong>

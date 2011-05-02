@@ -98,7 +98,7 @@
     <input type="hidden" name="supplierid" value="<!-- TMPL_VAR NAME="supplierid" -->" />
     <input type="hidden" name="datereceived" value="<!-- TMPL_VAR NAME="datereceived_iso" -->" />
     <input type="hidden" name="freight" value="<!-- TMPL_VAR NAME="freight" -->" />
-    <input type="hidden" name="gst" value="<!-- TMPL_VAR NAME="gst" -->" />
+    <input type="hidden" name="gstrate" value="<!-- TMPL_VAR NAME="gstrate" -->" />
 	</div>
 	<div class="yui-u">
     <fieldset class="rows">
@@ -148,7 +148,7 @@
 
 </div>
 </div><div class="yui-g"><fieldset class="action">
-        <input type="button"  value="Save" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate barcodes detected.  Please correct the errors and resubmit.') ); return false };" /> <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gst=<!-- TMPL_VAR NAME="gst" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
+        <input type="button"  value="Save" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate barcodes detected.  Please correct the errors and resubmit.') ); return false };" /> <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
 </fieldset></div>    </form>
 <!-- TMPL_ELSE -->
 <div id="acqui_acquire_orderlist">
@@ -165,7 +165,7 @@
         <tr>
             <td><!-- TMPL_VAR NAME="basketno" --></td>
             <td><!-- TMPL_VAR NAME="isbn" --></td>
-         <td><a href="orderreceive.pl?datereceived=<!-- TMPL_VAR NAME="datereceived" -->&amp;receive=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblio=<!-- TMPL_VAR NAME="biblionumber" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;gst=<!-- TMPL_VAR NAME="gst" -->&amp;id=<!-- TMPL_VAR NAME="id" -->"><!-- TMPL_VAR NAME="title" escape="html" --></a></td>
+         <td><a href="orderreceive.pl?datereceived=<!-- TMPL_VAR NAME="datereceived" -->&amp;receive=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblio=<!-- TMPL_VAR NAME="biblionumber" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;id=<!-- TMPL_VAR NAME="id" -->"><!-- TMPL_VAR NAME="title" escape="html" --></a></td>
             <td><!-- TMPL_VAR NAME="author" --></td>
             <td><!-- TMPL_VAR NAME="quantity" --></td>
             <td><!-- TMPL_VAR NAME="quantityreceived" --></td>
