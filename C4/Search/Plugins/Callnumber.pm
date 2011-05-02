@@ -27,16 +27,16 @@ our @EXPORT = qw/
 our $VERSION = 3.0.1;
 
 =head2 fonction
-   return "995$1 $3 $4 $5 $7 $8"
+   return "995$3 $4 $5 $6 $7 $8"
 =cut
 
 sub ComputeValue {
     map {
         join(' ', (
-            $_->subfield('1'),
             $_->subfield('3'),
             $_->subfield('4'),
             $_->subfield('5'),
+            $_->subfield('6'),
             $_->subfield('7'),
             $_->subfield('8'),
         ));
