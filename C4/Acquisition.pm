@@ -1329,7 +1329,7 @@ sub ModReceiveOrder {
     my $order = $sth->fetchrow_hashref();
     $sth->finish();
 
-    if ( ( $order->{quantity} - $order->{quantityreceived} ) > $quantrec ) {
+    if ( $order->{quantity} > $quantrec ) {
         $sth = $dbh->prepare( "
             UPDATE aqorders
             SET quantityreceived=?
@@ -1338,23 +1338,27 @@ sub ModReceiveOrder {
                 , unitprice=?
                 , freight=?
                 , rrp=?
-                , orderstatus=2
+                , quantity=?
+                , orderstatus=3
             WHERE biblionumber=? AND ordernumber=?" );
 
-        $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $biblionumber, $ordernumber );
+        $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $quantrec, $biblionumber, $ordernumber );
         $sth->finish;
 
+        # create a new order for the remaining items, and set its bookfund.
+        foreach my $orderkey ( "linenumber", "allocation" ) {
+            delete( $order->{'$orderkey'} );
+        }
+        $order->{'quantity'} -= $quantrec;
+        $order->{'quantityreceived'} = 0;
+        $order->{'orderstatus'} = 2;
+        my $newOrder = NewOrder($order, $$order{parent_ordernumber});
     } else {
         $sth = $dbh->prepare(
-            "UPDATE aqorders
-             SET quantityreceived = ?,
-                 datereceived = ?,
-                 booksellerinvoicenumber = ?,
-                 unitprice = ?,
-                 freight = ?,
-                 rrp = ?,
-                 orderstatus = 3
-             WHERE biblionumber=? and ordernumber=?"
+            "update aqorders
+                            set quantityreceived=?,datereceived=?,booksellerinvoicenumber=?,
+                                unitprice=?,freight=?,rrp=?,orderstatus=3
+                            where biblionumber=? and ordernumber=?"
         );
         $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $biblionumber, $ordernumber );
         $sth->finish;
@@ -1364,19 +1368,20 @@ sub ModReceiveOrder {
     # Do we have to remove order informations from the marc record?
     my ($ordertag, $ordersubtag) = GetMarcFromKohaField('aqorders.ordernumber', 'ACQ');
     if ($ordertag and $ordersubtag) {
-        # Getting record
-        my $record = GetMarcBiblio($biblionumber);
-        if ($record) {
-            # Looking for the right field
-            foreach ($record->field($ordertag)) {
-            if ($_->subfield($ordersubtag) eq $ordernumber) {
-               $record->delete_field($_);
-            }
-            }
-            # Applying changes
-            ModBiblio($record, $biblionumber, 'ACQ');
-        }
+	# Getting record
+	my $record = GetMarcBiblio($biblionumber);
+	if ($record) {
+	    # Looking for the right field
+	    foreach ($record->field($ordertag)) {
+		if ($_->subfield($ordersubtag) eq $ordernumber) {
+		   $record->delete_field($_); 
+		}
+	    }
+	    # Applying changes
+	    ModBiblio($record, $biblionumber, 'ACQ'); 
+	}
     }
+
 
     return $datereceived;
 }
