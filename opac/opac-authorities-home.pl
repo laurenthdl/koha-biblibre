@@ -115,23 +115,16 @@ if ( $op eq "do_search" ) {
 
     $template->param( result => \@resultrecords );
 
-} else {
-
-    if ( $op eq "delete" ) {
-        my $authid = $query->param('authid');
-        DelAuthority( $authid, 1 );
-    }
-
-    ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
+}
+else {
+( $template, $loggedinuser, $cookie ) = get_template_and_user( {
         template_name   => "opac-authorities-home.tmpl",
         query           => $query,
         type            => 'opac',
         authnotrequired => 1,
         debug           => 1,
     } );
-
 }
-
 $template->param(
     authtypesloop     => \@authtypesloop,
     name_index_name   => C4::Search::Query::getIndexName('auth-summary'),
