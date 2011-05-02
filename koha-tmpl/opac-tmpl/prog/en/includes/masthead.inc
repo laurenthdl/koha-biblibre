@@ -88,7 +88,7 @@
    <!-- TMPL_ELSE -->
       <!-- TMPL_UNLESS NAME="opac_limit_override" -->
           <!-- TMPL_IF name="mylibraryfirst" --> 
-               <input name="filters" value="<!-- TMPL_VAR NAME='holdingbranch' -->:<!-- TMPL_VAR name='mylibraryfirst' -->" type="hidden" />
+               <input name="filters" value="str_holdingbranch:<!-- TMPL_VAR name='mylibraryfirst' -->" type="hidden" />
           <!-- /TMPL_IF -->
        <!-- /TMPL_UNLESS -->
    <!-- /TMPL_IF -->
