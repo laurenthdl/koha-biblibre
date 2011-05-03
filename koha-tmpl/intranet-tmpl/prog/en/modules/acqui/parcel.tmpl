@@ -275,8 +275,12 @@
                       <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->" onclick="return confirm(_('Are you sure you want to cancel this order?'));">Cancel</a> /
                       <a href="transferorder.pl?ordernumber=<!--TMPL_VAR NAME="ordernumber" -->&amp;bookselleridfrom=<!-- TMPL_VAR NAME="supplierid" -->">Transfer</a>
                     <!-- TMPL_ELSE -->
-				      <a href="orderreceive.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->">Receive</a> /
-				      <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->" onclick="return confirm(_('Are you sure you want to cancel this order?'));">Cancel</a> /
+                     <!-- TMPL_UNLESS NAME="closedate" -->
+                      <a href="orderreceive.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->" onclick="return confirm(_('Basket is not closed. Do you really want to receive this order?'));">Receive</a> /
+                     <!-- TMPL_ELSE --> 
+                      <a href="orderreceive.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->">Receive</a> /
+                     <!-- /TMPL_UNLESS --> 
+                      <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->" onclick="return confirm(_('Are you sure you want to cancel this order?'));">Cancel</a> /
                       <a href="transferorder.pl?ordernumber=<!--TMPL_VAR NAME="ordernumber" -->&amp;bookselleridfrom=<!-- TMPL_VAR NAME="supplierid" -->">Transfer</a>
                     <!-- /TMPL_IF -->
                   <!-- /TMPL_IF -->
