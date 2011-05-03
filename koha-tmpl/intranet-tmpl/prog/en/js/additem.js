@@ -4,6 +4,7 @@ function deleteItemBlock(index) {
     var quantity = document.getElementById('quantity');
     quantity.setAttribute('value',parseFloat(quantity.getAttribute('value'))-1);
 }
+
 function cloneItemBlock(index) {    
     var original = document.getElementById(index); //original <div>
     var clone = original.cloneNode(true);
@@ -17,6 +18,7 @@ function cloneItemBlock(index) {
 
     var CloneButtonPlus;
     var CloneButtonMinus;
+    var CloneButtonClear;
     var aTags = clone.getElementsByTagName('a');
     var i = 0;
     while(aTags[i].getAttribute('name') != 'buttonPlus') i++;
@@ -25,6 +27,8 @@ function cloneItemBlock(index) {
     CloneButtonMinus = aTags[i+1];
     CloneButtonMinus.setAttribute('onclick', "deleteItemBlock('" + index + random + "')");
     CloneButtonMinus.style.display = 'inline';
+    CloneButtonClear = aTags[i+2];
+    CloneButtonClear.setAttribute('onclick', "clearItemBlock('" + index + random + "')");
 
     // change itemids of the clone
     var elems = clone.getElementsByTagName('input');
@@ -34,30 +38,93 @@ function cloneItemBlock(index) {
             elems[i].value = random;
         }
     }    
-   // }
-    //catch(e){        // do nothig if ButtonPlus & CloneButtonPlus don't exist.
-    //}
     // insert this line on the page    
     original.parentNode.insertBefore(clone,original.nextSibling);
     var quantity = document.getElementById('quantity');
     quantity.setAttribute('value',parseFloat(quantity.getAttribute('value'))+1);
+
+    // Don't copy value if must be uniq
+    // stocknumber copynumber barcode
+    var array_fields = ['items.stocknumber', 'items.copynumber', 'items.barcode'];
+    for ( field in array_fields ) {
+        var input = $(clone).find("[name='kohafield'][value="+array_fields[field]+"]").prevAll("input[name='field_value']")[0];
+        $(input).val("");
+    }
 }
+
+function clearItemBlock(index) {
+    var block = $("#"+index);
+    console.log("CLEAR FUNCTION");
+    console.log($(block));
+    $(block).find("input[type='text']").each(function(){
+        console.log(this);
+        $(this).val("");
+    });
+}
+
 function check_additem() {
-	var	barcodes = document.getElementsByName('barcode');
 	var success = true;
-	for(i=0;i<barcodes.length;i++){
-		for(j=0;j<barcodes.length;j++){
-			if( (i > j) && (barcodes[i].value == barcodes[j].value) && barcodes[i].value !='') {
-				barcodes[i].className='error';
-				barcodes[j].className='error';
-				success = false;
-			}
-		}
-	}
-	// TODO : Add AJAX function to test against barcodes already in the database, not just 
-	// duplicates within the form.  
+    var array_fields = ['items.stocknumber', 'items.copynumber', 'items.barcode'];
+    var url = '../acqui/check_unicity.pl?'; // Url for ajax call
+    $(".error").empty(); // Clear error div
+
+    // Check if a value is duplicated in form
+    for ( field in array_fields ) {
+        var fieldname = array_fields[field].split('.')[1];
+        var values = new Array();
+        $("[name='kohafield'][value="+array_fields[field]+"]").each(function(){
+            var input = $(this).prevAll("input[name='field_value']")[0];
+            values.push($(input).val());
+            url += "field=" + fieldname + "&value=" + $(input).val() + "&"; // construct url
+        });
+
+        var sorted_arr = values.sort();
+        for (var i = 0; i < sorted_arr.length - 1; i += 1) {
+            if (sorted_arr[i + 1] == sorted_arr[i]) {
+                $(".error").append( fieldname + " " + sorted_arr[i] + " is duplicated<br/>");
+                success = false;
+            }
+        }
+
+    }
+
+    // If there is a duplication, we raise an error
+    if ( success == false ) {
+        $(".error").show();
+        return false;
+    }
+
+    // Else, we check in DB
+    var xmlhttp = null;
+    xmlhttp = new XMLHttpRequest();
+    if ( typeof xmlhttp.overrideMimeType != 'undefined') {
+        xmlhttp.overrideMimeType('text/xml');
+    }
+
+    xmlhttp.open('GET', url, false);
+    xmlhttp.send(null);
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {} else {}
+    };
+    var response  =  xmlhttp.responseText;
+    var elts = response.split(';');
+    if ( response.length > 0 && elts.length > 0 ) {
+        for ( var i = 0 ; i < elts.length - 1 ; i += 1 ) {
+            console.log(elts[i]);
+            var fieldname = elts[i].split(':')[0];
+            var value = elts[i].split(':')[1];
+            $(".error").append( fieldname + " " + value + " already exist in database<br/>");
+        }
+        success = false;
+    }
+
+    if ( success == false ) {
+        $(".error").show();
+    }
 	return success;
 }
+
 $(document).ready(function(){
 	$(".cloneItemBlock").click(function(){
 		var clonedRow = $(this).parent().parent().clone(true);
