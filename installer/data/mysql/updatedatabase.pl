@@ -5830,6 +5830,14 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.021";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `permissions` (module_bit, code, description)
+        VALUES (11, 'order_manage_all', 'Manage all orders & baskets')");
+    print "Upgrade to $DBversion done (Add order_manage_all permission)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
