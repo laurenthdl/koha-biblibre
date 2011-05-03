@@ -193,6 +193,11 @@ if ( $op eq 'delete_confirm' ) {
     $basket->{closedate} = undef;
     ModBasket($basket);
     print $query->redirect( '/cgi-bin/koha/acqui/basket.pl?basketno=' . $basket->{'basketno'} );
+} elsif ( $op eq 'mod_users' ) {
+    my $basketusers_ids = $query->param('basketusers_ids');
+    my @basketusers = split( /:/, $basketusers_ids );
+    ModBasketUsers($basketno, @basketusers);
+    print $query->redirect( '/cgi-bin/koha/acqui/basket.pl?basketno=' . $basket->{'basketno'} );
 } else {
 
     # get librarian branch...
@@ -246,6 +251,16 @@ if ( $op eq 'delete_confirm' ) {
     $debug
       and warn sprintf "loggedinuser: $loggedinuser; creationdate: %s; authorisedby: %s",
       $basket->{creationdate}, $basket->{authorisedby};
+    my $basketusers_ids = GetBasketUsers($basketno);
+    my @basketusers_ids;
+    foreach (@$basketusers_ids) {
+        push @basketusers_ids, $_->{'borrowernumber'};
+    }
+    my @basketusers;
+    foreach my $basketuser_id (@basketusers_ids) {
+        my $basketuser = GetMember(borrowernumber => $basketuser_id);
+        push @basketusers, $basketuser if $basketuser;
+    }
 
     my @results = GetOrders($basketno);
     my $count   = scalar @results;
@@ -312,6 +327,8 @@ if ( $op eq 'delete_confirm' ) {
         creationdate         => C4::Dates->new( $basket->{creationdate}, 'iso' )->output,
         authorisedby         => $basket->{authorisedby},
         authorisedbyname     => $basket->{authorisedbyname},
+        basketusers_ids      => join(':', @basketusers_ids).":",
+        basketusers          => \@basketusers,
         deliveryplace        => $basket->{deliveryplace}||$basket->{freedeliveryplace},
         billingplace         => $basket->{billingplace},
         closedate            => C4::Dates->new( $basket->{closedate}, 'iso' )->output,

@@ -5819,6 +5819,22 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.020";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("DROP TABLE IF EXISTS `aqbasketusers`");
+    $dbh->do("
+        CREATE TABLE `aqbasketusers` (
+            `basketno` int(11) NOT NULL,
+            `borrowernumber` int(11) NOT NULL,
+            PRIMARY KEY (`basketno`,`borrowernumber`),
+            CONSTRAINT `aqbasketusers_ibfk_1` FOREIGN KEY (`basketno`) REFERENCES `aqbasket` (`basketno`),
+            CONSTRAINT `aqbasketusers_ibfk_2` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    ");
+    print "Upgrade to $DBversion done (Add aqbasketusers table)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
