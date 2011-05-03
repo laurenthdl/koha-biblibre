@@ -1985,3 +1985,7 @@ div#acqui_order_supplierlist > div.vendor > div.baskets {
 ul.vendors_anchors {
     margin: 0.5em 1.5em;
 }
+
+table#orders p.notes {
+    color: orange;
+}
