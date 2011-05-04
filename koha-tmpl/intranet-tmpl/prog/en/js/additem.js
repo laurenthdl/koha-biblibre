@@ -54,10 +54,7 @@ function cloneItemBlock(index) {
 
 function clearItemBlock(index) {
     var block = $("#"+index);
-    console.log("CLEAR FUNCTION");
-    console.log($(block));
     $(block).find("input[type='text']").each(function(){
-        console.log(this);
         $(this).val("");
     });
 }
@@ -111,7 +108,6 @@ function check_additem() {
     var elts = response.split(';');
     if ( response.length > 0 && elts.length > 0 ) {
         for ( var i = 0 ; i < elts.length - 1 ; i += 1 ) {
-            console.log(elts[i]);
             var fieldname = elts[i].split(':')[0];
             var value = elts[i].split(':')[1];
             $(".error").append( fieldname + " " + value + " already exist in database<br/>");
