@@ -95,11 +95,8 @@
       $("#"+id).remove();
       var ids = $("#basketusers_ids").val();
       var expr = "(^|:)"+id+":";
-      console.log(ids);
       var re = new RegExp(expr, "g");
-      console.log(ids);
       ids = ids.replace (re, ':');
-      console.log(ids);
       $("#basketusers_ids").val(ids);
     }
 //]]>
