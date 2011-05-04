@@ -317,9 +317,9 @@
     <table id="receivedt">
         <thead>
 	    <tr>
+        <th>Order Line</th>
 		<th>Basket</th>
 		<th>Order</th>
-        <th>Order Line</th>
 		<th>Summary</th>
 		<th>View Record</th>
 		<th>Quantity</th>  
@@ -370,9 +370,9 @@
         <!-- TMPL_ELSE -->
             <tr>
         <!-- /TMPL_UNLESS -->
+                <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                 <td><a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a></td>
                 <td><a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="supplierid" -->"><!-- TMPL_VAR NAME="ordernumber" --></a></td>
-                <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                 <td>
                     <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" ESCAPE="html" --></a>
                     <!-- TMPL_IF NAME="author" --> / <!-- TMPL_VAR NAME="author" --><!--/TMPL_IF-->
