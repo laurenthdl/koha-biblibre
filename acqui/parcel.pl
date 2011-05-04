@@ -188,38 +188,52 @@ my $biblionumber = $input->param('biblionumber');
 
 # If canceling an order
 if ( $action eq "cancelorder" ) {
+    my $confirm = $input->param('confirm');
+    if ( $confirm ) {
+        my $error_delitem;
+        my $error_delbiblio;
 
-    my $error_delitem;
-    my $error_delbiblio;
+        # We delete the order
+        DelOrder( $biblionumber, $ordernumber );
 
-    # We delete the order
-    DelOrder( $biblionumber, $ordernumber );
+        # We delete all the items related to this order
+        my @itemnumbers = GetItemnumbersFromOrder($ordernumber);
+        foreach (@itemnumbers) {
+            my $delcheck = DelItemCheck( C4::Context->dbh, $biblionumber, $_ );
 
-    # We delete all the items related to this order
-    my @itemnumbers = GetItemnumbersFromOrder($ordernumber);
-    foreach (@itemnumbers) {
-        my $delcheck = DelItemCheck( C4::Context->dbh, $biblionumber, $_ );
+            # (should always success, as no issue should exist on item on order)
+            if ( $delcheck != 1 ) { $error_delitem = 1; }
+        }
 
-        # (should always success, as no issue should exist on item on order)
-        if ( $delcheck != 1 ) { $error_delitem = 1; }
-    }
+        # We get the number of remaining items
+        my $itemcount = GetItemsCount($biblionumber);
 
-    # We get the number of remaining items
-    my $itemcount = GetItemsCount($biblionumber);
+        # If there are no items left,
+        if ( $itemcount eq 0 and $input->param('del_biblio')) {
+            # We delete the record
+            $error_delbiblio = DelBiblio($biblionumber);
+        }
 
-    # If there are no items left,
-    if ( $itemcount eq 0 ) {
-        # We delete the record
-        $error_delbiblio = DelBiblio($biblionumber);
-    }
+        if ( $error_delitem || $error_delbiblio ) {
+            warn $error_delitem;
+            warn $error_delbiblio;
+            if ($error_delitem)   { $template->param( error_delitem   => 1 ); }
+            if ($error_delbiblio) { $template->param( error_delbiblio => 1 ); }
+        } else {
+            $template->param( success_delorder => 1 );
+        }
 
-    if ( $error_delitem || $error_delbiblio ) {
-        warn $error_delitem;
-        warn $error_delbiblio;
-        if ($error_delitem)   { $template->param( error_delitem   => 1 ); }
-        if ($error_delbiblio) { $template->param( error_delbiblio => 1 ); }
+        print $input->redirect( '/cgi-bin/koha/acqui/parcel.pl?supplierid=' . $input->param('supplierid') . '&op=new&invoice=' . $input->param('invoice') . '&datereceived=' . $input->param('invoicedatereceived'));
+        exit;
     } else {
-        $template->param( success_delorder => 1 );
+        $template->param(
+            confirm_cancel => "1",
+            biblionumber   => $biblionumber,
+            ordernumber    => $ordernumber,
+            supplierid     => $input->param('supplierid'),
+            invoice        => $input->param('invoice'),
+            datereceived   => $input->param('invoicedatereceived'),
+        );
     }
 }
 
