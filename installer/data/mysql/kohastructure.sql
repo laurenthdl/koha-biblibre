@@ -2339,6 +2339,7 @@ CREATE TABLE `aqbasket` (
   `basketgroupid` int(11),
   `deliveryplace` varchar(10) default NULL,
   `billingplace` varchar(10) default NULL,
+  `branch` varchar(10) default NULL,
   PRIMARY KEY  (`basketno`),
   KEY `booksellerid` (`booksellerid`),
   KEY `basketgroupid` (`basketgroupid`),

@@ -28,6 +28,7 @@ use C4::Output;
 use CGI;
 use C4::Acquisition;
 use C4::Budgets;
+use C4::Branch;
 
 use C4::Bookseller;
 use C4::Dates qw/format_date/;
@@ -198,6 +199,14 @@ if ( $op eq 'delete_confirm' ) {
     my @basketusers = split( /:/, $basketusers_ids );
     ModBasketUsers($basketno, @basketusers);
     print $query->redirect( '/cgi-bin/koha/acqui/basket.pl?basketno=' . $basket->{'basketno'} );
+} elsif ( $op eq 'mod_branch' ) {
+    my $branch = $query->param('branch');
+    $branch = 'NULL' if($branch eq '');
+    ModBasket({
+        basketno => $basket->{'basketno'},
+        branch   => $branch
+    });
+    print $query->redirect( '/cgi-bin/koha/acqui/basket.pl?basketno=' . $basket->{'basketno'} );
 } else {
 
     # get librarian branch...
@@ -214,6 +223,17 @@ if ( $op eq 'delete_confirm' ) {
                 exit 1;
             }
         }
+    }
+
+    # get branches
+    my $branches = GetBranches();
+    my @branches_loop;
+    foreach  my $branch (sort keys %$branches) {
+        push @branches_loop, {
+            branchcode => $branch,
+            branchname => $branches->{$branch}->{'branchname'},
+            selected => $branch eq $basket->{'branch'} ? 1 : 0
+        };
     }
 
     #if the basket is closed,and the user has the permission to edit basketgroups, display a list of basketgroups
@@ -396,6 +416,7 @@ if ( $op eq 'delete_confirm' ) {
         basketbooksellernote => $basket->{booksellernote},
         basketcontractno     => $basket->{contractnumber},
         basketcontractname   => $contract->{contractname},
+        branches_loop        => \@branches_loop,
         creationdate         => C4::Dates->new( $basket->{creationdate}, 'iso' )->output,
         authorisedby         => $basket->{authorisedby},
         authorisedbyname     => $basket->{authorisedbyname},

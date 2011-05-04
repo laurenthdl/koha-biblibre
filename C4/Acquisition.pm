@@ -145,8 +145,7 @@ sub GetBasket {
     my $dbh        = C4::Context->dbh;
     my $query      = "
         SELECT  aqbasket.*,
-                concat( b.firstname,' ',b.surname) AS authorisedbyname,
-                b.branchcode AS branch
+                concat( b.firstname,' ',b.surname) AS authorisedbyname
         FROM    aqbasket
         LEFT JOIN borrowers b ON aqbasket.authorisedby=b.borrowernumber
         WHERE basketno=?
