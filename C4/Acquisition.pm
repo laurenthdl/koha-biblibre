@@ -1682,6 +1682,7 @@ sub GetLateOrders {
     my $delay      = shift;
     my $supplierid = shift;
     my $branch     = shift;
+    my $estimateddeliverydate = shift;
 
     my $dbh = C4::Context->dbh;
 
@@ -1709,6 +1710,8 @@ sub GetLateOrders {
         LEFT JOIN aqbudgets           ON aqorders.budget_id          = aqbudgets.budget_id,
         aqbasket LEFT JOIN borrowers  ON aqbasket.authorisedby       = borrowers.borrowernumber
         LEFT JOIN aqbooksellers       ON aqbasket.booksellerid       = aqbooksellers.id
+    ";
+    $from .= "
         WHERE aqorders.basketno = aqbasket.basketno
         AND ( datereceived = ''
             OR datereceived IS NULL
@@ -1745,6 +1748,14 @@ sub GetLateOrders {
     if ( defined $branch ) {
         $from .= ' AND borrowers.branchcode LIKE ? ';
         push @query_params, $branch;
+    }
+    if ( defined $estimateddeliverydate ) {
+        $from .= '
+            AND aqbasket.closedate IS NOT NULL 
+            AND aqbooksellers.deliverytime IS NOT NULL
+            AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) >= ?
+            AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) < CURDATE()';
+        push @query_params, $estimateddeliverydate
     }
     if (   C4::Context->preference("IndependantBranches")
         && C4::Context->userenv

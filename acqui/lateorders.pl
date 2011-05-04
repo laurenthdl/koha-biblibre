@@ -68,6 +68,7 @@ my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
 
 my $supplierid = $input->param('supplierid') || undef;    # we don't want "" or 0
 my $delay      = $input->param('delay');
+my $estimateddeliverydate      = $input->param('estimateddeliverydate');
 my $branch     = $input->param('branch');
 my $op         = $input->param('op');
 
@@ -90,7 +91,7 @@ foreach ( keys %supplierlist ) {
 $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 
-my @lateorders = GetLateOrders( $delay, undef, undef );
+my @lateorders = GetLateOrders( $delay, undef, undef, $estimateddeliverydate );
 
 my $total;
 foreach (@lateorders) {
@@ -145,7 +146,9 @@ $template->param( ERROR_LOOP => \@errors ) if (@errors);
 $template->param(
     lateorders              => \@lateorders,
     delay                   => $delay,
+    estimateddeliverydate   => $estimateddeliverydate,
     total                   => $total,
     intranetcolorstylesheet => C4::Context->preference("intranetcolorstylesheet"),
+    DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
 output_html_with_http_headers $input, $cookie, $template->output;
