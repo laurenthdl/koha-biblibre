@@ -1,6 +1,7 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions &rsaquo; Late orders</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
@@ -16,13 +17,18 @@ $(document).ready(function() {
         type: 'numeric'
     });
     $("#lateorders").tablesorter({
-	    widgets : ['zebra'],    
+	    widgets : ['zebra'],
 	    headers: {
             5: { sorter: false },
             3: {sorter: 'amount'}
         },
-	}); 
-}); 
+	});
+
+    $("#checkAll").click(function() {
+        $("#lateorders :checkbox").attr('checked', $("#checkAll").is(':checked'));
+    });
+
+});
 //]]>
 </script>
 </head>
@@ -34,7 +40,6 @@ $(document).ready(function() {
 <div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/acqui/acqui-home.pl">Acquisitions</a> &rsaquo; <a href="lateorders.pl">Late orders</a></div>
 
 <div id="doc3" class="yui-t2">
-   
    <div id="bd">
 	<div id="yui-main">
 	<div class="yui-b">
@@ -61,12 +66,12 @@ $(document).ready(function() {
                 <th>Information</th>
                 <th>Total cost</th>
                 <th>Basket</th>
-                <th>&nbsp;</th>
+                <th><input type="checkbox" id="checkAll"></th>
             </tr>
         </thead>
         <tbody>
     <!-- TMPL_LOOP name="lateorders" -->
-        <tr<!-- TMPL_UNLESS NAME="__odd__" --> class="highlight"<!-- /TMPL_UNLESS -->> 
+        <tr<!-- TMPL_UNLESS NAME="__odd__" --> class="highlight"<!-- /TMPL_UNLESS -->>
             <td>
                 <!-- TMPL_VAR name="orderdate" -->
                 (<!-- TMPL_VAR name="latesince" --> days)
@@ -134,7 +139,24 @@ $(document).ready(function() {
 <!-- TMPL_LOOP NAME="ERROR_LOOP" -->
 <!-- TMPL_IF NAME="delay_digits" --><p class="error">The number of days (<!-- TMPL_VAR NAME="bad_delay" -->) must be a number between 0 and 999.</p><!-- /TMPL_IF -->
 <!-- /TMPL_LOOP -->
-<ol><li><label for="delay">Order date:</label><input size="3" maxlength="3" id="delay" type="text" name="delay" value="<!--TMPL_VAR Name="delay" -->" /> days ago</li>
+<ol>
+    <li><label for="delay">Order date:</label><input size="3" maxlength="3" id="delay" type="text" name="delay" value="<!--TMPL_VAR Name="delay" -->" /> days ago</li>
+    <li><label for="delay">Estimated Delivery date:</label>
+        <input type="text" size="10" id="estimateddeliverydate" name="estimateddeliverydate" value="<!-- TMPL_VAR name="estimateddeliverydate" -->" />
+        <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="openCalendarFrom" style="cursor: pointer;" alt="Show Calendar" />
+        <div class="hint"><!-- TMPL_INCLUDE NAME="date-format.inc" --></div>
+		<script type="text/javascript">
+			// return true if the date is blocked.
+			function disable_from(date) {var limit = get_Calendar_limit(date,'estimateddeliverydate'); return (limit && limit < date);}  // true or false
+			Calendar.setup({
+				inputField : "estimateddeliverydate",
+				ifFormat : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+				button : "openCalendarFrom",
+				disableFunc : disable_from,
+				dateStatusFunc : disable_from
+			});
+		</script>
+    </li>
 	<li><label for="supplierid">Vendor:</label>
 		<select id="supplierid" size="1" tabindex="" name="supplierid">
 			<option value=""/>
