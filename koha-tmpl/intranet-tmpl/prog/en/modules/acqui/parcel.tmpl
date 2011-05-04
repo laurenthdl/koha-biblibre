@@ -180,6 +180,7 @@
    <div id="bd">
 	<div id="yui-main">
 	<div class="yui-b">
+    <!-- TMPL_UNLESS name="confirm_cancel" -->
 	<!-- TMPL_IF NAME="receive_error" -->
 	<div class="dialog alert">
 	<h3>Error adding items:</h3>
@@ -272,7 +273,7 @@
                   <!-- TMPL_ELSE -->
                     <!-- TMPL_IF NAME="receive_lock" -->
                       <span style="color: gray;">Receive</span> /
-                      <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->" onclick="return confirm(_('Are you sure you want to cancel this order?'));">Cancel</a> /
+                      <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->">Cancel</a> /
                       <a href="transferorder.pl?ordernumber=<!--TMPL_VAR NAME="ordernumber" -->&amp;bookselleridfrom=<!-- TMPL_VAR NAME="supplierid" -->">Transfer</a>
                     <!-- TMPL_ELSE -->
                      <!-- TMPL_UNLESS NAME="closedate" -->
@@ -280,7 +281,7 @@
                      <!-- TMPL_ELSE --> 
                       <a href="orderreceive.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->">Receive</a> /
                      <!-- /TMPL_UNLESS --> 
-                      <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->" onclick="return confirm(_('Are you sure you want to cancel this order?'));">Cancel</a> /
+                      <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->">Cancel</a> /
                       <a href="transferorder.pl?ordernumber=<!--TMPL_VAR NAME="ordernumber" -->&amp;bookselleridfrom=<!-- TMPL_VAR NAME="supplierid" -->">Transfer</a>
                     <!-- /TMPL_IF -->
                   <!-- /TMPL_IF -->
@@ -373,6 +374,29 @@
     </form>
 	<!-- TMPL_ELSE -->There are no received orders.<!-- /TMPL_IF -->
 </div>
+
+<!-- /TMPL_UNLESS -->
+<!-- TMPL_IF name="confirm_cancel" -->
+    <div id="cancelorder_needsconfirmation" class="dialog alert">
+
+    <form action="/cgi-bin/koha/acqui/parcel.pl" class="confirm">
+        <h1>Are you sure you want to cancel order <!-- TMPL_VAR name="ordernumber" -->?</h1>
+        <p>
+            <label for="del_biblio">Do you want to delete biblio if there are no items ?</label>
+            <input type="checkbox" id="del_biblio" name="del_biblio"/>
+        </p>
+        <input type="hidden" value="<!-- TMPL_VAR name="ordernumber" -->" name="ordernumber" />
+        <input type="hidden" value="<!-- TMPL_VAR name="biblionumber" -->" name="biblionumber" />
+        <input type="hidden" value="<!-- TMPL_VAR name="supplierid" -->" name="supplierid" />
+        <input type="hidden" value="<!-- TMPL_VAR name="invoice" -->" name="invoice" />
+        <input type="hidden" value="<!-- TMPL_VAR name="invoicedatereceived" -->" name="invoicedatereceived" />
+        <input type="hidden" name="action" value="cancelorder" />
+        <input type="hidden" name="confirm" value="1" />
+        <input type="submit" class="approve" value="Yes, Cancel (Y)" accesskey="y" />
+        <input type="submit" class="deny" value="No, Don't Cancel (N)" accesskey="n" onclick="javascript:window.location='/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&op=new&invoice=<!-- TMPL_VAR NAME="invoice" -->&datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->';return false;" />
+    </form>
+    </div>
+<!-- /TMPL_IF -->
 
 </div>
 </div>
