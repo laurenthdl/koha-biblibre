@@ -5860,6 +5860,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.022";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `aqbasket` ADD `branch` varchar(10) default NULL");
+    print "Upgrade to $DBversion done (Add branch field in aqbasket table)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

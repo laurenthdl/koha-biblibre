@@ -120,6 +120,7 @@ for ( my $i = 0 ; $i < $count ; $i++ ) {
         if ( $orders->[$i2]{'authorisedby'} eq $loggedinuser
           || $staff_flags->{'superlibrarian'} % 2 == 1
           || haspermission($uid, { acquisition => 'order_manage_all' })
+          || C4::Context->userenv->{'branch'} eq $orders->[$i2]{'branch'}
           || $isabasketuser ) {
             my @orders = GetOrders( $orders->[$i2]{'basketno'} );
             my $items_count= 0;
