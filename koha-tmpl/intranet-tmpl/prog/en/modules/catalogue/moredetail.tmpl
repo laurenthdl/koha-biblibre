@@ -53,7 +53,15 @@
             <!-- TMPL_IF NAME="copyvol" --><li><span class="label">Copy / Vol :</span> <!-- TMPL_VAR NAME="copyvol" -->&nbsp;</li> <!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="replacementprice" --><li><span class="label">Replacement Price:</span> <!-- TMPL_VAR NAME="replacementprice" -->&nbsp;</li> <!-- /TMPL_IF -->
             </ol></div>
-           <div class="listgroup"><h4>Statuses <!-- TMPL_IF NAME="status_advisory" -->(
+            <div class="listgroup"><h4>Acquisition Details</h4>
+              <ol class="bibliodetails">
+                <li><span class="label">Budget</span> <!-- TMPL_VAR NAME="budget_name" -->&nbsp;</li>
+                <li><span class="label">Receipt date</span> <!-- TMPL_VAR NAME="receiptdate" -->&nbsp;</li>
+                <li><span class="label">Supplier</span> <!-- TMPL_VAR NAME="supplier_name" -->&nbsp;</li>
+                <li><span class="label">Budgeted cost</span> <!-- TMPL_VAR NAME="ecost" -->&nbsp;</li>
+              </ol>
+            </div>
+            <div class="listgroup"><h4>Statuses <!-- TMPL_IF NAME="status_advisory" -->(
                 <!-- TMPL_IF name="notforloantext" --><!-- TMPL_VAR name="notforloantext" --> <!-- /TMPL_IF -->
                 <!-- TMPL_IF name="itemlost"-->Lost<!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="damaged" -->Damaged<!-- /TMPL_IF -->

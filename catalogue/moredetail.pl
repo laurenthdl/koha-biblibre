@@ -26,6 +26,8 @@ use C4::Biblio;
 use C4::Items;
 use C4::Branch;
 use C4::Acquisition;
+use C4::Budgets;
+use C4::Bookseller;
 use C4::Output;    # contains gettemplate
 use C4::Auth;
 use C4::Serials;
@@ -103,6 +105,19 @@ foreach my $item (@items) {
     $item->{'ordernumber'}             = $order->{'ordernumber'};
     $item->{'basketno'}                = $order->{'basketno'};
     $item->{'booksellerinvoicenumber'} = $order->{'booksellerinvoicenumber'};
+    $item->{'ecost'}                   = $order->{'ecost'};
+
+    my $timestamp = GetOrderItemTimestamp( $item->{'itemnumber'} );
+    $timestamp =~ /(\d+-\d+-\d+)/;
+    my $date = C4::Dates->new($1, "iso");
+    $item->{'receiptdate'} = $date->output;
+
+    my $budget = GetBudget( $order->{'budget_id'} );
+    $item->{'budget_name'} = $budget->{'budget_name'};
+
+    my $basket = GetBasket( $order->{'basketno'} );
+    my $supplier = GetBookSellerFromId( $basket->{'booksellerid'} );
+    $item->{'supplier_name'} = $supplier->{'name'};
 
     if ( $item->{notforloantext} or $item->{itemlost} or $item->{damaged} or $item->{wthdrawn} ) {
         $item->{status_advisory} = 1;
