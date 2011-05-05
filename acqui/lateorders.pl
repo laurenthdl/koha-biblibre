@@ -138,8 +138,15 @@ $template->param( letters => \@letters ) if (@letters);
 
 if ( $op and $op eq "send_alert" ) {
     my @ordernums = $input->param("claim_for");    # FIXME: Fallback values?
-    SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
-    AddClaim ( $_ ) for @ordernums;
+    eval {
+        #SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
+        #AddClaim ( $_ ) for @ordernums;
+    };
+    if ( $@ ) {
+        $template->param(error_claim => $@);
+    } else {
+        $template->param(info_claim => "Emails have been sent to the message queue");
+    }
 }
 
 $template->param( ERROR_LOOP => \@errors ) if (@errors);
