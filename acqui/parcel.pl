@@ -354,7 +354,6 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
         }
     }
     unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_receive_all'} ) {
-        warn "YAAAAAAH";
         if($line{branchcode} && $line{branchcode} ne C4::Context->userenv->{'branch'} ) {
             $line{receive_lock} = 1;
         }
