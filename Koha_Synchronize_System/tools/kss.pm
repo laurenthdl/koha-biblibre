@@ -544,6 +544,7 @@ sub backup_client_logbin {
     
     # Generate a filename
     my $filename = strftime "%Y-%m-%d_%H-%M-%S", localtime;
+    $filename .= "_" . int(rand(10000));
     my $dirname = $outbox . "/" . $filename;
 
     # Generate ids files
