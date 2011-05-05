@@ -127,17 +127,19 @@ sub GetBooksellersWithLateOrders {
             SELECT DISTINCT aqbasket.booksellerid, aqbooksellers.name
             FROM aqorders LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
             LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
-            WHERE (closedate < DATE_SUB(CURDATE( ),INTERVAL $delay DAY)
-                AND (datereceived = '' OR datereceived IS NULL))
+            WHERE 1
         ";
+        $strsth .= " AND (closedate < DATE_SUB(CURDATE( ),INTERVAL $delay DAY)
+                AND (datereceived = '' OR datereceived IS NULL))" if $delay;
     } else {
         $strsth = "
             SELECT DISTINCT aqbasket.booksellerid, aqbooksellers.name
             FROM aqorders LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
             LEFT JOIN aqbooksellers ON aqbasket.aqbooksellerid = aqbooksellers.id
-            WHERE (closedate < (CURDATE( )-(INTERVAL $delay DAY)))
-                AND (datereceived = '' OR datereceived IS NULL))
+            WHERE 1
         ";
+        $strsth .= " AND (closedate < (CURDATE( )-(INTERVAL $delay DAY)))
+                AND (datereceived = '' OR datereceived IS NULL))" if $delay;
     }
 
     my $sth = $dbh->prepare($strsth);
