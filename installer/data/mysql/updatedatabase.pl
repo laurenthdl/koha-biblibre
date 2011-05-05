@@ -5867,6 +5867,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.023";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `aqorders` ADD COLUMN `claims_count` INT(11)  DEFAULT 0 AFTER `parent_ordernumber`, ADD COLUMN `claimed_date` DATE  DEFAULT NULL AFTER `claims_count`");
+    print "Upgrade to $DBversion done (Add claims_count and claimed_date fields in aqorders table)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

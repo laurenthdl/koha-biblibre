@@ -2550,6 +2550,8 @@ CREATE TABLE `aqorders` (
   `sort2_authcat` varchar(10) default NULL,
   `uncertainprice` tinyint(1),
   `parent_ordernumber` int(11) default NULL,
+  `claims_count` int(11) default 0,
+  `claimed_date` date default NULL,
   PRIMARY KEY  (`ordernumber`),
   KEY `basketno` (`basketno`),
   KEY `biblionumber` (`biblionumber`),
