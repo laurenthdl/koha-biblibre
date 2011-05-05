@@ -206,7 +206,22 @@ if ( $count == 1 ) {
         push @itemloop, $cell;
 
         $template->param( items => \@itemloop );
-	$itemsreceiving = 1;
+        $itemsreceiving = 1;
+    } elsif ( C4::Context->preference('AcqCreateItem') eq 'ordering' ) {
+        my @items_loop;
+        my @itemnumbers = GetOrderItemnumbers( $order->{'ordernumber'} );
+        foreach( @itemnumbers ) {
+            my $item = GetItem( $_ );
+            my %line = %{ $item };
+
+            push @items_loop, \%line ;
+        }
+
+        $template->param(
+            AcqCreateItemOrdering   => 1,
+            items_loop              => \@items_loop,
+        );
+
     }
 
     $order->{quantityreceived} = '' if $order->{quantityreceived} == 0;

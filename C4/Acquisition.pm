@@ -60,7 +60,8 @@ BEGIN {
       &GetOrderFromItemnumber &SearchOrder &GetHistory &GetRecentAcqui
       &ModReceiveOrder &ModOrderBiblioitemNumber
 
-      &NewOrderItem &ModOrderItem &GetOrderItemTimestamp
+      &NewOrderItem &ModOrderItem &GetOrderItemTimestamp &GetOrderItemnumbers
+      &ModItemNumber
 
       &GetParcels &GetParcel
       &GetContracts &GetContract
@@ -1331,7 +1332,7 @@ sub ModOrderItem {
 
 #------------------------------------------------------------#
 
-=head3 ModOrderItem
+=head3 GetOrderItemTimestamp
 
 =over 4
 
@@ -1357,6 +1358,56 @@ sub GetOrderItemTimestamp {
 
     my $results = $sth->fetchrow_hashref;
     return $results->{'timestamp'};
+}
+
+#------------------------------------------------------------#
+
+=head3 GetOrderItemnumbers
+
+=over 4
+
+my @itemnumbers = &GetOrderItemnumbers($ordernumber);
+
+=over 2
+
+Returns the itemnumbers corresponding to the given ordernumber
+
+=back
+
+=back
+
+=cut
+
+sub GetOrderItemnumbers {
+    my $ordernumber= shift;
+
+    my $dbh = C4::Context->dbh;
+    my $query = "SELECT itemnumber FROM aqorders_items WHERE ordernumber=?";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($ordernumber);
+    my $results = $sth->fetchall_arrayref( {} );
+    my @itemnumbers = ();
+    foreach ( @$results ) {
+        push @itemnumbers, $_->{'itemnumber'};
+    }
+    return @itemnumbers;
+}
+
+sub ModItemOrder {
+    my $itemnumber = shift;
+    my $ordernumber = shift;
+
+    warn "MODITEMORDER $itemnumber -> $ordernumber";
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        UPDATE aqorders_items
+        SET ordernumber = ?
+        WHERE itemnumber = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($ordernumber, $itemnumber);
+    $sth->finish;
 }
 
 #------------------------------------------------------------#
@@ -1412,7 +1463,7 @@ C<$ordernumber>.
 =cut
 
 sub ModReceiveOrder {
-    my ( $biblionumber, $ordernumber, $quantrec, $user, $cost, $invoiceno, $freight, $rrp, $budget_id, $datereceived ) = @_;
+    my ( $biblionumber, $ordernumber, $quantrec, $user, $cost, $invoiceno, $freight, $rrp, $budget_id, $datereceived, @receiveditems ) = @_;
     my $dbh = C4::Context->dbh;
 
     #     warn "DATE BEFORE : $daterecieved";
@@ -1460,7 +1511,19 @@ sub ModReceiveOrder {
         $order->{'quantity'} -= $quantrec;
         $order->{'quantityreceived'} = 0;
         $order->{'orderstatus'} = 2;
-        my $newOrder = NewOrder($order, $$order{parent_ordernumber});
+        my ($basketno, $newOrder) = NewOrder($order, $$order{parent_ordernumber});
+        # Change ordernumber in aqorders_items for items not received
+        my @orderitems = GetOrderItemnumbers( $order->{'ordernumber'} );
+        my $count = scalar @orderitems;
+
+        for (my $i=0; $i<$count; $i++){
+            foreach (@receiveditems){
+                splice (@orderitems, $i, 1) if ($orderitems[$i] == $_);
+            }
+        }
+        foreach (@orderitems) {
+            ModItemOrder($_, $newOrder);
+        }
     } else {
         $sth = $dbh->prepare(
             "update aqorders
