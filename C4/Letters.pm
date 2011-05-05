@@ -340,9 +340,11 @@ sub SendAlerts {
             );
             sendmail(%mail) or carp $Mail::Sendmail::error;
             warn "sending to $mail{To} From $mail{From} subj $mail{Subject} Mess $mail{Message}";
-        }
-        if ( C4::Context->preference("LetterLog") ) {
-            logaction( "ACQUISITION", "Send Acquisition claim letter", "", "order list : " . join( ",", @$externalid ) . "\n$innerletter->{title}\n$innerletter->{content}" );
+            if ( C4::Context->preference("LetterLog") ) {
+                logaction( "ACQUISITION", "Send Acquisition claim letter", "", "order list : " . join( ",", @$externalid ) . "\n$innerletter->{title}\n$innerletter->{content}" );
+            }
+        } else {
+            die "This bookseller have not an email\n";
         }
     } elsif ( $type eq 'claimissues' ) {
 

@@ -47,6 +47,12 @@ $(document).ready(function() {
 <div id="acqui_lateorders">
 
 <!-- TMPL_IF NAME="lateorders" -->
+<!-- TMPL_IF NAME="error_claim" -->
+    <div class='error'><!-- TMPL_VAR NAME="error_claim" --></div>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="info_claim" -->
+    <div class='info'><!-- TMPL_VAR NAME="info_claim" --></div>
+<!-- /TMPL_IF -->
 <form action="lateorders.pl" name="claim" method="post">
   <input type="hidden" name="op" value="send_alert" />
 	<!-- TMPL_IF NAME="letters" -->
