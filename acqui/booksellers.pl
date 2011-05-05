@@ -111,14 +111,17 @@ for ( my $i = 0 ; $i < $count ; $i++ ) {
         if ( $orders->[$i2]{'authorisedby'} eq $loggedinuser || $staff_flags->{'superlibrarian'} % 2 == 1 ) {
             my @orders = GetOrders( $orders->[$i2]{'basketno'} );
             my $items_count= 0;
-            map (
-                $items_count += $_->{quantity}
-                , @orders);
+            my $items_expected_count = 0;
+            foreach ( @orders ) {
+                $items_count += $_->{quantity};
+                $items_expected_count += $_->{quantity} if( $_->{quantityreceived} == 0 );
+            }
             my %inner_line;
             $inner_line{basketno}     = $orders->[$i2]{'basketno'};
             $inner_line{basketname}   = $orders->[$i2]{'basketname'};
             $inner_line{biblio_count} = GetBiblioCountByBasketno( $orders->[$i2]{'basketno'} );
             $inner_line{items_count}  = $items_count;
+            $inner_line{items_expected_count} = $items_expected_count;
             $inner_line{authorisedby} = $orders->[$i2]{'authorisedby'};
             my $authby = GetMember( borrowernumber => $orders->[$i2]{'authorisedby'} );
             $inner_line{surname}        = $authby->{'firstname'};
