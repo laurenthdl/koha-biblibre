@@ -91,6 +91,7 @@ $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 
 my @lateorders = GetLateOrders( $delay, undef, undef, $estimateddeliverydatefrom, $estimateddeliverydateto );
+warn Data::Dumper::Dumper \@lateorders;
 
 my $total;
 foreach (@lateorders) {
@@ -139,6 +140,7 @@ $template->param( letters => \@letters ) if (@letters);
 if ( $op and $op eq "send_alert" ) {
     my @ordernums = $input->param("claim_for");    # FIXME: Fallback values?
     SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
+    AddClaim ( $_ ) for @ordernums;
 }
 
 $template->param( ERROR_LOOP => \@errors ) if (@errors);

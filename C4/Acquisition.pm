@@ -68,6 +68,8 @@ BEGIN {
       &GetItemnumbersFromOrder
 
       &GetBiblioCountByBasketno
+
+      &AddClaim
     );
 }
 
@@ -1775,6 +1777,8 @@ sub GetLateOrders {
         DATE(aqbasket.closedate)  AS orderdate,
         aqorders.rrp              AS unitpricesupplier,
         aqorders.ecost            AS unitpricelib,
+        aqorders.claims_count     AS claims_count,
+        aqorders.claimed_date     AS claimed_date,
         aqbudgets.budget_name     AS budget,
         borrowers.branchcode      AS branch,
         aqbooksellers.name        AS supplier,
@@ -2171,6 +2175,30 @@ sub GetBiblioCountByBasketno {
     return $sth->fetchrow;
 }
 
+=head3 AddClaim
+
+=over 4
+
+&AddClaim($ordernumber);
+
+Add a claim for an order
+
+=back
+
+=cut
+sub AddClaim {
+    my ($ordernumber) = @_;
+    my $dbh          = C4::Context->dbh;
+    my $query        = "
+        UPDATE aqorders SET
+            claims_count = claims_count + 1,
+            claimed_date = CURDATE()
+        WHERE ordernumber = ?
+        ";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($ordernumber);
+
+}
 
 1;
 __END__
