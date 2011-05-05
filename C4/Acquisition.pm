@@ -60,7 +60,7 @@ BEGIN {
       &GetOrderFromItemnumber &SearchOrder &GetHistory &GetRecentAcqui
       &ModReceiveOrder &ModOrderBiblioitemNumber
 
-      &NewOrderItem &ModOrderItem
+      &NewOrderItem &ModOrderItem &GetOrderItemTimestamp
 
       &GetParcels &GetParcel
       &GetContracts &GetContract
@@ -1335,6 +1335,36 @@ sub ModOrderItem {
     my $sth = $dbh->prepare($query);
     $sth->execute(@params);
     return 0;
+}
+
+#------------------------------------------------------------#
+
+=head3 ModOrderItem
+
+=over 4
+
+my $timestamp = &GetOrderItemTimestamp($itemnumber);
+
+=over 2
+
+Returns the timestamp in aqorders_items table
+
+=back
+
+=back
+
+=cut
+
+sub GetOrderItemTimestamp {
+    my $itemnumber = shift;
+
+    my $dbh = C4::Context->dbh;
+    my $query = "SELECT timestamp FROM aqorders_items WHERE itemnumber=?";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($itemnumber);
+
+    my $results = $sth->fetchrow_hashref;
+    return $results->{'timestamp'};
 }
 
 #------------------------------------------------------------#
