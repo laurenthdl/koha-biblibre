@@ -93,7 +93,6 @@ if ( any { $order->{$_} ne $tplorder{$_} } qw(quantity quantityreceived notes rr
 
 #need old recievedate if we update the order, parcel.pl only shows the right parcel this way FIXME
 if ( $quantityrec > $origquantityrec ) {
-
     # now, add items if applicable
     if ( C4::Context->preference('AcqCreateItem') eq 'receiving' ) {
         my @tags         = $input->param('tag');
@@ -129,6 +128,7 @@ if ( $quantityrec > $origquantityrec ) {
             );
             my $record = MARC::Record::new_from_xml( $xml, 'UTF-8' );
             my ( $biblionumber, $bibitemnum, $itemnumber ) = AddItemFromMarc( $record, $biblionumber );
+            NewOrderItem( $itemnumber, $order->{parent_ordernumber} || $order->{ordernumber} );
         }
     }
 
