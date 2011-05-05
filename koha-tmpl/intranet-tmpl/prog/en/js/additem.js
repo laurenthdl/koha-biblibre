@@ -50,6 +50,16 @@ function cloneItemBlock(index) {
         var input = $(clone).find("[name='kohafield'][value="+array_fields[field]+"]").prevAll("input[name='field_value']")[0];
         $(input).val("");
     }
+
+    // Set select value from original node
+    $(original).find("select").each(function(){
+        var parent_id = $(this).parent('div').attr('id');
+        var select_cloned = $(clone).find('div[id='+parent_id+']').find('select[name=field_value]');
+        var select_original = $(original).find('div[id='+parent_id+']').find('select[name=field_value]');
+        var option_value = $(select_original).find('option[selected=true]').val();
+        select_cloned.find('option[value='+option_value+']').attr('selected', 'selected');
+    });
+
 }
 
 function clearItemBlock(index) {
