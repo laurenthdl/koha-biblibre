@@ -74,13 +74,15 @@
                         <tr>
                             <th>Basket id</th>
                             <th>Basket</th>
-                            <th>Items count</th>
                             <th>Biblio count</th>
+                            <th>Items count</th>
+                            <th>Items exepected</th>
                             <th>Created by</th>
                             <th>Date</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
+                    <tbody>
                     <!-- TMPL_LOOP NAME="loop_basket" -->
                     <!--TMPL_IF Name="uncertainprices"-->
                         <tr class="problem">
@@ -93,8 +95,9 @@
                     <!--/TMPL_IF-->
                     <td><!-- TMPL_VAR NAME="basketno" --></td>
                     <td><!-- TMPL_VAR NAME="basketname" --></td>
-                    <td><!-- TMPL_VAR NAME="items_count" --></td>
                     <td><!-- TMPL_VAR NAME="biblio_count" --></td>
+                    <td><!-- TMPL_VAR NAME="items_count" --></td>
+                    <td><!-- TMPL_VAR NAME="items_expected_count" --></td>
                     <td><!-- TMPL_VAR name="firstname" --> <!-- TMPL_VAR name="surname" --></td>
                     <td><!-- TMPL_VAR NAME="creationdate" --></td>
                     <td>
@@ -109,7 +112,8 @@
                         <!-- /TMPL_IF -->
                     </td>
                     </tr>
-                <!-- /TMPL_LOOP -->
+                    <!-- /TMPL_LOOP -->
+                    </tbody>
                 </table>
                 <!-- TMPL_ELSE -->
                     <tr><td>No pending baskets</td></tr>
