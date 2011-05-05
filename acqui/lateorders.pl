@@ -91,7 +91,6 @@ $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 
 my @lateorders = GetLateOrders( $delay, undef, undef, $estimateddeliverydatefrom, $estimateddeliverydateto );
-warn Data::Dumper::Dumper \@lateorders;
 
 my $total;
 foreach (@lateorders) {
