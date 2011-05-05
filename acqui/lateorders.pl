@@ -68,15 +68,14 @@ my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
 
 my $supplierid = $input->param('supplierid') || undef;    # we don't want "" or 0
 my $delay      = $input->param('delay');
-my $estimateddeliverydate      = $input->param('estimateddeliverydate');
+my $estimateddeliverydatefrom      = $input->param('estimateddeliverydatefrom');
+my $estimateddeliverydateto      = $input->param('estimateddeliverydateto');
 my $branch     = $input->param('branch');
 my $op         = $input->param('op');
 
 my @errors = ();
-$delay = 30 unless defined $delay;
-unless ( $delay =~ /^\d{1,3}$/ ) {
+if ( defined $delay and $delay =~ /^\d{1,3}$/ ) {
     push @errors, { delay_digits => 1, bad_delay => $delay };
-    $delay = 30;                                          #default value for delay
 }
 
 my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch );
@@ -91,7 +90,7 @@ foreach ( keys %supplierlist ) {
 $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 
-my @lateorders = GetLateOrders( $delay, undef, undef, $estimateddeliverydate );
+my @lateorders = GetLateOrders( $delay, undef, undef, $estimateddeliverydatefrom, $estimateddeliverydateto );
 
 my $total;
 foreach (@lateorders) {
@@ -146,7 +145,8 @@ $template->param( ERROR_LOOP => \@errors ) if (@errors);
 $template->param(
     lateorders              => \@lateorders,
     delay                   => $delay,
-    estimateddeliverydate   => $estimateddeliverydate,
+    estimateddeliverydatefrom   => $estimateddeliverydatefrom,
+    estimateddeliverydateto   => $estimateddeliverydateto,
     total                   => $total,
     intranetcolorstylesheet => C4::Context->preference("intranetcolorstylesheet"),
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
