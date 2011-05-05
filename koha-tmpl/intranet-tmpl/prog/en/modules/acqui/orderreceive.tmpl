@@ -2,6 +2,11 @@
 <title>Koha &rsaquo; Acquisitions &rsaquo; Receipt summary for : <!-- TMPL_VAR NAME="name" --> <!-- TMPL_IF NAME="invoice" -->invoice, <!-- TMPL_VAR NAME="invoice" --><!-- /TMPL_IF --></title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/additem.js"> </script>
+<script type="text/javascript">
+//<![CDATA[
+// TODO Write function to update quantity received
+//]]>
+</script>
 </head>
 <body>
 <!-- TMPL_INCLUDE NAME="header.inc" -->
@@ -48,8 +53,35 @@
         </fieldset>
     <!-- /TMPL_IF -->
 
-
-
+    <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
+        <!-- TMPL_IF NAME="items_loop" -->
+        <fieldset class="rows">
+            <legend>Items</legend>
+            <table>
+              <thead>
+                <tr>
+                  <th>Receive?</th>
+                  <th>Barcode</th>
+                  <th>Home branch</th>
+                  <th>Holding branch</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- TMPL_LOOP NAME="items_loop" -->
+                <tr>
+                  <td><input type="checkbox" name="receive_for" value="<!-- TMPL_VAR NAME='itemnumber' -->" /></td>
+                  <td><!-- TMPL_VAR NAME="barcode" --></td>
+                  <td><!-- TMPL_VAR NAME="homebranch" --></td>
+                  <td><!-- TMPL_VAR NAME="holdingbranch" --></td>
+                  <td><!-- TMPL_VAR NAME="itemnotes" --></td>
+                </tr>
+                <!-- /TMPL_LOOP -->
+              </tbody>
+            </table>
+        </fieldset>
+        <!-- /TMPL_IF --> <!-- items_loop -->
+    <!-- TMPL_ELSE -->
     <!-- TMPL_IF name="items" -->
     <fieldset class="rows">
         <legend>Item</legend>
@@ -93,6 +125,7 @@
         <!--/TMPL_LOOP--> <!-- /items -->
     </fieldset>
     <!-- /TMPL_IF --> <!-- items -->
+    <!-- /TMPL_IF --> <!-- AcqCreateItemOrdering -->
     <input type="hidden" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" />
     <input type="hidden" name="ordernumber" value="<!-- TMPL_VAR NAME="ordernumber" -->" />
     <input type="hidden" name="biblioitemnumber" value="<!-- TMPL_VAR NAME="biblioitemnumber" -->" />
