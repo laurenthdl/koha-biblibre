@@ -49,6 +49,7 @@ my $replacement      = $input->param('rrp');
 my $gst              = $input->param('gst');
 my $freight          = $input->param('freight');
 my $supplierid       = $input->param('supplierid');
+my @receiveditems    = $input->param('receive_for');
 my $cnt              = 0;
 my $error_url_str;
 my $ecost = $input->param('ecost');
@@ -111,13 +112,14 @@ if ( $quantityrec > $origquantityrec ) {
             );
             my $record = MARC::Record::new_from_xml( $xml, 'UTF-8' );
             my ( $biblionumber, $bibitemnum, $itemnumber ) = AddItemFromMarc( $record, $biblionumber );
-            NewOrderItem( $itemnumber, $order->{parent_ordernumber} || $order->{ordernumber} );
+            NewOrderItem( $itemnumber, $order->{ordernumber} );
         }
     }
 
     # save the quantity received.
+    warn "RECEIVEDITEMS = ". join(',', @receiveditems);
     if ( $quantityrec > 0 ) {
-        $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $unitprice, $invoiceno, $freight, $replacement, undef, $datereceived );
+        $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $unitprice, $invoiceno, $freight, $replacement, undef, $datereceived, @receiveditems );
     }
 }
 print $input->redirect("/cgi-bin/koha/acqui/parcel.pl?invoice=$invoiceno&supplierid=$supplierid&freight=$freight&gst=$gst&datereceived=$datereceived$error_url_str");
