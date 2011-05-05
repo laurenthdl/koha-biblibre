@@ -19,8 +19,7 @@ $(document).ready(function() {
     $("#lateorders").tablesorter({
 	    widgets : ['zebra'],
 	    headers: {
-            5: { sorter: false },
-            3: {sorter: 'amount'}
+            8: { sorter: false },
         },
 	});
 
@@ -67,6 +66,8 @@ $(document).ready(function() {
                 <th>Information</th>
                 <th>Total cost</th>
                 <th>Basket</th>
+                <th>claims count</th>
+                <th>claimed date</th>
                 <th><input type="checkbox" id="checkAll"></th>
             </tr>
         </thead>
@@ -110,6 +111,8 @@ $(document).ready(function() {
                 </p>
                 <p title="branch"><!-- TMPL_VAR name="branch" --></p>
             </td>
+            <td><!-- TMPL_VAR NAME="claims_count" --></td>
+            <td><!-- TMPL_VAR NAME="claimed_date" --></td>
             <td>
               <!-- TMPL_UNLESS NAME="budget_lock" -->
                 <input type="checkbox" name="claim_for" value="<!--TMPL_VAR Name="ordernumber" -->" />
@@ -123,6 +126,8 @@ $(document).ready(function() {
                 <th>Total</th>
                 <th colspan="3">&nbsp;</th>
                 <th><!-- TMPL_VAR name="total" --></th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <td>
                     <input type="submit" value="Claim Order" />
