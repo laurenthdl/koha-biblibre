@@ -28,7 +28,7 @@ our $VERSION = 3.0.1;
 
 sub ComputeValue {
     my $record = shift;
-    my $date_str = $record->field('210')->subfield('d');
+    my $date_str = $record->subfield('210','d');
     my @dates = ();
     while ( $date_str =~ m/\d{4}-\d{4}/g ) {
         my @d = split('-', $&);

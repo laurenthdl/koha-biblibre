@@ -68,19 +68,17 @@ if ( $op eq "do_search" ) {
     );
 
     # This array is used to build pagination links
-    my @pager_params = ();
-    push @pager_params, { ind => 'op'          , val => 'do_search' };
-    push @pager_params, { ind => 'value'       , val => $value };
-    push @pager_params, { ind => 'orderby'     , val => $orderby };
-    push @pager_params, { ind => 'authtypecode', val => $authtypecode };
+    my @follower_params = ();
+    push @follower_params, { ind => 'op'          , val => 'do_search' };
+    push @follower_params, { ind => 'value'       , val => $value };
+    push @follower_params, { ind => 'orderby'     , val => $orderby };
+    push @follower_params, { ind => 'authtypecode', val => $authtypecode };
 
     ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
         template_name     => "opac-authoritiessearchresultlist.tmpl",
         query             => $query,
         type              => 'opac',
-        authnotrequired   => 0,
-        flagsrequired     => { catalogue => 1 },
-        debug             => 1,
+        authnotrequired   => 1,
     } );
 
     $template->param(
@@ -88,7 +86,7 @@ if ( $op eq "do_search" ) {
         next_page     => $pager->{next_page},
         PAGE_NUMBERS  => [ map { { page => $_, current => $_ == $page } } @{$pager->{numbers_of_set}} ],
         current_page  => $page,
-        pager_params  => \@pager_params,
+        follower_params  => \@follower_params,
         from          => $pager->{start_of_slice},
         to            => $pager->{end_of_slice},
         total         => $pager->{total_entries},
@@ -128,14 +126,9 @@ if ( $op eq "do_search" ) {
         template_name   => "opac-authorities-home.tmpl",
         query           => $query,
         type            => 'opac',
-        authnotrequired => 0,
-        flagsrequired   => { catalogue => 1 },
+        authnotrequired => 1,
         debug           => 1,
     } );
-
-    $template->param( result => \@resultrecords );
-
-} else {
 
     ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
         template_name   => "opac-authorities-home.tmpl",

@@ -8,7 +8,12 @@
 
             <!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="ShowOpacRecentSearchLink" -->
-                <li><a href="/cgi-bin/koha/opac-search-history.pl" title="View your search history">Search history</a> [<a class="logout" href="/cgi-bin/koha/opac-search-history.pl?action=delete" title="Delete your search history" onclick="return confirm(_('Are you sure you want to delete your search history?'));">x</a>]</li>
+                <script type="text/javascript">
+                    function ConfirmHistoryDeletion() {
+                        return confirm(_('Are you sure you want to delete your search history?'));
+                    }
+                </script>
+                <li><a href="/cgi-bin/koha/opac-search-history.pl" title="View your search history">Search history</a> [<a class="logout" href="/cgi-bin/koha/opac-search-history.pl?action=delete" title="Delete your search history" onclick="return ConfirmHistoryDeletion();">x</a>]</li>
             <!-- /TMPL_IF -->
 			<!-- TMPL_IF NAME="loggedinusername" --><li><a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1">Log Out</a></li><!-- /TMPL_IF -->
    	</ul>	
@@ -75,16 +80,16 @@
         <input type="text" id = "transl1" name="q" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
 <!-- /TMPL_IF -->
    <!-- TMPL_IF NAME="OpacAddMastheadLibraryPulldown" -->
-      <select name="limit" id="masthead_search" class="left" style="max-width:10em;width:10em;">
+      <select name="filters" id="masthead_search" class="left" style="max-width:10em;width:10em;">
          <option value="">All Libraries</option>
          <!-- TMPL_LOOP NAME="BranchesLoop" -->
-            <option <!-- TMPL_IF NAME="selected" -->SELECTED<!-- /TMPL_IF --> value="branch:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+            <option <!-- TMPL_IF NAME="selected" -->selected="selected"<!-- /TMPL_IF --> value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
          <!-- /TMPL_LOOP -->
       </select>
    <!-- TMPL_ELSE -->
       <!-- TMPL_UNLESS NAME="opac_limit_override" -->
           <!-- TMPL_IF name="mylibraryfirst" --> 
-               <input name="limit" value="branch:<!-- TMPL_VAR name="mylibraryfirst" -->" type="hidden" />
+               <input name="filters" value="<!-- TMPL_VAR NAME='holdingbranch' -->:<!-- TMPL_VAR name='mylibraryfirst' -->" type="hidden" />
           <!-- /TMPL_IF -->
        <!-- /TMPL_UNLESS -->
    <!-- /TMPL_IF -->
@@ -171,7 +176,7 @@
 </div>
 <div id="breadcrumbs" class="yui-g">
 <!-- TMPL_IF NAME="searchdesc" --><p><!-- TMPL_IF name="total" --><strong>&ldquo;<!-- TMPL_VAR NAME="query" ESCAPE="HTML"--><!-- TMPL_LOOP NAME="filters" --> <!-- TMPL_VAR NAME="ind" -->:<!-- TMPL_VAR NAME="val" --><!-- /TMPL_LOOP -->&rdquo; </strong>returned <!-- TMPL_VAR NAME="total" ESCAPE="HTML"--> results. <!-- TMPL_IF NAME="related" --> (related searches: <!-- TMPL_LOOP NAME="related" --><!-- TMPL_VAR NAME="related_search" --><!-- /TMPL_LOOP -->). <!-- /TMPL_IF -->
-<a href="<!-- TMPL_VAR NAME="OPACBaseURL" -->/cgi-bin/koha/opac-search.pl?<!-- TMPL_VAR name="query_cgi" ESCAPE="HTML" --><!-- TMPL_VAR NAME="limit_cgi"  ESCAPE="HTML" --><!-- TMPL_IF NAME="sort_by" -->&amp;sort_by=<!-- TMPL_VAR NAME="sort_by" ESCAPE="HTML" --><!-- /TMPL_IF -->&amp;format=rss2"><img src="/opac-tmpl/prog/images/feed-icon-16x16.png" alt="Subscribe to this search" title="Subscribe to this search" border="0" /></a>
+<a href="<!-- TMPL_VAR NAME="OPACBaseURL" -->/cgi-bin/koha/opac-search.pl?<!-- TMPL_VAR name="query_cgi" ESCAPE="HTML" --><!-- TMPL_VAR NAME="limit_cgi"  ESCAPE="HTML" -->&amp;count=<!-- TMPL_VAR NAME="countrss" ESCAPE="HTML" -->&amp;sort_by=acqdate_dsc&amp;format=rss2"><img src="/opac-tmpl/prog/images/feed-icon-16x16.png" alt="Subscribe to this search" title="Subscribe to this search" border="0" /></a>
 <!-- TMPL_ELSE -->
 <strong>No Result found!</strong>
 <p>

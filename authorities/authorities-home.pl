@@ -86,7 +86,8 @@ if ( $op eq "do_search" ) {
         total         => $pager->{total_entries},
         value         => $value,
         orderby       => $orderby,
-        searchtype    => $searchtype
+        searchtype    => $searchtype,
+        authtypecode  => $authtypecode
     );
 
     my $authid_index_name = C4::Search::Query::getIndexName('authid');
@@ -107,6 +108,20 @@ if ( $op eq "do_search" ) {
     $template->param( result => \@resultrecords );
 
 } else {
+
+    if ( $op eq "delete" ) {
+        my $authid = $query->param('authid');
+        DelAuthority( $authid, 1 );
+    }
+
+    ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
+        template_name   => "authorities/authorities-home.tmpl",
+        query           => $query,
+        type            => 'intranet',
+        authnotrequired => 0,
+        flagsrequired   => { catalogue => 1 },
+        debug           => 1,
+    } );
 
     if ( $op eq "delete" ) {
         my $authid = $query->param('authid');

@@ -28,6 +28,8 @@ use strict;
 
 use warnings;
 use CGI;
+use Text::Undiacritic qw(undiacritic);
+use Encode;
 use C4::Context;
 use C4::AuthoritiesMarc;
 use C4::Auth qw/check_cookie_auth/;
@@ -53,6 +55,8 @@ my $orderby      = $query->param('orderby') || '';
 my $page         = $query->param('page') || 1;
 my $count        = 20;
 
+$searchstr = undiacritic( decode_utf8( $searchstr ) );
+
 my $index = GetIndexBySearchtype($searchtype);
 my $indexes;
 my $operands;
@@ -77,8 +81,6 @@ my $filters = {
 };
 my $q = C4::Search::Query->buildQuery( $indexes, $operands, $operators );
 my $results = SimpleSearch( $q, $filters, $page, $count, $orderby );
-
-warn Data::Dumper::Dumper $results;
 
 my $summary_index_name = C4::Search::Query::getIndexName('auth-summary');
 map {

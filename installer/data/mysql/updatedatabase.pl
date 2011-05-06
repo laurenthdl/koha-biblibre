@@ -5727,6 +5727,23 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.062";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference numSearchRSSResults)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.001";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("UPDATE `systempreferences` SET options='acqdate|author|callnumber|ccode|dewey|location|pubdate|score|title' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
+    $dbh->do("UPDATE `systempreferences` SET options='asc|desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder')");
+    $dbh->do("UPDATE `systempreferences` SET value='score' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
+    print "Upgrade to $DBversion done (Update System Preferences defaultSortField and OPACdefaultSortField)\n";
+    SetVersion($DBversion);
+}
 
 $DBversion = "3.06.00.009";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {

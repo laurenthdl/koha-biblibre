@@ -1,5 +1,5 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
-<title>Koha &rsaquo; Catalog &rsaquo; <!-- TMPL_IF NAME="searchdesc" -->Results of Search <!-- TMPL_IF NAME="query_desc" -->for '<!-- TMPL_VAR NAME="query_desc" -->'<!-- /TMPL_IF --><!-- TMPL_IF NAME="limit_desc" -->&nbsp;with limit(s):&nbsp;'<!-- TMPL_VAR NAME="limit_desc" -->'<!-- /TMPL_IF --><!-- TMPL_ELSE -->You did not specify any search criteria<!-- /TMPL_IF --></title>
+<title>Koha &rsaquo; Catalog &rsaquo; <!-- TMPL_IF NAME="query_desc" -->Results of Search <!-- TMPL_IF NAME="query_desc" -->for '<!-- TMPL_VAR NAME="query_desc" -->'<!-- /TMPL_IF --><!-- TMPL_IF NAME="limit_desc" -->&nbsp;with limit(s):&nbsp;'<!-- TMPL_VAR NAME="limit_desc" -->'<!-- /TMPL_IF --><!-- TMPL_ELSE -->You did not specify any search criteria<!-- /TMPL_IF --></title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <script type="text/javascript" src="/intranet-tmpl/prog/en/lib/jquery/plugins/jquery.highlight-3.js"></script>
 <script type="text/javascript">
@@ -92,6 +92,18 @@ $(".addtocart").show();
         $("#highlight_toggle_on" ).hide().click(function() {highlightOn() ;});
         $("#highlight_toggle_off").show().click(function() {highlightOff();});
     <!-- /TMPL_IF -->
+
+    $("#itypes_form").hide();
+    $("#expand_sign").toggle(
+        function(){
+            $("#itypes_form").slideDown(100);
+            $(this).text("[-]");
+        },
+        function(){
+            $("#itypes_form").slideUp(300);
+            $(this).text("[+]");
+        }
+    );
 });
 
 function highlightOff() {
@@ -167,6 +179,7 @@ function GetZ3950Terms(){
 	<!-- /TMPL_LOOP -->
 	return strQuery;
 }
+
 //]]>
 </script>
 </head>
@@ -205,18 +218,11 @@ function GetZ3950Terms(){
     <!-- TMPL_IF NAME="total" -->
         <div id="searchheader">
             <form action="/cgi-bin/koha/catalogue/search.pl" method="get" id="sortbyform">
-                <input type="hidden" name="q" value="<!-- TMPL_VAR ESCAPE="HTML" NAME="query" -->" />
-                <!-- TMPL_LOOP NAME="filters" -->
-	                <input type="hidden" name="filters" value="<!--TMPL_VAR NAME="ind"-->:&quot;<!--TMPL_VAR ESCAPE="HTML" NAME="val"-->&quot;" />
+                <!-- TMPL_LOOP NAME="follower_params" -->
+                    <!-- TMPL_UNLESS EXPR="ind eq 'sort_by'" -->
+                        <input type="hidden" name='<!-- TMPL_VAR ESCAPE="HTML" NAME="ind" -->' value='<!-- TMPL_VAR ESCAPE="HTML" NAME="val" -->' />
+                    <!-- /TMPL_UNLESS -->
                 <!-- /TMPL_LOOP -->
-                <!-- TMPL_IF NAME="searchdesc" -->
-                    <!-- TMPL_LOOP NAME="QUERY_INPUTS"-->
-                    <input type="hidden" name="<!-- TMPL_VAR ESCAPE=HTML NAME="input_name" -->" value="<!-- TMPL_VAR ESCAPE=HTML NAME="input_value" -->"/>
-                    <!-- /TMPL_LOOP -->
-                    <!-- TMPL_LOOP NAME="LIMIT_INPUTS"-->
-                    <input type="hidden" name="<!-- TMPL_VAR ESCAPE=HTML NAME="input_name" -->" value="<!-- TMPL_VAR ESCAPE=HTML NAME="input_value" -->"/>
-                    <!-- /TMPL_LOOP -->
-                <!-- /TMPL_IF -->
                 <!-- RE-SORT START -->
                     <label for="sort_by">Sort By: </label>
                     <select id="sort_by" name="sort_by">
@@ -250,7 +256,7 @@ function GetZ3950Terms(){
 				<span id="z3950searchc"><input type="button" id="z3950search" value="Z39.50 Search" onclick="PopupZ3950(); return false;" /></span>
 			</form>
             <h3>No results found</h3>
-        <!-- TMPL_IF NAME="searchdesc" -->
+        <!-- TMPL_IF NAME="search_desc" -->
             <p>
                 No results match your search <!-- TMPL_IF NAME="query_desc" -->for <span style="font-weight: bold;">'<!-- TMPL_VAR NAME="query_desc" ESCAPE="HTML"-->'</span><!-- /TMPL_IF --><!-- TMPL_IF NAME="limit_desc" -->&nbsp;with limit(s): <span style="font-weight: bold;">'<!-- TMPL_VAR NAME="limit_desc" -->'</span><!-- /TMPL_IF --><!-- TMPL_IF NAME="LibraryName" --> in <!-- TMPL_VAR NAME="LibraryName" --> Catalog<!-- /TMPL_IF -->.
             </p>
@@ -339,14 +345,14 @@ function GetZ3950Terms(){
                         <ul>
                         <!-- TMPL_LOOP NAME="facets" -->
                             <li>
-                                <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR NAME="searchdesc" --> and <!-- TMPL_VAR NAME="type_link_value" -->:<!-- TMPL_VAR NAME="facet_link_value" -->" title="<!-- TMPL_VAR NAME="facet_title_value" -->">
+                                <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR NAME="search_desc" --> and <!-- TMPL_VAR NAME="type_link_value" -->:<!-- TMPL_VAR NAME="facet_link_value" -->" title="<!-- TMPL_VAR NAME="facet_title_value" -->">
                                     <!-- TMPL_VAR NAME="facet_label_value" -->
                                 </a> (<!-- TMPL_VAR NAME="facet_count" -->)
                             </li>
                         <!-- /TMPL_LOOP -->
                         <!-- TMPL_IF NAME="expandable" -->
                             <li class="showmore">
-                                <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR NAME="searchdesc" -->&amp;expand=<!-- TMPL_VAR NAME="expand" -->#<!-- TMPL_VAR NAME="type_id" -->">
+                                <a href="/cgi-bin/koha/catalogue/search.pl?q=<!-- TMPL_VAR NAME="search_desc" -->&amp;expand=<!-- TMPL_VAR NAME="expand" -->#<!-- TMPL_VAR NAME="type_id" -->">
                                     Show More
                                 </a>
                             </li>
@@ -365,7 +371,7 @@ function GetZ3950Terms(){
 <!-- TMPL_INCLUDE NAME="page-numbers.inc" -->
             <div id="searchresults">
                 <form action="/cgi-bin/koha/catalogue/search.pl" method="get" name="bookbag_form" id="bookbag_form">
-                <!-- TMPL_IF NAME="searchdesc" -->
+                <!-- TMPL_IF NAME="search_desc" -->
                 <!-- TMPL_LOOP NAME="QUERY_INPUTS"-->
                 <input type="hidden" name="<!-- TMPL_VAR ESCAPE=HTML NAME="input_name" -->" value="<!-- TMPL_VAR ESCAPE=HTML NAME="input_value" -->"/>
                 <!-- /TMPL_LOOP -->
