@@ -72,8 +72,7 @@ my $branch     = $input->param('branch');
 my $op         = $input->param('op');
 
 my @errors = ();
-$delay = 30 unless defined $delay;
-unless ( $delay =~ /^\d{1,3}$/ ) {
+if ( defined $delay and not $delay =~ /^\d{1,3}$/ ) {
     push @errors, { delay_digits => 1, bad_delay => $delay };
     $delay = 30;                                          #default value for delay
 }
@@ -96,34 +95,46 @@ my $total;
 foreach (@lateorders) {
     $total += $_->{subtotal};
 
-    # Check if user has permission to use budget
-    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
-        my $order = GetOrder( $_->{ordernumber} );
-        my $budget = GetBudget( $order->{budget_id} );
-        my $period = GetBudgetPeriod( $budget->{budget_period_id} );
-        my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
+    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_claim_for_all'} ) {
+        # Check if user has permission to use budget
+        unless( $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
+            my $order = GetOrder( $_->{ordernumber} );
+            my $budget = GetBudget( $order->{budget_id} );
+            my $period = GetBudgetPeriod( $budget->{budget_period_id} );
+            my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
 
-        if ( $$period{budget_period_locked} == 1 ) {
-            $_->{budget_lock} = 1;
-        } elsif ( $budget->{budget_permission} == 1 ) {
-            if ( $borrower_id != $budget->{'budget_owner_id'} ) {
-                $_->{lock} = 1;
-            }
-            # check parent perms too
-            my $parents_perm = 0;
-            if ( $budget->{depth} > 0 ) {
-                $parents_perm = CheckBudgetParentPerm( $budget, $borrower_id );
-                delete $_->{budget_lock} if $parents_perm == '1';
-            }
-        } elsif ( $budget->{budget_permission} == 2 ) {
-            if( defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
+            if ( $$period{budget_period_locked} == 1 ) {
                 $_->{budget_lock} = 1;
+            } elsif ( $budget->{budget_permission} == 1 ) {
+                if ( $borrower_id != $budget->{'budget_owner_id'} ) {
+                    $_->{lock} = 1;
+                }
+                # check parent perms too
+                my $parents_perm = 0;
+                if ( $budget->{depth} > 0 ) {
+                    $parents_perm = CheckBudgetParentPerm( $budget, $borrower_id );
+                    delete $_->{budget_lock} if $parents_perm == '1';
+                }
+            } elsif ( $budget->{budget_permission} == 2 ) {
+                if( defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
+                    $_->{budget_lock} = 1;
+                }
+            } elsif ( $budget->{budget_permission} == 3 ) {
+                my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
+                if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
+                    $_->{budget_lock} = 1;
+                }
             }
-        } elsif ( $budget->{budget_permission} == 3 ) {
-            my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
-            if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
-                $_->{budget_lock} = 1;
-            }
+        }
+        # Check if order belong to a basket the user is owner, or if basket
+        # branch is the current working branch. Otherwise, the user can't
+        # claim for this order.
+        my $basket = GetBasket($_->{'basketno'});
+        warn Data::Dumper::Dumper $basket;
+        if($basket->{'branch'} 
+        && $basket->{'branch'} ne C4::Context->userenv->{'branch'}
+        && $basket->{'authorisedby'} != $loggedinuser) {
+            $_->{'claim_lock'} = 1;
         }
     }
 
