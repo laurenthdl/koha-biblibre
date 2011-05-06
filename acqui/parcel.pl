@@ -251,6 +251,7 @@ my $total_quantity = 0;
 my $total_gste = 0;
 my $total_gsti = 0;
 
+# Received items
 for my $item ( @parcelitems ) {
     $total = ( $item->{'unitprice'} ) * $item->{'quantityreceived'};    #weird, are the freight fees counted by book? (pierre)
     $item->{'unitprice'} += 0;
@@ -280,6 +281,9 @@ for my $item ( @parcelitems ) {
     $totalfreight = $item->{'freight'};
     $totalquantity += $item->{'quantityreceived'};
     $tototal += $total;
+
+    my $budget = GetBudget( $line{budget_id} );
+    $line{budget_name} = $budget->{'budget_name'};
 
     push @loop_received, \%line;
 }
@@ -321,9 +325,11 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
     $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
 
+    my $budget = GetBudget( $line{budget_id} );
+    $line{budget_name} = $budget->{'budget_name'};
+
     # Check if user has permission to use budget
     unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
-        my $budget = GetBudget( $line{budget_id} );
         my $period = GetBudgetPeriod( $budget->{budget_period_id} );
         my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
 
