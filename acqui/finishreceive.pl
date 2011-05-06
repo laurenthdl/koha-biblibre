@@ -49,6 +49,7 @@ my $replacement      = $input->param('rrp');
 my $gst              = $input->param('gst');
 my $freight          = $input->param('freight');
 my $supplierid       = $input->param('supplierid');
+my $redirectreceive  = $input->param('redirectreceive');
 my $cnt              = 0;
 my $error_url_str;
 my $ecost = $input->param('ecost');
@@ -120,4 +121,8 @@ if ( $quantityrec > $origquantityrec ) {
         $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $unitprice, $invoiceno, $freight, $replacement, undef, $datereceived );
     }
 }
-print $input->redirect("/cgi-bin/koha/acqui/parcel.pl?invoice=$invoiceno&supplierid=$supplierid&freight=$freight&gst=$gst&datereceived=$datereceived$error_url_str");
+if ($redirectreceive) {
+    print $input->redirect("/cgi-bin/koha/acqui/orderreceive.pl?ordernumber=$ordernumber&datereceived=$datereceived&supplierid=$supplierid");
+} else {
+    print $input->redirect("/cgi-bin/koha/acqui/parcel.pl?invoice=$invoiceno&supplierid=$supplierid&freight=$freight&gst=$gst&datereceived=$datereceived$error_url_str");
+}

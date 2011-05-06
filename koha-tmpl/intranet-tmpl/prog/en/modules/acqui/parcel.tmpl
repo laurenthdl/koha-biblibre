@@ -33,7 +33,7 @@
                 3: { sorter: false },
                 5: { sorter: 'amount' },
                 6: { sorter: 'amount' },
-                7: { sorter: false },
+                8: { sorter: false },
             },
             textExtraction: {
                 2: function(o) {
@@ -226,6 +226,7 @@
             <th>Quantity</th>  
             <th>Unit cost</th>
             <th>Order cost</th>
+            <th>Budget</th>
             <th>&nbsp;</th>
         </tr>
     </thead>
@@ -262,6 +263,7 @@
                 <td><!-- TMPL_VAR NAME="quantity" --></td>
                 <td><!-- TMPL_VAR NAME="ecost" --></td>
                 <td><!-- TMPL_VAR NAME="ordertotal" --></td>
+		<td><!-- TMPL_VAR NAME="budget_name" --></td>
 				<td>
                   <!-- TMPL_IF NAME="budget_lock" -->
                     <span style="color: gray;">Receive</span>
@@ -312,29 +314,33 @@
 	    <tr>
 		<th>Basket</th>
 		<th>Order</th>
-        <th>Order Line</th>
+		<th>Order Line</th>
 		<th>Summary</th>
 		<th>View Record</th>
 		<th>Quantity</th>  
 		<th>Est cost</th>
 		<th>Actual cost</th>
 		<th>TOTAL</th>
+		<th>Budget</th>
 	    </tr>
 	</thead>
     <tfoot>
         <tr>
             <th colspan="8" class="total">Total Tax Exc.</th>
             <th><!--TMPL_VAR NAME="total_gste" --></th>
+	    <th></th>
         </tr>
         <!-- TMPL_LOOP NAME="book_foot_loop" -->
             <tr>
                 <th colspan="8">Total (GST <!--TMPL_VAR EXPR="sprintf('%.1f', gstrate*100)" --> %)</th>
                 <th><!--TMPL_VAR NAME="value" --></th>
+		<th></th>
             </tr>
         <!-- /TMPL_LOOP -->
         <tr>
             <th colspan="8" class="total">Total Tax Inc.</th>
             <th><!--TMPL_VAR NAME="total_gsti" --></th>
+	    <th></th>
         </tr>
     </tfoot>
 	<tbody class="filterclass">
@@ -361,6 +367,7 @@
                 <td><!-- TMPL_VAR NAME="ecost" --></td>
                 <td><!-- TMPL_VAR NAME="unitprice" --></td>
                 <td><!-- TMPL_VAR NAME="total" --></td>
+                <td><!-- TMPL_VAR NAME="budget_name" --></td>
             </tr>
 	    <!-- /TMPL_LOOP -->
 	</tbody>
