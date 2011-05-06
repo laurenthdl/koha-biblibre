@@ -2,6 +2,17 @@
 <title>Koha &rsaquo; Acquisitions &rsaquo; Receipt summary for : <!-- TMPL_VAR NAME="name" --> <!-- TMPL_IF NAME="invoice" -->invoice, <!-- TMPL_VAR NAME="invoice" --><!-- /TMPL_IF --></title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/additem.js"> </script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $("#additembutton").click(function() {
+	$("#redirectreceive").val(1);
+	this.form.submit();
+    });
+
+
+});
+</script>
 </head>
 <body>
 <!-- TMPL_INCLUDE NAME="header.inc" -->
@@ -21,6 +32,32 @@
     <br/>
     <div class='suggestion_info'>Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)</div>
 <!-- /TMPL_IF -->
+
+<div id="cataloguing_additem_itemlist">
+    <!-- TMPL_IF name="item_loop" -->
+        <div>
+        <table>
+            <tr>
+                <th colspan="2">&nbsp;</th>
+                <!-- TMPL_LOOP NAME="item_header_loop" -->
+                    <th>
+                        <!-- TMPL_VAR NAME="header_value" -->
+                    </th>
+                <!-- /TMPL_LOOP -->
+            </tr>
+                <!-- TMPL_LOOP NAME="item_loop" -->
+                <tr id="row<!-- TMPL_VAR NAME="itemnumber" -->">
+                    <!-- TMPL_IF Name="nomod"--> <td colspan="2">&nbsp;</td><!--TMPL_ELSE--><td><a href="additem.pl?op=edititem&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#edititem">Edit</a></td>
+                    <td><a class="delete" href="/cgi-bin/koha/cataloguing/additem.pl?op=delitem&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->" onclick="confirm_deletion(<!-- TMPL_VAR NAME="biblionumber" -->,<!-- TMPL_VAR NAME="itemnumber" -->); return false;">Delete</a></td><!--/TMPL_IF-->
+                <!-- TMPL_LOOP NAME="item_value" -->
+                    <td><!-- TMPL_VAR ESCAPE=HTML NAME="field" --></td>
+                <!-- /TMPL_LOOP -->
+                </tr>
+                <!-- /TMPL_LOOP -->
+        </table>
+        </div>
+    <!-- /TMPL_IF -->
+</div>
 
 
 <!-- TMPL_IF name="count" -->
@@ -77,9 +114,6 @@
                 </div></li>
             <!-- /TMPL_LOOP-->
             </ol>
-            <a name="buttonPlus" style="cursor: pointer; color: grey; font-size: 180%;" onclick="cloneItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">+</a>
-            <a name="buttonMinus" style="display:none; cursor: pointer; color: grey; font-size: 180%;" onclick="deleteItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">-</a>
-            <a name="buttonClear" style="cursor: pointer; color: grey; font-size: 180%;" onclick="clearItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">Clear</a>
         </div><!-- /iteminformation -->
         </div>
         
@@ -135,6 +169,7 @@
                 <input id="origquantityrec" READONLY type="hidden" name="origquantityrec" value="0" />
             <!-- /TMPL_IF -->
 		</li>
+	<li><label for="budget">Budget: </label><input id="budget" name="budget" type="text" disabled="disabled" value="<!-- TMPL_VAR NAME="budget_name" -->" /></li>
         <li><label for="rrp">Replacement cost: </label><input type="text" size="20" name="rrp" id="rrp" value="<!-- TMPL_VAR NAME="rrp" -->" /></li>
         <li><label for="ecost">Budgeted cost: </label><input type="text" size="20" name="ecost" id="ecost" value="<!-- TMPL_VAR NAME="ecost" -->" /></li>
         <li><label for="cost">Actual cost:</label>
@@ -149,7 +184,11 @@
 
 </div>
 </div><div class="yui-g"><fieldset class="action">
-        <input type="button"  value="Save" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate values detected.  Please correct the errors and resubmit.') ); return false };" /> <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
+    <!-- TMPL_IF NAME="itemsreceiving" -->
+	<input type="button" value="Add item" id="additembutton" />
+	<input type="hidden" name="redirectreceive" id="redirectreceive" value="0" />
+    <!-- /TMPL_IF -->
+        <input type="button"  value="Save" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate barcodes detected.  Please correct the errors and resubmit.') ); return false };" /> <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
 </fieldset></div>    </form>
 <!-- TMPL_ELSE -->
 <div id="acqui_acquire_orderlist">
