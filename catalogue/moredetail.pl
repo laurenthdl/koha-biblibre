@@ -107,10 +107,11 @@ foreach my $item (@items) {
     $item->{'booksellerinvoicenumber'} = $order->{'booksellerinvoicenumber'};
     $item->{'ecost'}                   = $order->{'ecost'};
 
-    my $timestamp = GetOrderItemTimestamp( $item->{'itemnumber'} );
-    $timestamp =~ /(\d+-\d+-\d+)/;
-    my $date = C4::Dates->new($1, "iso");
-    $item->{'receiptdate'} = $date->output;
+    my $datereceived = GetItemReceivedDate( $item->{'itemnumber'} );
+    if( $datereceived ) {
+        my $date = C4::Dates->new($datereceived, "iso");
+        $item->{'receiptdate'} = $date->output;
+    }
 
     my $budget = GetBudget( $order->{'budget_id'} );
     $item->{'budget_name'} = $budget->{'budget_name'};

@@ -56,7 +56,7 @@
             <div class="listgroup"><h4>Acquisition Details</h4>
               <ol class="bibliodetails">
                 <li><span class="label">Budget</span> <!-- TMPL_VAR NAME="budget_name" -->&nbsp;</li>
-                <li><span class="label">Receipt date</span> <!-- TMPL_VAR NAME="receiptdate" -->&nbsp;</li>
+                <li><span class="label">Receipt date</span> <!-- TMPL_IF NAME="receiptdate" --><!-- TMPL_VAR NAME="receiptdate" -->&nbsp;<!-- TMPL_ELSE -->Not received yet<!-- /TMPL_IF --></li>
                 <li><span class="label">Supplier</span> <!-- TMPL_VAR NAME="supplier_name" -->&nbsp;</li>
                 <li><span class="label">Budgeted cost</span> <!-- TMPL_VAR NAME="ecost" -->&nbsp;</li>
               </ol>
