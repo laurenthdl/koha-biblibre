@@ -271,11 +271,7 @@ if ( $op eq 'delete_confirm' ) {
     $debug
       and warn sprintf "loggedinuser: $loggedinuser; creationdate: %s; authorisedby: %s",
       $basket->{creationdate}, $basket->{authorisedby};
-    my $basketusers_ids = GetBasketUsers($basketno);
-    my @basketusers_ids;
-    foreach (@$basketusers_ids) {
-        push @basketusers_ids, $_->{'borrowernumber'};
-    }
+    my @basketusers_ids = GetBasketUsers($basketno);
     my @basketusers;
     foreach my $basketuser_id (@basketusers_ids) {
         my $basketuser = GetMember(borrowernumber => $basketuser_id);
