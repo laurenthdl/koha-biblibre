@@ -60,8 +60,8 @@ BEGIN {
       &GetOrderFromItemnumber &SearchOrder &GetHistory &GetRecentAcqui
       &ModReceiveOrder &ModOrderBiblioitemNumber
 
-      &NewOrderItem &ModOrderItem &GetOrderItemTimestamp &GetOrderItemnumbers
-      &ModItemNumber
+      &NewOrderItem &ModOrderItem &GetOrderItemnumbers
+      &GetItemReceivedDate &ModItemNumber
 
       &GetParcels &GetParcel
       &GetContracts &GetContract
@@ -1340,36 +1340,6 @@ sub ModOrderItem {
 
 #------------------------------------------------------------#
 
-=head3 GetOrderItemTimestamp
-
-=over 4
-
-my $timestamp = &GetOrderItemTimestamp($itemnumber);
-
-=over 2
-
-Returns the timestamp in aqorders_items table
-
-=back
-
-=back
-
-=cut
-
-sub GetOrderItemTimestamp {
-    my $itemnumber = shift;
-
-    my $dbh = C4::Context->dbh;
-    my $query = "SELECT timestamp FROM aqorders_items WHERE itemnumber=?";
-    my $sth = $dbh->prepare($query);
-    $sth->execute($itemnumber);
-
-    my $results = $sth->fetchrow_hashref;
-    return $results->{'timestamp'};
-}
-
-#------------------------------------------------------------#
-
 =head3 GetOrderItemnumbers
 
 =over 4
@@ -1401,11 +1371,61 @@ sub GetOrderItemnumbers {
     return @itemnumbers;
 }
 
+#------------------------------------------------------------#
+
+=head3 GetItemReceivedDate
+
+=over 4
+
+my $datereceived = &GetItemReceivedDate($itemnumber);
+
+=over 2
+
+Returns the datereceived of the order containing this item
+
+=back
+
+=back
+
+=cut
+
+sub GetItemReceivedDate {
+    my $itemnumber = shift;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT datereceived
+        FROM aqorders
+            LEFT JOIN aqorders_items ON aqorders_items.ordernumber = aqorders.ordernumber
+        WHERE itemnumber = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($itemnumber);
+    my @results = $sth->fetchrow_array;
+
+    return $results[0];
+}
+
+#------------------------------------------------------------#
+
+=head3 ModItemOrder
+
+=over 4
+
+&ModItemOrder($itemnumber, $newordernumber);
+
+=over 2
+
+Modify the ordernumber of corresponding itemnumber in aqorders_items
+
+=back
+
+=back
+
+=cut
 sub ModItemOrder {
     my $itemnumber = shift;
     my $ordernumber = shift;
-
-    warn "MODITEMORDER $itemnumber -> $ordernumber";
 
     my $dbh = C4::Context->dbh;
     my $query = qq{
