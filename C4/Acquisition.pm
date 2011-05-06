@@ -1740,6 +1740,7 @@ sub GetParcel {
                 aqorders.ecost,
                 aqorders.parent_ordernumber,
                 aqorders.gstrate,
+		aqorders.budget_id,
                 biblio.title
         FROM aqorders
         LEFT JOIN aqbasket ON aqbasket.basketno=aqorders.basketno

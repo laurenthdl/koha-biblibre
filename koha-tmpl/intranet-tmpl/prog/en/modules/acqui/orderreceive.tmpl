@@ -45,6 +45,32 @@ $(document).ready(function() {
     <div class='suggestion_info'>Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)</div>
 <!-- /TMPL_IF -->
 
+<div id="cataloguing_additem_itemlist">
+    <!-- TMPL_IF name="item_loop" -->
+        <div>
+        <table>
+            <tr>
+                <th colspan="2">&nbsp;</th>
+                <!-- TMPL_LOOP NAME="item_header_loop" -->
+                    <th>
+                        <!-- TMPL_VAR NAME="header_value" -->
+                    </th>
+                <!-- /TMPL_LOOP -->
+            </tr>
+                <!-- TMPL_LOOP NAME="item_loop" -->
+                <tr id="row<!-- TMPL_VAR NAME="itemnumber" -->">
+                    <!-- TMPL_IF Name="nomod"--> <td colspan="2">&nbsp;</td><!--TMPL_ELSE--><td><a href="additem.pl?op=edititem&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#edititem">Edit</a></td>
+                    <td><a class="delete" href="/cgi-bin/koha/cataloguing/additem.pl?op=delitem&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->" onclick="confirm_deletion(<!-- TMPL_VAR NAME="biblionumber" -->,<!-- TMPL_VAR NAME="itemnumber" -->); return false;">Delete</a></td><!--/TMPL_IF-->
+                <!-- TMPL_LOOP NAME="item_value" -->
+                    <td><!-- TMPL_VAR ESCAPE=HTML NAME="field" --></td>
+                <!-- /TMPL_LOOP -->
+                </tr>
+                <!-- /TMPL_LOOP -->
+        </table>
+        </div>
+    <!-- /TMPL_IF -->
+</div>
+
 
 <!-- TMPL_IF name="count" -->
     <form id="recv_form" action="/cgi-bin/koha/acqui/finishreceive.pl" method="post" onsubmit="return Check(this.form);">
@@ -205,6 +231,7 @@ $(document).ready(function() {
                 <input id="origquantityrec" READONLY type="hidden" name="origquantityrec" value="0" />
             <!-- /TMPL_IF -->
 		</li>
+	<li><label for="budget">Budget: </label><input id="budget" name="budget" type="text" disabled="disabled" value="<!-- TMPL_VAR NAME="budget_name" -->" /></li>
         <li><label for="rrp">Replacement cost: </label><input type="text" size="20" name="rrp" id="rrp" value="<!-- TMPL_VAR NAME="rrp" -->" /></li>
         <li><label for="ecost">Budgeted cost: </label><input type="text" size="20" name="ecost" id="ecost" value="<!-- TMPL_VAR NAME="ecost" -->" /></li>
         <li><label for="cost">Actual cost:</label>
