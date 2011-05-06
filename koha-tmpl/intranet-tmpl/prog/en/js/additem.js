@@ -57,7 +57,7 @@ function cloneItemBlock(index) {
         var select_cloned = $(clone).find('div[id='+parent_id+']').find('select[name=field_value]');
         var select_original = $(original).find('div[id='+parent_id+']').find('select[name=field_value]');
         var option_value = $(select_original).find('option[selected=true]').val();
-        select_cloned.find('option[value='+option_value+']').attr('selected', 'selected');
+        select_cloned.find('option[value='+option_value+']').attr('selected', true);
     });
 
 }
@@ -66,6 +66,9 @@ function clearItemBlock(index) {
     var block = $("#"+index);
     $(block).find("input[type='text']").each(function(){
         $(this).val("");
+    });
+    $(block).find("select").each(function(){
+        $(this).find("option:first").attr("selected", true);
     });
 }
 
