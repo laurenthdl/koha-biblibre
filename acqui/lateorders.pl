@@ -78,6 +78,19 @@ if ( defined $delay and $delay =~ /^\d{1,3}$/ ) {
     push @errors, { delay_digits => 1, bad_delay => $delay };
 }
 
+if ( $op and $op eq "send_alert" ) {
+    my @ordernums = $input->param("claim_for");    # FIXME: Fallback values?
+    eval {
+        SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
+        AddClaim ( $_ ) for @ordernums;
+    };
+    if ( $@ ) {
+        $template->param(error_claim => $@);
+    } else {
+        $template->param(info_claim => "Emails have been sent to the message queue");
+    }
+}
+
 my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch );
 my (@sloopy);                                             # supplier loop
 foreach ( keys %supplierlist ) {
@@ -135,19 +148,6 @@ foreach ( keys %$letters ) {
     push @letters, { code => $_, name => $letters->{$_} };
 }
 $template->param( letters => \@letters ) if (@letters);
-
-if ( $op and $op eq "send_alert" ) {
-    my @ordernums = $input->param("claim_for");    # FIXME: Fallback values?
-    eval {
-        SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
-        AddClaim ( $_ ) for @ordernums;
-    };
-    if ( $@ ) {
-        $template->param(error_claim => $@);
-    } else {
-        $template->param(info_claim => "Emails have been sent to the message queue");
-    }
-}
 
 $template->param( ERROR_LOOP => \@errors ) if (@errors);
 $template->param(
