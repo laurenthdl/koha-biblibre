@@ -20,6 +20,7 @@ INSERT INTO permissions (module_bit, code, description) VALUES
    (11, 'order_receive_all', 'Receive orders from any branch'),
    (11, 'budget_add_del', 'Add and delete budgets (but cant modify budgets)'),
    (11, 'budget_manage_all', 'Add, modify and delete all budgets, even if budgets access is restricted'),
+   (11, 'order_claim_for_all', 'Claim for all orders'),
    (13, 'edit_news', 'Write news for the OPAC and staff interfaces'),
    (13, 'label_creator', 'Create printable labels and barcodes from catalog and patron data'),
    (13, 'edit_calendar', 'Define days when the library is closed'),
