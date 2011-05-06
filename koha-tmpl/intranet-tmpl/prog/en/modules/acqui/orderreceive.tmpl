@@ -4,14 +4,30 @@
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/additem.js"> </script>
 <script type="text/javascript">
 //<![CDATA[
-// TODO Write function to update quantity received
 
 $(document).ready(function() {
     $("#additembutton").click(function() {
 	$("#redirectreceive").val(1);
 	this.form.submit();
     });
+    UpdateQty($("#recv_form"));
 });
+
+function UpdateQty(form) {
+    var count = $(form).find("#items tbody :checked").length;
+    $(form).find("input[name='quantityrec']")[0].value = count;
+}
+
+function Check(form) {
+    var qty = $(form).find("input[name='quantityrec']")[0].value;
+    if(qty == 0){
+        alert("You have not checked any items.");
+        return false;
+    }
+
+    return true;
+}
+
 //]]>
 </script>
 </head>
@@ -62,7 +78,7 @@ $(document).ready(function() {
 
 
 <!-- TMPL_IF name="count" -->
-    <form action="/cgi-bin/koha/acqui/finishreceive.pl" method="post">
+    <form id="recv_form" action="/cgi-bin/koha/acqui/finishreceive.pl" method="post" onsubmit="return Check(this.form);">
 <div class="yui-g">
 <div class="yui-u first">
     
@@ -87,10 +103,10 @@ $(document).ready(function() {
     <!-- /TMPL_IF -->
 
     <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
-        <!-- TMPL_IF NAME="items_loop" -->
+        <!-- TMPL_IF NAME="items" -->
         <fieldset class="rows">
             <legend>Items</legend>
-            <table>
+            <table id="items">
               <thead>
                 <tr>
                   <th>Receive?</th>
@@ -101,9 +117,9 @@ $(document).ready(function() {
                 </tr>
               </thead>
               <tbody>
-                <!-- TMPL_LOOP NAME="items_loop" -->
+                <!-- TMPL_LOOP NAME="items" -->
                 <tr>
-                  <td><input type="checkbox" name="receive_for" value="<!-- TMPL_VAR NAME='itemnumber' -->" /></td>
+                  <td><input type="checkbox" name="receive_for" value="<!-- TMPL_VAR NAME='itemnumber' -->" onchange="UpdateQty(this.form);" /></td>
                   <td><!-- TMPL_VAR NAME="barcode" --></td>
                   <td><!-- TMPL_VAR NAME="homebranch" --></td>
                   <td><!-- TMPL_VAR NAME="holdingbranch" --></td>
@@ -113,7 +129,7 @@ $(document).ready(function() {
               </tbody>
             </table>
         </fieldset>
-        <!-- /TMPL_IF --> <!-- items_loop -->
+        <!-- /TMPL_IF --> <!-- items -->
     <!-- TMPL_ELSE -->
     <!-- TMPL_IF name="items" -->
     <fieldset class="rows">
@@ -217,7 +233,12 @@ $(document).ready(function() {
 	<input type="button" value="Add item" id="additembutton" />
 	<input type="hidden" name="redirectreceive" id="redirectreceive" value="0" />
     <!-- /TMPL_IF -->
-        <input type="button"  value="Save" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate barcodes detected.  Please correct the errors and resubmit.') ); return false };" /> <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
+    <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
+        <input type="submit" value="Save" />
+    <!-- TMPL_ELSE -->
+        <input type="button"  value="Save" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate values detected.  Please correct the errors and resubmit.') ); return false };" />
+    <!-- /TMPL_IF -->
+        <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
 </fieldset></div>    </form>
 <!-- TMPL_ELSE -->
 <div id="acqui_acquire_orderlist">
