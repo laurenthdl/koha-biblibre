@@ -21,10 +21,22 @@
   <xsl:variable name="leader7" select="substring($leader,8,1)"/>
   <xsl:variable name="biblionumber" select="marc:datafield[@tag=090]/marc:subfield[@code='a']"/>
   <xsl:variable name="isbn" select="marc:datafield[@tag=010]/marc:subfield[@code='a']"/>
-     	
+  <xsl:variable name="BiblioDefaultView" select="marc:sysprefs/marc:syspref[@name='BiblioDefaultView']"/>
+  <xsl:choose>
+    <xsl:when test="$BiblioDefaultView='isbd'">
+      <xsl:variable name="detail" select="opac-ISBDdetail.pl"/>
+    </xsl:when>
+    <xsl:when test="$BiblioDefaultView='marc'">
+      <xsl:variable name="detail" select="opac-MARCdetail.pl"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:variable name="detail" select="opac-detail.pl"/>
+    </xsl:otherwise>
+  </xsl:choose>
+
   <xsl:if test="marc:datafield[@tag=200]">
     <xsl:for-each select="marc:datafield[@tag=200]">
-      	<a><xsl:attribute name="href">/cgi-bin/koha/opac-detail.pl?biblionumber=<xsl:value-of select="$biblionumber"/></xsl:attribute>
+      <a><xsl:attribute name="href">/cgi-bin/koha/<xsl:value-of select="$detail"/>?biblionumber=<xsl:value-of select="$biblionumber"/></xsl:attribute>
         <xsl:value-of select="marc:subfield[@code='a']"/>
       </a>
       <xsl:if test="marc:subfield[@code='e']">
@@ -92,8 +104,8 @@
           <xsl:variable name="available_items" select="key('item-by-status', 'available')"/>
           <xsl:for-each select="$available_items[generate-id() = generate-id(key('item-by-status-and-branch', concat(items:status, ' ', items:homebranch))[1])]">
             <xsl:value-of select="items:homebranch"/>
-  			    <xsl:if test="items:itemcallnumber != '' and items:itemcallnumber">[<xsl:value-of select="items:itemcallnumber"/>]
-  			    </xsl:if>
+              <xsl:if test="items:itemcallnumber != '' and items:itemcallnumber">[<xsl:value-of select="items:itemcallnumber"/>]
+              </xsl:if>
             <xsl:text> (</xsl:text>
             <xsl:value-of select="count(key('item-by-status-and-branch', concat(items:status, ' ', items:homebranch)))"/>
             <xsl:text>)</xsl:text>
