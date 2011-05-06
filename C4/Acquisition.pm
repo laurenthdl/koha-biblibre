@@ -682,7 +682,13 @@ sub GetBasketUsers {
     $sth->execute($basketno);
     my $results = $sth->fetchall_arrayref( {} );
     $sth->finish();
-    return $results;
+
+    my @tab = ();
+    foreach ( @$results ) {
+        push @tab, $_->{'borrowernumber'};
+    }
+    
+    return @tab;
 }
 
 #------------------------------------------------------------#
