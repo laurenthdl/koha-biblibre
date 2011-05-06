@@ -139,8 +139,8 @@ $template->param( letters => \@letters ) if (@letters);
 if ( $op and $op eq "send_alert" ) {
     my @ordernums = $input->param("claim_for");    # FIXME: Fallback values?
     eval {
-        #SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
-        #AddClaim ( $_ ) for @ordernums;
+        SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
+        AddClaim ( $_ ) for @ordernums;
     };
     if ( $@ ) {
         $template->param(error_claim => $@);
