@@ -130,10 +130,18 @@ foreach (@lateorders) {
         # branch is the current working branch. Otherwise, the user can't
         # claim for this order.
         my $basket = GetBasket($_->{'basketno'});
-        warn Data::Dumper::Dumper $basket;
+        my $basketusers = GetBasketUsers($_->{'basketno'});
+        my $isabasketuser = 0;
+        foreach (@$basketusers) {
+            if ($_->{'borrowernumber'} == $loggedinuser) {
+                $isabasketuser = 1;
+                last;
+            }
+        }
         if($basket->{'branch'} 
         && $basket->{'branch'} ne C4::Context->userenv->{'branch'}
-        && $basket->{'authorisedby'} != $loggedinuser) {
+        && $basket->{'authorisedby'} != $loggedinuser
+        && $isabasketuser == 0) {
             $_->{'claim_lock'} = 1;
         }
     }
