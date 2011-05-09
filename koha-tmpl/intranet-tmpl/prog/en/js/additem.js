@@ -28,7 +28,9 @@ function cloneItemBlock(index) {
     CloneButtonMinus.setAttribute('onclick', "deleteItemBlock('" + index + random + "')");
     CloneButtonMinus.style.display = 'inline';
     CloneButtonClear = aTags[i+2];
-    CloneButtonClear.setAttribute('onclick', "clearItemBlock('" + index + random + "')");
+    if(CloneButtonClear) {
+        CloneButtonClear.setAttribute('onclick', "clearItemBlock('" + index + random + "')");
+    }
 
     // change itemids of the clone
     var elems = clone.getElementsByTagName('input');
