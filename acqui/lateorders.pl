@@ -77,7 +77,7 @@ if ( defined $delay and $delay =~ /^\d{1,3}$/ ) {
     push @errors, { delay_digits => 1, bad_delay => $delay };
 }
 
-my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch );
+my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch, $estimateddeliverydatefrom, $estimateddeliverydateto );
 my (@sloopy);                                             # supplier loop
 foreach ( keys %supplierlist ) {
     push @sloopy,
