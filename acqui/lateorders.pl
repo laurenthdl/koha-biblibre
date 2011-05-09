@@ -87,7 +87,7 @@ if ( $op and $op eq "send_alert" ) {
     if ( $@ ) {
         $template->param(error_claim => $@);
     } else {
-        $template->param(info_claim => "Emails have been sent to the message queue");
+        $template->param(info_claim => "Emails have been sent");
     }
 }
 
