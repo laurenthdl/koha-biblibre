@@ -271,9 +271,10 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     my $budget = GetBudget( $line{budget_id} );
     $line{budget_name} = $budget->{'budget_name'};
 
+    my $basket = GetBasket( $line{'basketno'} );
+    my $branch = $line{'branchcode'} || $basket->{'branch'};
     # Check if user has permission to use basket
     unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_manage_all'} ) {
-        my $basket = GetBasket( $line{'basketno'} );
         my @basketusers = GetBasketUsers( $line{'basketno'} );
         my $isabasketuser = 0;
         foreach (@basketusers) {
@@ -284,13 +285,12 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
         }
         if($basket->{'authorisedby'} != $loggedinuser
         && $isabasketuser == 0
-        && $basket->{'branch'} ne C4::Context->userenv->{'branch'}) {
+        && $branch ne C4::Context->userenv->{'branch'}) {
             $line{'basket_lock'} = 1;
         }
     }
     unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_receive_all'} ) {
-        warn "YAAAAAAH";
-        if($line{branchcode} && $line{branchcode} ne C4::Context->userenv->{'branch'} ) {
+        if($branch ne C4::Context->userenv->{'branch'} ) {
             $line{receive_lock} = 1;
         }
     }
