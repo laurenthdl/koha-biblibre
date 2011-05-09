@@ -114,36 +114,49 @@ Searches for suppliers with late orders.
 =cut
 
 sub GetBooksellersWithLateOrders {
-    my ( $delay, $branch ) = @_;    # FIXME: Branch argument unused.
+    my ( $delay, $branch, $estimateddeliverydatefrom, $estimateddeliverydateto ) = @_;    # FIXME: Branch argument unused.
     my $dbh = C4::Context->dbh;
 
     # FIXME NOT quite sure that this operation is valid for DBMs different from Mysql, HOPING so
     # should be tested with other DBMs
 
     my $strsth;
+    my @query_params = ();
     my $dbdriver = C4::Context->config("db_scheme") || "mysql";
-    if ( $dbdriver eq "mysql" ) {
-        $strsth = "
-            SELECT DISTINCT aqbasket.booksellerid, aqbooksellers.name
-            FROM aqorders LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
-            LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
-            WHERE 1
-        ";
-        $strsth .= " AND (closedate < DATE_SUB(CURDATE( ),INTERVAL $delay DAY)
-                AND (datereceived = '' OR datereceived IS NULL))" if $delay;
+    $strsth = "
+        SELECT DISTINCT aqbasket.booksellerid, aqbooksellers.name
+        FROM aqorders LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
+        LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
+        WHERE 
+            ( datereceived = ''
+            OR datereceived IS NULL
+            OR aqorders.quantityreceived < aqorders.quantity
+            )
+            AND aqorders.rrp <> 0
+            AND aqorders.ecost <> 0
+            AND aqorders.quantity - IFNULL(aqorders.quantityreceived,0) <> 0
+    ";
+    if ( $delay ) {
+        $strsth .= " AND (closedate < DATE_SUB(CURDATE( ),INTERVAL ? DAY)
+                AND (datereceived = '' OR datereceived IS NULL))";
+        push @query_params, $delay;
+    }
+    if ( defined $estimateddeliverydatefrom ) {
+        $strsth .= '
+            AND aqbasket.closedate IS NOT NULL
+            AND aqbooksellers.deliverytime IS NOT NULL
+            AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) >= ?';
+        push @query_params, $estimateddeliverydatefrom;
+    }
+    if ( defined $estimateddeliverydatefrom and defined $estimateddeliverydateto ) {
+        $strsth .= ' AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) <= ?';
+        push @query_params, $estimateddeliverydateto;
     } else {
-        $strsth = "
-            SELECT DISTINCT aqbasket.booksellerid, aqbooksellers.name
-            FROM aqorders LEFT JOIN aqbasket ON aqorders.basketno=aqbasket.basketno
-            LEFT JOIN aqbooksellers ON aqbasket.aqbooksellerid = aqbooksellers.id
-            WHERE 1
-        ";
-        $strsth .= " AND (closedate < (CURDATE( )-(INTERVAL $delay DAY)))
-                AND (datereceived = '' OR datereceived IS NULL))" if $delay;
+        $strsth .= ' AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) <= CURDATE()';
     }
 
     my $sth = $dbh->prepare($strsth);
-    $sth->execute;
+    $sth->execute( @query_params );
     my %supplierlist;
     while ( my ( $id, $name ) = $sth->fetchrow ) {
         $supplierlist{$id} = $name;
