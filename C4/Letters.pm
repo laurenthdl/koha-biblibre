@@ -344,7 +344,7 @@ sub SendAlerts {
                 logaction( "ACQUISITION", "Send Acquisition claim letter", "", "order list : " . join( ",", @$externalid ) . "\n$innerletter->{title}\n$innerletter->{content}" );
             }
         } else {
-            die "This bookseller have not an email\n";
+            die "This bookseller have no email\n";
         }
     } elsif ( $type eq 'claimissues' ) {
 
