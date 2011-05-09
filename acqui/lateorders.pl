@@ -143,10 +143,10 @@ foreach (@lateorders) {
         # branch is the current working branch. Otherwise, the user can't
         # claim for this order.
         my $basket = GetBasket($_->{'basketno'});
-        my $basketusers = GetBasketUsers($_->{'basketno'});
+        my @basketusers = GetBasketUsers($_->{'basketno'});
         my $isabasketuser = 0;
-        foreach (@$basketusers) {
-            if ($_->{'borrowernumber'} == $loggedinuser) {
+        foreach (@basketusers) {
+            if ($_ == $loggedinuser) {
                 $isabasketuser = 1;
                 last;
             }
