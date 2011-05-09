@@ -107,24 +107,14 @@ $(document).ready(function() {
             </td>
             <td>
                 <p>
-                  <!-- TMPL_IF name="budget_lock" -->
-                    <!-- TMPL_VAR name="basketno" -->
-                  <!-- TMPL_ELSE -->
-                    <a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->" title="basket">
-                        <!-- TMPL_VAR name="basketno" -->
-                 	</a>
-                  <!-- /TMPL_IF -->
+                    <a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->" title="basket"><!-- TMPL_VAR name="basketno" --></a>
                 </p>
                 <p title="branch"><!-- TMPL_VAR name="branch" --></p>
             </td>
             <td><!-- TMPL_VAR NAME="claims_count" --></td>
             <td><!-- TMPL_VAR NAME="claimed_date" --></td>
             <td>
-              <!-- TMPL_UNLESS NAME="budget_lock" -->
-                <!-- TMPL_UNLESS NAME="claim_lock" -->
                 <input type="checkbox" name="claim_for" value="<!--TMPL_VAR Name="ordernumber" -->" />
-                <!-- /TMPL_UNLESS -->
-              <!-- /TMPL_UNLESS -->
             </td>
         </tr>
         <!-- /TMPL_LOOP -->
