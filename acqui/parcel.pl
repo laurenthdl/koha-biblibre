@@ -321,36 +321,24 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
     $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
 
-    # Check if user has permission to use budget
-    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
-        my $budget = GetBudget( $line{budget_id} );
-        my $period = GetBudgetPeriod( $budget->{budget_period_id} );
-        my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
+    my $budget = GetBudget( $line{budget_id} );
+    $line{budget_name} = $budget->{'budget_name'};
 
-        if ( $$period{budget_period_locked} == 1 ) {
-            $line{budget_lock} = 1;
-
-        } elsif ( $budget->{budget_permission} == 1 ) {
-
-            if ( $borrower_id != $budget->{'budget_owner_id'} ) {
-                $line{budget_lock} = 1;
+    # Check if user has permission to use basket
+    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_manage_all'} ) {
+        my $basket = GetBasket( $line{'basketno'} );
+        my @basketusers = GetBasketUsers( $line{'basketno'} );
+        my $isabasketuser = 0;
+        foreach (@basketusers) {
+            if($loggedinuser == $_ ){
+                $isabasketuser = 1;
+                last;
             }
-
-            # check parent perms too
-            my $parents_perm = 0;
-            if ( $budget->{depth} > 0 ) {
-                $parents_perm = CheckBudgetParentPerm( $budget, $borrower_id );
-                delete $line{budget_lock} if $parents_perm == '1';
-            }
-        } elsif ( $budget->{budget_permission} == 2 ) {
-            if(defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ){
-                $line{budget_lock} = 1;
-            }
-        } elsif ( $budget->{budget_permission} == 3) {
-            my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
-            if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
-                $line{budget_lock} = 1;
-            }
+        }
+        if($basket->{'authorisedby'} != $loggedinuser
+        && $isabasketuser == 0
+        && $basket->{'branch'} ne C4::Context->userenv->{'branch'}) {
+            $line{'basket_lock'} = 1;
         }
     }
     unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_receive_all'} ) {
