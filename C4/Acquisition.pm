@@ -1886,8 +1886,6 @@ sub GetLateOrders {
     my $dbh = C4::Context->dbh;
 
     #BEWARE, order of parenthesis and LEFT JOIN is important for speed
-    my $dbdriver = C4::Context->config("db_scheme") || "mysql";
-
     my @query_params = ();
     my $select       = "
     SELECT aqbasket.basketno,
@@ -1921,34 +1919,20 @@ sub GetLateOrders {
         )
     ";
     my $having = "";
-    if ( $dbdriver eq "mysql" ) {
-        $select .= "
+    $select .= "
         aqorders.quantity - IFNULL(aqorders.quantityreceived,0)                 AS quantity,
         (aqorders.quantity - IFNULL(aqorders.quantityreceived,0)) * aqorders.rrp AS subtotal,
         DATEDIFF(CURDATE( ),closedate) AS latesince
         ";
-        if ( defined $delay ) {
-            $from .= " AND (closedate <= DATE_SUB(CURDATE( ),INTERVAL ? DAY)) " ;
-            push @query_params, $delay;
-        }
-        $having = "
-        HAVING quantity          <> 0
-            AND unitpricesupplier <> 0
-            AND unitpricelib      <> 0
-        ";
-    } else {
-
-        # FIXME: account for IFNULL as above
-        $select .= "
-                aqorders.quantity                AS quantity,
-                aqorders.quantity * aqorders.rrp AS subtotal,
-                (CURDATE - closedate)            AS latesince
-        ";
-        if ( defined $delay ) {
-            $from .= " AND (closedate <= (CURDATE -(INTERVAL ? DAY)) ";
-            push @query_params, $delay;
-        }
+    if ( defined $delay ) {
+        $from .= " AND (closedate <= DATE_SUB(CURDATE( ),INTERVAL ? DAY)) " ;
+        push @query_params, $delay;
     }
+    $having = "
+    HAVING quantity          <> 0
+        AND unitpricesupplier <> 0
+        AND unitpricelib      <> 0
+    ";
     if ( defined $supplierid ) {
         $from .= ' AND aqbasket.booksellerid = ? ';
         push @query_params, $supplierid;

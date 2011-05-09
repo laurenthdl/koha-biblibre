@@ -90,7 +90,7 @@ if ( $op and $op eq "send_alert" ) {
     }
 }
 
-my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch );
+my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch, $estimateddeliverydatefrom, $estimateddeliverydateto );
 my (@sloopy);                                             # supplier loop
 foreach ( keys %supplierlist ) {
     push @sloopy,
