@@ -262,11 +262,6 @@ if ($master) {
 	    # Check if not already running
 	    if ($kssalreadyrunning == 0) {
 
-		# Creating backup
-		my $command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/backup.pl";	
-		$debug and warn "save command : $command";
-		qx{$command};
-		
 		# Sending backup
 		$command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/send_backups.pl";
 		qx{$command};
