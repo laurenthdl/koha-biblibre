@@ -141,7 +141,7 @@ if ( $query->param('op') eq 'do_search' ) {
         $page,
     );
 
-    my $pager_params = [
+    my $follower_params = [
         { ind => 'index'        , val => $index        },
         { ind => 'authtypecode' , val => $authtypecode },
         { ind => 'order_by'     , val => $orderby      },
@@ -153,7 +153,7 @@ if ( $query->param('op') eq 'do_search' ) {
         PAGE_NUMBERS   => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
         current_page   => $page,
         total          => $pager->{'total_entries'},
-        pager_params   => $pager_params,
+        follower_params   => $follower_params,
         result         => \@resultdatas,
         orderby        => $orderby,
         authtypecode   => $authtypecode,

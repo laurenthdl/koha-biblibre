@@ -81,7 +81,7 @@ if ( $query ) {
         total          => $res->{'pager'}->{'total_entries'},
         resultsloop    => \@results,
         PAGE_NUMBERS   => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
-        pager_params   => [ { ind => 'q', val => $query } ],
+        follower_params   => [ { ind => 'q', val => $query } ],
         breeding_count => $breeding_count,
         breeding_loop  => \@breeding_loop,
     );
