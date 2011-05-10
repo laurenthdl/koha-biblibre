@@ -263,7 +263,7 @@ if ($master) {
 	    if ($kssalreadyrunning == 0) {
 
 		# Sending backup
-		$command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/send_backups.pl";
+		my $command = "$COMMAND_EXPORT $COMMAND_SUDO" . $$conf{path}{kss_dir} . "scripts/client/send_backups.pl";
 		qx{$command};
 
 		# Executing remote kss.pl
