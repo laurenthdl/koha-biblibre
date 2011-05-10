@@ -8,5 +8,5 @@ my $log_filepath = $$conf{abspath}{logfile_stderr};
 open(STDSTD, ">&1");
 open(STDOUT, ">>$log_filepath");
 open(STDERR, ">>$log_filepath");
-my $filename = Koha_Synchronize_System::tools::kss::backup_client_logbin $log_kss;
+my $filename = Koha_Synchronize_System::tools::kss::backup_client_logbin 1, $log_kss;
 print STDSTD $filename;

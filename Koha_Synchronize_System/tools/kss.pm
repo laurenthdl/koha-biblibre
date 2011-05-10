@@ -524,9 +524,11 @@ sub insert_diff_file {
 #+--------------------------------------+
 
 =head2 backup_client_logbin
-Create a new tar.gz file with binary mysql log (in /var/log/mysql), hostname and idsD
+Create a new tar.gz file with binary mysql log (in /var/log/mysql), hostname and ids.
+This function deletes originals files.
 =cut
 sub backup_client_logbin {
+    my $copy = shift;
     my $log = shift;
 
     my $conf = get_conf;
@@ -565,7 +567,11 @@ sub backup_client_logbin {
     my @binfiles = qx{sudo $ls_cmd -1 $logdir | grep mysql-bin};
     for my $binfile ( @binfiles ) {
         chomp $binfile;
-        qx{sudo $mv_cmd $logdir/$binfile $dirname/logbin/};
+        if ( $copy ) {
+            qx{sudo $cp_cmd $logdir/$binfile $dirname/logbin/};
+        } else {
+            qx{sudo $mv_cmd $logdir/$binfile $dirname/logbin/};
+        }
     }
     qx{sudo $chown_cmd kss:kss $dirname/logbin -R};
 
