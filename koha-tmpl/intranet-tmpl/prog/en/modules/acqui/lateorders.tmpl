@@ -27,6 +27,14 @@ $(document).ready(function() {
         $("#lateorders :checkbox").attr('checked', $("#checkAll").is(':checked'));
     });
 
+    $("input:checkbox[name=claim_for]").click(function(){
+        var supplierid = $(this).attr('supplierid');
+        if ( $("input:checkbox[name=claim_for]:checked").length > 0) {
+            $("input:checkbox[name=claim_for][supplierid!="+supplierid+"]").attr('disabled', true);
+        } else {
+            $("input:checkbox[name=claim_for]").attr('disabled', false);
+        }
+    });
 });
 //]]>
 </script>
@@ -74,13 +82,18 @@ $(document).ready(function() {
                 <th>Basket</th>
                 <th>claims count</th>
                 <th>claimed date</th>
-                <th><input type="checkbox" id="checkAll"></th>
+                <!-- TMPL_IF name="Supplier" -->
+                    <th><input type="checkbox" id="checkAll"></th>
+                <!-- TMPL_ELSE -->
+                    <th></th>
+                <!-- /TMPL_IF -->
             </tr>
         </thead>
         <tbody>
     <!-- TMPL_LOOP name="lateorders" -->
-        <tr<!-- TMPL_UNLESS NAME="__odd__" --> class="highlight"<!-- /TMPL_UNLESS -->>
+        <tr>
             <td>
+            (<!-- TMPL_VAR NAME="supplierid" -->)
                 <!-- TMPL_VAR name="orderdate" -->
                 (<!-- TMPL_VAR name="latesince" --> days)
             </td>
@@ -121,7 +134,7 @@ $(document).ready(function() {
             <td><!-- TMPL_VAR NAME="claimed_date" --></td>
             <td>
               <!-- TMPL_UNLESS NAME="budget_lock" -->
-                <input type="checkbox" name="claim_for" value="<!--TMPL_VAR Name="ordernumber" -->" />
+                <input type="checkbox" name="claim_for" value="<!--TMPL_VAR NAME="ordernumber" -->" supplierid="<!-- TMPL_VAR NAME='supplierid' -->"/>
               <!-- /TMPL_UNLESS -->
             </td>
         </tr>

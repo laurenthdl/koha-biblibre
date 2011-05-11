@@ -1780,6 +1780,7 @@ sub GetLateOrders {
         aqbudgets.budget_name     AS budget,
         borrowers.branchcode      AS branch,
         aqbooksellers.name        AS supplier,
+        aqbooksellers.id          AS supplierid,
         biblio.author, biblio.title,
         biblioitems.publishercode AS publisher,
         biblioitems.publicationyear,
