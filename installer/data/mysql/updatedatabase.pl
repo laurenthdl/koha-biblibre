@@ -5056,7 +5056,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 
 $DBversion = "3.02.00.067";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(qq{
     $dbh->do("DELETE FROM systempreferences WHERE variable='OpacElectreResume'");
     $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectreLogin', '', 'Login for Electre ws',NULL,'free')");
 $dbh->do("INSERT IGNORE INTO systempreferences (variable,value,explanation,options,type) VALUES('ElectrePassw', '', 'Password for Electre ws',NULL,'free')");
