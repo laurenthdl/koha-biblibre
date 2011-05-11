@@ -166,6 +166,13 @@ my @indexes = $cgi->param('idx');
 my @operators = $cgi->param('op');
 my @operands = $cgi->param('q');
 
+my $query_cgi = "q=" .       join("&q=", @operands);
+$query_cgi   .= "&itypes=" . join("&itypes=", @itypes)  if (@itypes);
+$query_cgi   .= "&idx=" .    join("&idx=", @indexes)    if (@indexes);
+$query_cgi   .= "&op=" .     join("&op=", @operators)   if (@operators);
+$query_cgi   .= "&filters=" .join("&filters=", @params) if (@params);
+$query_cgi   .= "&sort_by=$sort_by"                     if ($sort_by);
+
 if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
     $itype_or_ccode = 'itype';
 } else {
@@ -352,6 +359,62 @@ if (!$res){
     output_with_http_headers $cgi, $cookie, $template->output, 'html';
     exit;
 }
+
+        # Opac search history
+        my $newsearchcookie;
+	my $limit_desc;
+	my $limit_cgi;
+        if ( C4::Context->preference('EnableOpacSearchHistory') ) {
+            my @recentSearches;
+
+            # Getting the (maybe) already sent cookie
+            my $searchcookie = $cgi->cookie('KohaOpacRecentSearches');
+            if ($searchcookie) {
+                $searchcookie = uri_unescape($searchcookie);
+                if ( thaw($searchcookie) ) {
+                    @recentSearches = @{ thaw($searchcookie) };
+                }
+            }
+
+            # Adding the new search if needed
+            if ( not defined $borrowernumber or $borrowernumber eq '' ) {
+
+                # To a cookie (the user is not logged in)
+
+                if ( not defined $page or $page == 1 ) {
+                    push @recentSearches,
+                      { "query_desc" => $q || "unknown",
+                        "query_cgi"  => $query_cgi  || "unknown",
+                        "time"       => time(),
+                        "total"      => $res->{'pager'}->{'total_entries'}
+                      };
+                    $template->param( ShowOpacRecentSearchLink => 1 );
+                }
+
+		# Only the 15 more recent searches are kept
+		# TODO: This has been done because of cookies' max size, which is
+		# usually 4KB. A real check on cookie actual size would be better
+		# than setting an arbitrary limit on the number of searches
+		shift @recentSearches if (@recentSearches > 15);
+
+                # Pushing the cookie back
+                $newsearchcookie = $cgi->cookie(
+                    -name => 'KohaOpacRecentSearches',
+
+                    # We uri_escape the whole freezed structure so we're sure we won't have any encoding problems
+                    -value   => uri_escape( freeze( \@recentSearches ) ),
+                    -expires => ''
+                );
+                $cookie = [ $cookie, $newsearchcookie ];
+            } else {
+
+                # To the session (the user is logged in)
+                if ( not defined $page or $page == 1 ) {
+                    AddSearchHistory( $borrowernumber, $cgi->cookie("CGISESSID"), $q, $query_cgi, $limit_desc, $limit_cgi, $res->{'pager'}->{'total_entries'} );
+                    $template->param( ShowOpacRecentSearchLink => 1 );
+                }
+            }
+        }
 
 ## If there's just one result, redirect to the detail page
 if ( $res->{'pager'}->{'total_entries'} == 1

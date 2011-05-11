@@ -2617,6 +2617,7 @@ sub enabled_opac_search_views {
 
 sub AddSearchHistory {
     my ( $borrowernumber, $session, $query_desc, $query_cgi, $limit_desc, $limit_cgi, $total ) = @_;
+    # Note : $limit_desc and $limit_cgi are currently unused (since solr)
     my $dbh = C4::Context->dbh;
 
     # Add the request the user just made
