@@ -196,8 +196,9 @@ sub new {
 
     my $parser = XML::LibXML->new();
     my $record_dom = $parser->parse_string( $marcxml );
+    my $syspref = C4::Context->preference("OPACBaseURL");
     if ( $args{metadataPrefix} ne 'marcxml' ) {
-        $record_dom = $repository->oai_dc_stylesheet()->transform( $record_dom );
+        $record_dom = $repository->oai_dc_stylesheet()->transform( $record_dom, syspref=> $syspref );
     }
     $self->metadata( HTTP::OAI::Metadata->new( dom => $record_dom ) );
 
