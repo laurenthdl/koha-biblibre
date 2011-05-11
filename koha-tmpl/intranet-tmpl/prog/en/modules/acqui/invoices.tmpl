@@ -22,9 +22,88 @@ $(document).ready(function() {
   <div id="yui-main">
     <div class="yui-b">
       <h1>Invoices</h1>
-
-      <!-- PAGE CONTENT GOES HERE -->
-
+      <!-- TMPL_IF NAME="do_search" -->
+        <!-- TMPL_IF NAME="results_loop" -->
+          <table id="resultst">
+            <thead>
+              <tr>
+                <th>Invoice no.</th>
+                <th>Vendor</th>
+                <th>Billing date</th>
+                <th>Received biblios</th>
+                <th>Received items</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- TMPL_LOOP NAME="results_loop" -->
+                <tr>
+                  <td><!-- TMPL_VAR NAME="invoicenumber" --></td>
+                  <td><!-- TMPL_VAR NAME="suppliername" --></td>
+                  <td><!-- TMPL_VAR NAME="billingdate" --></td>
+                  <td><!-- TMPL_VAR NAME="receivedbiblios" --></td>
+                  <td><!-- TMPL_VAR NAME="receiveditems" --></td>
+                  <td>
+                    <!-- TMPL_IF NAME="invoiceclosedate" -->
+                      Closed on <!-- TMPL_VAR NAME="invoiceclosedate" -->
+                    <!-- TMPL_ELSE -->
+                      Open
+                    <!-- /TMPL_IF -->
+                  </td>
+                </tr>
+              <!-- /TMPL_LOOP -->
+            </tbody>
+          </table>
+        <!-- TMPL_ELSE -->
+          <p>Sorry, but there is no results for your search.</p>
+          <p>Search was:
+            <ul>
+              <!-- TMPL_IF NAME="invoicenumber" -->
+                <li>Invoice no.: <!-- TMPL_VAR NAME="invoicenumber" --></li>
+              <!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="supplier" -->
+                <li>Vendor: <!-- TMPL_VAR NAME="suppliername" --></li>
+              <!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="billingdatefrom" -->
+                <li>Billing date:
+                <!-- TMPL_IF NAME="billingdateto" -->
+                  From <!-- TMPL_VAR NAME="billingdatefrom" -->
+                  To <!-- TMPL_VAR NAME="billingdateto" -->
+                <!-- TMPL_ELSE -->
+                  All since <!-- TMPL_VAR NAME="billingdatefrom" -->
+                <!-- /TMPL_IF -->
+                </li>
+              <!-- TMPL_ELSE -->
+                <!-- TMPL_IF NAME="billingdateto" -->
+                  <li>Billing date:
+                    All until <!-- TMPL_VAR NAME="billingdateto" -->
+                  </li>
+                <!-- /TMPL_IF -->
+              <!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="isbnean" -->
+                <li>ISBN/EAN: <!-- TMPL_VAR NAME="isbnean" --></li>
+              <!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="title" -->
+                <li>Title: <!-- TMPL_VAR NAME="title" --></li>
+              <!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="author" -->
+                <li>Author: <!-- TMPL_VAR NAME="author" --></li>
+              <!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="publisher" -->
+                <li>Publisher: <!-- TMPL_VAR NAME="publisher" --></li>
+              <!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="publicationyear" -->
+                <li>Publication year: <!-- TMPL_VAR NAME="publicationyear" --></li>
+              <!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="branch" -->
+                <li>Branch: <!-- TMPL_VAR NAME="branchname" --></li>
+              <!-- /TMPL_IF -->
+            </ul>
+          </p>
+        <!-- /TMPL_IF --><!-- results_loop -->
+      <!-- TMPL_ELSE -->
+        <p>Please fill in the form to the left to make a search.</p>
+      <!-- /TMPL_IF --><!-- do_search -->
     </div>
   </div>
   <div class="yui-b">
@@ -34,7 +113,7 @@ $(document).ready(function() {
         <ol>
           <li>
             <label for="invoicenumber">Invoice no:</label>
-            <input type="text" id="invoicenumber" name="invoicenumber" />
+            <input type="text" id="invoicenumber" name="invoicenumber" value="<!-- TMPL_VAR NAME='invoicenumber' -->" />
           </li>
           <li>
             <label for="supplier">Supplier:</label>
@@ -55,12 +134,12 @@ $(document).ready(function() {
               <ol>
                 <li>
                   <label for="billingdatefrom">From:</label>
-                  <input type="text" id="billingdatefrom" name="billingdatefrom" size="10" />
+                  <input type="text" id="billingdatefrom" name="billingdatefrom" size="10" value="<!-- TMPL_VAR NAME='billingdatefrom' -->" />
                   <img id="billingdatefromCalendar" alt="Show Calendar" style="cursor:pointer;" src="/intranet-tmpl/prog/en/lib/calendar/cal.gif" />
                 </li>
                 <li>
                   <label for="billingdateto">To:</label>
-                  <input type="text" id="billingdateto" name="billingdateto" size="10" />
+                  <input type="text" id="billingdateto" name="billingdateto" size="10" value="<!-- TMPL_VAR NAME='billingdateto' -->" />
                   <img id="billingdatetoCalendar" alt="Show Calendar" style="cursor:pointer;" src="/intranet-tmpl/prog/en/lib/calendar/cal.gif" />
                 </li>
               </ol>
@@ -68,23 +147,23 @@ $(document).ready(function() {
           </li>
           <li>
             <label for="isbnean">ISBN / EAN:</label>
-            <input type="text" id="isbnean" name="isbnean" />
+            <input type="text" id="isbnean" name="isbnean" value="<!-- TMPL_VAR NAME='isbnean' -->" />
           </li>
           <li>
             <label for="title">Title:</label>
-            <input type="text" id="title" name="title" />
+            <input type="text" id="title" name="title" value="<!-- TMPL_VAR NAME='title' -->" />
           </li>
           <li>
             <label for="author">Author:</label>
-            <input type="text" id="author" name="author" />
+            <input type="text" id="author" name="author" value="<!-- TMPL_VAR NAME='author' -->" />
           </li>
           <li>
             <label for="publisher">Publisher:</label>
-            <input type="text" id="publisher" name="publisher" />
+            <input type="text" id="publisher" name="publisher" value="<!-- TMPL_VAR NAME='publisher' -->" />
           </li>
           <li>
             <label for="publicationyear">Publication year:</label>
-            <input type="text" id="publicationyear" name="publicationyear" />
+            <input type="text" id="publicationyear" name="publicationyear" value="<!-- TMPL_VAR NAME='publicationyear' -->" />
           </li>
           <li>
             <label for="branch">Branch:</label>
@@ -99,11 +178,13 @@ $(document).ready(function() {
               <!-- /TMPL_LOOP -->
             </select>
           </li>
+          <li><input type="date" /></li>
         </ol>
         <fieldset class="action">
-            <input type="submit" value="Search" />
+          <input type="submit" value="Search" />
         </fieldset>
       </fieldset>
+      <input type="hidden" name="op" id="op" value="do_search" />
     </form>
     <!-- TMPL_INCLUDE NAME="acquisitions-menu.inc" -->
   </div>

@@ -33,6 +33,7 @@ use CGI;
 use C4::Auth;
 use C4::Output;
 
+use C4::Acquisition;
 use C4::Bookseller;
 use C4::Branch;
 
@@ -56,13 +57,37 @@ my $author          = $input->param('author');
 my $publisher       = $input->param('publisher');
 my $publicationyear = $input->param('publicationyear');
 my $branch          = $input->param('branch');
+my $op              = $input->param('op');
+
+my @results_loop = ();
+if($op eq "do_search") {
+    my @invoices = GetInvoices($invoicenumber, $supplier, $billingdatefrom,
+        $billingdateto, $isbnean, $title, $author, $publisher,
+        $publicationyear, $branch);
+    foreach (@invoices) {
+        my %row = (
+            billingdate     => $_->{'billingdate'},
+            invoicenumber   => $_->{'invoicenumber'},
+            suppliername    => $_->{'suppliername'},
+            receivedbiblios => $_->{'receivedbiblios'},
+            receiveditems   => $_->{'receiveditems'},
+            invoiceclosedate => $_->{'invoiceclosedate'},
+        );
+        push @results_loop, \%row;
+    }
+}
 
 
 # Build suppliers list
 my @suppliers = GetBookSeller(undef);
 my @suppliers_loop = ();
+my $suppliername;
 foreach (@suppliers) {
-    my $selected = 1 if $supplier == $_->{'id'};
+    my $selected = 0;
+    if ($supplier == $_->{'id'}) {
+        $selected = 1;
+        $suppliername = $_->{'name'};
+    }
     my %row = (
         suppliername => $_->{'name'},
         supplierid   => $_->{'id'},
@@ -74,8 +99,13 @@ foreach (@suppliers) {
 # Build branches list
 my $branches = GetBranches();
 my @branches_loop = ();
+my $branchname;
 foreach (sort keys %$branches) {
-    my $selected = 1 if ($branch eq $_);
+    my $selected = 0;
+    if ($branch && $branch eq $_) {
+        $selected = 1;
+        $branchname = $branches->{$_}->{'branchname'};
+    }
     my %row = (
         branchcode => $_,
         branchname => $branches->{$_}->{'branchname'},
@@ -85,8 +115,11 @@ foreach (sort keys %$branches) {
 }
 
 $template->param(
+    do_search       => ($op eq "do_search") ? 1 : 0,
+    results_loop    => \@results_loop,
     invoicenumber   => $invoicenumber,
     supplier        => $supplier,
+    suppliername    => $suppliername,
     billingdatefrom => $billingdatefrom,
     billingdateto   => $billingdateto,
     isbnean         => $isbnean,
@@ -95,6 +128,7 @@ $template->param(
     publisher       => $publisher,
     publicationyear => $publicationyear,
     branch          => $branch,
+    branchname      => $branchname,
     suppliers_loop  => \@suppliers_loop,
     branches_loop   => \@branches_loop,
 );
