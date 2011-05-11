@@ -349,13 +349,13 @@ sub SendAlerts {
         my $innerletter = $letter;
 
         # ... then send mail
-        if (   $orders_infos[0]->{bookselleremail}
-            || $orders_infos[0]->{contemail} ) {
+        if (   $orders_infos[0]->{'aqbooksellers.bookselleremail'}
+            || $orders_infos[0]->{'aqbooksellers.contemail'} ) {
             my %mail = (
-                To => $orders_infos[0]->{bookselleremail}
+                To => $orders_infos[0]->{'aqbooksellers.bookselleremail'}
                   . (
-                    $orders_infos[0]->{contemail}
-                    ? "," . $orders_infos[0]->{contemail}
+                    $orders_infos[0]->{'aqbooksellers.contemail'}
+                    ? "," . $orders_infos[0]->{'aqbooksellers.contemail'}
                     : ""
                   ),
                 From           => $userenv->{emailaddress},
