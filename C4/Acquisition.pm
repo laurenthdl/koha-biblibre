@@ -64,6 +64,7 @@ BEGIN {
       &GetItemReceivedDate &ModItemNumber
 
       &GetParcels &GetParcel
+      &GetInvoices
       &GetContracts &GetContract
 
       &GetItemnumbersFromOrder
@@ -1858,6 +1859,82 @@ sub GetParcels {
     $sth->execute(@query_params);
     my $results = $sth->fetchall_arrayref( {} );
     $sth->finish;
+    return @$results;
+}
+
+sub GetInvoices {
+    my ($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbnean,
+        $title, $author, $publisher, $publicationyear, $branch) = @_;
+    
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT aqorders.booksellerinvoicenumber AS invoicenumber,
+               COUNT(DISTINCT IF(aqorders.datereceived IS NOT NULL, aqorders.biblionumber, NULL)) AS receivedbiblios,
+               SUM(aqorders.quantityreceived) AS receiveditems,
+               aqorders.billingdate,
+               aqorders.invoiceclosedate,
+               aqbooksellers.name AS suppliername
+        FROM aqorders
+            LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
+            LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
+        WHERE aqorders.booksellerinvoicenumber IN (
+            SELECT aqorders.booksellerinvoicenumber
+            FROM aqorders
+                LEFT JOIN biblio ON aqorders.biblionumber = biblio.biblionumber
+                LEFT JOIN biblioitems ON aqorders.biblioitemnumber = biblioitems.biblioitemnumber
+    };
+    my @args = ();
+    my @where_strs = ();
+    if($invoicenumber){
+        push @where_strs, "aqorders.booksellerinvoicenumber=?";
+        push @args, $invoicenumber;
+    }
+    if($supplier){
+        push @where_strs, "aqbooksellers.id=?";
+        push @args, $supplier;
+    }
+    if($billingdatefrom) {
+        push @where_strs, "aqorders.billingdate>=?";
+        push @args, $billingdatefrom;
+    }
+    if($billingdateto) {
+        push @where_strs, "aqorders.billingdate<=?";
+        push @args, $billingdateto;
+    }
+    if($isbnean) {
+        push @where_strs, "(biblioitems.isbn=? OR biblioitems.ean=?)";
+        push @args, $isbnean, $isbnean;
+    }
+    if($title) {
+        push @where_strs, "biblio.title LIKE ?";
+        push @args, "%$title%";
+    }
+    if($author) {
+        push @where_strs, "biblio.author LIKE ?";
+        push @args, "%$author%";
+    }
+    if($publisher) {
+        push @where_strs, "biblioitems.publishercode LIKE ?";
+        push @args, "%$publisher%";
+    }
+    if($publicationyear) {
+        push @where_strs, "biblioitems.publicationyear = ?";
+        push @args, $publicationyear;
+    }
+    if($branch) {
+        push @where_strs, "aqorders.branchcode=?";
+        push @args, $branch;
+    }
+    if(@where_strs){
+        $query .= "WHERE " . join(" AND ", @where_strs);
+    }
+    $query .= ") GROUP BY aqorders.booksellerinvoicenumber";
+
+    my $sth = $dbh->prepare($query);
+    $sth->execute(@args);
+
+    my $results = $sth->fetchall_arrayref( {} );
+
     return @$results;
 }
 
