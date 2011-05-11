@@ -669,7 +669,7 @@ function updateCosts(){
     var exchangerate =  new Number($("#currency_rate").val());
     var gstrate = new Number($("#gstrate").val());
     var gst_on=false;
-    if (listinc==0 && invoiceincgst==1){
+    if ( listinc == 1 ) {
         gst_on = true;
     }
 
@@ -678,9 +678,6 @@ function updateCosts(){
 
     // Calcul real ecost with discount on dutyfree price
     var ecost = new Number(rrp * (100 - discount ) / 100);
-    //var rrp_tax_exclude = rrp - rrp * gstrate;
-    //var ecost_tax_exclude_with_discount = rrp_tax_exclude * ((100 - discount ) / 100);
-    //var ecost = ecost_tax_exclude_with_discount + ecost_tax_exclude_with_discount * gstrate;
 
     var GST   = new Number(0);
     if (gst_on) {
