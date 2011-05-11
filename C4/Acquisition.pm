@@ -1901,6 +1901,7 @@ sub GetLateOrders {
         aqbasket.branch           AS basket_branch,
         aqbudgets.budget_name     AS budget,
         aqbooksellers.name        AS supplier,
+        aqbooksellers.id          AS supplierid,
         biblio.author, biblio.title,
         biblioitems.publishercode AS publisher,
         biblioitems.publicationyear,
