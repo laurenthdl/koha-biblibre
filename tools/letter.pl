@@ -194,7 +194,7 @@ sub add_form {
     if ( $module eq 'reserves' ) {
         push @{$field_selection}, add_fields( 'borrowers', 'reserves', 'biblio', 'items' );
     } elsif ( $module eq 'claimacquisition' ) {
-        push @{$field_selection}, add_fields( 'aqbooksellers', 'aqorders' );
+        push @{$field_selection}, add_fields( 'aqbooksellers', 'aqorders', 'biblio', 'biblioitems');
     } elsif ( $module eq 'claimissues' ) {
         push @{$field_selection}, add_fields( 'aqbooksellers', 'serial', 'subscription' );
         push @{$field_selection},
