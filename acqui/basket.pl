@@ -385,6 +385,7 @@ sub get_infos {
         $line{rrpgste} = sprintf( "%.2f", $line{rrp} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
         $line{gstgste} = sprintf( "%.2f", $line{gstgsti} / ( 1 + ( $line{gstgsti} / 100 ) ) );
+        $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
         $line{ecostgsti} = sprintf( "%.2f", $line{ecost} );
         $line{ecostgste} = sprintf( "%.2f", $line{ecost} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{ecostgste} );
@@ -394,6 +395,7 @@ sub get_infos {
         $line{rrpgste} = sprintf( "%.2f", $line{rrp} );
         $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
         $line{gstgste} = sprintf( "%.2f", $line{gstrate} * 100 );
+        $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
         $line{ecostgsti} = sprintf( "%.2f", $line{ecost} * ( 1 + ( $line{gstrate} ) ) );
         $line{ecostgste} = sprintf( "%.2f", $line{ecost} );
         $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{ecostgste} );
