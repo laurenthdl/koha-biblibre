@@ -308,6 +308,7 @@ my $default_bib_view = get_default_view();
 $template->param(
     serialsadditems  => $serialdatalist[0]->{'serialsadditems'},
     callnumber	     => $serialdatalist[0]->{'callnumber'},
+    internalnotes    => $serialdatalist[0]->{'internalnotes'},
     bibliotitle      => $bibdata->{'title'},
     biblionumber     => $serialdatalist[0]->{'biblionumber'},
     serialslist      => \@serialdatalist,

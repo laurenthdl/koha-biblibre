@@ -168,6 +168,7 @@ $(document).ready(function() {
 
 <h1>Serial Edition <i><!-- TMPL_VAR name="bibliotitle" --></i>
 	( <!-- TMPL_VAR name="location" --> ) <!-- TMPL_IF name="callnumber" --> callnumber: <!-- TMPL_VAR name="callnumber" --><!-- /TMPL_IF --></h1>
+<!-- TMPL_IF NAME="internalnotes" --><p>Nonpublic notes: <!-- TMPL_VAR NAME="internalnotes" --></p><!-- /TMPL_IF -->
 <form method="post" name="f" action="serials-edit.pl" id="serials_edit">
 <!--onsubmit="return barcode_check()">-->
 
