@@ -147,7 +147,8 @@
             </fieldset>
         </div>
         <!-- LANGUAGE LIMIT -->
-        <fieldset>
+       <span style="display:none">
+       <fieldset>
             <legend>Language</legend>
             <p>
                 <label for="filters">Language: </label>                                        
@@ -161,6 +162,7 @@
                 </select>
             </p>
         </fieldset>
+	<span style="display:none">
         <!-- /LANGUAGE LIMIT -->
     </div>
     <div class="yui-g">
@@ -188,7 +190,9 @@
                                 <!-- /TMPL_LOOP -->
                             </select>
                         <!-- /TMPL_IF -->
-                        <div style="margin-top:.4em"><label for="available-items"><input type="checkbox" id="available-items" name="filters" value="<!-- TMPL_VAR NAME="availability_indexname" -->:1" /> Only items currently available for loan or reference</label></div>
+                        <span style="display:none">
+                            <div style="margin-top:.4em"><label for="available-items"><input type="checkbox" id="available-items" name="filters" value="<!-- TMPL_VAR NAME="availability_indexname" -->:1" /> Only items currently available for loan or reference</label></div>
+                        </span>
                     </fieldset>
                 </div>
             <!-- /TMPL_UNLESS -->
