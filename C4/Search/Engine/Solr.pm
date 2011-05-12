@@ -47,6 +47,8 @@ Contains SimpleSearch and IndexRecord for Solr search engine.
 =cut
 
 
+my $hash_indexes;
+
 sub GetSolrConnection {
     C4::Search::Engine::Solr->new(
         url     => C4::Context->preference("SolrAPI"),
@@ -59,6 +61,16 @@ sub GetRessourceTypes {
     my $sth = $dbh->prepare("SELECT DISTINCT(ressource_type) FROM indexes ORDER BY ressource_type");
     $sth->execute();
     return $sth->fetchall_arrayref({});
+}
+
+sub GetAllIndexes {
+    unless ($hash_indexes){
+        my $dbh = C4::Context->dbh;
+        my $sth = $dbh->prepare("SELECT * FROM indexes");
+        $sth->execute();
+        $hash_indexes=$sth->fetchall_hashref(['ressource_type','code','type']);
+    }
+    return $hash_indexes;
 }
 
 sub GetIndexes {

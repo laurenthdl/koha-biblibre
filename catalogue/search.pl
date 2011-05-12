@@ -86,11 +86,11 @@ There are several types of queries needed in the process of search and retrieve:
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 ## load Koha modules
+use Encode;
+use POSIX qw(ceil floor);
 use C4::Context;
 use C4::Output;
 use C4::Auth qw(:DEFAULT get_session);
@@ -100,9 +100,10 @@ use C4::Search::Query;
 use C4::Languages qw(getAllLanguagesAuthorizedValues);
 use C4::Koha;
 use C4::VirtualShelves qw(GetRecentShelves);
-use POSIX qw(ceil floor);
 use C4::Branch;    # GetBranches
 use Data::Pagination;
+use C4::AuthoritiesMarc;
+use C4::ItemType;
 
 # create a new CGI object
 # FIXME: no_undef_params needs to be tested
@@ -435,47 +436,13 @@ for my $searchresult ( @{ $res->items } ) {
 }
 
 # build facets
-my @facets;
-while ( my ($index,$facet) = each %{$res->facets} ) {
-    if ( @$facet > 1 ) {
-        my @values;
-        my ($type, $code) = split /_/, $index;
-        for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
-            my $value = $facet->[$i++];
-            my $count = $facet->[$i];
-            utf8::encode($value);            
-            my $lib;
-            if ( $code =~/branch/ ) {
-                $lib = GetBranchName $value;
-            }
-            if ( $code =~/itype/ ) {
-                $lib = GetSupportName $value;
-            }
-            if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
-                $lib = GetAuthorisedValueLib $avlist,$value;
-            }
-            $lib ||=$value;
-            push @values, {
-                'lib'     => $lib,
-                'value'   => $value,
-                'count'   => $count,
-                'active'  => $filters{$index} && $filters{$index} eq "\"$value\"",
-                'filters' => \@tplfilters,
-            };
-        }
-        push @facets, {
-            'index'  => $index,
-            'label'  => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
-            'values' => \@values,
-        };
-    }
-}
+my $facets=DisplayFacets($res, \%filters,\@tplfilters);
 
 $template->param(
     'total'          => $res->{'pager'}->{'total_entries'},
     'opacfacets'     => 1,
     'SEARCH_RESULTS' => \@results,
-    'facets_loop'    => \@facets,
+    'facets_loop'    => $facets,
     'query'          => $q,
     'query_desc'     => $q,
     'search_desc'    => $q,
@@ -505,3 +472,49 @@ if (@barshelves) {
 }
 
 output_html_with_http_headers $cgi, $cookie, $template->output;
+sub DisplayFacets{
+my ($res,$filters,$tplfilters)=@_;
+my $search_index = C4::Search::Engine::Solr::GetAllIndexes;
+my @facets;
+while ( my ($index,$facet) = each %{$res->facets} ) {
+    if ( @$facet > 1 ) {
+        my @values;
+        my ($type, $code) = split /_/, $index;
+
+        for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
+            my $value = $facet->[$i++];
+            my $count = $facet->[$i];
+            $value=decode_utf8($value);
+            my $lib;
+            if ( $code =~/branch/ ) {
+                $lib = GetBranchName $value;
+            }
+            if ( $code =~/itype/ ) {
+                $lib = GetSupportName $value;
+            }
+            if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
+                $lib = GetAuthorisedValueLib $avlist,$value;
+            }
+            if ( $search_index->{'biblio'}->{$code}->{$type}->{'plugin'}=~/Author/ig){
+                my $record=C4::AuthoritiesMarc::GetAuthority($value);
+                $lib=C4::AuthoritiesMarc::BuildSummary($record,$value,C4::AuthoritiesMarc::GetAuthtypecode($value));
+            }
+            $lib ||=$value;
+            push @values, {
+                'lib'     => $lib,
+                'value'   => $value,
+                'count'   => $count,
+                'active'  => $filters->{$index} && $filters->{$index} eq "\"$value\"",
+                'filters' => $tplfilters,
+            };
+        }
+
+        push @facets, {
+            'index'  => $index,
+            'label'  => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
+            'values' => \@values,
+        };
+    }
+}
+return \@facets;
+}

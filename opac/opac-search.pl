@@ -39,6 +39,7 @@ use C4::Branch;    # GetBranches
 use POSIX qw(ceil floor strftime);
 use URI::Escape;
 use Storable qw(thaw freeze);
+use Encode qw(decode_utf8);
 use Data::Pagination;
 use C4::XSLT;
 use C4::Charset;
@@ -174,6 +175,7 @@ if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
 }
 
 my $itype_indexname = C4::Search::Query::getIndexName($itype_or_ccode);
+my $indexloop = C4::Search::Engine::Solr::GetIndexes('biblio');
 # If @itypes exists, we delete idx, op and q in the corresponding arrays
 # => Advsearch of filter by itypes
 # Else we must push in @itypes values existing in @operands
@@ -244,7 +246,6 @@ if ( $template_type && $template_type eq 'advsearch' ) {
     # determine what to display next to the search boxes (ie, boolean option
     # shouldn't appear on the first one, scan indexes should, adding a new
     # box should only appear on the last, etc.
-    my $indexloop = C4::Search::Engine::Solr::GetIndexes('biblio');
     my $search_boxes_count = C4::Context->preference("OPACAdvSearchInputCount") || 3;
     my @search_boxes_array = map {{ indexloop => $indexloop }} 1..$search_boxes_count;
     
@@ -510,49 +511,12 @@ for my $searchresult ( @{ $res->items } ) {
 }
 
 # build facets
-my @facets;
-while ( my ($index,$facet) = each %{$res->facets} ) {
-    if ( @$facet > 1 ) {
-        my @values;
-        my ($type, $code) = split /_/, $index;
-
-        for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
-            my $value = $facet->[$i++];
-            my $count = $facet->[$i];
-            utf8::encode($value);
-            my $lib;
-            if ( $code =~/branch/ ) {
-                $lib = GetBranchName $value;
-            }
-            if ( $code =~/itype/ ) {
-                $lib = GetSupportName $value;
-            }
-            if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
-                $lib = GetAuthorisedValueLib $avlist,$value;
-            }
-            $lib ||=$value;
-            push @values, {
-                'lib'     => $lib,                
-                'value'   => $value,
-                'count'   => $count,
-                'active'  => $filters{$index} && $filters{$index} eq "\"$value\"",
-                'filters' => \@tplfilters,
-            };
-        }
-
-        push @facets, {
-            'index'  => $index,
-            'label'  => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
-            'values' => \@values,
-        };
-    }
-}
-
+my $facets=DisplayFacets($res,\%filters,\@tplfilters);
 $template->param(
     'total'          => $total,
     'opacfacets'     => 1,
     'SEARCH_RESULTS' => \@results,
-    'facets_loop'    => \@facets,
+    'facets_loop'    => $facets,
     'query'          => $q,
     'query_desc'     => $query_desc,
     'searchdesc'     => $q,
@@ -590,3 +554,50 @@ if ( C4::Context->preference('GoogleIndicTransliteration') ) {
 }
 
 output_with_http_headers $cgi, $cookie, $template->output, $content_type;
+
+sub DisplayFacets{
+my ($res,$filters,$tplfilters)=@_;
+my $search_index = C4::Search::Engine::Solr::GetAllIndexes;
+my @facets;
+while ( my ($index,$facet) = each %{$res->facets} ) {
+    if ( @$facet > 1 ) {
+        my @values;
+        my ($type, $code) = split /_/, $index;
+
+        for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
+            my $value = $facet->[$i++];
+            my $count = $facet->[$i];
+            $value=decode_utf8($value);
+            my $lib;
+            if ( $code =~/branch/ ) {
+                $lib = GetBranchName $value;
+            }
+            if ( $code =~/itype/ ) {
+                $lib = GetSupportName $value;
+            }
+            if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
+                $lib = GetAuthorisedValueLib $avlist,$value;
+            }
+            if ( $search_index->{'biblio'}->{$code}->{$type}->{'plugin'}=~/Author/ig){
+                my $record=C4::AuthoritiesMarc::GetAuthority($value);
+                $lib=C4::AuthoritiesMarc::BuildSummary($record,$value,C4::AuthoritiesMarc::GetAuthtypecode($value));
+            }
+            $lib ||=$value;
+            push @values, {
+                'lib'     => $lib,
+                'value'   => $value,
+                'count'   => $count,
+                'active'  => $filters->{$index} && $filters->{$index} eq "\"$value\"",
+                'filters' => $tplfilters,
+            };
+        }
+
+        push @facets, {
+            'index'  => $index,
+            'label'  => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
+            'values' => \@values,
+        };
+    }
+}
+return \@facets;
+}
