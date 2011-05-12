@@ -410,7 +410,7 @@ sub IndexRecord {
             if ( $index->{'plugin'} ) {
                 $concatmappings = &GetConcatMappingsValue( $index->{'plugin'}, \@list_of_plugins );
                 my $plugin = LoadSearchPlugin( $index->{'plugin'}, \@list_of_plugins ) if $index->{'plugin'};
-                @values = &$plugin( $record, $mapping );
+                @values = &$plugin( $record, $mapping, $id );
 
                 $plugin = LoadSearchPluginSrt( $index->{'plugin'}, \@list_of_plugins ) if $index->{'plugin'};
                 eval {

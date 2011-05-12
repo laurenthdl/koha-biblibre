@@ -4974,6 +4974,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
                 ('printed-music','Musique imprimée','ste',0,'biblio',0,0,'','','',''),
                 ('electronic-ressource','Ressource électronique','ste',0,'biblio',0,0,'','','',''),
                 ('country-heading','Pays d\'édition','str',0,'biblio',0,0,'','','',''),
+                ('tags','Tags for biblio','str',0,'biblio',0,0,'C4::Search::Plugins::Tags','','',''),
                 ('auth-heading','heading','ste',0,'authority',1,1,'','he','',''),
                 ('auth-heading-main','heading-main','ste',0,'authority',1,1,'','','',''),
                 ('auth-local-number','local-number','str',0,'authority',0,0,'','','',''),

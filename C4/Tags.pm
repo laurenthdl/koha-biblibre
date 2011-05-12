@@ -100,7 +100,7 @@ sub remove_tag ($;$) {
     my $rows =
       ( defined $user_id )
       ? get_tag_rows( { tag_id => $tag_id, borrowernumber => $user_id } )
-      : get_tag_rows( { tag_id => $tag_id } );
+      : get_tag_rowwhitelists( { tag_id => $tag_id } );
     $rows or return 0;
     ( scalar(@$rows) == 1 ) or return undef;    # should never happen (duplicate ids)
     my $row = shift(@$rows);
@@ -122,19 +122,24 @@ sub remove_tag ($;$) {
         decrement_weight_total( $row->{term} );
     }
     delete_tag_row_by_id($tag_id);
+    reindex_biblio( $row->{biblionumber} );
 }
 
 sub delete_tag_index ($$) {
     (@_) or return undef;
+    my ( $term, $biblionumber ) = @_;
     my $sth = C4::Context->dbh->prepare("DELETE FROM tags_index WHERE term = ? AND biblionumber = ? LIMIT 1");
-    $sth->execute(@_);
+    $sth->execute( $term, $biblionumber );
+    reindex_biblio( $biblionumber );
     return $sth->rows || 0;
 }
 
 sub delete_tag_approval ($) {
     (@_) or return undef;
+    my $term = shift;
     my $sth = C4::Context->dbh->prepare("DELETE FROM tags_approval WHERE term = ? LIMIT 1");
-    $sth->execute(shift);
+    $sth->execute($term);
+    reindex_biblio_with_term( $term );
     return $sth->rows || 0;
 }
 
@@ -451,6 +456,7 @@ sub mod_tag_approval ($$$) {
     $debug and print STDERR "mod_tag_approval query: $query\nmod_tag_approval args: ($operator,$approval,$term)\n";
     my $sth = C4::Context->dbh->prepare($query);
     $sth->execute( $operator, $approval, $term );
+    reindex_biblio_with_term( $term );
 }
 
 sub add_tag_index ($$;$) {
@@ -569,13 +575,14 @@ sub add_tag ($$;$$) {    # biblionumber,term,[borrowernumber,approvernumber]
     my $sth = C4::Context->dbh->prepare($query);
     $sth->execute( $borrowernumber, $biblionumber, $term );
 
+    my $approved = is_approved($term);
     # then
     if ( scalar @_ ) {    # if arg remains, it is the borrowernumber of the approver: tag is pre-approved.
         my $approver = shift;
         $debug and print STDERR "term '$term' pre-approved by borrower #$approver\n";
         add_tag_approval( $term, $approver, 1 );
         add_tag_index( $term, $biblionumber, $approver );
-    } elsif ( is_approved($term) >= 1 ) {
+    } elsif ( $approved >= 1 ) {
         $debug and print STDERR "term '$term' approved by whitelist\n";
         add_tag_approval( $term, 0, 1 );
         add_tag_index( $term, $biblionumber, 1 );
@@ -584,6 +591,19 @@ sub add_tag ($$;$$) {    # biblionumber,term,[borrowernumber,approvernumber]
         add_tag_approval($term);
         add_tag_index( $term, $biblionumber );
     }
+    if ( scalar @_ or $approved ) {
+        reindex_biblio_with_term( $term );
+    }
+}
+
+sub reindex_biblio {
+    my $biblionumber = shift;
+    C4::Search::Engine::index( 'biblio', $biblionumber );
+}
+
+sub reindex_biblio_with_term {
+    my $term = shift;
+
 }
 
 1;

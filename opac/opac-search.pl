@@ -70,7 +70,7 @@ if ( $format =~ /(rss|atom|opensearchdescription)/ ) {
     $template_name = 'opac-opensearch.tmpl';
 } elsif ($build_grouped_results) {
     $template_name = 'opac-results-grouped.tmpl';
-} elsif ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) ) {
+} elsif ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) || ( $cgi->param("tag") ) ) {
     $template_name = 'opac-results.tmpl';
 } else {
     $template_name = 'opac-advsearch.tmpl';
@@ -339,6 +339,14 @@ if ( $limit_yr ) {
         push @operators, 'AND';
         push @indexes, "date_pubdate";
     }
+}
+
+my $tag = $cgi->param('tag');
+if ( $tag ) {
+    my $tags_indexname = C4::Search::Query::getIndexName('tags');
+    push @operands, $tag;
+    push @operators, 'AND';
+    push @indexes, $tags_indexname;
 }
 
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
