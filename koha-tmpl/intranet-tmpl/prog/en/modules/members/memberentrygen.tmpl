@@ -263,7 +263,8 @@
         <!-- TMPL_IF NAME="ERROR_dateofbirth" --><span class="required">(Error)</span><!-- /TMPL_IF -->
 		<div class="hint"><!-- TMPL_INCLUDE NAME="date-format.inc" --></div>
             </li>
-            <li>
+            <span style="display:none">
+	    <li>
                 <!-- TMPL_IF NAME="mandatoryinitials" -->
                     <label for="initials" class="required">
                 <!-- TMPL_ELSE -->
@@ -273,6 +274,7 @@
                 <input type="text" id="initials" name="initials" size="20"  value="<!--TMPL_UNLESS NAME="opduplicate"--><!-- TMPL_VAR NAME="initials" --><!-- /TMPL_UNLESS -->" />	
                 <!-- TMPL_IF NAME="mandatoryinitials" --><span class="required">Required</span><!-- /TMPL_IF -->
             </li>
+	</span>
         <!-- /TMPL_UNLESS -->
 		<li>
 			<!-- TMPL_IF NAME="mandatoryothernames" -->
