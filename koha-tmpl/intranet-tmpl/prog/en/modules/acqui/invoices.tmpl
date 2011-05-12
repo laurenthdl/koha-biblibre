@@ -1,10 +1,20 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions &rsaquo; Invoices</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/javascript">
 //<![CDATA[
 $(document).ready(function() {
-    // Some JS
+    Calendar.setup({
+        inputField: "billingdatefrom",
+        ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+        button: "billingdatefromCalendar"
+    });
+    Calendar.setup({
+        inputField: "billingdateto",
+        ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+        button: "billingdatetoCalendar"
+    });
 });
 //]]>
 </script>
@@ -33,6 +43,7 @@ $(document).ready(function() {
                 <th>Received biblios</th>
                 <th>Received items</th>
                 <th>Status</th>
+                <th>&nbsp;</th>
               </tr>
             </thead>
             <tbody>
@@ -48,6 +59,14 @@ $(document).ready(function() {
                       Closed on <!-- TMPL_VAR NAME="invoiceclosedate" -->
                     <!-- TMPL_ELSE -->
                       Open
+                    <!-- /TMPL_IF -->
+                  </td>
+                  <td>
+                    <a href="/cgi-bin/koha/acqui/invoice.pl?invoicenumber=<!-- TMPL_VAR NAME='invoicenumber' -->">Details</a> /
+                    <!-- TMPL_IF NAME="invoiceclosedate" -->
+                      <a href="invoice.pl?op=reopen&invoicenumber=<!-- TMPL_VAR NAME='invoicenumber' -->">Reopen</a>
+                    <!-- TMPL_ELSE -->
+                      <a href="invoice.pl?op=close&invoicenumber=<!-- TMPL_VAR NAME='invoicenumber' -->">Close</a>
                     <!-- /TMPL_IF -->
                   </td>
                 </tr>

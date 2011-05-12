@@ -64,7 +64,7 @@ BEGIN {
       &GetItemReceivedDate &ModItemNumber
 
       &GetParcels &GetParcel
-      &GetInvoices
+      &GetInvoices &GetInvoice &GetInvoiceDetails &CloseInvoice &ReopenInvoice
       &GetContracts &GetContract
 
       &GetItemnumbersFromOrder
@@ -1862,6 +1862,35 @@ sub GetParcels {
     return @$results;
 }
 
+#------------------------------------------------------------#
+
+=head3 GetInvoices
+
+=over 4
+
+$invoices = &GetInvoices($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbnean, $title, $author, $publisher, $publicationyear, $branch);
+get a lists of invoices
+
+=over 2
+
+Search for invoices that matches the given criterias.
+
+Return a reference-to-hash list containing invoices informations as such :
+
+=item Received biblios count
+
+=item Received items count
+
+=item Billing date
+
+=item Close date
+
+=item Supplier name
+
+=back
+
+=cut
+
 sub GetInvoices {
     my ($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbnean,
         $title, $author, $publisher, $publicationyear, $branch) = @_;
@@ -1936,6 +1965,168 @@ sub GetInvoices {
     my $results = $sth->fetchall_arrayref( {} );
 
     return @$results;
+}
+
+#------------------------------------------------------------#
+
+=head3 GetInvoice
+
+=over 4
+
+$invoice = &GetInvoice($invoicenumber);
+
+=over 2
+
+Return a reference-to-hash containing invoices informations as such :
+
+=item Billing date
+
+=item Close date
+
+=item Supplier name
+
+=back
+
+=cut
+
+sub GetInvoice {
+    my $invoicenumber = shift;
+
+    my $query = qq{
+        SELECT aqorders.booksellerinvoicenumber,
+               aqorders.billingdate,
+               aqorders.invoiceclosedate,
+               aqbooksellers.name
+        FROM aqorders
+            LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
+            LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
+        WHERE aqorders.booksellerinvoicenumber = ?
+        LIMIT 0,1
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($invoicenumber);
+
+    return $sth->fetchrow_hashref();
+}
+
+#------------------------------------------------------------#
+
+=head3 GetInvoiceDetails
+
+=over 4
+
+$invoicedetails = &GetInvoiceDetails($invoicenumber);
+
+=over 2
+
+Return a reference-to-hash containing invoices informations as such :
+
+=item Billing date
+
+=item Close date
+
+=item Supplier name
+
+=item Orders information (in $invoicedetails->{'orders'})
+
+=back
+
+=cut
+
+sub GetInvoiceDetails {
+    my $invoicenumber = shift;
+    my $details = {};
+
+    my $query = qq{
+        SELECT aqorders.*,
+               biblio.author,
+               biblio.title,
+               biblioitems.isbn,
+               biblioitems.ean,
+               biblioitems.publicationyear,
+               biblioitems.publishercode,
+               aqbooksellers.name AS suppliername
+        FROM aqorders
+            LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
+            LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
+            LEFT JOIN biblio ON aqorders.biblionumber = biblio.biblionumber
+            LEFT JOIN biblioitems ON aqorders.biblioitemnumber = biblioitems.biblioitemnumber
+        WHERE aqorders.booksellerinvoicenumber = ?
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($invoicenumber);
+    $details->{'orders'} = $sth->fetchall_arrayref( {} );
+    $sth->finish;
+
+    $details->{'invoicenumber'} = $details->{'orders'}->[0]->{'booksellerinvoicenumber'};
+    $details->{'suppliername'} = $details->{'orders'}->[0]->{'suppliername'};
+    $details->{'billingdate'} = $details->{'orders'}->[0]->{'billingdate'};
+    $details->{'invoiceclosedate'} = $details->{'orders'}->[0]->{'invoiceclosedate'};
+
+    return $details;
+}
+
+#------------------------------------------------------------#
+
+=head3 CloseInvoice
+
+=over 4
+
+&CloseInvoice($invoicenumber, $closedate);
+
+=over 2
+
+Close invoice with given close date (or today if not given)
+
+=back
+
+=cut
+
+sub CloseInvoice {
+    my ($invoicenumber, $closedate) = @_;
+
+    $closedate ||= C4::Dates->new;
+    my $query = qq{
+        UPDATE aqorders
+        SET invoiceclosedate = ?
+        WHERE booksellerinvoicenumber = ?
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($closedate->output("iso"), $invoicenumber);
+    $sth->finish;
+}
+
+#------------------------------------------------------------#
+
+=head3 ReopenInvoice
+
+=over 4
+
+&ReopenInvoice($invoicenumber);
+
+=over 2
+
+Reopen invoice
+
+=back
+
+=cut
+
+sub ReopenInvoice {
+    my $invoicenumber = shift;
+
+    my $query = qq{
+        UPDATE aqorders
+        SET invoiceclosedate = NULL
+        WHERE booksellerinvoicenumber = ?
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($invoicenumber);
+    $sth->finish;
 }
 
 #------------------------------------------------------------#

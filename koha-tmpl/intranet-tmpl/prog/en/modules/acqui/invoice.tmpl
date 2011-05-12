@@ -1,0 +1,97 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Acquisitions &rsaquo; Invoice</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR NAME="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+$(document).ready(function() {
+    $("#orderst").tablesorter();
+});
+//]]>
+</script>
+</head>
+
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+<!-- TMPL_INCLUDE NAME="acquisitions-search.inc" -->
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/acqui/acqui-home.pl">Acquisitions</a> &rsaquo; Invoice</div>
+
+<div id="doc3" class="yui-t2">
+
+<div id="bd">
+  <div id="yui-main">
+    <div class="yui-b">
+      <h1>Invoice: <!-- TMPL_VAR NAME="invoicenumber" --></h1>
+
+      <p>Vendor: <!-- TMPL_VAR NAME="suppliername" --></p>
+      <p>Billing date: <!-- TMPL_VAR NAME="billingdate" --></p>
+      <p>Status: 
+        <!-- TMPL_IF NAME="invoiceclosedate" -->
+          Closed on <!-- TMPL_VAR NAME="invoiceclosedate" -->
+        <!-- TMPL_ELSE -->
+          Open
+        <!-- /TMPL_IF -->
+      </p>
+      
+      <h2>Invoice details</h2>
+      <table id="orderst">
+        <thead>
+          <tr>
+            <th>Order line</th>
+            <th>Order</th>
+            <th>Basket</th>
+            <th>Summary</th>
+            <th>Publisher</th>
+            <th>Branch</th>
+            <th>Quantity</th>
+            <th>Unit Price<br />(Tax included)</th>
+            <th>Total Price<br />(Tax included)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- TMPL_LOOP NAME="orders_loop" -->
+            <!-- TMPL_UNLESS NAME="odd" -->
+              <tr class="highlight">
+            <!-- TMPL_ELSE -->
+              <tr>
+            <!-- /TMPL_IF -->
+              <td><!-- TMPL_VAR NAME="orderline" --></td>
+              <td><!-- TMPL_VAR NAME="ordernumber" --></td>
+              <td><!-- TMPL_VAR NAME="basketno" --></td>
+              <td><p><!-- TMPL_VAR NAME="title" -->
+                <!-- TMPL_IF NAME="author" -->
+                  <br /><em>by</em> <!-- TMPL_VAR NAME="author" -->
+                <!-- /TMPL_IF -->
+              </p></td>
+              <td>
+                <!-- TMPL_IF NAME="publishercode" -->
+                  <p><!-- TMPL_VAR NAME="publishercode" -->
+                    <!-- TMPL_IF NAME="publicationyear" -->
+                      - <!-- TMPL_VAR NAME="publicationyear" -->
+                    <!-- /TMPL_IF -->
+                  </p>
+                <!-- /TMPL_IF -->
+              </td>
+              <td><p><!-- TMPL_VAR NAME="branchcode" --></p></td>
+              <td class="data"><!-- TMPL_VAR NAME="quantity" --></td>
+              <td class="data"><!-- TMPL_VAR NAME="ecost" --></td>
+              <td class="data"><!-- TMPL_VAR NAME="total_ecost" --></td>
+            </tr>
+          <!-- /TMPL_LOOP -->
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="8">TOTAL</th>
+            <th class="data"><!-- TMPL_VAR NAME="total" --></th>
+          </tr>
+        </tfoot>
+      </table>
+
+    </div>
+  </div>
+  <div class="yui-b">
+    <!-- TMPL_INCLUDE NAME="acquisitions-menu.inc" -->
+  </div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
