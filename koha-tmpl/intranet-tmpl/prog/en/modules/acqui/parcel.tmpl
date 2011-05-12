@@ -440,4 +440,20 @@
 		    <label for="orderfilter">Order :</label>
 		    <input type="text" name="orderfilter" id="orderfilter" />
 		</li>
+        <li>
+            <label for="eanfilter">EAN :</label>
+            <input type="text" name="eanfilter" id="eanfilter" />
+        </li>
 
+        </ol>
+        <fieldset class="action">
+            <input type="submit" value="Filter" />
+            <a href="#" onclick="clearFilters();">Clear</a>
+        </fieldset>
+
+        </fieldset>
+    </form>
+<!-- TMPL_INCLUDE NAME="acquisitions-menu.inc" -->
+</div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
