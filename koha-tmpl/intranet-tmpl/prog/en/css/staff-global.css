@@ -1957,3 +1957,7 @@ select.advsearchoperator {
     color: #ccc;
 }
 
+.imageccode {
+    float: left;
+    margin-right: 10px;
+}
