@@ -61,17 +61,21 @@ my $op              = $input->param('op');
 
 my @results_loop = ();
 if($op eq "do_search") {
-    my @invoices = GetInvoices($invoicenumber, $supplier, $billingdatefrom,
-        $billingdateto, $isbnean, $title, $author, $publisher,
+    my $billingdatefrom_iso = C4::Dates->new($billingdatefrom)->output("iso");
+    my $billingdateto_iso = C4::Dates->new($billingdateto)->output("iso");
+    my @invoices = GetInvoices($invoicenumber, $supplier, $billingdatefrom_iso,
+        $billingdateto_iso, $isbnean, $title, $author, $publisher,
         $publicationyear, $branch);
     foreach (@invoices) {
+        my $billingdate = C4::Dates->new($_->{'billingdate'}, "iso");
+        my $invoiceclosedate = C4::Dates->new($_->{'invoiceclosedate'}, "iso");
         my %row = (
-            billingdate     => $_->{'billingdate'},
+            billingdate     => $billingdate->output(),
             invoicenumber   => $_->{'invoicenumber'},
             suppliername    => $_->{'suppliername'},
             receivedbiblios => $_->{'receivedbiblios'},
             receiveditems   => $_->{'receiveditems'},
-            invoiceclosedate => $_->{'invoiceclosedate'},
+            invoiceclosedate => $invoiceclosedate->output(),
         );
         push @results_loop, \%row;
     }
@@ -84,7 +88,7 @@ my @suppliers_loop = ();
 my $suppliername;
 foreach (@suppliers) {
     my $selected = 0;
-    if ($supplier == $_->{'id'}) {
+    if ($supplier && $supplier == $_->{'id'}) {
         $selected = 1;
         $suppliername = $_->{'name'};
     }
@@ -131,6 +135,7 @@ $template->param(
     branchname      => $branchname,
     suppliers_loop  => \@suppliers_loop,
     branches_loop   => \@branches_loop,
+    DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;

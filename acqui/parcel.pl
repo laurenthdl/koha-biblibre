@@ -71,13 +71,16 @@ my $input      = new CGI;
 my $supplierid = $input->param('supplierid');
 my $bookseller = GetBookSellerFromId($supplierid);
 
+my $op = $input->param('op');
 my $invoice = $input->param('invoice') || '';
 my $freight = $input->param('freight');
 my $datereceived =
-  ( $input->param('op') eq 'new' )
+  ( $op eq 'new' )
   ? C4::Dates->new( $input->param('datereceived') )
   : C4::Dates->new( $input->param('datereceived'), 'iso' );
 $datereceived = C4::Dates->new() unless $datereceived;
+my $invoiceinfos = GetInvoice($invoice);
+my $invoiceclosedate = C4::Dates->new($invoiceinfos->{'invoiceclosedate'}, "iso")->output();
 my $code            = $input->param('code');
 my @rcv_err         = $input->param('error');
 my @rcv_err_barcode = $input->param('error_bc');
@@ -125,6 +128,29 @@ sub get_gst {
         return $value / ( 1 + $gstrate ) * $gstrate;
     } else {
         return $value * ( 1 + $gstrate ) - $value;
+    }
+}
+
+if($op eq 'new'){
+    my ($template, $loggedinuser, $cookie) = get_template_and_user(
+        {   template_name   => "acqui/parcel.tmpl",
+            query           => $input,
+            type            => "intranet",
+            authnotrequired => 0,
+            flagsrequired   => { acquisition => 'order_receive' },
+            debug           => 1,
+        }
+    );
+
+    my $invoiceinfos = GetInvoice($invoice);
+    if($invoiceinfos) {
+        $template->param(
+            error_existing  => 1,
+            invoice         => $invoice,
+            supplierid      => $supplierid,
+        );
+        output_html_with_http_headers $input, $cookie, $template->output;
+        exit;
     }
 }
 
@@ -368,7 +394,8 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
             $line{receive_lock} = 1;
         }
     }
-        
+    $line{'receive_lock'} = 1 if($invoiceclosedate);
+
     push @loop_orders, \%line if ( $i >= $startfrom and $i < $startfrom + $resultsperpage );
 }
 
@@ -412,11 +439,13 @@ if ( $count > $resultsperpage ) {
 
 $tototal = $tototal + $freight;
 
+
 $template->param(
     invoice               => $invoice,
     datereceived          => $datereceived->output('iso'),
     invoicedatereceived   => $datereceived->output('iso'),
     formatteddatereceived => $datereceived->output(),
+    invoiceclosedate      => $invoiceclosedate,
     name                  => $bookseller->{'name'},
     supplierid            => $supplierid,
     freight               => $freight,

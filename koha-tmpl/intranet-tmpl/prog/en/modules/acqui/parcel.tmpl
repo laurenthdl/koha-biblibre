@@ -180,6 +180,7 @@
    <div id="bd">
 	<div id="yui-main">
 	<div class="yui-b">
+    <!-- TMPL_UNLESS name="error_existing" -->
     <!-- TMPL_UNLESS name="confirm_cancel" -->
 	<!-- TMPL_IF NAME="receive_error" -->
 	<div class="dialog alert">
@@ -212,6 +213,13 @@
 
 <div id="acqui_receive_summary">
 <p><strong>Invoice number:</strong> <!-- TMPL_VAR NAME="invoice" --> <strong>Received by:</strong> <!-- TMPL_VAR NAME="loggedinusername" --> <strong>On:</strong> <!-- TMPL_VAR NAME="formatteddatereceived" --></p>
+<p><strong>Status:</strong>
+  <!-- TMPL_IF NAME="invoiceclosedate" -->
+    Closed on <!-- TMPL_VAR NAME="invoiceclosedate" -->. <a href="/cgi-bin/koha/acqui/invoice.pl?op=reopen&invoicenumber=<!-- TMPL_VAR NAME='invoice' -->">Reopen it</a>
+  <!-- TMPL_ELSE -->
+    Open. <a href="/cgi-bin/koha/acqui/invoice.pl?op=close&invoicenumber=<!-- TMPL_VAR NAME='invoice' -->">Close it</a>
+  <!-- /TMPL_IF -->
+</p>
 	<!-- TODO: Add date picker, change rcv date. -->
 </div>
 <div id="acqui_receive_search">
@@ -393,6 +401,13 @@
     </form>
     </div>
 <!-- /TMPL_IF -->
+<!-- TMPL_ELSE -->
+    <div class="dialog alert">
+        <p>Invoice <!-- TMPL_VAR NAME="invoice" --> already exist.</p>
+        <p><a href="/cgi-bin/koha/acqui/parcels.pl?supplierid=<!-- TMPL_VAR NAME='supplierid' -->">Return to previous page</a></p>
+    </div>
+<!-- /TMPL_UNLESS --><!-- error_existing -->
+
 
 </div>
 </div>
