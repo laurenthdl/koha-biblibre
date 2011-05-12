@@ -201,7 +201,7 @@ if ( @itypes ) {
 
 # Build itemtypesloop
 # Set selected itypes
-if ( $itype_or_ccode ) {
+if ( $itype_or_ccode ne 'ccode' ) {
     foreach my $thisitemtype ( sort { $itemtypes->{$a}->{'description'} cmp $itemtypes->{$b}->{'description'} } keys %$itemtypes ) {
         my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
