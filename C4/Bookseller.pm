@@ -136,8 +136,8 @@ sub GetBooksellersWithLateOrders {
             AND aqorders.ecost <> 0
             AND aqorders.quantity - IFNULL(aqorders.quantityreceived,0) <> 0
     ";
-    if ( $delay ) {
-        $strsth .= " AND (closedate <= DATE_SUB(CURDATE( ),INTERVAL ? DAY) ";
+    if ( defined $delay ) {
+        $strsth .= " AND (closedate <= DATE_SUB(CURDATE( ),INTERVAL ? DAY)) ";
         push @query_params, $delay;
     }
     if ( defined $estimateddeliverydatefrom ) {
