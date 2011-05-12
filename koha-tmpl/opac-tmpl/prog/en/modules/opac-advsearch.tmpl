@@ -76,7 +76,8 @@
             </fieldset>
         </div>
         <!-- LANGUAGE LIMIT -->
-        <fieldset>
+       <span style="display:none">
+       <fieldset>
             <legend>Language</legend>
             <p>
                 <label for="filters">Language: </label>                                        
@@ -90,6 +91,7 @@
                 </select>
             </p>
         </fieldset>
+	<span style="display:none">
         <!-- /LANGUAGE LIMIT -->
         <!-- SUBTYPE LIMITS -->
         <!-- TMPL_IF NAME="expanded_options" -->
@@ -171,7 +173,9 @@
                                 </option>
                             <!-- /TMPL_LOOP -->
                         </select>
+			<span style="display:none">
                         <div style="margin-top:.4em"><label for="available-items"><input type="checkbox" id="available-items" name="filters" value="int_availability:1" /> Only items currently available for loan or reference</label></div>
+			</span>
                     </fieldset>
                 </div>
             <!-- /TMPL_UNLESS -->
