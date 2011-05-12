@@ -84,7 +84,12 @@ if ( $op eq "do_search" && $query ) {
     }
 
     my $res = SimpleSearch( $query, $filters, $page, $count);
-    my @results = map { GetBiblio $_->{'values'}->{'recordid'} } @{ $res->items };
+    my @results;
+    foreach ( @{ $res->items }) {
+	my $bib = GetBiblio $_->{'values'}->{'recordid'};
+	$bib->{'issn'} = $_->{'values'}->{'str_issn'};
+	push @results, $bib;
+    }
 
     my $pager = Data::Pagination->new(
         $res->{'pager'}->{'total_entries'},
