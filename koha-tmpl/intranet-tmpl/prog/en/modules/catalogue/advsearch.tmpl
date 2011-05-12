@@ -155,7 +155,7 @@
 <div id="pubrange" class="container">
 <!-- PUB / COPY YEAR LIMIT --><!-- FIXME: add publication,copyright,acquisition options -->
 	<p><label for="limit-yr">Year: </label>
-		<input size="15" name="limit-yr" id="" value=""/>&nbsp;&nbsp;(format: yyyy-yyyy)</p>
+		<input size="15" name="limit-yr" id="" value=""/>&nbsp;&nbsp;For example: 1999-2001. You could also use "-1987" for everything published before 1987 or "2008-" for everything published after 2008.</p>
 <!-- /PUB / COPY YEAR LIMIT -->
 </div>
 <div id="language" class="container">
@@ -182,9 +182,11 @@
 <div id="availability" class="container">
 <!-- AVAILABILITY LIMITS -->
     <fieldset><legend>Location and availability: </legend>
+<span style="display:none">
 <div id="currently-avail" class="container">
     <label for="available-items">Only items currently available</label> <input type="checkbox" id="available-items" name="filters" value="<!-- TMPL_VAR NAME="availability_indexname" -->:1" />
 </div>
+</span>
 <p />
 <div id="select-libs" class="container">
     <label for="branchloop">Individual Libraries:</label>
