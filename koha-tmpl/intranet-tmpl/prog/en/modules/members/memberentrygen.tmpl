@@ -321,7 +321,7 @@
 	            <span class="label">Organization #:</span> <!-- TMPL_IF NAME="guarantorid" --> <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="guarantorid" -->" target="blank"><!-- TMPL_VAR NAME="guarantorid" --></a><!-- /TMPL_IF -->
 	        </li>
 	        <li>
-	            <label for="contactname">Organization name: </label>
+	            <label for="contactname">Organization/Name: </label>
 	            <!-- TMPL_IF NAME="guarantorid" -->
 	            <span><!-- TMPL_VAR NAME="contactname" --></span>
 	            <input name="contactname" id="contactname" type="hidden" size="20" value="<!-- TMPL_VAR NAME="contactname" -->" class="debarred" />
@@ -788,6 +788,7 @@
               <a href="/cgi-bin/koha/admin/categorie.pl">Please create one</a>
     <!-- /TMPL_IF -->
     </li>
+    <span style="display:none">
     <li>
       <!-- TMPL_IF NAME="mandatorysort1" -->
         <label for="sort1" class="required">
@@ -816,6 +817,7 @@
 	  <!-- TMPL_IF NAME="mandatorysort2" --><span class="required">Required</span><!-- /TMPL_IF -->
     <!-- /TMPL_IF --> 
     </li>
+    </span>
 	</ol>
   </fieldset>
 	<fieldset class="rows" id="memberentry_subscription">
@@ -903,6 +905,7 @@
 <!-- TMPL_ELSE -->
 <input type="text" id="userid" name="userid" size="20" value="<!-- TMPL_IF NAME="opduplicate" --><!--TMPL_ELSE--><!-- TMPL_VAR NAME="userid" --><!-- /TMPL_IF -->" />
 <!-- /TMPL_IF -->
+<div class="hint">prenom.nom ; laisser vide pour génération automatique</div>
 
 	  <!-- TMPL_IF NAME="mandatoryuserid" --><span class="required">Required</span><!-- /TMPL_IF -->
 		</li>
@@ -935,7 +938,7 @@
 			<!--/TMPL_IF-->
 			<!--/TMPL_IF-->
 	  <!-- TMPL_IF NAME="mandatorypassword" --><span class="required">Required</span><!-- /TMPL_IF --><!-- TMPL_IF NAME="ERROR_short_password" --><span class="required">Password is too short</span><!-- /TMPL_IF -->
-<!-- TMPL_IF NAME="minPasswordLength" --><div class="hint">Minimum password length: <!-- TMPL_VAR NAME="minPasswordLength" --></div><!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="minPasswordLength" --><div class="hint">Minimum password length: <!-- TMPL_VAR NAME="minPasswordLength" --> (date de naissance jjmmaaaa) </div><!-- /TMPL_IF -->
 		</li></ol>
 		</fieldset>
 		<!--this zones are not necessary in modif mode -->
