@@ -330,7 +330,8 @@ if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
     $itype_val_str = join ' OR ', @itypes ;
     $itype_val_str = "($itype_val_str)";
     if ( not @indexes ) {
-        $operands[0] .= " AND $itype_val_str";
+        $operands[0] .= " AND " if $operands[0];
+        $operands[0] .= "$itype_or_ccode:$itype_val_str";
     } else {
         push @operators, "AND";
         push @operands, $itype_val_str;
