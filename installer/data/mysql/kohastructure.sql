@@ -2543,6 +2543,7 @@ CREATE TABLE `aqorders` (
   `rrp` decimal(13,2) default NULL,
   `ecost` decimal(13,2) default NULL,
   `gstrate` decimal(6,4) default NULL,
+  `discount` decimal(6,4) default NULL,
   `budget_id` int(11) NOT NULL,
   `budgetgroup_id` int(11) NOT NULL,
   `budgetdate` date default NULL,
