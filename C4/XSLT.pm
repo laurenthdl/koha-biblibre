@@ -258,7 +258,7 @@ sub buildKohaItemsNamespace {
         my $itemmaterials = $item->{materials} || '';
         my $itemstocknumber = $item->{stocknumber} || '';
         my $itemstatisticvalue = $item->{statisticvalue} || '';
-        
+        my $itemnew = $item->{new} || '';
         #warn Data::Dumper::Dumper $item;
         $itemcallnumber =~ s/\&/\&amp\;/g;
         $xml .= "<item>
@@ -296,6 +296,7 @@ sub buildKohaItemsNamespace {
         <itemmaterials>$itemmaterials</itemmaterials>
         <itemstocknumber>$itemstocknumber</itemstocknumber>
         <itemstatisticvalue>$itemstatisticvalue</itemstatisticvalue>
+        <itemnew>$itemnew</itemnew>
         </item>";
     }
     $xml = "<items xmlns=\"http://www.koha.org/items\">" . $xml . "</items>";

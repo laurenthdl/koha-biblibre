@@ -1746,7 +1746,10 @@ sub getItemsInfos {
             $onloan_items->{$key}->{location}       = $shelflocations->{ $item->{location} };
             $onloan_items->{$key}->{itemcallnumber} = $item->{itemcallnumber};
             $onloan_items->{$key}->{imageurl}       = getitemtypeimagelocation( $interface, $itemtypes->{ $item->{itype} }->{imageurl} );
-
+			my $detailitem=GetItem($item->{itemnumber});
+			foreach my $kditems ( keys %$detailitem ) {
+				$onloan_items->{$key}->{"item".$kditems} = $detailitem->{$kditems};
+			}
             # if something's checked out and lost, mark it as 'long overdue'
             if ( $item->{itemlost} ) {
                 $onloan_items->{$prefix}->{longoverdue}++;
@@ -1823,6 +1826,10 @@ sub getItemsInfos {
                 $other_items->{$key}->{count}++ if $item->{$hbranch};
                 $other_items->{$key}->{location} = $shelflocations->{ $item->{location} };
                 $other_items->{$key}->{imageurl} = getitemtypeimagelocation( $interface, $itemtypes->{ $item->{itype} }->{imageurl} );
+                my $detailitem=GetItem($item->{itemnumber});
+				foreach my $kditems ( keys %$detailitem ) {
+					$other_items->{$key}->{"item".$kditems} = $detailitem->{$kditems};
+				}
             }
 
             # item is available
@@ -1832,6 +1839,10 @@ sub getItemsInfos {
                 $available_items->{$prefix}->{count}++ if $item->{$hbranch};
                 foreach (qw(branchname itemcallnumber hideatopac)) {
                     $available_items->{$prefix}->{$_} = $item->{$_};
+                }
+                my $detailitem=GetItem($item->{itemnumber});
+                foreach my $kditems ( keys %$detailitem ) {
+                    $available_items->{$prefix}->{"item".$kditems} = $detailitem->{$kditems};
                 }
                 $available_items->{$prefix}->{location} = $shelflocations->{ $item->{location} };
                 $available_items->{$prefix}->{imageurl} = getitemtypeimagelocation( $interface, $itemtypes->{ $item->{itype} }->{imageurl} );
