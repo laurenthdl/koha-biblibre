@@ -77,6 +77,7 @@ if ( $query->param('op') eq 'do_search' ) {
         if ( $value ){
             $value =~ s/$authoritysep//g; # Supression of the authority separator
             my @values = split (' ', $value); # Get all words
+            $_ =~ s/"/\\"/g for @values;
             push @$operands, "\"$_\"" for @values; # Each word is an operand
             push @$indexes, $index for @values; # For each word, push index corresponding
             push @$operators, 'AND' for @values; # idem for operator
@@ -113,6 +114,7 @@ if ( $query->param('op') eq 'do_search' ) {
             my $value = $query->param($searchtype);
             if ( $value ){
                 $value =~ s/^\s*(.*)\s*$/$1/; # Delete spaces (begin and after string)
+                $value =~ s/"/\\"/g;
                 push @$operands, "\"$value\"";
                 push @$indexes, $summary_index;
                 push @$operators, 'AND';
@@ -122,7 +124,6 @@ if ( $query->param('op') eq 'do_search' ) {
 
         $q = C4::Search::Query->buildQuery( $indexes, $operands, $operators );
         $results = SimpleSearch( $q, $filters, $page, $count, $orderby );
-
     }
 
     my @resultdatas = map {
@@ -142,9 +143,13 @@ if ( $query->param('op') eq 'do_search' ) {
     );
 
     my $follower_params = [
-        { ind => 'index'        , val => $index        },
-        { ind => 'authtypecode' , val => $authtypecode },
-        { ind => 'order_by'     , val => $orderby      },
+        { ind => 'index'            , val => $index        },
+        { ind => 'authtypecode'     , val => $authtypecode },
+        { ind => 'order_by'         , val => $orderby      },
+        { ind => 'op'               , val => 'do_search'   },
+        { ind => 'authority_search' , val => $query->param('authority_search') || "" },
+        { ind => 'main_heading'     , val => $query->param('main_heading') || "" },
+        { ind => 'all_headings'     , val => $query->param('all_headings') || "" },
     ];
 
     $template->param(
