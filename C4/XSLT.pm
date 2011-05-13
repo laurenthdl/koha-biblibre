@@ -238,7 +238,6 @@ sub buildKohaItemsNamespace {
         my $itemwthdrawn = $item->{wthdrawn} || '';
         my $itemnotforloan = $item->{notforloan} || '';
         my $itemcallnumber = $item->{itemcallnumber} || '';
-        my $itemnumber = $item->{itemnumber} || '';
         my $itemdescription = $item->{description} || '';
         my $itemlocation = GetAuthorisedValueByCode( "LOC", $item->{location}) || '';
         my $itemitype = $item->{itype} || '';
