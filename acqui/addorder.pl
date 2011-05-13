@@ -192,6 +192,7 @@ my $ordermodif;     # Is this an order modification?
                 "aqorders.uncertainprice"     => $$orderinfo{uncertainprice} ? $$orderinfo{uncertainprice} : "",
                 "aqorders.rrp"                => $$orderinfo{rrp} ? $$orderinfo{rrp} : "",
                 "aqorders.ecost"              => $$orderinfo{ecost} ? $$orderinfo{ecost} : "",
+                "aqorders.discount"           => $$orderinfo{discount} ? $$orderinfo{discount} : "",
                 "aqorders.notes"              => $$orderinfo{notes} ? $$orderinfo{notes} : "",
                 "aqorders.supplierreference"  => $supplierreference ? $supplierreference : "",
                 "aqorders.sort1"              => $$orderinfo{sort1} ? $$orderinfo{sort1} : "",

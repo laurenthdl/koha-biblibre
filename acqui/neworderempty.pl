@@ -359,6 +359,8 @@ $template->param(
     biblioitemnumber     => $data->{'biblioitemnumber'},
     discount_2dp         => sprintf( "%.2f", $bookseller->{'discount'} ),              # for display
     discount             => $bookseller->{'discount'},
+    orderdiscount_2dp    => sprintf( "%.2f", $data->{'discount'} ),
+    orderdiscount        => $data->{'discount'},
     editionstatement     => $data->{'editionstatement'},
     listincgst           => $bookseller->{'listincgst'},
     invoiceincgst        => $bookseller->{'invoiceincgst'},
