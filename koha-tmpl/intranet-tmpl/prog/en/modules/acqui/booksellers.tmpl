@@ -16,7 +16,47 @@
             6: {sorter: false},
         }
     });
+    toggleReceivedBaskets();
  }); 
+
+var AllBasketsShown = 1;
+function toggleReceivedBaskets() {
+    var lines = $(".baskets tbody > tr");
+    var i = 0;
+    if(AllBasketsShown){
+        $(lines).each(function(){
+            if($(this).hasClass("rcvd")){
+                $(this).addClass("content_hidden");
+            }else{
+                $(this).removeClass("even");
+                $(this).removeClass("odd");
+                if(i%2 == 0){
+                    $(this).addClass("even");
+                }else{
+                    $(this).addClass("odd");
+                }
+                i++;
+            }
+        });
+        $("#showReceivedBaskets").html("Show all baskets");
+        AllBasketsShown = 0;
+    }else{
+        $(lines).each(function(){
+            $(this).removeClass("content_hidden");
+
+            $(this).removeClass("even");
+            $(this).removeClass("odd");
+            if(i%2 == 0){
+                $(this).addClass("even");
+            }else{
+                $(this).addClass("odd");
+            }
+            i++;
+        });
+        $("#showReceivedBaskets").html("Hide received baskets");
+        AllBasketsShown = 1;
+    }
+}
  //]]>
 </script>
 
@@ -33,6 +73,7 @@
     <div id="yui-main">
     <div class="yui-b">
 <!-- TMPL_INCLUDE NAME="acquisitions-toolbar.inc" -->
+<a id="showReceivedBaskets" style="cursor:pointer;" onclick="toggleReceivedBaskets();"></a>
 <!-- TMPL_IF EXPR="count == 1" -->
 <h1> <!-- TMPL_VAR NAME="supplier_name" --> </h1>
 <!-- TMPL_ELSE -->
@@ -76,7 +117,7 @@
                             <th>Basket</th>
                             <th>Biblio count</th>
                             <th>Items count</th>
-                            <th>Items exepected</th>
+                            <th>Items expected</th>
                             <th>Created by</th>
                             <th>Date</th>
                             <th>&nbsp;</th>
@@ -87,11 +128,11 @@
                     <!--TMPL_IF Name="uncertainprices"-->
                         <tr class="problem">
                     <!--TMPL_ELSE-->
-                        <!-- TMPL_UNLESS NAME="__odd__" -->
-                            <tr class="highlight">
-                        <!-- TMPL_ELSE -->
-                            <tr>
-                        <!-- /TMPL_UNLESS -->
+                      <!-- TMPL_UNLESS NAME="items_expected_count" -->
+                        <tr class="rcvd">
+                      <!-- TMPL_ELSE -->
+                        <tr>
+                      <!-- /TMPL_UNLESS -->
                     <!--/TMPL_IF-->
                     <td><!-- TMPL_VAR NAME="basketno" --></td>
                     <td><!-- TMPL_VAR NAME="basketname" --></td>
