@@ -185,7 +185,7 @@ if ( $op eq 'delete_confirm' ) {
         );
 
     }
-} elsif ( $query->param('op') eq 'reopen' ) {
+} elsif ( $op eq 'reopen' ) {
     my $basket;
     $basket->{basketno}  = $query->param('basketno');
     $basket->{closedate} = undef;
@@ -336,8 +336,8 @@ sub get_infos {
     $line{budget_name}    = $budget->{budget_name};
     if ( $bookseller->{'listincgst'} ) {
         $line{rrpgsti} = sprintf( "%.2f", $line{rrp} );
-        $line{rrpgste} = sprintf( "%.2f", $line{rrp} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
+        $line{rrpgste} = sprintf( "%.2f", $line{rrp} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{gstgste} = sprintf( "%.2f", $line{gstgsti} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
         $line{ecostgsti} = sprintf( "%.2f", $line{ecost} );
