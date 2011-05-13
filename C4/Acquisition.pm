@@ -1554,7 +1554,7 @@ sub ModReceiveOrder {
             }
         }
         foreach (@orderitems) {
-            ModItemOrder($_, $newOrder);
+            ModItemOrder($_, $newordernumber);
         }
 
 	# Do we have to update order informations from the marc record?
@@ -1588,7 +1588,6 @@ sub ModReceiveOrder {
 	}
 
 
->>>>>>> MT5834
     } else {
         $sth = $dbh->prepare(
             "update aqorders
