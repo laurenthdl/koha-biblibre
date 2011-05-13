@@ -669,7 +669,7 @@ function updateCosts(){
     var exchangerate =  new Number($("#currency_rate").val());
     var gstrate = new Number($("#gstrate").val());
     var gst_on=false;
-    if ( listinc == 1 ) {
+    if ( listinc == 0 ) {
         gst_on = true;
     }
 
