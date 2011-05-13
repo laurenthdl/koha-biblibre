@@ -1,11 +1,17 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions &rsaquo; Invoice</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR NAME="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
 $(document).ready(function() {
     $("#orderst").tablesorter();
+    Calendar.setup({
+        inputField: "billingdate",
+        ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+        button: "billingdateCalendar"
+    });
 });
 //]]>
 </script>
@@ -22,10 +28,22 @@ $(document).ready(function() {
 <div id="bd">
   <div id="yui-main">
     <div class="yui-b">
+      <!-- TMPL_IF NAME="billingdate_saved" -->
+        <div class="dialog">
+          <p>Billing date has been saved.</p>
+        </div>
+      <!-- /TMPL_IF -->
       <h1>Invoice: <!-- TMPL_VAR NAME="invoicenumber" --></h1>
 
       <p>Vendor: <!-- TMPL_VAR NAME="suppliername" --></p>
-      <p>Billing date: <!-- TMPL_VAR NAME="billingdate" --></p>
+      <form action="" method="post">
+        <label for="billingdate">Billing date:</label>
+        <input type="text" size="10" id="billingdate" name="billingdate" value="<!-- TMPL_VAR NAME='billingdate' -->" readonly="readonly" />
+        <img id="billingdateCalendar" alt="Show Calendar" style="cursor:pointer" src="/intranet-tmpl/prog/en/lib/calendar/cal.gif" />
+        <input type="hidden" id="op" name="op" value="modbillingdate" />
+        <input type="hidden" id="invoicenumber" name="invoicenumber" value="<!-- TMPL_VAR NAME='invoicenumber' -->" />
+        <input type="submit" value="Save" />
+      </form>
       <p>Status: 
         <!-- TMPL_IF NAME="invoiceclosedate" -->
           Closed on <!-- TMPL_VAR NAME="invoiceclosedate" -->

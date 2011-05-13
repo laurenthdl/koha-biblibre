@@ -59,6 +59,11 @@ if($op && $op eq 'close') {
     if($referer) {
         print $input->redirect($referer);
     }
+}elsif($op && $op eq 'modbillingdate') {
+    my $billingdate = $input->param('billingdate');
+    ModInvoice(invoicenumber => $invoicenumber,
+               billingdate   => C4::Dates->new($billingdate)->output("iso"));
+    $template->param(billingdate_saved => 1);
 }
 
 my $details = GetInvoiceDetails($invoicenumber);
@@ -79,10 +84,11 @@ foreach my $order (@$orders) {
 $template->param(
     invoicenumber   => $details->{'invoicenumber'},
     suppliername    => $details->{'suppliername'},
-    billingdate     => $details->{'billingdate'},
+    billingdate     => C4::Dates->new($details->{'billingdate'}, "iso")->output(),
     invoiceclosedate => $details->{'invoiceclosedate'},
     orders_loop     => \@orders_loop,
     total           => sprintf("%.2f", $total),
+    DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;

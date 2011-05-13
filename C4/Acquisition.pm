@@ -65,6 +65,7 @@ BEGIN {
 
       &GetParcels &GetParcel
       &GetInvoices &GetInvoice &GetInvoiceDetails &CloseInvoice &ReopenInvoice
+      &ModInvoice
       &GetContracts &GetContract
 
       &GetItemnumbersFromOrder
@@ -2127,6 +2128,43 @@ sub ReopenInvoice {
     my $sth = $dbh->prepare($query);
     $sth->execute($invoicenumber);
     $sth->finish;
+}
+
+#------------------------------------------------------------#
+
+=head3 ModInvoice
+
+=over 4
+
+&ModInvoice(%invoiceinfos);
+
+=over 2
+
+Modify an invoice with values contained in hash. $invoiceinfos{'invoicenumber'} must to be set.
+
+=back
+
+=cut
+
+sub ModInvoice {
+    my %invoice = @_;
+
+    my $query = "UPDATE aqorders SET";
+    if( $invoice{'invoicenumber'} ) {
+        my @args = ();
+        foreach (keys %invoice) {
+            if( $_ ne 'invoicenumber') {
+                $query .= " $_ = ?";
+                push @args, $invoice{$_};
+            }
+        }
+        $query .= " WHERE booksellerinvoicenumber = ?";
+        push @args, $invoice{'invoicenumber'};
+        my $dbh = C4::Context->dbh;
+        my $sth = $dbh->prepare($query);
+        $sth->execute(@args);
+        $sth->finish;
+    }
 }
 
 #------------------------------------------------------------#
