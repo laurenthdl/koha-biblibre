@@ -128,6 +128,9 @@ foreach my $tmpserialid (@serialids) {
         && $tmpserialid =~ /^[0-9]+$/
         && !$processedserialid{$tmpserialid} ) {
         my $data = GetSerialInformation($tmpserialid);
+        if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+            $data->{'cannotedit'} = 0;
+        }
         $data->{publisheddate} = format_date( $data->{publisheddate} );
         $data->{planneddate}   = format_date( $data->{planneddate} );
         $data->{'editdisable'} =

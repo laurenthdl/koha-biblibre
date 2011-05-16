@@ -33,7 +33,6 @@ my $issueconfirmed = $query->param('issueconfirmed');
 my $dbh            = C4::Context->dbh;
 my ( $template, $loggedinuser, $cookie, $hemisphere );
 my $subscriptionid = $query->param('subscriptionid');
-my $subs           = GetSubscription($subscriptionid);
 # Permission needed if it is a deletion (del) : delete_subscription
 # Permission needed otherwise : *
 my $permission = ($op eq "del") ? "delete_subscription" : "*";
@@ -46,6 +45,11 @@ my $permission = ($op eq "del") ? "delete_subscription" : "*";
         debug           => 1,
     }
 );
+
+my $subs           = GetSubscription($subscriptionid);
+if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+    $subs->{'cannotedit'} = 0;
+}
 
 $$subs{enddate} ||= GetExpirationDate($subscriptionid);
 
