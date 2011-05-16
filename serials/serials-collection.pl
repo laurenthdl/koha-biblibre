@@ -53,6 +53,9 @@ my $subscriptions;
 if ( $op eq 'gennext' && @subscriptionid ) {
     my $subscriptionid = $subscriptionid[0];
     my $subscription   = GetSubscription($subscriptionid);
+    if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+        $subscription->{'cannotedit'} = 0;
+    }
 
     my $sth = $dbh->prepare(
         "SELECT publisheddate, serialid, serialseq, planneddate
@@ -88,6 +91,9 @@ if (@subscriptionid) {
     my @subscriptioninformation = ();
     foreach my $subscriptionid (@subscriptionid) {
         my $subs = GetSubscription($subscriptionid);
+        if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+            $subs->{'cannotedit'} = 0;
+        }
         $subs->{opacnote}     =~ s/\n/\<br\/\>/g;
         $subs->{missinglist}  =~ s/\n/\<br\/\>/g;
         $subs->{recievedlist} =~ s/\n/\<br\/\>/g;
