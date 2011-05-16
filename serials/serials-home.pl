@@ -94,9 +94,13 @@ if ($searched) {
     @subscriptions = GetSubscriptions( $title, $ISSN, $EAN, $biblionumber );
 }
 
+my @subs_loop = ();
 foreach my $sub (@subscriptions) {
     if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
         $sub->{'cannotedit'} = 0;
+    }
+    unless($sub->{'cannotedit'}){
+        push @subs_loop, $sub;
     }
 }
 
@@ -108,7 +112,7 @@ if ($routing) {
 }
 
 $template->param(
-    subscriptions => \@subscriptions,
+    subs_loop     => \@subs_loop,
     title_filter  => $title,
     ISSN_filter   => $ISSN,
     done_searched => $searched,

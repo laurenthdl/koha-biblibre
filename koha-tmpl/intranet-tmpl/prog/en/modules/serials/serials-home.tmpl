@@ -87,7 +87,7 @@ Serials updated :
 <!-- TMPL_IF NAME="routing" -->
         <h3>Search for Serial Routing List</h3>
 <!-- /TMPL_IF -->
-
+<!-- TMPL_IF NAME="subs_loop" -->
     <table id="srlt">
 	<thead>
         <tr>
@@ -105,7 +105,7 @@ Serials updated :
         </tr>
 	</thead>
 	<tbody> 
-        <!-- TMPL_LOOP name="subscriptions" -->
+        <!-- TMPL_LOOP name="subs_loop" -->
         <!-- TMPL_UNLESS name="__odd__" -->
             <tr class="highlight">
         <!-- TMPL_ELSE -->
@@ -152,8 +152,10 @@ Serials updated :
         <!-- /TMPL_LOOP -->
 	</tbody>
     </table>
-    
-        <!-- /TMPL_IF -->
+<!-- TMPL_ELSE -->
+    <p>Sorry, there is no result for your search.</p>
+<!-- /TMPL_IF -->
+<!-- /TMPL_IF -->
 
 </div>
 </div>
