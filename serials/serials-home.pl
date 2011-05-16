@@ -94,6 +94,12 @@ if ($searched) {
     @subscriptions = GetSubscriptions( $title, $ISSN, $EAN, $biblionumber );
 }
 
+foreach my $sub (@subscriptions) {
+    if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+        $sub->{'cannotedit'} = 0;
+    }
+}
+
 # to toggle between create or edit routing list options
 if ($routing) {
     for my $subscription (@subscriptions) {

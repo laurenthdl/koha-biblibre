@@ -317,7 +317,7 @@ sub GetSubscription {
                 subscription.biblionumber as bibnum);
     if (   C4::Context->preference('IndependantBranches')
         && C4::Context->userenv
-        && C4::Context->userenv->{'flags'} != 1
+        && C4::Context->userenv->{'flags'} % 2 != 1
         && C4::Context->userenv->{'branch'} ) {
         $query .= "
       , ((subscription.branchcode <>\"" . C4::Context->userenv->{'branch'} . "\") and subscription.branchcode <>\"\" and subscription.branchcode IS NOT NULL) as cannotedit ";

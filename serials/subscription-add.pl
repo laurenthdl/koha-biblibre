@@ -65,6 +65,9 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
 
     my $subscriptionid = $query->param('subscriptionid');
     $subs = GetSubscription($subscriptionid);
+    if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+        $subs->{'cannotedit'} = 0;
+    }
 ## FIXME : Check rights to edit if mod. Could/Should display an error message.
     if ( $subs->{'cannotedit'} && $op eq 'mod' ) {
         carp "Attempt to modify subscription $subscriptionid by " . C4::Context->userenv->{'id'} . " not allowed";
