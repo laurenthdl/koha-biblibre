@@ -47,6 +47,7 @@ INSERT INTO permissions (module_bit, code, description) VALUES
    (15, 'receive_serials', 'Serials receiving'),
    (15, 'renew_subscription', 'Renew a subscription'),
    (15, 'routing', 'Routing'),
+   (15, 'superserials', 'Manage subscriptions from any branch'),
    (16, 'execute_reports', 'Execute SQL reports'),
    (16, 'create_reports', 'Create SQL Reports')
 ;
