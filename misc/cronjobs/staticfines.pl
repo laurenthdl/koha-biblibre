@@ -58,6 +58,8 @@ my %catamounts;
 my @libraries;
 my $delay;
 my $borrowersalreadyapplied; # hashref of borrowers for whom we already applied the fine, so it's only applied once
+my $debug = 0;
+my $bigdebug = 0;
 
 GetOptions(
     'h|help'      => \$help,
@@ -141,8 +143,16 @@ print FILE join $delim, ( @borrower_fields, @item_fields, @other_fields );
 print FILE "\n";
 
 for ( my $i = 0 ; $i < scalar(@$data) ; $i++ ) {
-    my $datedue = C4::Dates->new( $data->[$i]->{'date_due'}, 'iso' );
-    my $datedue_days = Date_to_Days( split( /-/, $datedue->output('iso') ) );
+    my $datedue;
+    my $datedue_days;
+    eval {
+	$datedue = C4::Dates->new( $data->[$i]->{'date_due'}, 'iso' );
+	$datedue_days = Date_to_Days( split( /-/, $datedue->output('iso') ) );
+    };
+    if ($@) {
+	warn "Error on date for borrower " . $data->[$i]->{'borrowernumber'} .  ": $@date_due: " . $data->[$i]->{'date_due'} . "\ndatedue_days: " . $datedue_days . "\nSkipping";
+	next;
+    }
     my $due_str = $datedue->output();
     unless ( defined $data->[$i]->{'borrowernumber'} ) {
         print STDERR "ERROR in Getoverdues line $i: issues.borrowernumber IS NULL.  Repair 'issues' table now!  Skipping record.\n";
@@ -151,7 +161,7 @@ for ( my $i = 0 ; $i < scalar(@$data) ; $i++ ) {
     my $borrower = BorType( $data->[$i]->{'borrowernumber'} );
     
     # Skipping borrowers that are not in @categories
-    $debug and warn "Skipping borrower from category " . $borrower->{categorycode} if none { $borrower->{categorycode} eq $_ } @categories;
+    $bigdebug and warn "Skipping borrower from category " . $borrower->{categorycode} if none { $borrower->{categorycode} eq $_ } @categories;
     next if none { $borrower->{categorycode} eq $_ } @categories;
 
     my $branchcode =
@@ -161,7 +171,7 @@ for ( my $i = 0 ; $i < scalar(@$data) ; $i++ ) {
     # In final case, CircControl must be PickupLibrary. (branchcode comes from issues table here).
 
     # Skipping branchcodes that are not in @libraries
-    $debug and warn "Skipping library $branchcode" if none { $branchcode eq $_ } @libraries;
+    $bigdebug and warn "Skipping library $branchcode" if none { $branchcode eq $_ } @libraries;
     next if none { $branchcode eq $_ } @libraries;
 
     my $calendar;
@@ -172,7 +182,7 @@ for ( my $i = 0 ; $i < scalar(@$data) ; $i++ ) {
     my $isHoliday = $calendar->isHoliday( split '/', $today->output('metric') );
 
     # Reassing datedue_days if -delay specified in commandline
-    $debug and warn "Using commandline supplied delay : $delay" if ($delay);
+    $bigdebug and warn "Using commandline supplied delay : $delay" if ($delay);
     $datedue_days += $delay if ($delay);
 
     ( $datedue_days <= $today_days ) or next;    # or it's not overdue, right?
