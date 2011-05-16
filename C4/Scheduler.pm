@@ -31,7 +31,7 @@ BEGIN {
     $VERSION = 0.02;
     require Exporter;
     @ISA    = qw(Exporter);
-    @EXPORT = qw(get_jobs get_at_jobs get_at_job add_at_job remove_at_job);
+    @EXPORT = qw(get_jobs get_at_jobs get_at_job add_at_job remove_at_job remove_at_job_by_tag);
 }
 
 =head1 NAME
@@ -136,6 +136,12 @@ sub remove_at_job {
     my ($jobid) = @_;
     Schedule::At::remove( JOBID => $jobid );
 }
+
+sub remove_at_job_by_tag {
+    my ($tag) = @_;
+    Schedule::At::remove( TAG => $tag );
+}
+
 
 1;
 __END__

@@ -5045,6 +5045,16 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.069";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    INSERT INTO `permissions` (`module_bit`, `code`, `description`) VALUES ('13', 'kss', 'Allows to use the Koha Synchronize System');
+
+    });
+    print "Upgrade to $DBversion done (Adds New Permission KSS)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
