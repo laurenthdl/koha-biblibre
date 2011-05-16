@@ -58,6 +58,9 @@
 	</th>
 	<th>Call No.</th>
 	<th>Barcode</th>
+	<th>Item Type</th>
+	<th>Collection</th>
+	<th>Section</th>
 	<th>Number of Renewals</th>
 	<th>Checked out on</th>
 	<th>Checked out from</th>
@@ -87,20 +90,27 @@
 
         <td><!-- TMPL_VAR NAME="barcode" --></td>
 
-            <td>
-        <!-- TMPL_VAR NAME="renewals" --></td>
-            <td>
-        <!-- TMPL_VAR NAME="issuedate" --></td>
-            <td>
-        <!-- TMPL_VAR NAME="issuingbranch" --></td>
-			<td><!-- TMPL_IF NAME="date_due" --><!-- TMPL_VAR NAME="date_due" --><!-- TMPL_ELSE -->&nbsp;<!-- /TMPL_IF --></td>
-            <td>
-        <!-- TMPL_IF NAME="returndate" -->
-            <!-- TMPL_VAR name="returndate" -->
-        <!-- TMPL_ELSE -->
-            Checked Out
-        <!-- /TMPL_IF -->
-	</td>
+        <td><!-- TMPL_VAR NAME="itemtype" --></td>
+
+        <td><!-- TMPL_VAR NAME="location" --></td>
+
+        <td><!-- TMPL_VAR NAME="ccode" --></td>
+
+        <td><!-- TMPL_VAR NAME="renewals" --></td>
+
+        <td><!-- TMPL_VAR NAME="issuedate" --></td>
+
+        <td><!-- TMPL_VAR NAME="issuingbranch" --></td>
+
+        <td><!-- TMPL_IF NAME="date_due" --><!-- TMPL_VAR NAME="date_due" --><!-- TMPL_ELSE -->&nbsp;<!-- /TMPL_IF --></td>
+
+        <td>
+            <!-- TMPL_IF NAME="returndate" -->
+                <!-- TMPL_VAR name="returndate" -->
+            <!-- TMPL_ELSE -->
+                Checked Out
+            <!-- /TMPL_IF -->
+        </td>
 </tr>
 <!-- /TMPL_LOOP -->
 </table>

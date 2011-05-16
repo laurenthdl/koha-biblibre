@@ -761,6 +761,7 @@ sub patron_attributes_form {
             repeatable       => $attr_type->repeatable(),
             password_allowed => $attr_type->password_allowed(),
             category         => $attr_type->authorised_value_category(),
+            category_type    => $attr_type->category_type(),
             password         => '',
         };
         if ( exists $attr_hash{ $attr_type->code() } ) {

@@ -57,6 +57,9 @@
 	    	}
         });
 	if($(":radio:checked[name='lost']").val() == 0){ $('.classlost').hide() };
+
+    if ($("#categorycode").length > 0){update_category_code($("#categorycode"));}
+
    }); 
     	
     function clear_entry(node) {
@@ -82,6 +85,23 @@
             return this.name.replace(/patron_attr_\d+/, 'patron_attr_' + newId);
         });
         original.parentNode.insertBefore(clone, original.nextSibling);
+    }
+
+    function update_category_code(node) {
+        var category_type = $(node).find("option:selected").parents("optgroup").attr("value");
+        var mytable = $("#attributes_table>tbody");
+
+        mytable.find("tr").each(function(){
+            $(this).hide()
+        });
+
+        mytable.find("tr[category_type="+category_type+"]").each(function(){
+            $(this).show();
+        });
+        mytable.find("tr[category_type='']").each(function(){
+            $(this).show();
+        });
+
     }
 
 //]]>
@@ -765,22 +785,22 @@
     <li>
     <!-- TMPL_IF NAME="typeloop" -->
         <label for="categorycode">Category: </label>
-        <select id="categorycode" name="categorycode">
+        <select id="categorycode" name="categorycode" onchange="update_category_code(this);">
         <!-- TMPL_LOOP NAME="typeloop" -->
-		<!-- TMPL_IF EXPR="typename eq 'C'" --><optgroup label="Child"><!-- /TMPL_IF -->
-		<!-- TMPL_IF EXPR="typename eq 'A'" --><optgroup label="Adult"><!-- /TMPL_IF -->
-		<!-- TMPL_IF EXPR="typename eq 'S'" --><optgroup label="Staff"><!-- /TMPL_IF -->
-		<!-- TMPL_IF EXPR="typename eq 'I'" --><optgroup label="Organization"><!-- /TMPL_IF -->
-		<!-- TMPL_IF EXPR="typename eq 'P'" --><optgroup label="Professional"><!-- /TMPL_IF -->
-		<!-- TMPL_IF EXPR="typename eq 'X'" --><optgroup label="Statistical"><!-- /TMPL_IF -->
-                <!-- TMPL_LOOP NAME="categoryloop" -->
-				<!-- TMPL_IF NAME="categorycodeselected" -->
-               <option value="<!-- TMPL_VAR NAME="categorycode" -->" selected="selected"><!-- TMPL_VAR NAME="categoryname" --></option>
-				<!-- TMPL_ELSE -->
-<option value="<!-- TMPL_VAR NAME="categorycode" -->"><!-- TMPL_VAR NAME="categoryname" --></option>
-				<!-- /TMPL_IF -->
-                <!-- /TMPL_LOOP -->
-        </optgroup>
+            <!-- TMPL_IF EXPR="typename eq 'C'" --><optgroup label="Child"        value="C"><!-- /TMPL_IF -->
+            <!-- TMPL_IF EXPR="typename eq 'A'" --><optgroup label="Adult"        value="A"><!-- /TMPL_IF -->
+            <!-- TMPL_IF EXPR="typename eq 'S'" --><optgroup label="Staff"        value="S"><!-- /TMPL_IF -->
+            <!-- TMPL_IF EXPR="typename eq 'I'" --><optgroup label="Organization" value="I"><!-- /TMPL_IF -->
+            <!-- TMPL_IF EXPR="typename eq 'P'" --><optgroup label="Professional" value="P"><!-- /TMPL_IF -->
+            <!-- TMPL_IF EXPR="typename eq 'X'" --><optgroup label="Statistical"  value="X"><!-- /TMPL_IF -->
+            <!-- TMPL_LOOP NAME="categoryloop" -->
+                <!-- TMPL_IF NAME="categorycodeselected" -->
+                    <option value="<!-- TMPL_VAR NAME="categorycode" -->" selected="selected"><!-- TMPL_VAR NAME="categoryname" --></option>
+                <!-- TMPL_ELSE -->
+                    <option value="<!-- TMPL_VAR NAME="categorycode" -->"><!-- TMPL_VAR NAME="categoryname" --></option>
+                <!-- /TMPL_IF -->
+            <!-- /TMPL_LOOP -->
+            </optgroup>
         <!-- /TMPL_LOOP -->
 		</select>
     <!-- TMPL_ELSE -->
@@ -1013,14 +1033,17 @@
   <fieldset class="rows" id="memberentry_patron_attributes">
     <input type="hidden" name="setting_extended_patron_attributes" value="1" />
     <legend>Additional attributes and identifiers</legend>
-    <table>
-        <tr>
-            <th>Type</th>
-            <th colspan="2">Value</th>
-        </tr>
+    <table id="attributes_table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th colspan="2">Value</th>
+            </tr>
+        </thead>
         <!-- TMPL_LOOP NAME='patron_attributes' -->
-        <tr>
-            <td><!-- TMPL_VAR NAME="code" --> (<!-- TMPL_VAR NAME="description" -->)
+        <tr category_type="<!-- TMPL_VAR NAME="category_type" -->">
+            <td>
+                <!-- TMPL_VAR NAME="code" --> (<!-- TMPL_VAR NAME="description" -->)
             </td>
             <td>
                 <input type="hidden" id="<!-- TMPL_VAR NAME="form_id" -->_code" name="<!-- TMPL_VAR NAME="form_id" -->_code" value="<!-- TMPL_VAR NAME="code" ESCAPE="HTML" -->" />

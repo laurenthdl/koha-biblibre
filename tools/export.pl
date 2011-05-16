@@ -24,12 +24,16 @@ use C4::Biblio;    # GetMarcBiblio GetXmlBiblio
 use CGI;
 use C4::Koha;      # GetItemTypes
 use C4::Branch;    # GetBranches
+use C4::Record;
+use C4::Csv;
+
 
 my $query       = new CGI;
 my $op          = $query->param("op") || '';
-my $filename    = $query->param("filename");
+my $filename    = $query->param("filename") || 'koha.mrc';
 my $dbh         = C4::Context->dbh;
 my $marcflavour = C4::Context->preference("marcflavour");
+my $format      = $query->param("format") || 'iso2709';
 
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     {   template_name   => "tools/export.tmpl",
@@ -50,122 +54,141 @@ if ( C4::Context->preference("IndependantBranches") ) {
 }
 
 if ( $op eq "export" ) {
-    binmode( STDOUT, ":utf8" );
-    print $query->header(
-        -type       => 'application/octet-stream',
-        -charset    => 'utf-8',
-        -attachment => $filename
-    );
+    if ( $format eq "iso2709" ) {
+        binmode( STDOUT, ":utf8" );
+        print $query->header(
+            -type       => 'application/octet-stream',
+            -charset    => 'utf-8',
+            -attachment => $filename
+        );
 
-    my $StartingBiblionumber = $query->param("StartingBiblionumber");
-    my $EndingBiblionumber   = $query->param("EndingBiblionumber");
-    my $output_format        = $query->param("output_format");
-    my $itemtype             = $query->param("itemtype");
-    my $start_callnumber     = $query->param("start_callnumber");
-    my $end_callnumber       = $query->param("end_callnumber");
-    my $start_accession      = ( $query->param("start_accession") ) ? C4::Dates->new( $query->param("start_accession") ) : '';
-    my $end_accession        = ( $query->param("end_accession") ) ? C4::Dates->new( $query->param("end_accession") ) : '';
-    my $dont_export_items    = $query->param("dont_export_item");
-    my $strip_nonlocal_items = $query->param("strip_nonlocal_items");
-    my $dont_export_fields   = $query->param("dont_export_fields");
-    my @sql_params;
+        my $StartingBiblionumber = $query->param("StartingBiblionumber");
+        my $EndingBiblionumber   = $query->param("EndingBiblionumber");
+        my $output_format        = $query->param("output_format") || 'marc';
+        my $itemtype             = $query->param("itemtype");
+        my $start_callnumber     = $query->param("start_callnumber");
+        my $end_callnumber       = $query->param("end_callnumber");
+        my $start_accession      = ( $query->param("start_accession") ) ? C4::Dates->new( $query->param("start_accession") ) : '';
+        my $end_accession        = ( $query->param("end_accession") ) ? C4::Dates->new( $query->param("end_accession") ) : '';
+        my $dont_export_items    = $query->param("dont_export_item");
+        my $strip_nonlocal_items = $query->param("strip_nonlocal_items");
+        my $dont_export_fields   = $query->param("dont_export_fields");
+        my @biblionumbers        = $query->param("biblionumbers");
+        my @sql_params;
 
-    my $items_filter =
-         $branch
-      || $start_callnumber
-      || $end_callnumber
-      || $start_accession
-      || $end_accession
-      || ( $itemtype && C4::Context->preference('item-level_itypes') );
-    my $query = $items_filter
-      ? "SELECT DISTINCT biblioitems.biblionumber
-         FROM biblioitems JOIN items
-         USING (biblionumber) WHERE 1"
-      : "SELECT biblioitems.biblionumber FROM biblioitems WHERE biblionumber >0 ";
+        if (not @biblionumbers) {
+            my $items_filter =
+                 $branch
+              || $start_callnumber
+              || $end_callnumber
+              || $start_accession
+              || $end_accession
+              || ( $itemtype && C4::Context->preference('item-level_itypes') );
+            my $q = $items_filter
+              ? "SELECT DISTINCT biblioitems.biblionumber
+                 FROM biblioitems JOIN items
+                 USING (biblionumber) WHERE 1"
+              : "SELECT biblioitems.biblionumber FROM biblioitems WHERE biblionumber >0 ";
 
-    if ($StartingBiblionumber) {
-        $query .= " AND biblioitems.biblionumber >= ? ";
-        push @sql_params, $StartingBiblionumber;
-    }
-
-    if ($EndingBiblionumber) {
-        $query .= " AND biblioitems.biblionumber <= ? ";
-        push @sql_params, $EndingBiblionumber;
-    }
-
-    if ($branch) {
-        $query .= " AND homebranch = ? ";
-        push @sql_params, $branch;
-    }
-
-    if ($start_callnumber) {
-        $query .= " AND itemcallnumber <= ? ";
-        push @sql_params, $start_callnumber;
-    }
-
-    if ($end_callnumber) {
-        $query .= " AND itemcallnumber >= ? ";
-        push @sql_params, $end_callnumber;
-    }
-    if ($start_accession) {
-        $query .= " AND dateaccessioned >= ? ";
-        push @sql_params, $start_accession->output('iso');
-    }
-
-    if ($end_accession) {
-        $query .= " AND dateaccessioned <= ? ";
-        push @sql_params, $end_accession->output('iso');
-    }
-
-    if ($itemtype) {
-        $query .= ( C4::Context->preference('item-level_itypes') ) ? " AND items.itype = ? " : " AND biblioitems.itemtype = ?";
-        push @sql_params, $itemtype;
-    }
-    warn "$query, @sql_params";
-    my $sth = $dbh->prepare($query);
-    $sth->execute(@sql_params);
-
-    while ( my ($biblionumber) = $sth->fetchrow ) {
-        my $record = eval { GetMarcBiblio($biblionumber); };
-
-        # FIXME: decide how to handle records GetMarcBiblio can't parse or retrieve
-        if ($@) {
-            next;
-        }
-        next if not defined $record;
-        if ( $dont_export_items || $strip_nonlocal_items || $limit_ind_branch ) {
-            my ( $homebranchfield, $homebranchsubfield ) = GetMarcFromKohaField( 'items.homebranch', '' );
-            for my $itemfield ( $record->field($homebranchfield) ) {
-
-                # if stripping nonlocal items, use loggedinuser's branch if they didn't select one
-                $branch = C4::Context->userenv->{'branch'} unless $branch;
-                $record->delete_field($itemfield) if ( $dont_export_items || ( $itemfield->subfield($homebranchsubfield) ne $branch ) );
+            if ($StartingBiblionumber) {
+                $q .= " AND biblioitems.biblionumber >= ? ";
+                push @sql_params, $StartingBiblionumber;
             }
+
+            if ($EndingBiblionumber) {
+                $q .= " AND biblioitems.biblionumber <= ? ";
+                push @sql_params, $EndingBiblionumber;
+            }
+
+            if ($branch) {
+                $q .= " AND homebranch = ? ";
+                push @sql_params, $branch;
+            }
+
+            if ($start_callnumber) {
+                $q .= " AND itemcallnumber <= ? ";
+                push @sql_params, $start_callnumber;
+            }
+
+            if ($end_callnumber) {
+                $q .= " AND itemcallnumber >= ? ";
+                push @sql_params, $end_callnumber;
+            }
+            if ($start_accession) {
+                $q .= " AND dateaccessioned >= ? ";
+                push @sql_params, $start_accession->output('iso');
+            }
+
+            if ($end_accession) {
+                $q .= " AND dateaccessioned <= ? ";
+                push @sql_params, $end_accession->output('iso');
+            }
+
+            if ($itemtype) {
+                $q .= ( C4::Context->preference('item-level_itypes') ) ? " AND items.itype = ? " : " AND biblioitems.itemtype = ?";
+                push @sql_params, $itemtype;
+            }
+            warn "$q, @sql_params";
+            my $sth = $dbh->prepare($q);
+            $sth->execute(@sql_params);
+            push @biblionumbers, map { map { $$_[0] } $_ } @{$sth->fetchall_arrayref};
+
         }
 
-        if ($dont_export_fields) {
-            my @fields = split " ", $dont_export_fields;
-            foreach (@fields) {
-                /^(\d*)(\w)?$/;
-                my $field    = $1;
-                my $subfield = $2;
+        for my $biblionumber (@biblionumbers) {
+            my $record = eval { GetMarcBiblio($biblionumber); };
 
-                # skip if this record doesn't have this field
-                next if not defined $record->field($field);
-                if ($subfield) {
-                    $record->field($field)->delete_subfields($subfield);
-                } else {
-                    $record->delete_field( $record->field($field) );
+            # FIXME: decide how to handle records GetMarcBiblio can't parse or retrieve
+            if ($@) {
+                next;
+            }
+            next if not defined $record;
+            if ( $dont_export_items || $strip_nonlocal_items || $limit_ind_branch ) {
+                my ( $homebranchfield, $homebranchsubfield ) = GetMarcFromKohaField( 'items.homebranch', '' );
+                for my $itemfield ( $record->field($homebranchfield) ) {
+
+                    # if stripping nonlocal items, use loggedinuser's branch if they didn't select one
+                    $branch = C4::Context->userenv->{'branch'} unless $branch;
+                    $record->delete_field($itemfield) if ( $dont_export_items || ( $itemfield->subfield($homebranchsubfield) ne $branch ) );
                 }
             }
+
+            if ($dont_export_fields) {
+                my @fields = split " ", $dont_export_fields;
+                foreach (@fields) {
+                    /^(\d*)(\w)?$/;
+                    my $field    = $1;
+                    my $subfield = $2;
+
+                    # skip if this record doesn't have this field
+                    next if not defined $record->field($field);
+                    if ($subfield) {
+                        $record->field($field)->delete_subfields($subfield);
+                    } else {
+                        $record->delete_field( $record->field($field) );
+                    }
+                }
+            }
+            if ( $output_format eq "xml" ) {
+                print $record->as_xml_record($marcflavour);
+            } else {
+                print $record->as_usmarc();
+            }
         }
-        if ( $output_format eq "xml" ) {
-            print $record->as_xml_record($marcflavour);
-        } else {
-            print $record->as_usmarc();
-        }
+        exit;
+
     }
-    exit;
+    elsif ( $format eq "csv" ) {
+        my @biblionumbers        = $query->param("biblionumbers");
+        my $output = marc2csv( \@biblionumbers, GetCsvProfileId(C4::Context->preference('CsvProfileForExport')) );
+        print $query->header(
+            -type                        => 'application/octet-stream',
+            -'Content-Transfer-Encoding' => 'binary',
+            -attachment                  => "export.csv"
+        );
+        print $output;
+        exit;
+    }
 
 }    # if export
 

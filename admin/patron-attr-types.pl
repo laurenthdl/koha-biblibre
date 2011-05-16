@@ -110,6 +110,9 @@ sub error_add_attribute_type_form {
         $template->param( display_checkout_checked => 'checked="checked"' );
     }
 
+    $template->param( category_type => $input->param('category_type') );
+    $template->param( class => $input->param('class') );
+
     $template->param(
         attribute_type_form => 1,
         confirm_op          => 'add_attribute_type_confirmed',
@@ -152,6 +155,8 @@ sub add_update_attribute_type {
     $attr_type->password_allowed($password_allowed);
     my $display_checkout = $input->param('display_checkout');
     $attr_type->display_checkout($display_checkout);
+    $attr_type->category_type($input->param('category_type'));
+    $attr_type->class($input->param('class'));
 
     if ( $op eq 'edit' ) {
         $template->param( edited_attribute_type => $attr_type->code() );
@@ -232,6 +237,9 @@ sub edit_attribute_type_form {
     }
     authorised_value_category_list( $template, $attr_type->authorised_value_category() );
 
+    $template->param ( category_type => $attr_type->category_type );
+    $template->param ( class => $attr_type->class );
+
     $template->param(
         attribute_type_form => 1,
         edit_attribute_type => 1,
@@ -261,3 +269,4 @@ sub authorised_value_category_list {
     }
     $template->param( authorised_value_categories => \@list );
 }
+

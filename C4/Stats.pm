@@ -22,6 +22,7 @@ use warnings;
 require Exporter;
 use C4::Context;
 use C4::Debug;
+use DateTime;
 use vars qw($VERSION @ISA @EXPORT);
 
 our $debug;
@@ -34,6 +35,8 @@ BEGIN {
     @EXPORT  = qw(
       &UpdateStats
       &TotalPaid
+      &GetTotalIssuesByBorrower
+      &GetTotalIssuesLastYearByBorrower
     );
 }
 
@@ -106,6 +109,26 @@ sub TotalPaid {
     my $sth = $dbh->prepare($query);
     $sth->execute();
     return @{ $sth->fetchall_arrayref( {} ) };
+}
+
+# Return total issues for a borrower
+sub GetTotalIssuesByBorrower {
+    my ($borrowernumber) = @_;
+    my $dbh   = C4::Context->dbh;
+    my $query = "SELECT count(*) FROM statistics, borrowers WHERE (statistics.borrowernumber=borrowers.borrowernumber) AND type ='issue' AND statistics.borrowernumber=?";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($borrowernumber);
+    return $sth->fetchrow;
+}
+
+# Return total issues for a borrower during last year
+sub GetTotalIssuesLastYearByBorrower {
+    my ($borrowernumber) = @_;
+    my $dbh   = C4::Context->dbh;
+    my $query = "SELECT count(*) FROM statistics, borrowers WHERE (statistics.borrowernumber=borrowers.borrowernumber)  AND datetime is not null  AND datetime between (NOW() - INTERVAL 1 YEAR) AND NOW() AND type ='issue' AND statistics.borrowernumber=?";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($borrowernumber);
+    return $sth->fetchrow;
 }
 
 1;

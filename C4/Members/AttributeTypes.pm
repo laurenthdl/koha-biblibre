@@ -118,6 +118,8 @@ sub new {
     $self->{'staff_searchable'}          = 0;
     $self->{'display_checkout'}          = 0;
     $self->{'authorised_value_category'} = '';
+    $self->{'category_type'}             = '';
+    $self->{'class'}                     = '';
 
     bless $self, $class;
     return $self;
@@ -157,6 +159,8 @@ sub fetch {
     $self->{'staff_searchable'}          = $row->{'staff_searchable'};
     $self->{'display_checkout'}          = $row->{'display_checkout'};
     $self->{'authorised_value_category'} = $row->{'authorised_value_category'};
+    $self->{'category_type'}             = $row->{'category_type'};
+    $self->{'class'}                     = $row->{'class'};
 
     bless $self, $class;
     return $self;
@@ -192,16 +196,18 @@ sub store {
                                          password_allowed = ?,
                                          staff_searchable = ?,
                                          authorised_value_category = ?,
-                                         display_checkout = ?
+                                         display_checkout = ?,
+                                         category_type = ?,
+                                         class = ?
                                      WHERE code = ?"
         );
     } else {
         $sth = $dbh->prepare_cached(
             "INSERT INTO borrower_attribute_types 
                                         (description, repeatable, unique_id, opac_display, password_allowed,
-                                         staff_searchable, authorised_value_category, display_checkout,code)
+                                         staff_searchable, authorised_value_category, display_checkout,category_type,class,code)
                                         VALUES (?, ?, ?, ?, ?,
-                                                ?, ?, ?, ?)"
+                                                ?, ?, ?, ?, ?,  ?)"
         );
     }
     $sth->bind_param( 1, $self->{'description'} );
@@ -212,7 +218,9 @@ sub store {
     $sth->bind_param( 6, $self->{'staff_searchable'} );
     $sth->bind_param( 7, $self->{'authorised_value_category'} );
     $sth->bind_param( 8, $self->{'display_checkout'} );
-    $sth->bind_param( 9, $self->{'code'} );
+    $sth->bind_param( 9, $self->{'category_type'} );
+    $sth->bind_param( 10, $self->{'class'} );
+    $sth->bind_param( 11, $self->{'code'} );
     $sth->execute;
 
 }
@@ -384,6 +392,42 @@ Accessor.
 sub authorised_value_category {
     my $self = shift;
     @_ ? $self->{'authorised_value_category'} = shift : $self->{'authorised_value_category'};
+}
+
+=head2 category_type
+
+=over 4
+
+my $category_type = $attr_type->category_type();
+$attr_type->category_type($category_type);
+
+=back
+
+Accessor.
+
+=cut
+
+sub category_type {
+    my $self = shift;
+    @_ ? $self->{'category_type'} = shift : $self->{'category_type'};
+}
+
+=head2 class
+
+=over 4
+
+my $category_type = $attr_type->class();
+$attr_type->class($class);
+
+=back
+
+Accessor.
+
+=cut
+
+sub class {
+    my $self = shift;
+    @_ ? $self->{'class'} = shift : $self->{'class'};
 }
 
 =head2 delete

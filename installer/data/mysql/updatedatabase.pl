@@ -5000,6 +5000,51 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.063";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    ALTER TABLE borrower_attribute_types ADD COLUMN category_type VARCHAR(1)  NOT NULL DEFAULT '' AFTER `display_checkout`;
+    });
+    print "Upgrade to $DBversion done (New field borrower_attribute_types.category_type)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.064";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    ALTER TABLE borrower_attribute_types ADD COLUMN class VARCHAR(255)  NOT NULL DEFAULT '' AFTER `category_type`;
+    });
+    print "Upgrade to $DBversion done (New field borrower_attribute_types.class)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.066";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('StatisticsFields','location|itype|ccode','Define Fields used for statistics members (5 max !)','location|itype|ccode','free')
+    });
+    print "Upgrade to $DBversion done (Adds New System preference StatisticsFields)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.067";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('CsvProfileForExport','0','Set a profile name for CSV export','','');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference CsvProfileForExport)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.068";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('LibraryType','Public','Set a type for the library','Academic|Public|Special','Choice');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference LibraryType)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

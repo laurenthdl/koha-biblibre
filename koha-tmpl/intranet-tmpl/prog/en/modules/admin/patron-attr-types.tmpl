@@ -149,6 +149,25 @@ this feature on.</div>
                   to be chosen from the authorized value list.  However, an authorized value list is not 
                   enforced during batch patron import.</span>
         </li>
+
+       <li><label for="category_type">Category type: </label>
+            <select name="category_type" id="category_type">
+                <option value=""></option>
+                <!-- TMPL_IF EXPR="category_type eq 'A'" --><option value="A" selected="selected">Adult</option><!-- TMPL_ELSE --><option value="A">Adult</option><!-- /TMPL_IF -->
+                <!-- TMPL_IF EXPR="category_type eq 'C'" --><option value="C" selected="selected">Child</option><!-- TMPL_ELSE --><option value="C">Child</option><!-- /TMPL_IF -->
+                <!-- TMPL_IF EXPR="category_type eq 'S'" --><option value="S" selected="selected">Staff</option><!-- TMPL_ELSE --><option value="S">Staff</option><!-- /TMPL_IF -->
+                <!-- TMPL_IF EXPR="category_type eq 'I'" --><option value="I" selected="selected">Organization</option><!-- TMPL_ELSE --><option value="I">Organization</option><!-- /TMPL_IF -->
+                <!-- TMPL_IF EXPR="category_type eq 'P'" --><option value="P" selected="selected">Professional</option><!-- TMPL_ELSE --><option value="P">Professional</option><!-- /TMPL_IF -->
+                <!-- TMPL_IF EXPR="category_type eq 'X'" --><option value="X" selected="selected">Statistical</option><!-- TMPL_ELSE --><option value="X">Statistical</option><!-- /TMPL_IF -->
+            </select>
+            <span>Please let blank if you want these attributs to be for all types of patron. Else, select one type.</span>
+        </li>
+
+        <li>
+            <label for="class">Class: </label>
+            <input type="text" id="class" name="class"  size="20" value="<!-- TMPL_VAR name="class" ESCAPE="HTML" -->"/>
+            <span>Group attributes types with a block title</span>
+        </li>
     </ol>
   </fieldset>
   <fieldset class="action">

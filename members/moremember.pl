@@ -58,6 +58,7 @@ use C4::Form::MessagingPreferences;
 use C4::Overdues qw/CheckBorrowerDebarred/;
 use JSON;
 use List::MoreUtils qw/uniq/;
+use C4::Stats;
 
 #use Smart::Comments;
 #use Data::Dumper;
@@ -244,6 +245,8 @@ my @issuedata;
 my @borrowers_with_issues;
 my $overdues_exist = 0;
 my $totalprice     = 0;
+my $totalissues= GetTotalIssuesByBorrower($borrowernumber);
+my $totalissueslastyear = GetTotalIssuesLastYearByBorrower($borrowernumber);
 
 my @issuedata = build_issue_data($issue, $issuecount);
 my @relissuedata = build_issue_data($relissue, $relissuecount);
@@ -521,7 +524,22 @@ SetMemberInfosInTemplate( $borrowernumber, $template );
 
 if ( C4::Context->preference('ExtendedPatronAttributes') ) {
     $template->param( ExtendedPatronAttributes => 1 );
-    $template->param( patron_attributes        => C4::Members::Attributes::GetBorrowerAttributes($borrowernumber) );
+
+    my $attributes = C4::Members::Attributes::GetBorrowerAttributes($borrowernumber);
+    my @classes = uniq( map {$_->{class}} @$attributes );
+    my @attributes_loop;
+    for my $class (@classes) {
+        my @items;
+        for my $attr (@$attributes) {
+            push @items, $attr if $attr->{class} eq $class
+        }
+        push @attributes_loop, {
+            class => $class,
+            items => \@items
+        };
+    }
+    $template->param( attributes_loop => \@attributes_loop );
+
     my @types = C4::Members::AttributeTypes::GetAttributeTypes();
     if ( scalar(@types) == 0 ) {
         $template->param( no_patron_attribute_types => 1 );
@@ -551,18 +569,22 @@ $template->param(
     issueloop                 => @issuedata,
     relissueloop              => @relissuedata,
     issuecount                => $issuecount,
+    totalissues               => $totalissues,
+    totalissueslastyear       => $totalissueslastyear,
     relissuecount             => $relissuecount,
     overdues_exist            => $overdues_exist,
     error                     => $error,
     $error                    => 1,
     StaffMember               => ( $category_type eq 'S' ),
     is_child                  => ( $category_type eq 'C' ),
+    librarytype               => C4::Context->preference("LibraryType"),
 
     #   reserveloop     => \@reservedata,
     dateformat => C4::Context->preference("dateformat"),
     "dateformat_" . ( C4::Context->preference("dateformat") || '' ) => 1,
     samebranch => $samebranch,
     quickslip  => $quickslip,
+
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;
