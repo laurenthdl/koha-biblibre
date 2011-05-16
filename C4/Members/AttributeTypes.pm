@@ -80,7 +80,7 @@ If $all_fields is true, then each hashref also contains the other fields from bo
 
 sub GetAttributeTypes {
     my $all    = @_   ? shift : 0;
-    my $select = $all ? '*'   : 'code, description';
+    my $select = $all ? '*'   : 'code, description, class';
     my $dbh    = C4::Context->dbh;
     my $sth    = $dbh->prepare("SELECT $select FROM borrower_attribute_types ORDER by code");
     $sth->execute();

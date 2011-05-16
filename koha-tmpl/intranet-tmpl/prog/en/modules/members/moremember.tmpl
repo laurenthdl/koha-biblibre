@@ -33,6 +33,19 @@ $(document).ready(function() {
 		sortList: [[0,0]],
 		headers: { 1: { sorter: 'articles' },6: { sorter: false }}
 	}); 
+
+    <!-- TMPL_LOOP NAME="attributes_loop" -->
+        <!-- TMPL_IF NAME="class" -->
+            $("#aai_<!-- TMPL_VAR NAME='class' -->").tablesorter({
+                headers: {}
+            });
+        <!-- TMPL_ELSE -->
+            $("#aai").tablesorter({
+                headers: {}
+            });
+        <!-- /TMPL_IF -->
+    <!-- /TMPL_LOOP -->
+
     <!-- TMPL_IF NAME="picture" -->
     // new YAHOO.widget.Button("delpicture");   // FIXME: formatting mismatch between YUI and normal button
 	$('#delpicture').click(function(){
@@ -355,10 +368,11 @@ $(document).ready(function() {
 <!-- TMPL_LOOP NAME="attributes_loop" -->
     <!-- TMPL_IF NAME="class" -->
         <h3><!-- TMPL_VAR NAME="class" --></h3>
+        <table id="aai_<!-- TMPL_VAR NAME="class" -->">
     <!-- TMPL_ELSE -->
         <h3>Additional attributes and identifiers</h3>
+        <table id="aai">
     <!-- /TMPL_IF -->
-    <table>
         <thead>
             <th>Type</th>
             <th>Description</th>

@@ -214,6 +214,7 @@ sub edit_attribute_type_form {
 
     $template->param( code        => $code );
     $template->param( description => $attr_type->description() );
+    $template->param( class => $attr_type->class() );
 
     if ( $attr_type->repeatable() ) {
         $template->param( repeatable_checked => 'checked="checked"' );

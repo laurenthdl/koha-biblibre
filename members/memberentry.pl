@@ -756,6 +756,7 @@ sub patron_attributes_form {
     foreach my $type_code ( map { $_->{code} } @types ) {
         my $attr_type = C4::Members::AttributeTypes->fetch($type_code);
         my $entry     = {
+            class            => $attr_type->class(),
             code             => $attr_type->code(),
             description      => $attr_type->description(),
             repeatable       => $attr_type->repeatable(),
