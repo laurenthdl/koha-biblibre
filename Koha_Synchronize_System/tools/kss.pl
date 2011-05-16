@@ -142,6 +142,10 @@ eval {
     $log->info("=== Suppression des anciens fichiers de sauvegarde ===");
     system( qq{find $backup_server_diff_dir -maxdepth 1 -mtime +$backup_delay_diff -name '*.tar.gz' -delete} ) == 0 or die "Can't delete old backup diff ($!)";
     system( qq{find $backup_server_db_dir -maxdepth 1 -mtime +$backup_delay_db -exec rm -R {} \\;} ) == 0 or die "Can't delete old backup db ($!)";
+
+    $log->info("=== Réindexation des nouvelles biblios ===");
+    Koha_Synchronize_System::tools::kss::reindex_last_biblios_server $log;
+
 };
 
 if ( $@ ) {

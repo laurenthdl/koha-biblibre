@@ -49,6 +49,7 @@ which_cmd:
         file: /usr/bin/file
         perl: /usr/bin/perl
         tar: /bin/tar
+        rebuild_zebra: /home/jonathan/workspace/versions/koha_master/misc/migration_tools/rebuild_zebra.pl
 
 
 path:

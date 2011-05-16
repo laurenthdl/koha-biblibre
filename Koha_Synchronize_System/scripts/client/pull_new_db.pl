@@ -11,6 +11,7 @@ open(STDERR, ">>$log_filepath");
 while ( 1 ) {
     eval {
         Koha_Synchronize_System::tools::kss::pull_new_db($log_kss);
+        Koha_Synchronize_System::tools::kss::reindex_last_biblios_client($log_kss);
     };
     if ( not $@ ) {
         exit 0;

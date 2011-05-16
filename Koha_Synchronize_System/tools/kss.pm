@@ -89,7 +89,7 @@ sub get_dbh {
     if ( $host eq 'server' ) {
         $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
     } elsif ( $host eq 'client' ) {
-        $dbh = DBI->connect( "DBI:mysql:dbname=$db_server;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
+        $dbh = DBI->connect( "DBI:mysql:dbname=$db_client;host=$hostname;", $user, $passwd ) or die $DBI::errstr;
     }
 
     $dbh->{'mysql_enable_utf8'} = 1;
@@ -650,6 +650,49 @@ sub generate_ids_files {
     }
 }
 
+=head2 reindex_last_biblios_server
+Reindex all biblios updated after the next to last synchronization.
+=cut
+sub reindex_last_biblios_server {
+    my $log = shift;
+    my $dbh = get_dbh('server');
+    my $conf = get_conf;
+    my $perl_cmd = $$conf{which_cmd}{perl};
+    my $rebuild_cmd = $$conf{which_cmd}{rebuild_zebra};
+	my $query = "SELECT MIN(timestamp) FROM biblioitems WHERE timestamp > ( SELECT end_time FROM $kss_logs_table ORDER BY DESC LIMIT 1,1 )";
+	my $sth = $dbh->prepare($query);
+	$sth->execute();
+	my $timestamp = $sth->fetchrow_array;
+    if ( $timestamp ) {
+        $log->info("Réindexation des biblios modifiées après $timestamp");
+        system( qq{$perl_cmd $rebuild_cmd -b -x -nosanitize --where "timestamp >= ''"} ) == 0 or die "Can't rebuild_zebra ($?)";
+    } else {
+        $log->info("Aucune biblio à réindexer car pas de modification depuis $timestamp");
+    }
+}
+
+=head2 reindex_last_biblios_client
+Reindex all biblios updated after the last synchronization on this client.
+=cut
+sub reindex_last_biblios_client {
+    my $log = shift;
+    my $dbh = get_dbh('client');
+    my $conf = get_conf;
+    my $perl_cmd = $$conf{which_cmd}{perl};
+    my $rebuild_cmd = $$conf{which_cmd}{rebuild_zebra};
+    my $hostname = qx{hostname -f};
+    chomp $hostname;
+	my $query = "SELECT MIN(timestamp) FROM biblioitems WHERE timestamp > ( SELECT MAX(end_time) FROM $kss_logs_table WHERE hostname = ? )";
+	my $sth = $dbh->prepare($query);
+	$sth->execute($hostname);
+	my $timestamp = $sth->fetchrow_array;
+    if ( $timestamp ) {
+        $log->info("Réindexation des biblios modifiées après $timestamp");
+        system( qq{$perl_cmd $rebuild_cmd -b -x -nosanitize --where "timestamp >= ''"} ) == 0 or die "Can't rebuild_zebra ($?)";
+    } else {
+        $log->info("Aucune biblio à réindexer car pas de modification depuis $timestamp");
+    }
+}
 
 =head2 get_last_log
 
