@@ -109,10 +109,10 @@ for ( my $i = 0 ; $i < $count ; $i++ ) {
     my $uid = GetMember( borrowernumber => $loggedinuser )->{userid} if $loggedinuser;
     for ( my $i2 = 0 ; $i2 < $ordcount ; $i2++ ) {
         # Check if the user belong to basket users list
-        my $basketusers = GetBasketUsers( $orders->[$i2]{'basketno'} );
+        my @basketusers_ids = GetBasketUsers( $orders->[$i2]{'basketno'} );
         my $isabasketuser = 0;
-        foreach (@$basketusers) {
-            if( $loggedinuser == $_->{borrowernumber} ){
+        foreach (@basketusers_ids) {
+            if( $loggedinuser == $_ ){
                 $isabasketuser = 1;
                 last;
             }
