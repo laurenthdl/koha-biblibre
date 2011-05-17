@@ -36,6 +36,7 @@ my $authtypecode = $query->param('authtypecode') || '[* TO *]';
 my $index        = $query->param('index');
 my $tagid        = $query->param('tagid');
 my $resultstring = $query->param('result');
+my $op           = $query->param('op') || "";
 my $dbh          = C4::Context->dbh;
 
 my ( $template, $loggedinuser, $cookie );
@@ -48,7 +49,7 @@ my @authtypesloop = map { {
     index        => $index,
 } } keys %$authtypes;
 
-if ( $query->param('op') eq 'do_search' ) {
+if ( $op eq 'do_search' ) {
     my $orderby     = $query->param('orderby') || 'score desc';
     my $page        = $query->param('page') || 1;
     my $count       = 20;
@@ -145,7 +146,7 @@ if ( $query->param('op') eq 'do_search' ) {
     my $follower_params = [
         { ind => 'index'            , val => $index        },
         { ind => 'authtypecode'     , val => $authtypecode },
-        { ind => 'order_by'         , val => $orderby      },
+        { ind => 'orderby'         , val => $orderby      },
         { ind => 'op'               , val => 'do_search'   },
         { ind => 'authority_search' , val => $query->param('authority_search') || "" },
         { ind => 'main_heading'     , val => $query->param('main_heading') || "" },
