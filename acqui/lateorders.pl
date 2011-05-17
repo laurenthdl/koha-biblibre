@@ -72,9 +72,8 @@ my $estimateddeliverydatefrom      = $input->param('estimateddeliverydatefrom');
 my $estimateddeliverydateto      = $input->param('estimateddeliverydateto');
 my $branch     = $input->param('branch');
 my $op         = $input->param('op');
-
 my @errors = ();
-if ( defined $delay and $delay =~ /^\d{1,3}$/ ) {
+if ( defined $delay and not $delay =~ /^\d{1,3}$/ ) {
     push @errors, { delay_digits => 1, bad_delay => $delay };
 }
 
@@ -91,7 +90,7 @@ if ( $op and $op eq "send_alert" ) {
     }
 }
 
-my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch );
+my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch, C4::Dates->new($estimateddeliverydatefrom)->output("iso"), C4::Dates->new($estimateddeliverydateto)->output("iso") );
 my (@sloopy);                                             # supplier loop
 foreach ( keys %supplierlist ) {
     push @sloopy,
@@ -103,7 +102,7 @@ foreach ( keys %supplierlist ) {
 $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 
-my @lateorders = GetLateOrders( $delay, undef, undef, $estimateddeliverydatefrom, $estimateddeliverydateto );
+my @lateorders = GetLateOrders( $delay, $supplierid, undef, C4::Dates->new($estimateddeliverydatefrom)->output("iso"), C4::Dates->new($estimateddeliverydateto)->output("iso") );
 
 my $total;
 foreach (@lateorders) {
