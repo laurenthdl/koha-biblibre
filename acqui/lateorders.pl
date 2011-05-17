@@ -105,40 +105,31 @@ $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 my @lateorders = GetLateOrders( $delay, $supplierid, undef, C4::Dates->new($estimateddeliverydatefrom)->output("iso"), C4::Dates->new($estimateddeliverydateto)->output("iso") );
 
 my $total;
+my @orders_loop = ();
 foreach (@lateorders) {
     $total += $_->{subtotal};
+    $_->{'branch'} ||= $_->{'basket_branch'};
 
-    # Check if user has permission to use budget
-    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
-        my $order = GetOrder( $_->{ordernumber} );
-        my $budget = GetBudget( $order->{budget_id} );
-        my $period = GetBudgetPeriod( $budget->{budget_period_id} );
-        my $borrower_id = $template->{param_map}->{'USER_INFO'}[0]->{'borrowernumber'};
-
-        if ( $$period{budget_period_locked} == 1 ) {
-            $_->{budget_lock} = 1;
-        } elsif ( $budget->{budget_permission} == 1 ) {
-            if ( $borrower_id != $budget->{'budget_owner_id'} ) {
-                $_->{lock} = 1;
-            }
-            # check parent perms too
-            my $parents_perm = 0;
-            if ( $budget->{depth} > 0 ) {
-                $parents_perm = CheckBudgetParentPerm( $budget, $borrower_id );
-                delete $_->{budget_lock} if $parents_perm == '1';
-            }
-        } elsif ( $budget->{budget_permission} == 2 ) {
-            if( defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
-                $_->{budget_lock} = 1;
-            }
-        } elsif ( $budget->{budget_permission} == 3 ) {
-            my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
-            if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
-                $_->{budget_lock} = 1;
+    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_claim_for_all'} ) {
+        # Check if order belong to a basket the user is owner or user,
+        # or if order branch is the current working branch.
+        # Otherwise, the user can't claim for this order.
+        my $basket = GetBasket($_->{'basketno'});
+        my $basketusers = GetBasketUsers($_->{'basketno'});
+        my $isabasketuser = 0;
+        foreach (@$basketusers) {
+            if ($_->{'borrowernumber'} == $loggedinuser) {
+                $isabasketuser = 1;
+                last;
             }
         }
+        if($_->{'branch'} ne C4::Context->userenv->{'branch'}
+        && $basket->{'authorisedby'} != $loggedinuser
+        && $isabasketuser == 0) {
+            next;
+        }
     }
-
+    push @orders_loop, $_;
 }
 
 my @letters;
@@ -150,7 +141,7 @@ $template->param( letters => \@letters ) if (@letters);
 
 $template->param( ERROR_LOOP => \@errors ) if (@errors);
 $template->param(
-    lateorders              => \@lateorders,
+    lateorders              => \@orders_loop,
     delay                   => $delay,
     estimateddeliverydatefrom   => $estimateddeliverydatefrom,
     estimateddeliverydateto   => $estimateddeliverydateto,

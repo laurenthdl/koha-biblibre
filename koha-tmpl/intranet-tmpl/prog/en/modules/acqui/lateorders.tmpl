@@ -120,13 +120,7 @@ $(document).ready(function() {
             </td>
             <td>
                 <p>
-                  <!-- TMPL_IF name="budget_lock" -->
-                    <!-- TMPL_VAR name="basketno" -->
-                  <!-- TMPL_ELSE -->
-                    <a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->" title="basket">
-                        <!-- TMPL_VAR name="basketno" -->
-                 	</a>
-                  <!-- /TMPL_IF -->
+                    <a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->" title="basket"><!-- TMPL_VAR name="basketno" --></a>
                 </p>
                 <p title="branch"><!-- TMPL_VAR name="branch" --></p>
             </td>

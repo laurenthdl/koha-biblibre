@@ -1570,7 +1570,7 @@ sub DelOrder {
     my $dbh   = C4::Context->dbh;
     my $query = "
         UPDATE aqorders
-        SET    datecancellationprinted=now()
+        SET    datecancellationprinted=now(), orderstatus=4
         WHERE  biblionumber=? AND ordernumber=?
     ";
     my $sth = $dbh->prepare($query);
@@ -1783,8 +1783,9 @@ sub GetLateOrders {
         aqorders.ecost            AS unitpricelib,
         aqorders.claims_count     AS claims_count,
         aqorders.claimed_date     AS claimed_date,
+        aqorders.branchcode       AS branch,
+        aqbasket.branch           AS basket_branch,
         aqbudgets.budget_name     AS budget,
-        borrowers.branchcode      AS branch,
         aqbooksellers.name        AS supplier,
         aqbooksellers.id          AS supplierid,
         biblio.author, biblio.title,
