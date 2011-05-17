@@ -137,10 +137,10 @@ INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('WebBasedSelfCheck',0,'If ON, enables the web-based self-check system',NULL,'YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchResults',20,'Specify the maximum number of results to display on a page of results',NULL,'Integer');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('OPACnumSearchResults',20,'Specify the maximum number of results to display on a page of results',NULL,'Integer');
-INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('defaultSortField',NULL,'Specify the default field used for sorting','score|str_callnumber|date_pubdate|date_acqdate|txt_title|str_author','Choice');
-INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('defaultSortOrder',NULL,'Specify the default sort order','asc|desc','Choice');
-INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('OPACdefaultSortField',NULL,'Specify the default field used for sorting','score|str_callnumber|date_pubdate|date_acqdate|txt_title|str_author','Choice');
-INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('OPACdefaultSortOrder',NULL,'Specify the default sort order','asc|desc','Choice');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('defaultSortField','score','Specify the default field used for sorting','score|str_callnumber|date_pubdate|date_acqdate|txt_title|str_author','Choice');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('defaultSortOrder','desc','Specify the default sort order','asc|desc','Choice');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('OPACdefaultSortField','score','Specify the default field used for sorting','score|str_callnumber|date_pubdate|date_acqdate|txt_title|str_author','Choice');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('OPACdefaultSortOrder','desc','Specify the default sort order','asc|desc','Choice');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('staffClientBaseURL','','Specify the base URL of the staff client',NULL,'free');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('minPasswordLength',3,'Specify the minimum length of a patron/staff password',NULL,'free');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('noItemTypeImages',0,'If ON, disables item-type images',NULL,'YesNo');
