@@ -1966,6 +1966,13 @@ div.sql_error {
 	margin : 1em;
 }
 
+div.info {
+	border : 2px dashed #990000;
+	background-color : #99FFCC;
+	padding : .5em;
+	margin : 1em;
+}
+
 div#acqui_order_supplierlist > div.vendor {
     border: solid 1px #eee;
     margin: 0.5em;

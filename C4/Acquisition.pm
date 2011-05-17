@@ -68,6 +68,8 @@ BEGIN {
       &GetItemnumbersFromOrder
 
       &GetBiblioCountByBasketno
+
+      &AddClaim
     );
 }
 
@@ -145,8 +147,7 @@ sub GetBasket {
     my $dbh        = C4::Context->dbh;
     my $query      = "
         SELECT  aqbasket.*,
-                concat( b.firstname,' ',b.surname) AS authorisedbyname,
-                b.branchcode AS branch
+                concat( b.firstname,' ',b.surname) AS authorisedbyname
         FROM    aqbasket
         LEFT JOIN borrowers b ON aqbasket.authorisedby=b.borrowernumber
         WHERE basketno=?
@@ -1761,25 +1762,31 @@ sub GetLateOrders {
     my $delay      = shift;
     my $supplierid = shift;
     my $branch     = shift;
+    my $estimateddeliverydatefrom = shift;
+    my $estimateddeliverydateto = shift;
 
     my $dbh = C4::Context->dbh;
 
     #BEWARE, order of parenthesis and LEFT JOIN is important for speed
     my $dbdriver = C4::Context->config("db_scheme") || "mysql";
 
-    my @query_params = ($delay);    # delay is the first argument regardless
+    my @query_params = ();
     my $select       = "
     SELECT aqbasket.basketno,
         aqorders.ordernumber,
         DATE(aqbasket.closedate)  AS orderdate,
         aqorders.rrp              AS unitpricesupplier,
         aqorders.ecost            AS unitpricelib,
+        aqorders.claims_count     AS claims_count,
+        aqorders.claimed_date     AS claimed_date,
         aqbudgets.budget_name     AS budget,
         borrowers.branchcode      AS branch,
         aqbooksellers.name        AS supplier,
+        aqbooksellers.id          AS supplierid,
         biblio.author, biblio.title,
         biblioitems.publishercode AS publisher,
         biblioitems.publicationyear,
+        ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) AS estimateddeliverydate,
     ";
     my $from = "
     FROM
@@ -1788,6 +1795,8 @@ sub GetLateOrders {
         LEFT JOIN aqbudgets           ON aqorders.budget_id          = aqbudgets.budget_id,
         aqbasket LEFT JOIN borrowers  ON aqbasket.authorisedby       = borrowers.borrowernumber
         LEFT JOIN aqbooksellers       ON aqbasket.booksellerid       = aqbooksellers.id
+    ";
+    $from .= "
         WHERE aqorders.basketno = aqbasket.basketno
         AND ( datereceived = ''
             OR datereceived IS NULL
@@ -1801,7 +1810,10 @@ sub GetLateOrders {
         (aqorders.quantity - IFNULL(aqorders.quantityreceived,0)) * aqorders.rrp AS subtotal,
         DATEDIFF(CURDATE( ),closedate) AS latesince
         ";
-        $from .= " AND (closedate <= DATE_SUB(CURDATE( ),INTERVAL ? DAY)) ";
+        if ( defined $delay ) {
+            $from .= " AND (closedate <= DATE_SUB(CURDATE( ),INTERVAL ? DAY)) " ;
+            push @query_params, $delay;
+        }
         $having = "
         HAVING quantity          <> 0
             AND unitpricesupplier <> 0
@@ -1815,7 +1827,10 @@ sub GetLateOrders {
                 aqorders.quantity * aqorders.rrp AS subtotal,
                 (CURDATE - closedate)            AS latesince
         ";
-        $from .= " AND (closedate <= (CURDATE -(INTERVAL ? DAY)) ";
+        if ( defined $delay ) {
+            $from .= " AND (closedate <= (CURDATE -(INTERVAL ? DAY)) ";
+            push @query_params, $delay;
+        }
     }
     if ( defined $supplierid ) {
         $from .= ' AND aqbasket.booksellerid = ? ';
@@ -1824,6 +1839,19 @@ sub GetLateOrders {
     if ( defined $branch ) {
         $from .= ' AND borrowers.branchcode LIKE ? ';
         push @query_params, $branch;
+    }
+    if ( defined $estimateddeliverydatefrom ) {
+        $from .= '
+            AND aqbasket.closedate IS NOT NULL 
+            AND aqbooksellers.deliverytime IS NOT NULL
+            AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) >= ?';
+        push @query_params, $estimateddeliverydatefrom;
+    }
+    if ( defined $estimateddeliverydatefrom and defined $estimateddeliverydateto ) {
+        $from .= ' AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) <= ?';
+        push @query_params, $estimateddeliverydateto;
+    } else {
+        $from .= ' AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) <= CURDATE()';
     }
     if (   C4::Context->preference("IndependantBranches")
         && C4::Context->userenv
@@ -2148,6 +2176,30 @@ sub GetBiblioCountByBasketno {
     return $sth->fetchrow;
 }
 
+=head3 AddClaim
+
+=over 4
+
+&AddClaim($ordernumber);
+
+Add a claim for an order
+
+=back
+
+=cut
+sub AddClaim {
+    my ($ordernumber) = @_;
+    my $dbh          = C4::Context->dbh;
+    my $query        = "
+        UPDATE aqorders SET
+            claims_count = claims_count + 1,
+            claimed_date = CURDATE()
+        WHERE ordernumber = ?
+        ";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($ordernumber);
+
+}
 
 1;
 __END__

@@ -1,6 +1,7 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions &rsaquo; Late orders</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
@@ -16,13 +17,25 @@ $(document).ready(function() {
         type: 'numeric'
     });
     $("#lateorders").tablesorter({
-	    widgets : ['zebra'],    
+	    widgets : ['zebra'],
 	    headers: {
-            5: { sorter: false },
-            3: {sorter: 'amount'}
+            8: { sorter: false },
         },
-	}); 
-}); 
+	});
+
+    $("#checkAll").click(function() {
+        $("#lateorders :checkbox").attr('checked', $("#checkAll").is(':checked'));
+    });
+
+    $("input:checkbox[name=claim_for]").click(function(){
+        var supplierid = $(this).attr('supplierid');
+        if ( $("input:checkbox[name=claim_for]:checked").length > 0) {
+            $("input:checkbox[name=claim_for][supplierid!="+supplierid+"]").attr('disabled', true);
+        } else {
+            $("input:checkbox[name=claim_for]").attr('disabled', false);
+        }
+    });
+});
 //]]>
 </script>
 </head>
@@ -34,7 +47,6 @@ $(document).ready(function() {
 <div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/acqui/acqui-home.pl">Acquisitions</a> &rsaquo; <a href="lateorders.pl">Late orders</a></div>
 
 <div id="doc3" class="yui-t2">
-   
    <div id="bd">
 	<div id="yui-main">
 	<div class="yui-b">
@@ -43,6 +55,12 @@ $(document).ready(function() {
 <div id="acqui_lateorders">
 
 <!-- TMPL_IF NAME="lateorders" -->
+<!-- TMPL_IF NAME="error_claim" -->
+    <div class='error'><!-- TMPL_VAR NAME="error_claim" --></div>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="info_claim" -->
+    <div class='info'><!-- TMPL_VAR NAME="info_claim" --></div>
+<!-- /TMPL_IF -->
 <form action="lateorders.pl" name="claim" method="post">
   <input type="hidden" name="op" value="send_alert" />
 	<!-- TMPL_IF NAME="letters" -->
@@ -57,19 +75,30 @@ $(document).ready(function() {
         <thead>
             <tr>
                 <th>Order Date</th>
+                <th>Estimated delivery date</th>
                 <th>Vendor</th>
                 <th>Information</th>
                 <th>Total cost</th>
                 <th>Basket</th>
-                <th>&nbsp;</th>
+                <th>claims count</th>
+                <th>claimed date</th>
+                <!-- TMPL_IF name="Supplier" -->
+                    <th><input type="checkbox" id="checkAll"></th>
+                <!-- TMPL_ELSE -->
+                    <th></th>
+                <!-- /TMPL_IF -->
             </tr>
         </thead>
         <tbody>
     <!-- TMPL_LOOP name="lateorders" -->
-        <tr<!-- TMPL_UNLESS NAME="__odd__" --> class="highlight"<!-- /TMPL_UNLESS -->> 
+        <tr>
             <td>
+            (<!-- TMPL_VAR NAME="supplierid" -->)
                 <!-- TMPL_VAR name="orderdate" -->
                 (<!-- TMPL_VAR name="latesince" --> days)
+            </td>
+            <td>
+                <!-- TMPL_VAR NAME="estimateddeliverydate" -->
             </td>
             <td>
                 <!-- TMPL_VAR name="supplier" -->
@@ -101,9 +130,11 @@ $(document).ready(function() {
                 </p>
                 <p title="branch"><!-- TMPL_VAR name="branch" --></p>
             </td>
+            <td><!-- TMPL_VAR NAME="claims_count" --></td>
+            <td><!-- TMPL_VAR NAME="claimed_date" --></td>
             <td>
               <!-- TMPL_UNLESS NAME="budget_lock" -->
-                <input type="checkbox" name="claim_for" value="<!--TMPL_VAR Name="ordernumber" -->" />
+                <input type="checkbox" name="claim_for" value="<!--TMPL_VAR NAME="ordernumber" -->" supplierid="<!-- TMPL_VAR NAME='supplierid' -->"/>
               <!-- /TMPL_UNLESS -->
             </td>
         </tr>
@@ -112,8 +143,10 @@ $(document).ready(function() {
         <tfoot>
             <tr>
                 <th>Total</th>
-                <th colspan="2">&nbsp;</th>
+                <th colspan="3">&nbsp;</th>
                 <th><!-- TMPL_VAR name="total" --></th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <td>
                     <input type="submit" value="Claim Order" />
@@ -134,7 +167,37 @@ $(document).ready(function() {
 <!-- TMPL_LOOP NAME="ERROR_LOOP" -->
 <!-- TMPL_IF NAME="delay_digits" --><p class="error">The number of days (<!-- TMPL_VAR NAME="bad_delay" -->) must be a number between 0 and 999.</p><!-- /TMPL_IF -->
 <!-- /TMPL_LOOP -->
-<ol><li><label for="delay">Order date:</label><input size="3" maxlength="3" id="delay" type="text" name="delay" value="<!--TMPL_VAR Name="delay" -->" /> days ago</li>
+<ol>
+    <li><label for="delay">Order date:</label><input size="3" maxlength="3" id="delay" type="text" name="delay" value="<!--TMPL_VAR Name="delay" -->" /> days ago</li>
+    <li><label for="delay">Estimated Delivery date from: </label>
+        <input type="text" size="10" id="estimateddeliverydatefrom" name="estimateddeliverydatefrom" value="<!-- TMPL_VAR name="estimateddeliverydatefrom" -->" />
+        <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="openCalendarFrom" style="cursor: pointer;" alt="Show Calendar" />
+        <div class="hint"><!-- TMPL_INCLUDE NAME="date-format.inc" --></div>
+    </li>
+    <li><label for="delay">To: </label>
+        <input type="text" size="10" id="estimateddeliverydateto" name="estimateddeliverydateto" value="<!-- TMPL_VAR name="estimateddeliverydateto" -->" />
+        <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="openCalendarTo" style="cursor: pointer;" alt="Show Calendar" />
+		<script type="text/javascript">
+			// return true if the date is blocked.
+			function disable_from(date) {var limit = get_Calendar_limit(date,'estimateddeliverydatefrom'); return (limit && limit < date);}
+			function disable_to(date) {var limit = get_Calendar_limit(date,'estimateddeliverydateto'); return (limit && limit < date);}
+			Calendar.setup({
+				inputField : "estimateddeliverydatefrom",
+				ifFormat : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+				button : "openCalendarFrom",
+				disableFunc : disable_from,
+				dateStatusFunc : disable_from
+			});
+            Calendar.setup({
+                inputField : "estimateddeliverydateto",
+                ifFormat : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                button : "openCalendarTo",
+                disableFunc : disable_to,
+                dateStatusFunc : disable_to
+             });
+		</script>
+        <div class="hint"><!-- TMPL_INCLUDE NAME="date-format.inc" --></div>
+    </li>
 	<li><label for="supplierid">Vendor:</label>
 		<select id="supplierid" size="1" tabindex="" name="supplierid">
 			<option value=""/>

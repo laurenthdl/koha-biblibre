@@ -294,16 +294,20 @@ sub SendAlerts {
 
         # prepare the letter...
         # search the biblionumber
-        my $strsth =
-"select aqorders.*,aqbasket.*,biblio.*,biblioitems.* from aqorders LEFT JOIN aqbasket on aqbasket.basketno=aqorders.basketno LEFT JOIN biblio on aqorders.biblionumber=biblio.biblionumber LEFT JOIN biblioitems on aqorders.biblioitemnumber=biblioitems.biblioitemnumber where aqorders.ordernumber IN ("
+        my $strsth = "SELECT aqorders.*,aqbasket.*,biblio.*,biblioitems.*,aqbooksellers.* FROM aqorders LEFT JOIN aqbasket ON aqbasket.basketno=aqorders.basketno LEFT JOIN biblio ON aqorders.biblionumber=biblio.biblionumber LEFT JOIN biblioitems ON aqorders.biblioitemnumber=biblioitems.biblioitemnumber LEFT JOIN aqbooksellers ON aqbasket.booksellerid=aqbooksellers.id WHERE aqorders.ordernumber IN ("
           . join( ",", @$externalid ) . ")";
         my $sthorders = $dbh->prepare($strsth);
         $sthorders->execute;
-        my $dataorders = $sthorders->fetchall_arrayref( {} );
-        parseletter( $letter, 'aqbooksellers', $dataorders->[0]->{booksellerid} );
-        my $sthbookseller = $dbh->prepare("select * from aqbooksellers where id=?");
-        $sthbookseller->execute( $dataorders->[0]->{booksellerid} );
-        my $databookseller = $sthbookseller->fetchrow_hashref;
+        my @fields = map {
+            $sthorders->{mysql_table}[$_] . "." . $sthorders->{NAME}[$_] }
+            (0 .. $#{$sthorders->{NAME}} ) ;
+
+        my @orders_infos;
+        while ( my $row = $sthorders->fetchrow_arrayref() ) {
+            my %rec = ();
+            @rec{@fields} = @$row;
+            push @orders_infos, \%rec;
+        }
 
         # parsing branch info
         my $userenv = C4::Context->userenv;
@@ -313,24 +317,45 @@ sub SendAlerts {
         $letter->{content} =~ s/<<LibrarianFirstname>>/$userenv->{firstname}/g;
         $letter->{content} =~ s/<<LibrarianSurname>>/$userenv->{surname}/g;
         $letter->{content} =~ s/<<LibrarianEmailaddress>>/$userenv->{emailaddress}/g;
-        foreach my $data (@$dataorders) {
-            my $line = $1 if ( $letter->{content} =~ m/(<<.*>>)/ );
-            foreach my $field ( keys %$data ) {
-                $line =~ s/(<<[^\.]+.$field>>)/$data->{$field}/;
-            }
-            $letter->{content} =~ s/(<<.*>>)/$line\n$1/;
+
+        # Get Fields remplacement
+        my $item_format = $1 if ( $letter->{content} =~ m/(<item>.*<\/item>)/xms );
+
+        # Foreach field to remplace
+        while ( $letter->{content} =~ m/<<([^>]*)>>/g ) {
+            my $field = $1;
+            my $value = $orders_infos[0]->{$field} || "";
+            $value = sprintf("%.2f", $value) if $field =~ /price/;
+            $letter->{content} =~ s/<<$field>>/$value/g;
         }
-        $letter->{content} =~ s/<<[^>]*>>//g;
+
+        if ( $item_format ) {
+            # For each order
+            foreach my $infos ( @orders_infos ) {
+                my $order_content = $item_format;
+                # We replace by value
+                while ( $order_content =~ m/<<([^>]*)>>/g ) {
+                    my $field = $1;
+                    my $value = $infos->{$field} || "";
+                    $value = sprintf("%.2f", $value) if $field =~ /price/;
+                    $order_content =~ s/(<<$field>>)/$value/g;
+                }
+                $order_content =~ s/<\/{0,1}?item>//g;
+                $letter->{content} =~ s/<item>.*<\/item>/$order_content\n$item_format/xms;
+            }
+            $letter->{content} =~ s/<item>.*<\/item>//xms;
+        }
+
         my $innerletter = $letter;
 
         # ... then send mail
-        if (   $databookseller->{bookselleremail}
-            || $databookseller->{contemail} ) {
+        if (   $orders_infos[0]->{'aqbooksellers.bookselleremail'}
+            || $orders_infos[0]->{'aqbooksellers.contemail'} ) {
             my %mail = (
-                To => $databookseller->{bookselleremail}
+                To => $orders_infos[0]->{'aqbooksellers.bookselleremail'}
                   . (
-                    $databookseller->{contemail}
-                    ? "," . $databookseller->{contemail}
+                    $orders_infos[0]->{'aqbooksellers.contemail'}
+                    ? "," . $orders_infos[0]->{'aqbooksellers.contemail'}
                     : ""
                   ),
                 From           => $userenv->{emailaddress},
@@ -340,9 +365,11 @@ sub SendAlerts {
             );
             sendmail(%mail) or carp $Mail::Sendmail::error;
             warn "sending to $mail{To} From $mail{From} subj $mail{Subject} Mess $mail{Message}";
-        }
-        if ( C4::Context->preference("LetterLog") ) {
-            logaction( "ACQUISITION", "Send Acquisition claim letter", "", "order list : " . join( ",", @$externalid ) . "\n$innerletter->{title}\n$innerletter->{content}" );
+            if ( C4::Context->preference("LetterLog") ) {
+                logaction( "ACQUISITION", "Send Acquisition claim letter", "", "order list : " . join( ",", @$externalid ) . "\n$innerletter->{title}\n$innerletter->{content}" );
+            }
+        } else {
+            die "This bookseller have not an email\n";
         }
     } elsif ( $type eq 'claimissues' ) {
 
@@ -370,8 +397,11 @@ sub SendAlerts {
         $letter->{content} =~ s/<<LibrarianFirstname>>/$userenv->{firstname}/g;
         $letter->{content} =~ s/<<LibrarianSurname>>/$userenv->{surname}/g;
         $letter->{content} =~ s/<<LibrarianEmailaddress>>/$userenv->{emailaddress}/g;
+        
+
+
         foreach my $data (@$dataorders) {
-            my $line = $1 if ( $letter->{content} =~ m/(<<.*>>)/ );
+            my $line = $1 if ( $letter->{content} =~ m/(\[\[.*\]\])/ );
             foreach my $field ( keys %$data ) {
                 $line =~ s/(<<[^\.]+.$field>>)/$data->{$field}/;
             }

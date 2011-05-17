@@ -68,14 +68,14 @@ my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
 
 my $supplierid = $input->param('supplierid') || undef;    # we don't want "" or 0
 my $delay      = $input->param('delay');
+my $estimateddeliverydatefrom      = $input->param('estimateddeliverydatefrom');
+my $estimateddeliverydateto      = $input->param('estimateddeliverydateto');
 my $branch     = $input->param('branch');
 my $op         = $input->param('op');
 
 my @errors = ();
-$delay = 30 unless defined $delay;
-unless ( $delay =~ /^\d{1,3}$/ ) {
+if ( defined $delay and $delay =~ /^\d{1,3}$/ ) {
     push @errors, { delay_digits => 1, bad_delay => $delay };
-    $delay = 30;                                          #default value for delay
 }
 
 my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch );
@@ -90,7 +90,7 @@ foreach ( keys %supplierlist ) {
 $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 
-my @lateorders = GetLateOrders( $delay, undef, undef );
+my @lateorders = GetLateOrders( $delay, undef, undef, $estimateddeliverydatefrom, $estimateddeliverydateto );
 
 my $total;
 foreach (@lateorders) {
@@ -138,14 +138,25 @@ $template->param( letters => \@letters ) if (@letters);
 
 if ( $op and $op eq "send_alert" ) {
     my @ordernums = $input->param("claim_for");    # FIXME: Fallback values?
-    SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
+    eval {
+        SendAlerts( 'claimacquisition', \@ordernums, $input->param("letter_code") );    # FIXME: Fallback value?
+        AddClaim ( $_ ) for @ordernums;
+    };
+    if ( $@ ) {
+        $template->param(error_claim => $@);
+    } else {
+        $template->param(info_claim => "Emails have been sent to the message queue");
+    }
 }
 
 $template->param( ERROR_LOOP => \@errors ) if (@errors);
 $template->param(
     lateorders              => \@lateorders,
     delay                   => $delay,
+    estimateddeliverydatefrom   => $estimateddeliverydatefrom,
+    estimateddeliverydateto   => $estimateddeliverydateto,
     total                   => $total,
     intranetcolorstylesheet => C4::Context->preference("intranetcolorstylesheet"),
+    DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
 output_html_with_http_headers $input, $cookie, $template->output;

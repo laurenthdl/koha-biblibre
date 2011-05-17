@@ -94,8 +94,9 @@
     function deleteBasketUser(id) {
       $("#"+id).remove();
       var ids = $("#basketusers_ids").val();
-      ids = ids.replace (':'+id+':', ':');
-      ids = ids.replace ('^'+id+':', '');
+      var expr = "(^|:)"+id+":";
+      var re = new RegExp(expr, "g");
+      ids = ids.replace (re, ':');
       $("#basketusers_ids").val(ids);
     }
 //]]>
@@ -211,6 +212,23 @@
                 <!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="deliveryplace" --><p>Delivery place:  <!-- TMPL_VAR NAME="deliveryplace" --></p><!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="billingplace" --><p>Billing place:  <!-- TMPL_VAR NAME="billingplace" --></p><!-- /TMPL_IF -->
+                <form action="" method="post">
+                    <p>Branch:
+                    <select id="branch" name="branch">
+                        <option value="">No branch</option>
+                        <!-- TMPL_LOOP NAME="branches_loop" -->
+                          <!-- TMPL_IF NAME="selected" -->
+                            <option selected="selected" value="<!-- TMPL_VAR NAME='branchcode' -->"><!-- TMPL_VAR NAME="branchname" --></option>
+                          <!-- TMPL_ELSE -->
+                            <option value="<!-- TMPL_VAR NAME='branchcode' -->"><!-- TMPL_VAR NAME="branchname" --></option>
+                          <!-- /TMPL_IF -->
+                        <!-- /TMPL_LOOP -->
+                    </select>
+                    <input type="hidden" id="basketno" name="basketno" value="<!-- TMPL_VAR NAME='basketno' -->" />
+                    <input type="hidden" id="op" name="op" value="mod_branch" />
+                    <input type="submit" value="Save" />
+                    </p>
+                </form>
                 <!-- TMPL_IF NAME="authorisedbyname" --><p>Created by:  <!-- TMPL_VAR NAME="authorisedbyname" --></p><!-- /TMPL_IF -->
                 <form action="/cgi-bin/koha/acqui/basket.pl" method="post">
                 <p>Managed by:<p>
@@ -227,6 +245,7 @@
                 <input type="hidden" id="op" name="op" value="mod_users" />
                 <input type="button" id="add_user" onclick="basketUserSearchPopup(); return false;" value="Add user" />
                 <input type="submit" value="Save changes" />
+                </form>
                 <!-- TMPL_IF NAME="creationdate" --><p>Opened on:  <!-- TMPL_VAR NAME="creationdate" --></p><!-- /TMPL_IF -->
                 <!-- TMPL_IF name="closedate" -->
                 <form action="/cgi-bin/koha/acqui/basketgroup.pl" method="post">
