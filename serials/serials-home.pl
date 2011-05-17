@@ -94,6 +94,11 @@ if ($searched) {
     @subscriptions = GetSubscriptions( $title, $ISSN, $EAN, $biblionumber );
 }
 
+foreach my $subs (@subscriptions) {
+    my $enddate = C4::Dates->new($subs->{'enddate'}, "iso");
+    $subs->{'enddate'} = $enddate->output();
+}
+
 # to toggle between create or edit routing list options
 if ($routing) {
     for my $subscription (@subscriptions) {
