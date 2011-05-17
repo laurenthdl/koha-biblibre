@@ -96,6 +96,9 @@ if ($searched) {
 
 my @subs_loop = ();
 foreach my $sub (@subscriptions) {
+    my $enddate = C4::Dates->new($sub->{'enddate'}, "iso");
+    $sub->{'enddate'} = $enddate->output();
+
     if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
         $sub->{'cannotedit'} = 0;
     }
