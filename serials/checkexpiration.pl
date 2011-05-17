@@ -49,11 +49,12 @@ use C4::Serials;    # GetExpirationDate
 use C4::Output;
 use C4::Context;
 use C4::Dates qw/format_date format_date_in_iso/;
+use C4::Branch;
 use Date::Calc qw/Today Date_to_Days/;
 
 my $query = new CGI;
 
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
     {   template_name   => "serials/checkexpiration.tmpl",
         query           => $query,
         type            => "intranet",
@@ -65,6 +66,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 
 my $title = $query->param('title');
 my $issn  = $query->param('issn');
+my $branch = $query->param('branch');
 my $date  = format_date_in_iso( $query->param('date') );
 
 if ($date) {
@@ -77,21 +79,51 @@ if ($date) {
 
         $subscription->{expirationdate} = $expirationdate;
         next if $expirationdate !~ /\d{4}-\d{2}-\d{2}/;    # next if not in ISO format.
+        if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+            $subscription->{'cannotedit'} = 0;
+        }
+        next if $subscription->{'cannotedit'};
         if (   Date_to_Days( split "-", $expirationdate ) < Date_to_Days( split "-", $date )
-            && Date_to_Days( split "-", $expirationdate ) > Date_to_Days(&Today) ) {
+            && Date_to_Days( split "-", $expirationdate ) > Date_to_Days(&Today)
+            && ( ($branch && $subscription->{'branchcode'} eq $branch) || !$branch) ) {
             $subscription->{expirationdate} = format_date( $subscription->{expirationdate} );
             push @subscriptions_loop, $subscription;
         }
     }
 
     $template->param(
-        title                                                              => $title,
-        issn                                                               => $issn,
-        numsubscription                                                    => scalar @subscriptions_loop,
-        date                                                               => format_date($date),
-        subscriptions_loop                                                 => \@subscriptions_loop,
+        title               => $title,
+        issn                => $issn,
+        numsubscription     => scalar @subscriptions_loop,
+        date                => format_date($date),
+        subscriptions_loop  => \@subscriptions_loop,
         "BiblioDefaultView" . C4::Context->preference("BiblioDefaultView") => 1,
     );
 }
 $template->param( DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(), );
+
+if($flags->{'superlibrarian'} % 2 == 1
+|| $template->{'param_map'}->{'CAN_user_serials_superserials'}){
+    my $branches = GetBranches();
+    my $branchname;
+    my @branches_loop = ();
+    foreach (sort keys %$branches) {
+        my $selected = 0;
+        if( $branch eq $_ ){
+            $selected = 1;
+            $branchname = $branches->{$_}->{'branchname'};
+        }
+        push @branches_loop, {
+            branchcode => $_,
+            branchname => $branches->{$_}->{'branchname'},
+            selected   => $selected,
+        };
+    }
+    $template->param(
+        branches_loop   => \@branches_loop,
+        branchcode      => $branch,
+        branchname      => $branchname,
+    );
+}
+
 output_html_with_http_headers $query, $cookie, $template->output;
