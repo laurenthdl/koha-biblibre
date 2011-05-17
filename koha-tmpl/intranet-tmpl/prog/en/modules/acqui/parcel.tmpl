@@ -234,14 +234,14 @@
     <!-- TMPL_LOOP NAME="loop_orders" -->
             <tr>
                 <td class="basketfilterclass">
-                  <!-- TMPL_IF NAME="budget_lock" -->
+                  <!-- TMPL_IF NAME="basket_lock" -->
                     <!-- TMPL_VAR NAME="basketno" -->
                   <!-- TMPL_ELSE -->
                     <a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a>
                   <!-- /TMPL_IF -->
                 </td>
                 <td class="orderfilterclass">
-                  <!-- TMPL_IF NAME="budget_lock" -->
+                  <!-- TMPL_IF NAME="basket_lock" -->
                     <!-- TMPL_VAR NAME="ordernumber" -->
                   <!-- TMPL_ELSE -->
                     <a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="supplierid" -->"><!-- TMPL_VAR NAME="ordernumber" --></a>
@@ -264,26 +264,23 @@
                 <td><!-- TMPL_VAR NAME="ecost" --></td>
                 <td><!-- TMPL_VAR NAME="ordertotal" --></td>
 				<td>
-                  <!-- TMPL_IF NAME="budget_lock" -->
+                  <!-- TMPL_IF NAME="receive_lock" -->
                     <span style="color: gray;">Receive</span>
-                    /
+                  <!--  TMPL_ELSE -->
+                    <!-- TMPL_UNLESS NAME="closedate" -->
+                      <a href="orderreceive.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->" onclick="return confirm(_('Basket is not closed. Do you really want to receive this order?'));">Receive</a>
+                    <!-- TMPL_ELSE --> 
+                      <a href="orderreceive.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->">Receive</a>
+                    <!-- /TMPL_UNLESS --> 
+                  <!-- /TMPL_IF -->
+                  /
+                  <!-- TMPL_IF NAME="basket_lock" -->
                     <span style="color: gray;">Cancel</span>
                     /
                     <span style="color: gray;">Transfer</span>
                   <!-- TMPL_ELSE -->
-                    <!-- TMPL_IF NAME="receive_lock" -->
-                      <span style="color: gray;">Receive</span> /
                       <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->">Cancel</a> /
                       <a href="transferorder.pl?ordernumber=<!--TMPL_VAR NAME="ordernumber" -->&amp;bookselleridfrom=<!-- TMPL_VAR NAME="supplierid" -->">Transfer</a>
-                    <!-- TMPL_ELSE -->
-                     <!-- TMPL_UNLESS NAME="closedate" -->
-                      <a href="orderreceive.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->" onclick="return confirm(_('Basket is not closed. Do you really want to receive this order?'));">Receive</a> /
-                     <!-- TMPL_ELSE --> 
-                      <a href="orderreceive.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->">Receive</a> /
-                     <!-- /TMPL_UNLESS --> 
-                      <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->">Cancel</a> /
-                      <a href="transferorder.pl?ordernumber=<!--TMPL_VAR NAME="ordernumber" -->&amp;bookselleridfrom=<!-- TMPL_VAR NAME="supplierid" -->">Transfer</a>
-                    <!-- /TMPL_IF -->
                   <!-- /TMPL_IF -->
 				</td>
             </tr>
