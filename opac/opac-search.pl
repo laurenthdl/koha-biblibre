@@ -122,7 +122,6 @@ $template->param(
     branchloop       => $branchloop,
     searchdomainloop => GetBranchCategories( undef, 'searchdomain' ),
 );
-$template->param( holdingbranch_index => C4::Search::Query::getIndexName('holdingbranch') );
 
 # load the language limits (for search)
 $template->param( search_languages_loop => getAllLanguagesAuthorizedValues() );
