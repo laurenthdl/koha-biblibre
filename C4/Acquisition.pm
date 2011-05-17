@@ -47,8 +47,10 @@ BEGIN {
       &GetBasket &NewBasket &CloseBasket &DelBasket &ModBasket
       &GetBasketAsCSV &GetBasketGroupAsCSV
       &GetBasketsByBookseller &GetBasketsByBasketgroup
+      &GetBasketUsers
 
       &ModBasketHeader
+      &ModBasketUsers
 
       &ModBasketgroup &NewBasketgroup &DelBasketgroup &GetBasketgroup &CloseBasketgroup
       &GetBasketgroups &ReOpenBasketgroup
@@ -529,6 +531,48 @@ sub ModBasketHeader {
 
 #------------------------------------------------------------#
 
+=head3 ModBasketUsers
+
+=over 4
+
+my @basketusers_ids = (1, 2, 3);
+
+&ModBasketUsers($basketno, @basketusers_ids);
+
+=over 2
+
+Delete all users from basket users list, and add users in C<@basketusers_ids> to this users list.
+
+=back
+
+=back
+
+=cut
+
+sub ModBasketUsers {
+    my ($basketno, @basketusers_ids) = @_;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        DELETE FROM aqbasketusers
+        WHERE basketno = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($basketno);
+    $sth->finish();
+
+    $query = qq{
+        INSERT INTO aqbasketusers (basketno, borrowernumber)
+        VALUES (?, ?)
+    };
+    $sth = $dbh->prepare($query);
+    foreach my $basketuser_id (@basketusers_ids) {
+        $sth->execute($basketno, $basketuser_id);
+    }
+}
+
+#------------------------------------------------------------#
+
 =head3 GetBasketsByBookseller
 
 =over 4
@@ -603,6 +647,39 @@ sub GetBasketsByBasketgroup {
     $sth->execute($basketgroupid);
     my $results = $sth->fetchall_arrayref( {} );
     $sth->finish;
+    return $results;
+}
+
+#------------------------------------------------------------#
+
+=head3 GetBasketUsers
+
+=over 4
+
+$basketusers_ids = &GetBasketUsers($basketno);
+
+=over 2
+
+Returns a reference-to-array to all borrowernumber that are in basket users list
+
+=back
+
+=back
+
+=cut
+
+sub GetBasketUsers {
+    my $basketno = shift;
+    my $query = qq{
+        SELECT borrowernumber
+        FROM aqbasketusers
+        WHERE basketno = ?
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($basketno);
+    my $results = $sth->fetchall_arrayref( {} );
+    $sth->finish();
     return $results;
 }
 
@@ -1092,7 +1169,7 @@ Else, the upcoming July 1st is used.
 
 =item defaults entrydate to Now
 
-The following keys are used: "biblionumber", "title", "basketno", "quantity", "notes", "biblioitemnumber", "rrp", "ecost", "gst", "unitprice", "subscription", "sort1", "sort2", "booksellerinvoicenumber", "listprice", "budgetdate", "purchaseordernumber", "branchcode", "booksellerinvoicenumber", "bookfundid".
+The following keys are used: "biblionumber", "title", "basketno", "quantity", "notes", "biblioitemnumber", "rrp", "ecost", "gstrate", "unitprice", "subscription", "sort1", "sort2", "booksellerinvoicenumber", "listprice", "budgetdate", "purchaseordernumber", "branchcode", "booksellerinvoicenumber", "bookfundid".
 
 =back
 
@@ -1349,7 +1426,7 @@ sub ModReceiveOrder {
 
         # create a new order for the remaining items, and set its bookfund.
         foreach my $orderkey ( "linenumber", "allocation" ) {
-            delete( $order->{'$orderkey'} );
+            delete( $order->{$orderkey} );
         }
         $order->{'quantity'} -= $quantrec;
         $order->{'quantityreceived'} = 0;
@@ -1540,6 +1617,8 @@ sub GetParcel {
                 aqorders.listprice,
                 aqorders.rrp,
                 aqorders.ecost,
+                aqorders.parent_ordernumber,
+                aqorders.gstrate,
                 biblio.title
         FROM aqorders
         LEFT JOIN aqbasket ON aqbasket.basketno=aqorders.basketno

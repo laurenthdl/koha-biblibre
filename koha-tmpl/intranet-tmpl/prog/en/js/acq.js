@@ -658,43 +658,44 @@ function messenger(X,Y,etc){    // FIXME: unused?
 
 //  NEXT BLOCK IS USED BY NEWORDERBEMPTY
 
-function calcNeworderTotal(){
+function updateCosts(){
     //collect values
-    var f        = document.getElementById('Aform');
-    var quantity = new Number(f.quantity.value);
-    var discount = new Number(f.discount.value);
-    var listinc  = new Number (f.listinc.value);
-    var currency = f.currency.value;
-    var applygst = new Number (f.applygst.value);
-    var listprice   =  new Number(f.listprice.value);
-    var invoiceingst =  new Number (f.invoiceincgst.value);
-    var exchangerate =  new Number(f.elements[currency].value);      //get exchange rate
-    var gst_on=(!listinc && invoiceingst);
+    var quantity = new Number($("#quantity").val());
+    var discount = new Number($("#discount").val());
+    var listinc  = new Number ($("#listinc").val());
+    var applygst = new Number ($("#applygst").val());
+    var listprice   =  new Number($("#listprice").val());
+    var invoiceincgst =  new Number ($("#invoiceincgst").val());
+    var exchangerate =  new Number($("#currency_rate").val());
+    var gstrate = new Number($("#gstrate").val());
+    var gst_on=false;
+    if (listinc==0 && invoiceincgst==1){
+        gst_on = true;
+    }
 
     //do real stuff
     var rrp   = new Number(listprice*exchangerate);
-    var ecost = new Number(rrp * (1 - discount ) );
+
+    // Calcul real ecost with discount on dutyfree price
+    var ecost = new Number(rrp * (100 - discount ) / 100);
+    //var rrp_tax_exclude = rrp - rrp * gstrate;
+    //var ecost_tax_exclude_with_discount = rrp_tax_exclude * ((100 - discount ) / 100);
+    //var ecost = ecost_tax_exclude_with_discount + ecost_tax_exclude_with_discount * gstrate;
+
     var GST   = new Number(0);
     if (gst_on) {
-            rrp=rrp * (1+f.gstrate.value / 100);
-        GST=ecost * f.gstrate.value / 100;
+        rrp=rrp * (1 + gstrate);
+        GST=ecost * gstrate;
     }
 
     var total =  new Number( (ecost + GST) * quantity);
 
-    f.rrp.value = rrp.toFixed(2);
+    $("#rrp").val(rrp.toFixed(2));
 
-//	f.rrp.value = rrp
-//	f.rrp.value = 'moo'
+    $("#ecost").val(ecost.toFixed(2));
+    $("#total").val(total.toFixed(2));
+    $("listprice").val(listprice.toFixed(2));
 
-    f.ecost.value = ecost.toFixed(2);
-    f.total.value = total.toFixed(2);
-    f.listprice.value =  listprice.toFixed(2);
-
-//  gst-stuff needs verifing, mason.
-    if (f.GST) {
-        f.GST.value=GST;
-    }
     return true;
 }
 

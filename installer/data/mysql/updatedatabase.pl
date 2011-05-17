@@ -5796,21 +5796,67 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 $DBversion = "3.06.00.014";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT INTO `permissions` (module_bit, code, description) VALUES (11, 'budget_manage_all', 'Add, modify and delete all budgets, even if budgets access is restricted')");
-    print "Upgrade to $DBversion done (Adds budget_manage_all permission)";
+    print "Upgrade to $DBversion done (Adds budget_manage_all permission)\n";
     SetVersion($DBversion);
 }
 
 $DBversion = "3.06.00.015";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqbooksellers` ADD `deliverytime` INT DEFAULT NULL");
-    print "Upgrade to $DBversion done (Add deliverytime field in aqbooksellers table)";
+    print "Upgrade to $DBversion done (Add deliverytime field in aqbooksellers table)\n";
     SetVersion($DBversion);
 }
 
 $DBversion = "3.06.00.016";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqorders` ADD `internalnotes` mediumtext AFTER `notes`");
-    print "Upgrade to $DBversion done (Add internalnotes field in aqorders table)";
+    print "Upgrade to $DBversion done (Add internalnotes field in aqorders table)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.017";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("UPDATE systempreferences SET type='Choice', value='0.196', options='0.196|0.055' WHERE variable='gist'");
+    print "Upgrade to $DBversion done (Update gist syspref)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.018";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `aqorders` CHANGE COLUMN `gst` `gstrate` DECIMAL(6,4)  DEFAULT NULL");
+    print "Upgrade to $DBversion done (Change column name in aqorders gst --> gstrate)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.019";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `permissions` (module_bit, code, description)
+        VALUES (11, 'order_receive_all', 'Receive orders from any branch')");
+    print "Upgrade to $DBversion done (Add order_receive_all permission)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.020";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("DROP TABLE IF EXISTS `aqbasketusers`");
+    $dbh->do("
+        CREATE TABLE `aqbasketusers` (
+            `basketno` int(11) NOT NULL,
+            `borrowernumber` int(11) NOT NULL,
+            PRIMARY KEY (`basketno`,`borrowernumber`),
+            CONSTRAINT `aqbasketusers_ibfk_1` FOREIGN KEY (`basketno`) REFERENCES `aqbasket` (`basketno`),
+            CONSTRAINT `aqbasketusers_ibfk_2` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    ");
+    print "Upgrade to $DBversion done (Add aqbasketusers table)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.021";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `permissions` (module_bit, code, description)
+        VALUES (11, 'order_manage_all', 'Manage all orders & baskets')");
+    print "Upgrade to $DBversion done (Add order_manage_all permission)\n";
     SetVersion($DBversion);
 }
 

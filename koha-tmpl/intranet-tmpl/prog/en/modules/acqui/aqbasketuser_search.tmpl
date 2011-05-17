@@ -1,0 +1,82 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Basket User Search</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+
+<style type="text/css">
+    #custom-doc {
+        width:44.46em;
+        *width:43.39em;
+        min-width:578px;
+        margin:auto;
+        text-align:left;
+    }
+</style>
+
+<script type="text/javascript">
+//<![CDATA[
+
+// modify parent window owner element
+function returnUser(userId, userName){
+    var top1 = top.opener;
+    var name = 'basketusers_names';
+    var id = 'basketusers_ids';
+    console.log(top1.document.getElementById("basketusers_names"));
+    top1.document.getElementById(name).innerHTML += "<li id=\""+userId+"\">"+userName+" [<a style=\"text-decoration:none\" href=\"#\" onclick=\"deleteBasketUser("+userId+");return false;\">Delete user</a>]</li>";
+    top1.document.getElementById(id).value += userId+":";
+    window.close();
+}
+//]]>
+</script>
+
+</head>
+<body>
+<div id="custom-doc" class="yui-t7">
+  <div id="bd">
+    <div class="yui-g">
+
+      <h3>Search for Budget Owner</h3>
+	  <form action="/cgi-bin/koha/acqui/aqbasketuser_search.pl" method="post">
+        <fieldset>
+          <input type="hidden" name="op" id="op" value="do_search" />
+          <input type="text" name="q" id="q" value="<!-- TMPL_VAR NAME="q" -->" class="focus" />
+          <input type="submit" class="button" value="Search" />
+        </fieldset>
+        <div class="hint">Only staff with superlibrarian or acquisitions permissions (or order_manage permission if granular permissions are enabled) are returned in the search results</div>
+      </form>
+
+
+<!--TMPL_IF NAME="users_loop" -->
+    <p>Searched for <span class="ex"><!-- TMPL_VAR NAME="q" --></span>, <!-- TMPL_VAR Name ="nresults" --> patron(s) found:</p>
+    <table>
+      <thead>
+        <tr>
+            <th>Cardnumber</th>
+            <th>Name</th>
+            <th>Branch</th>
+            <th>Categorycode</th>
+            <th>Select?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- TMPL_LOOP NAME="users_loop" -->
+          <!-- TMPL_IF NAME="toggle" -->
+            <tr>
+          <!-- TMPL_ELSE -->
+            <tr class="highlight">
+          <!-- /TMPL_IF -->
+                <td><!-- TMPL_VAR NAME="cardnumber" --></td>
+                <td><!-- TMPL_VAR NAME="surname" -->, <!-- TMPL_VAR NAME="firstname" --></td>
+                <td><!-- TMPL_VAR NAME="branchcode" --></td>
+                <td><!-- TMPL_VAR NAME="categorycode" --></td>
+                <td>
+                    <input type="button" value="Select" onclick="returnUser('<!-- TMPL_VAR NAME="borrowernumber" -->', '<!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" -->');"  />
+                </td>
+            </tr>
+        <!-- /TMPL_LOOP -->
+    </table>
+<!--/TMPL_IF-->
+
+<div id="closewindow"><a href="#" class="close">Cancel</a></div>
+</div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->

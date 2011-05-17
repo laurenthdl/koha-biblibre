@@ -2349,6 +2349,19 @@ CREATE TABLE `aqbasket` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `aqbasketusers`
+--
+
+DROP TABLE IF EXISTS `aqbasketusers`;
+CREATE TABLE `aqbasketusers` (
+  `basketno` int(11) NOT NULL,
+  `borrowernumber` int(11) NOT NULL,
+  PRIMARY KEY (`basketno`,`borrowernumber`),
+  CONSTRAINT `aqbasketusers_ibfk_1` FOREIGN KEY (`basketno`) REFERENCES `aqbasket` (`basketno`),
+  CONSTRAINT `aqbasketusers_ibfk_2` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `aqbooksellers`
 --
 
@@ -2526,7 +2539,7 @@ CREATE TABLE `aqorders` (
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `rrp` decimal(13,2) default NULL,
   `ecost` decimal(13,2) default NULL,
-  `gst` decimal(13,2) default NULL,
+  `gstrate` decimal(6,4) default NULL,
   `budget_id` int(11) NOT NULL,
   `budgetgroup_id` int(11) NOT NULL,
   `budgetdate` date default NULL,

@@ -45,6 +45,7 @@ use C4::Auth;
 use C4::Acquisition;
 use C4::Contract;
 use C4::Biblio;
+use C4::Koha;
 use C4::Output;
 use C4::Dates qw/format_date /;
 use CGI;
@@ -66,12 +67,12 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
         debug           => 1,
     }
 );
+
 my $seller_gstrate = $booksellers[0]->{'gstrate'};
 
 # A perl-ism: '0'==false, '0.000'==true, but 0=='0.000' - this accounts for that
 undef $seller_gstrate if ( $seller_gstrate == 0 );
-my $GST = $seller_gstrate || C4::Context->preference("gist");
-$GST *= 100;
+my $gstrate = $seller_gstrate || C4::Context->preference("gist");
 
 my @contracts     = GetContracts($id);
 my $contractcount = scalar(@contracts);
@@ -112,15 +113,14 @@ if ( $op eq "display" ) {
         gstreg        => $booksellers[0]->{'gstreg'},
         listincgst    => $booksellers[0]->{'listincgst'},
         invoiceincgst => $booksellers[0]->{'invoiceincgst'},
-        gstrate       => $booksellers[0]->{'gstrate'} * 100,
-        discount      => sprintf("%.2f", $booksellers[0]->{'discount'}*100),
+        gstrate       => $booksellers[0]->{'gstrate'},
+        discount      => $booksellers[0]->{'discount'},
         deliverytime  => $booksellers[0]->{'deliverytime'},
         invoiceprice  => $booksellers[0]->{'invoiceprice'},
         listprice     => $booksellers[0]->{'listprice'},
-        GST           => $GST,
         basketcount   => $booksellers[0]->{'basketcount'},
         clientnumber  => $booksellers[0]->{'clientnumber'},
-        contracts     => \@contracts
+        contracts     => \@contracts,
     );
 } elsif ( $op eq 'delete' ) {
     &DelBookseller($id);
@@ -144,6 +144,12 @@ if ( $op eq "display" ) {
             push @loop_invoicecurrency, { currency => "<option value=\"$currencies[$i]->{'currency'}\">$currencies[$i]->{'currency'}</option>" };
         }
     }
+
+    # get option values for gist syspref
+    my @gst_values = map {
+        option => $_
+    }, GetOptionsFromSyspref("gist");
+
     $template->param(
         id                   => $id,
         name                 => $booksellers[0]->{'name'},
@@ -167,13 +173,13 @@ if ( $op eq "display" ) {
         gstreg               => $booksellers[0]->{'gstreg'},
         listincgst           => $booksellers[0]->{'listincgst'},
         invoiceincgst        => $booksellers[0]->{'invoiceincgst'},
-        gstrate              => $booksellers[0]->{'gstrate'} * 100,
+        gstrate              => $booksellers[0]->{'gstrate'} || C4::Context->preference("gist"),
+        gst_values           => \@gst_values,
         discount             => $booksellers[0]->{'discount'},
         deliverytime         => $booksellers[0]->{'deliverytime'},
         clientnumber         => $booksellers[0]->{'clientnumber'},
         loop_pricescurrency  => \@loop_pricescurrency,
         loop_invoicecurrency => \@loop_invoicecurrency,
-        GST                  => $GST,
         enter                => 1,
     );
 }

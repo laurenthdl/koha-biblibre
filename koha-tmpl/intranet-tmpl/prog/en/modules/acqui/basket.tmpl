@@ -23,8 +23,8 @@
                 4: { sorter: 'amount' },
                 <!-- TMPL_IF name="active" -->
                     <!-- TMPL_UNLESS name="closedate" -->
-                        6: { sorter: false },
-                        7: { sorter: false }
+                        11: { sorter: false },
+                        12: { sorter: false }
                     <!-- /TMPL_UNLESS -->
                 <!-- /TMPL_IF -->
             },
@@ -81,6 +81,25 @@
 </script>
 <!-- /TMPL_UNLESS -->
 <!-- /TMPL_UNLESS -->
+<script type="text/javascript">
+//<![CDATA[
+    function basketUserSearchPopup(f) {
+        window.open(
+            "/cgi-bin/koha/acqui/aqbasketuser_search.pl",
+            'BasketUserSearchPopup',
+            'width=740,height=450,toolbar=no,'
+         );
+    }
+
+    function deleteBasketUser(id) {
+      $("#"+id).remove();
+      var ids = $("#basketusers_ids").val();
+      ids = ids.replace (':'+id+':', ':');
+      ids = ids.replace ('^'+id+':', '');
+      $("#basketusers_ids").val(ids);
+    }
+//]]>
+</script>
 <style type="text/css">
 .sortmsg {font-size: 80%;}
 </style>
@@ -192,7 +211,22 @@
                 <!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="deliveryplace" --><p>Delivery place:  <!-- TMPL_VAR NAME="deliveryplace" --></p><!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="billingplace" --><p>Billing place:  <!-- TMPL_VAR NAME="billingplace" --></p><!-- /TMPL_IF -->
-                <!-- TMPL_IF NAME="authorisedbyname" --><p>Managed by:  <!-- TMPL_VAR NAME="authorisedbyname" --></p><!-- /TMPL_IF -->
+                <!-- TMPL_IF NAME="authorisedbyname" --><p>Created by:  <!-- TMPL_VAR NAME="authorisedbyname" --></p><!-- /TMPL_IF -->
+                <form action="/cgi-bin/koha/acqui/basket.pl" method="post">
+                <p>Managed by:<p>
+                <ul id="basketusers_names">
+                  <!-- TMPL_LOOP NAME="basketusers" -->
+                    <li id="<!-- TMPL_VAR NAME="borrowernumber" -->">
+                        <!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" -->
+                        [<a onclick="deleteBasketUser(<!-- TMPL_VAR NAME='borrowernumber' -->); return false;" href="#" style="text-decoration:none;">Delete user</a>]
+                    </li>
+                  <!-- /TMPL_LOOP -->
+                </ul>
+                <input type="hidden" id="basketno" name="basketno" value="<!-- TMPL_VAR NAME="basketno" -->" />
+                <input type="hidden" id="basketusers_ids" name="basketusers_ids" value="<!-- TMPL_VAR NAME='basketusers_ids' -->" />
+                <input type="hidden" id="op" name="op" value="mod_users" />
+                <input type="button" id="add_user" onclick="basketUserSearchPopup(); return false;" value="Add user" />
+                <input type="submit" value="Save changes" />
                 <!-- TMPL_IF NAME="creationdate" --><p>Opened on:  <!-- TMPL_VAR NAME="creationdate" --></p><!-- /TMPL_IF -->
                 <!-- TMPL_IF name="closedate" -->
                 <form action="/cgi-bin/koha/acqui/basketgroup.pl" method="post">
@@ -233,10 +267,15 @@
                 <thead>
                     <tr>
                         <th>Order</th>
-                        <th>RRP</th>
-                        <th>Est.</th>
                         <th>Qty.</th>
-                        <th>Total</th>
+                        <th>RRP Exclude Taxes</th>
+                        <th>GST %</th>
+                        <th>GST</th>
+                        <th>ecost Exclude Taxes</th>
+                        <th>Total Excludes Taxes</th>
+                        <th>RRP Include Taxes</th>
+                        <th>ecost Include Taxes</th>
+                        <th>Total Include Taxes</th>
                         <th>Fund</th>
                         <!-- TMPL_IF name="active" -->
                             <!-- TMPL_UNLESS name="closedate" -->
@@ -247,44 +286,36 @@
                     </tr>
                 </thead>
                 <tfoot>
-                <!-- TMPL_IF name="GST" -->
-                <tr>
-                    <th>Total Tax Exc.</th>
-                    <th><!-- TMPL_VAR NAME="total_rrp_gste" --></th>
-                    <th>&nbsp;</th>
-                    <th><!-- TMPL_VAR name="qty_total" --></th>
-                    <th><!-- TMPL_VAR NAME="total_est_gste" --></th>
-                        <!-- TMPL_IF name="active" -->
-                            <!-- TMPL_IF name="closedate" -->
-                            <td colspan="1" rowspan="3">&nbsp;</td>
-                            <!-- TMPL_ELSE -->
-                            <td colspan="3" rowspan="3">&nbsp;</td>
+                    <!-- TMPL_LOOP NAME="book_foot_loop" -->
+                        <tr>
+                            <th>Total (GST <!--TMPL_VAR NAME="gstgsti" --> %)</th>
+                            <th><!--TMPL_VAR NAME="quantity" --></th>
+                            <th/><th/><th/><th/>
+                            <th><!--TMPL_VAR NAME="totalgste" --></th>
+                            <th/><th/>
+                            <th><!--TMPL_VAR NAME="totalgsti" --></th>
+                            <th/>
+                            <!-- TMPL_IF name="active" -->
+                                <!-- TMPL_UNLESS name="closedate" -->
+                                    <th/><th/>
+                                <!-- /TMPL_UNLESS -->
                             <!-- /TMPL_IF -->
+                        </tr>
+                    <!-- /TMPL_LOOP -->
+                    <tr>
+                        <th>Total (<!-- TMPL_VAR NAME="currency" -->)</th>
+                        <th><!--TMPL_VAR NAME="total_quantity" --></th>
+                        <th/><th/><th/><th/>
+                        <th><!--TMPL_VAR NAME="total_gste" --></th>
+                        <th/><th/>
+                        <th><!--TMPL_VAR NAME="total_gsti" --></th>
+                        <th/>
+                        <!-- TMPL_IF name="active" -->
+                            <!-- TMPL_UNLESS name="closedate" -->
+                                <th/><th/>
+                            <!-- /TMPL_UNLESS -->
                         <!-- /TMPL_IF -->
-                </tr>
-                <tr>
-                    <th>Tax (<!-- TMPL_VAR NAME="gist_rate" -->)</th>
-                    <th><!-- TMPL_VAR NAME="gist_rrp" --></th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th><!-- TMPL_VAR NAME="gist_est" --></th>
-                </tr>
-                <tr>
-                    <th>Total Tax Inc. (<!-- TMPL_VAR NAME="currency" -->)</th>
-                    <th><!-- TMPL_VAR NAME="total_rrp_gsti" --></th>
-                    <th>&nbsp;</th>
-                    <th><!-- TMPL_VAR name="qty_total" --></th>
-                    <th><!-- TMPL_VAR NAME="total_est_gsti" --></th>
-                </tr>
-                <!-- TMPL_ELSE -->
-                <tr>
-                    <th>Total (<!-- TMPL_VAR NAME="currency" -->)</th>
-                    <th><!-- TMPL_VAR NAME="total_rrp_gsti" --></th>
-                    <th>&nbsp;</th>
-                    <th><!-- TMPL_VAR name="qty_total" --></th>
-                    <th><!-- TMPL_VAR NAME="total_est_gsti" --></th>
-                </tr>
-                <!-- /TMPL_IF -->
+                    </tr>
                 </tfoot>
                 <tbody>
                 <!-- TMPL_LOOP NAME="books_loop" -->
@@ -306,11 +337,19 @@
                             <!-- TMPL_IF NAME="internalnotes" -->
                             <p><em><!-- TMPL_VAR NAME="internalnotes" --></em></p>
                             <!-- /TMPL_IF -->
-                            </td>
-                        <td class="number"><!-- TMPL_VAR NAME="rrp" --></td>
-                        <td class="number"><!-- TMPL_VAR NAME="ecost" --></td>
+                            <!-- TMPL_IF NAME="notes" -->
+                            <p class="notes"><em><!-- TMPL_VAR NAME="notes" --></em></p>
+                            <!-- /TMPL_IF -->
+                        </td>
                         <td class="number"><!-- TMPL_VAR NAME="quantity" --></td>
-                        <td class="number"><!-- TMPL_VAR NAME="line_total" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="rrpgste" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="gstgsti" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="gstgste" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="ecostgste" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="totalgste" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="rrpgsti" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="ecostgsti" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="totalgsti" --></td>
                         <td><!-- TMPL_VAR NAME="budget_name" --></td>
                         <!-- TMPL_IF name="active" -->
                             <!-- TMPL_UNLESS name="closedate" -->
@@ -337,14 +376,20 @@
                 <thead>
                     <tr>
                         <th>Order</th>
-                        <th>RRP</th>
-                        <th>Est.</th>
                         <th>Qty.</th>
-                        <th>Total</th>
+                        <th>RRP Exclude Taxes</th>
+                        <th>GST %</th>
+                        <th>GST</th>
+                        <th>ecost Exclude Taxes</th>
+                        <th>Total Excludes Taxes</th>
+                        <th>RRP Include Taxes</th>
+                        <th>ecost Include Taxes</th>
+                        <th>Total Include Taxes</th>
                         <th>Fund</th>
                     </tr>
                 </thead>
 
+                <tbody>
                 <!-- TMPL_LOOP NAME="cancelledorders_loop" -->
                     <tr style="color:grey">
                         <td>
@@ -359,11 +404,19 @@
                             <!-- TMPL_IF NAME="internalnotes" -->
                             <p><em><!-- TMPL_VAR NAME="internalnotes" --></em></p>
                             <!-- /TMPL_IF -->
-                            </td>
-                        <td class="number"><!-- TMPL_VAR NAME="rrp" --></td>
-                        <td class="number"><!-- TMPL_VAR NAME="ecost" --></td>
+                            <!-- TMPL_IF NAME="notes" -->
+                            <p class="notes"><em><!-- TMPL_VAR NAME="notes" --></em></p>
+                            <!-- /TMPL_IF -->
+                        </td>
                         <td class="number"><!-- TMPL_VAR NAME="quantity" --></td>
-                        <td class="number"><!-- TMPL_VAR NAME="line_total" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="rrpgste" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="gstgsti" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="gstgste" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="ecostgste" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="totalgste" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="rrpgsti" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="ecostgsti" --></td>
+                        <td class="number"><!-- TMPL_VAR NAME="totalgsti" --></td>
                         <td><!-- TMPL_VAR NAME="budget_name" --></td>
                     </tr>
                 <!-- /TMPL_LOOP --><!-- cancelledorders_loop -->
