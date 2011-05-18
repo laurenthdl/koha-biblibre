@@ -5326,7 +5326,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 
 $DBversion = "3.02.00.070";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(
     $dbh->do("UPDATE `systempreferences` SET options='acqdate|author|callnumber|ccode|dewey|location|pubdate|score|title' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
     $dbh->do("UPDATE `systempreferences` SET options='asc|desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder')");
     $dbh->do("UPDATE `systempreferences` SET value='desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder')");
@@ -5335,8 +5334,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-
-$DBversion = "3.02.00.070";
+$DBversion = "3.02.00.071";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
     ALTER TABLE `items` ADD `new` INT( 1 ) NULL AFTER `statisticvalue`;
