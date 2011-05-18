@@ -25,6 +25,23 @@
 <p><!-- TMPL_VAR NAME="total"--> result(s) found in catalog,
 <a href="#searchresult-breeding"><!-- TMPL_VAR NAME="breeding_count" --> result(s) found in reservoir</a></p>
 
+<div>
+    <form action="/cgi-bin/koha/cataloguing/addbooks.pl" method="get" id="sortbyform">
+        <!-- TMPL_LOOP NAME="follower_params" -->
+            <!-- TMPL_UNLESS EXPR="ind eq 'sort_by'" -->
+                <input type="hidden" name='<!-- TMPL_VAR ESCAPE="HTML" NAME="ind" -->' value='<!-- TMPL_VAR ESCAPE="HTML" NAME="val" -->' />
+            <!-- /TMPL_UNLESS -->
+        <!-- /TMPL_LOOP -->
+        <!-- RE-SORT START -->
+            <label for="sort_by">Sort By: </label>
+            <select id="sort_by" name="sort_by">
+            <!-- TMPL_INCLUDE NAME="resort_form.inc" -->
+            </select>
+            <input type="submit" value="Go" />
+        <!-- RESORT END -->
+    </form>
+</div>
+
 <!-- TMPL_INCLUDE NAME="page-numbers.inc" -->
 
 <div class="searchresults">
