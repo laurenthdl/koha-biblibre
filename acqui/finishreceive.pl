@@ -112,12 +112,12 @@ if ( $quantityrec > $origquantityrec ) {
             );
             my $record = MARC::Record::new_from_xml( $xml, 'UTF-8' );
             my ( $biblionumber, $bibitemnum, $itemnumber ) = AddItemFromMarc( $record, $biblionumber );
-            NewOrderItem( $itemnumber, $order->{parent_ordernumber} || $order->{ordernumber} );
+            NewOrderItem( $itemnumber, $order->{ordernumber});
         }
     }
 
     # save the quantity received.
-    if ( $quantityrec > 0 ) {
+    if ( $quantityrec > 0 && !$redirectreceive) {
         $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $unitprice, $invoiceno, $freight, $replacement, undef, $datereceived );
     }
 }

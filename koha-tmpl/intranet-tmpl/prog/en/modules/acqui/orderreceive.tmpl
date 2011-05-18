@@ -188,7 +188,7 @@ $(document).ready(function() {
 	<input type="button" value="Add item" id="additembutton" />
 	<input type="hidden" name="redirectreceive" id="redirectreceive" value="0" />
     <!-- /TMPL_IF -->
-        <input type="button"  value="Save" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate barcodes detected.  Please correct the errors and resubmit.') ); return false };" /> <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
+        <input type="button"  value="<!-- TMPL_IF NAME="itemsreceiving" -->Add item and save<!-- TMPL_ELSE -->Save<!-- /TMPL_IF -->" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate barcodes detected.  Please correct the errors and resubmit.') ); return false };" /> <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
 </fieldset></div>    </form>
 <!-- TMPL_ELSE -->
 <div id="acqui_acquire_orderlist">
