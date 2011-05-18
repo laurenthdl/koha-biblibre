@@ -41,6 +41,7 @@ BEGIN {
     @EXPORT = qw(
       &NewSubscription    &ModSubscription    &DelSubscription    &GetSubscriptions
       &GetSubscription    &CountSubscriptionFromBiblionumber      &GetSubscriptionsFromBiblionumber
+      &SearchSubscriptions
       &GetFullSubscriptionsFromBiblionumber   &GetFullSubscription &ModSubscriptionHistory
       &HasSubscriptionStrictlyExpired &HasSubscriptionExpired &GetExpirationDate &abouttoexpire
 
@@ -644,6 +645,69 @@ sub GetSubscriptions {
         push @results, $line;
     }
     return @results;
+}
+
+=head2 SearchSubscriptions
+
+@results = SearchSubscriptions($title, $issn, $ean, $publisher, $supplier, $branch);
+
+this function gets all subscriptions which have title like $title, ISSN like $issn, EAN like $ean, publisher like $publisher, supplier like $supplier AND branchcode eq $branch.
+
+return:
+a table of hashref. Each hash containt the subscription.
+
+=cut
+
+sub SearchSubscriptions {
+    my ($title, $issn, $ean, $publisher, $supplier, $branch) = @_;
+
+    my $query = qq{
+        SELECT subscription.*, subscriptionhistory.*, biblio.*, biblioitems.issn
+        FROM subscription
+            LEFT JOIN subscriptionhistory USING(subscriptionid)
+            LEFT JOIN biblio ON biblio.biblionumber = subscription.biblionumber
+            LEFT JOIN biblioitems ON biblioitems.biblionumber = subscription.biblionumber
+            LEFT JOIN aqbooksellers ON subscription.aqbooksellerid = aqbooksellers.id
+    };
+    my @where_strs;
+    my @where_args;
+    if($title){
+        push @where_strs, "biblio.title LIKE ?";
+        push @where_args, "%$title%";
+    }
+    if($issn){
+        push @where_strs, "biblioitems.issn LIKE ?";
+        push @where_args, "%$issn%";
+    }
+    if($ean){
+        push @where_strs, "biblioitems.ean LIKE ?";
+        push @where_args, "%$ean%";
+    }
+    if($publisher){
+        push @where_strs, "biblioitems.publishercode LIKE ?";
+        push @where_args, "%$publisher%";
+    }
+    if($supplier){
+        push @where_strs, "aqbooksellers.name LIKE ?";
+        push @where_args, "%$supplier%";
+    }
+    if($branch){
+        push @where_strs, "subscription.branchcode = ?";
+        push @where_args, "$branch";
+    }
+
+    if(@where_strs){
+        $query .= " WHERE " . join(" AND ", @where_strs);
+    }
+    warn $query;
+    warn join(",", @where_args);
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute(@where_args);
+    my $results = $sth->fetchall_arrayref( {} );
+    $sth->finish;
+
+    return @$results;
 }
 
 =head2 GetSerials
