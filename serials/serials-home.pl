@@ -46,11 +46,15 @@ use C4::Auth;
 use C4::Serials;
 use C4::Output;
 use C4::Context;
+use C4::Branch;
 
 my $query        = new CGI;
 my $title        = $query->param('title_filter');
 my $ISSN         = $query->param('ISSN_filter');
 my $EAN          = $query->param('EAN_filter');
+my $publisher    = $query->param('publisher_filter');
+my $supplier     = $query->param('supplier_filter');
+my $branch       = $query->param('branch_filter');
 my $routing      = $query->param('routing') || C4::Context->preference("RoutingSerials");
 my $searched     = $query->param('searched');
 my $biblionumber = $query->param('biblionumber');
@@ -91,7 +95,7 @@ if (@serialseqs) {
 }
 my @subscriptions;
 if ($searched) {
-    @subscriptions = GetSubscriptions( $title, $ISSN, $EAN, $biblionumber );
+    @subscriptions = SearchSubscriptions($title, $ISSN, $EAN, $publisher, $supplier, $branch);
 }
 
 my @subs_loop = ();
@@ -114,10 +118,27 @@ if ($routing) {
     }
 }
 
+my $branches = GetBranches();
+my @branches_loop;
+foreach (sort keys %$branches){
+    my $selected = 0;
+    $selected = 1 if( $branch eq $_ );
+    push @branches_loop, {
+        branchcode  => $_,
+        branchname  => $branches->{$_}->{'branchname'},
+        selected    => $selected,
+    };
+}
+
 $template->param(
     subs_loop     => \@subs_loop,
     title_filter  => $title,
     ISSN_filter   => $ISSN,
+    EAN_filter    => $EAN,
+    publisher_filter => $publisher,
+    supplier_filter  => $supplier,
+    branch_filter => $branch,
+    branches_loop => \@branches_loop,
     done_searched => $searched,
     routing       => $routing,
 );
