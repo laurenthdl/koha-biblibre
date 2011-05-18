@@ -5,7 +5,6 @@
 #  - remove the "new" status of an item
 #  - change the itype to a given ccode
 
-
 # The tag where the "new" status is defined
 new_status_tag: 995$j
 
