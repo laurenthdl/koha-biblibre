@@ -2070,7 +2070,8 @@ sub _koha_new_item {
             more_subfields_xml  = ?,
             copynumber          = ?,
             stocknumber         = ?,
-            statisticvalue      = ?
+            statisticvalue      = ?,
+            new                 = ?
           ";
     my $sth = $dbh->prepare($query);
    $sth->execute(
@@ -2108,7 +2109,8 @@ sub _koha_new_item {
             $item->{'more_subfields_xml'},
             $item->{'copynumber'},
             $item->{'stocknumber'},
-            $item->{'statisticvalue'}
+            $item->{'statisticvalue'},
+            $item->{'new'}
     );
     my $itemnumber = $dbh->{'mysql_insertid'};
 
