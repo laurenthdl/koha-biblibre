@@ -5308,6 +5308,15 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.068";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    ALTER TABLE `items` ADD `new` INT( 1 ) NULL AFTER `statisticvalue`;
+    });
+    print "Upgrade to $DBversion done (Adds new in items table)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
