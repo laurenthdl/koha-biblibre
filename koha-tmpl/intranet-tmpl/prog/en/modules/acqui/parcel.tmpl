@@ -11,21 +11,21 @@
     var rowsToCollapse = 5;
 
     $(document).ready(function(){
-    	rowCountPending  = $("#pendingt tbody.filterclass tr").length;
-	    rowCountReceived = $("#receivedt tbody.filterclass tr").length;
-    	if (rowCountPending  > rowsToCollapse) { pendingCollapse(); }
-	    if (rowCountReceived > rowsToCollapse) { receivedCollapse(); }
+        rowCountPending  = $("#pendingt tbody.filterclass tr").length;
+        rowCountReceived = $("#receivedt tbody.filterclass tr").length;
+        if (rowCountPending  > rowsToCollapse) { pendingCollapse(); }
+        if (rowCountReceived > rowsToCollapse) { receivedCollapse(); }
 
-    	$.tablesorter.addParser({
+        $.tablesorter.addParser({
             id: 'amount',
             is: function(s) {
                 return false;
             },
-            format:	function(s) {
+            format:    function(s) {
                 return s.replace(/ /g,"").replace(/,/g,"");
             },
             type: 'numeric'
-    	});
+        });
 
         $("#pendingt").tablesorter({
             widgets : ['zebra'],    
@@ -37,8 +37,8 @@
             },
             textExtraction: {
                 2: function(o) {
-        			return $('a',o).val();
- 			   	},
+                    return $('a',o).val();
+                    },
             }
         });
         $("#receivedt").tablesorter({
@@ -51,8 +51,8 @@
             },
             textExtraction: {
                 2: function(o) {
-        			return $('a',o).val();
- 			   	},
+                    return $('a',o).val();
+                    },
             }
         }); 
 
@@ -60,7 +60,7 @@
 
      // Case-insensitive version of jquery's contains function
      jQuery.extend(jQuery.expr[':'], {
-	    icontains : "jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase())>=0"
+        icontains : "jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase())>=0"
      });
 
      // Contains exactly function
@@ -71,62 +71,62 @@
 
     // Collapse pending items table
     function pendingCollapse() {
-	$("#pendingcollapserow").remove();
+    $("#pendingcollapserow").remove();
     $("#pendingt tr").show();
-	$("#pendingt tbody.filterclass tr:gt(" + (rowsToCollapse-1) + ")").hide();
-	$("#pendingt").before("<p id=\"pendingcollapserow\">" + _("Only the first ")  + rowsToCollapse +  _(" items are displayed.") + "<a href=\"javascript:pendingExpand();\">" + _("Click here to show all ")  + rowCountPending + _(" items") + "<\/a>.<\/p>");
+    $("#pendingt tbody.filterclass tr:gt(" + (rowsToCollapse-1) + ")").hide();
+    $("#pendingt").before("<p id=\"pendingcollapserow\">" + _("Only the first ")  + rowsToCollapse +  _(" items are displayed.") + "<a href=\"javascript:pendingExpand();\">" + _("Click here to show all ")  + rowCountPending + _(" items") + "<\/a>.<\/p>");
 
     }
 
     // Expend pending items table
     function pendingExpand() {
-	$("#pendingcollapserow").remove();
-	$("#pendingt tr").show();
+    $("#pendingcollapserow").remove();
+    $("#pendingt tr").show();
     $("#pendingt tbody.filterclass tr.orderfound").remove();
-	$("#pendingt").before("<p id=\"pendingcollapserow\">" + rowCountPending + _(" items are displayed.") + "<a href=\"javascript:pendingCollapse();\">" + _("Click here to show only the first ") + rowsToCollapse + _(" items") + "<\/a>.<\/p>");
+    $("#pendingt").before("<p id=\"pendingcollapserow\">" + rowCountPending + _(" items are displayed.") + "<a href=\"javascript:pendingCollapse();\">" + _("Click here to show only the first ") + rowsToCollapse + _(" items") + "<\/a>.<\/p>");
     }
 
     // Collapse already received items table
     function receivedCollapse() {
-	$("#receivedcollapserow").remove();
-	$("#receivedt tbody.filterclass tr:gt(" + (rowsToCollapse-1) + ")").hide();
-	$("#receivedt").before("<p id=\"receivedcollapserow\">" + _("Only the first ") + rowsToCollapse + _(" items are displayed.") + "<a href=\"javascript:receivedExpand();\">" + _("Click here to show all ") + rowCountReceived + _(" items") + "<\/a>.<\/p>");
+    $("#receivedcollapserow").remove();
+    $("#receivedt tbody.filterclass tr:gt(" + (rowsToCollapse-1) + ")").hide();
+    $("#receivedt").before("<p id=\"receivedcollapserow\">" + _("Only the first ") + rowsToCollapse + _(" items are displayed.") + "<a href=\"javascript:receivedExpand();\">" + _("Click here to show all ") + rowCountReceived + _(" items") + "<\/a>.<\/p>");
     }
 
     // Expand already received items table
     function receivedExpand() {
-	$("#receivedcollapserow").remove();
-	$("#receivedt tr").show();
-	$("#receivedt").before("<p id=\"receivedcollapserow\">" + _("All ") + rowCountReceived + _(" items are displayed.") + "<a href=\"javascript:receivedCollapse();\">" + _("Click here to show only the first ") + rowsToCollapse + _(" items") + "<\/a>.<\/p>");
+    $("#receivedcollapserow").remove();
+    $("#receivedt tr").show();
+    $("#receivedt").before("<p id=\"receivedcollapserow\">" + _("All ") + rowCountReceived + _(" items are displayed.") + "<a href=\"javascript:receivedCollapse();\">" + _("Click here to show only the first ") + rowsToCollapse + _(" items") + "<\/a>.<\/p>");
     }
 
     // Launch filtering
     function filter() {
 
     var summaryStatus = jQuery.trim($("#summaryfilter").val());
-	var basketStatus  = $("#basketfilter").val();
-	var orderStatus   = $("#orderfilter").val();
-	var eanStatus     = $("#eanfilter").val();
+    var basketStatus  = $("#basketfilter").val();
+    var orderStatus   = $("#orderfilter").val();
+    var eanStatus     = $("#eanfilter").val();
 
-	if (summaryStatus == '' && basketStatus == '' && orderStatus == '' && eanStatus == '') { clearFilters(); return false; }
+    if (summaryStatus == '' && basketStatus == '' && orderStatus == '' && eanStatus == '') { clearFilters(); return false; }
 
-	var filtered = "table#pendingt tbody.filterclass tr";
+    var filtered = "table#pendingt tbody.filterclass tr";
 
-	// We hide everything
-	$("#nothingfoundrow").remove();
-	$(filtered).hide();
+    // We hide everything
+    $("#nothingfoundrow").remove();
+    $(filtered).hide();
 
-	// Do the search
-	var callback =  {
-		success: function(o) {
-			var jsonString = o.responseText;
-			try {
-				var orders = YAHOO.lang.JSON.parse(jsonString);
-				var foundCount = orders.length;
+    // Do the search
+    var callback =  {
+        success: function(o) {
+            var jsonString = o.responseText;
+            try {
+                var orders = YAHOO.lang.JSON.parse(jsonString);
+                var foundCount = orders.length;
 
-				for( i = 0 ; i < orders.length ; i++){
-					order = orders[i];
-					$('<tr class="orderfound">'
+                for( i = 0 ; i < orders.length ; i++){
+                    order = orders[i];
+                    $('<tr class="orderfound">'
                        + '<td class="basketfilterclass"><a href="/cgi-bin/koha/acqui/basket.pl?basketno=' + order.basketno + '">' + order.basketno + '</a></td>'
                        + '<td class="orderfilterclass"> <a href="neworderempty.pl?ordernumber=' + order.ordernumber + '&booksellerid=' + order.booksellerid + '">' + order.ordernumber + ' </a></td>'
                        + '<td class="summaryfilterclass">'
@@ -139,26 +139,26 @@
                        + '<a href="orderreceive.pl?ordernumber=' + order.ordernumber + '&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;freight=' + order.freight + '&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->">Receive</a> /'
                        + '<a href="parcel.pl?type=intra&amp;ordernumber=' + order.ordernumber + '&amp;biblionumber=' + order.biblionumber + '&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->" onclick="return confirm(\'' + _('Are you sure you want to cancel this order?') + '\');">Cancel</a>'
                        + '</td></tr>').appendTo("table#pendingt");
-				}
+                }
 
-				// If nothing has been found, we tell the user so
-				if (orders.length == 0) {
-				    $("<tr><td id=\"nothingfoundrow\" colspan=\"8\">No items match your criteria.<\/tr>").appendTo("#pendingt");
-				}
-			}catch(e){alert(e);}
-		}
-	}
-	var transaction = YAHOO.util.Connect.asyncRequest('GET', '/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&search='+summaryStatus+'&basketno='+basketStatus+'&orderno='+orderStatus+'&ean='+eanStatus+'&format=json', callback, null);
+                // If nothing has been found, we tell the user so
+                if (orders.length == 0) {
+                    $("<tr><td id=\"nothingfoundrow\" colspan=\"8\">No items match your criteria.<\/tr>").appendTo("#pendingt");
+                }
+            }catch(e){alert(e);}
+        }
+    }
+    var transaction = YAHOO.util.Connect.asyncRequest('GET', '/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&search='+summaryStatus+'&basketno='+basketStatus+'&orderno='+orderStatus+'&ean='+eanStatus+'&format=json', callback, null);
 
-	return false;
+    return false;
     }
 
     // Clear already applied filters
     function clearFilters() {
-	$("#nothingfoundrow").remove();
+    $("#nothingfoundrow").remove();
         $("#pendingt tbody.filterclass tr").show();
         //$("#pendingt tbody.filterclass tr.orderfound").remove();
-	pendingExpand();
+    pendingExpand();
     }
 
 //]]>
@@ -178,20 +178,20 @@
 <div id="doc3" class="yui-t2">
 
    <div id="bd">
-	<div id="yui-main">
-	<div class="yui-b">
+    <div id="yui-main">
+    <div class="yui-b">
     <!-- TMPL_UNLESS name="error_existing" -->
     <!-- TMPL_UNLESS name="confirm_cancel" -->
-	<!-- TMPL_IF NAME="receive_error" -->
-	<div class="dialog alert">
-	<h3>Error adding items:</h3>
-	<ul>
-	<!-- TMPL_LOOP NAME="error_loop" -->
-		<li><!-- TMPL_VAR NAME="error_param" --><!-- TMPL_IF NAME="error_duplicate_barcode" -->Duplicate Barcode<!-- /TMPL_IF --> <!-- todo: other error conditions come here. --></li>
-	<!-- /TMPL_LOOP -->
-	</ul>
-	</div>
-	<!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="receive_error" -->
+    <div class="dialog alert">
+    <h3>Error adding items:</h3>
+    <ul>
+    <!-- TMPL_LOOP NAME="error_loop" -->
+        <li><!-- TMPL_VAR NAME="error_param" --><!-- TMPL_IF NAME="error_duplicate_barcode" -->Duplicate Barcode<!-- /TMPL_IF --> <!-- todo: other error conditions come here. --></li>
+    <!-- /TMPL_LOOP -->
+    </ul>
+    </div>
+    <!-- /TMPL_IF -->
     <h1>
         <!-- TMPL_IF name="datereceived" -->
             Receipt Summary for <i><!-- TMPL_VAR NAME="name" --></i> <!--TMPL_IF Name="invoice"--> <i> [ <!-- TMPL_VAR NAME="invoice" --> ] </i><!--/TMPL_IF --> on <i><!-- TMPL_VAR NAME="formatteddatereceived" --></i>
@@ -203,12 +203,12 @@
     <!-- TMPL_IF NAME="success_delorder" -->
     <div class="dialog message">The order has been successfully canceled.</div>
     <!-- TMPL_ELSE -->
-	<!-- TMPL_IF NAME="error_delitem" -->
-	    <div class="dialog alert">The order has been canceled, although one or more items could not have been deleted.</div>
-	<!-- /TMPL_IF -->
-	<!-- TMPL_IF NAME="error_delbiblio" -->
-	    <div class="dialog alert">The order has been canceled, although the record has not been deleted.</div>
-	<!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="error_delitem" -->
+        <div class="dialog alert">The order has been canceled, although one or more items could not have been deleted.</div>
+    <!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="error_delbiblio" -->
+        <div class="dialog alert">The order has been canceled, although the record has not been deleted.</div>
+    <!-- /TMPL_IF -->
     <!-- /TMPL_IF -->
 
 <div id="acqui_receive_summary">
@@ -220,7 +220,7 @@
     Open. <a href="/cgi-bin/koha/acqui/invoice.pl?op=close&invoicenumber=<!-- TMPL_VAR NAME='invoice' -->">Close it</a>
   <!-- /TMPL_IF -->
 </p>
-	<!-- TODO: Add date picker, change rcv date. -->
+    <!-- TODO: Add date picker, change rcv date. -->
 </div>
 <div id="acqui_receive_search">
     <h3>Pending Orders</h3>
@@ -231,7 +231,7 @@
             <th>Basket</th>
             <th>Order</th>
             <th>Summary</th>
-    	    <th>View Record</th>
+            <th>View Record</th>
             <th>Quantity</th>  
             <th>Unit cost</th>
             <th>Order cost</th>
@@ -272,8 +272,8 @@
                 <td><!-- TMPL_VAR NAME="quantity" --></td>
                 <td><!-- TMPL_VAR NAME="ecost" --></td>
                 <td><!-- TMPL_VAR NAME="ordertotal" --></td>
-		<td><!-- TMPL_VAR NAME="budget_name" --></td>
-				<td>
+        <td><!-- TMPL_VAR NAME="budget_name" --></td>
+                <td>
                   <!-- TMPL_IF NAME="receive_lock" -->
                     <span style="color: gray;">Receive</span>
                   <!--  TMPL_ELSE -->
@@ -292,27 +292,27 @@
                       <a href="parcel.pl?type=intra&amp;ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;action=cancelorder&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->">Cancel</a> /
                       <a href="transferorder.pl?ordernumber=<!--TMPL_VAR NAME="ordernumber" -->&amp;bookselleridfrom=<!-- TMPL_VAR NAME="supplierid" -->">Transfer</a>
                   <!-- /TMPL_IF -->
-				</td>
+                </td>
             </tr>
         <!-- /TMPL_LOOP -->
     </tbody>
      </table><!-- TMPL_ELSE -->There are no pending orders.<!-- /TMPL_IF -->
    <div id="resultnumber">
-	<!-- Row of numbers corresponding to search result pages -->
-	<!-- TMPL_IF NAME="displayprev" -->
-		<a href="parcel.pl?type=intra&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;startfrom=<!-- TMPL_VAR NAME="prevstartfrom" --><!--TMPL_IF Name="datereceived"-->&amp;datereceived=<!--TMPL_VAR Name="datereceived"--><!--/TMPL_IF--><!--TMPL_IF Name="invoice"-->&amp;invoice=<!--TMPL_VAR Name="invoice"--><!--/TMPL_IF--><!--TMPL_IF Name="resultsperpage"-->&amp;resultsperpage=<!--TMPL_VAR Name="resultsperpage"--><!--/TMPL_IF-->#resultnumber">&lt;&lt; Previous</a>
-	<!-- /TMPL_IF -->
-	<!-- TMPL_LOOP NAME="numbers" -->
-		<!-- TMPL_IF NAME="highlight" -->
-		<span class="current"><!-- TMPL_VAR NAME="number" --></span>
-		<!-- TMPL_ELSE -->
-		<a href="parcel.pl?type=intra&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;startfrom=<!-- TMPL_VAR NAME="startfrom" --><!--TMPL_IF Name="datereceived"-->&amp;datereceived=<!--TMPL_VAR Name="datereceived"--><!--/TMPL_IF--><!--TMPL_IF Name="invoice"-->&amp;invoice=<!--TMPL_VAR Name="invoice"--><!--/TMPL_IF--><!--TMPL_IF Name="resultsperpage"-->&amp;resultsperpage=<!--TMPL_VAR Name="resultsperpage"--><!--/TMPL_IF-->#resultnumber"><!-- TMPL_VAR NAME="number" --></a>
-		<!-- /TMPL_IF -->
-	<!-- /TMPL_LOOP -->
-	<!-- TMPL_IF NAME="displaynext" -->
-		<a href="parcel.pl?type=intra&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;startfrom=<!-- TMPL_VAR NAME="nextstartfrom" --><!--TMPL_IF Name="datereceived"-->&amp;datereceived=<!--TMPL_VAR Name="datereceived"--><!--/TMPL_IF--><!--TMPL_IF Name="invoice"-->&amp;invoice=<!--TMPL_VAR Name="invoice"--><!--/TMPL_IF--><!--TMPL_IF Name="resultsperpage"-->&amp;resultsperpage=<!--TMPL_VAR Name="resultsperpage"--><!--/TMPL_IF-->#resultnumber">Next &gt;&gt;</a>
-	<!-- /TMPL_IF -->
-	</div>
+    <!-- Row of numbers corresponding to search result pages -->
+    <!-- TMPL_IF NAME="displayprev" -->
+        <a href="parcel.pl?type=intra&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;startfrom=<!-- TMPL_VAR NAME="prevstartfrom" --><!--TMPL_IF Name="datereceived"-->&amp;datereceived=<!--TMPL_VAR Name="datereceived"--><!--/TMPL_IF--><!--TMPL_IF Name="invoice"-->&amp;invoice=<!--TMPL_VAR Name="invoice"--><!--/TMPL_IF--><!--TMPL_IF Name="resultsperpage"-->&amp;resultsperpage=<!--TMPL_VAR Name="resultsperpage"--><!--/TMPL_IF-->#resultnumber">&lt;&lt; Previous</a>
+    <!-- /TMPL_IF -->
+    <!-- TMPL_LOOP NAME="numbers" -->
+        <!-- TMPL_IF NAME="highlight" -->
+        <span class="current"><!-- TMPL_VAR NAME="number" --></span>
+        <!-- TMPL_ELSE -->
+        <a href="parcel.pl?type=intra&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;startfrom=<!-- TMPL_VAR NAME="startfrom" --><!--TMPL_IF Name="datereceived"-->&amp;datereceived=<!--TMPL_VAR Name="datereceived"--><!--/TMPL_IF--><!--TMPL_IF Name="invoice"-->&amp;invoice=<!--TMPL_VAR Name="invoice"--><!--/TMPL_IF--><!--TMPL_IF Name="resultsperpage"-->&amp;resultsperpage=<!--TMPL_VAR Name="resultsperpage"--><!--/TMPL_IF-->#resultnumber"><!-- TMPL_VAR NAME="number" --></a>
+        <!-- /TMPL_IF -->
+    <!-- /TMPL_LOOP -->
+    <!-- TMPL_IF NAME="displaynext" -->
+        <a href="parcel.pl?type=intra&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;startfrom=<!-- TMPL_VAR NAME="nextstartfrom" --><!--TMPL_IF Name="datereceived"-->&amp;datereceived=<!--TMPL_VAR Name="datereceived"--><!--/TMPL_IF--><!--TMPL_IF Name="invoice"-->&amp;invoice=<!--TMPL_VAR Name="invoice"--><!--/TMPL_IF--><!--TMPL_IF Name="resultsperpage"-->&amp;resultsperpage=<!--TMPL_VAR Name="resultsperpage"--><!--/TMPL_IF-->#resultnumber">Next &gt;&gt;</a>
+    <!-- /TMPL_IF -->
+    </div>
 </div>
 <div id="acqui_receive_receivelist">
     <h3>Already Received</h3>
@@ -321,40 +321,40 @@
    <form action="/cgi-bin/koha/acqui/parcel.pl" method="get" name="orderform">
     <table id="receivedt">
         <thead>
-	    <tr>
+        <tr>
         <th>Order Line</th>
-		<th>Basket</th>
-		<th>Order</th>
-		<th>Summary</th>
-		<th>View Record</th>
-		<th>Quantity</th>  
-		<th>Est cost</th>
-		<th>Actual cost</th>
-		<th>TOTAL</th>
-		<th>Budget</th>
-	    </tr>
-	</thead>
+        <th>Basket</th>
+        <th>Order</th>
+        <th>Summary</th>
+        <th>View Record</th>
+        <th>Quantity</th>  
+        <th>Est cost</th>
+        <th>Actual cost</th>
+        <th>TOTAL</th>
+        <th>Budget</th>
+        </tr>
+    </thead>
     <tfoot>
         <tr>
             <th colspan="8" class="total">Total Tax Exc.</th>
             <th><!--TMPL_VAR NAME="total_gste" --></th>
-	    <th></th>
+        <th></th>
         </tr>
         <!-- TMPL_LOOP NAME="book_foot_loop" -->
             <tr>
                 <th colspan="8">Total (GST <!--TMPL_VAR EXPR="sprintf('%.1f', gstrate*100)" --> %)</th>
                 <th><!--TMPL_VAR NAME="value" --></th>
-		<th></th>
+                <th></th>
             </tr>
         <!-- /TMPL_LOOP -->
         <tr>
             <th colspan="8" class="total">Total Tax Inc.</th>
             <th><!--TMPL_VAR NAME="total_gsti" --></th>
-	    <th></th>
+            <th></th>
         </tr>
     </tfoot>
-	<tbody class="filterclass">
-	    <!-- TMPL_LOOP NAME="loop_received" -->
+    <tbody class="filterclass">
+        <!-- TMPL_LOOP NAME="loop_received" -->
             <tr>
                 <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
                 <td><a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a></td>
@@ -379,11 +379,11 @@
                 <td><!-- TMPL_VAR NAME="total" --></td>
                 <td><!-- TMPL_VAR NAME="budget_name" --></td>
             </tr>
-	    <!-- /TMPL_LOOP -->
-	</tbody>
+        <!-- /TMPL_LOOP -->
+    </tbody>
     </table>
     </form>
-	<!-- TMPL_ELSE -->There are no received orders.<!-- /TMPL_IF -->
+    <!-- TMPL_ELSE -->There are no received orders.<!-- /TMPL_IF -->
 </div>
 
 <!-- /TMPL_UNLESS -->
@@ -415,7 +415,6 @@
     </div>
 <!-- /TMPL_UNLESS --><!-- error_existing -->
 
-
 </div>
 </div>
 <div class="yui-b">
@@ -424,22 +423,22 @@
 
             <h4>Filter</h4>
 
-	    <ol>
+        <ol>
 
-		<li>
-		    <label for="summaryfilter">ISBN, author or title :</label>
-		    <input type="text" name="summaryfilter" id="summaryfilter" />
-		</li>
+        <li>
+            <label for="summaryfilter">ISBN, author or title :</label>
+            <input type="text" name="summaryfilter" id="summaryfilter" />
+        </li>
 
-		<li>
-		    <label for="basketfilter">Basket :</label>
-		    <input type="text" name="basketfilter" id="basketfilter" />
-		</li>
+        <li>
+            <label for="basketfilter">Basket :</label>
+            <input type="text" name="basketfilter" id="basketfilter" />
+        </li>
 
-		<li>
-		    <label for="orderfilter">Order :</label>
-		    <input type="text" name="orderfilter" id="orderfilter" />
-		</li>
+        <li>
+            <label for="orderfilter">Order :</label>
+            <input type="text" name="orderfilter" id="orderfilter" />
+        </li>
         <li>
             <label for="eanfilter">EAN :</label>
             <input type="text" name="eanfilter" id="eanfilter" />

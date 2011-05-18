@@ -264,6 +264,7 @@ if ( $count == 1 ) {
         isbn                  => $order->{'isbn'},
         seriestitle           => $order->{'seriestitle'},
         budget_name           => $budget->{'budget_name'},
+        bookfund              => $order->{'bookfundid'},
         quantity              => $order->{'quantity'},
         quantityreceivedplus1 => $order->{'quantityreceived'} + 1,
         quantityreceived      => $order->{'quantityreceived'},
@@ -277,7 +278,7 @@ if ( $count == 1 ) {
         suggestionid          => $$suggestion{suggestionid},
         surnamesuggestedby    => $$suggestion{surnamesuggestedby},
         firstnamesuggestedby  => $$suggestion{firstnamesuggestedby},
-	itemsreceiving        => $itemsreceiving
+        itemsreceiving        => $itemsreceiving
     );
 } else {
     my @loop;

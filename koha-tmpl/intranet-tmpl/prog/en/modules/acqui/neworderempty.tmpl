@@ -155,6 +155,7 @@ $(document).ready(function()
         <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME="booksellerid" -->" />
         <input type="hidden" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" />
         <input type="hidden" name="biblioitemnumber" value="<!-- TMPL_VAR NAME="biblioitemnumber" -->" />
+        <input type="hidden" name="discount" id="discount" value="<!-- TMPL_VAR NAME="discount" -->" />
         <input type="hidden" name="listinc" id="listinc" value="<!-- TMPL_VAR NAME="listincgst" -->" />
         <input type="hidden" name="applygst" id="applygst" value="<!-- TMPL_VAR NAME="gstreg" -->" />
         <input type="hidden" name="invoiceincgst" id="invoiceincgst" value="<!-- TMPL_VAR NAME="invoiceincgst" -->" />
@@ -399,7 +400,7 @@ $(document).ready(function()
             </li>
             <li>
                 <!-- TMPL_IF name="close" -->
-            <span class="label">Replacement cost: </span>
+                    <span class="label">Replacement cost: </span>
                     <input type="hidden" size="20" name="rrp" id="rrp" value="<!-- TMPL_VAR NAME="rrp" -->" /><!-- TMPL_VAR NAME="rrp" -->
                 <!-- TMPL_ELSE -->
                 <label for="rrp">Replacement cost: </label>

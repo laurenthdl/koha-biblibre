@@ -158,6 +158,9 @@ function Check(form) {
                 </div></li>
             <!-- /TMPL_LOOP-->
             </ol>
+            <a name="buttonPlus" style="cursor: pointer; color: grey; font-size: 180%;" onclick="cloneItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">+</a>
+            <a name="buttonMinus" style="display:none; cursor: pointer; color: grey; font-size: 180%;" onclick="deleteItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">-</a>
+            <a name="buttonClear" style="cursor: pointer; color: grey; font-size: 180%;" onclick="clearItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">Clear</a>
         </div><!-- /iteminformation -->
         </div>
         
@@ -230,8 +233,8 @@ function Check(form) {
 </div>
 </div><div class="yui-g"><fieldset class="action">
     <!-- TMPL_IF NAME="itemsreceiving" -->
-	<input type="button" value="Add item" id="additembutton" />
-	<input type="hidden" name="redirectreceive" id="redirectreceive" value="0" />
+        <input type="button" value="Add item" id="additembutton" />
+        <input type="hidden" name="redirectreceive" id="redirectreceive" value="0" />
     <!-- /TMPL_IF -->
     <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
         <input type="submit" value="Save" />

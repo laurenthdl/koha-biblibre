@@ -127,7 +127,9 @@ $(document).ready(function() {
             <td><!-- TMPL_VAR NAME="claims_count" --></td>
             <td><!-- TMPL_VAR NAME="claimed_date" --></td>
             <td>
+              <!-- TMPL_UNLESS NAME="budget_lock" -->
                 <input type="checkbox" name="claim_for" value="<!--TMPL_VAR NAME="ordernumber" -->" supplierid="<!-- TMPL_VAR NAME='supplierid' -->"/>
+              <!-- /TMPL_UNLESS -->
             </td>
         </tr>
         <!-- /TMPL_LOOP -->

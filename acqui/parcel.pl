@@ -391,6 +391,11 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
             $line{receive_lock} = 1;
         }
     }
+    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_receive_all'} ) {
+        if($line{branchcode} && $line{branchcode} ne C4::Context->userenv->{'branch'} ) {
+            $line{receive_lock} = 1;
+        }
+    }
     $line{'receive_lock'} = 1 if($invoiceclosedate);
         
     push @loop_orders, \%line if ( $i >= $startfrom and $i < $startfrom + $resultsperpage );
