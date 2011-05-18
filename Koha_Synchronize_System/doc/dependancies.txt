@@ -1,0 +1,4 @@
+Modern::Perl
+Locale::gettext
+Net::Ping
+File::Slurp
