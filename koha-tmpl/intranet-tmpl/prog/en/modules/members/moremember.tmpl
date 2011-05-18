@@ -645,7 +645,7 @@ $(document).ready(function() {
             <td><a href="/cgi-bin/koha/catalogue/moredetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#item<!-- TMPL_VAR NAME="itemnumber" -->"><!-- TMPL_VAR NAME="barcode" --></a></td>
 <td><!-- TMPL_UNLESS NAME="noItemTypeImages" --> <!-- TMPL_IF NAME="itemtype_image" --><img src="<!-- TMPL_VAR NAME="itemtype_image" -->" alt="" /><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME="itemtype_description" --></td>
             <td><!-- TMPL_VAR NAME="issuedate" --></td>
-	        <td><!-- TMPL_VAR NAME="itemcallnumber" --></td>
+	        <td><!-- TMPL_VAR NAME="copynumber" --> <!-- TMPL_VAR NAME="price" --> <!-- TMPL_VAR NAME="statisticvalue" --> <!-- TMPL_VAR NAME="stack" --> <!-- TMPL_VAR NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="materials" --></td>
             <td><!-- TMPL_VAR NAME="charge" --></td>
             <td><!-- TMPL_VAR NAME="replacementprice" --></td>
       <!-- TMPL_IF NAME="renew_failed" -->
@@ -747,7 +747,7 @@ $(document).ready(function() {
 <td><!-- TMPL_UNLESS NAME="noItemTypeImages" --> <!-- TMPL_IF NAME="itemtype_image" --><img src="<!-- TMPL_VAR NAME="itemtype_image" -->" alt="" /><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME="itemtype_description" --></td>
             <td><!-- TMPL_VAR NAME="issuedate" --></td>
 	    <td><a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->"><!-- TMPL_VAR NAME="borrowername" --></a></td>
-	    <td><!-- TMPL_VAR NAME="itemcallnumber" --></td>
+	    <td><!-- TMPL_VAR NAME="copynumber" --> <!-- TMPL_VAR NAME="price" --> <!-- TMPL_VAR NAME="statisticvalue" --> <!-- TMPL_VAR NAME="stack" --> <!-- TMPL_VAR NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="materials" --></td>
             <td><!-- TMPL_VAR NAME="charge" --></td>
             <td><!-- TMPL_VAR NAME="replacementprice" --></td>
         </tr>
@@ -777,7 +777,7 @@ $(document).ready(function() {
             <td>
                 <a href="/cgi-bin/koha/reserve/request.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html" --></a><!-- TMPL_IF NAME="author" -->, by <!-- TMPL_VAR NAME="author" --><!-- /TMPL_IF -->
             </td>
-            <td><!-- TMPL_VAR NAME="itemcallnumber" --></td>
+            <td><!-- TMPL_VAR NAME="copynumber" --> <!-- TMPL_VAR NAME="price" --> <!-- TMPL_VAR NAME="statisticvalue" --> <!-- TMPL_VAR NAME="stack" --> <!-- TMPL_VAR NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="materials" --></td>
             <td> <em> Item <!-- TMPL_IF name="barcodereserv" -->
                 <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->"><!-- TMPL_VAR NAME="barcodereserv" --></a>
                 <!-- /TMPL_IF -->
