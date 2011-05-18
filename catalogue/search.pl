@@ -374,7 +374,8 @@ if ( $limit_yr ) {
         #FIXME: Should return a error to the user, incorect date format specified
     }
     if ( not @indexes ) {
-        $operands[0] .= " AND $op";
+        $operands[0] .= " AND " if $operands[0];
+        $operands[0] .= "$op";
     } else {
         push @operands, $op;
         push @operators, 'AND';
