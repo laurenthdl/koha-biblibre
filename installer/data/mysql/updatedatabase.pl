@@ -5874,37 +5874,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.06.00.020";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("DROP TABLE IF EXISTS `aqbasketusers`");
-    $dbh->do("
-        CREATE TABLE `aqbasketusers` (
-            `basketno` int(11) NOT NULL,
-            `borrowernumber` int(11) NOT NULL,
-            PRIMARY KEY (`basketno`,`borrowernumber`),
-            CONSTRAINT `aqbasketusers_ibfk_1` FOREIGN KEY (`basketno`) REFERENCES `aqbasket` (`basketno`),
-            CONSTRAINT `aqbasketusers_ibfk_2` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    ");
-    print "Upgrade to $DBversion done (Add aqbasketusers table)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.06.00.021";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("INSERT INTO `permissions` (module_bit, code, description)
-        VALUES (11, 'order_manage_all', 'Manage all orders & baskets')");
-    print "Upgrade to $DBversion done (Add order_manage_all permission)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.06.00.022";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("ALTER TABLE `aqbasket` ADD `branch` varchar(10) default NULL");
-    print "Upgrade to $DBversion done (Add branch field in aqbasket table)\n";
-    SetVersion($DBversion);
-}
-
 $DBversion = "3.06.00.024";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT INTO `permissions` (module_bit, code, description)
