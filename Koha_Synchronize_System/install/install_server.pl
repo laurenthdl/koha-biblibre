@@ -53,9 +53,9 @@ qx{mkdir -p $backup_server_diff};
 
 qx{chown -R $username:$username $inbox};
 qx{chown -R $username:$username $outbox};
-qx{chown -R $dump_id_dir};
-qx{chown -R $dump_db_server_dir};
-qx{chown -R $backup_server_diff};
+qx{chown -R $username:$username $dump_id_dir};
+qx{chown -R $username:$username $dump_db_server_dir};
+qx{chown -R $username:$username $backup_server_diff};
 
 qx{chown -R $username:$username $kss_home};
 
@@ -65,8 +65,8 @@ system( qq{perl $kss_dir/tools/insert_or_update_crontab.pl --host=master} ) == 0
 print "/!\ Changer le mot de passe pour l'utilisateur $username\n";
 
 print "=== Mise à disposition du client de la base de données du serveur ===\n";
-print "Sauvegarde de la base du serveur");
-Koha_Synchronize_System::tools::kss::backup_server_db $log;
+print "Sauvegarde de la base du serveur";
+Koha_Synchronize_System::tools::kss::backup_server_db;
 print "Insertion des procedures\n";
 Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server;
 
