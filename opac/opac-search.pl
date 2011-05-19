@@ -70,7 +70,7 @@ if ( $format =~ /(rss|atom|opensearchdescription)/ ) {
     $template_name = 'opac-opensearch.tmpl';
 } elsif ($build_grouped_results) {
     $template_name = 'opac-results-grouped.tmpl';
-} elsif ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) ) {
+} elsif ( ( $cgi->param("filters") ) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) || ( $cgi->param('tag') ) ) {
     $template_name = 'opac-results.tmpl';
 } else {
     $template_name = 'opac-advsearch.tmpl';
@@ -108,12 +108,6 @@ if ( C4::Context->preference('BakerTaylorEnabled') ) {
         BakerTaylorBookstoreURL => C4::Context->preference('BakerTaylorBookstoreURL'),
     );
 }
-if ( C4::Context->preference('TagsEnabled') ) {
-    $template->param( TagsEnabled => 1 );
-    foreach (qw(TagsShowOnList TagsInputOnList)) {
-        C4::Context->preference($_) and $template->param( $_ => 1 );
-    }
-}
 
 # load the branches
 my $mybranch = ( C4::Context->preference('SearchMyLibraryFirst') && C4::Context->userenv && C4::Context->userenv->{branch} ) ? C4::Context->userenv->{branch} : '';
@@ -128,7 +122,6 @@ $template->param(
     branchloop       => $branchloop,
     searchdomainloop => GetBranchCategories( undef, 'searchdomain' ),
 );
-$template->param( holdingbranch_index => C4::Search::Query::getIndexName('holdingbranch') );
 
 # load the language limits (for search)
 $template->param( search_languages_loop => getAllLanguagesAuthorizedValues() );
@@ -165,6 +158,13 @@ my @itypes = $cgi->param('itypes');
 my @indexes = $cgi->param('idx');
 my @operators = $cgi->param('op');
 my @operands = $cgi->param('q');
+
+my $query_cgi = "q=" .       join("&q=", @operands);
+$query_cgi   .= "&itypes=" . join("&itypes=", @itypes)  if (@itypes);
+$query_cgi   .= "&idx=" .    join("&idx=", @indexes)    if (@indexes);
+$query_cgi   .= "&op=" .     join("&op=", @operators)   if (@operators);
+$query_cgi   .= "&filters=" .join("&filters=", @params) if (@params);
+$query_cgi   .= "&sort_by=$sort_by"                     if ($sort_by);
 
 if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
     $itype_or_ccode = 'itype';
@@ -290,7 +290,8 @@ if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
     $itype_val_str = join ' OR ', @itypes ;
     $itype_val_str = "($itype_val_str)";
     if ( not @indexes ) {
-        $operands[0] .= " AND $itype_val_str";
+        $operands[0] .= " AND " if $operands[0];
+        $operands[0] .= "$itype_or_ccode:$itype_val_str";
     } else {
         push @operators, "AND";
         push @operands, $itype_val_str;
@@ -301,7 +302,7 @@ if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
 my %filters;
 # This array is used to build facets GUI
 my @tplfilters;
-for my $filter ( $cgi->param('filters') ) {
+for my $filter ( grep {$_ ne ""} $cgi->param('filters') ) {
     my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
     $filters{$k} = $v;
     $v =~ s/"//g;
@@ -333,7 +334,8 @@ if ( $limit_yr ) {
         #FIXME: Should return a error to the user, incorect date format specified
     }
     if ( not @indexes ) {
-        $operands[0] .= " AND $op";
+        $operands[0] .= " AND " if $operands[0];
+        $operands[0] .= "$op";
     } else {
         push @operands, $op;
         push @operators, 'AND';
@@ -341,11 +343,39 @@ if ( $limit_yr ) {
     }
 }
 
+if ( C4::Context->preference('TagsEnabled') ) {
+    $template->param( TagsEnabled => 1 );
+    foreach (qw(TagsShowOnList TagsInputOnList)) {
+        C4::Context->preference($_) and $template->param( $_ => 1 );
+    }
+}
+
+my $total = 0;
+my $res;
+my $query_desc;
+
+my $tag = $cgi->param('tag');
+if ($tag) {
+    $query_desc = "tag=$tag";
+    $query_cgi  = "tag=$tag";
+    warn $tag;
+    my $taglist = get_tags( { term => $tag, approved => 1 } );
+    my @biblionumber = map { $_->{biblionumber} } @$taglist;
+    my $biblionumber_indexname = C4::Search::Query::getIndexName('recordid');
+    if ( @biblionumber ) {
+        $operands[0] = "$biblionumber_indexname:(" . join(' OR ', @biblionumber)  .")";
+    } else {
+        $operands[0] = "";
+    }
+}
+my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
+$query_desc = $q if not $tag;
+
 my $countRSS         = C4::Context->preference('numSearchRSSResults') || 50;
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 
 # perform the search
-my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
+$res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
 C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q:";
 
 if (!$res){
@@ -354,8 +384,66 @@ if (!$res){
     exit;
 }
 
+$total = $res->{'pager'}->{'total_entries'},
+
+# Opac search history
+my $newsearchcookie;
+my $limit_desc;
+my $limit_cgi;
+if ( C4::Context->preference('EnableOpacSearchHistory') ) {
+    my @recentSearches;
+
+    # Getting the (maybe) already sent cookie
+    my $searchcookie = $cgi->cookie('KohaOpacRecentSearches');
+    if ($searchcookie) {
+        $searchcookie = uri_unescape($searchcookie);
+        if ( thaw($searchcookie) ) {
+            @recentSearches = @{ thaw($searchcookie) };
+        }
+    }
+
+    # Adding the new search if needed
+    if ( not defined $borrowernumber or $borrowernumber eq '' ) {
+
+        # To a cookie (the user is not logged in)
+
+        if ( not defined $page or $page == 1 ) {
+            push @recentSearches,
+              { "query_desc" => $query_desc || "unknown",
+                "query_cgi"  => $query_cgi  || "unknown",
+                "time"       => time(),
+                "total"      => $total
+              };
+            $template->param( ShowOpacRecentSearchLink => 1 );
+        }
+
+        # Only the 15 more recent searches are kept
+        # TODO: This has been done because of cookies' max size, which is
+        # usually 4KB. A real check on cookie actual size would be better
+        # than setting an arbitrary limit on the number of searches
+        shift @recentSearches if (@recentSearches > 15);
+
+        # Pushing the cookie back
+        $newsearchcookie = $cgi->cookie(
+            -name => 'KohaOpacRecentSearches',
+
+            # We uri_escape the whole freezed structure so we're sure we won't have any encoding problems
+            -value   => uri_escape( freeze( \@recentSearches ) ),
+            -expires => ''
+        );
+        $cookie = [ $cookie, $newsearchcookie ];
+    } else {
+
+        # To the session (the user is logged in)
+        if ( not defined $page or $page == 1 ) {
+            AddSearchHistory( $borrowernumber, $cgi->cookie("CGISESSID"), $q, $query_cgi, $limit_desc, $limit_cgi, $total );
+            $template->param( ShowOpacRecentSearchLink => 1 );
+        }
+    }
+}
+
 ## If there's just one result, redirect to the detail page
-if ( $res->{'pager'}->{'total_entries'} == 1
+if ( $total == 1
     && $format ne 'rss2'
     && $format ne 'opensearchdescription'
     && $format ne 'atom' ) {
@@ -372,7 +460,7 @@ if ( $res->{'pager'}->{'total_entries'} == 1
 
 
 my $pager = Data::Pagination->new(
-    $res->{'pager'}->{'total_entries'},
+    $total,
     $count,
     20,
     $page,
@@ -387,6 +475,7 @@ push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
 push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
 push @follower_params, { ind => 'sort_by', val => $sort_by };
+push @follower_params, { ind => 'tag', val => $tag } if $tag;
 
 # Pager template params
 $template->param(
@@ -464,16 +553,17 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
 }
 
 $template->param(
-    'total'          => $res->{'pager'}->{'total_entries'},
+    'total'          => $total,
     'opacfacets'     => 1,
     'SEARCH_RESULTS' => \@results,
     'facets_loop'    => \@facets,
     'query'          => $q,
-    'query_desc'     => $q,
+    'query_desc'     => $query_desc,
     'searchdesc'     => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => $count,
     'countrss'       => $countRSS,
+    'tag'            => $tag,
 );
 
 # VI. BUILD THE TEMPLATE

@@ -313,7 +313,7 @@ $(document).ready(function(){
 			<tr>
 			<!-- /TMPL_IF -->
                 <td>
-                    <a href="/cgi-bin/koha/opac-search.pl?q=<!-- TMPL_VAR NAME="scan_use" escape="url" -->&quot;<!-- TMPL_VAR NAME="title"  ESCAPE="URL" -->&quot;"><!-- TMPL_IF NAME="title" --><!-- TMPL_VAR NAME="title" ESCAPE="html" --><!-- TMPL_ELSE -->No title<!-- /TMPL_IF --></a>
+                    <a href="/cgi-bin/koha/opac-search.pl?q=<!-- TMPL_VAR NAME="scan_use" escape="url" --><!-- TMPL_VAR NAME="title"  ESCAPE="URL" -->"><!-- TMPL_IF NAME="title" --><!-- TMPL_VAR NAME="title" ESCAPE="html" --><!-- TMPL_ELSE -->No title<!-- /TMPL_IF --></a>
                 </td>
                 <td>
                     <!-- TMPL_VAR NAME="author" -->
@@ -469,7 +469,7 @@ $(document).ready(function(){
                 <!-- TMPL_IF NAME="TagLoop" -->
 					<div class="results_summary">
                         <span class="label">Tags:</span>
-                        <ul style="display: inline; list-style: none;"><!-- TMPL_LOOP NAME="TagLoop" --><li style="display: inline; list-style: none;"><a href="/cgi-bin/koha/opac-search.pl?tag=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->&amp;q=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->"><!-- TMPL_VAR NAME="term" --></a> <span class="weight">(<!-- TMPL_VAR NAME="weight_total" -->)</span></li>
+                        <ul style="display: inline; list-style: none;"><!-- TMPL_LOOP NAME="TagLoop" --><li style="display: inline; list-style: none;"><a href="/cgi-bin/koha/opac-search.pl?tag=<!-- TMPL_VAR NAME="term" ESCAPE="URL" -->"><!-- TMPL_VAR NAME="term" --></a> <span class="weight">(<!-- TMPL_VAR NAME="weight_total" -->)</span></li>
                             <!-- /TMPL_LOOP -->
                         </ul>
                	<!-- /TMPL_IF -->

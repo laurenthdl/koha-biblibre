@@ -48,7 +48,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 $template->param( dateformat => C4::Context->preference("dateformat") );
 
 # If the user is not logged in, we deal with the cookie
-if ( !$loggedinuser ) {
+if ( not defined $loggedinuser ) {
 
     # Deleting search history
     if ( $cgi->param('action') && $cgi->param('action') eq 'delete' ) {
@@ -100,7 +100,6 @@ if ( !$loggedinuser ) {
 } else {
 
     # And if the user is logged in, we deal with the database
-
     my $dbh = C4::Context->dbh;
 
     # Deleting search history

@@ -201,7 +201,7 @@ if ( @itypes ) {
 
 # Build itemtypesloop
 # Set selected itypes
-if ( $itype_or_ccode ) {
+if ( $itype_or_ccode ne 'ccode' ) {
     foreach my $thisitemtype ( sort { $itemtypes->{$a}->{'description'} cmp $itemtypes->{$b}->{'description'} } keys %$itemtypes ) {
         my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
@@ -231,7 +231,26 @@ if ( $itype_or_ccode ) {
         push @itemtypesloop, \%row;
     }
 }
-$template->param( itemtypeloop => \@itemtypesloop );
+
+$template->param(
+    itemtypeloop => \@itemtypesloop,
+    itemtypelib => C4::Search::Engine::Solr::GetIndexLabelFromCode( $itype_or_ccode ) # Lib for category
+);
+
+# set the default sorting
+my $sort_by = $cgi->param('sort_by') || join(' ', grep { defined } ( 
+        C4::Search::Query::getIndexName(C4::Context->preference('defaultSortField'))
+                                      , C4::Context->preference('defaultSortOrder') ) );
+my $sortloop = C4::Search::Engine::Solr::GetSortableIndexes('biblio');
+for ( @$sortloop ) { # because html template is stupid
+    $_->{'asc_selected'}  = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' asc';
+    $_->{'desc_selected'} = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' desc';
+}
+
+$template->param(
+    'sort_by'  => $sort_by,
+    'sortloop' => $sortloop,
+);
 
 $template->param(
     itemtypeloop => \@itemtypesloop,
@@ -331,7 +350,8 @@ if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
     $itype_val_str = join ' OR ', @itypes ;
     $itype_val_str = "($itype_val_str)";
     if ( not @indexes ) {
-        $operands[0] .= " AND $itype_val_str";
+        $operands[0] .= " AND " if $operands[0];
+        $operands[0] .= "$itype_or_ccode:$itype_val_str";
     } else {
         push @operators, "AND";
         push @operands, $itype_val_str;
@@ -374,7 +394,8 @@ if ( $limit_yr ) {
         #FIXME: Should return a error to the user, incorect date format specified
     }
     if ( not @indexes ) {
-        $operands[0] .= " AND $op";
+        $operands[0] .= " AND " if $operands[0];
+        $operands[0] .= "$op";
     } else {
         push @operands, $op;
         push @operators, 'AND';

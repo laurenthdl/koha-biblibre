@@ -302,12 +302,12 @@ sub plugin {
         my $itype          = $query->param('itype');
         my $startfrom      = $query->param('startfrom');
         my $resultsperpage = $query->param('resultsperpage') || 20;
+        my $page           = $query->param('page') || 1;
         my $orderby;
         $search = 'kw,wrdl=' . $search . ' and mc-itype=' . $itype if $itype;
-        $search = C4::Search::Query->normalSearch($query);
-        my $results = SimpleSearch( $search, $startfrom * $resultsperpage, $resultsperpage );
+        $search = C4::Search::Query->normalSearch($search);
+        my $results = SimpleSearch( $search, undef, $page, $resultsperpage );
         my $total_hits = $results->{'pager'}->{'total_entries'};
-        my $total = scalar(@$results);
 
         ( $template, $loggedinuser, $cookie ) = get_template_and_user(
             {   template_name   => "cataloguing/value_builder/unimarc_field_4XX.tmpl",
@@ -327,16 +327,10 @@ sub plugin {
         }
         my @arrayresults;
         my @field_data = ($search);
-        for ( my $i = 0 ; $i < $resultsperpage ; $i++ ) {
-            my $record = GetMarcBiblio(@{$results->items}[$i]->{values}->{recordid});
+        for my $biblio ( @{$results->items} ) {
+            my $record = GetMarcBiblio($biblio->{values}{recordid});
             my $rechash = TransformMarcToKoha( $dbh, $record );
-            my $pos;
-            my $countitems = 1 if ( $rechash->{itemnumber} );
-            while ( index( $rechash->{itemnumber}, '|', $pos ) > 0 ) {
-                $countitems += 1;
-                $pos = index( $rechash->{itemnumber}, '|', $pos ) + 1;
-            }
-            $rechash->{totitem} = $countitems;
+            $rechash->{totitem} = C4::Items::GetItemsCount $biblio->{values}{recordid};
             my @holdingbranches = split /\|/, $rechash->{holdingbranch};
             my @itemcallnumbers = split /\|/, $rechash->{itemcallnumber};
             my $CN;
@@ -350,8 +344,8 @@ sub plugin {
 
         my @numbers = ();
 
-        if ( $total > $resultsperpage ) {
-            for ( my $i = 1 ; $i < $total / $resultsperpage + 1 ; $i++ ) {
+        if ( $total_hits > $resultsperpage ) {
+            for ( my $i = 1 ; $i < $total_hits / $resultsperpage + 1 ; $i++ ) {
                 if ( $i < 16 ) {
                     my $highlight = 0;
                     ( $startfrom == ( $i - 1 ) ) && ( $highlight = 1 );
@@ -371,7 +365,7 @@ sub plugin {
         if ( $total_hits < $from + $resultsperpage ) {
             $to = $total_hits;
         } else {
-            $to = $from + $resultsperpage;
+            $to = $from + $resultsperpage - 1;
         }
         my $defaultview = 'BiblioDefaultView' . C4::Context->preference('BiblioDefaultView');
 
@@ -401,6 +395,7 @@ sub plugin {
             total          => $total_hits,
             from           => $from,
             to             => $to,
+            page           => $page,
             numbers        => \@numbers,
             search         => $search,
             $defaultview   => 1,
