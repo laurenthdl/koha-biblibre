@@ -84,9 +84,15 @@ if ( $op && $op eq 'preview' ) {
 } else {
     my @serialnums = $input->param('serialid');
     if (@serialnums) {    # i.e. they have been flagged to generate claims
-        SendAlerts( 'claimissues', \@serialnums, $input->param("letter_code") );
+        eval {
+            SendAlerts( 'claimissues', \@serialnums, $input->param("letter_code") );
         my $cntupdate = UpdateClaimdateIssues( \@serialnums );
-        ### $cntupdate SHOULD be equal to scalar(@$serialnums)
+        };
+        if ( $@ ) {
+            $template->param(error_claim => $@);
+        } else {
+            $template->param(info_claim => "Emails have been sent");
+        }
     }
 }
 $template->param( 'letters' => \@letters, 'letter' => $letter );
