@@ -363,3 +363,17 @@ is($got, $expected, qq{Test [* TO *] format});
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = qq{$titleindex:[* TO ZZ]};
 is($got, $expected, qq{Test [* TO ZZ] format});
+
+BEGIN { $tests += 2 } # test just one " or (
+$q = qq{foo \\"bar};
+$got = C4::Search::Query->normalSearch($q);
+$expected = qq{foo \\"bar};
+is($got, $expected, qq{Test just one \" (normalSearch)});
+
+@$operands = (qq{"foo \\"bar"});
+@$indexes = ("title");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{($titleindex:"foo \\"bar")};
+is($got, $expected, qq{Test just one \" (buildQuery)});
+

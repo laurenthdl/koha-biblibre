@@ -37,7 +37,6 @@ use Switch;
 use C4::Search::Query;
 use C4::Search;
 
-
 my $query = new CGI;
 
 binmode STDOUT, ":utf8";
@@ -65,6 +64,9 @@ my @values;
 if ( defined $searchstr ) {
     my $authoritysep = C4::Context->preference('authoritysep');
     $searchstr =~ s/$authoritysep//g;
+    $searchstr =~ s/"/\\"/g;
+    $searchstr =~ s/\Q(\E/\\(/g;
+    $searchstr =~ s/\Q)\E/\\)/g;
     push @values, split(' ', $searchstr);
     $values[-1] = $values[-1] . '*';
 } else {

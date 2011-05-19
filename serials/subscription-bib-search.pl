@@ -113,9 +113,9 @@ if ( $op eq "do_search" && $query ) {
         resultsloop    => \@results,
         total          => $res->{'pager'}->{'total_entries'},
         PAGE_NUMBERS  => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
-        pager_params  => [ { ind => 'op'           , val => $op            },
-                           { ind => 'q'            , val => $query         },
-                           { ind => 'itemtypelimit', val => $itemtypelimit } ],
+        follower_params  => [ { ind => 'op'           , val => $op            },
+                              { ind => 'q'            , val => $query         },
+                              { ind => 'itemtypelimit', val => $itemtypelimit } ],
     );
 
 } else {

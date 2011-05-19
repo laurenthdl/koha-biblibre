@@ -445,6 +445,7 @@ sub get_template_and_user {
             'Version'                      => C4::Context->preference('Version'),
             hidelostitems                  => C4::Context->preference("hidelostitems"),
             mylibraryfirst                 => ( C4::Context->preference("SearchMyLibraryFirst") && C4::Context->userenv ) ? C4::Context->userenv->{'branch'} : '',
+            holdingbranch_index            => C4::Search::Query::getIndexName('holdingbranch'),
             opaclayoutstylesheet           => "" . C4::Context->preference("opaclayoutstylesheet"),
             opaccolorstylesheet            => "" . C4::Context->preference("opaccolorstylesheet"),
             opacstylesheet                 => "" . C4::Context->preference("opacstylesheet"),

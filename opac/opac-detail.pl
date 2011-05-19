@@ -108,7 +108,6 @@ if ($hideitems) {
     # Or not
     @items = @all_items;
 }
-
 my $dat = &GetBiblioData($biblionumber);
 
 my $itemtypes = GetItemTypes();
@@ -234,7 +233,7 @@ for my $itm (@items) {
       if ( ( not $itm->{'wthdrawn'} )
         && ( not $itm->{'itemlost'} )
         && ( $itm->{'itemnotforloan'} < 0 || not $itm->{'itemnotforloan'} )
-        && ( not $itemtypes->{ $itm->{'itype'} }->{notforloan} )
+        && ( not defined $itm->{'itype'} or not $itemtypes->{ $itm->{'itype'} }->{notforloan} )
         && ( $itm->{'itemnumber'} ) );
 
     if ( defined $itm->{'publictype'} ) {

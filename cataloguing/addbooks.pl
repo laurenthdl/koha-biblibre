@@ -34,12 +34,13 @@ use C4::Koha;
 use C4::Search;
 use Data::Pagination;
 
-my $input  = new CGI;
-my $succes = $input->param('biblioitem');
-my $query  = $input->param('q');
-my @value  = $input->param('value');
-my $page   = $input->param('page') || 1;
-my $count  = 20;
+my $input   = new CGI;
+my $succes  = $input->param('biblioitem');
+my $query   = $input->param('q');
+my @value   = $input->param('value');
+my $page    = $input->param('page') || 1;
+my $sort_by = $input->param('sort_by');
+my $count   = 20;
 
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
     template_name   => "cataloguing/addbooks.tmpl",
@@ -52,7 +53,6 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
 
 # Get framework list
 my $frameworks = getframeworks;
-warn Data::Dumper::Dumper $frameworks;
 my @frameworkcodeloop = map { {
     value         => $_,
     frameworktext => $frameworks->{$_}->{'frameworktext'},
@@ -62,7 +62,7 @@ my @frameworkcodeloop = map { {
 if ( $query ) {
 
     # Regular search
-    my $res = SimpleSearch( $query, { recordtype => 'biblio' }, $page, $count );
+    my $res = SimpleSearch( $query, { recordtype => 'biblio' }, $page, $count, $sort_by );
     my @results = map { GetBiblio $_->{'values'}->{'recordid'} } @{ $res->items };
     my $pager = Data::Pagination->new(
         $res->{'pager'}->{'total_entries'},
@@ -76,12 +76,27 @@ if ( $query ) {
     $query =~ /^(\d{10}|\d{12}.)$/ ? $isbn = $1 : $title = $1;
     my ( $breeding_count, @breeding_loop ) = BreedingSearch( $title, $isbn );
 
+    # set the default sorting
+    my $sort_by = $input->param('sort_by') || join(' ', grep { defined } (
+            C4::Search::Query::getIndexName(C4::Context->preference('defaultSortField'))
+                                          , C4::Context->preference('defaultSortOrder') ) );
+    my $sortloop = C4::Search::Engine::Solr::GetSortableIndexes('biblio');
+    for ( @$sortloop ) { # because html template is stupid
+        $_->{'asc_selected'}  = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' asc';
+        $_->{'desc_selected'} = $sort_by eq $_->{'type'}.'_'.$_->{'code'}.' desc';
+    }
+
+    $template->param(
+        'sort_by'  => $sort_by,
+        'sortloop' => $sortloop,
+    );
+
     $template->param(
         query          => $query,
         total          => $res->{'pager'}->{'total_entries'},
         resultsloop    => \@results,
         PAGE_NUMBERS   => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
-        pager_params   => [ { ind => 'q', val => $query } ],
+        follower_params => [ { ind => 'q', val => $query }, { ind => 'sort_by', val => $sort_by } ],
         breeding_count => $breeding_count,
         breeding_loop  => \@breeding_loop,
     );

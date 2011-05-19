@@ -1379,6 +1379,7 @@ sub GetMarcNotes {
     } else {    # assume unimarc if not marc21
         $scope = '3..';
     }
+    return unless $record;
     my @marcnotes;
     my $note = "";
     my $tag  = "";
