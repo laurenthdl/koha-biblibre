@@ -290,7 +290,10 @@ sub UpdateClaimdateIssues {
     my $dbh = C4::Context->dbh;
     $date = strftime( "%Y-%m-%d", localtime ) unless ($date);
     my $query = "
-        UPDATE serial SET claimdate='$date',status=7
+        UPDATE serial SET
+        claimdate = '$date',
+        status = 7,
+        claims_count = claims_count + 1
         WHERE  serialid in (" . join( ",", @$serialids ) . ")";
     my $rq = $dbh->prepare($query);
     $rq->execute;
@@ -1823,7 +1826,7 @@ sub GetLateOrMissingIssues {
             "SELECT
                 serialid,      aqbooksellerid,        name,
                 biblio.title,  planneddate,           serialseq,
-                serial.status, serial.subscriptionid, claimdate,
+                serial.status, serial.subscriptionid, claimdate, claims_count,
                 subscription.branchcode
             FROM      serial 
                 LEFT JOIN subscription  ON serial.subscriptionid=subscription.subscriptionid 
@@ -1840,7 +1843,7 @@ sub GetLateOrMissingIssues {
             "SELECT 
                 serialid,      aqbooksellerid,         name,
                 biblio.title,  planneddate,           serialseq,
-                serial.status, serial.subscriptionid, claimdate,
+                serial.status, serial.subscriptionid, claimdate, claims_count,
                 subscription.branchcode
             FROM serial 
                 LEFT JOIN subscription ON serial.subscriptionid=subscription.subscriptionid 
@@ -1920,8 +1923,10 @@ sub updateClaim {
     my ($serialid) = @_;
     my $dbh        = C4::Context->dbh;
     my $sth        = $dbh->prepare(
-        "UPDATE serial SET claimdate = now()
-                WHERE serialid = ?
+        "UPDATE serial SET
+            claimdate = now(),
+            claims_count = claims_count + 1
+        WHERE serialid = ?
         "
     );
     $sth->execute($serialid);
