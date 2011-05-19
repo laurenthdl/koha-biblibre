@@ -75,6 +75,8 @@ if ( !$record ) {
 $template->param( biblionumber => $biblionumber );
 use C4::Charset;
 SetUTF8Flag($record);
+my $marcflavour      = C4::Context->preference("marcflavour");
+my $ean = GetNormalizedEAN( $record, $marcflavour );
 
 # XSLT processing of some stuff
 if ( C4::Context->preference("OPACXSLTDetailsDisplay") ) {
@@ -285,7 +287,6 @@ for my $itm (@items) {
 
 ## get notes and subjects from MARC record
 my $dbh              = C4::Context->dbh;
-my $marcflavour      = C4::Context->preference("marcflavour");
 my $marcnotesarray   = GetMarcNotes( $record, $marcflavour );
 my $marcauthorsarray = GetMarcAuthors( $record, $marcflavour );
 my $marcsubjctsarray = GetMarcSubjects( $record, $marcflavour );
@@ -353,7 +354,6 @@ foreach ( keys %{$dat} ) {
 # in each case, we're grabbing the first value we find in
 # the record and normalizing it
 my $upc = GetNormalizedUPC( $record, $marcflavour );
-my $ean = GetNormalizedEAN( $record, $marcflavour );
 my $oclc = GetNormalizedOCLCNumber( $record, $marcflavour );
 my $isbn = GetNormalizedISBN( undef, $record, $marcflavour );
 my $content_identifier_exists = 1 if ( $isbn or $ean or $oclc or $upc );
