@@ -1625,6 +1625,7 @@ CREATE TABLE `serial` (
   `publisheddate` date default NULL,
   `itemnumber` text default NULL,
   `claimdate` date default NULL,
+  `claims_count` int(11) default 0,
   `routingnotes` text,
   PRIMARY KEY  (`serialid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

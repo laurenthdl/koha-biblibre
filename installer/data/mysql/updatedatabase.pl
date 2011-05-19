@@ -5236,6 +5236,15 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.062";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference numSearchRSSResults)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.001";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
@@ -5727,24 +5736,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.062";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(qq{
-    INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');
-    });
-    print "Upgrade to $DBversion done (Adds New System preference numSearchRSSResults)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.06.00.001";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("UPDATE `systempreferences` SET options='acqdate|author|callnumber|ccode|dewey|location|pubdate|score|title' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
-    $dbh->do("UPDATE `systempreferences` SET options='asc|desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder')");
-    $dbh->do("UPDATE `systempreferences` SET value='score' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
-    print "Upgrade to $DBversion done (Update System Preferences defaultSortField and OPACdefaultSortField)\n";
-    SetVersion($DBversion);
-}
-
 $DBversion = "3.06.00.009";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `aqorders` ADD `branchcode` VARCHAR( 10 ) NULL");
@@ -5879,6 +5870,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT INTO `permissions` (module_bit, code, description)
         VALUES (11, 'order_claim_for_all', 'Claim for all orders')");
     print "Upgrade to $DBversion done (Add order_claim_for_all permission)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.029";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `serial` ADD COLUMN `claims_count` INT(11)  DEFAULT 0");
+    print "Upgrade to $DBversion done (Add claims_count field in serial table)\n";
     SetVersion($DBversion);
 }
 
