@@ -163,7 +163,12 @@
 	<div class="yui-b">
 
     <h1>Claims</h1>
-
+    <!-- TMPL_IF NAME="error_claim" -->
+        <div class='error'><!-- TMPL_VAR NAME="error_claim" --></div>
+    <!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="info_claim" -->
+        <div class='info'><!-- TMPL_VAR NAME="info_claim" --></div>
+    <!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="letter" --><!-- TMPL_UNLESS NAME="missingissues" --><!-- TMPL_IF NAME="supplierid" --> <div class="dialog alert">No missing issues found.</div><!-- TMPL_ELSE --><div class="dialog message">Please choose a vendor.</div><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- /TMPL_IF -->
 	
 	     <!-- TMPL_IF NAME="SHOWCONFIRMATION" -->
