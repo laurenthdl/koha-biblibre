@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nicomo-fr-FR-i-opac-t-prog-v-3000000\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-13 17:43+0200\n"
-"PO-Revision-Date: 2011-05-17 17:18+0200\n"
+"POT-Creation-Date: 2011-05-19 11:31+0200\n"
+"PO-Revision-Date: 2011-05-19 11:41+0200\n"
 "Last-Translator: Paul Poulain <paul.poulain@biblibre.com>\n"
 "Language-Team: American English <kde-i18n-doc@kde.org>\n"
 "Language: \n"
@@ -102,9 +102,9 @@ msgstr "%s (%s)"
 #. %1$s: TMPL_VAR name=lib
 #. %2$s: TMPL_VAR name=count
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/includes/opac-facets.inc:48
-#, fuzzy, c-format
+#, c-format
 msgid "%s (%s) [<a1>x</a>]"
-msgstr "%s <a1>Modifier</a>"
+msgstr "%s (%s) [<a1>x</a>]"
 
 #. %1$s: TMPL_VAR name=bibliotitle
 #. %2$s: TMPL_VAR name=biblionumber
@@ -215,9 +215,9 @@ msgstr "%s mois"
 
 #. %1$s: TMPL_VAR name=total
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/opac-authoritiessearchresultlist.tmpl:16
-#, fuzzy, c-format
+#, c-format
 msgid "%s results"
-msgstr "Résultats"
+msgstr "%s résultats"
 
 #. %1$s: TMPL_VAR name=ExpectedAtLibrary
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/opac-reserve.tmpl:526
@@ -1433,9 +1433,9 @@ msgstr ""
 #. %1$s: TMPL_VAR name=lib
 #. %2$s: TMPL_VAR name=count
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/includes/opac-facets.inc:52
-#, fuzzy, c-format
+#, c-format
 msgid "<a1> %s </a> (%s)"
-msgstr "<a1>%s</a>,"
+msgstr "<a1>%s</a> (%s)"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/ilsdi.tmpl:396
 #, c-format
@@ -1597,9 +1597,9 @@ msgstr "<a1>Ne pas surligner</a> <a2>Surligner</a>"
 
 #. %1$s: TMPL_VAR name=itemtypelib
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/includes/opac-facets.inc:22
-#, fuzzy, c-format
+#, c-format
 msgid "<a1>[+]</a> %s"
-msgstr "<a1>%s</a>,"
+msgstr "<a1>[+]</a> %s"
 
 #. %1$s: TMPL_VAR name=marc_lib
 #. %2$s: TMPL_VAR name=marc_value
@@ -4424,14 +4424,12 @@ msgstr "Nom"
 
 #
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/opac-authorities-home.tmpl:37
-#, fuzzy
 msgid "Name asc"
-msgstr "Nom"
+msgstr "Nom croissant"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/opac-authorities-home.tmpl:38
-#, fuzzy
 msgid "Name desc"
-msgstr "Date desc."
+msgstr "Nom décroissant"
 
 #
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/opac-userdetails.tmpl:15
@@ -4915,8 +4913,12 @@ msgstr "Pas de copie disponible"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/opac-auth.tmpl:83
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/opac-main.tmpl:53
-msgid "Password (date de naissance, ex:01011970)"
-msgstr "Mot de passe (date de naissance, ex:01011970)"
+msgid ""
+"Password (par défaut votre date de naissance, ex:01011970. Veillez à le "
+"changer dès votre 1ère connexion pour vous protéger)"
+msgstr ""
+"Mot de passe (par défaut votre date de naissance, ex:01011970. Veillez à le "
+"changer dès votre 1ère connexion pour vous protéger)"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/modules/opac-passwd.tmpl:44
 msgid "Password Updated"
@@ -7083,7 +7085,6 @@ msgstr "en ligne"
 
 #
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/xslt/UNIMARCslim2OPACItemsDetail.xsl:46
-#, fuzzy
 msgid "barcode"
 msgstr "Code-barres"
 
@@ -7115,9 +7116,8 @@ msgid "bibliography"
 msgstr "bibliographie"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/xslt/UNIMARCslim2OPACItemsDetail.xsl:18
-#, fuzzy
 msgid "biblioitemnumber"
-msgstr "borrowernumber"
+msgstr "biblioitemnumber"
 
 #. IMG
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACResults.xsl:668
@@ -7300,9 +7300,8 @@ msgstr "cylindre"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/xslt/UNIMARCslim2OPACItemsDetail.xsl:54
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/xslt/UNIMARCslim2OPACItemsDetail.xsl:162
-#, fuzzy
 msgid "damaged"
-msgstr "Damaged ("
+msgstr "endommagé"
 
 #. IMG
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/xslt/MARC21slim2OPACResults.xsl:543
@@ -9103,6 +9102,9 @@ msgstr "Édition:"
 
 #~ msgid "Password"
 #~ msgstr "Mot de passe"
+
+#~ msgid "Password (date de naissance, ex:01011970)"
+#~ msgstr "Mot de passe (date de naissance, ex:01011970)"
 
 #~ msgid "Password or PIN"
 #~ msgstr "Mot de passe ou PIN"
