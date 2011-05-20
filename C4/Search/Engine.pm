@@ -21,6 +21,9 @@ use Moose;
 
 use C4::Context;
 use C4::Search::Engine::Solr;
+use C4::Logguer;
+
+my $log = C4::Logguer->new('koha');
 
 =head1 NAME
 
@@ -62,7 +65,7 @@ sub search {
         return C4::Search::Engine::Solr::SimpleSearch(@_);
     } elsif ($self->searchengine eq "Zebra") {
         # SimpleSearch( $query, $offset, $max_results, $servers ) 
-        warn "Unsupported yet";
+        $log->error("Zebra is Unsupported yet");
         #return C4::Search::Engine::Zebra->SimpleSearch(@_);
     }
 }
@@ -76,11 +79,10 @@ sub index {
         return C4::Search::Engine::Solr::IndexRecord(@_);
     } elsif ($self->searchengine eq "Zebra") {
         # SimpleSearch( $query, $offset, $max_results, $servers ) 
-        warn "Unsupported yet";
+        $log->error("Zebra is Unsupported yet");
         #return C4::Search::Engine::Zebra->IndexRecord(@_);
     } else {
-        warn "System preference 'SearchEngine' not equal 'Solr' or 'Zebra'.";
-        warn "We can not indexing";
+        $log->error("System preference 'SearchEngine' not equal 'Solr' or 'Zebra'.\nWe can not indexing");
     }
 }
 

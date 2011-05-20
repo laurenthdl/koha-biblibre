@@ -20,7 +20,7 @@ package C4::Logguer;
 use strict;
 use base 'Exporter';
 our @EXPORT    = qw();
-our @EXPORT_OK = qw($log_opac $log_koha);
+#our @EXPORT_OK = qw($log_opac $log_koha);
 
 use C4::Context;
 use Log::LogLite;
@@ -35,20 +35,23 @@ my $NORMAL_LOG_LEVEL   = 5;
 my $INFO_LOG_LEVEL     = 6;
 my $DEBUG_LOG_LEVEL    = 7;
 
-our $log_koha = C4::Logguer->new($KOHA_LOG_FILE, 7);
-our $log_opac = C4::Logguer->new($OPAC_LOG_FILE, 7);
-
 use Data::Dumper;
 
 sub new {
     my $proto = shift;
     my $class = ref($proto) || $proto;
     my $self = {};
-    $self->{FILE_PATH} = shift;
-    $self->{LEVEL} = shift || $NORMAL_LOG_LEVEL;
-    $self->{LOGGER} = Log::LogLite->new($self->{FILE_PATH}, $self->{LEVEL});
-    return bless( $self );
+    my $type = shift || 'koha';
+    $self->{LEVEL} = shift || C4::Context->preference("DebugLevel") || $NORMAL_LOG_LEVEL;
 
+    if ( $type eq 'koha' ) {
+        $self->{FILE_PATH} = $KOHA_LOG_FILE;
+    } elsif ( $type eq 'opac' ) {
+        $self->{FILE_PATH} = $OPAC_LOG_FILE;
+    }
+    $self->{LOGGER} = Log::LogLite->new($self->{FILE_PATH}, $self->{LEVEL});
+
+    return bless( $self );
 }
 
 sub write {
