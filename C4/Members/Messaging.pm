@@ -17,8 +17,7 @@ package C4::Members::Messaging;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Context;
 
 use vars qw($VERSION);
@@ -95,7 +94,6 @@ END_SQL
   ROW: while ( my $row = $sth->fetchrow_hashref() ) {
         next ROW unless $row->{'message_attribute_id'};
 
-        # warn( Data::Dumper->Dump( [ $row ], [ 'row' ] ) );
         $return->{'days_in_advance'} = $row->{'days_in_advance'} if defined $row->{'days_in_advance'};
         $return->{'wants_digest'}    = $row->{'wants_digest'}    if defined $row->{'wants_digest'};
         $return->{'letter_code'}     = $row->{'letter_code'};
@@ -218,7 +216,6 @@ END_SQL
 
     my @return = values %$choices;
 
-    # warn( Data::Dumper->Dump( [ \@return ], [ 'return' ] ) );
     return \@return;
 }
 

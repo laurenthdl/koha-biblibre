@@ -17,9 +17,8 @@ package C4::AuthoritiesMarc::UNIMARC;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
+use Modern::Perl;
 
-#use warnings; FIXME - Bug 2505
 our $VERSION = 3.00;
 
 =head1 NAME

@@ -30,9 +30,7 @@
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use YAML;
 use C4::Context;
@@ -58,15 +56,15 @@ use C4::Form::MessagingPreferences;
 use C4::Overdues qw/CheckBorrowerDebarred/;
 use JSON;
 use List::MoreUtils qw/uniq/;
-
-#use Smart::Comments;
-#use Data::Dumper;
+use C4::Logguer;
 
 use vars qw($debug);
 
 BEGIN {
     $debug = $ENV{DEBUG} || 0;
 }
+
+my $log = C4::Logguer->new();
 
 my $dbh = C4::Context->dbh;
 
@@ -130,7 +128,7 @@ foreach (qw(dateenrolled dateexpiry dateofbirth)) {
     my $userdate = $data->{$_};
     $debug and printf STDERR "%s : %s", $_, $userdate;
     unless ($userdate && $userdate ne "0000-00-00") {
-        $debug and warn sprintf "Empty \$data{%12s}", $_;
+        $log->debug(sprintf "Empty \$data{%12s}", $_);
         $data->{$_} = '';
         $template->param( $_ => $data->{$_} );
         next;
@@ -192,7 +190,7 @@ if ( $category_type eq 'A' ) {
             }
         );
     }
-    warn Data::Dumper::Dumper(@guaranteedata);
+    $log->debug(\@guaranteedata, 1);
     $template->param( guaranteeloop => \@guaranteedata );
     ( $template->param( adultborrower => 1 ) ) if ( $category_type eq 'A' );
 } 
@@ -247,7 +245,6 @@ my $totalprice     = 0;
 
 my @issuedata = build_issue_data($issue, $issuecount);
 my @relissuedata = build_issue_data($relissue, $relissuecount);
-#warn Data::Dumper::Dumper(@issuedata);
 
 sub build_issue_data {
     my $issue = shift;

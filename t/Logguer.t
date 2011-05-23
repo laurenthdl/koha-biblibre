@@ -1,6 +1,7 @@
 package LogTest;
 
-use C4::Logguer qw(:DEFAULT $log_opac);
+use C4::Logguer;
+$log_opac = C4::Logguer->new('opac');
 
 sub test{
 

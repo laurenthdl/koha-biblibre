@@ -15,9 +15,8 @@ package C4::Search;
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
+use Modern::Perl;
 
-#use warnings; FIXME - Bug 2505
 require Exporter;
 use 5.10.0;
 use C4::Context;
@@ -38,6 +37,7 @@ use YAML;
 use URI::Escape;
 use C4::MarcFramework;
 use C4::Search::Engine;
+use C4::Logguer;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
@@ -46,6 +46,8 @@ BEGIN {
     $VERSION = 3.01;
     $DEBUG = ( $ENV{DEBUG} ) ? 1 : 0;
 }
+
+my $log = C4::Logguer->new();
 
 =head1 NAME
 
@@ -173,8 +175,7 @@ sub getRecords {
         # if this is a local search, use the $koha-query, if it's a federated one, use the federated-query
         my $query_to_use = ( $servers[$i] =~ /biblioserver/ ) ? $koha_query : $simple_query;
 
-        #$query_to_use = $simple_query if $scan;
-        warn $simple_query if ( $scan and $DEBUG );
+        $log->debug($simple_query) if $scan;
 
         # Check if we've got a query_type defined, if so, use it
         eval {
@@ -187,7 +188,7 @@ sub getRecords {
                 } elsif ( $query_type =~ /^pqf/ ) {
                     $results[$i] = $zconns[$i]->search( new ZOOM::Query::PQF( $query_to_use, $zconns[$i] ) );
                 } else {
-                    warn "Unknown query_type '$query_type'.  Results undetermined.";
+                    $log->warning("Unknown query_type '$query_type'.  Results undetermined.");
                 }
             } elsif ($scan) {
                 $results[$i] = $zconns[$i]->scan( new ZOOM::Query::CCL2RPN( $query_to_use, $zconns[$i] ) );
@@ -196,7 +197,7 @@ sub getRecords {
             }
         };
         if ($@) {
-            warn "WARNING: query problem with $query_to_use " . $@;
+            $log->warning("query problem with $query_to_use " . $@);
         }
 
         # Concatenate the sort_by limits and pass them to the results object
@@ -228,12 +229,12 @@ sub getRecords {
             } elsif ( $sort eq "title_za" ) {
                 $sort_by .= "1=4 >i ";
             } else {
-                warn "Ignoring unrecognized sort '$sort' requested" if $sort_by;
+                $log->warning("Ignoring unrecognized sort '$sort' requested") if $sort_by;
             }
         }
         if ($sort_by) {
             if ( $results[$i]->sort( "yaz", $sort_by ) < 0 ) {
-                warn "WARNING sort $sort_by failed";
+                $log->warning("sort $sort_by failed");
             }
         }
     }    # finished looping through servers
@@ -289,14 +290,12 @@ sub getRecords {
                     else {
                         $record = $results[ $i - 1 ]->record($j)->raw();
 
-                        # warn "RECORD $j:".$record;
                         $results_hash->{'RECORDS'}[$j] = $record;
 
                         # Fill the facets while we're looping, but only for the biblioserver
                         $facet_record = MARC::Record->new_from_usmarc($record)
                           if $servers[ $i - 1 ] =~ /biblioserver/;
 
-                        #warn $servers[$i-1]."\n".$record; #.$facet_record->title();
                         if ($facet_record) {
                             for ( my $k = 0 ; $k <= @$facets ; $k++ ) {
                                 ( $facets->[$k] ) or next;
@@ -318,8 +317,6 @@ sub getRecords {
                 $results_hashref->{ $servers[ $i - 1 ] } = $results_hash;
             }
 
-            # warn "connection ", $i-1, ": $size hits";
-            # warn $results[$i-1]->record(0)->render() if $size > 0;
 
             # BUILD FACETS
             if ( $servers[ $i - 1 ] =~ /biblioserver/ ) {
@@ -466,8 +463,8 @@ sub _remove_initial_stopwords {
     my ( $operand ) = @_;
     my @stopwords_removed;
        my $str_replace=join "|",keys %{ C4::Context->stopwords };
-       $debug && warn "$_ Dump($str_replace)";
-       $debug && warn "$_ Dump($operand)";
+       $log->debug("$_ Dump($str_replace)");
+       $log->debug("$_ Dump($operand)");
        $operand =~ s/^($str_replace) //gi;
     
     return ( $operand );
@@ -488,7 +485,7 @@ sub _remove_stopwords {
         #
         foreach ( keys %{ C4::Context->stopwords } ) {
             next if ( $_ =~ /(and|or|not)/ );    # don't remove operators
-            $debug && warn "$_ Dump($operand)";
+            $log->debug(warn "$_ Dump($operand)");
             if ( my ($matched) = ( $operand =~ /([^\X\p{isAlnum}]\Q$_\E[^\X\p{isAlnum}]|[^\X\p{isAlnum}]\Q$_\E$|^\Q$_\E[^\X\p{isAlnum}])/gi ) ) {
                 $operand =~ s/\Q$matched\E/ /gi;
                 push @stopwords_removed, $_;
@@ -535,7 +532,6 @@ sub _build_stemmed_operand {
     return $operand if $operand =~ /\d/;
 
     # FIXME: the locale should be set based on the user's language and/or search choice
-    #warn "$lang";
     my $stemmer = Lingua::Stem::Snowball->new(
         lang     => $lang,
         encoding => "UTF-8"
@@ -549,7 +545,7 @@ sub _build_stemmed_operand {
           unless ( $stem =~ /(and$|or$|not$)/ ) || ( length($stem) < 3 );
         $stemmed_operand .= " ";
     }
-    warn "STEMMED OPERAND: $stemmed_operand" if $DEBUG;
+    $log->debug("STEMMED OPERAND: $stemmed_operand");
     return $stemmed_operand;
 }
 
@@ -830,7 +826,7 @@ See verbose embedded documentation.
 sub buildQuery {
     my ( $operators, $operands, $indexes, $limits, $sort_by, $scan, $lang ) = @_;
 
-    warn "---------\nEnter buildQuery\n---------" if $DEBUG;
+    $log->debug("---------\nEnter buildQuery\n---------");
 
     # dereference
     my @operators = $operators ? @$operators : ();
@@ -969,8 +965,8 @@ sub buildQuery {
                 # Remove Stopwords
                 if ($remove_stopwords) {
                     ( $operand, $stopwords_removed ) = _remove_stopwords( $operand, $index );
-                    warn "OPERAND w/out STOPWORDS: >$operand<" if $DEBUG;
-                    warn "REMOVED STOPWORDS: @$stopwords_removed"
+                    $log->debug("OPERAND w/out STOPWORDS: >$operand<");
+                    $log->debug("REMOVED STOPWORDS: @$stopwords_removed");
                       if ( $stopwords_removed && $DEBUG );
                 }
 
@@ -979,15 +975,14 @@ sub buildQuery {
 
                         #FIXME only valid with LTR scripts
                         $operand = join( " ", map { ( index( $_, "*" ) > 0 ? "$_" : "$_*" ) } split( /\s+/, $operand ) );
-                        warn $operand if $DEBUG;
+                        $log->debug($operand);
                     }
                 }
 
                 # Detect Truncation
                 my $truncated_operand;
                 my ( $nontruncated, $righttruncated, $lefttruncated, $rightlefttruncated, $regexpr ) = _detect_truncation( $operand, $index );
-                warn "TRUNCATION: NON:>@$nontruncated< RIGHT:>@$righttruncated< LEFT:>@$lefttruncated< RIGHTLEFT:>@$rightlefttruncated< REGEX:>@$regexpr<"
-                  if $DEBUG;
+                $log->debug("TRUNCATION: NON:>@$nontruncated< RIGHT:>@$righttruncated< LEFT:>@$lefttruncated< RIGHTLEFT:>@$rightlefttruncated< REGEX:>@$regexpr<");
 
                 # Apply Truncation
                 if ( scalar(@$righttruncated) + scalar(@$lefttruncated) + scalar(@$rightlefttruncated) + scalar(@$regexpr) > 0 ) {
@@ -1022,14 +1017,14 @@ sub buildQuery {
                     }
                 }
                 $operand = $truncated_operand if $truncated_operand;
-                warn "TRUNCATED OPERAND: >$truncated_operand<" if $DEBUG;
+                $log->info("TRUNCATED OPERAND: >$truncated_operand<");
 
                 # Handle Stemming
                 my $stemmed_operand;
                 $stemmed_operand = _build_stemmed_operand( $operand, $lang )
                   if $stemming;
 
-                warn "STEMMED OPERAND: >$stemmed_operand<" if $DEBUG;
+                $log->debug("STEMMED OPERAND: >$stemmed_operand<");
 
                 # Handle Field Weighting
                 my $weighted_operand;
@@ -1039,7 +1034,7 @@ sub buildQuery {
                     $indexes_set      = 1;
                 }
 
-                warn "FIELD WEIGHTED OPERAND: >$weighted_operand<" if $DEBUG;
+                $log->debug("FIELD WEIGHTED OPERAND: >$weighted_operand<");
 
                 # If there's a previous operand, we need to add an operator
                 if ($previous_operand) {
@@ -1080,7 +1075,7 @@ sub buildQuery {
             }    #/if $operands
         }    # /for
     }
-    warn "QUERY BEFORE LIMITS: >$query<" if $DEBUG;
+    $log->debug("QUERY BEFORE LIMITS: >$query<");
 
     # add limits
     my $group_OR_limits;
@@ -1159,16 +1154,14 @@ sub buildQuery {
     # append the limit to the query
     $query .= " " . $limit;
 
-    # Warnings if DEBUG
-    if ($DEBUG) {
-        warn "QUERY:" . $query;
-        warn "QUERY CGI:" . $query_cgi;
-        warn "QUERY DESC:" . $query_desc;
-        warn "LIMIT:" . $limit;
-        warn "LIMIT CGI:" . $limit_cgi;
-        warn "LIMIT DESC:" . $limit_desc;
-        warn "---------\nLeave buildQuery\n---------";
-    }
+    $log->debug( "QUERY:" . $query );
+    $log->debug( "QUERY CGI:" . $query_cgi );
+    $log->debug( "QUERY DESC:" . $query_desc );
+    $log->debug( "LIMIT:" . $limit );
+    $log->debug( "LIMIT CGI:" . $limit_cgi );
+    $log->debug( "LIMIT DESC:" . $limit_desc );
+    $log->debug( "---------\nLeave buildQuery\n---------" );
+
     return ( undef, $query, $simple_query, $query_cgi, $query_desc, $limit, $limit_cgi, $limit_desc, $stopwords_removed, $query_type );
 }
 
@@ -1504,7 +1497,7 @@ sub searchResults {
         # XSLT processing of some stuff
         use C4::Charset;
         SetUTF8Flag($marcrecord);
-        $debug && warn $marcrecord->as_formatted;
+        $log->debug($marcrecord->as_formatted);
 
 	# If it is opac, or OPAC, or OpAc or whatever, we use 'OPAC' so it works with the XSLT syspref
 	$interface =~ s/(opac)/\U$1/i;
@@ -1991,7 +1984,7 @@ sub SearchAcquisitions {
 
         eval { $qdataacquisitions->execute(@params); };
 
-        if ($@) { warn "recentacquisitions Error :$@"; }
+        $log->error("recentacquisitions Error :$@") if $@;
         else {
             my @loopdata;
             while ( my $data = $qdataacquisitions->fetchrow_hashref ) {
@@ -2019,9 +2012,9 @@ sub SearchAcquisitions {
 
 sub NZgetRecords {
     my ( $query, $simple_query, $sort_by_ref, $servers_ref, $results_per_page, $offset, $expanded_facet, $branches, $query_type, $scan ) = @_;
-    warn "query =$query" if $DEBUG;
+    $log->debug("query =$query");
     my $result = NZanalyse($query);
-    warn "results =$result" if $DEBUG;
+    $log->debug("results =$result");
     return ( undef, NZorder( $result, @$sort_by_ref[0], $results_per_page, $offset ), undef );
 }
 
@@ -2037,10 +2030,7 @@ sub NZgetRecords {
 sub NZanalyse {
     my ( $string, $server ) = @_;
 
-    #     warn "---------"       if $DEBUG;
     warn " NZanalyse" if $DEBUG;
-
-    #     warn "---------"       if $DEBUG;
 
     # $server contains biblioserver or authorities, depending on what we search on.
     #warn "querying : $string on $server";
@@ -2785,8 +2775,6 @@ AND (authtypecode IS NOT NULL AND authtypecode<>\"\")|
                     SetMarcUnicodeFlag( $marcrecordauth, 'MARC21' );
                 }
 
-                #          warn "AUTH RECORD ADDED : ".$marcrecordauth->as_formatted;
-
                 my $authid = AddAuthority( $marcrecordauth, '', $data->{authtypecode} );
                 $countcreated++;
                 $field->add_subfields( '9' => $authid );
@@ -2809,7 +2797,6 @@ sub GetDistinctValues {
     if ( $fieldname =~ /\./ ) {
         my ( $table, $column ) = split /\./, $fieldname;
         my $dbh = C4::Context->dbh;
-        warn "select DISTINCT($column) as value, count(*) as cnt from $table group by lib order by $column " if $DEBUG;
         my $sth = $dbh->prepare(
             "select DISTINCT($column) as value, count(*) as cnt from $table " . ( $string ? " where $column like \"$string%\" and $column is not null " : " where $column is not null " ) . "group by value order by $column " );
         $sth->execute;

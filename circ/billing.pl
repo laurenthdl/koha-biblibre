@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Context;
 use C4::Output;
 use CGI;
@@ -26,7 +25,9 @@ use C4::Auth;
 use C4::Dates qw/format_date format_date_in_iso/;
 use C4::Debug;
 use Date::Calc qw/Today Add_Delta_YM/;
+use C4::Logguer;
 
+my $log = C4::Logguer->new();
 my $input     = new CGI;
 my $order     = $input->param('order') || '';
 my $startdate = $input->param('from') || '';
@@ -61,7 +62,7 @@ $enddate   = format_date($todaysdate)   unless $enddate;
 
 my $dbh = C4::Context->dbh;
 my ( $sqlorderby, $sqldatewhere, $presqldatewhere ) = ( "", "", "" );
-$debug and warn "start: " . format_date_in_iso($startdate) . "\nend: " . format_date_in_iso($enddate);
+$log->debug("start: " . format_date_in_iso($startdate) . "\nend: " . format_date_in_iso($enddate));
 my @query_params = ();
 
 # the dates below is to check for compliance of the current date range

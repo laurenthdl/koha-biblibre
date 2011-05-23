@@ -21,8 +21,7 @@ This script displays items in the tmp_holdsqueue table
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Output;

@@ -21,8 +21,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use Number::Format qw(:all);
 
@@ -104,7 +103,6 @@ if ( $op eq "" ) {
         # prepare empty item form
         my $cell = PrepareItemrecordDisplay( '', '', '', 'ACQ' );
 
-        #     warn "==> ".Data::Dumper::Dumper($cell);
         unless ($cell) {
             $cell = PrepareItemrecordDisplay( '', '', '', '' );
             $template->param( 'NoACQframework' => 1 );

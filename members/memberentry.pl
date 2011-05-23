@@ -18,8 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 # pragma
-use strict;
-use warnings;
+use Modern::Perl;
 
 # external modules
 use CGI;
@@ -40,6 +39,9 @@ use C4::Log;
 use C4::Letters;
 use C4::Branch;    # GetBranches
 use C4::Form::MessagingPreferences;
+use C4::Logguer;
+
+my $log = C4::Logguer->new();
 
 use vars qw($debug);
 
@@ -157,9 +159,9 @@ if ( $op eq 'insert' || $op eq 'modify' || $op eq 'save' || $op eq 'duplicate' )
         if ( $userdate =~ /$syspref/ ) {
             $newdata{$_} = format_date_in_iso($userdate);    # if they match syspref format, then convert to ISO
         } elsif ( $userdate =~ /$iso/ ) {
-            warn "Date $_ ($userdate) is already in ISO format";
+            $log->warning("Date $_ ($userdate) is already in ISO format");
         } else {
-            ( $userdate eq '0000-00-00' ) and warn "Data error: $_ is '0000-00-00'";
+            ( $userdate eq '0000-00-00' ) and $log->error("Data error: $_ is '0000-00-00'");
             $template->param( "ERROR_$_" => 1 );             # else ERROR!
             push( @errors, "ERROR_$_" );
         }
@@ -248,7 +250,7 @@ if ( ( defined $newdata{'userid'} ) && ( $newdata{'userid'} eq '' ) ) {
     $newdata{'userid'} = Generate_Userid( $borrowernumber, $newdata{'firstname'}, $newdata{'surname'} );
 }
 
-$debug and warn join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry);
+$log->debug(join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry));;
 my $extended_patron_attributes = ();
 if ( $op eq 'save' || $op eq 'insert' ) {
     if ( checkcardnumber( $newdata{cardnumber}, $newdata{borrowernumber} ) ) {
@@ -306,7 +308,7 @@ if ( ( defined $input->param('SMSnumber') ) && ( $input->param('SMSnumber') ne $
 ###  Error checks should happen before this line.
 $nok = $nok || scalar(@errors);
 if ( ( !$nok ) and $nodouble and ( $op eq 'insert' or $op eq 'save' ) ) {
-    $debug and warn "$op dates: " . join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry);
+    $log->debug("$op dates: " . join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry));
     if ( $op eq 'insert' ) {
 
         # we know it's not a duplicate borrowernumber or there would already be an error
@@ -642,7 +644,7 @@ foreach (qw(dateenrolled dateexpiry dateofbirth debarred)) {
     my $userdate = $data{$_};
     $debug and printf STDERR "%s : %s", $_, $userdate;
     unless ($userdate && $userdate ne "0000-00-00") {
-        $debug and warn sprintf "Empty \$data{%12s}", $_;
+        $log->debug(sprintf "Empty \$data{%12s}", $_);
         $data{$_} = '';
         next;
     }
@@ -668,7 +670,7 @@ if ( C4::Context->preference('EnhancedMessagingPreferences') ) {
 }
 
 $template->param( "showguarantor" => ( $category_type =~ /I|S|X/ ) ? 0 : 1 );    # associate with step to know where you are
-$debug and warn "memberentry step: $step";
+$log->debug("memberentry step: $step");
 $template->param(%data);
 $template->param( "step_$step" => 1 )      if $step;                               # associate with step to know where u are
 $template->param( step         => $step )  if $step;                               # associate with step to know where u are

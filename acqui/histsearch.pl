@@ -46,9 +46,7 @@ to filter on ended date.
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Auth;    # get_template_and_user
 use C4::Output;

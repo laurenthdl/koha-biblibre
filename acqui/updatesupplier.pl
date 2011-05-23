@@ -44,9 +44,7 @@ list_currency, gst, list_gst, invoice_gst, discount, gstrate.
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Context;
 use C4::Auth;
 use C4::Bookseller;
@@ -91,7 +89,6 @@ $data{'contfax'}      = $input->param('contact_fax');
 $data{'contemail'}    = $input->param('company_email');
 $data{'contnotes'}    = $input->param('contact_notes');
 
-# warn "".$data{'contnotes'};
 $data{'notes'}         = $input->param('notes');
 $data{'active'}        = $input->param('status');
 $data{'specialty'}     = $input->param('publishers_imprints');

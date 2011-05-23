@@ -21,8 +21,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Circulation;
 use C4::Output;
@@ -33,6 +32,9 @@ use C4::Auth qw/:DEFAULT get_session/;
 use C4::Branch;    # GetBranches
 use C4::Koha;
 use C4::Members;
+use C4::Logguer;
+
+my $log = C4::Logguer->new();
 
 ###############################################
 #  Getting state
@@ -108,14 +110,11 @@ my $barcode = $query->param('barcode');
 # strip whitespace
 defined $barcode and $barcode =~ s/\s*//g;    # FIXME: barcodeInputFilter
 
-# warn "barcode : $barcode";
 if ($barcode) {
 
     my $iteminformation;
     ( $transfered, $messages, $iteminformation ) = transferbook( $tobranchcd, $barcode, $ignoreRs );
 
-    #       use Data::Dumper;
-    #       warn "Transfered : $transfered / ".Dumper($messages);
     $found = $messages->{'ResFound'};
     if ($transfered) {
         my %item;
@@ -137,7 +136,6 @@ if ($barcode) {
         $item{tobrcd}   = $tobranchcd;
         push( @trsfitemloop, \%item );
 
-        #         warn Dumper(@trsfitemloop);
     }
 }
 
@@ -199,7 +197,7 @@ foreach my $code ( keys %$messages ) {
         $err{msg}        = $messages->{'BadBarcode'};
         $err{errbadcode} = 1;
     } elsif ( $code eq "NotAllowed" ) {
-        warn "NotAllowed: $messages->{'NotAllowed'} to  " . $branches->{ $messages->{'NotAllowed'} }->{'branchname'};
+        $log->warning("NotAllowed: $messages->{'NotAllowed'} to  " . $branches->{ $messages->{'NotAllowed'} }->{'branchname'});
 
         # Do we really want a error log message here? --atz
         $err{errnotallowed} = 1;
@@ -223,8 +221,6 @@ foreach my $code ( keys %$messages ) {
     push( @errmsgloop, \%err );
 }
 
-# use Data::Dumper;
-# warn "FINAL ============= ".Dumper(@trsfitemloop);
 $template->param(
     found            => $found,
     reserved         => $reserved,

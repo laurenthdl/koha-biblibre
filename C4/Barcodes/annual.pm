@@ -17,18 +17,20 @@ package C4::Barcodes::annual;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use Carp;
 
 use C4::Context;
 use C4::Debug;
 use C4::Dates;
+use C4::Logguer;
 
 use vars qw($VERSION @ISA);
 use vars qw($debug $cgi_debug);    # from C4::Debug, of course
 use vars qw($width);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     $VERSION = 0.01;
@@ -47,7 +49,7 @@ sub db_max ($;$) {
         my $input = shift;
         $iso = C4::Dates->new( $input, 'iso' )->output('iso');    # try to set the date w/ 2nd arg
         unless ($iso) {
-            warn "Failed to create 'iso' Dates object with input '$input'.  Reverting to today's date.";
+            $log->warning("Failed to create 'iso' Dates object with input '$input'.  Reverting to today's date.");
             $iso = C4::Dates->new->output('iso');                 # failover back to today
         }
     } else {
@@ -56,7 +58,7 @@ sub db_max ($;$) {
     my $year = substr( $iso, 0, 4 );                              # YYYY
     $sth->execute("$year-%");
     my $row = $sth->fetchrow_hashref;
-    warn "barcode db_max (annual format, year $year): $row->{barcode}" if $debug;
+    $log->debug("barcode db_max (annual format, year $year): $row->{barcode}");
     return $row->{barcode};
 }
 
@@ -72,7 +74,7 @@ sub parse ($;$) {
         carp "Barcode '$barcode' has no incrementing part!";
         return ( $barcode, undef, undef );
     }
-    $debug and warn "Barcode '$barcode' parses into: '$1', '$2', ''";
+    $log->debug("Barcode '$barcode' parses into: '$1', '$2', ''");
     return ( $1, $2, '' );                       # the third part is in anticipation of barcodes that include checkdigits
 }
 

@@ -17,14 +17,14 @@ package C4::Barcodes::hbyymmincr;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use Carp;
 
 use C4::Context;
 use C4::Debug;
 use C4::Dates;
+use C4::Logguer;
 
 use vars qw($VERSION @ISA);
 use vars qw($debug $cgi_debug);    # from C4::Debug, of course
@@ -40,6 +40,8 @@ INIT {
     $width  = 4;                   # FIXME: 4 is too small for sizeable or multi-branch libraries.
 }
 
+my $log = C4::Logguer->new();
+
 # Generates barcode where hb = home branch Code, yymm = year/month catalogued, incr = incremental number,
 # 	increment resets yearly -fbcit
 
@@ -53,7 +55,7 @@ sub db_max ($;$) {
         my $input = shift;
         $iso = C4::Dates->new( $input, 'iso' )->output('iso');    # try to set the date w/ 2nd arg
         unless ($iso) {
-            warn "Failed to create 'iso' Dates object with input '$input'.  Reverting to today's date.";
+            $log->warning("Failed to create 'iso' Dates object with input '$input'.  Reverting to today's date.");
             $iso = C4::Dates->new->output('iso');                 # failover back to today
         }
     } else {
@@ -63,12 +65,12 @@ sub db_max ($;$) {
     my $andtwo = $width + 2;
     $sth->execute( "^[a-zA-Z]{1,}" . $year . "[0-9]{$andtwo}" );    # the extra two digits are the month.  we don't care what they are, just that they are there.
     unless ( $sth->rows ) {
-        warn "No existing hbyymmincr barcodes found.  Reverting to initial value.";
+        $log->warning("No existing hbyymmincr barcodes found.  Reverting to initial value.");
         return $self->initial;
     }
     my ($row) = $sth->fetchrow_hashref;
     my $max = $row->{barcode};
-    warn "barcode max (hbyymmincr format): $max" if $debug;
+    $log->debug("barcode max (hbyymmincr format): $max");
     return ( $max || 0 );
 }
 
@@ -88,7 +90,7 @@ sub parse ($;$) {                               # return 3 parts of barcode: non
         carp "Barcode '$barcode' has no incrementing part!";
         return ( $barcode, undef, undef );
     }
-    $debug and warn "Barcode '$barcode' parses into: '$1', '$2', ''";
+    $log->debug("Barcode '$barcode' parses into: '$1', '$2', ''");
     return ( $1, $2, '' );                      # the third part is in anticipation of barcodes that include checkdigits
 }
 
@@ -113,7 +115,6 @@ sub process_head($$;$$) {                       # (self,head,whole,specific)
 }
 
 sub new_object {
-    $debug and warn "hbyymmincr: new_object called";
     my $class_or_object = shift;
     my $type            = ref($class_or_object) || $class_or_object;
     my $from_obj        = ref($class_or_object) ? 1 : 0;                  # are we building off another Barcodes object?

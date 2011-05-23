@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use vars qw($debug $cgi_debug);
 
 use CGI;
@@ -35,6 +34,8 @@ use C4::Items qw(GetItemInfosOf get_itemnumbers_of);
 use C4::Koha qw(GetItemTypes);    # XXX subfield_is_koha_internal_p
 use C4::Creators::Lib qw(html_table);
 use C4::Debug;
+use C4::Logguer;
+my $log = C4::Logguer->new();
 
 BEGIN {
     $debug = $debug || $cgi_debug;
@@ -93,9 +94,7 @@ if ( $op eq "do_search" ) {
     if ( scalar($marcresults->items) > 0 ) {
         $show_results = scalar @{$marcresults->items};
     } else {
-        $debug and warn "ERROR label-item-search: no results from SimpleSearch";
-
-        # leave $show_results undef
+        $log->error("ERROR label-item-search: no results from SimpleSearch");
     }
 }
 
@@ -143,7 +142,7 @@ if ($show_results) {
         } else {
 
             # FIXME: Some error trapping code needed
-            warn sprintf( 'No item numbers retrieved for biblio number: %s', $biblionumber );
+            $log->warning(sprintf( 'No item numbers retrieved for biblio number: %s', $biblionumber ));
         }
     }
 

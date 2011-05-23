@@ -22,9 +22,7 @@
 #
 # 		The reserve pull lists *works* as long as not for indepencdant branches, I can fix!
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Context;
 use C4::Output;
 use CGI;
@@ -92,7 +90,6 @@ my ( $prev_results, $next_results, $next_or_previous ) = ( 0, 0, 0 );
 if ($run_report) {
     my $dbh = C4::Context->dbh;
     my ( $sqlorderby, $sqldatewhere, $sqllimitoffset ) = ( "", "", "" );
-    $debug and warn format_date_in_iso($startdate) . "\n" . format_date_in_iso($enddate);
     my @query_params = ();
     if ($startdate) {
         $sqldatewhere .= " AND reservedate >= ?";

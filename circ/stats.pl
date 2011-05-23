@@ -20,9 +20,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Context;
 use C4::Output;
@@ -30,8 +28,9 @@ use C4::Auth;
 use Date::Manip;
 use C4::Stats;
 use C4::Debug;
+use C4::Logguer;
 
-use vars qw($debug);
+my $log = C4::Logguer->new();
 
 my $input = new CGI;
 my $time = $input->param('time') || '';
@@ -70,10 +69,8 @@ if ( $time eq 'yesterday' ) {
     exit;
 }
 
-$debug and warn "d : $date // d2 : $date2";
 $date  = UnixDate( $date,  '%Y-%m-%d' );
 $date2 = UnixDate( $date2, '%Y-%m-%d' );
-$debug and warn "d : $date // d2 : $date2";
 my @payments = TotalPaid( $date, $date2 );
 my $count    = @payments;
 my $total    = 0;
@@ -84,7 +81,7 @@ my %row;
 my $i = 0;
 
 while ( $i < $count ) {
-    $debug and warn " pay : " . $payments[$i]{'timestamp'};
+    $log->debug(" pay : " . $payments[$i]{'timestamp'});
     my $time         = $payments[$i]{'datetime'};
     my $payments     = $payments[$i]{'value'};
     my $charge       = 0;

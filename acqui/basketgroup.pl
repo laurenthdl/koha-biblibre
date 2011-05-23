@@ -41,8 +41,7 @@ The bookseller who we want to display the baskets (and basketgroups) of.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Input;
 use C4::Auth;

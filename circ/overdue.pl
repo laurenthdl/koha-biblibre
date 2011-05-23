@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Context;
 use C4::Output;
 use CGI qw(-oldstyle_urls);
@@ -295,7 +294,6 @@ if ($noreport) {
     $template->param( sql => $strsth );
     my $sth = $dbh->prepare($strsth);
 
-    #warn "overdue.pl : query string ".$strsth;
     $sth->execute();
 
     my @overduedata;

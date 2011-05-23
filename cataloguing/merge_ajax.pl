@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 # standard or CPAN modules used
 use IO::File;

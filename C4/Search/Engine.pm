@@ -23,7 +23,7 @@ use C4::Context;
 use C4::Search::Engine::Solr;
 use C4::Logguer;
 
-my $log = C4::Logguer->new('koha');
+my $log = C4::Logguer->new();
 
 =head1 NAME
 

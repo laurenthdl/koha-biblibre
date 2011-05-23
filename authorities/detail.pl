@@ -37,8 +37,7 @@ parameters tables.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::AuthoritiesMarc;
 use C4::Auth;

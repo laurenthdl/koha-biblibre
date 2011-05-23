@@ -17,15 +17,10 @@ package C4::Logguer;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use base 'Exporter';
-our @EXPORT    = qw();
-#our @EXPORT_OK = qw($log_opac $log_koha);
-
-use C4::Context;
+use Modern::Perl;
 use Log::LogLite;
-my $LOG_DIR = C4::Context->config('logdir');
 
+my $LOG_DIR = C4::Context->config('logdir');
 my $KOHA_LOG_FILE = $LOG_DIR . "/koha.log";
 my $OPAC_LOG_FILE = $LOG_DIR . "/opac.log";
 my $CRITICAL_LOG_LEVEL = 2;
@@ -41,7 +36,7 @@ sub new {
     my $proto = shift;
     my $class = ref($proto) || $proto;
     my $self = {};
-    my $type = shift || 'koha';
+    my $type = shift || $ENV{LOG} || 'koha';
     $self->{LEVEL} = shift || C4::Context->preference("DebugLevel") || $NORMAL_LOG_LEVEL;
 
     if ( $type eq 'koha' ) {

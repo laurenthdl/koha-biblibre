@@ -35,7 +35,7 @@ use List::MoreUtils qw(uniq);
 
 extends 'Data::SearchEngine::Solr';
 
-my $log = C4::Logguer->new('koha');
+my $log = C4::Logguer->new();
 
 =head1 NAME
 

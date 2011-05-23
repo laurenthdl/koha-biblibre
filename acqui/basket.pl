@@ -20,8 +20,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Auth;
 use C4::Koha;
 use C4::Output;
@@ -34,6 +33,10 @@ use C4::Dates qw/format_date/;
 use C4::Debug;
 
 use C4::Members qw/GetMember/;    #needed for permissions checking for changing basketgroup of a basket
+
+use C4::Logguer;
+
+my $log = C4::Logguer->new();
 
 =head1 NAME
 
@@ -82,7 +85,6 @@ my $basket = GetBasket($basketno);
 # FIXME : what about the "discount" percentage?
 # FIXME : the query->param('supplierid') below is probably useless. The bookseller is always known from the basket
 # if no booksellerid in parameter, get it from basket
-# warn "=>".$basket->{booksellerid};
 $booksellerid = $basket->{booksellerid} unless $booksellerid;
 my ($bookseller) = GetBookSellerFromId($booksellerid);
 my $op = $query->param('op');
@@ -230,9 +232,7 @@ if ( $op eq 'delete_confirm' ) {
     # if new basket, pre-fill infos
     $basket->{creationdate} = ""            unless ( $basket->{creationdate} );
     $basket->{authorisedby} = $loggedinuser unless ( $basket->{authorisedby} );
-    $debug
-      and warn sprintf "loggedinuser: $loggedinuser; creationdate: %s; authorisedby: %s",
-      $basket->{creationdate}, $basket->{authorisedby};
+    $log->debug("loggedinuser: $loggedinuser; creationdate: $basket->{creationdate}; authorisedby: $basket->{authorisedby}");
 
     my @results = GetOrders($basketno);
     my $count   = scalar @results;

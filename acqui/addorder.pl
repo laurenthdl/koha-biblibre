@@ -114,8 +114,7 @@ if it is an order from an existing suggestion : the id of this suggestion.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Auth;           # get_template_and_user
 use C4::Acquisition;    # NewOrder DelOrder ModOrder

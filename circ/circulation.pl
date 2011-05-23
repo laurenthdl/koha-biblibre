@@ -20,9 +20,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Output;
 use C4::Print;
@@ -37,6 +35,7 @@ use C4::Biblio;
 use C4::Reserves;
 use C4::Context;
 use C4::Debug;
+use C4::Logguer;
 use List::MoreUtils qw/any/;
 use CGI::Session;
 use C4::Items;
@@ -49,6 +48,8 @@ use Date::Calc qw(
   Date_to_Days
 );
 use List::MoreUtils qw/uniq/;
+
+my $log = C4::Logguer->new();
 
 #
 # PARAMETERS READING
@@ -134,7 +135,6 @@ my $organisation   = $query->param('organisations');
 my $print          = $query->param('print');
 my $newexpiry      = $query->param('dateexpiry');
 my $debt_confirmed = $query->param('debt_confirmed') || 0;    # Don't show the debt error dialog twice
-$debug && warn $newexpiry;
 
 # Check if stickyduedate is turned off
 if ($barcode) {
@@ -645,7 +645,7 @@ if ($borrowerslist) {
 
 #title
 my $flags = $borrower->{'flags'};
-$debug && warn Dump($flags);
+$log->debug($flags, 1);
 foreach my $flag ( sort keys %$flags ) {
     $template->param( flagged => 1 );
     $flags->{$flag}->{'message'} =~ s#\n#<br />#g;

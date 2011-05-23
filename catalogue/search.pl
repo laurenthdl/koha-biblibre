@@ -86,9 +86,7 @@ There are several types of queries needed in the process of search and retrieve:
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 ## load Koha modules
 use C4::Context;
@@ -103,6 +101,9 @@ use C4::VirtualShelves qw(GetRecentShelves);
 use POSIX qw(ceil floor);
 use C4::Branch;    # GetBranches
 use Data::Pagination;
+use C4::Logguer;
+
+my $log = C4::Logguer->new();
 
 # create a new CGI object
 # FIXME: no_undef_params needs to be tested
@@ -386,7 +387,7 @@ if ( $limit_yr ) {
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 
 my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
-C4::Context->preference("DebugLevel") eq '2' && warn "ProSolrSimpleSearch:q=$q:";
+$log->debug("ProSolrSimpleSearch:q=$q:");
 
 if (!$res){
     $template->param(query_error => "Bad request! help message ?");

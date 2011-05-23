@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Output;
@@ -30,11 +28,12 @@ use C4::Koha;      # XXX subfield_is_koha_internal_p
 use C4::Branch;    # XXX subfield_is_koha_internal_p
 use C4::ClassSource;
 use C4::Dates;
+use C4::Logguer;
 use List::MoreUtils qw/any/;
 use Storable qw(thaw freeze);
 use URI::Escape;
 
-
+my $log = C4::Logguer->new();
 
 use MARC::File::XML;
 
@@ -211,7 +210,7 @@ sub generate_subfield_form {
                         <a href="#" class="buttonDot" onclick="Clic$function_name('$subfield_data{id}'); return false;" title="Tag Editor">...</a>
                         $javascript];
                 } else {
-                    warn "Plugin Failed: $plugin";
+                    $log->warning("Plugin Failed: $plugin");
                     $subfield_data{marc_value} = "<input $attributes />"; # supply default input form
                 }
         }
@@ -538,7 +537,6 @@ if ( $op eq "additem" ) {
     my $itemtosave = MARC::Record::new_from_xml( $xml, 'UTF-8' );
 
     # MARC::Record builded => now, record in DB
-    # warn "R: ".$record->as_formatted;
     # check that the barcode don't exist already
     my $addedolditem = TransformMarcToKoha( $dbh, $itemtosave );
     my $exist_itemnumber = get_item_from_barcode( $addedolditem->{'barcode'} );
