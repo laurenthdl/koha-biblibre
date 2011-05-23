@@ -17,8 +17,7 @@ package C4::Reports::Guided;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
+use Modern::Perl;
 #use warnings; FIXME - Bug 2505 this module needs a lot of repair to run clean under warnings
 use CGI;
 use Carp;
@@ -30,7 +29,6 @@ use C4::Output;
 use C4::Dates;
 use XML::Simple;
 use XML::Dumper;
-use Switch;
 use C4::Debug;
 use utf8;
 #use open qw(:std :utf8);
@@ -59,12 +57,14 @@ $table_areas{'2'} = [ 'items', 'biblioitems', 'biblio' ];                     # 
 $table_areas{'3'} = ['borrowers'];                                            # patrons
 $table_areas{'4'} = [ 'aqorders', 'biblio', 'items' ];                        # acquisitions
 $table_areas{'5'} = [ 'borrowers', 'accountlines' ];                          # accounts
+$table_areas{'6'} = [ 'biblio', 'biblioitems', 'serial', 'serialitems', 'subscription', 'subscriptionhistory', 'subscriptionroutinglists', 'aqbooksellers' ]; # serial
 our %keys;
 $keys{'1'} = [ 'statistics.borrowernumber=borrowers.borrowernumber',  'items.itemnumber = statistics.itemnumber', 'biblioitems.biblioitemnumber = items.biblioitemnumber' ];
 $keys{'2'} = [ 'items.biblioitemnumber=biblioitems.biblioitemnumber', 'biblioitems.biblionumber=biblio.biblionumber' ];
 $keys{'3'} = [];
 $keys{'4'} = [ 'aqorders.biblionumber=biblio.biblionumber',           'biblio.biblionumber=items.biblionumber' ];
 $keys{'5'} = ['borrowers.borrowernumber=accountlines.borrowernumber'];
+$keys{'6'} = [ 'biblio.biblionumber=biblioitems.biblionumber', 'biblioitems.biblionumber=serial.biblionumber', 'serial.serialid=serialitems.serialid', 'serial.subscriptionid=subscription.subscriptionid', 'serial.subscriptionid=subscriptionhistory.subscriptionid', 'serial.subscriptionid=subscriptionroutinglists.subscriptionid', 'subscription.aqbooksellerid=aqbooksellers.id'];
 
 # have to do someting here to know if its dropdown, free text, date etc
 
@@ -89,6 +89,9 @@ $criteria{'4'} = ['aqorders.datereceived|date'];
 
 # reports on accounting
 $criteria{'5'} = [ 'borrowers.branchcode', 'borrowers.categorycode' ];
+
+# reports on serial
+$criteria{'6'} = ['subscription.startdate|date', 'subscription.enddate|date', 'subscription.periodicity', 'subscription.callnumber', 'subscription.location', 'subscription.branchcode'];
 
 # Adds itemtypes to criteria, according to the syspref
 if ( C4::Context->preference('item-level_itypes') ) {
@@ -148,9 +151,9 @@ sub get_report_areas {
     my $dbh = C4::Context->dbh();
 
     # FIXME these should be in the database
-    my @reports = ( 'Circulation', 'Catalog', 'Patrons', 'Acquisitions', 'Accounts' );
+    my @reports = ( 'Circulation', 'Catalog', 'Patrons', 'Acquisitions', 'Accounts', 'Serial' );
     my @reports2;
-    for ( my $i = 0 ; $i < 5 ; $i++ ) {
+    for my $i ( 0 .. $#reports ) {
         my %hashrep;
         $hashrep{id}   = $i + 1;
         $hashrep{name} = $reports[$i];
@@ -306,8 +309,8 @@ sub get_criteria {
     foreach my $localcrit (@$crit) {
         my ( $value, $type )   = split( /\|/, $localcrit );
         my ( $table, $column ) = split( /\./, $value );
-        switch ($type) {
-            case 'textrange' {
+        given ($type) {
+            when ( 'textrange' ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'from'}        = "from_" . $value;
@@ -317,7 +320,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            case 'date' {
+            when ( 'date' ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'date'}        = 1;
@@ -325,7 +328,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            case 'daterange' {
+            when ( 'daterange' ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'from'}        = "from_" . $value;
@@ -335,7 +338,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            else {
+            default {
                 my $query = "SELECT distinct($column) as availablevalues FROM $table";
                 my $sth   = $dbh->prepare($query);
                 $sth->execute();
@@ -349,10 +352,14 @@ sub get_criteria {
                 $list = 'ccode'        if $column eq 'ccode';
 
                 # TODO : improve to let the librarian choose the description at runtime
-                push @values, { availablevalues => "<<$column" . ( $list ? "|$list" : '' ) . ">>" };
+                push @values, {
+                    availablevalues => "<<$column" . ( $list ? "|$list" : '' ) . ">>",
+                    display_value   => "<<$column" . ( $list ? "|$list" : '' ) . ">>"
+                };
                 while ( my $row = $sth->fetchrow_hashref() ) {
-                    push @values, $row;
                     if ( $row->{'availablevalues'} eq '' ) { $row->{'default'} = 1 }
+                    else { $row->{display_value} = _get_display_value( $row->{'availablevalues'}, $column ); }
+                    push @values, $row;
                 }
                 $sth->finish();
 
@@ -364,7 +371,6 @@ sub get_criteria {
                 push @criteria_array, \%temp;
 
             }
-
         }
     }
     return ( \@criteria_array );
@@ -684,7 +690,7 @@ sub get_from_dictionary {
         $sth->execute();
     }
     my @loop;
-    my @reports = ( 'Circulation', 'Catalog', 'Patrons', 'Acquisitions', 'Accounts' );
+    my @reports = ( 'Circulation', 'Catalog', 'Patrons', 'Acquisitions', 'Accounts', 'Serial' );
     while ( my $data = $sth->fetchrow_hashref() ) {
         $data->{'areaname'} = $reports[ $data->{'area'} - 1 ];
         push @loop, $data;
@@ -730,6 +736,21 @@ sub _get_column_defs {
     close COLUMNS;
     return \%columns;
 }
+
+sub _get_display_value {
+    my ( $original_value, $column ) = @_;
+    given ( $column ) {
+        when ("periodicity") {
+            my $dbh = C4::Context->dbh();
+            my $query = "SELECT description FROM subscription_frequencies WHERE id = ?";
+            my $sth   = $dbh->prepare($query);
+            $sth->execute($original_value);
+            return $sth->fetchrow;
+        }
+    }
+    return $original_value;
+}
+
 1;
 __END__
 
