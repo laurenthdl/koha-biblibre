@@ -59,12 +59,14 @@ $table_areas{'2'} = [ 'items', 'biblioitems', 'biblio' ];                     # 
 $table_areas{'3'} = ['borrowers'];                                            # patrons
 $table_areas{'4'} = [ 'aqorders', 'biblio', 'items' ];                        # acquisitions
 $table_areas{'5'} = [ 'borrowers', 'accountlines' ];                          # accounts
+$table_areas{'6'} = [ 'serial', 'serialitems', 'subscription', 'subscriptionhistory', 'subscriptionroutinglist' ]; # serial
 our %keys;
 $keys{'1'} = [ 'statistics.borrowernumber=borrowers.borrowernumber',  'items.itemnumber = statistics.itemnumber', 'biblioitems.biblioitemnumber = items.biblioitemnumber' ];
 $keys{'2'} = [ 'items.biblioitemnumber=biblioitems.biblioitemnumber', 'biblioitems.biblionumber=biblio.biblionumber' ];
 $keys{'3'} = [];
 $keys{'4'} = [ 'aqorders.biblionumber=biblio.biblionumber',           'biblio.biblionumber=items.biblionumber' ];
 $keys{'5'} = ['borrowers.borrowernumber=accountlines.borrowernumber'];
+$keys{'6'} = [ 'serial.serialid=serialitems.serialid', 'serial.subscriptionid=subscription.subscriptionid', 'serial.subscriptionid=subscriptionhistory.subscriptionid', 'serial.subscriptionid=subscriptionroutinglist.subscriptionid'];
 
 # have to do someting here to know if its dropdown, free text, date etc
 
@@ -89,6 +91,9 @@ $criteria{'4'} = ['aqorders.datereceived|date'];
 
 # reports on accounting
 $criteria{'5'} = [ 'borrowers.branchcode', 'borrowers.categorycode' ];
+
+# reports on serial
+$criteria{'6'} = ['subscription.startdate|date', 'subscription.enddate|date', 'subscription.periodicity', 'subscription.callnumber', 'subscription.location', 'subscription.branchcode'];
 
 # Adds itemtypes to criteria, according to the syspref
 if ( C4::Context->preference('item-level_itypes') ) {
@@ -148,9 +153,9 @@ sub get_report_areas {
     my $dbh = C4::Context->dbh();
 
     # FIXME these should be in the database
-    my @reports = ( 'Circulation', 'Catalog', 'Patrons', 'Acquisitions', 'Accounts' );
+    my @reports = ( 'Circulation', 'Catalog', 'Patrons', 'Acquisitions', 'Accounts', 'Serial' );
     my @reports2;
-    for ( my $i = 0 ; $i < 5 ; $i++ ) {
+    for my $i ( 0 .. $#reports ) {
         my %hashrep;
         $hashrep{id}   = $i + 1;
         $hashrep{name} = $reports[$i];
@@ -684,7 +689,7 @@ sub get_from_dictionary {
         $sth->execute();
     }
     my @loop;
-    my @reports = ( 'Circulation', 'Catalog', 'Patrons', 'Acquisitions', 'Accounts' );
+    my @reports = ( 'Circulation', 'Catalog', 'Patrons', 'Acquisitions', 'Accounts', 'Serial' );
     while ( my $data = $sth->fetchrow_hashref() ) {
         $data->{'areaname'} = $reports[ $data->{'area'} - 1 ];
         push @loop, $data;
