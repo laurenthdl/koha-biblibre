@@ -28,6 +28,7 @@ use C4::Output;
 use C4::Context;
 use C4::Acquisition;
 use C4::Biblio;
+use C4::Bookseller;
 use C4::Items;
 use C4::Search;
 use List::MoreUtils qw/any/;
@@ -71,6 +72,21 @@ if ( any { $order->{$_} ne $tplorder{$_} } qw(quantity quantityreceived notes rr
     $order->{rrp}              = $tplorder{rrp}              if $tplorder{rrp};
     $order->{ecost}            = $tplorder{ecost}            if $tplorder{ecost};
     $order->{unitprice}        = $tplorder{unitprice}        if $tplorder{unitprice};
+
+
+    my $bookseller = GetBookSellerFromId($supplierid);
+    if ( $bookseller->{listincgst} ) {
+        if ( not $bookseller->{invoiceincgst} ) {
+            $order->{rrp} = $order->{rrp} * ( 1 + $order->{gstrate} );
+             $order->{ecost} = $order->{ecost} * ( 1 + $order->{gstrate} );
+        }
+    } else {
+        if ( $bookseller->{invoiceincgst} ) {
+            $order->{rrp} = $order->{rrp} / ( 1 + $order->{gstrate} );
+            $order->{ecost} = $order->{ecost} / ( 1 + $order->{gstrate} );
+        }
+    }
+
     ModOrder($order);
 }
 
