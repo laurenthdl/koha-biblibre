@@ -659,33 +659,17 @@ function messenger(X,Y,etc){    // FIXME: unused?
 //  NEXT BLOCK IS USED BY NEWORDERBEMPTY
 
 function updateCosts(){
-    //collect values
     var quantity = new Number($("#quantity").val());
     var discount = new Number($("#discount").val());
-    var listinc  = new Number ($("#listinc").val());
     var applygst = new Number ($("#applygst").val());
     var listprice   =  new Number($("#listprice").val());
-    var invoiceincgst =  new Number ($("#invoiceincgst").val());
     var exchangerate =  new Number($("#currency_rate").val());
-    var gstrate = new Number($("#gstrate").val());
-    var gst_on=false;
-    if ( listinc == 0 ) {
-        gst_on = true;
-    }
 
-    //do real stuff
     var rrp   = new Number(listprice*exchangerate);
 
-    // Calcul real ecost with discount on dutyfree price
     var ecost = new Number(rrp * (100 - discount ) / 100);
 
-    var GST   = new Number(0);
-    if (gst_on) {
-        rrp=rrp * (1 + gstrate);
-        GST=ecost * gstrate;
-    }
-
-    var total =  new Number( (ecost + GST) * quantity);
+    var total =  new Number( ecost * quantity);
 
     $("#rrp").val(rrp.toFixed(2));
 

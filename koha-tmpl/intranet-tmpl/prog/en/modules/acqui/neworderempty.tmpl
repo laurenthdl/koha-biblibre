@@ -351,10 +351,10 @@ $(document).ready(function()
             </li>
             <li>
                 <!-- TMPL_IF name="close" -->
-            <span class="label">Retail price (taxes included): </span>
+                    <span class="label">Retail price: </span>
                     <input type="hidden" size="20" name="listprice" id="listprice" value="<!-- TMPL_VAR NAME="listprice" -->" /><!-- TMPL_VAR NAME="listprice" -->
                 <!-- TMPL_ELSE -->
-                <label for="listprice">Retail price (taxes included): </label>
+                    <label for="listprice">Retail price: </label>
                     <input type="text" size="20" name="listprice" id="listprice" value="<!-- TMPL_VAR NAME="listprice" -->" onchange="updateCosts()" /> (entered as <!-- TMPL_VAR NAME="currency" -->)
 
                 <!--/TMPL_IF-->
