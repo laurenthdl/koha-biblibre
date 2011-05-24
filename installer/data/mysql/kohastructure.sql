@@ -2630,16 +2630,6 @@ CREATE TABLE `indexes` (
   UNIQUE (`code`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-T NULL,
-
-
-
-
-
-
-
-
 --
 -- Table structure for table `indexmappings`
 --

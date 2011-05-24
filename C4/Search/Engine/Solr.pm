@@ -161,8 +161,12 @@ sub GetAvlistFromCode {
     return $result->{'avlist'};
 }
 
+my $hashindex_subfields;
+
 sub GetSubfieldsForIndex {
     my $index = shift;
+    return $hashindex_subfields->{$index} if exists ( $hashindex_subfields->{$index});
+
     my $dbh = C4::Context->dbh;
     my $query = "SELECT field, subfield FROM indexmappings WHERE `index` = ?";
     $query .= " ORDER BY field, subfield";
@@ -174,6 +178,8 @@ sub GetSubfieldsForIndex {
     for ( @$arrayref ) {
         push @{ $subfields->{ $_->{'field'} } }, $_->{'subfield'};
     }
+    $hashindex_subfields->{$index}=$subfields;
+
     return $subfields;
 }
 
