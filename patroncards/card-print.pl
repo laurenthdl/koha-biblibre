@@ -17,11 +17,9 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
-use Data::Dumper;
 
 use C4::Auth qw(get_template_and_user);
 use C4::Output qw(output_html_with_http_headers);

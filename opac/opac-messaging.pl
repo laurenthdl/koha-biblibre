@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 
@@ -64,7 +63,6 @@ if ( defined $query->param('modify') && $query->param('modify') eq 'yes' ) {
 
 C4::Form::MessagingPreferences::set_form_values( { borrowernumber => $borrower->{'borrowernumber'} }, $template );
 
-# warn( Data::Dumper->Dump( [ $messaging_options ], [ 'messaging_options' ] ) );
 $template->param(
     BORROWER_INFO => [$borrower],
     messagingview => 1,

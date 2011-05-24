@@ -17,7 +17,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
+use Modern::Perl;
 
 use CGI;
 
@@ -30,7 +30,7 @@ use C4::Output;
 use C4::Reports;
 use C4::Members;
 use C4::Dates qw/format_date format_date_in_iso/;
-use C4::Category;
+use C4::Catuse C4::Logguer;
 use List::MoreUtils qw/any/;
 use YAML;
 
@@ -44,7 +44,7 @@ plugin that shows circulation stats
 
 =cut
 
-# my $debug = 1;	# override for now.
+my $log = C4::Logguer->new();egory;
 my $input          = new CGI;
 my $fullreportname = "reports/reserves_stats.tmpl";
 my $do_it          = $input->param('do_it');
@@ -246,7 +246,6 @@ sub calculate {
         my $string;
         my $stringfield = $filter;
         $stringfield =~ s/\_[a-z_]+$//;
-        warn $stringfield;
         if ( $filter =~ / / ) {
             $string = $stringfield;
         } elsif ( $filter =~ /_or/ ) {
@@ -313,7 +312,7 @@ sub calculate {
         my $total = 0;
         foreach my $row (@loopline) {
             $total += $$data{$row}{$col}{calculation};
-            $debug and warn "value added " . $$data{$row}{$col}{calculation} . "for line " . $row;
+            $log->debug("value added " . $$data{$row}{$col}{calculation} . "for line " . $row);
         }
         push @loopfooter, { 'totalcol' => $total };
         push @loopcol,

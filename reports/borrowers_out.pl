@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Auth;
@@ -130,10 +129,6 @@ if ($do_it) {
 
     my @mime = ( C4::Context->preference("MIME") );
 
-    #	foreach my $mime (@mime){
-    #		warn "".$mime;
-    #	}
-
     my $CGIextChoice = CGI::scrolling_list(
         -name     => 'MIME',
         -id       => 'MIME',
@@ -197,9 +192,6 @@ sub calculate {
         my @colfilter;
         $colfilter[0] = @$filters[0] if ( $column =~ /category/ );
 
-        # 	$colfilter[0] = @$filters[11] if ($column =~ /sort2/ ) ;
-        #warn "filtre col ".$colfilter[0]." ".$colfilter[1];
-
         # loop cols.
         $colfield .= $column;
         $colorder .= $column;
@@ -213,32 +205,23 @@ sub calculate {
         $strsth2 .= " group by $colfield";
         $strsth2 .= " order by $colorder";
 
-        # warn "". $strsth2;
-
         my $sth2 = $dbh->prepare($strsth2);
         $sth2->execute;
         while ( my ($celvalue) = $sth2->fetchrow ) {
             my %cell;
 
-            #		my %ft;
-            #		warn "coltitle :".$celvalue;
             $cell{coltitle} = $celvalue;
 
-            #		$ft{totalcol} = 0;
             push @loopcol, \%cell;
         }
 
-        #	warn "fin des titres colonnes";
     }
 
     my $i = 0;
 
-    #	my @totalcol;
-
     #Initialization of cell values.....
     my @table;
 
-    #	warn "init table";
     if ($line) {
         for ( my $i = 1 ; $i <= $line ; $i++ ) {
             foreach my $col (@loopcol) {
@@ -276,11 +259,9 @@ sub calculate {
         $strcalc .= " LIMIT 0,$max";
     }
 
-warn $strcalc;
     my $dbcalc = $dbh->prepare($strcalc);
     $dbcalc->execute;
 
-    # 	warn "filling table";
     my $previous_col;
     $i = 1;
     while ( my @data = $dbcalc->fetchrow ) {
@@ -289,7 +270,6 @@ warn $strcalc;
         $i = 1 if ( ($previous_col) and not( $col eq $previous_col ) );
         $table[$i]->{$col} = $row;
 
-        #		warn " $i $col $row";
         $i++;
         $previous_col = $col;
     }

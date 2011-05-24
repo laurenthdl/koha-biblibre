@@ -18,8 +18,7 @@
 # Suite 330, Boston, MA  02111-1307 USA
 #
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Output;
@@ -33,10 +32,12 @@ use C4::Members;
 use C4::Stats;
 use C4::UploadedFile;
 use C4::BackgroundJob;
-
+use C4::Logguer;
 use Date::Calc qw( Add_Delta_Days Date_to_Days );
 
 use constant DEBUG => 0;
+
+my $log = C4::Logguer->new();
 
 # this is the file version number that we're coded against.
 my $FILE_VERSION = '1.0';
@@ -105,7 +106,7 @@ if ($completedJobID) {
 
             # fork failed, so exit immediately
             # fork failed, so exit immediately
-            warn "fork failed while attempting to run $ENV{'SCRIPT_NAME'} as a background job";
+            $log->error("fork failed while attempting to run $ENV{'SCRIPT_NAME'} as a background job");
             exit 0;
         }
 
@@ -144,7 +145,7 @@ if ($completedJobID) {
         if ( exists $dispatch_table{ $command_line->{'command'} } ) {
             $dispatch_table{ $command_line->{'command'} }->($command_line);
         } else {
-            warn "unknown command: '$command_line->{command}' not processed";
+            $log->error("unknown command: '$command_line->{command}' not processed");
         }
 
         if ($runinbackground) {
@@ -255,12 +256,9 @@ sub kocIssueItem {
 
     if ( $issue->{'date_due'} ) {    ## Item is currently checked out to another person.
 
-        #warn "Item Currently Issued.";
         my $issue = GetOpenIssue( $item->{'itemnumber'} );
 
         if ( $issue->{'borrowernumber'} eq $borrower->{'borrowernumber'} ) {    ## Issued to this person already, renew it.
-
-            #warn "Item issued to this member already, renewing.";
 
             my $date_due_object = C4::Dates->new( $date_due, 'iso' );
             C4::Circulation::AddRenewal(
@@ -287,9 +285,6 @@ sub kocIssueItem {
 
         } else {
 
-            #warn "Item issued to a different member.";
-            #warn "Date of previous issue: $issue->{'issuedate'}";
-            #warn "Date of this issue: $circ->{'date'}";
             my ( $i_y, $i_m, $i_d ) = split( /-/, $issue->{'issuedate'} );
             my ( $c_y, $c_m, $c_d ) = split( /-/, $circ->{'date'} );
 
@@ -312,7 +307,7 @@ sub kocIssueItem {
 
             } else {    ## Current issue is *newer* than this issue, write a 'returned' issue, as the item is most likely in the hands of someone else now.
 
-                #warn "Current issue to another member is newer. Doing nothing";
+                $log->warning("Current issue to another member is newer. Doing nothing");
                 ## This situation should only happen of the Offline Circ data is *really* old.
                 ## FIXME: write line to old_issues and statistics
             }
@@ -342,7 +337,6 @@ sub kocReturnItem {
     $circ->{'barcode'} = barcodedecode( $circ->{'barcode'} ) if ( $circ->{'barcode'} && C4::Context->preference('itemBarcodeInputFilter') );
     my $item = GetBiblioFromItemNumber( undef, $circ->{'barcode'} );
 
-    #warn( Data::Dumper->Dump( [ $circ, $item ], [ qw( circ item ) ] ) );
     my $borrowernumber = _get_borrowernumber_from_barcode( $circ->{'barcode'} );
     if ($borrowernumber) {
         my $borrower = GetMember( 'borrowernumber' => $borrowernumber );

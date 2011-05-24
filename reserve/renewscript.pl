@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License along
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-use strict;
-use warnings;
+
+use Modern::Perl;
 use CGI;
 use C4::Circulation;
 use C4::Auth;
@@ -73,7 +73,6 @@ if ( $input->param('newduedate') ) {
     $datedue = C4::Dates->new( $input->param('newduedate') );
 }
 
-# warn "barcodes : @barcodes";
 #
 # renew items
 #
@@ -95,10 +94,7 @@ foreach my $itemno (@data) {
         #unless($pid && $remotehost=~qr(^$ips$)){
         #if (!$pid && any{ $remotehost eq $_ }@ips ){
         if ( any { $remotehost eq $_ } @ips ) {
-            warn $remotehost;
             system("../services/magnetise.pl $remotehost out");
-
-            #die 0;
         }
     } else {
         $failedrenews .= "&failedrenew=$itemno&renewerror=" . encode_json($error);
@@ -155,10 +151,7 @@ foreach my $barcode (@barcodes) {
         #unless($pid && $remotehost=~qr(^$ips$)){
         #if (!$pid && any{ $remotehost eq $_ }@ips ){
         if ( any { $remotehost eq $_ } @ips ) {
-            warn $remotehost;
             system("../services/magnetise.pl $remotehost in");
-
-            #die 0;
         }
     }
     if ( !$returned || $messages ) {
@@ -170,7 +163,6 @@ foreach my $barcode (@barcodes) {
 # redirection to the referrer page
 #
 if ( $input->param('destination') eq "circ" ) {
-    warn($failedreturn);
     print $input->redirect( '/cgi-bin/koha/circ/circulation.pl?findborrower=' . $cardnumber . $failedrenews . $failedreturn );
 } else {
     print $input->redirect( '/cgi-bin/koha/members/moremember.pl?borrowernumber=' . $borrowernumber . $failedrenews . $failedreturn );

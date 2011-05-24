@@ -23,9 +23,7 @@
 # script now takes a branchcode arg
 # eg: http://koha.rangitikei.katipo.co.nz/cgi-bin/koha/reports/reservereport.pl?branch=BL
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Stats;
 use C4::Dates qw/format_date/;
 use CGI;

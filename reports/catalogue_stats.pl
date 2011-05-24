@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Auth;
 use CGI;
 use C4::Context;
@@ -28,7 +26,7 @@ use C4::Output;
 use C4::Koha;
 use C4::Reports;
 use C4::Circulation;
-
+use C4::Logguer;
 =head1 NAME
 
 plugin that shows a stats on borrowers
@@ -39,6 +37,7 @@ plugin that shows a stats on borrowers
 
 =cut
 
+my $log = C4::Logguer->new();
 our $debug = 0;
 my $input          = new CGI;
 my $fullreportname = "reports/catalogue_stats.tmpl";
@@ -243,8 +242,6 @@ sub calculate {
         }
     }
 
-    #	warn map {"filtres $_\n"} @filters[0..3];
-
     my @linefilter;
     $linefilter[0] = @$filters[0] if ( $line =~ /dewey/ );
     $linefilter[1] = @$filters[1] if ( $line =~ /dewey/ );
@@ -396,11 +393,9 @@ sub calculate {
     #Initialization of cell values.....
     my %table;
 
-    #	warn "init table";
     foreach my $row (@loopline) {
         foreach my $col (@loopcol) {
 
-            #			warn " init table : $row->{rowtitle} / $col->{coltitle} ";
             $table{ $row->{rowtitle} }->{ $col->{coltitle} } = 0;
         }
         $table{ $row->{rowtitle} }->{totalrow} = 0;
@@ -471,7 +466,7 @@ sub calculate {
         $strcalc .= " AND TO_DAYS(now()) - TO_DAYS(items.dateaccessioned) > (" . @$filters[15] . " * 365)";
     }
     $strcalc .= " group by $linefield, $colfield order by $linefield,$colfield";
-    $debug and warn "SQL: $strcalc";
+    $log->debug("SQL: $strcalc");
     my $dbcalc = $dbh->prepare($strcalc);
     if ($barcodefilter) {
         $dbcalc->execute($barcodefilter);
@@ -479,12 +474,9 @@ sub calculate {
         $dbcalc->execute();
     }
 
-    #	warn "filling table";
-
     my $emptycol;
     while ( my ( $row, $col, $value ) = $dbcalc->fetchrow ) {
 
-        #		warn "filling table $row / $col / $value ";
         $emptycol = 1         if ( !defined($col) );
         $col      = "zzEMPTY" if ( !defined($col) );
         $row      = "zzEMPTY" if ( !defined($row) );
@@ -518,16 +510,12 @@ sub calculate {
           };
     }
 
-    #	warn "footer processing";
     foreach my $col (@loopcol) {
         my $total = 0;
         foreach my $row (@looprow) {
             $total += $table{ ( $row->{rowtitle} eq "NULL" ) ? "zzEMPTY" : $row->{rowtitle} }->{ ( $col->{coltitle} eq "NULL" ) ? "zzEMPTY" : $col->{coltitle} };
-
-            #			warn "value added ".$table{$row->{rowtitle}}->{$col->{coltitle}}. "for line ".$row->{rowtitle};
         }
 
-        #		warn "summ for column ".$col->{coltitle}."  = ".$total;
         push @loopfooter, { 'totalcol' => $total };
     }
 

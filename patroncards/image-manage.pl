@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
-use warnings;
-use strict;
+use Modern::Perl;
 
 use CGI;
 use Graphics::Magick;
@@ -14,6 +13,9 @@ use C4::Output;
 use C4::Debug;
 use C4::Creators 1.000000;
 use C4::Patroncards 1.000000;
+use C4::Logguer;
+
+my $log = C4::Logguer->new();
 
 my $cgi = CGI->new;
 
@@ -49,7 +51,7 @@ my $errstr      = '';                                                    # NOTE:
 
 if ( $op eq 'upload' ) {
     if ( !$upload_file ) {
-        warn sprintf( 'An error occurred while attempting to upload file %s.', $source_file );
+        $log->error(sprintf( 'An error occurred while attempting to upload file %s.', $source_file ));
         $errstr = 301;
         $template->param(
             IMPORT_SUCCESSFUL => 0,
@@ -63,7 +65,7 @@ if ( $op eq 'upload' ) {
         my $image = Graphics::Magick->new;
         eval { $image->Read( $cgi->tmpFileName($file_name) ); };
         if ($@) {
-            warn sprintf( 'An error occurred while creating the image object: %s', $@ );
+            $log->error(sprintf( 'An error occurred while creating the image object: %s', $@ ));
             $errstr = 202;
             $template->param(
                 IMPORT_SUCCESSFUL => 0,
@@ -109,7 +111,7 @@ if ( $op eq 'upload' ) {
         $err = rm_image( \@image_ids );
         $errstr = 102 if $err;
     } else {
-        warn sprintf('No image ids passed in to delete.');
+        $log->info('No image ids passed in to delete.');
         $errstr = 202;
     }
     if ($errstr) {
@@ -136,7 +138,7 @@ if ( $op eq 'upload' ) {
         TABLE             => $table,
     );
 } else {    # to trap unsupported operations
-    warn sprintf( 'Image upload interface called an unsupported operation: %s', $op );
+    $log->warning(sprintf( 'Image upload interface called an unsupported operation: %s', $op ));
     $errstr = 201;
     $template->param(
         IMPORT_SUCCESSFUL => 0,

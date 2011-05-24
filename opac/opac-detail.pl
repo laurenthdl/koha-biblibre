@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Auth;
@@ -39,10 +38,8 @@ use C4::Serials;
 use C4::Members;
 use C4::VirtualShelves;
 use C4::XSLT;
+use C4::Logguer;
 use List::MoreUtils qw/any none/;
-use 5.10.0;
-
-#use Switch;
 
 BEGIN {
     if ( C4::Context->preference('BakerTaylorEnabled') ) {
@@ -51,6 +48,7 @@ BEGIN {
     }
 }
 
+my $log = C4::Logguer->new();
 my $query = new CGI;
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
     {   template_name   => "opac-detail.tmpl",
@@ -264,8 +262,6 @@ for my $itm (@items) {
     # walk through the item-level authorised values and populate some images
     my $item_authorised_value_images = C4::Items::get_authorised_value_images( C4::Items::get_item_authorised_values( $itm->{'itemnumber'} ) );
 
-    # warn( Data::Dumper->Dump( [ $item_authorised_value_images ], [ 'item_authorised_value_images' ] ) );
-
     if ( $itm->{'itemlost'} ) {
         my $lostimageinfo = List::Util::first { $_->{'category'} eq 'LOST' } @$item_authorised_value_images;
         $itm->{'lostimageurl'}   = $lostimageinfo->{'imageurl'};
@@ -409,7 +405,7 @@ if ( C4::Context->preference("virtualshelves") ) {
 # XISBN Stuff
 if ( C4::Context->preference("OPACFRBRizeEditions") == 1 ) {
     eval { $template->param( XISBNS => get_xisbns($isbn) ); };
-    if ($@) { warn "XISBN Failed $@"; }
+    $log->warning("XISBN Failed $@") if $@;
 }
 
 # Amazon.com Stuff
@@ -466,11 +462,9 @@ if ( C4::Context->preference("SyndeticsEnabled") ) {
         $syndetics_elements = &get_syndetics_index( $isbn, $upc, $oclc );
         for my $element ( values %$syndetics_elements ) {
             $template->param( "Syndetics$element" . "Exists" => 1 );
-
-            #warn "Exists: "."Syndetics$element"."Exists";
         }
     };
-    warn $@ if $@;
+    $log->warning($@) if $@;
 }
 
 if (   C4::Context->preference("SyndeticsEnabled")
@@ -480,7 +474,7 @@ if (   C4::Context->preference("SyndeticsEnabled")
         my $syndetics_summary = &get_syndetics_summary( $isbn, $upc, $oclc, $syndetics_elements );
         $template->param( SYNDETICS_SUMMARY => $syndetics_summary );
     };
-    warn $@ if $@;
+    $log->warning($@) if $@;
 
 }
 
@@ -491,7 +485,7 @@ if (   C4::Context->preference("SyndeticsEnabled")
         my $syndetics_toc = &get_syndetics_toc( $isbn, $upc, $oclc );
         $template->param( SYNDETICS_TOC => $syndetics_toc );
     };
-    warn $@ if $@;
+    $log->warning($@) if $@;
 }
 
 if (   C4::Context->preference("SyndeticsEnabled")
@@ -501,7 +495,7 @@ if (   C4::Context->preference("SyndeticsEnabled")
         my $syndetics_excerpt = &get_syndetics_excerpt( $isbn, $upc, $oclc );
         $template->param( SYNDETICS_EXCERPT => $syndetics_excerpt );
     };
-    warn $@ if $@;
+    $log->warning($@) if $@;
 }
 
 if (   C4::Context->preference("SyndeticsEnabled")
@@ -510,7 +504,7 @@ if (   C4::Context->preference("SyndeticsEnabled")
         my $syndetics_reviews = &get_syndetics_reviews( $isbn, $upc, $oclc, $syndetics_elements );
         $template->param( SYNDETICS_REVIEWS => $syndetics_reviews );
     };
-    warn $@ if $@;
+    $log->warning($@) if $@;
 }
 
 if (   C4::Context->preference("SyndeticsEnabled")
@@ -520,7 +514,7 @@ if (   C4::Context->preference("SyndeticsEnabled")
         my $syndetics_anotes = &get_syndetics_anotes( $isbn, $upc, $oclc );
         $template->param( SYNDETICS_ANOTES => $syndetics_anotes );
     };
-    warn $@ if $@;
+    $log->warning($@) if $@;
 }
 
 # LibraryThingForLibraries ID Code and Tabbed View Option

@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use CGI;
 use Date::Manip;
@@ -34,6 +32,7 @@ use C4::Circulation;
 use C4::Reports;
 use C4::Dates qw/format_date format_date_in_iso/;
 use C4::Members;
+use C4::Logguer;
 
 =head1 NAME
 
@@ -45,7 +44,7 @@ plugin that shows circulation stats
 
 =cut
 
-# my $debug = 1;	# override for now.
+my $log = C4::Logguer->new();
 my $input          = new CGI;
 my $fullreportname = "reports/issues_stats.tmpl";
 my $do_it          = $input->param('do_it');
@@ -241,7 +240,7 @@ sub calculate {
     push @loopfilter, { crit => "Select Month", filter => $monthsel } if ($monthsel);
 
     my @linefilter;
-    $debug and warn "filtres " . join "|", @filters;
+    $log->debug("filtres " . join "|", @filters);
     my ( $colsource, $linesource );
     $linefilter[1] = @$filters[1] if ( $line =~ /datetime/ );
     $linefilter[0] =
@@ -322,7 +321,7 @@ sub calculate {
         $strsth .= " AND $line LIKE ? ";
     }
     $strsth .= " group by $linefield order by $lineorder ";
-    $debug and warn $strsth;
+    $log->debug($strsth);
     push @loopfilter, { crit => 'SQL =', sql => 1, filter => $strsth };
     my $sth = $dbh->prepare($strsth);
     if ( (@linefilter) and ( $linefilter[1] ) ) {
@@ -443,7 +442,7 @@ sub calculate {
     my %table;
     foreach my $row (@loopline) {
         foreach my $col (@loopcol) {
-            $debug and warn " init table : $row->{rowtitle} ( $row->{rowtitle_display} ) / $col->{coltitle} ( $col->{coltitle_display} )  ";
+            $log->debug(" init table : $row->{rowtitle} ( $row->{rowtitle_display} ) / $col->{coltitle} ( $col->{coltitle_display} )  ");
             $table{ $row->{rowtitle} }->{ $col->{coltitle} } = 0;
         }
         $table{ $row->{rowtitle} }->{totalrow} = 0;
@@ -489,13 +488,13 @@ sub calculate {
     $strcalc .= " AND statistics.type LIKE '" . $type . "'"               if ($type);
 
     $strcalc .= " GROUP BY $linefield, $colfield order by $lineorder,$colorder";
-    ($debug) and warn $strcalc;
+    $log->debug($strcalc);
     my $dbcalc = $dbh->prepare($strcalc);
     push @loopfilter, { crit => 'SQL =', sql => 1, filter => $strcalc };
     $dbcalc->execute;
     my ( $emptycol, $emptyrow );
     while ( my ( $row, $col, $value ) = $dbcalc->fetchrow ) {
-        ($debug) and warn "filling table $row / $col / $value ";
+        $log->debug("filling table $row / $col / $value ");
         unless ( defined $col ) {
             $emptycol = 1;
             $col      = "zzEMPTY";
@@ -532,7 +531,7 @@ sub calculate {
         my $total = 0;
         foreach my $row (@looprow) {
             $total += $table{ null_to_zzempty( $row->{rowtitle} ) }->{ null_to_zzempty( $col->{coltitle} ) };
-            $debug and warn "value added " . $table{ $row->{rowtitle} }->{ $col->{coltitle} } . "for line " . $row->{rowtitle};
+            $log->debug("value added " . $table{ $row->{rowtitle} }->{ $col->{coltitle} } . "for line " . $row->{rowtitle});
         }
         push @loopfooter, { 'totalcol' => $total };
     }

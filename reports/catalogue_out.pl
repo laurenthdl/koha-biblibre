@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 
 use C4::Auth;
@@ -29,6 +28,7 @@ use C4::Output;
 use C4::Koha;       # GetItemTypes
 use C4::Reports;    # GetDelimiterChoices
 use C4::Circulation;
+use C4::Logguer;
 
 # use Date::Manip;  # TODO: add not borrowed since date X criteria
 use Data::Dumper;
@@ -38,6 +38,8 @@ use Data::Dumper;
 Report that shows unborrowed items.
 
 =cut
+
+my $log = C4::Logguer->new();
 
 my $input    = new CGI;
 my $do_it    = $input->param('do_it');
@@ -170,7 +172,7 @@ sub calculate {
         }
         $strsth2 .= " GROUP BY $column ORDER BY $column ";    # needed for count
         push @loopfilter, { crit => 'SQL', sql => 1, filter => $strsth2 };
-        $debug and warn "catalogue_out SQL: " . $strsth2;
+        $log->debug("catalogue_out SQL: " . $strsth2);
         my $sth2 = $dbh->prepare($strsth2);
         $sth2->execute;
 
@@ -217,9 +219,8 @@ sub calculate {
     }
     $query .= " ORDER BY items.itemcallnumber DESC, barcode";
     $query .= " LIMIT 0,$limit" if ($limit);
-    $debug and warn "SQL : $query";
+    $log->debug("SQL : $query");
 
-    # warn "SQL : $query";
     push @loopfilter, { crit => 'SQL', sql => 1, filter => $query };
     my $dbcalc = $dbh->prepare($query);
 

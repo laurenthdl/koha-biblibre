@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Auth;
 use CGI;
 use C4::Context;
@@ -55,7 +53,6 @@ my $output   = $input->param("output");
 my $basename = $input->param("basename");
 my $mime     = $input->param("MIME");
 
-#warn "calcul : ".$calc;
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
     {   template_name   => $fullreportname,
         query           => $input,
@@ -135,10 +132,6 @@ if ($do_it) {
     my $req;
 
     my @mime = ( C4::Context->preference("MIME") );
-
-    #	foreach my $mime (@mime){
-    #		warn "".$mime;
-    #	}
 
     my $CGIextChoice = CGI::scrolling_list(
         -name     => 'MIME',
@@ -249,8 +242,6 @@ sub calculate {
         $colfilter[0] = @$filters[8] if ( $column =~ /timestamp/ );
         $colfilter[0] = @$filters[9] if ( $column =~ /timestamp/ );
 
-        #warn "filtre col ".$colfilter[0]." ".$colfilter[1];
-
         # loop cols.
         if ( $column eq "Day" ) {
 
@@ -296,7 +287,6 @@ sub calculate {
         }
         $strsth2 .= " group by $colfield";
         $strsth2 .= " order by $colorder";
-        warn "" . $strsth2;
 
         my $sth2 = $dbh->prepare($strsth2);
         if ( (@colfilter) and ( $colfilter[1] ) ) {
@@ -313,7 +303,6 @@ sub calculate {
             push @loopcol, \%cell;
         }
 
-        #	warn "fin des titres colonnes";
     }
 
     my $i = 0;
@@ -324,11 +313,8 @@ sub calculate {
     #Initialization of cell values.....
     my @table;
 
-    #	warn "init table";
     for ( my $i = 1 ; $i <= $line ; $i++ ) {
         foreach my $col (@loopcol) {
-
-            #			warn " init table : $row->{rowtitle} / $col->{coltitle} ";
             $table[$i]->{ ( $col->{coltitle} ) ? $col->{coltitle} : "total" }->{'name'} = 0;
         }
     }

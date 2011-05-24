@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use Text::CSV;
 use C4::Reports::Guided;
@@ -233,7 +231,6 @@ elsif ( $phase eq 'Choose these criteria' ) {
                 $query_criteria .= " AND $crit='$value'";
             }
         }
-        warn $query_criteria;
     }
 
     $template->param(
@@ -501,7 +498,6 @@ elsif ( $phase eq 'Run this report' ) {
                 my @cells = map { +{ cell => $_ } } @$row;
                 push @rows, { cells => \@cells };
             }
-warn "nb rangs : ".$total;
         }
 
         my $totpages = int( $total / $limit ) + ( ( $total % $limit ) > 0 ? 1 : 0 );

@@ -23,8 +23,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 # standard or CPAN modules used
 use CGI;
@@ -73,7 +72,6 @@ if ( $view eq 'card' ) {
     my $results      = $stylesheet->transform($source);
     my $newxmlrecord = $stylesheet->output_string($results);
 
-    #warn $newxmlrecord;
     print $input->header(), $newxmlrecord;
     exit;
 } else {

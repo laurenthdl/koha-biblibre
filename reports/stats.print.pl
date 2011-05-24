@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Output;
 
@@ -64,8 +62,6 @@ if ( $time2 ne '' ) {
 
 my $date  = UnixDate( $date,  '%Y-%m-%d' );
 my $date2 = UnixDate( $date2, '%Y-%m-%d' );
-
-#warn "MASON: DATE: $date, $date2";
 
 #get a list of every payment
 my @payments = TotalPaid( $date, $date2 );

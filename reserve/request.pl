@@ -24,8 +24,7 @@ script to place reserves/requests
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Branch;    # GetBranches get_branchinfos_of
 use CGI;
 use List::MoreUtils qw/uniq/;

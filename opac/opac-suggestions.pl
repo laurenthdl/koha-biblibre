@@ -15,8 +15,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Auth;    # get_template_and_user
@@ -64,7 +63,6 @@ if ($allsuggestions) {
     $$suggestion{suggestedby} ||= $borrowernumber unless ($allsuggestions);
 }
 
-# warn "bornum:",$borrowernumber;
 use YAML;
 my $suggestions_loop = &SearchSuggestion($suggestion);
 if ( $op eq "add_confirm" ) {

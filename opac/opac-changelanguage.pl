@@ -15,14 +15,15 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Output qw(setlanguagecookie);
+use C4::Logguer;
 use CGI;
 
 my $query    = new CGI;
 my $language = $query->param('language');
 my $url      = $query->referer();
+my $log = C4::Logguer->new();
 
-# warn "Language : $query // $language // $url";
+$log->info("Language : $query // $language // $url");
 setlanguagecookie( $query, $language, $url );

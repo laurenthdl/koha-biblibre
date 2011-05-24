@@ -15,8 +15,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 # FIXME - Generates a warning from C4/Context.pm (uninitilized value).
 

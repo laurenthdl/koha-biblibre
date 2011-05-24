@@ -18,9 +18,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
-use vars qw($debug);
+use Modern::Perl;
 
 use CGI;
 use autouse 'Data::Dumper' => qw(Dumper);
@@ -31,6 +29,9 @@ use autouse 'C4::Branch' => qw(get_branch_code_from_name);
 use C4::Creators 1.000000;
 use C4::Patroncards 1.000000;
 use C4::Labels 1.000000;
+use C4::Logguer;
+
+my $log = C4::Logguer->new();
 
 my $cgi = new CGI;
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -86,7 +87,7 @@ if ( $op eq 'delete' ) {
     elsif ( $card_element eq 'template' ) { $err = C4::Patroncards::Template::delete( template_id => $element_id ); }
     elsif ( $card_element eq 'profile' ) { $err = C4::Patroncards::Profile::delete( profile_id => $element_id ); }
     elsif ( $card_element eq 'batch' ) { $err = C4::Labels::Batch::delete( batch_id => $element_id, branch_code => $branch_code ); }
-    else                               { warn sprintf( "Unknown card element passed in for delete operation: %s.", $card_element ); $errstr = 202; }
+    else                               { $log->warning(sprintf( "Unknown card element passed in for delete operation: %s.", $card_element )); $errstr = 202; }
     print $cgi->redirect( "manage.pl?card_element=$card_element" . ( $err ? "&error=102" : '' ) );
     exit;
 } elsif ( $op eq 'none' ) {
@@ -94,9 +95,9 @@ if ( $op eq 'delete' ) {
     elsif ( $card_element eq 'template' ) { $db_rows = get_all_templates( table_name => 'creator_templates', filter => 'creator=\'Patroncards\'' ); }
     elsif ( $card_element eq 'profile' ) { $db_rows = get_all_profiles( table_name => 'printers_profile', filter => 'creator=\'Patroncards\'' ); }
     elsif ( $card_element eq 'batch' ) { $db_rows = get_batch_summary( filter => "branch_code=\'$branch_code\' OR branch_code=\'NB\'", creator => 'Patroncards' ); }
-    else                               { warn sprintf( "Unknown card element passed in: %s.", $card_element ); $errstr = 202; }
+    else                               { $log->warning(sprintf( "Unknown card element passed in: %s.", $card_element )); $errstr = 202; }
 } else {    # trap unsupported operations here
-    warn sprintf( 'Manage interface called an unsupported operation: %s', $op );
+    $log->warning(sprintf( 'Manage interface called an unsupported operation: %s', $op ));
     print $cgi->redirect("manage.pl?card_element=$card_element&error=201");
     exit;
 }

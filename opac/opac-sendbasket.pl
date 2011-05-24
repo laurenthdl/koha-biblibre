@@ -15,8 +15,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use Encode qw(encode);
@@ -30,7 +29,9 @@ use C4::Auth;
 use C4::Output;
 use C4::Biblio;
 use C4::Members;
+use C4::Logguer;
 
+my $log = C4::Logguer->new();
 my $query = new CGI;
 
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
@@ -169,7 +170,7 @@ END_OF_BODY
     } else {
 
         # do something if it doesnt work....
-        warn "Error sending mail: $Mail::Sendmail::error \n";
+        $log->error("Error sending mail: $Mail::Sendmail::error");
         $template->param( error => 1 );
     }
     $template->param( email_add => $email_add );
