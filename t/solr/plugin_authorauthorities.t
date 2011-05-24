@@ -5,7 +5,7 @@ use Modern::Perl;
 use Test::More;
 use KohaTest::Search::MocksForSearch;
 
-use C4::Search::Plugins::Authorities;
+use C4::Search::Plugins::AuthorAuthorities;
 use C4::Biblio;
 use C4::AuthoritiesMarc;
 use Test::MockModule;
@@ -31,15 +31,5 @@ my $mapping;
 
 $mapping = KohaTest::Search::MocksForSearch::MockMappingAuthor;
 @got = ComputeValue($rec, $mapping);
-@expected = ('Gary', 'Romain', 'Gaa', 'Rom', 'Gaa410', 'Rom410', '42410', 'Ajar', 'Emilie', 'Ajar710', 'Emilie710', '43710');
+@expected = ('Gaa', 'Rom', 'Gaa410', 'Rom410', 'Ajar', 'Emilie', 'Ajar710', 'Emilie710');
 is_deeply (\@got, \@expected, 'Authority plugin in Author authority case');
-
-$mapping = KohaTest::Search::MocksForSearch::MockMappingSubject;
-@got = ComputeValue($rec, $mapping);
-@expected = ('Papillon', 'RejPapillon','ParPapillon');
-is_deeply (\@got, \@expected, 'Authority plugin in Subject authority case');
-
-$mapping = KohaTest::Search::MocksForSearch::MockMappingGeoSubject;
-@got = ComputeValue($rec, $mapping);
-@expected = ('Europe', 'RejEurope','ParEurope');
-is_deeply (\@got, \@expected, 'Authority plugin in geographic Subject authority case');
