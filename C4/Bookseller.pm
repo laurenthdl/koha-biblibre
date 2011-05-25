@@ -135,6 +135,7 @@ sub GetBooksellersWithLateOrders {
             AND aqorders.rrp <> 0
             AND aqorders.ecost <> 0
             AND aqorders.quantity - IFNULL(aqorders.quantityreceived,0) <> 0
+            AND aqbasket.closedate IS NOT NULL
     ";
     if ( defined $delay ) {
         $strsth .= " AND (closedate <= DATE_SUB(CURDATE( ),INTERVAL ? DAY)) ";
@@ -142,7 +143,6 @@ sub GetBooksellersWithLateOrders {
     }
     if ( defined $estimateddeliverydatefrom ) {
         $strsth .= '
-            AND aqbasket.closedate IS NOT NULL
             AND aqbooksellers.deliverytime IS NOT NULL
             AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) >= ?';
         push @query_params, $estimateddeliverydatefrom;
@@ -150,7 +150,7 @@ sub GetBooksellersWithLateOrders {
     if ( defined $estimateddeliverydatefrom and defined $estimateddeliverydateto ) {
         $strsth .= ' AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) <= ?';
         push @query_params, $estimateddeliverydateto;
-    } else {
+    } elsif ( defined $estimateddeliverydatefrom ) {
         $strsth .= ' AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) <= CURDATE()';
     }
 
