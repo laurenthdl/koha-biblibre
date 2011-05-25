@@ -87,20 +87,21 @@ my $resultsperpage = $input->param('resultsperpage');
 $resultsperpage = 20 unless ($resultsperpage);
 $startfrom      = 0  unless ($startfrom);
 
-sub get_ecost {
-    my $order = shift;
+sub get_value_with_gst_params {
+    my $value = shift;
+    my $gstrate = shift;
     my $bookseller = shift;
     if ( $bookseller->{listincgst} ) {
         if ( $bookseller->{invoiceincgst} ) {
-            return $order->{ecost};
+            return $value;
         } else {
-            return $order->{ecost} / ( 1 + $order->{gstrate} );
+            return $value / ( 1 + $gstrate );
         }
     } else {
         if ( $bookseller->{invoiceincgst} ) {
-            return $order->{ecost} * ( 1 + $order->{gstrate} );
+            return $value * ( 1 + $gstrate );
         } else {
-            return $order->{ecost};
+            return $value;
         }
     }
 }
@@ -149,7 +150,7 @@ if ( $input->param('format') eq "json" ) {
     foreach my $order (@$orders) {
         if ( $order->{quantityreceived} < $order->{quantity} ) {
             my $data = {};
-            my $ecost = get_ecost( $order, $bookseller );
+            my $ecost = get_value_with_gst_params( $order->{ecost}, $order->{gstrate}, $bookseller );
 
             $data->{basketno}     = $order->{basketno};
             $data->{ordernumber}  = $order->{ordernumber};
@@ -252,11 +253,12 @@ my $total_gste = 0;
 my $total_gsti = 0;
 
 for my $item ( @parcelitems ) {
+    $item->{unitprice} = get_value_with_gst_params( $item->{unitprice}, $item->{gstrate}, $bookseller );
     $total = ( $item->{'unitprice'} ) * $item->{'quantityreceived'};    #weird, are the freight fees counted by book? (pierre)
     $item->{'unitprice'} += 0;
     my %line;
     %line          = %{ $item };
-    my $ecost = get_ecost( $item, $bookseller );
+    my $ecost = get_value_with_gst_params( $line{ecost}, $line{gstrate}, $bookseller );
     $line{ecost} = sprintf( "%.2f", $ecost );
     $line{invoice} = $invoice;
     $line{total} = sprintf( $cfstr, $total );
@@ -266,7 +268,6 @@ for my $item ( @parcelitems ) {
     my $gste = get_gste( $line{total}, $line{gstrate}, $bookseller );
     my $gst = get_gst( $line{total}, $line{gstrate}, $bookseller );
     $foot{$line{gstrate}}{gstrate} = $line{gstrate};
-    warn $line{gstrate};
     $foot{$line{gstrate}}{value} += sprintf( "%.2f", $gst );
     $total_quantity += $line{quantity};
     $total_gste += $gste;
@@ -300,7 +301,8 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
     my %line;
     %line = %{ $pendingorders->[$i] };
 
-    my $ecost = get_ecost( $pendingorders->[$i], $bookseller );
+    my $ecost = get_value_with_gst_params( $line{ecost}, $line{gstrate}, $bookseller );
+    $line{unitprice} = get_value_with_gst_params( $line{unitprice}, $line{gstrate}, $bookseller );
     $line{quantity}         += 0;
     $line{quantityreceived} += 0;
     $line{unitprice}        += 0;

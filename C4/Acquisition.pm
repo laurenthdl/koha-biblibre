@@ -1304,7 +1304,7 @@ C<$ordernumber>.
 =cut
 
 sub ModReceiveOrder {
-    my ( $biblionumber, $ordernumber, $quantrec, $user, $cost, $invoiceno, $freight, $rrp, $budget_id, $datereceived ) = @_;
+    my ( $biblionumber, $ordernumber, $quantrec, $user, $cost, $ecost, $invoiceno, $freight, $rrp, $budget_id, $datereceived ) = @_;
     my $dbh = C4::Context->dbh;
 
     #     warn "DATE BEFORE : $daterecieved";
@@ -1338,11 +1338,12 @@ sub ModReceiveOrder {
                 , unitprice=?
                 , freight=?
                 , rrp=?
+                , ecost=?
                 , quantity=?
                 , orderstatus=3
             WHERE biblionumber=? AND ordernumber=?" );
 
-        $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $quantrec, $biblionumber, $ordernumber );
+        $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $ecost, $quantrec, $biblionumber, $ordernumber );
         $sth->finish;
 
         # create a new order for the remaining items, and set its bookfund.
@@ -1357,10 +1358,10 @@ sub ModReceiveOrder {
         $sth = $dbh->prepare(
             "update aqorders
                             set quantityreceived=?,datereceived=?,booksellerinvoicenumber=?,
-                                unitprice=?,freight=?,rrp=?,orderstatus=3
+                                unitprice=?,freight=?,rrp=?,ecost=?,orderstatus=3
                             where biblionumber=? and ordernumber=?"
         );
-        $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $biblionumber, $ordernumber );
+        $sth->execute( $quantrec, $datereceived, $invoiceno, $cost, $freight, $rrp, $ecost, $biblionumber, $ordernumber );
         $sth->finish;
     }
     return $datereceived;
