@@ -46,7 +46,6 @@ my $quantity         = $input->param('quantity');
 my $unitprice        = $input->param('cost');
 my $invoiceno        = $input->param('invoice');
 my $datereceived     = $input->param('datereceived');
-my $replacement      = $input->param('rrp');
 my $gst              = $input->param('gst');
 my $freight          = $input->param('freight');
 my $supplierid       = $input->param('supplierid');
@@ -80,12 +79,14 @@ if ( any { $order->{$_} ne $tplorder{$_} } qw(quantity quantityreceived notes rr
     if ( $bookseller->{listincgst} ) {
         if ( not $bookseller->{invoiceincgst} ) {
             $order->{rrp} = $order->{rrp} * ( 1 + $order->{gstrate} );
-             $order->{ecost} = $order->{ecost} * ( 1 + $order->{gstrate} );
+            $order->{ecost} = $order->{ecost} * ( 1 + $order->{gstrate} );
+            $order->{unitprice} = $order->{unitprice} * ( 1 + $order->{gstrate} );
         }
     } else {
         if ( $bookseller->{invoiceincgst} ) {
             $order->{rrp} = $order->{rrp} / ( 1 + $order->{gstrate} );
             $order->{ecost} = $order->{ecost} / ( 1 + $order->{gstrate} );
+            $order->{unitprice} = $order->{unitprice} / ( 1 + $order->{gstrate} );
         }
     }
 
@@ -135,7 +136,7 @@ if ( $quantityrec > $origquantityrec ) {
 
     # save the quantity received.
     if ( $quantityrec > 0 ) {
-        $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $unitprice, $invoiceno, $freight, $replacement, undef, $datereceived, @receiveditems );
+        $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $order->{unitprice}, $order->{ecost}, $invoiceno, $freight, $order->{rrp}, undef, $datereceived, @receiveditems );
     }
 }
 if ($redirectreceive) {

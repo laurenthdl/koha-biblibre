@@ -229,21 +229,26 @@ if ( $count == 1 ) {
 
     my $rrp;
     my $ecost;
+    my $unitprice;
     if ( $bookseller->{listincgst} ) {
         if ( $bookseller->{invoiceincgst} ) {
             $rrp = $order->{rrp};
             $ecost = $order->{ecost};
+            $unitprice = $order->{unitprice};
         } else {
             $rrp = $order->{rrp} / ( 1 + $order->{gstrate} );
             $ecost = $order->{ecost} / ( 1 + $order->{gstrate} );
+            $unitprice = $order->{unitprice} / ( 1 + $order->{gstrate} );
         }
     } else {
         if ( $bookseller->{invoiceincgst} ) {
             $rrp = $order->{rrp} * ( 1 + $order->{gstrate} );
             $ecost = $order->{ecost} * ( 1 + $order->{gstrate} );
+            $unitprice = $order->{unitprice} * ( 1 + $order->{gstrate} );
         } else {
             $rrp = $order->{rrp};
             $ecost = $order->{ecost};
+            $unitprice = $order->{unitprice};
         }
     }
     my $suggestion   = GetSuggestionInfoFromBiblionumber($order->{'biblionumber'});
@@ -270,7 +275,7 @@ if ( $count == 1 ) {
         quantityreceived      => $order->{'quantityreceived'},
         rrp                   => sprintf( "%.2f", $rrp ),
         ecost                 => sprintf( "%.2f", $ecost ),
-        unitprice             => $order->{'unitprice'},
+        unitprice             => $unitprice,
         invoice               => $invoice,
         datereceived          => $datereceived->output(),
         datereceived_iso      => $datereceived->output('iso'),
