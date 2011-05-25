@@ -686,7 +686,7 @@ sub GetBasketUsers {
     foreach ( @$results ) {
         push @tab, $_->{'borrowernumber'};
     }
-    
+
     return @tab;
 }
 
