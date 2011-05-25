@@ -292,7 +292,6 @@ my $total_quantity = 0;
 my $total_gste = 0;
 my $total_gsti = 0;
 
-# Received items
 for my $item ( @parcelitems ) {
     $item->{unitprice} = get_value_with_gst_params( $item->{unitprice}, $item->{gstrate}, $bookseller );
     $total = ( $item->{'unitprice'} ) * $item->{'quantityreceived'};    #weird, are the freight fees counted by book? (pierre)
@@ -322,9 +321,6 @@ for my $item ( @parcelitems ) {
     $totalfreight = $item->{'freight'};
     $totalquantity += $item->{'quantityreceived'};
     $tototal += $total;
-
-    my $budget = GetBudget( $line{budget_id} );
-    $line{budget_name} = $budget->{'budget_name'};
 
     push @loop_received, \%line;
 }

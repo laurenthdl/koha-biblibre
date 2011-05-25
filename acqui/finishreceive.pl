@@ -139,8 +139,4 @@ if ( $quantityrec > $origquantityrec ) {
         $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $order->{unitprice}, $order->{ecost}, $invoiceno, $freight, $order->{rrp}, undef, $datereceived, @receiveditems );
     }
 }
-if ($redirectreceive) {
-    print $input->redirect("/cgi-bin/koha/acqui/orderreceive.pl?ordernumber=$ordernumber&datereceived=$datereceived&supplierid=$supplierid");
-} else {
-    print $input->redirect("/cgi-bin/koha/acqui/parcel.pl?invoice=$invoiceno&supplierid=$supplierid&freight=$freight&gst=$gst&datereceived=$datereceived$error_url_str");
-}
+print $input->redirect("/cgi-bin/koha/acqui/parcel.pl?invoice=$invoiceno&supplierid=$supplierid&freight=$freight&gst=$gst&datereceived=$datereceived$error_url_str");

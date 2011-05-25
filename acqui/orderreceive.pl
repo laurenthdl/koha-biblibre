@@ -71,8 +71,6 @@ use C4::Branch;    # GetBranches
 use C4::Items;
 use C4::Biblio;
 use C4::Suggestions;
-use C4::Budgets;
-use List::MoreUtils qw(none);
 
 my $input = new CGI;
 
@@ -83,7 +81,6 @@ my $search       = $input->param('receive');
 my $invoice      = $input->param('invoice');
 my $freight      = $input->param('freight');
 my $datereceived = $input->param('datereceived');
-my $itemsreceiving;
 
 $datereceived = $datereceived ? C4::Dates->new( $datereceived, 'iso' ) : C4::Dates->new();
 
@@ -105,91 +102,6 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
         debug           => 1,
     }
 );
-
-# Getting items
-# now, build existiing item list
-my $biblionumber  = $order->{'biblionumber'};
-my $frameworkcode = &GetFrameworkCode($biblionumber);
-my $tagslib       = &GetMarcStructure( 1, $frameworkcode );
-my $temp          = GetMarcBiblio($biblionumber);
-my @fields        = $temp->fields();
-my @orderitems    = GetItemnumbersFromOrder($ordernumber);
-
-#my @fields = $record->fields();
-my %witness;    #---- stores the list of subfields used at least once, with the "meaning" of the code
-my @big_array;
-
-#---- finds where items.itemnumber is stored
-my ( $itemtagfield,   $itemtagsubfield )   = &GetMarcFromKohaField( "items.itemnumber", $frameworkcode );
-my ( $branchtagfield, $branchtagsubfield ) = &GetMarcFromKohaField( "items.homebranch", $frameworkcode );
-
-foreach my $field (@fields) {
-    next if ($field->tag()<10);
-
-    my @subf = $field->subfields or (); # don't use ||, as that forces $field->subfelds to be interpreted in scalar context
-    my %this_row;
-# loop through each subfield
-    my $i = 0;
-    foreach my $subfield (@subf){
-        my $subfieldcode = $subfield->[0];
-        my $subfieldvalue= $subfield->[1];
-        
-        next if ($tagslib->{$field->tag()}->{$subfieldcode}->{tab} ne 10 
-                && ($field->tag() ne $itemtagfield 
-                && $subfieldcode   ne $itemtagsubfield));
-        $witness{$subfieldcode} = $tagslib->{$field->tag()}->{$subfieldcode}->{lib} if ($tagslib->{$field->tag()}->{$subfieldcode}->{tab}  eq 10);
-		if ($tagslib->{$field->tag()}->{$subfieldcode}->{tab}  eq 10) {
-		    $this_row{$subfieldcode} .= " | " if($this_row{$subfieldcode});
-        	$this_row{$subfieldcode} .= GetAuthorisedValueDesc( $field->tag(),
-                        $subfieldcode, $subfieldvalue, '', $tagslib) 
-						|| $subfieldvalue;
-		}
-
-        if (($field->tag eq $branchtagfield) && ($subfieldcode eq $branchtagsubfield) && C4::Context->preference("IndependantBranches")) {
-            #verifying rights
-            my $userenv = C4::Context->userenv();
-            unless (($userenv->{'flags'} == 1) or (($userenv->{'branch'} eq $subfieldvalue))){
-                    $this_row{'nomod'}=1;
-            }
-        }
-        $this_row{itemnumber} = $subfieldvalue if ($field->tag() eq $itemtagfield && $subfieldcode eq $itemtagsubfield);
-    }
-    if (%this_row) {
-        push( @big_array, \%this_row );
-    }
-}
-
-my ( $holdingbrtagf, $holdingbrtagsubf ) = &GetMarcFromKohaField( "items.holdingbranch", $frameworkcode );
-@big_array = sort { $a->{$holdingbrtagsubf} cmp $b->{$holdingbrtagsubf} } @big_array;
-
-# now, construct template !
-# First, the existing items for display
-my @item_value_loop;
-my @header_value_loop;
-
-for my $row (@big_array) {
-
-    # Only keeping items associated with this order
-    next if (none { $row->{itemnumber} eq $_ } @orderitems);
-    my %row_data;
-    my @item_fields = map +{ field => $_ || '' }, @$row{ sort keys(%witness) };
-    $row_data{item_value} = [@item_fields];
-    $row_data{itemnumber} = $row->{itemnumber};
-
-    #reporting this_row values
-    $row_data{'nomod'} = $row->{'nomod'};
-    push( @item_value_loop, \%row_data );
-}
-foreach my $subfield_code ( sort keys(%witness) ) {
-    my %header_value;
-    $header_value{header_value} = $witness{$subfield_code};
-    push( @header_value_loop, \%header_value );
-}
-$template->param(
-    item_loop        => \@item_value_loop,
-    item_header_loop => \@header_value_loop,
-);
-
 
 # prepare the form for receiving
 if ( $count == 1 ) {
@@ -252,7 +164,7 @@ if ( $count == 1 ) {
         }
     }
     my $suggestion   = GetSuggestionInfoFromBiblionumber($order->{'biblionumber'});
-    my $budget       = GetBudget($order->{'budget_id'});
+
     $template->param(
         count                 => 1,
         biblionumber          => $order->{'biblionumber'},
@@ -268,7 +180,10 @@ if ( $count == 1 ) {
         copyrightdate         => $order->{'copyrightdate'},
         isbn                  => $order->{'isbn'},
         seriestitle           => $order->{'seriestitle'},
+<<<<<<< HEAD
         budget_name           => $budget->{'budget_name'},
+=======
+>>>>>>> parent of fd5b97d... MT6523: Receving improvements
         bookfund              => $order->{'bookfundid'},
         quantity              => $order->{'quantity'},
         quantityreceivedplus1 => $order->{'quantityreceived'} + 1,
@@ -283,7 +198,10 @@ if ( $count == 1 ) {
         suggestionid          => $$suggestion{suggestionid},
         surnamesuggestedby    => $$suggestion{surnamesuggestedby},
         firstnamesuggestedby  => $$suggestion{firstnamesuggestedby},
+<<<<<<< HEAD
         itemsreceiving        => $itemsreceiving
+=======
+>>>>>>> parent of fd5b97d... MT6523: Receving improvements
     );
 } else {
     my @loop;
