@@ -2290,6 +2290,7 @@ sub GetLateOrders {
             OR datereceived IS NULL
             OR aqorders.quantityreceived < aqorders.quantity
         )
+        AND aqbasket.closedate IS NOT NULL
     ";
     my $having = "";
     $select .= "
@@ -2316,7 +2317,6 @@ sub GetLateOrders {
     }
     if ( defined $estimateddeliverydatefrom ) {
         $from .= '
-            AND aqbasket.closedate IS NOT NULL 
             AND aqbooksellers.deliverytime IS NOT NULL
             AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) >= ?';
         push @query_params, $estimateddeliverydatefrom;
@@ -2324,7 +2324,7 @@ sub GetLateOrders {
     if ( defined $estimateddeliverydatefrom and defined $estimateddeliverydateto ) {
         $from .= ' AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) <= ?';
         push @query_params, $estimateddeliverydateto;
-    } else {
+    } elsif ( defined $estimateddeliverydatefrom ) {
         $from .= ' AND ADDDATE(aqbasket.closedate, INTERVAL aqbooksellers.deliverytime DAY) <= CURDATE()';
     }
     if (   C4::Context->preference("IndependantBranches")
