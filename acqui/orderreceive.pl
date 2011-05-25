@@ -206,7 +206,6 @@ if ( $count == 1 ) {
         push @itemloop, $cell;
 
         $template->param( items => \@itemloop );
-        $itemsreceiving = 1;
     } elsif ( C4::Context->preference('AcqCreateItem') eq 'ordering' ) {
         my @items;
         my @itemnumbers = GetOrderItemnumbers( $order->{'ordernumber'} );
@@ -283,7 +282,6 @@ if ( $count == 1 ) {
         suggestionid          => $$suggestion{suggestionid},
         surnamesuggestedby    => $$suggestion{surnamesuggestedby},
         firstnamesuggestedby  => $$suggestion{firstnamesuggestedby},
-        itemsreceiving        => $itemsreceiving
     );
 } else {
     my @loop;
