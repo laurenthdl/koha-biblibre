@@ -38,7 +38,7 @@ for my $f ( @field ) {
         when ( "barcode" ) {
             $query = "SELECT barcode FROM items WHERE barcode=?";
         }
-        when ( "sotcknumber" ) {
+        when ( "stocknumber" ) {
             $query = "SELECT stocknumber FROM items WHERE stocknumber=?";
         }
     }
