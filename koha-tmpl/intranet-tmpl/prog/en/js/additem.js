@@ -63,6 +63,35 @@ function constructTrNode(index) {
 
     return result;
 }
+function addItemInList(index) {
+    $("#items_list").show();
+    var li = constructLiNode(index);
+    $("#items_list ul").append(li);
+}
+
+function deleteItemBlock(node_a, index) {
+    $("#" + index).remove();
+    var current_qty = parseInt($("#quantity").val());
+    var max_qty = parseInt($("#quantity_to_receive").val());
+    $("#quantity").val(current_qty - 1);
+    $(node_a).parent('li').remove();
+    if(current_qty - 1 == 0)
+        $("#items_list").hide();
+
+    if ( $("#quantity").val() <= max_qty - 1) {
+        if ( $("#outeritemblock").children("div :visible").length == 0 ) {
+            $("#outeritemblock").children("div:last").show();
+        }
+    }
+    if ( $("#quantity").val() == 0 && $("#outeritemblock > div").length == 0) {
+        var new_form = $("#to_cloned").children('div').clone();
+        $(new_form).attr('id', 'itemblock');
+        $("#outeritemblock").append(new_form);
+    }
+}
+
+function cloneItemBlock(index) {
+    var original = $("#" + index); //original <div>
 
 function addItemInList(index) {
     $("#items_list").show();
