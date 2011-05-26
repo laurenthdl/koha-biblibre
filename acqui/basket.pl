@@ -295,11 +295,14 @@ if ( $op eq 'delete_confirm' ) {
     my $total_quantity = 0;
     my $total_gste = 0;
     my $total_gsti = 0;
+    my $total_gstvalue = 0;
     for my $order (@results) {
         my $line = get_infos( $order, $bookseller);
         push @books_loop, $line;
-        
+
         $foot{$$line{gstgsti}}{gstgsti} = $$line{gstgsti};
+        $foot{$$line{gstgsti}}{gstvalue} += $$line{gstvalue};
+        $total_gstvalue += $$line{gstvalue};
         $foot{$$line{gstgsti}}{quantity}  += $$line{quantity};
         $total_quantity += $$line{quantity};
         $foot{$$line{gstgsti}}{totalgste} += $$line{totalgste};
@@ -360,6 +363,7 @@ if ( $op eq 'delete_confirm' ) {
         total_quantity       => $total_quantity,
         total_gste           => sprintf( "%.2f", $total_gste ),
         total_gsti           => sprintf( "%.2f", $total_gsti ),
+        total_gstvalue       => sprintf( "%.2f", $total_gstvalue ),
         currency             => $bookseller->{'listprice'},
         listincgst           => $bookseller->{listincgst},
         basketgroups         => $basketgroups,
