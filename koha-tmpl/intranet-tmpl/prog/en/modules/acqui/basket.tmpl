@@ -9,9 +9,9 @@
             $("table .gste, .gsti").show();
         } else {
             <!-- TMPL_IF NAME="listincgst" -->
-                $("table .gsti").hide();
-            <!-- TMPL_ELSE -->
                 $("table .gste").hide();
+            <!-- TMPL_ELSE -->
+                $("table .gsti").hide();
             <!-- /TMPL_IF -->
         }
         }
