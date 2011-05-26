@@ -2321,6 +2321,11 @@ sub PrepareItemrecordDisplay {
 
     my ( $bibnum, $itemnum, $defaultvalues, $frameworkcode ) = @_;
 
+    
+    my $today_iso = C4::Dates->today('iso');
+    my ( $year, $month, $day ) = split '-', $today_iso;     # FIXME: iso dates don't have commas!
+    $month = sprintf( "%02d", $month );
+    $day   = sprintf( "%02d", $day );
     my $dbh = C4::Context->dbh;
     $frameworkcode = &GetFrameworkCode($bibnum) if $bibnum;
     my ( $itemtagfield, $itemtagsubfield ) = &GetMarcFromKohaField( "items.itemnumber", $frameworkcode );
@@ -2356,7 +2361,17 @@ sub PrepareItemrecordDisplay {
                 if ($itemrecord) {
                     ( $x, $defaultvalue ) = _find_value( $tag, $subfield, $itemrecord );
                 }
-                $defaultvalue = $tagslib->{$tag}->{$subfield}->{defaultvalue} unless $defaultvalue;
+                unless (defined $defaultvalue){
+		    $defaultvalue = $tagslib->{$tag}->{$subfield}->{defaultvalue};
+
+		    # get today date & replace YYYY, MM, DD if provided in the default value
+		    $defaultvalue =~ s/YYYY/$year/g;
+		    $defaultvalue =~ s/MM/$month/g;
+		    $defaultvalue =~ s/DD/$day/g;
+		    my $username = ( C4::Context->userenv ? C4::Context->userenv->{'surname'} : "superlibrarian" );
+		    $defaultvalue =~ s/user/$username/g;
+		}
+
                 if ( !defined $defaultvalue ) {
                     $defaultvalue = q||;
                 }
