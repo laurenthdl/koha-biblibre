@@ -1819,6 +1819,7 @@ sub TransformHtmlToXml {
     my $first   = 1;
     my $j       = -1;
     for ( my $i = 0 ; $i < @$tags ; $i++ ) {
+        next if ($tags->[$i] eq "");
 
         if ( C4::Context->preference('marcflavour') eq 'UNIMARC' and @$tags[$i] eq "100" and @$subfields[$i] eq "a" ) {
 
