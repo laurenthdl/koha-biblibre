@@ -1,49 +1,92 @@
-function deleteItemBlock(index) {
-    var aDiv = document.getElementById(index);
-    aDiv.parentNode.removeChild(aDiv);
-    var quantity = document.getElementById('quantity');
-    quantity.setAttribute('value',parseFloat(quantity.getAttribute('value'))-1);
+function addItem( node ) {
+    var index = $(node).parent().attr('id');
+    var current_qty = parseInt($("#quantity").val());
+    var max_qty = parseInt($("#quantity_to_receive").val());
+    if ( $("#items_list ul").find('li[idblock="' + index + '"]').length == 0 ) {
+        if ( current_qty < max_qty ) {
+            if ( current_qty < max_qty - 1 )
+                cloneItemBlock(index);
+            addItemInList(index);
+            $("#quantity").val(current_qty + 1);
+        } else if ( current_qty >= max_qty ) {
+            alert(_("You can't receive any more items."));
+        }
+    } else {
+        if ( current_qty < max_qty )
+            cloneItemBlock(index);
+        var li = constructLiNode(index);
+        $("#items_list ul").find('li[idblock="' + index + '"]:first').replaceWith(li);
+    }
+    $("#" + index).hide();
 }
 
-function cloneItemBlock(index) {    
-    var original = document.getElementById(index); //original <div>
-    var clone = original.cloneNode(true);
+function showItem(index) {
+    $("#outeritemblock").children("div").each(function(){
+        if ( $(this).attr('id') == index ) {
+            $(this).show();
+        } else {
+            if ( $("#items_list ul").find('li[idblock="' + $(this).attr('id') + '"]').length == 0 ) {
+                $(this).remove();
+            } else {
+                $(this).hide();
+            }
+        }
+    });
+}
+
+function constructLiNode(index) {
+    var input_barcode = $('#' + index).find("[name='kohafield'][value='items.barcode']").prevAll("input[name='field_value']")[0];
+    var barcode = $(input_barcode).val();
+    var show_link = "<a href='#items' onclick='showItem(\"" + index + "\");'>show</a>";
+    var del_link = "<a href='#' onclick='deleteItemBlock(this, \"" + index + "\");'>delete</a>";
+    return "<li idblock='" + index + "'>Barcode " + barcode + " " + show_link + " " + del_link + "</li>";
+
+}
+function addItemInList(index) {
+    $("#items_list").show();
+    var li = constructLiNode(index);
+    $("#items_list ul").append(li);
+}
+
+function deleteItemBlock(node_a, index) {
+    $("#" + index).remove();
+    var current_qty = parseInt($("#quantity").val());
+    var max_qty = parseInt($("#quantity_to_receive").val());
+    $("#quantity").val(current_qty - 1);
+    $(node_a).parent('li').remove();
+    if(current_qty - 1 == 0)
+        $("#items_list").hide();
+
+    if ( $("#quantity").val() <= max_qty - 1) {
+        if ( $("#outeritemblock").children("div :visible").length == 0 ) {
+            $("#outeritemblock").children("div:last").show();
+        }
+    }
+    if ( $("#quantity").val() == 0 && $("#outeritemblock > div").length == 0) {
+        var new_form = $("#to_cloned").children('div').clone();
+        $(new_form).attr('id', 'itemblock');
+        $("#outeritemblock").append(new_form);
+    }
+}
+
+function cloneItemBlock(index) {
+    var original = $("#" + index); //original <div>
+
+    var clone = $(original).clone(true);
     var random = Math.floor(Math.random()*100000); // get a random itemid.
     // set the attribute for the new 'div' subfields
-    clone.setAttribute('id',index + random);//set another id.
-    var NumTabIndex;
-    NumTabIndex = parseInt(original.getAttribute('tabindex'));
-    if(isNaN(NumTabIndex)) NumTabIndex = 0;
-    clone.setAttribute('tabindex',NumTabIndex+1);
-
-    var CloneButtonPlus;
-    var CloneButtonMinus;
-    var CloneButtonClear;
-    var aTags = clone.getElementsByTagName('a');
-    var i = 0;
-    while(aTags[i].getAttribute('name') != 'buttonPlus') i++;
-    CloneButtonPlus = aTags[i];
-    CloneButtonPlus.setAttribute('onclick', "cloneItemBlock('" + index + random + "')");
-    CloneButtonMinus = aTags[i+1];
-    CloneButtonMinus.setAttribute('onclick', "deleteItemBlock('" + index + random + "')");
-    CloneButtonMinus.style.display = 'inline';
-    CloneButtonClear = aTags[i+2];
-    if(CloneButtonClear) {
-        CloneButtonClear.setAttribute('onclick', "clearItemBlock('" + index + random + "')");
-    }
+    $(clone).attr('id', index + random);//set another id.
 
     // change itemids of the clone
-    var elems = clone.getElementsByTagName('input');
-    for( i = 0 ; elems[i] ; i++ )
-    {
+    var elems = $(clone).find('input');
+    for( i = 0 ; elems[i] ; i++ ) {
         if(elems[i].name.match(/^itemid/)) {
             elems[i].value = random;
         }
-    }    
-    // insert this line on the page    
-    original.parentNode.insertBefore(clone,original.nextSibling);
-    var quantity = document.getElementById('quantity');
-    quantity.setAttribute('value',parseFloat(quantity.getAttribute('value'))+1);
+    }
+
+    // Insert block in items block
+    $("#outeritemblock").append($(clone));
 
     // Don't copy value if must be uniq
     // stocknumber copynumber barcode
@@ -64,18 +107,16 @@ function cloneItemBlock(index) {
 
 }
 
-function clearItemBlock(index) {
+function clearItemBlock(node) {
+    var index = $(node).parent().attr('id');
     var block = $("#"+index);
     $(block).find("input[type='text']").each(function(){
         $(this).val("");
     });
-    $(block).find("select").each(function(){
-        $(this).find("option:first").attr("selected", true);
-    });
 }
 
 function check_additem() {
-	var success = true;
+    var success = true;
     var array_fields = ['items.stocknumber', 'items.copynumber', 'items.barcode'];
     var url = '../acqui/check_unicity.pl?'; // Url for ajax call
     $(".error").empty(); // Clear error div
@@ -97,7 +138,6 @@ function check_additem() {
                 success = false;
             }
         }
-
     }
 
     // If there is a duplication, we raise an error
@@ -133,46 +173,6 @@ function check_additem() {
     if ( success == false ) {
         $(".error").show();
     }
-	return success;
+    return success;
 }
 
-$(document).ready(function(){
-	$(".cloneItemBlock").click(function(){
-		var clonedRow = $(this).parent().parent().clone(true);
-		clonedRow.insertAfter($(this).parent().parent()).find("a.deleteItemBlock").show();
-		// find ID of cloned row so we can increment it for the clone
-		var count = $("input[id^=volinf]",clonedRow).attr("id");
-		var current = Number(count.replace("volinf",""));
-		var increment = current + 1;
-		// loop over inputs
-		var inputs = ["volinf","barcode"];
-		jQuery.each(inputs,function() {
-			// increment IDs of labels and inputs in the clone
-			$("label[for="+this+current+"]",clonedRow).attr("for",this+increment);
-			$("input[name="+this+"]",clonedRow).attr("id",this+increment);
-		});
-		// loop over selects
-		var selects = ["homebranch","location","itemtype","ccode"];
-		jQuery.each(selects,function() {
-			// increment IDs of labels and selects in the clone
-			$("label[for="+this+current+"]",clonedRow).attr("for",this+increment);
-			$("input[name="+this+"]",clonedRow).attr("id",this+increment);
-			$("select[name="+this+"]",clonedRow).attr("id",this+increment);
-			// find the selected option and select it in the clone
-			var selectedVal = $("select#"+this+current).find("option:selected").attr("value");
-			$("select[name="+this+"] option[value="+selectedVal+"]",clonedRow).attr("selected","selected");
-		});
-		
-		var quantityrec = parseFloat($("#quantityrec").attr("value"));
-		quantityrec++;
-		$("#quantityrec").attr("value",quantityrec);
-		return false;
-	});
-	$(".deleteItemBlock").click(function(){
-		$(this).parent().parent().remove();
-		var quantityrec = parseFloat($("#quantityrec").attr("value"));
-		quantityrec--;
-		$("#quantityrec").attr("value",quantityrec);
-		return false;
-	});
-});
