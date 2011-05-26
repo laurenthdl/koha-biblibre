@@ -4,24 +4,51 @@
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/additem.js"> </script>
 <script type="text/javascript">
 //<![CDATA[
-// TODO Write function to update quantity received
 function UpdateQty(form) {
     var count = $(form).find("#items tbody :checked").length;
     $(form).find("input[name='quantityrec']")[0].value = count;
 }
 
 function Check(form) {
-    var qty = $(form).find("input[name='quantityrec']")[0].value;
-    if(qty == 0){
-        alert("You have not checked any items.");
-        return false;
+    <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
+        var qty = $(form).find("input[name='quantityrec']")[0].value;
+        if(qty == 0){
+            alert("You have not checked any items.");
+            return false;
+        }
+    <!-- /TMPL_IF -->
+
+    // Remove last itemblock if it is not in items_list
+    var lastitemblock = $("#outeritemblock > div:last");
+    var tobedeleted = true;
+    var listitems = $("#items_list li");
+    $(listitems).each(function(){
+        if($(this).attr('idblock') == $(lastitemblock).attr('id')){
+            tobedeleted = false;
+        }
+    });
+    if(tobedeleted){
+        $(lastitemblock).remove();
     }
+
+    if(check_additem() == false){
+        alert(_('Duplicate values detected. Please correct the errors and resubmit.') );
+        return false;
+    };
 
     return true;
 }
 
 $(document).ready(function() {
-    UpdateQty($("#recv_form"));
+    <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
+        UpdateQty($("#recv_form"));
+    <!-- TMPL_ELSE -->
+        $('#to_cloned').hide();
+        var clone = $('#itemblock').clone();
+        var random = Math.floor(Math.random()*100000);
+        $(clone).attr('id', 'itemblock' + random);
+        $('#to_cloned').append(clone);
+    <!-- /TMPL_IF -->
 });
 //]]>
 </script>
@@ -45,6 +72,7 @@ $(document).ready(function() {
     <div class='suggestion_info'>Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)</div>
 <!-- /TMPL_IF -->
 
+<div class="error"></div>
 <div id="cataloguing_additem_itemlist">
     <!-- TMPL_IF name="item_loop" -->
         <div>
@@ -73,6 +101,7 @@ $(document).ready(function() {
 
 
 <!-- TMPL_IF name="count" -->
+    <div id="to_cloned"></div>
     <form id="recv_form" action="/cgi-bin/koha/acqui/finishreceive.pl" method="post" onsubmit="return Check(this.form);">
 <div class="yui-g">
 <div class="yui-u first">
@@ -146,6 +175,10 @@ $(document).ready(function() {
         <!-- /TMPL_IF --> <!-- items -->
     <!-- TMPL_ELSE -->
     <!-- TMPL_IF name="items" -->
+    <fieldset class="rows" id="items_list" style="display:none">
+        <a name="items"><legend>Items list</legend></a>
+        <ul/>
+    </fieldset>
     <fieldset class="rows">
         <legend>Item</legend>
         <!-- TMPL_IF name="NoACQframework" -->
@@ -155,7 +188,9 @@ $(document).ready(function() {
         <!-- TMPL_LOOP NAME="items" -->
         <div id="outeritemblock">
         <div id="itemblock">
-            <ol><!-- TMPL_LOOP NAME="iteminformation" --><li>
+            <ol>
+            <!-- TMPL_LOOP NAME="iteminformation" -->
+                <li>
                 <div class="subfield_line" style="<!-- TMPL_VAR NAME='hidden' -->;" id="subfield<!-- TMPL_VAR NAME='serialid' --><!-- TMPL_VAR NAME='countitems' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->">
                                 
                     <label><!-- TMPL_VAR NAME="subfield" --> - <!-- TMPL_IF name="mandatory" --><b><!-- /TMPL_IF --><!-- TMPL_VAR NAME="marc_lib" --><!-- TMPL_IF name="mandatory" --> *</b><!-- /TMPL_IF --></label>
@@ -168,16 +203,15 @@ $(document).ready(function() {
                     <!-- TMPL_IF NAME="ITEM_SUBFIELDS_ARE_NOT_REPEATABLE" -->
                         <span class="buttonPlus" onclick="CloneSubfield('subfield<!-- TMPL_VAR NAME='serialid' --><!-- TMPL_VAR NAME='countitems' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->')">+</span>
                     <!-- /TMPL_IF -->
-            
-                </div></li>
+                </div>
+                </li>
             <!-- /TMPL_LOOP-->
             </ol>
-            <a name="buttonPlus" style="cursor: pointer; color: grey; font-size: 180%;" onclick="cloneItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">+</a>
-            <a name="buttonMinus" style="display:none; cursor: pointer; color: grey; font-size: 180%;" onclick="deleteItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">-</a>
-            <a name="buttonClear" style="cursor: pointer; color: grey; font-size: 180%;" onclick="clearItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">Clear</a>
+            <a name="buttonPlus" style="cursor: pointer; color: grey; font-size: 180%;" onclick="addItem(this)">+</a>
+            <a name="buttonClear" class='buttonClear' style="cursor: pointer; color: grey; font-size: 180%;" onclick="clearItemBlock(this)">Clear</a>
         </div><!-- /iteminformation -->
         </div>
-        
+
         <input type="hidden" name="moditem" value="" /> 
         <input type="hidden" name="tag" value="<!-- TMPL_VAR NAME="itemtagfield" -->" />
         <input type="hidden" name="subfield" value="<!-- TMPL_VAR NAME="itemtagsubfield" -->" />
@@ -185,6 +219,7 @@ $(document).ready(function() {
         <input type="hidden" name="bibnum" value="<!-- TMPL_VAR NAME="biblionumber" -->" />
         <input type="hidden" name="itemid" value="1" />
         <input type="hidden" name="field_value" value="<!-- TMPL_VAR NAME="itemnumber" -->" />
+
         <!--/TMPL_LOOP--> <!-- /items -->
     </fieldset>
     <!-- /TMPL_IF --> <!-- items -->
@@ -200,15 +235,14 @@ $(document).ready(function() {
 	<div class="yui-u">
     <fieldset class="rows">
     <legend>Accounting details</legend>
-       <ol>
-       <li><label for="datereceived">Date received: </label><span class="label"> <!-- TMPL_VAR NAME="datereceived" --> </span></li>
-       <li><label for="quantityto">Quantity to receive: </label><span class="label">
-           <!-- TMPL_IF name="edit" -->
-               <input type="text" name="quantity" value="<!-- TMPL_VAR NAME="quantity" -->" />
-           <!-- TMPL_ELSE -->
-               <input type="text" READONLY name="quantity" value="<!-- TMPL_VAR NAME="quantity" -->" />
-           <!-- /TMPL_IF -->
-           </span></li>
+        <ol>
+        <li><label for="datereceived">Date received: </label><span class="label"> <!-- TMPL_VAR NAME="datereceived" --> </span></li>
+        <li>
+            <label for="quantityto">Quantity to receive: </label>
+            <span class="label">
+                <input type="text" id="quantity_to_receive" name="quantity" value="<!-- TMPL_VAR NAME="quantity" -->" <!-- TMPL_IF name="edit" --> READONLY <!-- /TMPL_IF -->/>
+            </span>
+        </li>
         <li><label for="quantity">Quantity received: </label>
             <!-- TMPL_IF NAME="quantityreceived" -->
                 <!-- TMPL_IF name="edit" -->
@@ -224,14 +258,14 @@ $(document).ready(function() {
                 <!-- /TMPL_IF -->
             <!-- TMPL_ELSE -->
                 <!-- TMPL_IF name="items" -->
-                    <input READONLY type="text" id="quantity" size="20" name="quantityrec" value="1" />
+                    <input READONLY type="text" id="quantity" size="20" name="quantityrec" value="0" />
                 <!-- TMPL_ELSE -->
-                    <input type="text" size="20" id="quantity" name="quantityrec" value="1" />
+                    <input type="text" size="20" id="quantity" name="quantityrec" value="0" />
                 <!-- /TMPL_IF -->
                 <input id="origquantityrec" READONLY type="hidden" name="origquantityrec" value="0" />
             <!-- /TMPL_IF -->
-		</li>
-	<li><label for="budget">Budget: </label><input id="budget" name="budget" type="text" disabled="disabled" value="<!-- TMPL_VAR NAME="budget_name" -->" /></li>
+        </li>
+    <li><label for="budget">Budget: </label><input id="budget" name="budget" type="text" disabled="disabled" value="<!-- TMPL_VAR NAME="budget_name" -->" /></li>
         <li><label for="rrp">Replacement cost: </label><input type="text" size="20" name="rrp" id="rrp" value="<!-- TMPL_VAR NAME="rrp" -->" /></li>
         <li><label for="ecost">Budgeted cost: </label><input type="text" size="20" name="ecost" id="ecost" value="<!-- TMPL_VAR NAME="ecost" -->" /></li>
         <li><label for="cost">Actual cost:</label>
@@ -246,11 +280,7 @@ $(document).ready(function() {
 
 </div>
 </div><div class="yui-g"><fieldset class="action">
-    <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
         <input type="submit" value="Save" />
-    <!-- TMPL_ELSE -->
-        <input type="button"  value="Save" onclick="javascript:if(check_additem()) { this.form.submit(); } else { alert( _('Duplicate values detected.  Please correct the errors and resubmit.') ); return false };" />
-    <!-- /TMPL_IF -->
         <a class="cancel" href="/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&amp;invoice=<!-- TMPL_VAR NAME="invoice" -->&amp;gstrate=<!-- TMPL_VAR NAME="gstrate" -->&amp;freight=<!-- TMPL_VAR NAME="freight" -->">Cancel</a>
 </fieldset></div>    </form>
 <!-- TMPL_ELSE -->
