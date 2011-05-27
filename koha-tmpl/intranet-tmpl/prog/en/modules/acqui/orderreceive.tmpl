@@ -18,23 +18,20 @@ function Check(form) {
         }
     <!-- /TMPL_IF -->
 
-    // Remove last itemblock if it is not in items_list
-    var lastitemblock = $("#outeritemblock > div:last");
-    var tobedeleted = true;
-    var listitems = $("#items_list li");
-    $(listitems).each(function(){
-        if($(this).attr('idblock') == $(lastitemblock).attr('id')){
-            tobedeleted = false;
+    <!-- TMPL_IF NAME="AcqCreateItemReceiving" -->
+        // Remove last itemblock if it is not in items_list
+        var lastitemblock = $("#outeritemblock > div:last");
+        var tobedeleted = true;
+        var listitems = $("#items_list li");
+        $(listitems).each(function(){
+            if($(this).attr('idblock') == $(lastitemblock).attr('id')){
+                tobedeleted = false;
+            }
+        });
+        if(tobedeleted){
+            $(lastitemblock).remove();
         }
-    });
-    if(tobedeleted){
-        $(lastitemblock).remove();
-    }
-
-    if(check_additem() == false){
-        alert(_('Duplicate values detected. Please correct the errors and resubmit.') );
-        return false;
-    };
+    <!-- /TMPL_IF -->
 
     return true;
 }
@@ -72,40 +69,11 @@ $(document).ready(function() {
     <div class='suggestion_info'>Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)</div>
 <!-- /TMPL_IF -->
 
-<div class="error"></div>
-<div id="cataloguing_additem_itemlist">
-    <!-- TMPL_IF name="item_loop" -->
-        <div>
-        <table>
-            <tr>
-                <th colspan="2">&nbsp;</th>
-                <!-- TMPL_LOOP NAME="item_header_loop" -->
-                    <th>
-                        <!-- TMPL_VAR NAME="header_value" -->
-                    </th>
-                <!-- /TMPL_LOOP -->
-            </tr>
-                <!-- TMPL_LOOP NAME="item_loop" -->
-                <tr id="row<!-- TMPL_VAR NAME="itemnumber" -->">
-                    <!-- TMPL_IF Name="nomod"--> <td colspan="2">&nbsp;</td><!--TMPL_ELSE--><td><a href="additem.pl?op=edititem&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#edititem">Edit</a></td>
-                    <td><a class="delete" href="/cgi-bin/koha/cataloguing/additem.pl?op=delitem&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->" onclick="confirm_deletion(<!-- TMPL_VAR NAME="biblionumber" -->,<!-- TMPL_VAR NAME="itemnumber" -->); return false;">Delete</a></td><!--/TMPL_IF-->
-                <!-- TMPL_LOOP NAME="item_value" -->
-                    <td><!-- TMPL_VAR ESCAPE=HTML NAME="field" --></td>
-                <!-- /TMPL_LOOP -->
-                </tr>
-                <!-- /TMPL_LOOP -->
-        </table>
-        </div>
-    <!-- /TMPL_IF -->
-</div>
-
-
 <!-- TMPL_IF name="count" -->
     <div id="to_cloned"></div>
     <form id="recv_form" action="/cgi-bin/koha/acqui/finishreceive.pl" method="post" onsubmit="return Check(this.form);">
 <div class="yui-g">
 <div class="yui-u first">
-    
     <fieldset class="rows">
     <legend>Catalog Details</legend>
     <ol><li><span class="label">Title: </span><span class="title"><!-- TMPL_VAR NAME="title" escape="html" --></span></li>
@@ -118,15 +86,13 @@ $(document).ready(function() {
     <li> <span class="label">Series: </span>
         <!-- TMPL_VAR NAME="seriestitle" --></li>
     </ol>
-	</fieldset>
+    </fieldset>
     <!-- TMPL_IF name="suggestionid" -->
         <fieldset class="rows">
         <legend>Suggestion</legend>
         <ol><li><span class="label">Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)</span></li></ol>
         </fieldset>
     <!-- /TMPL_IF -->
-
-
 
     <!-- TMPL_IF name="items" -->
     <fieldset class="rows" id="items_list" style="display:none">

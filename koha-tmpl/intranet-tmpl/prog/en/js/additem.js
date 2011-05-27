@@ -107,7 +107,7 @@ function clearItemBlock(node) {
 function check_additem() {
     var success = true;
     var array_fields = ['items.stocknumber', 'items.copynumber', 'items.barcode'];
-    var url = '../acqui/check_unicity.pl'; // Url for ajax call
+    var url = '../acqui/check_unicity.pl?'; // Url for ajax call
     $(".error").empty(); // Clear error div
 
     // Check if a value is duplicated in form
