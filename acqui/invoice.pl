@@ -84,6 +84,8 @@ foreach my $order (@$orders) {
 $template->param(
     invoicenumber   => $details->{'invoicenumber'},
     suppliername    => $details->{'suppliername'},
+    supplierid      => $details->{'supplierid'},
+    datereceived    => $details->{'datereceived'},
     billingdate     => C4::Dates->new($details->{'billingdate'}, "iso")->output(),
     invoiceclosedate => $details->{'invoiceclosedate'},
     orders_loop     => \@orders_loop,
