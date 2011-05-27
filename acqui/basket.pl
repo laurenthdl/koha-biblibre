@@ -232,7 +232,7 @@ if ( $op eq 'delete_confirm' ) {
         push @branches_loop, {
             branchcode => $branch,
             branchname => $branches->{$branch}->{'branchname'},
-            selected => $branch eq $basket->{'branch'} ? 1 : 0
+            selected => ( $basket->{branch} && $branch eq $basket->{branch}) ? 1 : 0
         };
     }
 
