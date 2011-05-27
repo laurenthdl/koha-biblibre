@@ -35,27 +35,23 @@ function showItem(index) {
 }
 
 function constructTrNode(index) {
-    var homebranch_select = $("#" + index).find("[name='kohafield'][value='items.homebranch']").prevAll("select[name='field_value']")[0];
-    var homebranch = $(homebranch_select).val();
-    var location_input = $("#" + index).find("[name='kohafield'][value='items.location']").prevAll("input[name='field_value']")[0];
-    var loc = $(location_input).val();
-    var callnumber_input = $("#" + index).find("[name='kohafield'][value='items.itemcallnumber']").prevAll("input[name='field_value']")[0];
-    var callnumber = $(callnumber_input).val();
-    var notforloan_input = $("#" + index).find("[name='kohafield'][value='items.notforloan']").prevAll("input[name='field_value']")[0];
-    var notforloan = $(notforloan_input).val();
-    var input_barcode = $('#' + index).find("[name='kohafield'][value='items.barcode']").prevAll("input[name='field_value']")[0];
-    var barcode = $(input_barcode).val();
+    var homebranch = $("#" + index).find("[name='kohafield'][value='items.homebranch']").prevAll("[name='field_value']")[0];
+    homebranch = $(homebranch).val();
+    var loc = $("#" + index).find("[name='kohafield'][value='items.location']").prevAll("[name='field_value']")[0];
+    loc = $(loc).val();
+    var callnumber = $("#" + index).find("[name='kohafield'][value='items.itemcallnumber']").prevAll("[name='field_value']")[0];
+    callnumber = $(callnumber).val();
+    var notforloan = $("#" + index).find("[name='kohafield'][value='items.notforloan']").prevAll("[name='field_value']")[0];
+    notforloan = $(notforloan).val();
+    var barcode = $('#' + index).find("[name='kohafield'][value='items.barcode']").prevAll("[name='field_value']")[0];
+    barcode = $(barcode).val();
     var show_link = "<a href='#items' onclick='showItem(\"" + index + "\");'>Show</a>";
     var del_link = "<a href='#' onclick='deleteItemBlock(this, \"" + index + "\");'>Delete</a>";
     var result = "<tr idblock='" + index + "'>";
     result += "<td>" + homebranch + "</td>";
     result += "<td>" + loc + "</td>";
     result += "<td>" + callnumber + "</td>";
-    if(notforloan){
-        result += "<td>" + _("Not for loan") + "</td>";
-    } else {
-        result += "<td>" + _("Available") + "</td>";
-    }
+    result += "<td>" + notforloan + "</td>";
     result += "<td>" + barcode + "</td>";
     result += "<td>" + show_link + "</td>";
     result += "<td>" + del_link + "</td>";
