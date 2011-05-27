@@ -33,6 +33,8 @@ use CGI;
 use C4::Auth;
 use C4::Output;
 use C4::Acquisition;
+use C4::Bookseller;
+use C4::Budgets;
 
 my $input = new CGI;
 my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
@@ -66,29 +68,114 @@ if($op && $op eq 'close') {
     $template->param(billingdate_saved => 1);
 }
 
+
+
 my $details = GetInvoiceDetails($invoicenumber);
+my ($bookseller) = GetBookSellerFromId($details->{supplierid});
+my $basketno = $details->{basketno};
 my @orders_loop = ();
 my $orders = $details->{'orders'};
-my $total = 0;
-my $odd = 1;
+my $qty_total;
+my @books_loop;
+my @book_foot_loop;
+my %foot;
+my $total_quantity = 0;
+my $total_gste = 0;
+my $total_gsti = 0;
+my $total_gstvalue = 0;
 foreach my $order (@$orders) {
-    my %row = %{ $order };
+    my $line = get_infos( $order, $bookseller);
+
+    $foot{$$line{gstgsti}}{gstgsti} = $$line{gstgsti};
+    $foot{$$line{gstgsti}}{gstvalue} += $$line{gstvalue};
+    $total_gstvalue += $$line{gstvalue};
+    $foot{$$line{gstgsti}}{quantity}  += $$line{quantity};
+    $total_quantity += $$line{quantity};
+    $foot{$$line{gstgsti}}{totalgste} += $$line{totalgste};
+    $total_gste += $$line{totalgste};
+    $foot{$$line{gstgsti}}{totalgsti} += $$line{totalgsti};
+    $total_gsti += $$line{totalgsti};
+
+    my %row = %{ $order, $line };
     $row{'orderline'} = $row{'parent_ordernumber'};
-    $row{'total_ecost'} = sprintf("%.2f", $row{'quantity'} * $row{'ecost'});
-    $row{'odd'} = $odd if $odd;
-    $total += $row{'total_ecost'};
-    $odd = $odd ? 0 : 1;
     push @orders_loop, \%row;
 }
 
+push @book_foot_loop, map {
+    $_
+} values %foot;
+
 $template->param(
-    invoicenumber   => $details->{'invoicenumber'},
-    suppliername    => $details->{'suppliername'},
-    billingdate     => C4::Dates->new($details->{'billingdate'}, "iso")->output(),
+    invoicenumber    => $details->{'invoicenumber'},
+    suppliername     => $details->{'suppliername'},
+    supplierid       => $details->{'supplierid'},
+    datereceived     => $details->{'datereceived'},
+    billingdate      => C4::Dates->new($details->{'billingdate'}, "iso")->output(),
     invoiceclosedate => $details->{'invoiceclosedate'},
-    orders_loop     => \@orders_loop,
-    total           => sprintf("%.2f", $total),
+    orders_loop      => \@orders_loop,
+    book_foot_loop   => \@book_foot_loop,
+    total_quantity   => $total_quantity,
+    total_gste       => sprintf( "%.2f", $total_gste ),
+    total_gsti       => sprintf( "%.2f", $total_gsti ),
+    total_gstvalue   => sprintf( "%.2f", $total_gstvalue ),
+    invoiceincgst    => $bookseller->{invoiceincgst},
+    currency         => $bookseller->{listprice},
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
+
+# FIXME
+# Fonction dupplicated from basket.pl
+# Code must to be exported. Where ??
+sub get_infos {
+    my $order = shift;
+    my $bookseller = shift;
+    my $qty = $order->{'quantity'} || 0;
+    if ( !defined $order->{quantityreceived} ) {
+        $order->{quantityreceived} = 0;
+    }
+    my $budget = GetBudget( $order->{'budget_id'} );
+
+    my %line = %{ $order };
+    $line{order_received} = ( $qty == $order->{'quantityreceived'} );
+    $line{basketno}       = $basketno;
+    $line{budget_name}    = $budget->{budget_name};
+    if ( $bookseller->{'listincgst'} ) {
+        $line{rrpgsti} = sprintf( "%.2f", $line{rrp} );
+        $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
+        $line{rrpgste} = sprintf( "%.2f", $line{rrp} / ( 1 + ( $line{gstgsti} / 100 ) ) );
+        $line{gstgste} = sprintf( "%.2f", $line{gstgsti} / ( 1 + ( $line{gstgsti} / 100 ) ) );
+        $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
+        $line{ecostgsti} = sprintf( "%.2f", $line{ecost} );
+        $line{ecostgste} = sprintf( "%.2f", $line{ecost} / ( 1 + ( $line{gstgsti} / 100 ) ) );
+        $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{ecostgste} );
+        $line{totalgsti} = sprintf( "%.2f", $order->{quantity} * $line{ecostgsti} );
+    } else {
+        $line{rrpgsti} = sprintf( "%.2f", $line{rrp} * ( 1 + ( $line{gstrate} ) ) );
+        $line{rrpgste} = sprintf( "%.2f", $line{rrp} );
+        $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
+        $line{gstgste} = sprintf( "%.2f", $line{gstrate} * 100 );
+        $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
+        $line{ecostgsti} = sprintf( "%.2f", $line{ecost} * ( 1 + ( $line{gstrate} ) ) );
+        $line{ecostgste} = sprintf( "%.2f", $line{ecost} );
+        $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{ecostgste} );
+        $line{totalgsti} = sprintf( "%.2f", $order->{quantity} * $line{ecostgsti} );
+    }
+
+    if ( $line{uncertainprice} ) {
+        $template->param( uncertainprices => 1 );
+        $line{rrp} .= ' (Uncertain)';
+    }
+    if ( $line{'title'} ) {
+        my $volume      = $order->{'volume'};
+        my $seriestitle = $order->{'seriestitle'};
+        $line{'title'} .= " / $seriestitle" if $seriestitle;
+        $line{'title'} .= " / $volume"      if $volume;
+    } else {
+        $line{'title'} = "Deleted bibliographic notice, can't find title.";
+    }
+
+    return \%line;
+}
+
 
 output_html_with_http_headers $input, $cookie, $template->output;
