@@ -125,7 +125,8 @@ function cloneItemBlock(index) {
 
 }
 
-function clearItemBlock(index) {
+function clearItemBlock(node) {
+    var index = $(node).parent().attr('id');
     var block = $("#"+index);
     $(block).find("input[type='text']").each(function(){
         $(this).val("");
