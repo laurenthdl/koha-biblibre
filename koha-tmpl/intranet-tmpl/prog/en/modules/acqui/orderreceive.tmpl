@@ -79,20 +79,39 @@ $(document).ready(function() {
               <thead>
                 <tr>
                   <th>Receive?</th>
-                  <th>Barcode</th>
                   <th>Home branch</th>
-                  <th>Holding branch</th>
-                  <th>Notes</th>
+                  <th>Location</th>
+                  <th>Call number</th>
+                  <th>Status</th>
+                  <th>Barcode</th>
+                  <th>&nbsp;</th>
                 </tr>
               </thead>
               <tbody>
                 <!-- TMPL_LOOP NAME="items" -->
                 <tr>
                   <td><input type="checkbox" name="receive_for" value="<!-- TMPL_VAR NAME='itemnumber' -->" onchange="UpdateQty(this.form);" /></td>
-                  <td><!-- TMPL_VAR NAME="barcode" --></td>
                   <td><!-- TMPL_VAR NAME="homebranch" --></td>
-                  <td><!-- TMPL_VAR NAME="holdingbranch" --></td>
-                  <td><!-- TMPL_VAR NAME="itemnotes" --></td>
+                  <td><!-- TMPL_VAR NAME="location" --></td>
+                  <td><!-- TMPL_VAR NAME="itemcallnumber" --></td>
+                  <td>
+                    <!-- TMPL_IF NAME="notforloan" -->
+                      Not for loan
+                    <!-- TMPL_ELSE --><!-- TMPL_IF NAME="damaged" -->
+                      Damaged
+                    <!-- TMPL_ELSE --><!-- TMPL_IF NAME="itemlost" -->
+                      Lost
+                    <!-- TMPL_ELSE --><!-- TMPL_IF NAME="wthdrawn" -->
+                      Withdrawn
+                    <!-- TMPL_ELSE -->
+                      Available
+                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF -->
+                  </td>
+                  <td><!-- TMPL_VAR NAME="barcode" -->
+                  <td><a href="/cgi-bin/koha/cataloguing/additem.pl?op=edititem&biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->&itemnumber=<!-- TMPL_VAR NAME='itemnumber' -->#edititem">Edit</a></td>
                 </tr>
                 <!-- /TMPL_LOOP -->
               </tbody>
