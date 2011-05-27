@@ -5,14 +5,31 @@
 <script type="text/javascript" src="<!-- TMPL_VAR NAME="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
-$(document).ready(function() {
-    $("#orderst").tablesorter();
-    Calendar.setup({
-        inputField: "billingdate",
-        ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
-        button: "billingdateCalendar"
+    function updateColumnsVisibility(visible) {
+        if ( visible ) {
+            $("table .gste, .gsti").show();
+        } else {
+            <!-- TMPL_IF NAME="listincgst" -->
+                $("table .gste").hide();
+            <!-- TMPL_ELSE -->
+                $("table .gsti").hide();
+            <!-- /TMPL_IF -->
+        }
+    }
+    $(document).ready(function() {
+        $("#orderst").tablesorter({widgets : ['zebra']});
+        Calendar.setup({
+            inputField: "billingdate",
+            ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+            button: "billingdateCalendar"
+        });
+        $("#show_all_details").click(function(){
+            updateColumnsVisibility($(this+":checked").val());
+        });
+
+        $("#show_all_details").attr('checked', false);
+        updateColumnsVisibility(false);
     });
-});
 //]]>
 </script>
 </head>
@@ -52,7 +69,10 @@ $(document).ready(function() {
         <!-- /TMPL_IF -->
         <a href="/cgi-bin/koha/acqui/parcel.pl?type=intra&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" ESCAPE="URL" -->&amp;datereceived=<!-- TMPL_VAR NAME="datereceived" ESCAPE="URL" -->&amp;invoice=<!--TMPL_VAR Name="invoicenumber" ESCAPE="URL" -->">see receipt summary</a>
       </p>
-      
+      <label for="show_all_details">
+          <input type="checkbox" style="vertical-align: middle;" id="show_all_details" />
+          Show all details
+      </label>
       <h2>Invoice details</h2>
       <table id="orderst">
         <thead>
@@ -63,9 +83,15 @@ $(document).ready(function() {
             <th>Summary</th>
             <th>Publisher</th>
             <th>Branch</th>
-            <th>Quantity</th>
-            <th>Unit Price<br />(Tax included)</th>
-            <th>Total Price<br />(Tax included)</th>
+            <th class="gste">RRP Exclude Taxes</th>
+            <th class="gste">ecost Exclude Taxes</th>
+            <th class="gsti">RRP Include Taxes</th>
+            <th class="gsti">ecost Include Taxes</th>
+            <th>Qty.</th>
+            <th class="gste">Total Excludes Taxes</th>
+            <th class="gsti">Total Include Taxes</th>
+            <th>GST %</th>
+            <th>GST</th>
           </tr>
         </thead>
         <tbody>
@@ -93,17 +119,39 @@ $(document).ready(function() {
                 <!-- /TMPL_IF -->
               </td>
               <td><p><!-- TMPL_VAR NAME="branchcode" --></p></td>
-              <td class="data"><!-- TMPL_VAR NAME="quantity" --></td>
-              <td class="data"><!-- TMPL_VAR NAME="ecost" --></td>
-              <td class="data"><!-- TMPL_VAR NAME="total_ecost" --></td>
+              <td class="number gste"><!-- TMPL_VAR NAME="rrpgste" --></td>
+              <td class="number gste"><!-- TMPL_VAR NAME="ecostgste" --></td>
+              <td class="number gsti"><!-- TMPL_VAR NAME="rrpgsti" --></td>
+              <td class="number gsti"><!-- TMPL_VAR NAME="ecostgsti" --></td>
+              <td class="number"><!-- TMPL_VAR NAME="quantity" --></td>
+              <td class="number gste"><!-- TMPL_VAR NAME="totalgste" --></td>
+              <td class="number gsti"><!-- TMPL_VAR NAME="totalgsti" --></td>
+              <td class="number"><!-- TMPL_VAR NAME="gstgsti" --></td>
+              <td class="number"><!-- TMPL_VAR NAME="gstvalue" --></td>
             </tr>
           <!-- /TMPL_LOOP -->
         </tbody>
         <tfoot>
-          <tr>
-            <th colspan="8">TOTAL</th>
-            <th class="data"><!-- TMPL_VAR NAME="total" --></th>
-          </tr>
+            <!-- TMPL_LOOP NAME="book_foot_loop" -->
+                <tr>
+                    <th colspan='6'>Total (GST <!--TMPL_VAR NAME="gstgsti" --> %)</th>
+                    <th class="gste"/><th class="gste"/><th class="gsti"/><th class="gsti"/>
+                    <th><!--TMPL_VAR NAME="quantity" --></th>
+                    <th class="gste"><!--TMPL_VAR NAME="totalgste" --></th>
+                    <th class="gsti"><!--TMPL_VAR NAME="totalgsti" --></th>
+                    <th/>
+                    <th><!--TMPL_VAR NAME="gstvalue" --></th>
+                </tr>
+            <!-- /TMPL_LOOP -->
+            <tr>
+                <th colspan='6'>Total (<!-- TMPL_VAR NAME="currency" -->)</th>
+                <th class="gste"/><th class="gste"/><th class="gsti"/><th class="gsti"/>
+                <th><!--TMPL_VAR NAME="total_quantity" --></th>
+                <th class="gste"><!--TMPL_VAR NAME="total_gste" --></th>
+                <th class="gsti"><!--TMPL_VAR NAME="total_gsti" --></th>
+                <th/>
+                <th><!--TMPL_VAR NAME="total_gstvalue" --></th>
+            </tr>
         </tfoot>
       </table>
 

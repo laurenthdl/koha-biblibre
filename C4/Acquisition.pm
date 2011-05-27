@@ -2047,6 +2047,7 @@ sub GetInvoiceDetails {
                biblioitems.ean,
                biblioitems.publicationyear,
                biblioitems.publishercode,
+               aqbasket.basketno,
                aqbooksellers.name AS suppliername,
                aqbooksellers.id AS supplierid
         FROM aqorders
@@ -2065,6 +2066,7 @@ sub GetInvoiceDetails {
     $details->{'invoicenumber'} = $details->{'orders'}->[0]->{'booksellerinvoicenumber'};
     $details->{'suppliername'} = $details->{'orders'}->[0]->{'suppliername'};
     $details->{'supplierid'} = $details->{'orders'}->[0]->{'supplierid'};
+    $details->{'basketno'} = $details->{'orders'}->[0]->{'basketno'};
     $details->{'billingdate'} = $details->{'orders'}->[0]->{'billingdate'};
     $details->{'invoiceclosedate'} = $details->{'orders'}->[0]->{'invoiceclosedate'};
     $details->{'datereceived'} = $details->{'orders'}->[0]->{'datereceived'};
