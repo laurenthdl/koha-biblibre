@@ -122,22 +122,7 @@ $(document).ready(function() {
                   <td><!-- TMPL_VAR NAME="homebranch" --></td>
                   <td><!-- TMPL_VAR NAME="location" --></td>
                   <td><!-- TMPL_VAR NAME="itemcallnumber" --></td>
-                  <td>
-                    <!-- TMPL_IF NAME="notforloan" -->
-                      Not for loan
-                    <!-- TMPL_ELSE --><!-- TMPL_IF NAME="damaged" -->
-                      Damaged
-                    <!-- TMPL_ELSE --><!-- TMPL_IF NAME="itemlost" -->
-                      Lost
-                    <!-- TMPL_ELSE --><!-- TMPL_IF NAME="wthdrawn" -->
-                      Withdrawn
-                    <!-- TMPL_ELSE -->
-                      Available
-                    <!-- /TMPL_IF -->
-                    <!-- /TMPL_IF -->
-                    <!-- /TMPL_IF -->
-                    <!-- /TMPL_IF -->
-                  </td>
+                  <td><!-- TMPL_VAR NAME="notforloan" --></td>
                   <td><!-- TMPL_VAR NAME="barcode" -->
                   <td><a href="/cgi-bin/koha/cataloguing/additem.pl?op=edititem&biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->&itemnumber=<!-- TMPL_VAR NAME='itemnumber' -->#edititem">Edit</a></td>
                 </tr>
