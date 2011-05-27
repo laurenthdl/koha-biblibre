@@ -150,38 +150,6 @@ $orderinfo->{'list_price'} ||= 0;
 $orderinfo->{'uncertainprice'} ||= 0;
 
 
-#my $ordernumber        = $input->param('ordernumber');
-#my $basketno      = $input->param('basketno');
-#my $booksellerid  = $input->param('booksellerid');
-#my $existing      = $input->param('existing');    # existing biblio, (not basket or order)
-#my $title         = $input->param('title');
-#my $author        = $input->param('author');
-#my $publicationyear= $input->param('publicationyear');
-#my $isbn          = $input->param('ISBN');
-#my $itemtype      = $input->param('format');
-#my $quantity      = $input->param('quantity');		# FIXME: else ERROR!
-#my $branch        = $input->param('branch');
-#my $series        = $input->param('series');
-#my $notes         = $input->param('notes');
-#my $budget_id     = $input->param('budget_id');
-#my $sort1         = $input->param('sort1');
-#my $sort2         = $input->param('sort2');
-#my $rrp           = $input->param('rrp');
-#my $ecost         = $input->param('ecost');
-#my $gst           = $input->param('GST');
-#my $budget        = $input->param('budget');
-#my $cost          = $input->param('cost');
-#my $sub           = $input->param('sub');
-#my $purchaseorder = $input->param('purchaseordernumber');
-#my $invoice       = $input->param('invoice');
-#my $publishercode = $input->param('publishercode');
-#my $suggestionid  = $input->param('suggestionid');
-#my $biblionumber  = $input->param('biblionumber');
-#my $uncertainprice = $input->param('uncertainprice');
-#my $import_batch_id= $input->param('import_batch_id');
-#
-#my $createbibitem = $input->param('createbibitem');
-#
 my $user = $input->remote_user;
 
 # create, modify or delete biblio
@@ -248,7 +216,7 @@ my $ordermodif;     # Is this an order modification?
     # Getting record
     $record = GetMarcBiblio($$orderinfo{biblionumber});
 
-    
+    $$orderinfo{unitprice} = $$orderinfo{ecost} if not defined $$orderinfo{unitprice} or $$orderinfo{unitprice} eq '';
 
      # if we already have $ordernumber, then it's an ordermodif
     if ( $$orderinfo{ordernumber} ) {

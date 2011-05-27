@@ -188,7 +188,7 @@ if ( $op eq 'delete_confirm' ) {
         );
 
     }
-} elsif ( $query->param('op') eq 'reopen' ) {
+} elsif ( $op eq 'reopen' ) {
     my $basket;
     $basket->{basketno}  = $query->param('basketno');
     $basket->{closedate} = undef;
@@ -295,11 +295,14 @@ if ( $op eq 'delete_confirm' ) {
     my $total_quantity = 0;
     my $total_gste = 0;
     my $total_gsti = 0;
+    my $total_gstvalue = 0;
     for my $order (@results) {
         my $line = get_infos( $order, $bookseller);
         push @books_loop, $line;
-        
+
         $foot{$$line{gstgsti}}{gstgsti} = $$line{gstgsti};
+        $foot{$$line{gstgsti}}{gstvalue} += $$line{gstvalue};
+        $total_gstvalue += $$line{gstvalue};
         $foot{$$line{gstgsti}}{quantity}  += $$line{quantity};
         $total_quantity += $$line{quantity};
         $foot{$$line{gstgsti}}{totalgste} += $$line{totalgste};
@@ -360,6 +363,7 @@ if ( $op eq 'delete_confirm' ) {
         total_quantity       => $total_quantity,
         total_gste           => sprintf( "%.2f", $total_gste ),
         total_gsti           => sprintf( "%.2f", $total_gsti ),
+        total_gstvalue       => sprintf( "%.2f", $total_gstvalue ),
         currency             => $bookseller->{'listprice'},
         listincgst           => $bookseller->{listincgst},
         basketgroups         => $basketgroups,
@@ -382,9 +386,10 @@ sub get_infos {
     $line{budget_name}    = $budget->{budget_name};
     if ( $bookseller->{'listincgst'} ) {
         $line{rrpgsti} = sprintf( "%.2f", $line{rrp} );
-        $line{rrpgste} = sprintf( "%.2f", $line{rrp} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
+        $line{rrpgste} = sprintf( "%.2f", $line{rrp} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{gstgste} = sprintf( "%.2f", $line{gstgsti} / ( 1 + ( $line{gstgsti} / 100 ) ) );
+        $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
         $line{ecostgsti} = sprintf( "%.2f", $line{ecost} );
         $line{ecostgste} = sprintf( "%.2f", $line{ecost} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{ecostgste} );
@@ -394,6 +399,7 @@ sub get_infos {
         $line{rrpgste} = sprintf( "%.2f", $line{rrp} );
         $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
         $line{gstgste} = sprintf( "%.2f", $line{gstrate} * 100 );
+        $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
         $line{ecostgsti} = sprintf( "%.2f", $line{ecost} * ( 1 + ( $line{gstrate} ) ) );
         $line{ecostgste} = sprintf( "%.2f", $line{ecost} );
         $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{ecostgste} );

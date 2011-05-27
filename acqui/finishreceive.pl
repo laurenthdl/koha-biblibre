@@ -28,6 +28,7 @@ use C4::Output;
 use C4::Context;
 use C4::Acquisition;
 use C4::Biblio;
+use C4::Bookseller;
 use C4::Items;
 use C4::Search;
 use List::MoreUtils qw/any/;
@@ -45,7 +46,6 @@ my $quantity         = $input->param('quantity');
 my $unitprice        = $input->param('cost');
 my $invoiceno        = $input->param('invoice');
 my $datereceived     = $input->param('datereceived');
-my $replacement      = $input->param('rrp');
 my $gst              = $input->param('gst');
 my $freight          = $input->param('freight');
 my $supplierid       = $input->param('supplierid');
@@ -71,6 +71,23 @@ if ( any { $order->{$_} ne $tplorder{$_} } qw(quantity quantityreceived notes rr
     $order->{rrp}              = $tplorder{rrp}              if $tplorder{rrp};
     $order->{ecost}            = $tplorder{ecost}            if $tplorder{ecost};
     $order->{unitprice}        = $tplorder{unitprice}        if $tplorder{unitprice};
+
+
+    my $bookseller = GetBookSellerFromId($supplierid);
+    if ( $bookseller->{listincgst} ) {
+        if ( not $bookseller->{invoiceincgst} ) {
+            $order->{rrp} = $order->{rrp} * ( 1 + $order->{gstrate} );
+            $order->{ecost} = $order->{ecost} * ( 1 + $order->{gstrate} );
+            $order->{unitprice} = $order->{unitprice} * ( 1 + $order->{gstrate} );
+        }
+    } else {
+        if ( $bookseller->{invoiceincgst} ) {
+            $order->{rrp} = $order->{rrp} / ( 1 + $order->{gstrate} );
+            $order->{ecost} = $order->{ecost} / ( 1 + $order->{gstrate} );
+            $order->{unitprice} = $order->{unitprice} / ( 1 + $order->{gstrate} );
+        }
+    }
+
     ModOrder($order);
 }
 
@@ -117,7 +134,7 @@ if ( $quantityrec > $origquantityrec ) {
 
     # save the quantity received.
     if ( $quantityrec > 0 ) {
-        $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $unitprice, $invoiceno, $freight, $replacement, undef, $datereceived );
+        $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $order->{unitprice}, $order->{ecost}, $invoiceno, $freight, $order->{rrp}, undef, $datereceived );
     }
 }
 print $input->redirect("/cgi-bin/koha/acqui/parcel.pl?invoice=$invoiceno&supplierid=$supplierid&freight=$freight&gst=$gst&datereceived=$datereceived$error_url_str");
