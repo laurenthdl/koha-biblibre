@@ -135,6 +135,7 @@ if ( $quantityrec > $origquantityrec ) {
     }
 
     # save the quantity received.
+    warn "RECEIVEDITEMS = ". join(',', @receiveditems);
     if ( $quantityrec > 0 ) {
         $datereceived = ModReceiveOrder( $biblionumber, $ordernumber, $quantityrec, $user, $order->{unitprice}, $order->{ecost}, $invoiceno, $freight, $order->{rrp}, undef, $datereceived, @receiveditems );
     }
