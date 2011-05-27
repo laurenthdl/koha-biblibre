@@ -64,6 +64,8 @@ BEGIN {
       &GetItemReceivedDate &ModItemNumber
 
       &GetParcels &GetParcel
+      &GetInvoices &GetInvoice &GetInvoiceDetails &CloseInvoice &ReopenInvoice
+      &ModInvoice
       &GetContracts &GetContract
 
       &GetItemnumbersFromOrder
@@ -1860,6 +1862,315 @@ sub GetParcels {
     my $results = $sth->fetchall_arrayref( {} );
     $sth->finish;
     return @$results;
+}
+
+#------------------------------------------------------------#
+
+=head3 GetInvoices
+
+=over 4
+
+$invoices = &GetInvoices($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbnean, $title, $author, $publisher, $publicationyear, $branch);
+get a lists of invoices
+
+=over 2
+
+Search for invoices that matches the given criterias.
+
+Return a reference-to-hash list containing invoices informations as such :
+
+=item Received biblios count
+
+=item Received items count
+
+=item Billing date
+
+=item Close date
+
+=item Supplier name
+
+=back
+
+=cut
+
+sub GetInvoices {
+    my ($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbnean,
+        $title, $author, $publisher, $publicationyear, $branch) = @_;
+    
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT aqorders.booksellerinvoicenumber AS invoicenumber,
+               COUNT(DISTINCT IF(aqorders.datereceived IS NOT NULL, aqorders.biblionumber, NULL)) AS receivedbiblios,
+               SUM(aqorders.quantityreceived) AS receiveditems,
+               aqorders.billingdate,
+               aqorders.invoiceclosedate,
+               aqbooksellers.name AS suppliername
+        FROM aqorders
+            LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
+            LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
+        WHERE aqorders.booksellerinvoicenumber IN (
+            SELECT aqorders.booksellerinvoicenumber
+            FROM aqorders
+                LEFT JOIN biblio ON aqorders.biblionumber = biblio.biblionumber
+                LEFT JOIN biblioitems ON aqorders.biblioitemnumber = biblioitems.biblioitemnumber
+    };
+    my @args = ();
+    my @where_strs = ();
+    if($invoicenumber){
+        push @where_strs, "aqorders.booksellerinvoicenumber=?";
+        push @args, $invoicenumber;
+    }
+    if($supplier){
+        push @where_strs, "aqbooksellers.id=?";
+        push @args, $supplier;
+    }
+    if($billingdatefrom) {
+        push @where_strs, "aqorders.billingdate>=?";
+        push @args, $billingdatefrom;
+    }
+    if($billingdateto) {
+        push @where_strs, "aqorders.billingdate<=?";
+        push @args, $billingdateto;
+    }
+    if($isbnean) {
+        push @where_strs, "(biblioitems.isbn=? OR biblioitems.ean=?)";
+        push @args, $isbnean, $isbnean;
+    }
+    if($title) {
+        push @where_strs, "biblio.title LIKE ?";
+        push @args, "%$title%";
+    }
+    if($author) {
+        push @where_strs, "biblio.author LIKE ?";
+        push @args, "%$author%";
+    }
+    if($publisher) {
+        push @where_strs, "biblioitems.publishercode LIKE ?";
+        push @args, "%$publisher%";
+    }
+    if($publicationyear) {
+        push @where_strs, "biblioitems.publicationyear = ?";
+        push @args, $publicationyear;
+    }
+    if($branch) {
+        push @where_strs, "aqorders.branchcode=?";
+        push @args, $branch;
+    }
+    if(@where_strs){
+        $query .= "WHERE " . join(" AND ", @where_strs);
+    }
+    $query .= ") GROUP BY aqorders.booksellerinvoicenumber";
+
+    my $sth = $dbh->prepare($query);
+    $sth->execute(@args);
+
+    my $results = $sth->fetchall_arrayref( {} );
+
+    return @$results;
+}
+
+#------------------------------------------------------------#
+
+=head3 GetInvoice
+
+=over 4
+
+$invoice = &GetInvoice($invoicenumber);
+
+=over 2
+
+Return a reference-to-hash containing invoices informations as such :
+
+=item Billing date
+
+=item Close date
+
+=item Supplier name
+
+=back
+
+=cut
+
+sub GetInvoice {
+    my $invoicenumber = shift;
+
+    my $query = qq{
+        SELECT aqorders.booksellerinvoicenumber,
+               aqorders.billingdate,
+               aqorders.invoiceclosedate,
+               aqbooksellers.name
+        FROM aqorders
+            LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
+            LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
+        WHERE aqorders.booksellerinvoicenumber = ?
+        LIMIT 0,1
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($invoicenumber);
+
+    return $sth->fetchrow_hashref();
+}
+
+#------------------------------------------------------------#
+
+=head3 GetInvoiceDetails
+
+=over 4
+
+$invoicedetails = &GetInvoiceDetails($invoicenumber);
+
+=over 2
+
+Return a reference-to-hash containing invoices informations as such :
+
+=item Billing date
+
+=item Close date
+
+=item Supplier name
+
+=item Orders information (in $invoicedetails->{'orders'})
+
+=back
+
+=cut
+
+sub GetInvoiceDetails {
+    my $invoicenumber = shift;
+    my $details = {};
+
+    my $query = qq{
+        SELECT aqorders.*,
+               biblio.author,
+               biblio.title,
+               biblioitems.isbn,
+               biblioitems.ean,
+               biblioitems.publicationyear,
+               biblioitems.publishercode,
+               aqbasket.basketno,
+               aqbooksellers.name AS suppliername,
+               aqbooksellers.id AS supplierid
+        FROM aqorders
+            LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
+            LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
+            LEFT JOIN biblio ON aqorders.biblionumber = biblio.biblionumber
+            LEFT JOIN biblioitems ON aqorders.biblioitemnumber = biblioitems.biblioitemnumber
+        WHERE aqorders.booksellerinvoicenumber = ?
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($invoicenumber);
+    $details->{'orders'} = $sth->fetchall_arrayref( {} );
+    $sth->finish;
+
+    $details->{'invoicenumber'} = $details->{'orders'}->[0]->{'booksellerinvoicenumber'};
+    $details->{'suppliername'} = $details->{'orders'}->[0]->{'suppliername'};
+    $details->{'supplierid'} = $details->{'orders'}->[0]->{'supplierid'};
+    $details->{'basketno'} = $details->{'orders'}->[0]->{'basketno'};
+    $details->{'billingdate'} = $details->{'orders'}->[0]->{'billingdate'};
+    $details->{'invoiceclosedate'} = $details->{'orders'}->[0]->{'invoiceclosedate'};
+    $details->{'datereceived'} = $details->{'orders'}->[0]->{'datereceived'};
+
+    return $details;
+}
+
+#------------------------------------------------------------#
+
+=head3 CloseInvoice
+
+=over 4
+
+&CloseInvoice($invoicenumber, $closedate);
+
+=over 2
+
+Close invoice with given close date (or today if not given)
+
+=back
+
+=cut
+
+sub CloseInvoice {
+    my ($invoicenumber, $closedate) = @_;
+
+    $closedate ||= C4::Dates->new;
+    my $query = qq{
+        UPDATE aqorders
+        SET invoiceclosedate = ?
+        WHERE booksellerinvoicenumber = ?
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($closedate->output("iso"), $invoicenumber);
+    $sth->finish;
+}
+
+#------------------------------------------------------------#
+
+=head3 ReopenInvoice
+
+=over 4
+
+&ReopenInvoice($invoicenumber);
+
+=over 2
+
+Reopen invoice
+
+=back
+
+=cut
+
+sub ReopenInvoice {
+    my $invoicenumber = shift;
+
+    my $query = qq{
+        UPDATE aqorders
+        SET invoiceclosedate = NULL
+        WHERE booksellerinvoicenumber = ?
+    };
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($invoicenumber);
+    $sth->finish;
+}
+
+#------------------------------------------------------------#
+
+=head3 ModInvoice
+
+=over 4
+
+&ModInvoice(%invoiceinfos);
+
+=over 2
+
+Modify an invoice with values contained in hash. $invoiceinfos{'invoicenumber'} must to be set.
+
+=back
+
+=cut
+
+sub ModInvoice {
+    my %invoice = @_;
+
+    my $query = "UPDATE aqorders SET";
+    if( $invoice{'invoicenumber'} ) {
+        my @args = ();
+        foreach (keys %invoice) {
+            if( $_ ne 'invoicenumber') {
+                $query .= " $_ = ?";
+                push @args, $invoice{$_};
+            }
+        }
+        $query .= " WHERE booksellerinvoicenumber = ?";
+        push @args, $invoice{'invoicenumber'};
+        my $dbh = C4::Context->dbh;
+        my $sth = $dbh->prepare($query);
+        $sth->execute(@args);
+        $sth->finish;
+    }
 }
 
 #------------------------------------------------------------#

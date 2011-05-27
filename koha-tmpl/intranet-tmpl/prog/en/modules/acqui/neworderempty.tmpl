@@ -155,7 +155,6 @@ $(document).ready(function()
         <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME="booksellerid" -->" />
         <input type="hidden" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" />
         <input type="hidden" name="biblioitemnumber" value="<!-- TMPL_VAR NAME="biblioitemnumber" -->" />
-        <input type="hidden" name="discount" id="discount" value="<!-- TMPL_VAR NAME="discount" -->" />
         <input type="hidden" name="listinc" id="listinc" value="<!-- TMPL_VAR NAME="listincgst" -->" />
         <input type="hidden" name="applygst" id="applygst" value="<!-- TMPL_VAR NAME="gstreg" -->" />
         <input type="hidden" name="invoiceincgst" id="invoiceincgst" value="<!-- TMPL_VAR NAME="invoiceincgst" -->" />
@@ -356,7 +355,6 @@ $(document).ready(function()
                 <!-- TMPL_ELSE -->
                     <label for="listprice">Retail price: </label>
                     <input type="text" size="20" name="listprice" id="listprice" value="<!-- TMPL_VAR NAME="listprice" -->" onchange="updateCosts()" /> (entered as <!-- TMPL_VAR NAME="currency" -->)
-
                 <!--/TMPL_IF-->
             </li>
             <!-- TMPL_UNLESS NAME="close" -->
@@ -381,7 +379,24 @@ $(document).ready(function()
                     <!-- /TMPL_LOOP -->
                     </select>
                 <!-- /TMPL_IF -->
-			<li>
+            </li>
+            <li>
+                <label for="discount">Discount: </label>
+                <!-- TMPL_IF NAME="close" -->
+                  <!-- TMPL_IF NAME="orderdiscount" -->
+                    <input type="hidden" name="discount" id="discount" value="<!-- TMPL_VAR NAME='orderdiscount' -->" /><!-- TMPL_VAR NAME="orderdiscount_2dp" -->%
+                  <!-- TMPL_ELSE -->
+                    <input type="hidden" name="discount" id="discount" value="<!-- TMPL_VAR NAME='discount' -->" /><!-- TMPL_VAR NAME="discount_2dp" -->%
+                  <!-- /TMPL_IF -->
+                <!-- TMPL_ELSE -->
+                  <!-- TMPL_IF NAME="orderdiscount" -->
+                    <input type="text" size="6" name="discount" id="discount" value="<!-- TMPL_VAR NAME='orderdiscount' -->" onchange="updateCosts();" />%
+                  <!-- TMPL_ELSE -->
+                    <input type="text" size="6" name="discount" id="discount" value="<!-- TMPL_VAR NAME='discount' -->" onchange="updateCosts();" />%
+                  <!-- /TMPL_IF -->
+                <!-- /TMPL_IF -->
+            </li>
+            <li>
                 <!-- TMPL_IF name="close" -->
             <span class="label">Replacement cost: </span>
                     <input type="hidden" size="20" name="rrp" id="rrp" value="<!-- TMPL_VAR NAME="rrp" -->" /><!-- TMPL_VAR NAME="rrp" -->
@@ -398,7 +413,6 @@ $(document).ready(function()
                 <label for="ecost">Budgeted cost: </label>
                     <input type="text" size="20" name="ecost" id="ecost" value="<!-- TMPL_VAR NAME="ecost" -->" />
                 <!--/TMPL_IF-->
-                <!-- TMPL_IF name="discount_2dp" -->  (adjusted for <!-- TMPL_VAR name="discount_2dp" -->% discount)  <!--/TMPL_IF-->
 
             </li>
             <li>

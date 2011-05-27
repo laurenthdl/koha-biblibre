@@ -1,0 +1,164 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Acquisitions &rsaquo; Invoice</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<!-- TMPL_INCLUDE NAME="calendar.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR NAME="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+    function updateColumnsVisibility(visible) {
+        if ( visible ) {
+            $("table .gste, .gsti").show();
+        } else {
+            <!-- TMPL_IF NAME="invoiceincgst" -->
+                $("table .gste").hide();
+            <!-- TMPL_ELSE -->
+                $("table .gsti").hide();
+            <!-- /TMPL_IF -->
+        }
+    }
+    $(document).ready(function() {
+        $("#orderst").tablesorter({widgets : ['zebra']});
+        Calendar.setup({
+            inputField: "billingdate",
+            ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+            button: "billingdateCalendar"
+        });
+        $("#show_all_details").click(function(){
+            updateColumnsVisibility($(this+":checked").val());
+        });
+
+        $("#show_all_details").attr('checked', false);
+        updateColumnsVisibility(false);
+    });
+//]]>
+</script>
+</head>
+
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+<!-- TMPL_INCLUDE NAME="acquisitions-search.inc" -->
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/acqui/acqui-home.pl">Acquisitions</a> &rsaquo; Invoice</div>
+
+<div id="doc3" class="yui-t2">
+
+<div id="bd">
+  <div id="yui-main">
+    <div class="yui-b">
+      <!-- TMPL_IF NAME="billingdate_saved" -->
+        <div class="dialog">
+          <p>Billing date has been saved.</p>
+        </div>
+      <!-- /TMPL_IF -->
+      <h1>Invoice: <!-- TMPL_VAR NAME="invoicenumber" --></h1>
+
+      <p>Vendor: <!-- TMPL_VAR NAME="suppliername" --></p>
+      <form action="" method="post">
+        <label for="billingdate">Billing date:</label>
+        <input type="text" size="10" id="billingdate" name="billingdate" value="<!-- TMPL_VAR NAME='billingdate' -->" readonly="readonly" />
+        <img id="billingdateCalendar" alt="Show Calendar" style="cursor:pointer" src="/intranet-tmpl/prog/en/lib/calendar/cal.gif" />
+        <input type="hidden" id="op" name="op" value="modbillingdate" />
+        <input type="hidden" id="invoicenumber" name="invoicenumber" value="<!-- TMPL_VAR NAME='invoicenumber' -->" />
+        <input type="submit" value="Save" />
+      </form>
+      <p>Status: 
+        <!-- TMPL_IF NAME="invoiceclosedate" -->
+          Closed on <!-- TMPL_VAR NAME="invoiceclosedate" -->
+        <!-- TMPL_ELSE -->
+          Open
+        <!-- /TMPL_IF -->
+        <a href="/cgi-bin/koha/acqui/parcel.pl?type=intra&amp;supplierid=<!-- TMPL_VAR NAME="supplierid" ESCAPE="URL" -->&amp;datereceived=<!-- TMPL_VAR NAME="datereceived" ESCAPE="URL" -->&amp;invoice=<!--TMPL_VAR Name="invoicenumber" ESCAPE="URL" -->">see receipt summary</a>
+      </p>
+      <label for="show_all_details">
+          <input type="checkbox" style="vertical-align: middle;" id="show_all_details" />
+          Show all details
+      </label>
+      <h2>Invoice details</h2>
+      <table id="orderst">
+        <thead>
+          <tr>
+            <th>Order line</th>
+            <th>Order</th>
+            <th>Basket</th>
+            <th>Summary</th>
+            <th>Publisher</th>
+            <th>Branch</th>
+            <th class="gste">RRP Exclude Taxes</th>
+            <th class="gste">ecost Exclude Taxes</th>
+            <th class="gsti">RRP Include Taxes</th>
+            <th class="gsti">ecost Include Taxes</th>
+            <th>Qty.</th>
+            <th class="gste">Total Excludes Taxes</th>
+            <th class="gsti">Total Include Taxes</th>
+            <th>GST %</th>
+            <th>GST</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- TMPL_LOOP NAME="orders_loop" -->
+            <!-- TMPL_UNLESS NAME="odd" -->
+              <tr class="highlight">
+            <!-- TMPL_ELSE -->
+              <tr>
+            <!-- /TMPL_IF -->
+              <td><!-- TMPL_VAR NAME="orderline" --></td>
+              <td><!-- TMPL_VAR NAME="ordernumber" --></td>
+              <td><!-- TMPL_VAR NAME="basketno" --></td>
+              <td><p><!-- TMPL_VAR NAME="title" -->
+                <!-- TMPL_IF NAME="author" -->
+                  <br /><em>by</em> <!-- TMPL_VAR NAME="author" -->
+                <!-- /TMPL_IF -->
+              </p></td>
+              <td>
+                <!-- TMPL_IF NAME="publishercode" -->
+                  <p><!-- TMPL_VAR NAME="publishercode" -->
+                    <!-- TMPL_IF NAME="publicationyear" -->
+                      - <!-- TMPL_VAR NAME="publicationyear" -->
+                    <!-- /TMPL_IF -->
+                  </p>
+                <!-- /TMPL_IF -->
+              </td>
+              <td><p><!-- TMPL_VAR NAME="branchcode" --></p></td>
+              <td class="number gste"><!-- TMPL_VAR NAME="rrpgste" --></td>
+              <td class="number gste"><!-- TMPL_VAR NAME="ecostgste" --></td>
+              <td class="number gsti"><!-- TMPL_VAR NAME="rrpgsti" --></td>
+              <td class="number gsti"><!-- TMPL_VAR NAME="ecostgsti" --></td>
+              <td class="number"><!-- TMPL_VAR NAME="quantity" --></td>
+              <td class="number gste"><!-- TMPL_VAR NAME="totalgste" --></td>
+              <td class="number gsti"><!-- TMPL_VAR NAME="totalgsti" --></td>
+              <td class="number"><!-- TMPL_VAR NAME="gstgsti" --></td>
+              <td class="number"><!-- TMPL_VAR NAME="gstvalue" --></td>
+            </tr>
+          <!-- /TMPL_LOOP -->
+        </tbody>
+        <tfoot>
+            <!-- TMPL_LOOP NAME="book_foot_loop" -->
+                <tr>
+                    <th colspan='6'>Total (GST <!--TMPL_VAR NAME="gstgsti" --> %)</th>
+                    <th class="gste"/><th class="gste"/><th class="gsti"/><th class="gsti"/>
+                    <th><!--TMPL_VAR NAME="quantity" --></th>
+                    <th class="gste"><!--TMPL_VAR NAME="totalgste" --></th>
+                    <th class="gsti"><!--TMPL_VAR NAME="totalgsti" --></th>
+                    <th/>
+                    <th><!--TMPL_VAR NAME="gstvalue" --></th>
+                </tr>
+            <!-- /TMPL_LOOP -->
+            <tr>
+                <th colspan='6'>Total (<!-- TMPL_VAR NAME="currency" -->)</th>
+                <th class="gste"/><th class="gste"/><th class="gsti"/><th class="gsti"/>
+                <th><!--TMPL_VAR NAME="total_quantity" --></th>
+                <th class="gste"><!--TMPL_VAR NAME="total_gste" --></th>
+                <th class="gsti"><!--TMPL_VAR NAME="total_gsti" --></th>
+                <th/>
+                <th><!--TMPL_VAR NAME="total_gstvalue" --></th>
+            </tr>
+        </tfoot>
+      </table>
+
+    </div>
+  </div>
+  <div class="yui-b">
+    <!-- TMPL_INCLUDE NAME="acquisitions-menu.inc" -->
+  </div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
