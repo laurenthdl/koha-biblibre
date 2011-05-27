@@ -2,7 +2,7 @@ function addItem( node ) {
     var index = $(node).parent().attr('id');
     var current_qty = parseInt($("#quantity").val());
     var max_qty = parseInt($("#quantity_to_receive").val());
-    if ( $("#items_list ul").find('li[idblock="' + index + '"]').length == 0 ) {
+    if ( $("#items_list table").find('tr[idblock="' + index + '"]').length == 0 ) {
         if ( current_qty < max_qty ) {
             if ( current_qty < max_qty - 1 )
                 cloneItemBlock(index);
@@ -14,8 +14,8 @@ function addItem( node ) {
     } else {
         if ( current_qty < max_qty )
             cloneItemBlock(index);
-        var li = constructLiNode(index);
-        $("#items_list ul").find('li[idblock="' + index + '"]:first').replaceWith(li);
+        var tr = constructTrNode(index);
+        $("#items_list table").find('tr[idblock="' + index + '"]:first').replaceWith(tr);
     }
     $("#" + index).hide();
 }
@@ -25,7 +25,7 @@ function showItem(index) {
         if ( $(this).attr('id') == index ) {
             $(this).show();
         } else {
-            if ( $("#items_list ul").find('li[idblock="' + $(this).attr('id') + '"]').length == 0 ) {
+            if ( $("#items_list table").find('tr[idblock="' + $(this).attr('id') + '"]').length == 0 ) {
                 $(this).remove();
             } else {
                 $(this).hide();
@@ -34,18 +34,40 @@ function showItem(index) {
     });
 }
 
-function constructLiNode(index) {
+function constructTrNode(index) {
+    var homebranch_select = $("#" + index).find("[name='kohafield'][value='items.homebranch']").prevAll("select[name='field_value']")[0];
+    var homebranch = $(homebranch_select).val();
+    var location_input = $("#" + index).find("[name='kohafield'][value='items.location']").prevAll("input[name='field_value']")[0];
+    var loc = $(location_input).val();
+    var callnumber_input = $("#" + index).find("[name='kohafield'][value='items.itemcallnumber']").prevAll("input[name='field_value']")[0];
+    var callnumber = $(callnumber_input).val();
+    var notforloan_input = $("#" + index).find("[name='kohafield'][value='items.notforloan']").prevAll("input[name='field_value']")[0];
+    var notforloan = $(notforloan_input).val();
     var input_barcode = $('#' + index).find("[name='kohafield'][value='items.barcode']").prevAll("input[name='field_value']")[0];
     var barcode = $(input_barcode).val();
-    var show_link = "<a href='#items' onclick='showItem(\"" + index + "\");'>show</a>";
-    var del_link = "<a href='#' onclick='deleteItemBlock(this, \"" + index + "\");'>delete</a>";
-    return "<li idblock='" + index + "'>Barcode " + barcode + " " + show_link + " " + del_link + "</li>";
+    var show_link = "<a href='#items' onclick='showItem(\"" + index + "\");'>Show</a>";
+    var del_link = "<a href='#' onclick='deleteItemBlock(this, \"" + index + "\");'>Delete</a>";
+    var result = "<tr idblock='" + index + "'>";
+    result += "<td>" + homebranch + "</td>";
+    result += "<td>" + loc + "</td>";
+    result += "<td>" + callnumber + "</td>";
+    if(notforloan){
+        result += "<td>" + _("Not for loan") + "</td>";
+    } else {
+        result += "<td>" + _("Available") + "</td>";
+    }
+    result += "<td>" + barcode + "</td>";
+    result += "<td>" + show_link + "</td>";
+    result += "<td>" + del_link + "</td>";
+    result += "</tr>";
 
+    return result;
 }
+
 function addItemInList(index) {
     $("#items_list").show();
-    var li = constructLiNode(index);
-    $("#items_list ul").append(li);
+    var tr = constructTrNode(index);
+    $("#items_list table tbody").append(tr);
 }
 
 function deleteItemBlock(node_a, index) {
@@ -53,7 +75,7 @@ function deleteItemBlock(node_a, index) {
     var current_qty = parseInt($("#quantity").val());
     var max_qty = parseInt($("#quantity_to_receive").val());
     $("#quantity").val(current_qty - 1);
-    $(node_a).parent('li').remove();
+    $(node_a).parents('tr').remove();
     if(current_qty - 1 == 0)
         $("#items_list").hide();
 
