@@ -135,6 +135,9 @@ function clearItemBlock(node) {
     $(block).find("input[type='text']").each(function(){
         $(this).val("");
     });
+    $(block).find("select").each(function(){
+        $(this).find("option:first").attr("selected", true);
+    });
 }
 
 function check_additem() {

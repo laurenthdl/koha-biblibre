@@ -399,7 +399,7 @@ for ( my $i = 0 ; $i < $countpendings ; $i++ ) {
         }
     }
     $line{'receive_lock'} = 1 if($invoiceclosedate);
-        
+
     push @loop_orders, \%line if ( $i >= $startfrom and $i < $startfrom + $resultsperpage );
 }
 
