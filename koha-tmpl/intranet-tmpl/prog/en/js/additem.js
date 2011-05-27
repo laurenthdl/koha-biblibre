@@ -63,10 +63,11 @@ function constructTrNode(index) {
 
     return result;
 }
+
 function addItemInList(index) {
     $("#items_list").show();
-    var li = constructLiNode(index);
-    $("#items_list ul").append(li);
+    var tr = constructTrNode(index);
+    $("#items_list table tbody").append(tr);
 }
 
 function deleteItemBlock(node_a, index) {
@@ -74,7 +75,7 @@ function deleteItemBlock(node_a, index) {
     var current_qty = parseInt($("#quantity").val());
     var max_qty = parseInt($("#quantity_to_receive").val());
     $("#quantity").val(current_qty - 1);
-    $(node_a).parent('li').remove();
+    $(node_a).parents('tr').remove();
     if(current_qty - 1 == 0)
         $("#items_list").hide();
 
