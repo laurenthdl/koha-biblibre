@@ -49,7 +49,8 @@ my ( $template, $borrowernumber, $cookie, $staffflags ) = get_template_and_user(
         query           => $input,
         type            => "intranet",
         authnotrequired => 0,
-        flagsrequired   => { acquisition => 'budget_manage' },
+        flagsrequired   => { acquisition => 'budget_manage',
+                             acquisition => 'budget_manage_all' },
         debug           => 0,
     }
 );
@@ -65,7 +66,7 @@ my $show      = $input->param('show');    # SET TO 1, BY A FORM SUMBIT
 $show_all     = $input->param('show_all') if $show == 1;
 
 # IF USER DOESNT HAVE PERM FOR AN 'ADD', THEN REDIRECT TO THE DEFAULT VIEW...
-if ( not defined $template->{param_map}->{'CAN_user_acquisition_budget_add_del'} && $op == 'add_form' ) {
+if ( (not defined $template->{param_map}->{'CAN_user_acquisition_budget_add_del'}) && (not defined $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'}) && ($op == 'add_form') ) {
     $op = '';
 }
 

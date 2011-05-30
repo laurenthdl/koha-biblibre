@@ -23,7 +23,9 @@
 						{ text: _("New budget"), url: "/cgi-bin/koha/admin/aqbudgetperiods.pl?op=add_form" },
                         { text: _("New fund for '<!-- TMPL_VAR NAME="budget_period_description" -->'"), url: "/cgi-bin/koha/admin/aqbudgets.pl?op=add_form&budget_period_id=<!-- TMPL_VAR NAME="budget_period_id" -->"
                            <!-- TMPL_IF NAME="budget_period_locked" -->,  disabled:true<!-- /TMPL_IF  -->
+                           <!-- TMPL_UNLESS NAME="CAN_user_acquisition_budget_manage_all" -->
                            <!-- TMPL_UNLESS NAME="CAN_user_acquisition_budget_add_del" -->,  disabled:true <!-- /TMPL_UNLESS  -->
+                           <!-- /TMPL_UNLESS -->
                           }
                 ]
 		<!-- TMPL_ELSE -->
