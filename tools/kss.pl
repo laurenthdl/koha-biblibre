@@ -42,7 +42,6 @@ use C4::Output;
 use CGI;
 use C4::Koha;
 use YAML;
-use Net::Ping;
 use C4::Scheduler;
 use POSIX qw(strftime);
 use File::Slurp qw(slurp);
@@ -78,10 +77,6 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     }
 );
 
-# Is the server reachable?
-my $ping = Net::Ping->new();
-my $pingresult = $ping->ping($conf->{'cron'}->{'serverhost'});
-$template->param(pingresult => $pingresult);
 
 # Are we a master or a slave?
 my $master = $$conf{cron}{master};
@@ -95,6 +90,16 @@ sub is_kss_running {
     $return = 0 if ($kssreturn =~ /not running$/);
     return $return;
 }
+
+# Parse kss.pl --status to tell if server is reachable
+sub is_server_reachable {
+    my $kssreturn = shift;
+    my $return = -1;
+    $return = 1 if ($kssreturn =~ /is running$/);
+    $return = 1 if ($kssreturn =~ /not running$/);
+    return $return;
+}
+
 
 # ------
 # MASTER
@@ -190,6 +195,10 @@ if ($master) {
     my $kssalreadyrunning = is_kss_running($result);
     $template->param("KSS_already_running" => 1) if ($kssalreadyrunning);
     $template->param("KSS_already_running_unknown" => 1) if ($kssalreadyrunning == -1);
+
+    # Is the server reachable?
+    my $pingresult = is_server_reachable($result);
+    $template->param(pingresult => $pingresult) if ($pingresult == 1);
 
     # What is our hostname?
     my $hostname = qx{hostname -f};
