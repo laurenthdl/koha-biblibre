@@ -1,7 +1,12 @@
 function addItem( node ) {
     var index = $(node).parent().attr('id');
     var current_qty = parseInt($("#quantity").val());
-    var max_qty = parseInt($("#quantity_to_receive").val());
+    var max_qty;
+    if($("#quantity_to_receive").length != 0){
+        max_qty = parseInt($("#quantity_to_receive").val());
+    } else  {
+        max_qty = 99999;
+    }
     if ( $("#items_list table").find('tr[idblock="' + index + '"]').length == 0 ) {
         if ( current_qty < max_qty ) {
             if ( current_qty < max_qty - 1 )
@@ -69,7 +74,12 @@ function addItemInList(index) {
 function deleteItemBlock(node_a, index) {
     $("#" + index).remove();
     var current_qty = parseInt($("#quantity").val());
-    var max_qty = parseInt($("#quantity_to_receive").val());
+    var max_qty;
+    if($("#quantity_to_receive").length != 0) {
+        max_qty = parseInt($("#quantity_to_receive").val());
+    } else {
+        max_qty = 99999;
+    }
     $("#quantity").val(current_qty - 1);
     $(node_a).parents('tr').remove();
     if(current_qty - 1 == 0)
