@@ -48,7 +48,6 @@ my $error        = $input->param('error');
 my $biblionumber = $input->param('biblionumber');
 $biblionumber = 0 unless $biblionumber;
 my $frameworkcode = $input->param('frameworkcode');
-warn($frameworkcode);
 my $title        = $input->param('title');
 my $author       = $input->param('author');
 my $isbn         = $input->param('isbn');
@@ -59,10 +58,11 @@ my $dewey        = $input->param('dewey');
 my $controlnumber = $input->param('controlnumber');
 my $stdid        = $input->param('stdid');
 my $srchany      = $input->param('srchany');
-my $op           = $input->param('op');
+my $op           = $input->param('op') || 'form';
 my $booksellerid = $input->param('booksellerid');
 my $basketno     = $input->param('basketno');
 my $tab          = $input->param('tab');
+my $page         = $input->param('page');
 my $noconnection;
 my $numberpending;
 my $attr = '';
@@ -98,8 +98,8 @@ foreach my $thisframeworkcode ( keys %$frameworks ) {
         value         => $thisframeworkcode,
         frameworktext => $frameworks->{$thisframeworkcode}->{'frameworktext'},
     );
-    if ( %row->{'value'} eq $frameworkcode ) {
-        %row->{'active'} = 'true';
+    if ( defined $frameworkcode && $row{'value'} eq $frameworkcode ) {
+        $row{'active'} = 'true';
     }
     push @frameworkcodeloop, \%row;
 }
@@ -259,9 +259,16 @@ if ( $op ne "do_search" ) {
                             # In rel2_2 i am not sure what encoding is so no character conversion is done here
 ##Add necessary encoding changes to here -TG
                             my $oldbiblio = TransformMarcToKoha( $dbh, $marcrecord, "" );
-                            $oldbiblio->{isbn}   =~ s/ |-|\.//g,
-                              $oldbiblio->{issn} =~ s/ |-|\.//g,
-                              my ( $notmarcrecord, $alreadyindb, $alreadyinfarm, $imported, $breedingid ) =
+
+                            $oldbiblio->{issn} =~ s/ |-|\.//g if defined $oldbiblio->{issn};
+                            $oldbiblio->{issn} =~ s/\|/ \| /g if defined $oldbiblio->{issn};
+                            $oldbiblio->{issn} =~ s/\(/ \(/g  if defined $oldbiblio->{issn};
+
+                            $oldbiblio->{isbn} =~ s/ |-|\.//g if defined $oldbiblio->{isbn};
+                            $oldbiblio->{isbn} =~ s/\|/ \| /g if defined $oldbiblio->{isbn};
+                            $oldbiblio->{isbn} =~ s/\(/ \(/g  if defined $oldbiblio->{isbn};
+
+                            my ( $notmarcrecord, $alreadyindb, $alreadyinfarm, $imported, $breedingid ) =
                               ImportBreeding( $marcdata, 2, $serverhost[$k], $encoding[$k], $random, 'z3950' );
                             my %row_data;
                             if ( $i % 2 ) {
@@ -321,8 +328,8 @@ if ( $op ne "do_search" ) {
                         server_name => $servername[$k],
                         previous_page => $pager->{prev_page},
                         next_page => $pager->{next_page},
-                        PAGE_NUMBERS => [ map { { page => $_, current => $_ == $server_page[$k] } } @{ $pager->{'numbers_of_set'} } ],
-                        pager_params => \@pager_params,
+                        PAGE_NUMBERS => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
+                        follower_params => \@pager_params,
                         serverresultsloop => \@serverresultsloop
                     } );
                 }    #$numresults
@@ -335,6 +342,7 @@ if ( $op ne "do_search" ) {
             server        => $servername[$k],
             numberpending => $numberpending,
             tab           => $tab,
+            page          => $page,
         );
 
         output_html_with_http_headers $input, $cookie, $template->output if $numberpending == 0;
