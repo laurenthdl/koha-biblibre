@@ -33,8 +33,7 @@
 # dates should be in the format you have set up Koha to expect
 # branchcode and categorycode need to be valid
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Auth;
 use C4::Output;
@@ -186,7 +185,6 @@ if ( $uploadborrowers && length($uploadborrowers) > 0 ) {
         $csvkeycol{$keycol} = $col++;
     }
 
-    #warn($borrowerline);
     if ($extended) {
         $matchpoint_attr_type = C4::Members::AttributeTypes->fetch($matchpoint);
     }
@@ -236,7 +234,6 @@ if ( $uploadborrowers && length($uploadborrowers) > 0 ) {
             }
         }
 
-        #warn join(':',%borrower);
         if ( $borrower{categorycode} ) {
             push @missing_criticals, { key => 'categorycode', line => $., lineraw => $borrowerline, value => $borrower{categorycode}, category_map => 1 }
               unless GetBorrowercategory( $borrower{categorycode} );

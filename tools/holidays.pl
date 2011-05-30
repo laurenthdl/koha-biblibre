@@ -16,9 +16,7 @@
 # Suite 330, Boston, MA  02111-1307 USA
 
 #####Sets holiday periods for each branch. Datedues will be extended if branch is closed -TG
-use strict;
-use warnings;
-
+use Modern::Perl;
 use CGI;
 
 use C4::Auth;
@@ -89,7 +87,6 @@ my $week_days_holidays = $calendar->get_week_days_holidays();
 my @week_days;
 foreach my $weekday ( keys %$week_days_holidays ) {
 
-    # warn "WEEK DAY : $weekday";
     my %week_day;
     %week_day = (
         KEY         => $weekday,

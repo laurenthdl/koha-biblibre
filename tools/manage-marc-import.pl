@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 # standard or CPAN modules used
 use CGI;
@@ -35,6 +34,8 @@ use C4::Matcher;
 use C4::BackgroundJob;
 use C4::Labels::Batch 1.000000;
 use C4::Branch qw(get_branch_code_from_name);
+use C4::Logguer;
+my $log = C4::Logguer->new();
 
 my $script_name = "/cgi-bin/koha/tools/manage-marc-import.pl";
 
@@ -185,14 +186,13 @@ sub create_labelbatch_from_importbatch {
     my $batch = C4::Labels::Batch->new( branch_code => $branch_code );
     my @items = GetItemNumbersFromImportBatch($batch_id);
     if ( grep { $_ == 0 } @items ) {
-        warn
-          sprintf( 'create_labelbatch_from_importbatch() : Call to C4::ImportBatch::GetItemNumbersFromImportBatch returned no item number(s) from import batch #%s.', $batch_id );
+        $log->warning(sprintf( 'create_labelbatch_from_importbatch() : Call to C4::ImportBatch::GetItemNumbersFromImportBatch returned no item number(s) from import batch #%s.', $batch_id ));
         return -1;
     }
     foreach my $item_number (@items) {
         $err = $batch->add_item($item_number);
         if ( $err == -1 ) {
-            warn sprintf( 'create_labelbatch_from_importbatch() : Error attempting to add item #%s of import batch #%s to label batch.', $item_number, $batch_id );
+            $log->error(sprintf( 'create_labelbatch_from_importbatch() : Error attempting to add item #%s of import batch #%s to label batch.', $item_number, $batch_id ));
             return -1;
         }
     }
@@ -314,7 +314,7 @@ sub put_in_background {
     } else {
 
         # fork failed, so exit immediately
-        warn "fork failed while attempting to run $ENV{'SCRIPT_NAME'} as a background job";
+        $log->warning("fork failed while attempting to run $ENV{'SCRIPT_NAME'} as a background job");
         exit 0;
     }
     return $job;

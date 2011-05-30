@@ -18,9 +18,8 @@
 # In this instance it is in fact a setting up of a list of reserves for the item
 # where the hierarchical order can be changed on the fly and a routing list can be
 # printed out
-use strict;
 
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Context;

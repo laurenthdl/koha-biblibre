@@ -24,9 +24,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 # standard or CPAN modules used
 use CGI;
@@ -42,7 +40,9 @@ use C4::ImportBatch;
 use C4::Matcher;
 use C4::UploadedFile;
 use C4::BackgroundJob;
+use C4::Logguer;
 
+my $log = C4::Logguer->new();
 my $input = new CGI;
 my $dbh   = C4::Context->dbh;
 $dbh->{AutoCommit} = 0;
@@ -126,7 +126,7 @@ if ($completedJobID) {
         } else {
 
             # fork failed, so exit immediately
-            warn "fork failed while attempting to run $ENV{'SCRIPT_NAME'} as a background job";
+            $log->error("fork failed while attempting to run $ENV{'SCRIPT_NAME'} as a background job");
             exit 0;
         }
 

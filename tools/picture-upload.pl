@@ -19,8 +19,7 @@
 #
 #
 
-#use strict;
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use File::Temp;
 use File::Copy;
@@ -55,7 +54,7 @@ my $op             = $input->param('op');
 #       Other parts of this code could be optimized as well, I think. Perhaps the file upload could be done with YUI's upload
 #       coded. -fbcit
 
-$debug and warn "Params are: filetype=$filetype, cardnumber=$cardnumber, borrowernumber=$borrowernumber, uploadfile=$uploadfilename";
+$log->debug("Params are: filetype=$filetype, cardnumber=$cardnumber, borrowernumber=$borrowernumber, uploadfile=$uploadfilename");
 
 =head1 NAME
 
@@ -72,16 +71,16 @@ Files greater than 100K will be refused. Images should be 140x200 pixels. If the
 
 =cut
 
-$debug and warn "Operation requested: $op";
+$log->debug("Operation requested: $op");
 
 my ( $total, $handled, @counts, $tempfile, $tfh );
 
 if ( ( $op eq 'Upload' ) && $uploadfile ) {    # Case is important in these operational values as the template must use case to be visually pleasing!
     my $dirname = File::Temp::tempdir( CLEANUP => 1 );
-    $debug and warn "dirname = $dirname";
+    $log->debug("dirname = $dirname");
     my $filesuffix = $1 if $uploadfilename =~ m/(\..+)$/i;
     ( $tfh, $tempfile ) = File::Temp::tempfile( SUFFIX => $filesuffix, UNLINK => 1 );
-    $debug and warn "tempfile = $tempfile";
+    $log->debug("tempfile = $tempfile");
     my ( @directories, $errors );
 
     $errors{'NOTZIP'} = 1 if ( $uploadfilename !~ /\.zip$/i && $filetype =~ m/zip/i );
@@ -107,7 +106,7 @@ if ( ( $op eq 'Upload' ) && $uploadfile ) {    # Case is important in these oper
                 opendir $dir, $recursive_dir;
                 while ( my $entry = readdir $dir ) {
                     push @directories, "$recursive_dir/$entry" if ( -d "$recursive_dir/$entry" and $entry !~ /^\./ );
-                    $debug and warn "$recursive_dir/$entry";
+                    $log->debug("$recursive_dir/$entry");
                 }
                 closedir $dir;
             }
@@ -128,8 +127,8 @@ if ( ( $op eq 'Upload' ) && $uploadfile ) {    # Case is important in these oper
         } else {
             my $filecount;
             map { $filecount += $_->{count} } @counts;
-            $debug and warn "Total directories processed: $total";
-            $debug and warn "Total files processed: $filecount";
+            $log->debug("Total directories processed: $total");
+            $log->debug("Total files processed: $filecount");
             $template->param(
                 TOTAL   => $total,
                 HANDLED => $handled,
@@ -140,13 +139,13 @@ if ( ( $op eq 'Upload' ) && $uploadfile ) {    # Case is important in these oper
         }
     }
 } elsif ( ( $op eq 'Upload' ) && !$uploadfile ) {
-    warn "Problem uploading file or no file uploaded.";
+    $log->warning("Problem uploading file or no file uploaded.");
     $template->param( cardnumber => $cardnumber );
     $template->param( filetype   => $filetype );
 } elsif ( $op eq 'Delete' ) {
     my $dberror = RmPatronImage($cardnumber);
-    $debug and warn "Patron image deleted for $cardnumber";
-    warn "Database returned $dberror" if $dberror;
+    $log->debug("Patron image deleted for $cardnumber");
+    $log->error("Database returned $dberror") if $dberror;
 }
 if ( $borrowernumber && !$errors && !$template->param('ERRORS') ) {
     print $input->redirect("/cgi-bin/koha/members/moremember.pl?borrowernumber=$borrowernumber");
@@ -157,35 +156,35 @@ if ( $borrowernumber && !$errors && !$template->param('ERRORS') ) {
 sub handle_dir {
     my ( $dir, $suffix ) = @_;
     my $source;
-    $debug and warn "Entering sub handle_dir; passed \$dir=$dir, \$suffix=$suffix";
+    $log->debug("Entering sub handle_dir; passed \$dir=$dir, \$suffix=$suffix");
     if ( $suffix =~ m/zip/i ) {    # If we were sent a zip file, process any included data/idlink.txt files
         my ( $file, $filename, $cardnumber );
-        $debug and warn "Passed a zip file.";
+        $log->debug("Passed a zip file.");
         opendir my $dirhandle, $dir;
         while ( my $filename = readdir $dirhandle ) {
             $file = "$dir/$filename" if ( $filename =~ m/datalink\.txt/i || $filename =~ m/idlink\.txt/i );
         }
         unless ( open( FILE, $file ) ) {
-            warn "Opening $dir/$file failed!";
+            $log->warning("Opening $dir/$file failed!");
             $errors{'OPNLINK'} = $file;
             return $errors;        # This error is fatal to the import of this directory contents, so bail and return the error to the caller
         }
 
         while ( my $line = <FILE> ) {
-            $debug and warn "Reading contents of $file";
+            $log->debug("Reading contents of $file");
             chomp $line;
-            $debug and warn "Examining line: $line";
+            $log->debug("Examining line: $line");
             my $delim = ( $line =~ /\t/ ) ? "\t" : ( $line =~ /,/ ) ? "," : "";
-            $debug and warn "Delimeter is \'$delim\'";
+            $log->debug("Delimeter is \'$delim\'");
             unless ( $delim eq "," || $delim eq "\t" ) {
-                warn "Unrecognized or missing field delimeter. Please verify that you are using either a ',' or a 'tab'";
+                $log->warning("Unrecognized or missing field delimeter. Please verify that you are using either a ',' or a 'tab'");
                 $errors{'DELERR'} = 1;    # This error is fatal to the import of this directory contents, so bail and return the error to the caller
                 return $errors;
             }
             ( $cardnumber, $filename ) = split $delim, $line;
             $cardnumber =~ s/[\"\r\n]//g;     # remove offensive characters
             $filename   =~ s/[\"\r\n\s]//g;
-            $debug and warn "Cardnumber: $cardnumber Filename: $filename";
+            $log->debug("Cardnumber: $cardnumber Filename: $filename");
             $source = "$dir/$filename";
             %counts = handle_file( $cardnumber, $source, %counts );
         }
@@ -201,7 +200,7 @@ sub handle_dir {
 
 sub handle_file {
     my ( $cardnumber, $source, %count ) = @_;
-    $debug and warn "Entering sub handle_file; passed \$cardnumber=$cardnumber, \$source=$source";
+    $log->debug("Entering sub handle_file; passed \$cardnumber=$cardnumber, \$source=$source");
     $count{filenames} = ()      if !$count{filenames};
     $count{source}    = $source if !$count{source};
     if ( $cardnumber && $source ) {    # Now process any imagefiles
@@ -212,7 +211,7 @@ sub handle_file {
         } else {
             $filename = $1 if ( $source =~ /\/([^\/]+)$/ );
         }
-        $debug and warn "Source: $source";
+        $log->debug("Source: $source");
         my $size = ( stat($source) )[7];
         if ( $size > 550000 ) {        # This check is necessary even with image resizing to avoid possible security/performance issues...
             $filerrors{'OVRSIZ'} = 1;
@@ -229,9 +228,9 @@ sub handle_file {
                 my $mimetype = 'image/png';    # GD autodetects three basic image formats: PNG, JPEG, XPM; we will convert all to PNG which is lossless...
                                                # Check the pixel size of the image we are about to import...
                 my ( $width, $height ) = $srcimage->getBounds();
-                $debug and warn "$filename is $width pix X $height pix.";
+                $log->debug("$filename is $width pix X $height pix.");
                 if ( $width > 200 || $height > 300 ) {    # MAX pixel dims are 200 X 300...
-                    $debug and warn "$filename exceeds the maximum pixel dimensions of 200 X 300. Resizing...";
+                    $log->debug("$filename exceeds the maximum pixel dimensions of 200 X 300. Resizing...");
                     my $percent_reduce;                   # Percent we will reduce the image dimensions by...
                     if ( $width > 200 ) {
                         $percent_reduce = sprintf( "%.5f", ( 140 / $width ) );    # If the width is oversize, scale based on width overage...
@@ -240,40 +239,40 @@ sub handle_file {
                     }
                     my $width_reduce  = sprintf( "%.0f", ( $width * $percent_reduce ) );
                     my $height_reduce = sprintf( "%.0f", ( $height * $percent_reduce ) );
-                    $debug and warn "Reducing $filename by " . ( $percent_reduce * 100 ) . "\% or to $width_reduce pix X $height_reduce pix";
+                    $log->debug("Reducing $filename by " . ( $percent_reduce * 100 ) . "\% or to $width_reduce pix X $height_reduce pix");
                     $image = GD::Image->new( $width_reduce, $height_reduce, 1 );    #'1' creates true color image...
                     $image->copyResampled( $srcimage, 0, 0, 0, 0, $width_reduce, $height_reduce, $width, $height );
                     $imgfile = $image->png();
-                    $debug and warn "$filename is " . length($imgfile) . " bytes after resizing.";
+                    $log->debug("$filename is " . length($imgfile) . " bytes after resizing.");
                     undef $image;
                     undef $srcimage;                                                # This object can get big...
                 } else {
                     $image   = $srcimage;
                     $imgfile = $image->png();
-                    $debug and warn "$filename is " . length($imgfile) . " bytes.";
+                    $log->debug("$filename is " . length($imgfile) . " bytes.");
                     undef $image;
                     undef $srcimage;                                                # This object can get big...
                 }
-                $debug and warn "Image is of mimetype $mimetype";
+                $log->debug("Image is of mimetype $mimetype");
                 my $dberror = PutPatronImage( $cardnumber, $mimetype, $imgfile ) if $mimetype;
                 if ( !$dberror && $mimetype ) {    # Errors from here on are fatal only to the import of a particular image, so don't bail, just note the error and keep going
                     $count{count}++;
                     push @{ $count{filenames} }, { source => $filename, cardnumber => $cardnumber };
                 } elsif ($dberror) {
-                    warn "Database returned error: $dberror";
+                    $log->error("Database returned error: $dberror");
                     ( $dberror =~ /patronimage_fk1/ ) ? $filerrors{'IMGEXISTS'} = 1 : $filerrors{'DBERR'} = 1;
                     push my @filerrors, \%filerrors;
                     push @{ $count{filenames} }, { filerrors => \@filerrors, source => $filename, cardnumber => $cardnumber };
                     $template->param( ERRORS => 1 );
                 } elsif ( !$mimetype ) {
-                    warn "Unable to determine mime type of $filename. Please verify mimetype.";
+                    $log->warning("Unable to determine mime type of $filename. Please verify mimetype.");
                     $filerrors{'MIMERR'} = 1;
                     push my @filerrors, \%filerrors;
                     push @{ $count{filenames} }, { filerrors => \@filerrors, source => $filename, cardnumber => $cardnumber };
                     $template->param( ERRORS => 1 );
                 }
             } else {
-                warn "Contents of $filename corrupted!";
+                $log->warn "Contents of $filename corrupted!";
 
                 #	$count{count}--;
                 $filerrors{'CORERR'} = 1;
@@ -282,14 +281,14 @@ sub handle_file {
                 $template->param( ERRORS => 1 );
             }
         } else {
-            warn "Opening $dir/$filename failed!";
+            $log->error("Opening $dir/$filename failed!");
             $filerrors{'OPNERR'} = 1;
             push my @filerrors, \%filerrors;
             push @{ $count{filenames} }, { filerrors => \@filerrors, source => $filename, cardnumber => $cardnumber };
             $template->param( ERRORS => 1 );
         }
     } else {    # The need for this seems a bit unlikely, however, to maximize error trapping it is included
-        warn "Missing " . ( $cardnumber ? "filename" : ( $filename ? "cardnumber" : "cardnumber and filename" ) );
+        $log->warning("Missing " . ( $cardnumber ? "filename" : ( $filename ? "cardnumber" : "cardnumber and filename" ) ));
         $filerrors{'CRDFIL'} = ( $cardnumber ? "filename" : ( $filename ? "cardnumber" : "cardnumber and filename" ) );
         push my @filerrors, \%filerrors;
         push @{ $count{filenames} }, { filerrors => \@filerrors, source => $filename, cardnumber => $cardnumber };

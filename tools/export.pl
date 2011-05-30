@@ -16,8 +16,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Auth;
 use C4::Output;    # contains gettemplate
 use C4::Biblio;    # GetMarcBiblio GetXmlBiblio
@@ -121,7 +120,6 @@ if ( $op eq "export" ) {
         $query .= ( C4::Context->preference('item-level_itypes') ) ? " AND items.itype = ? " : " AND biblioitems.itemtype = ?";
         push @sql_params, $itemtype;
     }
-    warn "$query, @sql_params";
     my $sth = $dbh->prepare($query);
     $sth->execute(@sql_params);
 

@@ -60,8 +60,7 @@ op can be :
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Dates qw/format_date format_date_in_iso/;
@@ -195,7 +194,6 @@ my ( $totalissues, @serialslist ) = GetSerials($subscriptionid);
 my $count = @serialslist;
 for ( my $i = 0 ; $i < $count ; $i++ ) {
 
-    #warn "la : $i";
     $serialslist[$i]->{'callnumber'} = $subscription->{'callnumber'};
     my $temp = rand(10000000);
     $serialslist[$i]->{'barcode'} = "TEMP" . sprintf( "%.0f", $temp );
@@ -235,7 +233,6 @@ if ( C4::Context->preference("serialsadditems") ) {
             itemlib => $itemstatushash->{$thisitemstatus},
         );
 
-        #		warn "".$row{'itemval'}.", ". $row{"itemlib"};
         $itemstatusloopcount++;
         push @itemstatusloop, \%row;
     }
@@ -256,7 +253,6 @@ if ( C4::Context->preference("serialsadditems") ) {
         $data->{"branchloop"}       = \@branchloop;
     }
 
-    # warn "Choice: $choice";
     $template->param( choice => $choice );
     $template->param(
         serialadditems => C4::Context->preference("serialsadditems"),
