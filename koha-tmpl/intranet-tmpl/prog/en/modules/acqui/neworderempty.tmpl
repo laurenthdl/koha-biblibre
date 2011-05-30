@@ -9,6 +9,21 @@
 actTotal = "";
 
 function Check(ff) {
+    <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
+        // Remove last itemblock if it is not in items_list
+        var lastitemblock = $("#outeritemblock > div:last");
+        var tobedeleted = true;
+        var listitems = $("#items_list li");
+        $(listitems).each(function(){
+            if($(this).attr('idblock') == $(lastitemblock).attr('id')){
+                tobedeleted = false;
+            }
+        });
+        if(tobedeleted){
+            $(lastitemblock).remove();
+        }
+    <!-- /TMPL_IF -->
+
     var ok=0;
     var _alertString= _("Form not submitted because of the following problem(s)")+"\n";
 
@@ -18,8 +33,7 @@ function Check(ff) {
         ok=1;
                     _alertString += "\n- " + _("Title cannot be empty");
     }
-
-    if (!(isNum(ff.quantity,0))){
+    if (!(isNum(ff.quantity,0)) || ff.quantity.value == 0){
         ok=1;
                     _alertString += "\n- " + _("Quantity must be greater than '0'");
     }
@@ -39,16 +53,20 @@ function Check(ff) {
         _alertString += "\n- " + "Order total (" + ff.total.value + ") exceeds budget available ("+actTotal+")";
     }
 
-if (ok) {
+    if (ok) {
         alert(_alertString);
-    return false;
+        return false;
     }
-
-ff.submit();
-
 }
+
 $(document).ready(function() 
     {
+    <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
+        var clone = $('#itemblock').clone();
+        var random = Math.floor(Math.random()*100000);
+        $(clone).attr('id', 'itemblock' + random);
+        $('#to_cloned').append(clone);
+    <!-- /TMPL_IF -->
         //We apply the fonction only for modify option
         <!--TMPL_IF NAME="quantityrec"-->
         $('#quantity').blur(function() 
@@ -143,7 +161,8 @@ $(document).ready(function()
     </div>
 <!-- /TMPL_IF -->
 
-<form action="/cgi-bin/koha/acqui/addorder.pl" method="post" id="Aform">
+<div id="to_cloned" style="display:none"></div>
+<form action="/cgi-bin/koha/acqui/addorder.pl" method="post" id="Aform" onsubmit="return Check(this);">
 
 <fieldset class="rows">
         <legend>Catalog details</legend>
@@ -285,6 +304,24 @@ $(document).ready(function()
             <div class="dialog message">No ACQ framework, using default. You should create a framework with code ACQ, the items framework would be used</div>
         <!-- /TMPL_IF -->
 
+        <div id="items_list" style="display:none">
+          <table>
+            <thead>
+              <tr>
+                <th>Home branch</th>
+                <th>Location</th>
+                <th>Call number</th>
+                <th>Status</th>
+                <th>Barcode</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+
         <!-- TMPL_LOOP NAME="items" -->
         <div id="outeritemblock">
         <div id="itemblock">
@@ -305,8 +342,7 @@ $(document).ready(function()
                 </div></li>
             <!-- /TMPL_LOOP-->
             </ol>
-            <a name="buttonPlus" style="cursor: pointer; color: grey; font-size: 180%;" onclick="cloneItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">+</a>
-            <a name="buttonMinus" style="display:none; cursor: pointer; color: grey; font-size: 180%;" onclick="deleteItemBlock('itemblock<!-- TMPL_VAR name="itemBlockIndex" -->')">-</a>
+            <a name="buttonPlus" style="cursor: pointer; color: grey; font-size: 180%;" onclick="addItem(this)">+</a>
         </div><!-- /iteminformation -->
         </div>
 
@@ -324,7 +360,7 @@ $(document).ready(function()
                 <!-- TMPL_ELSE -->
                     <label class="required" for="quantity">Quantity: </label>
                     <!-- TMPL_IF name="items" -->
-                        <input type="text" readonly="readonly" size="20" id="quantity" name="quantity" value="1" onchange="updateCosts();" />
+                        <input type="text" readonly="readonly" size="20" id="quantity" name="quantity" value="0" onchange="updateCosts();" />
                     <!-- TMPL_ELSE -->
                         <input type="text" size="20" id="quantity" name="quantity" <!-- TMPL_IF NAME="subscriptionid" -->value="1" READONLY<!-- TMPL_ELSE -->value="<!-- TMPL_VAR name="quantityrec" -->"<!-- /TMPL_IF  --> onchange="updateCosts();" />
                     <!-- /TMPL_IF -->
@@ -463,7 +499,7 @@ $(document).ready(function()
     </fieldset>
     <fieldset class="action">
         <input type="hidden" name="subscriptionid" value="<!-- TMPL_VAR NAME="subscriptionid" -->" />
-        <input type="button" value="Save" onclick="Check(this.form)" /> 
+        <input type="submit" value="Save" /> 
         <!-- TMPL_IF name="suggestionid" -->
             <a class="cancel" href="/cgi-bin/koha/acqui/newordersuggestion.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">Cancel</a>
         <!-- TMPL_ELSE -->
