@@ -61,10 +61,16 @@ my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
         query           => $input,
         type            => "intranet",
         authnotrequired => 0,
-        flagsrequired   => { acquisition => 'order_receive' },
+        flagsrequired   => { acquisition => '*' },
         debug           => 1,
     }
 );
+
+# User can access to this page if he has at least one of these permissions.
+# There is no other way to do this atm.
+if( (not defined $template->{'param_map'}->{'CAN_user_acquisition_order_receive'}) && (not defined $template->{'param_map'}->{'CAN_user_acquisition_order_claim_for_all'}) ){
+    checkauth($input, 0, { acquisition => 'order_receive' }, "intranet");
+}
 
 my $supplierid = $input->param('supplierid') || undef;    # we don't want "" or 0
 my $delay      = $input->param('delay');
