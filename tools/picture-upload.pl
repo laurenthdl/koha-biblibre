@@ -30,6 +30,9 @@ use C4::Auth;
 use C4::Output;
 use C4::Members;
 use C4::Debug;
+use C4::Logguer;
+
+my $log = C4::Logguer->new();
 
 my $input = new CGI;
 
@@ -83,6 +86,7 @@ if ( ( $op eq 'Upload' ) && $uploadfile ) {    # Case is important in these oper
     $log->debug("tempfile = $tempfile");
     my ( @directories, $errors );
 
+    my %errors;
     $errors{'NOTZIP'} = 1 if ( $uploadfilename !~ /\.zip$/i && $filetype =~ m/zip/i );
     $errors{'NOWRITETEMP'} = 1 unless ( -w $dirname );
     $errors{'EMPTYUPLOAD'} = 1 unless ( length($uploadfile) > 0 );
@@ -102,7 +106,7 @@ if ( ( $op eq 'Upload' ) && $uploadfile ) {    # Case is important in these oper
                 exit;
             }
             push @directories, "$dirname";
-            foreach $recursive_dir (@directories) {
+            foreach my $recursive_dir (@directories) {
                 opendir $dir, $recursive_dir;
                 while ( my $entry = readdir $dir ) {
                     push @directories, "$recursive_dir/$entry" if ( -d "$recursive_dir/$entry" and $entry !~ /^\./ );

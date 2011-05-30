@@ -38,6 +38,7 @@ use URI::Escape;
 use C4::MarcFramework;
 use C4::Search::Engine;
 use C4::Logguer;
+use C4::Charset;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
@@ -966,7 +967,7 @@ sub buildQuery {
                 if ($remove_stopwords) {
                     ( $operand, $stopwords_removed ) = _remove_stopwords( $operand, $index );
                     $log->debug("OPERAND w/out STOPWORDS: >$operand<");
-                    $log->debug("REMOVED STOPWORDS: @$stopwords_removed");
+                    $log->debug("REMOVED STOPWORDS: @$stopwords_removed")
                       if ( $stopwords_removed && $DEBUG );
                 }
 
@@ -1495,7 +1496,6 @@ sub searchResults {
         #--------------------------------------------------------------
 
         # XSLT processing of some stuff
-        use C4::Charset;
         SetUTF8Flag($marcrecord);
         $log->debug($marcrecord->as_formatted);
 
@@ -1984,8 +1984,9 @@ sub SearchAcquisitions {
 
         eval { $qdataacquisitions->execute(@params); };
 
-        $log->error("recentacquisitions Error :$@") if $@;
-        else {
+        if ( $@ ) {
+            $log->error("recentacquisitions Error :$@");
+        } else {
             my @loopdata;
             while ( my $data = $qdataacquisitions->fetchrow_hashref ) {
                 push @loopdata, { "summary" => GetBiblioSummary( $data->{'marcxml'} ) };

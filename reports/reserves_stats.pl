@@ -30,7 +30,8 @@ use C4::Output;
 use C4::Reports;
 use C4::Members;
 use C4::Dates qw/format_date format_date_in_iso/;
-use C4::Catuse C4::Logguer;
+use C4::Category;
+use C4::Logguer;
 use List::MoreUtils qw/any/;
 use YAML;
 
@@ -44,7 +45,7 @@ plugin that shows circulation stats
 
 =cut
 
-my $log = C4::Logguer->new();egory;
+my $log = C4::Logguer->new();
 my $input          = new CGI;
 my $fullreportname = "reports/reserves_stats.tmpl";
 my $do_it          = $input->param('do_it');
@@ -277,7 +278,6 @@ sub calculate {
     $dbcalc->execute( @sqlparams, @sqlparams );
     my ( $emptycol, $emptyrow );
     my $data = $dbcalc->fetchall_hashref( [qw(line col)] );
-    my @loopline;
     my %cols_hash;
 
     foreach my $row ( keys %$data ) {

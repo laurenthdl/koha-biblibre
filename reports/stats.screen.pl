@@ -60,7 +60,6 @@ my $count = @payments;
 
 $log->debug("MASON: number of payments=$count");
 
-my $i            = 0;
 my $totalcharges = 0;
 my $totalcredits = 0;
 my $totalpaid    = 0;
@@ -118,7 +117,7 @@ foreach my $payment (@payments) {
 #get credits and append to the bottom of payments
 my @credits = getcredits( $date, $date2 );
 
-my $count = @credits;
+$count = @credits;
 my $i     = 0;
 
 while ( $i < $count ) {

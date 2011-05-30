@@ -217,7 +217,7 @@ sub makepayment {
         returnlost( $borrowernumber, $data->{'itemnumber'} );
     }
      
-    my $sth = $dbh->prepare("SELECT max(id) AS lastinsertid FROM accountlines");
+    $sth = $dbh->prepare("SELECT max(id) AS lastinsertid FROM accountlines");
     $sth->execute();
     my $datalastinsertid = $sth->fetchrow_hashref;
     $sth->finish;

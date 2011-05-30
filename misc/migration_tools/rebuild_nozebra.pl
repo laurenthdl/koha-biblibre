@@ -224,7 +224,7 @@ while ( my ($biblionumber) = $sth->fetchrow ) {
 print "\nInserting records...\n";
 $i = 0;
 
-my $commitnum = 100;
+$commitnum = 100;
 $dbh->{AutoCommit} = 0;
 
 $sth = $dbh->prepare("INSERT INTO nozebra (server,indexname,value,biblionumbers) VALUES ('biblioserver',?,?,?)");
@@ -345,7 +345,7 @@ while ( my ($authid) = $sth->fetchrow ) {
 print "\nInserting...\n";
 $i = 0;
 
-my $commitnum = 100;
+$commitnum = 100;
 $dbh->{AutoCommit} = 0;
 $sth = $dbh->prepare("INSERT INTO nozebra (server,indexname,value,biblionumbers) VALUES ('authorityserver',?,?,?)");
 foreach my $key ( keys %result ) {

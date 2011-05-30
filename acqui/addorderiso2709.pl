@@ -242,7 +242,7 @@ my $budget = GetBudget($budget_id);
 
 # build budget list
 my $budget_loop = [];
-my $budgets = GetBudgetHierarchy( q{}, $borrower->{branchcode}, $borrower->{borrowernumber} );
+$budgets = GetBudgetHierarchy( q{}, $borrower->{branchcode}, $borrower->{borrowernumber} );
 foreach my $r ( @{$budgets} ) {
     if ( !defined $r->{budget_amount} || $r->{budget_amount} == 0 ) {
         next;

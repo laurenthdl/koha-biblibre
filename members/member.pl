@@ -105,7 +105,7 @@ if ( $count == 1 ) {
 }
 
 my @resultsdata;
-my $to = ( $count > $to ? $to : $count );
+$to = ( $count > $to ? $to : $count );
 my $index = $from;
 
 foreach my $borrower ( @$results[ $from .. $to - 1 ] ) {

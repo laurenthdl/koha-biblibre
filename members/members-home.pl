@@ -49,7 +49,5 @@ $template->param(
     categoryloop => \@categories,
 );
 $template->param( "AddPatronLists_" . C4::Context->preference("AddPatronLists") => "1", );
-my @letters = map { { letter => $_ } } ( 'A' .. 'Z' );
-$template->param( letters => \@letters );
 
 output_html_with_http_headers $query, $cookie, $template->output;

@@ -115,7 +115,6 @@ if ($do_it) {
     my $req;
     $req = $dbh->prepare("SELECT distinctrow id,name FROM aqbooksellers ORDER BY name");
     $req->execute;
-    my @select;
     push @select, "";
     $select{''} = "All Suppliers";
 

@@ -168,7 +168,7 @@ if ( $op ne "do_search" ) {
             $option1->option( 'preferredRecordSyntax', $server->{syntax} );
             $oConnection[$s] = create ZOOM::Connection($option1)
               || $log->warning("" . $oConnection[$s]->errmsg() );
-            $log->debug("server data", $server->{name}, $server->{port} ))
+            $log->debug("server data", $server->{name}, $server->{port} );
             $oConnection[$s]->connect( $server->{host}, $server->{port} )
               || $log->warning("" . $oConnection[$s]->errmsg() );
             $serverhost[$s] = $server->{host};

@@ -491,7 +491,8 @@ $template->param(
 
 my $row_count = 10;    # FIXME:This probably should be a syspref
 my ( $pubshelves, $total ) = GetRecentShelves( 2, $row_count, undef );
-my ( $barshelves, $total ) = GetRecentShelves( 1, undef,      $borrowernumber );
+my $barshelves;
+( $barshelves, $total ) = GetRecentShelves( 1, undef,      $borrowernumber );
 
 my @pubshelves = @{$pubshelves};
 my @barshelves = @{$barshelves};

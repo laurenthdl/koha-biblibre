@@ -81,9 +81,10 @@ my @not_deleted;              # List of the itemnumbers that could not be delete
 
 my %cookies   = parse CGI::Cookie($cookie);
 my $sessionID = $cookies{'CGISESSID'}->value;
-my $dbh       = C4::Context->dbh;
 
 my ( $itemtagfield, $itemtagsubfield ) = &GetMarcFromKohaField( "items.itemnumber", "" );
+
+sub UpdateMarcWith($$); # Predeclare UpdateMarcWith
 
 #--- ----------------------------------------------------------------------------
 if ( $op eq "action" ) {

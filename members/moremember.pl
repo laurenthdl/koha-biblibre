@@ -238,7 +238,6 @@ my $issuecount  = scalar(@$issue);
 my $relissuecount  = scalar(@$relissue) if ($relissue);
 my $roaddetails = &GetRoadTypeDetails( $data->{'streettype'} );
 my $today       = POSIX::strftime( "%Y-%m-%d", localtime );       # iso format
-my @issuedata;
 my @borrowers_with_issues;
 my $overdues_exist = 0;
 my $totalprice     = 0;

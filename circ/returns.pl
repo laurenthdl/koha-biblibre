@@ -281,7 +281,7 @@ $template->param( inputloop => \@inputloop );
 
 
 # Is there a circulation note?
-my $itemnumber = GetItemnumberFromBarcode($barcode);
+$itemnumber = GetItemnumberFromBarcode($barcode);
 my $biblionumber = GetBiblionumberFromItemnumber($itemnumber);
 my $record = GetMarcBiblio($biblionumber);
 my $frameworkcode = GetFrameworkCode($biblionumber);
@@ -613,7 +613,7 @@ $template->param(
     soundon        => C4::Context->preference("SoundOn"),
 );
 
-my $itemnumber = GetItemnumberFromBarcode( $query->param('barcode') );
+$itemnumber = GetItemnumberFromBarcode( $query->param('barcode') );
 if ($itemnumber) {
     my ( $holdingBranch, $collectionBranch ) = GetCollectionItemBranches($itemnumber);
     if ( !( $holdingBranch eq $collectionBranch ) ) {
