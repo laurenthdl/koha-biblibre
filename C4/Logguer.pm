@@ -19,6 +19,7 @@ package C4::Logguer;
 
 use Modern::Perl;
 use Log::LogLite;
+use C4::Context;
 
 my $LOG_DIR = C4::Context->config('logdir');
 my $KOHA_LOG_FILE = $LOG_DIR . "/koha.log";
@@ -36,13 +37,15 @@ sub new {
     my $proto = shift;
     my $class = ref($proto) || $proto;
     my $self = {};
-    my $type = shift || $ENV{LOG} || 'koha';
+    my $file = shift || $ENV{LOG} || 'koha';
     $self->{LEVEL} = shift || C4::Context->preference("DebugLevel") || $NORMAL_LOG_LEVEL;
 
-    if ( $type eq 'koha' ) {
+    if ( $file eq 'koha' ) {
         $self->{FILE_PATH} = $KOHA_LOG_FILE;
-    } elsif ( $type eq 'opac' ) {
+    } elsif ( $file eq 'opac' ) {
         $self->{FILE_PATH} = $OPAC_LOG_FILE;
+    } else {
+        $self->{FILE_PATH} = $ENV{LOG};
     }
     $self->{LOGGER} = Log::LogLite->new($self->{FILE_PATH}, $self->{LEVEL});
 
@@ -135,3 +138,4 @@ sub called_by {
     return $str;
 } # of called_by
 
+1;
