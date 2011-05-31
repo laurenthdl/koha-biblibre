@@ -5910,11 +5910,11 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.06.00.016";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("ALTER TABLE `aqorders` ADD `internalnotes` mediumtext AFTER `notes`");
-    print "Upgrade to $DBversion done (Add internalnotes field in aqorders table)";
-    SetVersion($DBversion);
+$DBversion = "3.06.00.030";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do(q{ALTER TABLE `aqbudgets` ADD UNIQUE ( budget_name );});
+    print "Upgrade to $DBversion done (Unique constraint on budget_name field.)\n";
+    SetVersion ($DBversion);
 }
 
 =item DropAllForeignKeys($table)
