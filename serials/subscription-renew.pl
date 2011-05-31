@@ -62,7 +62,7 @@ my $mode           = $query->param('mode');
 my $op             = $query->param('op') || q{};
 my $subscriptionid = $query->param('subscriptionid');
 my $done           = 0;                                 # for after form has been submitted
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
     {   template_name   => "serials/subscription-renew.tmpl",
         query           => $query,
         type            => "intranet",
@@ -84,8 +84,14 @@ if ( $op eq "renew" ) {
 }
 
 my $subscription = GetSubscription($subscriptionid);
-if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+if( $flags->{'superlibrarian'} == 1
+ || $template->{'param_map'}->{'CAN_user_serials_superserials'}
+ || !defined $subscription->{'branchcode'}
+ || $subscription->{'branchcode'} eq ''
+ || $subscription->{'branchcode'} eq C4::Context->userenv->{'branch'} ) {
     $subscription->{'cannotedit'} = 0;
+} else {
+    $subscription->{'cannotedit'} = 1;
 }
 if ( $subscription->{'cannotedit'} ) {
     carp "Attempt to renew subscription $subscriptionid by " . C4::Context->userenv->{'id'} . " not allowed";

@@ -61,7 +61,7 @@ my @publisheddates = $query->param('publisheddate');
 my @status         = $query->param('status');
 my @notes          = $query->param('notes');
 
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
     {   template_name   => "serials/serials-home.tmpl",
         query           => $query,
         type            => "intranet",
@@ -95,8 +95,14 @@ if ($searched) {
 }
 
 foreach my $sub (@subscriptions) {
-    if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+    if( $flags->{'superlibrarian'} == 1
+     || $template->{'param_map'}->{'CAN_user_serials_superserials'}
+     || !defined $sub->{'branchcode'}
+     || $sub->{'branchcode'} eq ''
+     || $sub->{'branchcode'} eq C4::Context->userenv->{'branch'} ) {
         $sub->{'cannotedit'} = 0;
+    } else {
+        $sub->{'cannotedit'} = 1;
     }
 }
 
