@@ -43,7 +43,7 @@ my $sub_length;
 # Permission needed otherwise (nothing or dup) : create_subscription
 my $permission = ($op eq "mod") ? "edit_subscription" : "create_subscription";
 
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
     {   template_name   => "serials/subscription-add.tmpl",
         query           => $query,
         type            => "intranet",
@@ -65,8 +65,14 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
 
     my $subscriptionid = $query->param('subscriptionid');
     $subs = GetSubscription($subscriptionid);
-    if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+    if( $flags->{'superlibrarian'} == 1
+     || $template->{'param_map'}->{'CAN_user_serials_superserials'}
+     || !defined $subs->{'branchcode'}
+     || $subs->{'branchcode'} eq ''
+     || $subs->{'branchcode'} eq C4::Context->userenv->{'branch'} ) {
         $subs->{'cannotedit'} = 0;
+    } else {
+        $subs->{'cannotedit'} = 1;
     }
 ## FIXME : Check rights to edit if mod. Could/Should display an error message.
     if ( $subs->{'cannotedit'} && $op eq 'mod' ) {

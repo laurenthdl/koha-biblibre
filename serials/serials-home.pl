@@ -105,8 +105,9 @@ foreach my $sub (@subscriptions) {
 
     if( $flags->{'superlibrarian'} == 1
      || $template->{'param_map'}->{'CAN_user_serials_superserials'}
-     || ( $sub->{'branchcode'}
-     && $sub->{'branchcode'} eq C4::Context->userenv->{'branch'} ) ) {
+     || !defined $sub->{'branchcode'}
+     || $sub->{'branchcode'} eq ''
+     || $sub->{'branchcode'} eq C4::Context->userenv->{'branch'} ) {
         $sub->{'cannotedit'} = 0;
     } else {
         $sub->{'cannotedit'} = 1;

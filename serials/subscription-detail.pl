@@ -31,12 +31,12 @@ my $query          = new CGI;
 my $op             = $query->param('op') || q{};
 my $issueconfirmed = $query->param('issueconfirmed');
 my $dbh            = C4::Context->dbh;
-my ( $template, $loggedinuser, $cookie, $hemisphere );
+my ( $template, $loggedinuser, $cookie, $hemisphere, $flags );
 my $subscriptionid = $query->param('subscriptionid');
 # Permission needed if it is a deletion (del) : delete_subscription
 # Permission needed otherwise : *
 my $permission = ($op eq "del") ? "delete_subscription" : "*";
-( $template, $loggedinuser, $cookie ) = get_template_and_user(
+( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
     {   template_name   => "serials/subscription-detail.tmpl",
         query           => $query,
         type            => "intranet",
@@ -47,8 +47,15 @@ my $permission = ($op eq "del") ? "delete_subscription" : "*";
 );
 
 my $subs           = GetSubscription($subscriptionid);
-if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+
+if( $flags->{'superlibrarian'} == 1
+ || $template->{'param_map'}->{'CAN_user_serials_superserials'}
+ || !defined $subs->{'branchcode'}
+ || $subs->{'branchcode'} eq ''
+ || $subs->{'branchcode'} eq C4::Context->userenv->{'branch'} ) {
     $subs->{'cannotedit'} = 0;
+} else {
+    $subs->{'cannotedit'} = 1;
 }
 
 $$subs{enddate} ||= GetExpirationDate($subscriptionid);
