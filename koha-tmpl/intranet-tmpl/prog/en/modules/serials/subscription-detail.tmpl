@@ -51,7 +51,7 @@ function popup(subscriptionid) {
 	<!-- TMPL_INCLUDE NAME="serials-toolbar.inc" -->
 
     <h1>Subscription for <!-- TMPL_VAR name="bibliotitle" --> </h1>
-    <!--TMPL_IF Name="abouttoexpire"--><div class="problem">Subscription is near its end. It should be renewed now.</div><!--/TMPL_IF-->
+    <!--TMPL_IF Name="abouttoexpire"--><div class="warning">Subscription is near its end. It should be renewed now.</div><!--/TMPL_IF-->
     <!-- TMPL_IF NAME="NEEDSCONFIRMATION" -->
     <div id="circ_needsconfirmation" class="dialog alert">
 			<h3>Please Confirm Subscription deletion</h3>
