@@ -44,7 +44,7 @@ use C4::Koha;
 use YAML;
 use C4::Scheduler;
 use POSIX qw(strftime);
-use File::Slurp qw(slurp);
+use File::Slurp qw(slurp read_file);
 use File::Basename;
 
 use Koha_Synchronize_System::tools::kss;
@@ -255,7 +255,8 @@ if ($master) {
 		-'Content-Transfer-Encoding' => 'binary',
 		-attachment                  => "$filename"
 	    );
-	    my $output = slurp($file); 
+            #my $output = slurp($file); 
+            my $output = read_file($file, binmode => ':raw'); 
 	    print $output;
 	} else {
 	    $template->param("save_error" => 1);
@@ -297,4 +298,4 @@ if ($master) {
 }
 
 $template->param("Debug" => $debug);
-output_html_with_http_headers $input, $cookie, $template->output;
+output_html_with_http_headers $input, $cookie, $template->output  unless ($input->param("save"));
