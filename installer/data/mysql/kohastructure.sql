@@ -2604,7 +2604,7 @@ DROP TABLE IF EXISTS `indexmappings`;
 CREATE TABLE `indexmappings` (
   `field` char(3) DEFAULT NULL,
   `subfield` char(1) DEFAULT NULL,
-  `index` varchar(15) DEFAULT NULL,
+  `index` varchar(255) DEFAULT NULL,
   `ressource_type` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
