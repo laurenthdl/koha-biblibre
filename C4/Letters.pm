@@ -17,8 +17,7 @@ package C4::Letters;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use MIME::Lite;
 use Mail::Sendmail;
@@ -29,11 +28,14 @@ use C4::Members;
 use C4::Log;
 use C4::SMS;
 use C4::Debug;
+use C4::Logguer;
 use Date::Calc qw( Add_Delta_Days );
 use Encode;
 use Carp;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     require Exporter;
@@ -157,7 +159,7 @@ sub addalert ($$$) {
 
 sub delalert ($) {
     my $alertid = shift or die "delalert() called without valid argument (alertid)";    # it's gonna die anyway.
-    $debug and warn "delalert: deleting alertid $alertid";
+    $log->debug("delalert: deleting alertid $alertid");
     my $sth = C4::Context->dbh->prepare("delete from alert where alertid=?");
     $sth->execute($alertid);
 }
@@ -217,7 +219,7 @@ sub findrelatedto ($$) {
       : ( $type eq 'borrower' ) ? "select concat(firstname,' ',surname) from borrowers where borrowernumber=?"
       :                           undef;
     unless ($q) {
-        warn "findrelatedto(): Illegal type '$type'";
+        $log->warning("findrelatedto(): Illegal type '$type'");
         return undef;
     }
     my $sth = C4::Context->dbh->prepare($q);
@@ -242,7 +244,6 @@ sub SendAlerts {
     my $dbh = C4::Context->dbh;
     if ( $type eq 'issue' ) {
 
-        # 		warn "sending issues...";
         my $letter = getletter( 'serial', $letter );
 
         # prepare the letter...
@@ -284,12 +285,10 @@ sub SendAlerts {
                 );
                 sendmail(%mail) or carp $Mail::Sendmail::error;
 
-                # warn "sending to $mail{To} From $mail{From} subj $mail{Subject} Mess $mail{Message}";
             }
         }
     } elsif ( $type eq 'claimacquisition' ) {
 
-        # 		warn "sending issues...";
         my $letter = getletter( 'claimacquisition', $letter );
 
         # prepare the letter...
@@ -339,14 +338,13 @@ sub SendAlerts {
                 'Content-Type' => 'text/plain; charset="utf8"',
             );
             sendmail(%mail) or carp $Mail::Sendmail::error;
-            warn "sending to $mail{To} From $mail{From} subj $mail{Subject} Mess $mail{Message}";
+            $log->info("sending to $mail{To} From $mail{From} subj $mail{Subject} Mess $mail{Message}");
         }
         if ( C4::Context->preference("LetterLog") ) {
             logaction( "ACQUISITION", "Send Acquisition claim letter", "", "order list : " . join( ",", @$externalid ) . "\n$innerletter->{title}\n$innerletter->{content}" );
         }
     } elsif ( $type eq 'claimissues' ) {
 
-        # 		warn "sending issues...";
         my $letter = getletter( 'claimissues', $letter );
 
         # prepare the letter...
@@ -408,7 +406,7 @@ sub SendAlerts {
             logaction( "ACQUISITION", "CLAIM ISSUE", undef, "To=" . $databookseller->{contemail} . " Title=" . $innerletter->{title} . " Content=" . $innerletter->{content} )
               if C4::Context->preference("LetterLog");
         }
-        warn "sending to From $userenv->{emailaddress} subj $innerletter->{title} Mess $innerletter->{content}";
+        $log->info("sending to From $userenv->{emailaddress} subj $innerletter->{title} Mess $innerletter->{content}");
     }
 
     # send an "account details" notice to a newly created user
@@ -465,11 +463,11 @@ sub parseletter_sth {
       : ( $table eq 'aqbooksellers' ) ? "SELECT * FROM $table WHERE             id = ?"
       :                                 undef;
     unless ($query) {
-        warn "ERROR: No parseletter_sth query for table '$table'";
+        $log->error("ERROR: No parseletter_sth query for table '$table'");
         return;    # nothing to get
     }
     unless ( $handles{$table} = C4::Context->dbh->prepare($query) ) {
-        warn "ERROR: Failed to prepare query: '$query'";
+        $log->error("ERROR: Failed to prepare query: '$query'");
         return;
     }
     return $handles{$table};    # now cache is populated for that $table
@@ -483,7 +481,7 @@ sub parseletter {
     }
     my $sth = parseletter_sth($table);
     unless ($sth) {
-        warn "parseletter_sth('$table') failed to return a valid sth.  No substitution will be done for that table.";
+        $log->warning("parseletter_sth('$table') failed to return a valid sth.  No substitution will be done for that table.");
         return;
     }
     if ($pk2) {
@@ -600,9 +598,7 @@ sub SendQueuedMessages (;$) {
     my $unsent_messages = _get_unsent_messages();
   MESSAGE: foreach my $message (@$unsent_messages) {
 
-        # warn Data::Dumper->Dump( [ $message ], [ 'message' ] );
-        warn sprintf( 'sending %s message to patron: %s', $message->{'message_transport_type'}, $message->{'borrowernumber'} || 'Admin' )
-          if $params->{'verbose'} or $debug;
+        $log->info(sprintf( 'sending %s message to patron: %s', $message->{'message_transport_type'}, $message->{'borrowernumber'} || 'Admin' ));
 
         # This is just begging for subclassing
         next MESSAGE if ( lc( $message->{'message_transport_type'} ) eq 'rss' );
@@ -797,8 +793,8 @@ ENDSQL
             push @query_params, $params->{'limit'};
         }
     }
-    $debug and warn "_get_unsent_messages SQL: $statement";
-    $debug and warn "_get_unsent_messages params: " . join( ',', @query_params );
+    $log->debug("_get_unsent_messages SQL: $statement");
+    $log->debug("_get_unsent_messages params: " . join( ',', @query_params ));
     my $sth    = $dbh->prepare($statement);
     my $result = $sth->execute(@query_params);
     return $sth->fetchall_arrayref( {} );
@@ -815,7 +811,7 @@ sub _send_message_by_email ($;$$$) {
     unless ($to_address) {
         my $member = C4::Members::GetMember( 'borrowernumber' => $message->{'borrowernumber'} );
         unless ($member) {
-            warn "FAIL: No 'to_address' and INVALID borrowernumber ($message->{borrowernumber})";
+            $log->error("FAIL: No 'to_address' and INVALID borrowernumber ($message->{borrowernumber})");
             _set_message_status(
                 {   message_id => $message->{'message_id'},
                     status     => 'failed'
@@ -831,7 +827,6 @@ sub _send_message_by_email ($;$$$) {
 
         unless ($to_address) {
 
-            # warn "FAIL: No 'to_address' and no email for " . ($member->{surname} ||'') . ", borrowernumber ($message->{borrowernumber})";
             # warning too verbose for this more common case?
             _set_message_status(
                 {   message_id => $message->{'message_id'},

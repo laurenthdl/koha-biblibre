@@ -20,8 +20,7 @@ package C4::Boolean;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use POSIX;
 
@@ -97,14 +96,14 @@ sub true_p ($) {
     my ($x) = @_;
     my $it;
     if ( !defined $x || ref($x) ne '' ) {
-        warn INVALID_BOOLEAN_STRING_EXCEPTION;
+        $log->warning(INVALID_BOOLEAN_STRING_EXCEPTION);
     }
     $x = lc($x);
     $x =~ s/\s//g;
     if ( defined $strings{$x} ) {
         $it = $strings{$x};
     } else {
-        warn INVALID_BOOLEAN_STRING_EXCEPTION;
+        $log->warning(INVALID_BOOLEAN_STRING_EXCEPTION);
     }
     return $it;
 }

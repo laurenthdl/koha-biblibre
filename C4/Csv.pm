@@ -19,8 +19,7 @@ package C4::Csv;
 #
 #
 
-#use strict;
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use C4::Context;
 use vars qw($VERSION @ISA @EXPORT);

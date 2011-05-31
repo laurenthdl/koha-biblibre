@@ -17,8 +17,7 @@ package C4::Barcodes;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use Carp;
 
@@ -28,10 +27,13 @@ use C4::Dates;
 use C4::Barcodes::hbyymmincr;
 use C4::Barcodes::annual;
 use C4::Barcodes::incremental;
+use C4::Logguer;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use vars qw($debug $cgi_debug);    # from C4::Debug, of course
 use vars qw($max $prefformat);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     $VERSION = 0.01;
@@ -82,7 +84,7 @@ sub value ($;$) {
         if ( defined $value ) {
             $debug and print STDERR "    setting barcode value to $value\n";
         } else {
-            warn "Error: UNDEF argument to value";
+            $log->error("Error: UNDEF argument to value");
         }
         $self->{value} = $value;
     }
@@ -104,7 +106,7 @@ sub parse ($;$) {           # return 3 parts of barcode: non-incrementing, incre
         carp "Barcode '$barcode' has no incrementing part!";
         return ( $barcode, undef, undef );
     }
-    $debug and warn "Barcode '$barcode' parses into: '$1', '$2', ''";
+    $log->debug("Barcode '$barcode' parses into: '$1', '$2', ''");
     return ( $1, $2, '' );                    # the third part is in anticipation of barcodes that include checkdigits
 }
 
@@ -131,13 +133,13 @@ sub next_value ($;$) {
     my $specific = ( scalar @_ ) ? 1 : 0;
     my $max      = $specific ? shift : $self->max;                # optional argument, i.e. next_value after X
     unless ($max) {
-        warn "No max barcode ($self->autoBarcode format) found.  Using initial value.";
+        $log->info("No max barcode ($self->autoBarcode format) found.  Using initial value.");
         return $self->initial;
     }
     $debug and print STDERR "(current) max barcode found: $max\n";
     my ( $head, $incr, $tail ) = $self->parse($max);              # for incremental, you'd get ('',the_whole_barcode,'')
     unless ( defined $incr ) {
-        warn "No incrementing part of barcode ($max) returned by parse.";
+        $log->warning("No incrementing part of barcode ($max) returned by parse.");
         return undef;
     }
     my $x = length($incr);                                        # number of digits
@@ -146,7 +148,6 @@ sub next_value ($;$) {
                                                                   # Those should override next_value() to work accordingly.
     $incr++;
 
-    $debug and warn "$incr";
     $head = $self->process_head( $head, $max, $specific );
     $tail = $self->process_tail( $tail, $max, $specific );
     my $next_value = $head . $incr . $tail;

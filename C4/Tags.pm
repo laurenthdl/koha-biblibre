@@ -15,16 +15,18 @@ package C4::Tags;
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 use Carp;
 use Exporter;
 
 use C4::Context;
 use C4::Debug;
+use C4::Logguer;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use vars qw($ext_dict $select_all @fields);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     $VERSION   = 0.03;
@@ -90,7 +92,7 @@ sub approval_counts () {
     $sth->execute;
     my $result = $sth->fetchrow_hashref();
     $result->{approved_total} = $result->{approved_count} + $result->{rejected_count} + $result->{unapproved_count};
-    $debug and warn "counts returned: " . Dumper $result;
+    $log->debug("counts returned: "); $log->debug($result, 1);
     return $result;
 }
 
@@ -152,7 +154,7 @@ sub delete_tag_rows_by_ids (@) {
         $i += delete_tag_row_by_id($_);
     }
     ( $i == scalar(@_) )
-      or warn sprintf "delete_tag_rows_by_ids tried %s tag_ids, only succeeded on $i", scalar(@_);
+      or $log->warning(sprintf "delete_tag_rows_by_ids tried %s tag_ids, only succeeded on $i", scalar(@_));
     return $i;
 }
 
@@ -417,7 +419,7 @@ sub remove_filter {
 }
 
 sub add_tag_approval ($;$$) {             # or disapproval
-    $debug and warn "add_tag_approval(" . join( ", ", map { defined($_) ? $_ : 'UNDEF' } @_ ) . ")";
+    $log->debug("add_tag_approval(" . join( ", ", map { defined($_) ? $_ : 'UNDEF' } @_ ) . ")");
     my $term  = shift or return undef;
     my $query = "SELECT * FROM tags_approval WHERE term = ?";
     my $sth   = C4::Context->dbh->prepare($query);

@@ -17,8 +17,7 @@ package C4::Serials;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Dates qw(format_date format_date_in_iso);
 use Date::Calc qw(:all);
 use POSIX qw(strftime);
@@ -30,9 +29,12 @@ use C4::Items;
 use C4::Search;
 use C4::Letters;
 use C4::Log;    # logaction
+use C4::Logguer;
 use C4::Debug;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     $VERSION = 3.01;    # set version for version checking
@@ -236,7 +238,7 @@ sub GetSerialInformation {
 
                 #It is ASSUMED that GetMarcItem ALWAYS WORK...
                 #Maybe GetMarcItem should return values on failure
-                $debug and warn "itemnumber :$itemnum->[0], bibnum :" . $data->{'biblionumber'};
+                $log->debug("itemnumber :$itemnum->[0], bibnum :" . $data->{'biblionumber'});
                 my $itemprocessed = PrepareItemrecordDisplay( $data->{'biblionumber'}, $itemnum->[0], $data );
                 $itemprocessed->{'itemnumber'}   = $itemnum->[0];
                 $itemprocessed->{'itemid'}       = $itemnum->[0];
@@ -330,13 +332,7 @@ sub GetSubscription {
        WHERE subscription.subscriptionid = ?
     );
 
-    #     if (C4::Context->preference('IndependantBranches') &&
-    #         C4::Context->userenv &&
-    #         C4::Context->userenv->{'flags'} != 1){
-    # #       $debug and warn "flags: ".C4::Context->userenv->{'flags'};
-    #       $query.=" AND subscription.branchcode IN ('".C4::Context->userenv->{'branch'}."',\"\")";
-    #     }
-    $debug and warn "query : $query\nsubsid :$subscriptionid";
+    $log->debug("query : $query\nsubsid :$subscriptionid");
     my $sth = $dbh->prepare($query);
     $sth->execute($subscriptionid);
     my $data = $sth->fetchrow_hashref;
@@ -383,7 +379,7 @@ sub GetFullSubscription {
           IF(serial.publisheddate="00-00-0000",serial.planneddate,serial.publisheddate) DESC,
           serial.subscriptionid
           |;
-    $debug and warn "GetFullSubscription query: $query";
+    $log->debug("GetFullSubscription query: $query");
     my $sth = $dbh->prepare($query);
     $sth->execute($subscriptionid);
     return $sth->fetchall_arrayref( {} );
@@ -583,7 +579,7 @@ sub GetSubscriptions {
         foreach my $index qw(biblio.title subscription.callnumber subscription.location subscription.notes subscription.internalnotes) {
             push @bind_params, @strings_to_search;
             my $tmpstring = "AND $index LIKE ? " x scalar(@strings_to_search);
-            $debug && warn "$tmpstring";
+            $log->debug($tmpstring);
             $tmpstring =~ s/^AND //;
             push @sqlstrings, $tmpstring;
         }
@@ -596,14 +592,14 @@ sub GetSubscriptions {
         foreach my $index qw(biblioitems.issn subscription.callnumber) {
             push @bind_params, @strings_to_search;
             my $tmpstring = "OR $index LIKE ? " x scalar(@strings_to_search);
-            $debug && warn "$tmpstring";
+            $log->debug("$tmpstring");
             $tmpstring =~ s/^OR //;
             push @sqlstrings, $tmpstring;
         }
         $sqlwhere .= ( $sqlwhere ? " AND " : " WHERE " ) . "(" . join( ") OR (", @sqlstrings ) . ")";
     }
     $sql .= "$sqlwhere ORDER BY title";
-    $debug and warn "GetSubscriptions query: $sql params : ", join( " ", @bind_params );
+    $log->debug("GetSubscriptions query: $sql params : ", join( " ", @bind_params ));
     $sth = $dbh->prepare($sql);
     $sth->execute(@bind_params);
     my @results;
@@ -706,7 +702,7 @@ sub GetSerials2 {
                  WHERE    subscriptionid=$subscription AND status IN ($status)
                  ORDER BY publisheddate,serialid DESC
                     |;
-    $debug and warn "GetSerials2 query: $query";
+    $log->debug("GetSerials2 query: $query");
     my $sth = $dbh->prepare($query);
     $sth->execute;
     my @serials;
@@ -1030,7 +1026,6 @@ sub ModSerialStatus {
                   unless ( index( "$recievedlist", "$serialseq" ) >= 0 );
             }
 
-            #         warn "missinglist : $missinglist serialseq :$serialseq, ".index("$missinglist","$serialseq");
             $missinglist .= "; $serialseq"
               if ( $status == 4
                 and not index( "$missinglist", "$serialseq" ) >= 0 );
@@ -1151,7 +1146,6 @@ sub ModSubscription {
         $internalnotes,   $serialsadditems, $staffdisplaycount, $opacdisplaycount, $graceperiod,   $location,    $enddate,       $subscriptionid
     ) = @_;
 
-    #     warn $irregularity;
     my $dbh   = C4::Context->dbh;
     my $query = "UPDATE subscription
                     SET librarian=?, branchcode=?,aqbooksellerid=?,cost=?,aqbudgetid=?,startdate=?,
@@ -1165,7 +1159,6 @@ sub ModSubscription {
 						,enddate=?
                     WHERE subscriptionid = ?";
 
-    #warn "query :".$query;
     my $sth = $dbh->prepare($query);
     $sth->execute(
         $auser,           $branchcode,     $aqbooksellerid, $cost,
@@ -1337,7 +1330,7 @@ sub ReNewSubscription {
     $sth = $dbh->prepare($query);
     $sth->execute( $startdate, $numberlength, $weeklength, $monthlength, $subscriptionid );
     my $enddate = GetExpirationDate($subscriptionid);
-    $debug && warn "enddate :$enddate";
+    $log->debug("enddate :$enddate");
     $query = qq|
         UPDATE subscription
         SET    enddate=?
@@ -1468,7 +1461,6 @@ sub ItemizeSerials {
             if ( $info->{branch} ) {
                 my ( $tag, $subfield ) = GetMarcFromKohaField( "items.homebranch", $fwk );
 
-                #warn "items.homebranch : $tag , $subfield";
                 if ( $marcrecord->field($tag) ) {
                     $marcrecord->field($tag)->add_subfields( "$subfield" => $info->{branch} );
                 } else {
@@ -1477,7 +1469,6 @@ sub ItemizeSerials {
                 }
                 ( $tag, $subfield ) = GetMarcFromKohaField( "items.holdingbranch", $fwk );
 
-                #warn "items.holdingbranch : $tag , $subfield";
                 if ( $marcrecord->field($tag) ) {
                     $marcrecord->field($tag)->add_subfields( "$subfield" => $info->{branch} );
                 } else {
@@ -1808,10 +1799,8 @@ sub removeMissingIssue {
     my $missinglist       = $data->{'missinglist'};
     my $missinglistbefore = $missinglist;
 
-    # warn $missinglist." before";
     $missinglist =~ s/($sequence)//;
 
-    # warn $missinglist." after";
     if ( $missinglist ne $missinglistbefore ) {
         $missinglist =~ s/\|\s\|/\|/g;
         $missinglist =~ s/^\| //g;
@@ -2183,7 +2172,6 @@ sub GetNextDate(@) {
     $day   = 1 unless ($day);
     my @resultdate;
 
-    #       warn "DOW $dayofweek";
     if ( $subscription->{periodicity} % 16 == 0 ) {    # 'without regularity' || 'irregular'
         return 0;
     }
@@ -2193,7 +2181,7 @@ sub GetNextDate(@) {
     #   renaming this pattern from 1/day to " n / week ".
     if ( $subscription->{periodicity} == 1 ) {
         my $dayofweek = eval { Day_of_Week( $year, $month, $day ) };
-        if ($@) { warn "year month day : $year $month $day $subscription->{subscriptionid} : $@"; }
+        if ($@) { $log->warning("year month day : $year $month $day $subscription->{subscriptionid} : $@"); }
         else {
             for ( my $i = 0 ; $i < @irreg ; $i++ ) {
                 $dayofweek = 0 if ( $dayofweek == 7 );
@@ -2209,7 +2197,7 @@ sub GetNextDate(@) {
     #   1  week
     if ( $subscription->{periodicity} == 2 ) {
         my ( $wkno, $yearweek ) = eval { Week_of_Year( $year, $month, $day ) };
-        if ($@) { warn "year month day : $year $month $day $subscription->{subscriptionid} : $@"; }
+        if ($@) { $log->warning("year month day : $year $month $day $subscription->{subscriptionid} : $@"); }
         else {
             for ( my $i = 0 ; $i < @irreg ; $i++ ) {
 
@@ -2226,7 +2214,7 @@ sub GetNextDate(@) {
     #   1 / 2 weeks
     if ( $subscription->{periodicity} == 3 ) {
         my ( $wkno, $yearweek ) = eval { Week_of_Year( $year, $month, $day ) };
-        if ($@) { warn "year month day : $year $month $day $subscription->{subscriptionid} : $@"; }
+        if ($@) { $log->warning("year month day : $year $month $day $subscription->{subscriptionid} : $@"); }
         else {
             for ( my $i = 0 ; $i < @irreg ; $i++ ) {
                 if ( $irreg[$i] == ( ( $wkno != 50 ) ? ( $wkno + 2 ) % 52 : 52 ) ) {
@@ -2242,7 +2230,7 @@ sub GetNextDate(@) {
     #   1 / 3 weeks
     if ( $subscription->{periodicity} == 4 ) {
         my ( $wkno, $yearweek ) = eval { Week_of_Year( $year, $month, $day ) };
-        if ($@) { warn "année mois jour : $year $month $day $subscription->{subscriptionid} : $@"; }
+        if ($@) { $log->warning("année mois jour : $year $month $day $subscription->{subscriptionid} : $@"); }
         else {
             for ( my $i = 0 ; $i < @irreg ; $i++ ) {
                 if ( $irreg[$i] == ( ( $wkno != 49 ) ? ( $wkno + 3 ) % 52 : 52 ) ) {

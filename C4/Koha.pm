@@ -17,14 +17,15 @@ package C4::Koha;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Context;
+use C4::Logguer;
 use C4::Output;
 use URI::Split qw(uri_split);
 
 use vars qw($VERSION @ISA @EXPORT $DEBUG);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     $VERSION = 3.01;
@@ -376,8 +377,6 @@ sub GetCcodes {
         if ( $data->{category} eq "CCODE" ) {
             $count++;
             $results[$count] = $data;
-
-            #warn "data: $data";
         }
     }
     $sth->finish;
@@ -606,7 +605,7 @@ sub _getImagesFromDirectory {
         closedir $dh;
         return @images;
     } else {
-        warn "unable to opendir $directoryname: $!";
+        $log->error("unable to opendir $directoryname: $!");
         return;
     }
 }
@@ -637,7 +636,7 @@ sub _getSubdirectoryNames {
         closedir $dh;
         return @directories;
     } else {
-        warn "unable to opendir $directoryname: $!";
+        $log->error("unable to opendir $directoryname: $!");
         return;
     }
 }

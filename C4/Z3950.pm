@@ -23,9 +23,7 @@ package C4::Z3950;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 # standard or CPAN modules used
 use DBI;
@@ -238,7 +236,6 @@ sub addz3950queue {
                 # spawn a separate 'cat' process.
                 my $pid = `cat $pidfile`;
                 chomp $pid;
-                warn "PID : $pid";
 
                 # Kill -HUP the Z39.50 daemon to tell it to process
                 # this query.

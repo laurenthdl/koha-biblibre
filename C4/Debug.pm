@@ -17,13 +17,14 @@ package C4::Debug;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
-
+use Modern::Perl;
+use C4::Logguer;
 use Exporter;
 
 # use CGI;
 use vars qw($VERSION @ISA @EXPORT $debug $cgi_debug);
+
+my $log = C4::Logguer->new();
 
 # use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
@@ -58,12 +59,11 @@ BEGIN {
         }
     }
     unless ( $debug =~ /^\d$/ ) {
-        warn "Invalid \$debug value attempted: $debug";
+        $log->warning("Invalid \$debug value attempted: $debug");
         $debug = 1;
     }
     unless ( $cgi_debug =~ /^\d$/ ) {
-        $debug
-          and warn "Invalid \$cgi_debug value attempted: $cgi_debug";
+        $log->debug("Invalid \$cgi_debug value attempted: $cgi_debug");
         $cgi_debug = 1;
     }
 }

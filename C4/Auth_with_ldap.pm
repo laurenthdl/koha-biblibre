@@ -17,13 +17,12 @@ package C4::Auth_with_ldap;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use Digest::MD5 qw(md5_base64);
 
 use C4::Debug;
 use C4::Context;
+use C4::Logguer;
 use C4::Members qw(AddMember changepassword);
 use C4::Members::Attributes;
 use C4::Members::AttributeTypes;
@@ -33,6 +32,8 @@ use Net::LDAP;
 use Net::LDAP::Filter;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     require Exporter;
@@ -83,7 +84,7 @@ sub search_method {
     my $filter    = Net::LDAP::Filter->new("$uid_field=$userid") or die "Failed to create new Net::LDAP::Filter";
     my $res = ( $config{anonymous} ) ? $db->bind : $db->bind( $ldapname, password => $ldappassword );
     if ( $res->code ) {    # connection refused
-        warn "LDAP bind failed as ldapuser " . ( $ldapname || '[ANONYMOUS]' ) . ": " . description($res);
+        $log->error("LDAP bind failed as ldapuser " . ( $ldapname || '[ANONYMOUS]' ) . ": " . description($res));
         return 0;
     }
     my $search = $db->search(
@@ -94,11 +95,11 @@ sub search_method {
     ) or die "LDAP search failed to return object.";
     my $count = $search->count;
     if ( $search->code > 0 ) {
-        warn sprintf( "LDAP Auth rejected : %s gets %d hits\n", $filter->as_string, $count ) . description($search);
+        $log->error(sprintf( "LDAP Auth rejected : %s gets %d hits", $filter->as_string, $count ) . description($search));
         return 0;
     }
     if ( $count != 1 ) {
-        warn sprintf( "LDAP Auth rejected : %s gets %d hits\n", $filter->as_string, $count );
+        $log->error(sprintf( "LDAP Auth rejected : %s gets %d hits", $filter->as_string, $count ));
         return 0;
     }
     return $search;
@@ -120,7 +121,7 @@ sub checkpw_ldap {
         }
         my $res = $db->bind( $principal_name, password => $password );
         if ( $res->code ) {
-            $debug and warn "LDAP bind failed as kohauser $principal_name: " . description($res);
+            $log->error("LDAP bind failed as kohauser $principal_name: " . description($res));
             return 0;
         }
 
@@ -133,7 +134,7 @@ sub checkpw_ldap {
         $userldapentry = $search->shift_entry;
         my $cmpmesg = $db->compare( $userldapentry, attr => 'userpassword', value => $password );
         if ( $cmpmesg->code != 6 ) {
-            warn "LDAP Auth rejected : invalid password for user '$userid'. " . description($cmpmesg);
+            $log->error("LDAP Auth rejected : invalid password for user '$userid'. " . description($cmpmesg));
             return 0;
         }
     }
@@ -153,7 +154,7 @@ sub checkpw_ldap {
     if ($borrowernumber) {
         if ( $config{update} ) {    # A1, B1
             my $c2 = &update_local( $local_userid, $password, $borrowernumber, \%borrower ) || '';
-            ( $cardnumber eq $c2 ) or warn "update_local returned cardnumber '$c2' instead of '$cardnumber'";
+            ( $cardnumber eq $c2 ) or $log->warning("update_local returned cardnumber '$c2' instead of '$cardnumber'");
         } else {                    # C1, D1
                                     # maybe update just the password?
             return ( 1, $cardnumber );    # FIXME dpavlin -- don't destroy ExtendedPatronAttributes
@@ -178,7 +179,7 @@ sub checkpw_ldap {
             my $attr = $extended_patron_attributes->[$i];
             unless ( C4::Members::Attributes::CheckUniqueness( $attr->{code}, $attr->{value}, $borrowernumber ) ) {
                 unshift @errors, $i;
-                warn "ERROR_extended_unique_id_failed $attr->{code} $attr->{value}";
+                $log->error("ERROR_extended_unique_id_failed $attr->{code} $attr->{value}");
             }
         }
 
@@ -255,7 +256,7 @@ sub _do_changepassword {
     if ( $sth->rows ) {
         my ( $md5password, $cardnum ) = $sth->fetchrow;
         ( $digest eq $md5password ) and return $cardnum;
-        warn "Password mismatch after update to cardnumber=$cardnum (borrowernumber=$borrowerid)";
+        $log->warning("Password mismatch after update to cardnumber=$cardnum (borrowernumber=$borrowerid)");
         return undef;
     }
     die "Unexpected error after password update to userid/borrowernumber: $userid / $borrowerid.";

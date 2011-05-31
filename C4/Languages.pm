@@ -18,9 +18,7 @@ package C4::Languages;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use Carp;
 use C4::Context;
 use List::MoreUtils qw/any uniq/;
@@ -335,7 +333,6 @@ sub language_get_description {
     my $desc;
     my $sth = $dbh->prepare("SELECT description FROM language_descriptions WHERE subtag=? AND lang=? AND type=?");
 
-    #warn "QUERY: SELECT description FROM language_descriptions WHERE subtag=$script AND lang=$lang AND type=$type";
     $sth->execute( $script, $lang, $type );
     while ( my $descriptions = $sth->fetchrow_hashref ) {
         $desc = $descriptions->{'description'};
@@ -490,7 +487,6 @@ sub accept_language {
     my %secondaryLanguages = ();
     foreach my $language (@$supportedLanguages) {
 
-        # warn "Language supported: " . $language->{language};
         my $subtag = $language->{rfc4646_subtag};
         $supportedLanguages{ lc($subtag) } = $subtag;
         if ( $subtag =~ /^([^-]+)-?/ ) {

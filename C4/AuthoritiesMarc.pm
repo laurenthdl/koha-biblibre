@@ -29,9 +29,12 @@ use C4::Charset;
 use List::MoreUtils qw/none first_index/;
 use C4::Debug;
 use C4::Search::Query;
+use C4::Logguer;
 require C4::Search;
 
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
 
@@ -448,14 +451,11 @@ sub AddAuthority {
         }
     } else {
         $auth_exists = $dbh->do( qq(select authid from auth_header where authid=?), undef, $authid );
-
-        #     warn "auth_exists = $auth_exists";
     }
     if ( $auth_exists > 0 ) {
         $oldRecord = GetAuthority($authid);
         $record->add_fields( '001', $authid ) unless ( $record->field('001') );
 
-        #       warn "\n\n\n enregistrement".$record->as_formatted;
         my $sth = $dbh->prepare("update auth_header set authtypecode=?,marc=?,marcxml=? where authid=?");
         $sth->execute( $authtypecode, $record->as_usmarc, $record->as_xml_record($format), $authid ) or die $sth->errstr;
         $sth->finish;
@@ -694,10 +694,8 @@ sub FindDuplicateAuthority {
 
     my ( $record, $authtypecode ) = @_;
 
-    #    warn "IN for ".$record->as_formatted;
     my $dbh = C4::Context->dbh;
 
-    #    warn "".$record->as_formatted;
     my $sth = $dbh->prepare("select auth_tag_to_report from auth_types where authtypecode=?");
     $sth->execute($authtypecode);
     my ($auth_tag_to_report) = $sth->fetchrow;
@@ -943,7 +941,6 @@ Example of text:
 
 sub BuildUnimarcHierarchies{
   my $authid = shift @_;
-#   warn "authid : $authid";
   my $force = shift @_;
   my @globalresult;
   my $dbh=C4::Context->dbh;
@@ -1102,7 +1099,6 @@ sub merge {
     my $authtypecodefrom = GetAuthTypeCode($mergefrom);
     my $authtypecodeto   = GetAuthTypeCode($mergeto);
 
-    #     warn "mergefrom : $authtypecodefrom $mergefrom mergeto : $authtypecodeto $mergeto ";
     # return if authority does not exist
     return "error MARCFROM not a marcrecord " . Data::Dumper::Dumper($MARCfrom) if scalar( $MARCfrom->fields() ) == 0;
     return "error MARCTO not a marcrecord" . Data::Dumper::Dumper($MARCto)      if scalar( $MARCto->fields() ) == 0;
@@ -1145,7 +1141,6 @@ sub merge {
         my $query = C4::Search::Query->normalSearch("an=$mergefrom");
         my $results = C4::Search::SimpleSearch($query);
 
-        $debug && warn scalar(@$results);
 
         foreach my $rawrecord( @{$results->items} ) {
             my $marcrecord = GetMarcBiblio($rawrecord->{values}->{recordid});
@@ -1154,7 +1149,6 @@ sub merge {
         }
     }
 
-    #warn scalar(@reccache)." biblios to update";
     # Get All candidate Tags for the change
     # (This will reduce the search scope in marc records).
     $sth = $dbh->prepare("select distinct tagfield from marc_subfield_structure where authtypecode=?");
@@ -1182,16 +1176,14 @@ sub merge {
 		my $index_9_auth =0;
 		my $found =0;
 		for my $subf (@localsubfields) {
-		#			$debug && warn Data::Dumper::Dumper($subf);
 			if (($subf->[0] eq "9") and ($subf->[1] == $mergefrom))
 			{
 			    $found=1;
-			    $debug && warn "found $mergefrom ".$subf->[1];
+			    $log->debug("found $mergefrom ".$subf->[1]);
 			    last;
 			}
 			$index_9_auth++;
 		};
-		#$debug && warn "$index_9_auth $#localsubfields $found";
 		next if ($index_9_auth >= $#localsubfields and !$found);
 		#Get the next $9 subfield
 		my $nextindex_9 =0;
@@ -1203,7 +1195,7 @@ sub merge {
 		# That is : change the first tag ($a) to what it is in the biblio record
 		# Since some composed authorities will place the $a into $x or $y
 		my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
-		$debug && warn @tags;
+		$log->debug(@tags);
 		if (defined $tags[0]->[0] and $tags[0]->[0] ne "a"){
 		    for my $record (@record_to){
 		       if ($record->[0] eq "a"){
@@ -1212,10 +1204,9 @@ sub merge {
 		       }
 		    }
 		}
-		#$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
 		# Replace in local subfields the subfields related to recordfrom with data from record_to
 	        splice(@localsubfields,$index_9_auth,$nextindex_9 + 1,([9,$mergeto],@record_to));
-		#$debug && warn "after splice ".Data::Dumper::Dumper(@localsubfields);
+		#$log->debug("after splice ");$log->debug(\@localsubfields, 1);
 		#very nice api for MARC::Record
 		# It seems that some elements localsubfields can be undefined so skip them
           	@newsubfields=map{(defined $_?@$_:())}@localsubfields;
@@ -1232,15 +1223,14 @@ sub merge {
         } else {
             $biblionumber = $marcrecord->subfield( $bibliotag, $bibliosubf );
         }
-	#    $debug && warn $biblionumber,$marcrecord->as_formatted;
         unless ($biblionumber){
-            warn "pas de numéro de notice bibliographique dans : ".$marcrecord->as_formatted;
+            $log->warning("pas de numéro de notice bibliographique dans : ".$marcrecord->as_formatted);
             next;
         }
         #if ( $update == 1 ) {
             &ModBiblio( $marcrecord, $biblionumber, GetFrameworkCode($biblionumber) );
             $counteditedbiblio++;
-            warn $counteditedbiblio if ( ( $counteditedbiblio % 10 ) and $ENV{DEBUG} );
+            $log->debug($counteditedbiblio) if ( $counteditedbiblio % 10 );
         #}
     }    #foreach $marc
     DelAuthority($mergefrom) if ($mergefrom != $mergeto);

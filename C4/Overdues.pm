@@ -17,9 +17,7 @@ package C4::Overdues;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use Date::Calc qw/Today Date_to_Days/;
 use Date::Manip qw/UnixDate/;
 use C4::Circulation;
@@ -28,8 +26,11 @@ use C4::Context;
 use C4::Accounts;
 use C4::Log;    # logaction
 use C4::Debug;
+use C4::Logguer;
 
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
 
@@ -232,7 +233,7 @@ or "Final Notice".  But CalcFine never defined any value.
 
 sub CalcFine {
     my ( $item, $bortype, $branchcode, $difference, $dues, $start_date, $end_date ) = @_;
-    $debug and warn sprintf(
+    $log->debug(sprintf(
         "CalcFine(%s, %s, %s, %s, %s, %s, %s)",
         ( $item ? '{item}' : 'UNDEF' ),
         ( $bortype    || 'UNDEF' ),
@@ -241,13 +242,13 @@ sub CalcFine {
         ( $dues       || 'UNDEF' ),
         ( $start_date ? ( $start_date->output('iso') || 'Not a C4::Dates object' ) : 'UNDEF' ),
         ( $end_date   ? ( $end_date->output('iso')   || 'Not a C4::Dates object' ) : 'UNDEF' )
-    );
+    ));
     my $dbh    = C4::Context->dbh;
     my $amount = 0;
     my $daystocharge;
 
     # get issuingrules (fines part will be used)
-    $debug and warn sprintf( "CalcFine calling GetIssuingRule(%s, %s, %s)", $bortype, $item->{'itemtype'}, $branchcode );
+    $log->debug(sprintf( "CalcFine calling GetIssuingRule(%s, %s, %s)", $bortype, $item->{'itemtype'}, $branchcode ));
     my $data = GetIssuingRule( $bortype, $item->{'itemtype'}, $branchcode );
     if ($difference) {
 
@@ -277,7 +278,7 @@ sub CalcFine {
         # a zero (or null)  chargeperiod means no charge.
     }
     $amount = C4::Context->preference('MaxFine') if ( C4::Context->preference('MaxFine') && ( $amount > C4::Context->preference('MaxFine') ) );
-    $debug and warn sprintf( "CalcFine returning (%s, %s, %s, %s)", $amount, $data->{'chargename'}, $days_minus_grace, $daystocharge );
+    $log->debug(sprintf( "CalcFine returning (%s, %s, %s, %s)", $amount, $data->{'chargename'}, $days_minus_grace, $daystocharge ));
     return ( $amount, $data->{'chargename'}, $days_minus_grace, $daystocharge );
 
     # FIXME: chargename is NEVER populated anywhere.
@@ -460,7 +461,7 @@ accountlines table of the Koha database.
 #
 sub UpdateFine {
     my ( $itemnum, $borrowernumber, $amount, $type, $due ) = @_;
-    $debug and warn "UpdateFine($itemnum, $borrowernumber, $amount, " . ( $type || '""' ) . ", $due) called";
+    $log->debug("UpdateFine($itemnum, $borrowernumber, $amount, " . ( $type || '""' ) . ", $due) called");
     my $dbh = C4::Context->dbh;
 
     # FIXME - What exactly is this query supposed to do? It looks up an

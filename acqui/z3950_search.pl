@@ -179,7 +179,7 @@ if ( $op ne "do_search" ) {
             $option1->option( 'preferredRecordSyntax', $server->{syntax} );
             $oConnection[$s] = create ZOOM::Connection($option1)
               || $log->warning("" . $oConnection[$s]->errmsg() );
-            $log->debug("server data", $server->{name}, $server->{port} );
+            $log->debug("server data" . $server->{name} . $server->{port} );
             $oConnection[$s]->connect( $server->{host}, $server->{port} )
               || $log->warning("" . $oConnection[$s]->errmsg() );
             $serverhost[$s] = $server->{host};
@@ -204,7 +204,7 @@ if ( $op ne "do_search" ) {
         my $event;
         while ( ( $k = ZOOM::event( \@oConnection ) ) != 0 ) {
             $event = $oConnection[ $k - 1 ]->last_event();
-            $log->debug("connection ", $k - 1, ": event $event (", ZOOM::event_str($event), ")\n" );
+            $log->debug("connection " . $k - 1 . ": event $event (" . ZOOM::event_str($event));
             last if $event == ZOOM::Event::ZEND;
         }
 

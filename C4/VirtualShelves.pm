@@ -20,17 +20,19 @@ package C4::VirtualShelves;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use Carp;
 use C4::Context;
 use C4::Circulation;
 use C4::Debug;
 use C4::Members;
+use C4::Logguer;
 require C4::Auth;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
 
@@ -448,7 +450,7 @@ sub ModShelf {
     $query .= " WHERE shelfnumber = ? ";
     push @bind_params, $shelfnumber;
 
-    $debug and warn "ModShelf query:\n $query\n", "ModShelf query args: ", join( ',', @bind_params ), "\n";
+    $log->debug("ModShelf query:\n $query\n" . "ModShelf query args: " . join( ',', @bind_params ));
     my $sth = $dbh->prepare($query);
     $sth->execute(@bind_params);
 }

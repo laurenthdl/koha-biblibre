@@ -18,8 +18,7 @@ package C4::XSLT;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Context;
 use C4::Branch;
@@ -27,6 +26,7 @@ use C4::Items;
 use C4::Koha;
 use C4::Biblio;
 use C4::Circulation;
+use C4::Logguer;
 use C4::Reserves;
 use Encode;
 use XML::LibXML;
@@ -34,6 +34,8 @@ use XML::LibXSLT;
 use LWP::Simple;
 
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     require Exporter;
@@ -78,7 +80,7 @@ sub transformMARCXML4XSLT {
 
     # FIXME: wish there was a better way to handle exceptions
     eval { @fields = $record->fields(); };
-    if ($@) { warn "$record PROBLEM WITH RECORD"; return;}
+    if ($@) { $log->error("$record PROBLEM WITH RECORD"); return;}
     my $av = getAuthorisedValues4MARCSubfields($frameworkcode);
     foreach my $tag ( keys %$av ) {
         foreach my $field ( $record->field($tag) ) {

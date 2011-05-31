@@ -17,15 +17,17 @@ package C4::ClassSortRoutine;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 require Exporter;
 use Class::Factory::Util;
 use C4::Context;
 use C4::Koha;
+use C4::Logguer;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+my $log = C4::Logguer->new();
 
 # set the version for version checking
 $VERSION = 3.00;
@@ -94,7 +96,7 @@ normalization routine.
 sub GetClassSortKey {
     my ( $sort_routine, $cn_class, $cn_item ) = @_;
     unless ( exists $loaded_routines{$sort_routine} ) {
-        warn "attempting to use non-existent class sorting routine $sort_routine\n";
+        $log->warning("attempting to use non-existent class sorting routine $sort_routine");
         $loaded_routines{$sort_routine} = \&_get_class_sort_key;
     }
     my $key = $loaded_routines{$sort_routine}->( $cn_class, $cn_item );

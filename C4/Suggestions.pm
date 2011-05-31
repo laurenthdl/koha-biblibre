@@ -17,9 +17,7 @@ package C4::Suggestions;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 
 use C4::Context;
@@ -28,6 +26,7 @@ use C4::Dates qw(format_date format_date_in_iso);
 use C4::SQLHelper qw(:all);
 use C4::Debug;
 use C4::Letters;
+use C4::Logguer;
 use List::MoreUtils qw<any>;
 use base 'Exporter';    # parent would be better there
 our $VERSION = 3.01;
@@ -46,6 +45,8 @@ our @EXPORT  = qw<
 >;
 use C4::Dates qw(format_date_in_iso);
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
 
@@ -189,7 +190,7 @@ sub SearchSuggestion {
         } 
     }
 
-    $debug && warn "@query";
+    $log->debug("@query");
     my $sth = $dbh->prepare("@query");
     $sth->execute(@sql_params);
     my @results;
@@ -409,7 +410,7 @@ sub ModSuggestion {
                     msg_transport_type => 'email'
                 }
             );
-            if ( !$enqueued ) { warn "can't enqueue letter $letter"; }
+            if ( !$enqueued ) { $log->warning("can't enqueue letter $letter"); }
         }
     }
     return $status_update_table;
