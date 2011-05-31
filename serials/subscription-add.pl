@@ -87,8 +87,8 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
     $subs->{'letter'} = '' unless ( $subs->{'letter'} );
     letter_loop( $subs->{'letter'}, $template );
     $nextexpected = GetNextExpected($subscriptionid);
-    $nextexpected->{'isfirstissue'} = $nextexpected->{planneddate}->output('iso') eq $firstissuedate;
-    $subs->{nextacquidate} = $nextexpected->{planneddate}->output() if ( $op eq 'mod' );
+    $nextexpected->{'isfirstissue'} = defined $nextexpected->{planneddate} ? $nextexpected->{planneddate}->output('iso') eq $firstissuedate : undef;
+    $subs->{nextacquidate} = defined $nextexpected->{planneddate} and $op eq 'mod' ? $nextexpected->{planneddate}->output() : undef;
     unless ( $op eq 'modsubscription' ) {
         foreach my $length_unit qw(numberlength weeklength monthlength) {
             if ( $subs->{$length_unit} ) {
@@ -107,7 +107,7 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
             history => ( $op eq 'mod' ),
             "periodicity" . $subs->{'periodicity'}     => 1,
             "numberpattern" . $subs->{'numberpattern'} => 1,
-            firstacquiyear => substr( $firstissuedate, 0, 4 ),
+            firstacquiyear => defined $firstissuedate ? substr( $firstissuedate, 0, 4 ) : undef,
         );
     }
     if ( $op eq 'dup' ) {

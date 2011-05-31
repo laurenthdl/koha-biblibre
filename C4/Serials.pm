@@ -742,8 +742,8 @@ sub GetSerials {
 
     while ( my $line = $sth->fetchrow_hashref ) {
         $line->{ "status" . $line->{status} } = 1;                                         # fills a "statusX" value, used for template status select list
-        $line->{"publisheddate"}              = format_date( $line->{"publisheddate"} );
-        $line->{"planneddate"}                = format_date( $line->{"planneddate"} );
+        $line->{publisheddate}              = $line->{publisheddate} ne '0000-00-00' ? format_date( $line->{publisheddate} ) : undef;
+        $line->{planneddate}                = $line->{planneddate} ne '0000-00-00' ? format_date( $line->{planneddate} ) : undef;
         push @serials, $line;
     }
 
@@ -759,8 +759,8 @@ sub GetSerials {
     while ( ( my $line = $sth->fetchrow_hashref ) && $counter < $count ) {
         $counter++;
         $line->{ "status" . $line->{status} } = 1;                                         # fills a "statusX" value, used for template status select list
-        $line->{"planneddate"}                = format_date( $line->{"planneddate"} );
-        $line->{"publisheddate"}              = format_date( $line->{"publisheddate"} );
+        $line->{planneddate}                = $line->{planneddate} ne '0000-00-00' ? format_date( $line->{planneddate} ) : undef;
+        $line->{publisheddate}              = $line->{publisheddate} ne '0000-00-00' ? format_date( $line->{publisheddate} ) : undef;
         push @serials, $line;
     }
 
@@ -796,8 +796,8 @@ sub GetSerials2 {
 
     while ( my $line = $sth->fetchrow_hashref ) {
         $line->{ "status" . $line->{status} } = 1;                                         # fills a "statusX" value, used for template status select list
-        $line->{"planneddate"}                = format_date( $line->{"planneddate"} );
-        $line->{"publisheddate"}              = format_date( $line->{"publisheddate"} );
+        $line->{planneddate}                = $line->{planneddate} ne '0000-00-00' ? format_date( $line->{planneddate} ) : undef;
+        $line->{publisheddate}              = $line->{publisheddate} ne '0000-00-00' ? format_date( $line->{publisheddate} ) : undef;
         push @serials, $line;
     }
     return @serials;
@@ -828,7 +828,7 @@ sub GetLatestSerials {
     my @serials;
     while ( my $line = $sth->fetchrow_hashref ) {
         $line->{ "status" . $line->{status} } = 1;                        # fills a "statusX" value, used for template status select list
-        $line->{"planneddate"} = format_date( $line->{"planneddate"} );
+        $line->{planneddate}                = $line->{planneddate} ne '0000-00-00' ? format_date( $line->{planneddate} ) : undef;
         push @serials, $line;
     }
 
@@ -1187,7 +1187,7 @@ sub GetNextExpected($) {
         # or should this default to 1st Jan ???
         $nextissue->{planneddate} = strftime( '%Y-%m-%d', localtime );
     }
-    $nextissue->{planneddate} = C4::Dates->new( $nextissue->{planneddate}, 'iso' );
+    $nextissue->{planneddate} = $nextissue->{planneddate} ne '0000-00-00' ? C4::Dates->new( $nextissue->{planneddate}, 'iso' ) : undef;
     return $nextissue;
 
 }

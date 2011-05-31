@@ -131,8 +131,8 @@ foreach my $tmpserialid (@serialids) {
         if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
             $data->{'cannotedit'} = 0;
         }
-        $data->{publisheddate} = format_date( $data->{publisheddate} );
-        $data->{planneddate}   = format_date( $data->{planneddate} );
+        $data->{planneddate}   = $data->{planneddate} ne '0000-00-00' ? format_date( $data->{planneddate} ) : undef;
+        $data->{publisheddate} = $data->{publisheddate} ne '0000-00-00' ? format_date( $data->{publisheddate} ) : undef;
         $data->{'editdisable'} =
           ( ( HasSubscriptionExpired( $data->{subscriptionid} ) && $data->{'status1'} ) || $data->{'cannotedit'} );
         push @serialdatalist, $data;
