@@ -37,7 +37,7 @@ my $suppliername = $input->param('suppliername');
 my $order        = $input->param('order');
 
 # open template first (security & userenv set here)
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
     {   template_name   => 'serials/claims.tmpl',
         query           => $input,
         type            => 'intranet',
@@ -73,6 +73,16 @@ my @supplierinfo;
 if ($supplierid) {
     @missingissues = GetLateOrMissingIssues( $supplierid, $serialid, $order );
     @supplierinfo = GetBookSeller($supplierid);
+}
+
+unless( $flags->{'superlibrarian'} == 1
+ || $template->{'param_map'}->{'CAN_user_serials_superserials'} ){
+    foreach (@missingissues) {
+        if( $_->{'branchcode'}
+         && $_->{'branchcode'} ne C4::Context->userenv->{'branch'} ) {
+            $_->{'cannot_claim'} = 1;
+        }
+    }
 }
 
 my $branchloop = GetBranchesLoop();
