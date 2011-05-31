@@ -948,7 +948,7 @@ $(document).ready(function() {
     var node;
     <!-- TMPL_LOOP NAME="dont_export" -->
         node = $("#<!-- TMPL_VAR NAME="fieldid" -->");
-        if ( $(node).is('input') ) {
+        if ( $(node).is('input') || $(node).is('textarea') ) {
             $(node).val("");
         } else if ( $(node).is('select') ) {
             $(node).find("option:first").attr('selected','selected');
