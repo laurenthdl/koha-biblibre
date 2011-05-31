@@ -2431,7 +2431,8 @@ CREATE TABLE `aqbudgets` (
   `budget_owner_id` int(11) default NULL,
   `budget_permission` int(1) default '0',
   PRIMARY KEY  (`budget_id`),
-  UNIQUE KEY `uniq_aqbudgets` (`budget_name`, `budget_code`)
+  UNIQUE KEY `uniq_aqbudgets` (`budget_name`, `budget_code`),
+  UNIQUE KEY `uniq_budget_name_aqbudgets` (`budget_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `aqbudgetborrowers`;
