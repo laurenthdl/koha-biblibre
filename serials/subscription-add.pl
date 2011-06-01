@@ -116,6 +116,11 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
             firstacquiyear => substr( $firstissuedate, 0, 4 ),
         );
     }
+    if ( $op eq 'dup' ) {
+        my $dont_copy_fields = C4::Context->preference('SubscriptionDuplicateDroppedInput');
+        my @fields_id = map { fieldid => $_ }, split ';', $dont_copy_fields;
+        $template->param( dont_export => \@fields_id );
+    }
 }
 
 my $onlymine =

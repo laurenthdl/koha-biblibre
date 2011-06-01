@@ -944,6 +944,17 @@ $(document).ready(function() {
     $('#numberpattern').change( function() { 
         reset_num_pattern(); 
     });
+
+    var node;
+    <!-- TMPL_LOOP NAME="dont_export" -->
+        node = $("#<!-- TMPL_VAR NAME="fieldid" -->");
+        if ( $(node).is('input') || $(node).is('textarea') ) {
+            $(node).val("");
+        } else if ( $(node).is('select') ) {
+            $(node).find("option:first").attr('selected','selected');
+        }
+    <!-- /TMPL_LOOP -->
+
 });
 //]]>
 </script>
