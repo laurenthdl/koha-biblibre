@@ -137,8 +137,8 @@ foreach my $tmpserialid (@serialids) {
         } else {
             $data->{'cannotedit'} = 1;
         }
-        $data->{planneddate}   = $data->{planneddate} ne '0000-00-00' ? format_date( $data->{planneddate} ) : undef;
-        $data->{publisheddate} = $data->{publisheddate} ne '0000-00-00' ? format_date( $data->{publisheddate} ) : undef;
+        $data->{planneddate}   = defined $data->{planneddate} && $data->{planneddate} ne '0000-00-00' ? format_date( $data->{planneddate} ) : undef;
+        $data->{publisheddate} = defined $data->{publisheddate} && $data->{publisheddate} ne '0000-00-00' ? format_date( $data->{publisheddate} ) : undef;
         $data->{'editdisable'} =
           ( ( HasSubscriptionExpired( $data->{subscriptionid} ) && $data->{'status1'} ) || $data->{'cannotedit'} );
         push @serialdatalist, $data;
