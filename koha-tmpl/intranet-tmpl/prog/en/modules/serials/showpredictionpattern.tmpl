@@ -1,0 +1,114 @@
+<h1>Prediction pattern</h1>
+
+<!-- TMPL_IF NAME="predictions_loop" -->
+<table>
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Publication Date</th>
+      <th>Not published</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- TMPL_LOOP NAME="predictions_loop" -->
+      <tr>
+        <td><!-- TMPL_VAR NAME="number" --></td>
+        <td><!-- TMPL_VAR NAME="publicationdate" --></td>
+        <td style="text-align:center"><input type="checkbox" /></td>
+      </tr>
+    <!-- /TMPL_LOOP -->
+  </tbody>
+</table>
+<!-- /TMPL_IF -->
+
+<h4>For debug purposes only:</h4>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>numberpattern</td>
+      <td><!-- TMPL_VAR NAME="calcnumberpattern" --></td>
+    </tr>
+    <tr>
+      <td>numberingmethod</td>
+      <td><!-- TMPL_VAR NAME="calcnumberingmethod" --></td>
+    </tr>
+    <tr>
+      <td>lastvalue1</td>
+      <td><!-- TMPL_VAR NAME="calclastvalue1" --></td>
+    </tr>
+    <tr>
+      <td>lastvalue2</td>
+      <td><!-- TMPL_VAR NAME="calclastvalue2" --></td>
+    </tr>
+    <tr>
+      <td>lastvalue3</td>
+      <td><!-- TMPL_VAR NAME="calclastvalue3" --></td>
+    </tr>
+    <tr>
+      <td>innerloop1</td>
+      <td><!-- TMPL_VAR NAME="calcinnerloop1" --></td>
+    </tr>
+    <tr>
+      <td>innerloop2</td>
+      <td><!-- TMPL_VAR NAME="calcinnerloop2" --></td>
+    </tr>
+    <tr>
+      <td>innerloop3</td>
+      <td><!-- TMPL_VAR NAME="calcinnerloop3" --></td>
+    </tr>
+    <tr>
+      <td>add1</td>
+      <td><!-- TMPL_VAR NAME="calcadd1" --></td>
+    </tr>
+    <tr>
+      <td>add2</td>
+      <td><!-- TMPL_VAR NAME="calcadd2" --></td>
+    </tr>
+    <tr>
+      <td>add3</td>
+      <td><!-- TMPL_VAR NAME="calcadd3" --></td>
+    </tr>
+    <tr>
+      <td>setto1</td>
+      <td><!-- TMPL_VAR NAME="calcsetto1" --></td>
+    </tr>
+    <tr>
+      <td>setto2</td>
+      <td><!-- TMPL_VAR NAME="calcsetto2" --></td>
+    </tr>
+    <tr>
+      <td>setto3</td>
+      <td><!-- TMPL_VAR NAME="calcsetto3" --></td>
+    </tr>
+    <tr>
+      <td>every1</td>
+      <td><!-- TMPL_VAR NAME="calcevery1" --></td>
+    </tr>
+    <tr>
+      <td>every2</td>
+      <td><!-- TMPL_VAR NAME="calcevery2" --></td>
+    </tr>
+    <tr>
+      <td>every3</td>
+      <td><!-- TMPL_VAR NAME="calcevery3" --></td>
+    </tr>
+    <tr>
+      <td>whenmorethan1</td>
+      <td><!-- TMPL_VAR NAME="calcwhenmorethan1" --></td>
+    </tr>
+    <tr>
+      <td>whenmorethan2</td>
+      <td><!-- TMPL_VAR NAME="calcwhenmorethan2" --></td>
+    </tr>
+    <tr>
+      <td>whenmorethan3</td>
+      <td><!-- TMPL_VAR NAME="calcwhenmorethan3" --></td>
+    </tr>
+  </tbody>
+</table>

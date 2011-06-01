@@ -53,6 +53,27 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     }
 );
 
+my $weekarrayjs='';
+my $count = 0;
+# FIXME - This assumes first pub date of today().
+# You can't enter past-date irregularities.
+my ($year, $month, $day) = Today;
+my $firstday   =  Day_of_Year($year,$month,$day);
+my ($wkno,$yr) = Week_of_Year($year,$month,$day); # week starting monday
+my $weekno = $wkno;
+for(my $i=$firstday;$i<($firstday+365);$i=$i+7){
+        #$count = $i;
+        #if($wkno > 52){$year++; $wkno=1;}
+        #if($count>365){$count=$i-365;}    
+        my ($y,$m,$d) = Add_Delta_Days($year,1,1,$i - 1);
+#warn "$y-$m-$d";
+        #BUGFIX padding add_delta_days() date
+        my $output  =  sprintf("%04d-%02d-%02d",$y , $m, $d );
+        $weekarrayjs .= "'Wk $wkno: ". format_date($output) ."',";
+        $wkno++;    
+}
+chop($weekarrayjs);
+
 my $sub_on;
 my @subscription_types = ( 'issues', 'weeks', 'months' );
 my @sub_type_data;
@@ -169,6 +190,30 @@ if ( $op eq 'addsubscription' ) {
             $template->param( bibliotitle => $bib->{title} );
         }
     }
+    my $frequencies = GetSubscriptionFrequencies;
+    my @frqloop;
+    foreach my $thisfrq (@$frequencies) {
+        my $selected = 1 if $thisfrq->{'id'} eq $subs->{'periodicity'};
+        my %row =(id => $thisfrq->{'id'},
+                    selected => $selected,
+                    label=> $thisfrq->{'description'},
+                );
+        push @frqloop, \%row;
+    }
+    $template->param(frequencies => \@frqloop);
+
+    my $numpatterns = GetSubscriptionNumberpatterns;
+    my @numberpatternloop;
+    foreach my $thisnumpattern (@$numpatterns) {
+        my $selected = 1 if $thisnumpattern->{'id'} eq $subs->{'numberpattern'};
+        my %row =(id => $thisnumpattern->{'id'},
+                    selected => $selected,
+                    label=> $thisnumpattern->{'label'},
+                );
+        push @numberpatternloop, \%row;
+    }
+    $template->param(numberpatterns => \@numberpatternloop);
+
     output_html_with_http_headers $query, $cookie, $template->output;
 }
 
