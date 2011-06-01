@@ -118,6 +118,7 @@ foreach my $subscription (@subscriptions) {
     $cell{branchcode}        = $subscription->{branchcode};
     $cell{branchname}        = GetBranchName( $subscription->{branchcode} );
     $cell{hasalert}          = $subscription->{hasalert};
+    $cell{callnumber}        = $subscription->{callnumber};
 
     #get the three latest serials.
     $serials_to_display      = $subscription->{staffdisplaycount};
