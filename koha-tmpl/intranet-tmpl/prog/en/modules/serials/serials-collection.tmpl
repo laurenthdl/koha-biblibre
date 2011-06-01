@@ -176,6 +176,7 @@ $(document).ready(function() {
 
  <!-- TMPL_LOOP NAME="years" -->
 <div id="subscription-year-<!-- TMPL_VAR NAME="year" -->">
+    <p><input type="submit" value="Edit serials" />&nbsp;<input type="button" value="Generate Next" onclick="javascript:generateNext(<!-- TMPL_VAR NAME="subscriptionidlist" -->)" /></p>
         <table style="width:400px;">
             <tr>
 <!--TMPL_UNLESS Name="onesubscription"-->
@@ -237,7 +238,6 @@ $(document).ready(function() {
             </tr>
       <!-- /TMPL_LOOP -->
         </table>
-      <p><input type="submit" value="Edit serials" />&nbsp;<input type="button" value="Generate Next" onclick="javascript:generateNext(<!-- TMPL_VAR NAME="subscriptionidlist" -->)" /></p>
     </div>
     <!--/TMPL_LOOP -->
   <input type="hidden" name="subscriptionid" value="<!--TMPL_VAR Name="subscriptionidlist"-->" />
