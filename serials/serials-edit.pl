@@ -108,7 +108,7 @@ unless ( scalar(@serialids) ) {
 
     print $query->redirect($string);
 }
-my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
     {   template_name   => "serials/serials-edit.tmpl",
         query           => $query,
         type            => "intranet",
@@ -128,8 +128,14 @@ foreach my $tmpserialid (@serialids) {
         && $tmpserialid =~ /^[0-9]+$/
         && !$processedserialid{$tmpserialid} ) {
         my $data = GetSerialInformation($tmpserialid);
-        if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+        if( $flags->{'superlibrarian'} == 1
+         || $template->{'param_map'}->{'CAN_user_serials_superserials'}
+         || !defined $data->{'branchcode'}
+         || $data->{'branchcode'} eq ''
+         || $data->{'branchcode'} eq C4::Context->userenv->{'branch'} ) {
             $data->{'cannotedit'} = 0;
+        } else {
+            $data->{'cannotedit'} = 1;
         }
         $data->{publisheddate} = format_date( $data->{publisheddate} );
         $data->{planneddate}   = format_date( $data->{planneddate} );

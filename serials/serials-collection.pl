@@ -33,8 +33,8 @@ my $query = new CGI;
 my $op    = $query->param('op') || q{};
 my $dbh   = C4::Context->dbh;
 
-my ( $template, $loggedinuser, $cookie );
-( $template, $loggedinuser, $cookie ) = get_template_and_user(
+my ( $template, $loggedinuser, $cookie, $flags );
+( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
     {   template_name   => "serials/serials-collection.tmpl",
         query           => $query,
         type            => "intranet",
@@ -53,8 +53,14 @@ my $subscriptions;
 if ( $op eq 'gennext' && @subscriptionid ) {
     my $subscriptionid = $subscriptionid[0];
     my $subscription   = GetSubscription($subscriptionid);
-    if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+    if( $flags->{'superlibrarian'} == 1
+     || $template->{'param_map'}->{'CAN_user_serials_superserials'}
+     || !defined $subscription->{'branchcode'}
+     || $subscription->{'branchcode'} eq ''
+     || $subscription->{'branchcode'} eq C4::Context->userenv->{'branch'} ) {
         $subscription->{'cannotedit'} = 0;
+    } else {
+        $subscription->{'cannotedit'} = 1;
     }
 
     my $sth = $dbh->prepare(
@@ -91,8 +97,14 @@ if (@subscriptionid) {
     my @subscriptioninformation = ();
     foreach my $subscriptionid (@subscriptionid) {
         my $subs = GetSubscription($subscriptionid);
-        if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+        if( $flags->{'superlibrarian'} == 1
+         || $template->{'param_map'}->{'CAN_user_serials_superserials'}
+         || !defined $subs->{'branchcode'}
+         || $subs->{'branchcode'} eq ''
+         || $subs->{'branchcode'} eq C4::Context->userenv->{'branch'} ) {
             $subs->{'cannotedit'} = 0;
+        } else {
+            $subs->{'cannotedit'} = 1;
         }
         $subs->{opacnote}     =~ s/\n/\<br\/\>/g;
         $subs->{missinglist}  =~ s/\n/\<br\/\>/g;
