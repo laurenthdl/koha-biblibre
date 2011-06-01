@@ -379,7 +379,7 @@ sub SendAlerts {
             warn "sending to $mail{To} From $mail{From} subj $mail{Subject} Mess $mail{Message}";
             if ( C4::Context->preference("LetterLog") ) {
                 logaction( "ACQUISITION", "Send Acquisition claim letter", "", "order list : " . join( ",", @$externalid ) . "\n$innerletter->{title}\n$innerletter->{content}" ) if $type eq 'claimacquisition';
-                logaction( "ACQUISITION", "CLAIM ISSUE", undef, "To=" . $mail{To} . " Title=" . $innerletter->{title} . " Content=" . $innerletter->{content} ) if $type eq 'claimissues ';
+                logaction( "ACQUISITION", "CLAIM ISSUE", undef, "To=" . $mail{To} . " Title=" . $innerletter->{title} . " Content=" . $innerletter->{content} ) if $type eq 'claimissues';
             }
         } else {
             die "This bookseller have no email\n";
