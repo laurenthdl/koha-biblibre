@@ -421,13 +421,9 @@ sub PrepareSerialsData {
     my $previousnote = "";
 
     foreach my $subs (@$lines) {
-        $subs->{'publisheddate'} = (
-            $subs->{'publisheddate'}
-            ? format_date( $subs->{'publisheddate'} )
-            : "XXX"
-        );
         $subs->{'branchname'}                   = GetBranchName( $subs->{'branchcode'} );
-        $subs->{'planneddate'}                  = format_date( $subs->{'planneddate'} );
+        $subs->{planneddate}                    = defined $subs->{planneddate} && $subs->{planneddate} ne '0000-00-00' ? format_date( $subs->{planneddate} ) : undef;
+        $subs->{publisheddate}                  = defined $subs->{publisheddate} && $subs->{publisheddate} ne '0000-00-00' ? format_date( $subs->{publisheddate} ) : undef;
         $subs->{ "status" . $subs->{'status'} } = 1;
         $subs->{"checked"}                      = $subs->{'status'} =~ /1|3|4|7/;
 
@@ -882,8 +878,8 @@ sub GetSerials {
     while ( ( my $line = $sth->fetchrow_hashref ) && $counter < $count ) {
         $counter++;
         $line->{ "status" . $line->{status} } = 1;                                         # fills a "statusX" value, used for template status select list
-        $line->{planneddate}                = $line->{planneddate} ne '0000-00-00' ? format_date( $line->{planneddate} ) : undef;
-        $line->{publisheddate}              = $line->{publisheddate} ne '0000-00-00' ? format_date( $line->{publisheddate} ) : undef;
+        $line->{planneddate}                = defined $line->{planneddate} && $line->{planneddate} ne '0000-00-00' ? format_date( $line->{planneddate} ) : undef;
+        $line->{publisheddate}              = defined $line->{publisheddate} && $line->{publisheddate} ne '0000-00-00' ? format_date( $line->{publisheddate} ) : undef;
         push @serials, $line;
     }
 
@@ -1168,17 +1164,25 @@ sub ModSerialStatus {
     #It is a usual serial
     # 1st, get previous status :
     my $dbh   = C4::Context->dbh;
-    my $query = "SELECT subscriptionid,status FROM serial WHERE  serialid=?";
+    my $query = "SELECT serial.subscriptionid,serial.status,subscription.periodicity
+        FROM serial, subscription
+        WHERE serial.subscriptionid=subscription.subscriptionid
+            AND serialid=?";
     my $sth   = $dbh->prepare($query);
     $sth->execute($serialid);
-    my ( $subscriptionid, $oldstatus ) = $sth->fetchrow;
+    my ( $subscriptionid, $oldstatus, $periodicity ) = $sth->fetchrow;
 
     # change status & update subscriptionhistory
     my $val;
     if ( $status == 6 ) {
         DelIssue( { 'serialid' => $serialid, 'subscriptionid' => $subscriptionid, 'serialseq' => $serialseq } );
     } else {
-        my $query = 'UPDATE serial SET serialseq=?,publisheddate=?,publisheddatetext=?,planneddate=?,status=?,notes=? WHERE  serialid = ?';
+
+        if ( ( $periodicity % 16 ) == 0 ) {
+            if ( not $planneddate or $planneddate eq '0000-00-00' ) { $planneddate = C4::Dates->new()->output('iso') };
+            if ( not $publisheddate or $publisheddate eq '0000-00-00' ) { $publisheddate = C4::Dates->new()->output('iso') };
+        }
+        my $query = 'UPDATE serial SET serialseq=?,publisheddate=?,planneddate=?,status=?,notes=? WHERE  serialid = ?';
         $sth = $dbh->prepare($query);
         $sth->execute( $serialseq, $publisheddate, $publisheddatetext, $planneddate, $status, $notes, $serialid );
         $query = "SELECT * FROM   subscription WHERE  subscriptionid = ?";
@@ -1449,6 +1453,9 @@ sub NewSubscription {
         VALUES (?,?,?,?,?,?)
     |;
     $sth = $dbh->prepare($query);
+    if ( ( $periodicity % 16 ) == 0 ) {
+        if ( not $firstacquidate ) { $firstacquidate = C4::Dates->new() };
+    }
     $sth->execute( "$serialseq", $subscriptionid, $biblionumber, 1, $firstacquidate, $firstacquidate );
 
     logaction( "SERIAL", "ADD", $subscriptionid, "" ) if C4::Context->preference("SubscriptionLog");
@@ -2209,7 +2216,7 @@ sub countissuesfrom {
             SELECT count(*)
             FROM   serial
             WHERE  subscriptionid=?
-            AND serial.publisheddate>?
+            AND serial.publisheddate>=?
         |;
     my $sth = $dbh->prepare($query);
     $sth->execute( $subscriptionid, $startdate );
