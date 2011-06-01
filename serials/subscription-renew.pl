@@ -84,6 +84,9 @@ if ( $op eq "renew" ) {
 }
 
 my $subscription = GetSubscription($subscriptionid);
+if($template->{'param_map'}->{'CAN_user_serials_superserials'}){
+    $subscription->{'cannotedit'} = 0;
+}
 if ( $subscription->{'cannotedit'} ) {
     carp "Attempt to renew subscription $subscriptionid by " . C4::Context->userenv->{'id'} . " not allowed";
     print $query->redirect("/cgi-bin/koha/serials/subscription-detail.pl?subscriptionid=$subscriptionid");

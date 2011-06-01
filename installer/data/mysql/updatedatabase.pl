@@ -5898,6 +5898,12 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.027";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO permissions (module_bit, code, description) VALUES(15, 'superserials', 'Manage subscriptions from any branch')");
+    print "Upgrade to $DBversion done (Add superserials permission)\n";
+    SetVersion($DBversion);
+}
 
 =item DropAllForeignKeys($table)
 
