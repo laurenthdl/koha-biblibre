@@ -8,8 +8,8 @@
         $("#srlt").tablesorter({
             headers: {
                 2: { sorter: false },
-                4: { sorter: false },
-				5: { sorter: false }
+                6: { sorter: false },
+                7: { sorter: false }
             }
         }); 
  }); 
@@ -83,9 +83,9 @@ Serials updated :
             <th>ISSN</th>
             <th>Title</th>
             <th> Notes </th>
-            <th>
-                Library (Callnumber)
-            </th>
+            <th>Library</th>
+            <th>Call number</th>
+            <th>Expiration date</th>
             <!-- TMPL_IF NAME="routing" -->
               <th>Routing list</th>
             <!-- /TMPL_IF -->        
@@ -112,7 +112,12 @@ Serials updated :
                 </td>
                 <td>
                 <!-- TMPL_IF name="branchcode" --><!-- TMPL_VAR name="branchcode" --><!-- /TMPL_IF -->
-                <!-- TMPL_IF name="callnumber" -->(<!-- TMPL_VAR name="callnumber" -->)<!-- /TMPL_IF -->
+                </td>
+                <td>
+                <!-- TMPL_IF name="callnumber" --><!-- TMPL_VAR name="callnumber" --><!-- /TMPL_IF -->
+                </td>
+                <td>
+                <!-- TMPL_IF NAME="enddate" --><!-- TMPL_VAR NAME="enddate" --><!-- /TMPL_IF -->
                 </td>
                 <!-- TMPL_IF NAME="routing" -->
                 <td>
@@ -121,6 +126,7 @@ Serials updated :
                 <!-- TMPL_ELSE -->
                     <!--TMPL_IF Name="routingedit"-->
                         <a href="/cgi-bin/koha/serials/routing.pl?subscriptionid=<!-- TMPL_VAR name="subscriptionid" -->">Edit</a>
+                        (<!-- TMPL_VAR NAME="routingedit" -->)
                 	<!-- TMPL_ELSE -->
 						<a href="/cgi-bin/koha/serials/routing.pl?subscriptionid=<!-- TMPL_VAR name="subscriptionid" -->&amp;op=new">New</a>
 					<!--/TMPL_IF-->
