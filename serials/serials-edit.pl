@@ -128,8 +128,8 @@ foreach my $tmpserialid (@serialids) {
         && $tmpserialid =~ /^[0-9]+$/
         && !$processedserialid{$tmpserialid} ) {
         my $data = GetSerialInformation($tmpserialid);
-        $data->{planneddate}   = $data->{planneddate} ne '0000-00-00' ? format_date( $data->{planneddate} ) : undef;
-        $data->{publisheddate} = $data->{publisheddate} ne '0000-00-00' ? format_date( $data->{publisheddate} ) : undef;
+        $data->{planneddate}   = defined $data->{planneddate} && $data->{planneddate} ne '0000-00-00' ? format_date( $data->{planneddate} ) : undef;
+        $data->{publisheddate} = defined $data->{publisheddate} && $data->{publisheddate} ne '0000-00-00' ? format_date( $data->{publisheddate} ) : undef;
         $data->{'editdisable'} =
           ( ( HasSubscriptionExpired( $data->{subscriptionid} ) && $data->{'status1'} ) || $data->{'cannotedit'} );
         push @serialdatalist, $data;

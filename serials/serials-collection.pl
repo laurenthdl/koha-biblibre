@@ -95,13 +95,9 @@ if (@subscriptionid) {
         $subs->{ "periodicity" . $subs->{periodicity} }     = 1;
         $subs->{ "numberpattern" . $subs->{numberpattern} } = 1;
         $subs->{ "status" . $subs->{'status'} }             = 1;
-        $subs->{startdate}                                  = format_date( $subs->{startdate} );
-        $subs->{histstartdate}                              = format_date( $subs->{histstartdate} );
-        if ( !defined $subs->{enddate} || $subs->{enddate} eq '0000-00-00' ) {
-            $subs->{enddate} = '';
-        } else {
-            $subs->{enddate} = format_date( $subs->{enddate} );
-        }
+        $subs->{startdate}     = defined $subs->{startdate} ne '0000-00-00' ? format_date( $subs->{startdate} ) : undef;
+        $subs->{histstartdate} = defined $subs->{histstartdate} ne '0000-00-00' ? format_date( $subs->{histstartdate} ) : undef;
+        $subs->{enddate}     = defined $subs->{enddate} ne '0000-00-00' ? format_date( $subs->{enddate} ) : undef;
         $subs->{'abouttoexpire'}       = abouttoexpire( $subs->{'subscriptionid'} );
         $subs->{'subscriptionexpired'} = HasSubscriptionExpired( $subs->{'subscriptionid'} );
         $subs->{'subscriptionid'}      = $subscriptionid;                                       # FIXME - why was this lost ?
@@ -133,7 +129,6 @@ my $locationlib;
 foreach (@$location) {
     $locationlib = $_->{'lib'} if $_->{'selected'};
 }
-
 chop $subscriptionidlist;
 $template->param(
     onesubscription    => ( scalar(@$subscriptiondescs) == 1 ),
