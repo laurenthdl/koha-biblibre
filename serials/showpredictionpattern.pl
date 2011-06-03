@@ -31,6 +31,7 @@ use strict;
 use warnings;
 
 use CGI;
+use Date::Calc qw(Today Day_of_Year Week_of_Year Day_of_Week Days_in_Year);
 use C4::Auth;
 use C4::Output;
 use C4::Serials;
@@ -87,20 +88,59 @@ my %subscription = (
     periodicity     => $frequencyid,
     countissuesperunit  => 0,
 );
-my $date = C4::Dates->new("2000-01-23", "iso");
+
+my $date;
+if(!defined $firstacquidate || $firstacquidate eq ''){
+    my ($year, $month, $day) = Today();
+    $date = C4::Dates->new("$year-$month-$day", "iso");
+} else {
+    $date = C4::Dates->new($firstacquidate);
+}
+
+my $issuenumber;
+my ($year, $month, $day) = split("-", $date->output("iso"));
+my $frequency = GetSubscriptionFrequency($frequencyid);
+if ($frequency->{'unit'} eq "day") {
+    my $doy = Day_of_Year($year, $month, $day);
+    $issuenumber = ($doy - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + 1;
+} elsif ($frequency->{'unit'} eq "week") {
+    my ($wkno, $yr) = Week_of_Year($year, $month, $day);
+    my $issue_of_week = (Day_of_Week($year, $month, $day) - 1) / int( 7 / $frequency->{'issuesperunit'} ) + 1;
+    if($issue_of_week > $frequency->{'issuesperunit'}){
+        $issue_of_week = $frequency->{'issuesperunit'};
+    }
+    $issuenumber = ($wkno - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + $issue_of_week;
+} elsif ($frequency->{'unit'} eq "month") {
+    $issuenumber = ($month - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + 1;
+} elsif ( $frequency->{'unit'} eq "year") {
+    $issuenumber = (Day_of_Year($year, $month, $day) - 1) / ( Days_in_Year($year, 12) / $frequency->{'issuesperunit'} ) + 1;
+}
+$issuenumber = int($issuenumber);
+
 my @predictions_loop;
 my ($calculated) = GetSeq(\%val);
 push @predictions_loop, {
     number => $calculated,
     publicationdate => $date->output(),
+    issuenumber => $issuenumber,
 };
-for( my $i = 1 ; $i < 20 ; $i++){
+my $i = 1;
+my $date_iso = $date->output("iso");
+while( $date_iso =~ /^(\d{4})/ && $1 == $year && $i < 1000 ){
     ($calculated, $val{'lastvalue1'}, $val{'lastvalue2'}, $val{'lastvalue3'}, $val{'innerloop1'}, $val{'innerloop2'}, $val{'innerloop3'}) = GetNextSeq(\%val);
-    $date = GetNextDate($date->output(), \%subscription, 1);
+    $date = GetNextDate($date->output("iso"), \%subscription, 1);
+    $issuenumber++;
     push @predictions_loop, {
         number => $calculated,
         publicationdate => $date->output(),
+        issuenumber => $issuenumber,
     };
+    $date_iso = $date->output("iso");
+    $i++;
+}
+
+if($date_iso =~ /^(\d{4})/ && $1 != $year){
+    pop @predictions_loop;
 }
 
 $template->param(

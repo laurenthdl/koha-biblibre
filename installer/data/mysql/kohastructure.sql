@@ -1704,7 +1704,6 @@ CREATE TABLE `subscription` (
   `numberlength` int(11) default 0,
   `periodicity` tinyint(4) default 0,
   `dow` varchar(100) default '',
-  `numberingmethod` varchar(100) default '',
   `notes` mediumtext,
   `status` varchar(100) NOT NULL default '',
   `lastvalue1` int(11) default NULL,

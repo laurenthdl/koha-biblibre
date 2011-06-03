@@ -20,9 +20,9 @@ sub ComputePredictiveModel {
         return undef;
     }
 
-    undef $lastvalue1 if ($lastvalue1 eq '');
-    undef $lastvalue2 if ($lastvalue2 eq '');
-    undef $lastvalue3 if ($lastvalue3 eq '');
+    undef $lastvalue1 if (defined $lastvalue1 && $lastvalue1 eq '');
+    undef $lastvalue2 if (defined $lastvalue2 && $lastvalue2 eq '');
+    undef $lastvalue3 if (defined $lastvalue3 && $lastvalue3 eq '');
 
     my %predictivemodel;
     foreach ( qw(numberingmethod
@@ -41,6 +41,7 @@ sub ComputePredictiveModel {
     $p{'every3'} //= 1;
     $p{'innerloop3'} //= 0;
     if($numberpattern->{'numberingmethod'} =~ /{Z}/) {
+        $numberpattern->{'basedon3'} //= '';
         if($numberpattern->{'basedon3'} eq 'frequency') {
             $p{'whenmorethan3'} = $frequency->{'expectedissuesayear'};
         } elsif($numberpattern->{'basedon3'} eq 'dow') {
@@ -70,6 +71,7 @@ sub ComputePredictiveModel {
     $p{'every2'} //= 1;
     $p{'innerloop2'} //= 0;
     if($numberpattern->{'numberingmethod'} =~ /{Y}/) {
+        $numberpattern->{'basedon2'} //= '';
         if($numberpattern->{'basedon2'} eq 'value3') {
             $p{'every2'} = ($p{'whenmorethan3'} + $p{'add3'} - $p{'setto3'}) * $p{'every3'} / $p{'add3'};
             $p{'innerloop2'} = ($p{'lastvalue3'} - $p{'setto3'}) * $p{'every3'} / $p{'add3'} + $p{'innerloop3'};
@@ -101,25 +103,26 @@ sub ComputePredictiveModel {
     $p{'every1'} //= 1;
     $p{'innerloop1'} //= 0;
     if($numberpattern->{'numberingmethod'} =~ /{X}/) {
+        $numberpattern->{'basedon1'} //= '';
         if($numberpattern->{'basedon1'} eq 'value2') {
             $p{'every1'} = ($p{'whenmorethan2'} + $p{'add2'} - $p{'setto2'}) * $p{'every2'} / $p{'add2'};
             $p{'innerloop1'} = ($p{'lastvalue2'} - $p{'setto2'}) * $p{'every2'} / $p{'add2'} + $p{'innerloop2'};
         } elsif($numberpattern->{'basedon1'} eq 'value3') {
             $p{'every1'} = ($p{'whenmorethan3'} + $p{'add3'} - $p{'setto3'}) * $p{'every3'} / $p{'add3'};
             $p{'innerloop1'} = ($p{'lastvalue3'} - $p{'setto3'}) * $p{'every3'} / $p{'add3'} + $p{'innerloop3'};
-        } elsif($numberpattern->{'basedon2'} eq 'frequency') {
+        } elsif($numberpattern->{'basedon1'} eq 'frequency') {
             $p{'whenmorethan1'} = $frequency->{'expectedissuesayear'};
-        } elsif($numberpattern->{'basedon2'} eq 'dow') {
+        } elsif($numberpattern->{'basedon1'} eq 'dow') {
             # TODO Get publication date
-        } elsif($numberpattern->{'basedon2'} eq 'dom') {
+        } elsif($numberpattern->{'basedon1'} eq 'dom') {
             # TODO Get publication date
-        } elsif($numberpattern->{'basedon2'} eq 'doy') {
+        } elsif($numberpattern->{'basedon1'} eq 'doy') {
             # TODO Get publication date
-        } elsif($numberpattern->{'basedon2'} eq 'week') {
+        } elsif($numberpattern->{'basedon1'} eq 'week') {
             # TODO Get publication date
-        } elsif($numberpattern->{'basedon2'} eq 'month') {
+        } elsif($numberpattern->{'basedon1'} eq 'month') {
             # TODO Get publication date
-        } elsif($numberpattern->{'basedon2'} eq 'year') {
+        } elsif($numberpattern->{'basedon1'} eq 'year') {
             # TODO Get publication date
         }
         if($numberpattern->{'whenmorethan1basedonfrequency'}) {

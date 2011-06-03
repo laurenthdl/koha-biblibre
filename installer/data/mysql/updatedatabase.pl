@@ -5993,6 +5993,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
 
     $dbh->do("ALTER TABLE `subscription`
+        DROP COLUMN `numberingmethod`,
         DROP COLUMN `add1`,
         DROP COLUMN `every1`,
         DROP COLUMN `whenmorethan1`,

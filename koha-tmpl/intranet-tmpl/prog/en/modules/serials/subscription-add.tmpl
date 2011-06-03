@@ -171,6 +171,7 @@ function showPredictionPattern() {
     var lastvaluetemp1 = $("#lastvaluetemp1").val();
     var lastvaluetemp2 = $("#lastvaluetemp2").val();
     var lastvaluetemp3 = $("#lastvaluetemp3").val();
+    var firstacquidate = $("#acqui_date").val();
     $.ajax({
         url: "showpredictionpattern.pl",
         data: {
@@ -179,6 +180,7 @@ function showPredictionPattern() {
             'lastvaluetemp1':lastvaluetemp1,
             'lastvaluetemp2':lastvaluetemp2,
             'lastvaluetemp3':lastvaluetemp3,
+            'firstacquidate':firstacquidate
         },
         async: false,
         dataType: "text",

@@ -1,5 +1,6 @@
-<h1>Prediction pattern</h1>
+<h2>Prediction pattern</h1>
 
+<p><em>Please check issues that are NOT published (irregularities)</em></p>
 <!-- TMPL_IF NAME="predictions_loop" -->
 <table>
   <thead>
@@ -14,7 +15,7 @@
       <tr>
         <td><!-- TMPL_VAR NAME="number" --></td>
         <td><!-- TMPL_VAR NAME="publicationdate" --></td>
-        <td style="text-align:center"><input type="checkbox" /></td>
+        <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" /></td>
       </tr>
     <!-- /TMPL_LOOP -->
   </tbody>
