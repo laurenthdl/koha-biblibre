@@ -61,24 +61,19 @@ sub new {
 
 sub AddFrequency {
     my ( $class, $frequency ) = @_;
-    return InsertInTable( "subscription_frequency", $frequency );
-}
-
-sub GetExpectedissuesayear {
-    my ( $class, $unit, $issuesperunit, $unitperissues ) = @_;
-    return Int( $count_issues_a_year{$unit} / $issuesperunit ) * $unitperissues;
+    return InsertInTable( "subscription_frequencies", $frequency );
 }
 
 # -------------------------------------------------------------------
 sub ModFrequency {
     my ( $class, $frequency ) = @_;
-    return UpdateInTable( "subscription_frequency", $frequency );
+    return UpdateInTable( "subscription_frequencies", $frequency );
 }
 
 # -------------------------------------------------------------------
 sub DelFrequency {
     my ( $class, $frequency ) = @_;
-    return DeleteInTable( "subscription_frequency", $frequency );
+    return DeleteInTable( "subscription_frequencies", $frequency );
 }
 
 sub all {
@@ -89,7 +84,7 @@ sub all {
 
             # The subscription_frequency table is small enough for
             # `SELECT *` to be harmless.
-            "SELECT * FROM subscription_frequency ORDER BY description",
+            "SELECT * FROM subscription_frequencies ORDER BY description",
             { Slice => {} },
         )
       };
@@ -111,7 +106,7 @@ gets frequency where $freq_id is the identifier
 sub GetFrequency {
     my ($freq_id) = @_;
     return undef unless $freq_id;
-    my $results = SearchInTable( "subscription_frequency", { frequency_id => $freq_id }, undef, undef, undef, undef, "wide" );
+    my $results = SearchInTable( "subscription_frequencies", { frequency_id => $freq_id }, undef, undef, undef, undef, "wide" );
     return undef unless ($results);
     return $$results[0];
 }
@@ -131,7 +126,7 @@ gets frequencies restricted on filters
 # -------------------------------------------------------------------
 sub GetFrequencies {
     my ( $filters, $orderby ) = @_;
-    return SearchInTable( "subscription_frequency", $filters, $orderby, undef, undef, undef, "wide" );
+    return SearchInTable( "subscription_frequencies", $filters, $orderby, undef, undef, undef, "wide" );
 }
 
 END { }    # module clean-up code here (global destructor)

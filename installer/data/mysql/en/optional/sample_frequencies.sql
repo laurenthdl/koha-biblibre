@@ -1,0 +1,17 @@
+INSERT INTO `subscription_frequencies` (`id`, `description`, `unit`, `unitsperissue`, `issuesperunit`, `expectedissuesayear`, `displayorder`) VALUES
+(1, '1/day', 'day', 1, 1, 365, 6),
+(2, '1/week', 'week', 1, 1, 52, 8),
+(3, '1/2 weeks', 'week', 2, 1, 26, 9),
+(4, '1/3 weeks', 'week', 3, 1, 17, 10),
+(5, '1/month', 'month', 1, 1, 12, 11),
+(6, '1/2 months', 'month', 2, 1, 6, 12),
+(7, '1/3 months', 'month', 3, 1, 4, 13),
+(8, '1/quarter', 'year', 1, 4, 4, 14),
+(9, '2/year', 'year', 1, 2, 2, 15),
+(10, '1/year', 'year', 1, 1, 1, 16),
+(11, '1/2 year', 'year', 2, 1, 0, 17),
+(12, '2 per day', 'day', 1, 2, 730, 5),
+(13, '3 per week', 'week', 1, 3, 156, 7),
+(16, 'Without Periodicity', NULL, 1, 1, 0, 19),
+(32, 'Irregular', NULL, 1, 1, 0, 18),
+(48, 'unknown', NULL, 1, 1, 0, 20);

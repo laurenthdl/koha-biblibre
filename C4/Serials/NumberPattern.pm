@@ -53,19 +53,19 @@ sub new {
 
 sub AddNumberpattern {
     my ( $class, $numberpattern ) = @_;
-    return InsertInTable( "subscription_numberpattern", $numberpattern );
+    return InsertInTable( "subscription_numberpatterns", $numberpattern );
 }
 
 # -------------------------------------------------------------------
 sub ModNumberpattern {
     my ( $class, $numberpattern ) = @_;
-    return UpdateInTable( "subscription_numberpattern", $numberpattern );
+    return UpdateInTable( "subscription_numberpatterns", $numberpattern );
 }
 
 # -------------------------------------------------------------------
 sub DelNumberpattern {
     my ( $class, $numberpattern ) = @_;
-    return DeleteInTable( "subscription_numberpattern", $numberpattern );
+    return DeleteInTable( "subscription_numberpatterns", $numberpattern );
 }
 
 sub all {
@@ -76,7 +76,7 @@ sub all {
 
             # The subscription_numberpattern table is small enough for
             # `SELECT *` to be harmless.
-            "SELECT * FROM subscription_numberpattern ORDER BY description",
+            "SELECT * FROM subscription_numberpatterns ORDER BY description",
             { Slice => {} },
         )
       };
@@ -98,7 +98,7 @@ gets numberpattern where $freq_id is the identifier
 sub GetNumberpattern {
     my ($numpattern_id) = @_;
     return undef unless $num_patternid;
-    my $results = SearchInTable( "subscription_numberpattern", { numberpattern_id => $freq_id }, undef, undef, undef, undef, "wide" );
+    my $results = SearchInTable( "subscription_numberpatterns", { numberpattern_id => $freq_id }, undef, undef, undef, undef, "wide" );
     return undef unless ($results);
     return $$results[0];
 }
@@ -118,7 +118,7 @@ gets frequencies restricted on filters
 # -------------------------------------------------------------------
 sub GetNumberPatterns {
     my ( $filters, $orderby ) = @_;
-    return SearchInTable( "subscription_numberpattern", $filters, $orderby, undef, undef, undef, "wide" );
+    return SearchInTable( "subscription_numberpatterns", $filters, $orderby, undef, undef, undef, "wide" );
 }
 
 END { }    # module clean-up code here (global destructor)
