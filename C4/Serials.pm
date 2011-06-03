@@ -1314,7 +1314,7 @@ sub NewSubscription {
             irregularity, numberpattern, callnumber, hemisphere,
             manualhistory, internalnotes, serialsadditems, staffdisplaycount,
             opacdisplaycount, graceperiod, location, enddate)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         |;
     my $sth = $dbh->prepare($query);
     $sth->execute(
@@ -1352,6 +1352,7 @@ sub NewSubscription {
     $query = qq(
         SELECT *
         FROM   subscription
+        LEFT JOIN subscription_numberpatterns ON subscription.numberpattern = subscription_numberpatterns.id
         WHERE  subscriptionid = ?
     );
     $sth = $dbh->prepare($query);
