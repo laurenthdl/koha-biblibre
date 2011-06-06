@@ -240,6 +240,16 @@ sub clean_fs {
     qx{rm -f $$conf{abspath}{server_inbox}/hostname};
     qx{rm -Rf $$conf{abspath}{server_inbox}/ids};
     qx{rm -Rf $$conf{abspath}{server_inbox}/logbin};
+
+}
+
+=head2 clean_tar_gz
+Delete all tar.gz files.
+=cut
+sub clean_tar_gz {
+
+    my $conf = get_conf();
+
     qx{mv $$conf{abspath}{server_inbox}/*.tar.gz $$conf{abspath}{backup_server_diff}};
 
 }
