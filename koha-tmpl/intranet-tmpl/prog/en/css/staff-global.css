@@ -1953,6 +1953,7 @@ select.advsearchoperator {
 .warning {
     color: red;
     margin-left: 1%;
+    clear: left;
 }
 
 span.suggestion_info {

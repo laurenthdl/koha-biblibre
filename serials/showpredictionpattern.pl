@@ -54,6 +54,8 @@ my $lastvaluetemp2 = $input->param('lastvaluetemp2');
 my $lastvaluetemp3 = $input->param('lastvaluetemp3');
 my $firstacquidate = $input->param('firstacquidate');
 
+my $debug = 1;
+
 my $predictivemodel = ComputePredictiveModel($frequencyid, $numberpatternid,
                         $lastvaluetemp1, $lastvaluetemp2, $lastvaluetemp3);
 
@@ -123,6 +125,7 @@ push @predictions_loop, {
     number => $calculated,
     publicationdate => $date->output(),
     issuenumber => $issuenumber,
+    dow => Day_of_Week(split /-/, $date->output("iso")),
 };
 my $i = 1;
 my $date_iso = $date->output("iso");
@@ -134,6 +137,7 @@ while( $date_iso =~ /^(\d{4})/ && $1 == $year && $i < 1000 ){
         number => $calculated,
         publicationdate => $date->output(),
         issuenumber => $issuenumber,
+        dow => Day_of_Week(split /-/, $date->output("iso")),
     };
     $date_iso = $date->output("iso");
     $i++;
@@ -145,26 +149,66 @@ if($date_iso =~ /^(\d{4})/ && $1 != $year){
 
 $template->param(
     predictions_loop => \@predictions_loop,
-    calcnumberpattern    => $numberpatternid,
-    calcnumberingmethod  => $predictivemodel->{'numberingmethod'},
-    calclastvalue1       => $predictivemodel->{'lastvalue1'},
-    calclastvalue2       => $predictivemodel->{'lastvalue2'},
-    calclastvalue3       => $predictivemodel->{'lastvalue3'},
-    calcinnerloop1       => $predictivemodel->{'innerloop1'},
-    calcinnerloop2       => $predictivemodel->{'innerloop2'},
-    calcinnerloop3       => $predictivemodel->{'innerloop3'},
-    calcadd1             => $predictivemodel->{'add1'},
-    calcadd2             => $predictivemodel->{'add2'},
-    calcadd3             => $predictivemodel->{'add3'},
-    calcsetto1           => $predictivemodel->{'setto1'},
-    calcsetto2           => $predictivemodel->{'setto2'},
-    calcsetto3           => $predictivemodel->{'setto3'},
-    calcevery1           => $predictivemodel->{'every1'},
-    calcevery2           => $predictivemodel->{'every2'},
-    calcevery3           => $predictivemodel->{'every3'},
-    calcwhenmorethan1    => $predictivemodel->{'whenmorethan1'},
-    calcwhenmorethan2    => $predictivemodel->{'whenmorethan2'},
-    calcwhenmorethan3    => $predictivemodel->{'whenmorethan3'},
 );
+
+if($frequency->{'unit'} eq 'day' && $frequency->{'unitsperissue'} == 1) {
+    my (@mondays, @tuesdays, @wednesdays, @thursdays, @fridays, @saturdays, @sundays);
+    my $i = 0;
+    foreach (@predictions_loop) {
+        my $date = C4::Dates->new($_->{'publicationdate'})->output("iso");
+        my ($year, $month, $day) = split /-/, $date;
+        my $dow = Day_of_Week($year, $month, $day);
+        if($dow == 1) {
+            push @mondays, $_->{'issuenumber'};
+        } elsif ($dow == 2) {
+            push @tuesdays, $_->{'issuenumber'};
+        } elsif ($dow == 3) {
+            push @wednesdays, $_->{'issuenumber'};
+        } elsif ($dow == 4) {
+            push @thursdays, $_->{'issuenumber'};
+        } elsif ($dow == 5) {
+            push @fridays, $_->{'issuenumber'};
+        } elsif ($dow == 6) {
+            push @saturdays, $_->{'issuenumber'};
+        } elsif ($dow == 7) {
+            push @sundays, $_->{'issuenumber'};
+        }
+    }
+    $template->param(
+        daily_options => 1,
+        mondays     => join(":", @mondays),
+        tuesdays    => join(":", @tuesdays),
+        wednesdays  => join(":", @wednesdays),
+        thursdays   => join(":", @thursdays),
+        fridays     => join(":", @fridays),
+        saturdays   => join(":", @saturdays),
+        sundays     => join(":", @sundays),
+    );
+}
+
+if($debug){
+    $template->param(
+        calcnumberpattern    => $numberpatternid,
+        calcnumberingmethod  => $predictivemodel->{'numberingmethod'},
+        calclastvalue1       => $predictivemodel->{'lastvalue1'},
+        calclastvalue2       => $predictivemodel->{'lastvalue2'},
+        calclastvalue3       => $predictivemodel->{'lastvalue3'},
+        calcinnerloop1       => $predictivemodel->{'innerloop1'},
+        calcinnerloop2       => $predictivemodel->{'innerloop2'},
+        calcinnerloop3       => $predictivemodel->{'innerloop3'},
+        calcadd1             => $predictivemodel->{'add1'},
+        calcadd2             => $predictivemodel->{'add2'},
+        calcadd3             => $predictivemodel->{'add3'},
+        calcsetto1           => $predictivemodel->{'setto1'},
+        calcsetto2           => $predictivemodel->{'setto2'},
+        calcsetto3           => $predictivemodel->{'setto3'},
+        calcevery1           => $predictivemodel->{'every1'},
+        calcevery2           => $predictivemodel->{'every2'},
+        calcevery3           => $predictivemodel->{'every3'},
+        calcwhenmorethan1    => $predictivemodel->{'whenmorethan1'},
+        calcwhenmorethan2    => $predictivemodel->{'whenmorethan2'},
+        calcwhenmorethan3    => $predictivemodel->{'whenmorethan3'},
+    );
+}
 
 output_html_with_http_headers $input, $cookie, $template->output;
