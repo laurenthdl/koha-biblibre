@@ -70,7 +70,22 @@ eval {
     my $tar_gz_files = Koha_Synchronize_System::tools::kss::get_archives ;
 
     if ( scalar ( @$tar_gz_files ) == 0 ) {
-        $log->error("Aucune archive n'a été trouvé, le serveur ne sera pas modifié.");
+        $log->warning("Aucune archive n'a été trouvée, le serveur ne sera pas modifié.");
+
+        $log->info("=== Génération et insertion en base des triggers et procédures stockées ===");
+        Koha_Synchronize_System::tools::kss::insert_proc_and_triggers $user, $passwd, $db_server, $log;
+
+        $log && $log->info("=== Préparation pour la prochaine itération ===");
+        Koha_Synchronize_System::tools::kss::prepare_next_iteration $log;
+
+        $log->info("=== Cleaning ... ===");
+        Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server, $log;
+
+        $log->info("=== Mise à disposition du client de la nouvelle base de données ===");
+        Koha_Synchronize_System::tools::kss::dump_available_db $log;
+
+        $log->info("END");
+
         exit(1);
     }
 
@@ -125,10 +140,10 @@ eval {
             $log && $log->info("Traitement de $file en cours...");
             Koha_Synchronize_System::tools::kss::insert_diff_file ($file, undef, $log);
         }
-
-        $log->info("== Suppression des fichiers utilisés ==");
-        Koha_Synchronize_System::tools::kss::clean_fs;
     }
+
+    $log->info("== Suppression des fichiers utilisés ==");
+    Koha_Synchronize_System::tools::kss::clean_fs;
 
     $log && $log->info("=== Préparation pour la prochaine itération ===");
     Koha_Synchronize_System::tools::kss::prepare_next_iteration $log;
