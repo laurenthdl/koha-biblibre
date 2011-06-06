@@ -342,13 +342,20 @@ $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "m?th?matiqu? AND fo* AND ?a?";
 is($got, $expected, qq{Test wildCard ? and * on multiples operands and positions});
 
-BEGIN { $tests += 3 } # [ TO ] format
+BEGIN { $tests += 4 } # [ TO ] format
 @$operands = (qq{["1900-01-01T00:00:00Z" TO "2011-01-01T00:00:00Z"]});
 @$indexes = ("pubdate");
 @$operators = ();
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = qq{date_pubdate:["1900-01-01T00\\:00\\:00Z" TO "2011-01-01T00\\:00\\:00Z"]};
 is($got, $expected, qq{Test date with [ TO ] format});
+
+@$operands = (qq{["1900-01-01T00\\:00\\:00Z" TO "2011-01-01T00\\:00\\:00Z"]});
+@$indexes = ("pubdate");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{date_pubdate:["1900-01-01T00\\:00\\:00Z" TO "2011-01-01T00\\:00\\:00Z"]};
+is($got, $expected, qq{Test date with [ TO ] format (and colons already escaped)});
 
 @$operands = (qq{[* TO *]});
 @$indexes = ("title");
