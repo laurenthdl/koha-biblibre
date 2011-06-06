@@ -140,10 +140,13 @@ eval {
             $log && $log->info("Traitement de $file en cours...");
             Koha_Synchronize_System::tools::kss::insert_diff_file ($file, undef, $log);
         }
+
+        $log->info("== Suppression des fichiers utilisés pendant cette itération ==");
+        Koha_Synchronize_System::tools::kss::clean_fs;
     }
 
-    $log->info("== Suppression des fichiers utilisés ==");
-    Koha_Synchronize_System::tools::kss::clean_fs;
+    $log->info("=== Suppression des archives ===");
+    Koha_Synchronize_System::tools::kss::clean_tar_gz;
 
     $log && $log->info("=== Préparation pour la prochaine itération ===");
     Koha_Synchronize_System::tools::kss::prepare_next_iteration $log;
@@ -168,6 +171,7 @@ if ( $@ ) {
     $log->error("An error occured, try to clean...");
     $log->error($@);
     Koha_Synchronize_System::tools::kss::log_error($@, "Erreur lors de l'exécution ...");
+    $log->info("Suppression des fichiers utilisés pendant la dernière itération");
     Koha_Synchronize_System::tools::kss::clean_fs;
     Koha_Synchronize_System::tools::kss::clean $user, $passwd, $db_server, $log;
 
