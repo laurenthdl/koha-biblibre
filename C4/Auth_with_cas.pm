@@ -22,11 +22,14 @@ use Modern::Perl;
 use C4::Debug;
 use C4::Context;
 use C4::Utils qw( :all );
+use C4::Logguer;
 use Authen::CAS::Client;
 use CGI;
 use FindBin;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug);
+
+my $log = C4::Logguer->new();
 
 BEGIN {
     require Exporter;

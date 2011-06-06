@@ -297,7 +297,7 @@ sub _build_languages_arrayref {
         my $language_subtags_hashref = regex_lang_subtags($translated_language);
 
         # group this language, key by langtag
-        $language_subtags_hashref->{'sublanguage_current'} = 1 if $translated_language eq $current_language;
+        $language_subtags_hashref->{'sublanguage_current'} = 1 if defined $current_language && $translated_language eq $current_language;
         $language_subtags_hashref->{'rfc4646_subtag'}      = $translated_language;
         $language_subtags_hashref->{'enabled'}             = 1;
         $language_subtags_hashref->{'native_description'}  = language_get_description( $language_subtags_hashref->{language}, $language_subtags_hashref->{language}, 'language' );
@@ -320,7 +320,7 @@ sub _build_languages_arrayref {
             language           => $key,
             sublanguages_loop  => $value,
             plural             => $track_language_groups->{$key} > 1 ? 1 : 0,
-            current            => $current_language_regex->{language} eq $key ? 1 : 0,
+            current            => defined $current_language_regex->{langage} && $current_language_regex->{language} eq $key ? 1 : 0,
             group_enabled      => 1
         };
     }
@@ -421,7 +421,7 @@ sub regex_lang_subtags {
 #my $root = qr{(?: ($language) (?: $s ($script) )? 40% (?: $s ($region) )? 40% (?: $s ($variant) )? 10% (?: $s ($extension) )? 5% (?: $s ($privateuse) )? 5% ) 90% | ($grandfathered) 5% | ($privateuse) 5% };
 
     $string =~
-      qr{^ (?:($language)) (?:$s($script))? (?:$s($region))?  (?:$s($variant))?  (?:$s($extension))?  (?:$s($privateuse))? $}xi;    # |($grandfathered) | ($privateuse) $}xi;
+      qr{^ (?:($language)) (?:$s($script))? (?:$s($region))?  (?:$s($variant))?  (?:$s($extension))?  (?:$s($privateuse))? $}xi if defined $string;    # |($grandfathered) | ($privateuse) $}xi;
     my %subtag = (
         'rfc4646_subtag' => $string,
         'language'       => $1,

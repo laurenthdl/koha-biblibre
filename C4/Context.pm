@@ -18,10 +18,10 @@ package C4::Context;
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 use Modern::Perl;
-use C4::Logguer;
+#use C4::Logguer;
 use vars qw($VERSION $AUTOLOAD $context @context_stack);
 
-my $log = C4::Logguer->new();
+#my $log = C4::Logguer->new();
 
 eval {
     my $servers = C4::Context->config('memcached_servers');
@@ -337,7 +337,7 @@ sub new {
         } elsif ( -s CONFIG_FNAME ) {
             $conf_fname = CONFIG_FNAME;
         } else {
-            $log->warning("unable to locate Koha configuration file koha-conf.xml");
+            #$log->warning("unable to locate Koha configuration file koha-conf.xml");
             return undef;
         }
     }
@@ -346,7 +346,7 @@ sub new {
     $self = read_config_file($conf_fname);
     $self->{"config_file"} = $conf_fname;
 
-    $log->warning("read_config_file($conf_fname) returned undef") if !defined( $self->{"config"} );
+    #$log->warning("read_config_file($conf_fname) returned undef") if !defined( $self->{"config"} );
     return undef if !defined( $self->{"config"} );
 
     $self->{"dbh"}               = undef;    # Database handle
@@ -683,7 +683,7 @@ sub _new_Zconn {
 
         # check for errors and warn
         if ( $Zconn->errcode() != 0 ) {
-            $log->warning("something wrong with the connection: " . $Zconn->errmsg());
+            #$log->warning("something wrong with the connection: " . $Zconn->errmsg());
         }
 
     };
@@ -1005,7 +1005,7 @@ sub set_shelves_userenv ($$) {
 sub get_shelves_userenv () {
     my $active;
     unless ( $active = $context->{userenv}->{ $context->{activeuser} } ) {
-        $log->debug("get_shelves_userenv cannot retrieve context->{userenv}->{context->{activeuser}}");
+        #$log->debug("get_shelves_userenv cannot retrieve context->{userenv}->{context->{activeuser}}");
         return undef;
     }
     my $totshelves = $active->{totshelves} or undef;

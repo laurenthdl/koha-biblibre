@@ -101,7 +101,7 @@ use C4::VirtualShelves qw(GetRecentShelves);
 use POSIX qw(ceil floor);
 use C4::Branch;    # GetBranches
 use Data::Pagination;
-use C4::Logguer;
+require C4::Logguer;
 
 my $log = C4::Logguer->new();
 
@@ -116,6 +116,7 @@ my ( $template, $borrowernumber, $cookie );
 my $template_name;
 my $template_type;
 if ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) ) {
+    $template_type = 'results';
     $template_name = 'catalogue/results.tmpl';
 } else {
     $template_name = 'catalogue/advsearch.tmpl';
