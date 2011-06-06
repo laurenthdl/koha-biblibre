@@ -128,11 +128,12 @@ sub backup_server_db {
     my $db_server = $$conf{databases_infos}{db_server};
     my $dump_db_server_dir = $$conf{abspath}{backup_server_db};
     my $mysqldump_cmd = $$conf{which_cmd}{mysqldump};
+    my $gzip_cmd = $$conf{which_cmd}{gzip};
 
-    my $dump_filename = $dump_db_server_dir . "/" . ( strftime "%Y-%m-%d_%H:%M:%S", localtime );
-    $log && $log->info("Dump en cours dans $dump_filename");
+    my $dump_filename = $dump_db_server_dir . "/" . ( strftime "%Y-%m-%d_%H:%M:%S", localtime ) . ".sql.gz";
+    $log && $log->info("Dump et compression en cours dans $dump_filename");
 
-    system( qq{$mysqldump_cmd -u $user -p$passwd $db_server > $dump_filename} ) == 0 or die $?;
+    system( qq{$mysqldump_cmd -u $user -p$passwd $db_server | $gzip_cmd > $dump_filename} ) == 0 or die $?;
 }
 
 =head2 diff_files_exists

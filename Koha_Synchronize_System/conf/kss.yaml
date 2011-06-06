@@ -50,6 +50,7 @@ which_cmd:
         perl: /usr/bin/perl
         tar: /bin/tar
         rebuild_zebra: /home/jonathan/workspace/versions/koha_master/misc/migration_tools/rebuild_zebra.pl
+        gzip_cmd: /bin/gzip
 
 
 path:
