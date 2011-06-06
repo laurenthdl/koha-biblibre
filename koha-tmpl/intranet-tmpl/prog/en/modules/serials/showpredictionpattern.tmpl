@@ -1,8 +1,42 @@
 <h2>Prediction pattern</h1>
 
 <p><em>Please check issues that are NOT published (irregularities)</em></p>
+<!-- TMPL_IF NAME="daily_options" -->
+<script type="text/javascript">
+//<![CDATA[
+function Check_boxes(dow) {
+    if($(":checkbox[data-dow='"+dow+"']:first").attr("checked") == true) {
+        $("#predictionst :checkbox[data-dow='"+dow+"']").each(function(){
+            $(this).attr('checked', true);
+            $(this).attr('disabled', true);
+        });
+    } else {
+        $("#predictionst :checkbox[data-dow='"+dow+"']").each(function(){
+            $(this).attr('checked', false);
+            $(this).attr('disabled', false);
+        });
+    }
+}
+//]]>
+</script>
+<p><em>If there is a day (or more) in the week where issues are never published, you can check corresponding boxes below.</em></p>
+<input type="checkbox" id="monday" data-dow="1" onchange="Check_boxes(1);" />
+<label for="monday">Monday</label>
+<input type="checkbox" id="tuesday" data-dow="2" onchange="Check_boxes(2);" />
+<label for="tuesday">Tuesday</label>
+<input type="checkbox" id="wednesday" data-dow="3" onchange="Check_boxes(3);" />
+<label for="wednesday">Wednesday</label>
+<input type="checkbox" id="thursday" data-dow="4" onchange="Check_boxes(4);" />
+<label for="thursday">Thursday</label>
+<input type="checkbox" id="friday" data-dow="5" onchange="Check_boxes(5);" />
+<label for="friday">Friday</label>
+<input type="checkbox" id="saturday" data-dow="6" onchange="Check_boxes(6);" />
+<label for="saturday">Saturday</label>
+<input type="checkbox" id="sunday" data-dow="7" onchange="Check_boxes(7);" />
+<label for="sunday">Sunday</label>
+<!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="predictions_loop" -->
-<table>
+<table id="predictionst">
   <thead>
     <tr>
       <th>Number</th>
@@ -15,13 +49,14 @@
       <tr>
         <td><!-- TMPL_VAR NAME="number" --></td>
         <td><!-- TMPL_VAR NAME="publicationdate" --></td>
-        <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" /></td>
+        <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" data-dow="<!-- TMPL_VAR NAME='dow' -->" /></td>
       </tr>
     <!-- /TMPL_LOOP -->
   </tbody>
 </table>
 <!-- /TMPL_IF -->
 
+<!-- TMPL_IF NAME="debug" -->
 <h4>For debug purposes only:</h4>
 <table>
   <thead>
@@ -113,3 +148,4 @@
     </tr>
   </tbody>
 </table>
+<!-- /TMPL_IF -->
