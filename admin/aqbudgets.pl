@@ -49,10 +49,16 @@ my ( $template, $borrowernumber, $cookie, $staffflags ) = get_template_and_user(
         query           => $input,
         type            => "intranet",
         authnotrequired => 0,
-        flagsrequired   => { acquisition => 'budget_manage' },
+        flagsrequired   => { acquisition => '*' },
         debug           => 0,
     }
 );
+
+# User can access to this page if he has at least one of these permissions.
+# There is no other way to do it atm.
+if( (not defined $template->{'param_map'}->{'CAN_user_acquisition_budget_manage'}) && (not defined $template->{'param_map'}->{'CAN_user_acquisition_budget_manage_all'}) ) {
+    checkauth($input, 0, { acquisition => 'budget_manage' }, "intranet");
+}
 
 my $cur = GetCurrency();
 $template->param( cur => $cur->{symbol} );
@@ -65,7 +71,7 @@ my $show      = $input->param('show');    # SET TO 1, BY A FORM SUMBIT
 $show_all     = $input->param('show_all') if $show == 1;
 
 # IF USER DOESNT HAVE PERM FOR AN 'ADD', THEN REDIRECT TO THE DEFAULT VIEW...
-if ( not defined $template->{param_map}->{'CAN_user_acquisition_budget_add_del'} && $op == 'add_form' ) {
+if ( (not defined $template->{param_map}->{'CAN_user_acquisition_budget_add_del'}) && (not defined $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'}) && ($op == 'add_form') ) {
     $op = '';
 }
 
