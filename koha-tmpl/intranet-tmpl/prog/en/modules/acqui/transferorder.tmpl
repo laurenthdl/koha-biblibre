@@ -21,9 +21,9 @@
 <div id="bd">
 <div id="yui-main">
     <div class="yui-b">
-        <!-- Main content -->
+        <!-- TMPL_IF NAME="show_baskets" -->
+        <h1>Baskets for <!-- TMPL_VAR NAME="booksellertoname" --></h1>
         <!-- TMPL_IF NAME="basketsloop" -->
-            <h1>Baskets for <!-- TMPL_VAR NAME="booksellertoname" --></h1>
             <table>
                 <thead>
                     <th>Basket (#)</th>
@@ -42,7 +42,10 @@
                     <!-- /TMPL_LOOP --><!-- basketsloop -->
                 </tbody>
             </table>
+        <!-- TMPL_ELSE -->
+            <p>There is no open baskets for this supplier.</p>
         <!-- /TMPL_IF --><!-- basketsloop -->
+        <!-- /TMPL_IF --><!-- show_baskets -->
         <!-- TMPL_IF NAME="ordersloop" -->
             <h1>Orders for <!-- TMPL_VAR NAME="booksellerfromname" --></h1>
             <table>
