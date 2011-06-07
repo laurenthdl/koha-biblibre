@@ -24,7 +24,7 @@ GetOptions(
     'r'   => \$reset,
     'n:s' => \$number,
     't:s' => \$recordtype,
-    'w' => \$biblionumber,
+    'w:s' => \$biblionumber,
     'o'   => \$optimize,
     'h|help' => \$want_help,
 );
