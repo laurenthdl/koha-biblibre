@@ -57,6 +57,7 @@ my @categories;
 my %catamounts;
 my @libraries;
 my $delay;
+my $useborrowerlibrary;
 my $borrowersalreadyapplied; # hashref of borrowers for whom we already applied the fine, so it's only applied once
 my $debug = 0;
 my $bigdebug = 0;
@@ -67,7 +68,8 @@ GetOptions(
     'o|out:s'     => \$output_dir,
     'c|category:s'=> \@pcategories,
     'l|library:s' => \@libraries,
-    'd|delay:i'     => \$delay
+    'd|delay:i'   => \$delay,
+    'u|use-borrower-library' => \$useborrowerlibrary
 );
 my $usage = << 'ENDUSAGE';
 
@@ -84,9 +86,9 @@ This script has the following parameters :
     -c --category borrower_category,amount (repeatable)
     -l --library  (repeatable)
     -d --delay
+    -u --use-borrower-libraray: use borrower's libraray, regardless of the CircControl syspref
 
 ENDUSAGE
-
 die $usage if $help;
 
 # Processing categories
@@ -165,7 +167,8 @@ for ( my $i = 0 ; $i < scalar(@$data) ; $i++ ) {
     next if none { $borrower->{categorycode} eq $_ } @categories;
 
     my $branchcode =
-        ( $control eq 'ItemHomeLibrary' ) ? $data->[$i]->{homebranch}
+        ( $useborrowerlibrary )           ? $borrower->{branchcode}
+      : ( $control eq 'ItemHomeLibrary' ) ? $data->[$i]->{homebranch}
       : ( $control eq 'PatronLibrary' )   ? $borrower->{branchcode}
       :                                     $data->[$i]->{branchcode};
     # In final case, CircControl must be PickupLibrary. (branchcode comes from issues table here).
