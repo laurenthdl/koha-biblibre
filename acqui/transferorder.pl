@@ -108,6 +108,7 @@ if( $basketno && $ordernumber) {
         push @basketsloop, \%line unless $line{closedate};
     }
     $template->param(
+        show_baskets => 1,
         basketsloop => \@basketsloop,
         basketfromname => $basketfrom->{basketname},
     );
