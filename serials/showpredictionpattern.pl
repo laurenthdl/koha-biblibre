@@ -47,44 +47,105 @@ my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
     debug           => 1,
 } );
 
+my %val = ();
 my $frequencyid = $input->param('frequency');
-my $numberpatternid = $input->param('numberpattern');
-my $lastvaluetemp1 = $input->param('lastvaluetemp1');
-my $lastvaluetemp2 = $input->param('lastvaluetemp2');
-my $lastvaluetemp3 = $input->param('lastvaluetemp3');
 my $firstacquidate = $input->param('firstacquidate');
+my $custompattern = $input->param('custompattern');
 
-my $debug = 1;
+my $debug = 0;
 
-my $predictivemodel = ComputePredictiveModel($frequencyid, $numberpatternid,
-                        $lastvaluetemp1, $lastvaluetemp2, $lastvaluetemp3);
+if($custompattern){
+    %val = (
+        locale      => "en-GB",
+        numberingmethod => $input->param('numberingmethod') // '',
+        numbering1      => $input->param('numbering1') // '',
+        numbering2      => $input->param('numbering2') // '',
+        numbering3      => $input->param('numbering3') // '',
+        lastvalue1      => $input->param('lastvalue1') // '',
+        lastvalue2      => $input->param('lastvalue2') // '',
+        lastvalue3      => $input->param('lastvalue3') // '',
+        add1            => $input->param('add1') // '',
+        add2            => $input->param('add2') // '',
+        add3            => $input->param('add3') // '',
+        whenmorethan1   => $input->param('whenmorethan1') // '',
+        whenmorethan2   => $input->param('whenmorethan2') // '',
+        whenmorethan3   => $input->param('whenmorethan3') // '',
+        setto1          => $input->param('setto1') // '',
+        setto2          => $input->param('setto2') // '',
+        setto3          => $input->param('setto3') // '',
+        every1          => $input->param('every1') // '',
+        every2          => $input->param('every2') // '',
+        every3          => $input->param('every3') // '',
+        innerloop1      => $input->param('innerloop1') // '',
+        innerloop2      => $input->param('innerloop2') // '',
+        innerloop3      => $input->param('innerloop3') // '',
+    );
+    warn Data::Dumper::Dumper \%val;
+    $template->param(custompattern => 1);
+} else {
+    $debug = 1;
 
-my %val = (
-    locale          => "en-GB",
-    numberpattern   => $numberpatternid,
-    numberingmethod => $predictivemodel->{'numberingmethod'},
-    numbering1      => $predictivemodel->{'numbering1'},
-    numbering2      => $predictivemodel->{'numbering2'},
-    numbering3      => $predictivemodel->{'numbering3'},
-    lastvalue1      => $predictivemodel->{'lastvalue1'},
-    lastvalue2      => $predictivemodel->{'lastvalue2'},
-    lastvalue3      => $predictivemodel->{'lastvalue3'},
-    add1            => $predictivemodel->{'add1'},
-    add2            => $predictivemodel->{'add2'},
-    add3            => $predictivemodel->{'add3'},
-    whenmorethan1   => $predictivemodel->{'whenmorethan1'},
-    whenmorethan2   => $predictivemodel->{'whenmorethan2'},
-    whenmorethan3   => $predictivemodel->{'whenmorethan3'},
-    setto1          => $predictivemodel->{'setto1'},
-    setto2          => $predictivemodel->{'setto2'},
-    setto3          => $predictivemodel->{'setto3'},
-    every1          => $predictivemodel->{'every1'},
-    every2          => $predictivemodel->{'every2'},
-    every3          => $predictivemodel->{'every3'},
-    innerloop1      => $predictivemodel->{'innerloop1'},
-    innerloop2      => $predictivemodel->{'innerloop2'},
-    innerloop3      => $predictivemodel->{'innerloop3'},
-);
+    my $numberpatternid = $input->param('numberpattern');
+    my $lastvaluetemp1 = $input->param('lastvaluetemp1');
+    my $lastvaluetemp2 = $input->param('lastvaluetemp2');
+    my $lastvaluetemp3 = $input->param('lastvaluetemp3');
+
+    my $predictivemodel = ComputePredictiveModel($frequencyid, $numberpatternid,
+                            $lastvaluetemp1, $lastvaluetemp2, $lastvaluetemp3);
+
+    %val = (
+        locale          => "en-GB",
+        numberpattern   => $numberpatternid,
+        numberingmethod => $predictivemodel->{'numberingmethod'},
+        numbering1      => $predictivemodel->{'numbering1'},
+        numbering2      => $predictivemodel->{'numbering2'},
+        numbering3      => $predictivemodel->{'numbering3'},
+        lastvalue1      => $predictivemodel->{'lastvalue1'},
+        lastvalue2      => $predictivemodel->{'lastvalue2'},
+        lastvalue3      => $predictivemodel->{'lastvalue3'},
+        add1            => $predictivemodel->{'add1'},
+        add2            => $predictivemodel->{'add2'},
+        add3            => $predictivemodel->{'add3'},
+        whenmorethan1   => $predictivemodel->{'whenmorethan1'},
+        whenmorethan2   => $predictivemodel->{'whenmorethan2'},
+        whenmorethan3   => $predictivemodel->{'whenmorethan3'},
+        setto1          => $predictivemodel->{'setto1'},
+        setto2          => $predictivemodel->{'setto2'},
+        setto3          => $predictivemodel->{'setto3'},
+        every1          => $predictivemodel->{'every1'},
+        every2          => $predictivemodel->{'every2'},
+        every3          => $predictivemodel->{'every3'},
+        innerloop1      => $predictivemodel->{'innerloop1'},
+        innerloop2      => $predictivemodel->{'innerloop2'},
+        innerloop3      => $predictivemodel->{'innerloop3'},
+    );
+
+    if($debug){
+        $template->param(
+            calcnumberpattern    => $numberpatternid,
+            calcnumberingmethod  => $predictivemodel->{'numberingmethod'},
+            calclastvalue1       => $predictivemodel->{'lastvalue1'},
+            calclastvalue2       => $predictivemodel->{'lastvalue2'},
+            calclastvalue3       => $predictivemodel->{'lastvalue3'},
+            calcinnerloop1       => $predictivemodel->{'innerloop1'},
+            calcinnerloop2       => $predictivemodel->{'innerloop2'},
+            calcinnerloop3       => $predictivemodel->{'innerloop3'},
+            calcadd1             => $predictivemodel->{'add1'},
+            calcadd2             => $predictivemodel->{'add2'},
+            calcadd3             => $predictivemodel->{'add3'},
+            calcsetto1           => $predictivemodel->{'setto1'},
+            calcsetto2           => $predictivemodel->{'setto2'},
+            calcsetto3           => $predictivemodel->{'setto3'},
+            calcevery1           => $predictivemodel->{'every1'},
+            calcevery2           => $predictivemodel->{'every2'},
+            calcevery3           => $predictivemodel->{'every3'},
+            calcwhenmorethan1    => $predictivemodel->{'whenmorethan1'},
+            calcwhenmorethan2    => $predictivemodel->{'whenmorethan2'},
+            calcwhenmorethan3    => $predictivemodel->{'whenmorethan3'},
+        );
+    }
+}
+
 my %subscription = (
     irregularity    => '',
     periodicity     => $frequencyid,
@@ -186,29 +247,5 @@ if($frequency->{'unit'} eq 'day' && $frequency->{'unitsperissue'} == 1) {
     );
 }
 
-if($debug){
-    $template->param(
-        calcnumberpattern    => $numberpatternid,
-        calcnumberingmethod  => $predictivemodel->{'numberingmethod'},
-        calclastvalue1       => $predictivemodel->{'lastvalue1'},
-        calclastvalue2       => $predictivemodel->{'lastvalue2'},
-        calclastvalue3       => $predictivemodel->{'lastvalue3'},
-        calcinnerloop1       => $predictivemodel->{'innerloop1'},
-        calcinnerloop2       => $predictivemodel->{'innerloop2'},
-        calcinnerloop3       => $predictivemodel->{'innerloop3'},
-        calcadd1             => $predictivemodel->{'add1'},
-        calcadd2             => $predictivemodel->{'add2'},
-        calcadd3             => $predictivemodel->{'add3'},
-        calcsetto1           => $predictivemodel->{'setto1'},
-        calcsetto2           => $predictivemodel->{'setto2'},
-        calcsetto3           => $predictivemodel->{'setto3'},
-        calcevery1           => $predictivemodel->{'every1'},
-        calcevery2           => $predictivemodel->{'every2'},
-        calcevery3           => $predictivemodel->{'every3'},
-        calcwhenmorethan1    => $predictivemodel->{'whenmorethan1'},
-        calcwhenmorethan2    => $predictivemodel->{'whenmorethan2'},
-        calcwhenmorethan3    => $predictivemodel->{'whenmorethan3'},
-    );
-}
 
 output_html_with_http_headers $input, $cookie, $template->output;

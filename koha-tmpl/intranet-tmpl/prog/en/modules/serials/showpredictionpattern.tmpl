@@ -1,5 +1,5 @@
 <h2>Prediction pattern</h1>
-
+<!-- TMPL_UNLESS NAME="custompattern" -->
 <p><em>Please check issues that are NOT published (irregularities)</em></p>
 <!-- TMPL_IF NAME="daily_options" -->
 <script type="text/javascript">
@@ -35,13 +35,16 @@ function Check_boxes(dow) {
 <input type="checkbox" id="sunday" data-dow="7" onchange="Check_boxes(7);" />
 <label for="sunday">Sunday</label>
 <!-- /TMPL_IF -->
+<!-- /TMPL_UNLESS -->
 <!-- TMPL_IF NAME="predictions_loop" -->
 <table id="predictionst">
   <thead>
     <tr>
       <th>Number</th>
       <th>Publication Date</th>
+      <!-- TMPL_UNLESS NAME="custompattern" -->
       <th>Not published</th>
+      <!-- /TMPL_UNLESS -->
     </tr>
   </thead>
   <tbody>
@@ -49,7 +52,9 @@ function Check_boxes(dow) {
       <tr>
         <td><!-- TMPL_VAR NAME="number" --></td>
         <td><!-- TMPL_VAR NAME="publicationdate" --></td>
+        <!-- TMPL_UNLESS NAME="custompattern" -->
         <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" data-dow="<!-- TMPL_VAR NAME='dow' -->" /></td>
+        <!-- /TMPL_UNLESS -->
       </tr>
     <!-- /TMPL_LOOP -->
   </tbody>

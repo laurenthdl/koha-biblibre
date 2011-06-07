@@ -93,13 +93,6 @@ function frequencyload(){
     $.getJSON("subscription-frequency.pl",{"frequency_id":document.f.frequency.value,ajax:'true'},
         function(freqdata){
             globalfreqdata=freqdata;
-            if(globalnumpatterndata == undefined){
-                if( document.f.numberpattern.value ){
-                    numberpatternload();
-                } else {
-                    return false;
-                }
-            }
         }
     )
 }
@@ -111,16 +104,8 @@ function numberpatternload(){
             if (globalnumpatterndata==undefined){
                 return false;
             }
-            document.f.numberingmethod.value=unescape(numpatterndata.numberingmethod);
-            if(globalfreqdata == undefined){
-                if(document.f.frequency.value){
-                    frequencyload();
-                } else {
-                    alert(_("Please define frequency"));
-                    return false;
-                }
-            }
             displaymoreoptions();
+            restoreAdvancedPattern();
         }
     );
 }
@@ -145,25 +130,31 @@ function displaymoreoptions() {
         $("#headerX").html(globalnumpatterndata.label1);
         $("#headerX").show();
         $("#beginsX").show();
+        $("#innerX").show();
     } else {
         $("#headerX").hide();
         $("#beginsX").hide();
+        $("#innerX").hide();
     }
     if(globalnumpatterndata.label2) {
         $("#headerY").html(globalnumpatterndata.label2);
         $("#headerY").show();
         $("#beginsY").show();
+        $("#innerY").show();
     } else {
         $("#headerY").hide();
         $("#beginsY").hide();
+        $("#innerY").hide();
     }
     if(globalnumpatterndata.label3) {
         $("#headerZ").html(globalnumpatterndata.label3);
         $("#headerZ").show();
         $("#beginsZ").show();
+        $("#innerZ").show();
     } else {
         $("#headerZ").hide();
         $("#beginsZ").hide();
+        $("#innerZ").hide();
     }
 }
 
@@ -174,6 +165,27 @@ function showPredictionPattern() {
     var lastvaluetemp2 = $("#lastvaluetemp2").val();
     var lastvaluetemp3 = $("#lastvaluetemp3").val();
     var firstacquidate = $("#acqui_date").val();
+    var error = 0;
+    var error_msg = "";
+    if(frequencyid == undefined || frequencyid == ""){
+        error_msg += "- Frequency is not defined\n";
+        error ++;
+    }
+    if(numberpatternid == undefined || numberpatternid == ""){
+        error_msg += "- Number pattern is not defined\n";
+        error ++;
+    }
+    if(firstacquidate == undefined || firstacquidate == ""){
+        error_msg += "- First publication date is not defined\n";
+        error ++;
+    }
+
+    if(error){
+        alert("Cannot test prediction pattern for the following reason(s):\n\n"
+            + error_msg);
+        return false;
+    }
+
     $.ajax({
         url: "showpredictionpattern.pl",
         data: {
@@ -183,6 +195,122 @@ function showPredictionPattern() {
             'lastvaluetemp2':lastvaluetemp2,
             'lastvaluetemp3':lastvaluetemp3,
             'firstacquidate':firstacquidate
+        },
+        async: false,
+        dataType: "text",
+        success: function(data) {
+            $("#displayexample").html(data);
+        }
+    });
+}
+
+var advancedpatternlocked;
+
+function toggleAdvancedPattern() {
+    $("#advancedpredictionpattern").toggle();
+}
+
+function modifyAdvancedPattern() {
+    $("#patternname").attr("readonly", false);
+    $("#numberingmethod").attr("readonly", false);
+    $("#label1").attr("readonly", false);
+    $("#label2").attr("readonly", false);
+    $("#label3").attr("readonly", false);
+    $("#lastvalue1").attr("readonly", false);
+    $("#lastvalue2").attr("readonly", false);
+    $("#lastvalue3").attr("readonly", false);
+    $("#add1").attr("readonly", false);
+    $("#add2").attr("readonly", false);
+    $("#add3").attr("readonly", false);
+    $("#every1").attr("readonly", false);
+    $("#every2").attr("readonly", false);
+    $("#every3").attr("readonly", false);
+    $("#innerloop1").attr("readonly", false);
+    $("#innerloop2").attr("readonly", false);
+    $("#innerloop3").attr("readonly", false);
+    $("#setto1").attr("readonly", false);
+    $("#setto2").attr("readonly", false);
+    $("#setto3").attr("readonly", false);
+    $("#whenmorethan1").attr("readonly", false);
+    $("#whenmorethan2").attr("readonly", false);
+    $("#whenmorethan3").attr("readonly", false);
+    $("#numbering1").attr("readonly", false);
+    $("#numbering2").attr("readonly", false);
+    $("#numbering3").attr("readonly", false);
+
+    $("#restoreadvancedpatternbutton").show();
+    $("#testadvancedpatternbutton").show();
+    $("#saveadvancedpatternbutton").show();
+    $("#modifyadvancedpatternbutton").hide();
+
+    advancedpatternlocked = 0;
+}
+
+function restoreAdvancedPattern() {
+    $("#patternname").attr("readonly", true).val(unescape(globalnumpatterndata.label));
+    $("#numberingmethod").attr("readonly", true).val(unescape(globalnumpatterndata.numberingmethod));
+    $("#label1").attr("readonly", true).val(globalnumpatterndata.label1);
+    $("#label2").attr("readonly", true).val(globalnumpatterndata.label2);
+    $("#label3").attr("readonly", true).val(globalnumpatterndata.label3);
+    $("#lastvalue1").attr("readonly", true).val($("#lastvaluetemp1").val());
+    $("#lastvalue2").attr("readonly", true).val($("#lastvaluetemp2").val());
+    $("#lastvalue3").attr("readonly", true).val($("#lastvaluetemp3").val());
+    $("#add1").attr("readonly", true).val(globalnumpatterndata.add1);
+    $("#add2").attr("readonly", true).val(globalnumpatterndata.add2);
+    $("#add3").attr("readonly", true).val(globalnumpatterndata.add3);
+    $("#every1").attr("readonly", true).val(globalnumpatterndata.every1);
+    $("#every2").attr("readonly", true).val(globalnumpatterndata.every2);
+    $("#every3").attr("readonly", true).val(globalnumpatterndata.every3);
+    $("#innerloop1").attr("readonly", true).val($("#innerlooptemp1").val());
+    $("#innerloop2").attr("readonly", true).val($("#innerlooptemp2").val());
+    $("#innerloop3").attr("readonly", true).val($("#innerlooptemp3").val());
+    $("#setto1").attr("readonly", true).val(globalnumpatterndata.setto1);
+    $("#setto2").attr("readonly", true).val(globalnumpatterndata.setto2);
+    $("#setto3").attr("readonly", true).val(globalnumpatterndata.setto3);
+    $("#whenmorethan1").attr("readonly", true).val(globalnumpatterndata.whenmorethan1);
+    $("#whenmorethan2").attr("readonly", true).val(globalnumpatterndata.whenmorethan2);
+    $("#whenmorethan3").attr("readonly", true).val(globalnumpatterndata.whenmorethan3);
+    $("#numbering1").attr("readonly", true).val(globalnumpatterndata.numbering1);
+    $("#numbering2").attr("readonly", true).val(globalnumpatterndata.numbering2);
+    $("#numbering3").attr("readonly", true).val(globalnumpatterndata.numbering3);
+
+    $("#restoreadvancedpatternbutton").hide();
+    $("#testadvancedpatternbutton").hide();
+    $("#saveadvancedpatternbutton").hide();
+    $("#modifyadvancedpatternbutton").show();
+
+    advancedpatternlocked = 1;
+}
+
+function testAdvancedPattern() {
+    $.ajax({
+        url: "showpredictionpattern.pl",
+        data: {
+            'custompattern' : true,
+            'firstacquidate': $("#acqui_date").val(),
+            'frequency'     : $("#frequency").val(),
+            'numberingmethod' : $("#numberingmethod").val(),
+            'lastvalue1'    : $("#lastvalue1").val(),
+            'lastvalue2'    : $("#lastvalue2").val(),
+            'lastvalue3'    : $("#lastvalue3").val(),
+            'add1'          : $("#add1").val(),
+            'add2'          : $("#add2").val(),
+            'add3'          : $("#add3").val(),
+            'every1'        : $("#every1").val(),
+            'every2'        : $("#every2").val(),
+            'every3'        : $("#every3").val(),
+            'innerloop1'    : $("#innerloop1").val(),
+            'innerloop2'    : $("#innerloop2").val(),
+            'innerloop3'    : $("#innerloop3").val(),
+            'setto1'        : $("#setto1").val(),
+            'setto2'        : $("#setto2").val(),
+            'setto3'        : $("#setto3").val(),
+            'whenmorethan1' : $("#whenmorethan1").val(),
+            'whenmorethan2' : $("#whenmorethan2").val(),
+            'whenmorethan3' : $("#whenmorethan3").val(),
+            'numbering1'    : $("#numbering1").val(),
+            'numbering2'    : $("#numbering2").val(),
+            'numbering3'    : $("#numbering3").val()
         },
         async: false,
         dataType: "text",
@@ -212,6 +340,50 @@ $(document).ready(function() {
     $("select#numberpattern").change(function(){
         numberpatternload();
     });
+    $("#lastvaluetemp1").keyup(function(){
+        $("#lastvalue1").val($(this).val());
+    });
+    $("#lastvaluetemp2").keyup(function(){
+        $("#lastvalue2").val($(this).val());
+    });
+    $("#lastvaluetemp3").keyup(function(){
+        $("#lastvalue3").val($(this).val());
+    });
+    $("#lastvalue1").keyup(function(){
+        $("#lastvaluetemp1").val($(this).val());
+    });
+    $("#lastvalue2").keyup(function(){
+        $("#lastvaluetemp2").val($(this).val());
+    });
+    $("#lastvalue3").keyup(function(){
+        $("#lastvaluetemp3").val($(this).val());
+    });
+
+    $("#innerlooptemp1").keyup(function(){
+        $("#innerloop1").val($(this).val());
+    });
+    $("#innerlooptemp2").keyup(function(){
+        $("#innerloop2").val($(this).val());
+    });
+    $("#innerlooptemp3").keyup(function(){
+        $("#innerloop3").val($(this).val());
+    });
+    $("#innerloop1").keyup(function(){
+        $("#innerlooptemp1").val($(this).val());
+    });
+    $("#innerloop2").keyup(function(){
+        $("#innerlooptemp2").val($(this).val());
+    });
+    $("#innerloop3").keyup(function(){
+        $("#innerlooptemp3").val($(this).val());
+    });
+
+    if($("#frequency").val() != ""){
+        frequencyload();
+    }
+    if($("#numberpattern").val() != ""){
+        numberpatternload();
+    }
 
     show_page_1();
 });
@@ -430,10 +602,6 @@ $(document).ready(function() {
                                             <!--/TMPL_LOOP-->
                                         </select>
                                     </li>
-                                    <li>
-                                        <label for="numberingmethod">Numbering formula:</label>
-                                        <input readonly="readonly" type="text" name="numberingmethod" id="numberingmethod" size="70" value="<!-- TMPL_VAR name="numberingmethod" -->" />
-                                    </li>
                                     <li id="more_options">
                                         <table id="moreoptionst">
                                             <thead>
@@ -451,9 +619,87 @@ $(document).ready(function() {
                                                     <td id="beginsY"><input type="text" id="lastvaluetemp2" name="lastvaluetemp2" /></td>
                                                     <td id="beginsZ"><input type="text" id="lastvaluetemp3" name="lastvaluetemp3" /></td>
                                                 </tr>
+                                                <tr>
+                                                    <td>Inner counter</td>
+                                                    <td id="innerX"><input type="text" id="innerlooptemp1" name="innerlooptemp1" /></td>
+                                                    <td id="innerY"><input type="text" id="innerlooptemp2" name="innerlooptemp2" /></td>
+                                                    <td id="innerZ"><input type="text" id="innerlooptemp3" name="innerlooptemp3" /></td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </li>
+                                    <li><a style="cursor:pointer" onclick="toggleAdvancedPattern();">Show/Hide advanced pattern</a></li>
+                                    <div id="advancedpredictionpattern" style="display:none">
+                                      <li>
+                                        <label for="patternname">Pattern name: (*)</label>
+                                        <input id="patternname" type="text" readonly="readonly" />
+                                      </li>
+                                      <li>
+                                        <label for="numberingmethod">Numbering formula:</label>
+                                        <input readonly="readonly" type="text" name="numberingmethod" id="numberingmethod" size="50" value="<!-- TMPL_VAR name="numberingmethod" -->" />
+                                      </li>
+                                        <table id="advancedpredictionpatternt">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="4">Advanced prediction pattern</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>&nbsp;</td>
+                                                    <th><input type="text" readonly="readonly" id="label1" /></td>
+                                                    <th><input type="text" readonly="readonly" id="label2" /></td>
+                                                    <th><input type="text" readonly="readonly" id="label3" /></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Begins with</td>
+                                                    <td><input type="text" readonly="readonly" id="lastvalue1" name="lastvalue1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="lastvalue2" name="lastvalue2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="lastvalue3" name="lastvalue3" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Add</td>
+                                                    <td><input type="text" readonly="readonly" id="add1" name="add1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="add2" name="add2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="add3" name="add3" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Every</td>
+                                                    <td><input type="text" readonly="readonly" id="every1" name="every1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="every2" name="every2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="every3" name="every3" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Inner counter</td>
+                                                    <td><input type="text" readonly="readonly" id="innerloop1" name="innerloop1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="innerloop2" name="innerloop2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="innerloop3" name="innerloop3" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Set back to</td>
+                                                    <td><input type="text" readonly="readonly" id="setto1" name="setto1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="setto2" name="setto2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="setto3" name="setto3" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>When more than</td>
+                                                    <td><input type="text" readonly="readonly" id="whenmorethan1" name="whenmorethan1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="whenmorethan2" name="whenmorethan2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="whenmorethan3" name="whenmorethan3" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Numbering</td>
+                                                    <td><input type="text" readonly="readonly" id="numbering1" name="numbering1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="numbering2" name="numbering2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="numbering3" name="numbering3" /></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <input id="modifyadvancedpatternbutton" type="button" value="Modify pattern" onclick="modifyAdvancedPattern();" />
+                                        <input id="restoreadvancedpatternbutton" type="button" value="Cancel modifications" onclick="restoreAdvancedPattern();" style="display:none" />
+                                        <input id="testadvancedpatternbutton" type="button" value="Test advanced pattern" onclick="testAdvancedPattern();" style="display:none" />
+                                        <input id="saveadvancedpatternbutton" type="button" value="Save as new pattern" onclick="saveAdvancedPattern();" style="display:none" />
+                                    </div>
                                 </ol>
                             </fieldset>
                             <fieldset class="action">
