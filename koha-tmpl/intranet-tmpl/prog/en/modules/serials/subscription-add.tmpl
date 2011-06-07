@@ -63,6 +63,11 @@ function Check_page1() {
         alert(_("You must choose or create a biblio"));
         return false;
     }
+
+    return true;
+}
+
+function Check_page2(){
     if($("#acqui_date").val().length == 0){
         alert(_("You must choose a first publication date"));
         return false;
@@ -81,10 +86,6 @@ function Check_page1() {
         return false;
     }
 
-    return true;
-}
-
-function Check_page2(){
     return true;
 }
 
@@ -317,106 +318,6 @@ $(document).ready(function() {
                             <input type="button" value="Next >>" onclick="if ( Check_page1() ) show_page_2();" style="float:right;" />
                         </fieldset>
                     </div>
-                    <div class="yui-u">
-                        <fieldset class="rows">
-                            <legend>Serials planning</legend>
-                            <ol>
-                                <li>
-                                    <label for="firstacquidate">Publication date for the first expected issue this year: (*)</label>
-                                    <input type="text" name="firstacquidate" value="<!-- TMPL_VAR name="firstacquidate" -->" size="13" maxlength="10" id="acqui_date" readonly="readonly" />
-                                    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button2" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-                                    <!-- both scripts for calendar must follow the input field --> 
-                                    <script type="text/javascript">
-                                        Calendar.setup({
-                                            inputField:"acqui_date",
-                                            ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                            button         :   "button2",
-                                            align          :   "Tl"
-                                        });
-                                    </script>
-                                    <script type="text/javascript">
-                                        Calendar.setup({
-                                            inputField     :   "acqui_date",
-                                            ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                            button         :   "acqui_date",
-                                            align          :   "Tl"
-                                        });
-                                    </script>
-                                </li>
-                                <li>
-                                    <label for="frequency">Frequency: (*)</label>
-                                    <select name="frequency" size="1" id="frequency">
-                                        <option value="">-- please choose --</option>
-                                        <!--TMPL_LOOP Name="frequencies"-->
-                                            <option value="<!--TMPL_VAR Name="id"-->" <!--TMPL_IF name="selected"--> selected="selected" <!-- /TMPL_IF -->>
-                                                <!--TMPL_VAR Name="label"-->
-                                            </option>
-                                        <!--/TMPL_LOOP-->
-                                    </select>
-                                </li>
-                                <li>
-                                    <label for="manuallist"> Manual history:</label>
-                                    <input type="checkbox" name="manualhist" id="manuallist" value="1" />
-                                </li>
-                                <li>
-                                    <label for="subtype">Subscription length:</label>
-                                    <select name="subtype" id="subtype2">
-                                        <!-- TMPL_LOOP NAME="subtype" -->
-                                            <option value="<!-- TMPL_VAR NAME="name" -->" <!-- TMPL_IF NAME="selected" --> selected="selected" <!-- /TMPL_IF --> >
-                                                <!-- TMPL_VAR NAME="name" -->
-                                            </option>
-                                        <!-- /TMPL_LOOP -->
-                                    </select>
-                                    <input type="text" name="sublength" id="sublength" value="<!-- TMPL_VAR name="sublength" -->" size="3" /> (enter amount in numerals)
-                                    <input type="hidden" name="issuelengthcount">
-                                </li>
-                                <li>
-                                    <label for="startdate"> Subscription start date: (*)</label>
-                                    <input type="text" name="startdate" value="<!-- TMPL_VAR name="startdate" -->" size="13" maxlength="10" id="beginning_date" readonly="readonly" />
-                                    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button1" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-                                    <!-- both scripts for calendar must follow the input field --> 
-                                    <script type="text/javascript">
-                                        Calendar.setup({
-                                            inputField   : "beginning_date",
-                                            ifFormat     : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                            button       : "button1",
-                                            align        : "Tl"
-                                        });
-                                    </script>
-                                    <script type="text/javascript">
-                                        Calendar.setup({
-                                            inputField   : "beginning_date",
-                                            ifFormat     : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                            button       : "beginning_date",
-                                            align        : "Tl"
-                                        });
-                                    </script>
-                                </li>
-                                <li>
-                                    <label for="enddate">Subscription end date:</label>
-                                    <input type="text" name="enddate" value="<!-- TMPL_VAR name="enddate" -->" size="13" maxlength="10" id="enddate" readonly="readonly" />
-                                    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button3" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-                                    <!-- both scripts for calendar must follow the input field --> 
-                                    <script type="text/javascript">
-                                        Calendar.setup({
-                                            inputField   : "enddate",
-                                            ifFormat     : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                            button       : "button3",
-                                            align        : "Tl"
-                                        });
-                                    </script>
-                                    <script type="text/javascript">
-                                        Calendar.setup({
-                                            inputField   : "enddate",
-                                            ifFormat     : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                            button       : "enddate",
-                                            align        : "Tl"
-                                        });
-                                    </script>
-                                </li>
-                            </ol>
-                        </fieldset>
-                    </div>
                 </div>
 
                 <div id="page_2">
@@ -425,6 +326,99 @@ $(document).ready(function() {
                             <fieldset class="rows">
                                 <legend>Serials planning</legend>
                                 <ol>
+                                    <li>
+                                        <label for="firstacquidate">Publication date for the first expected issue this year: (*)</label>
+                                        <input type="text" name="firstacquidate" value="<!-- TMPL_VAR name="firstacquidate" -->" size="13" maxlength="10" id="acqui_date" readonly="readonly" />
+                                        <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button2" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                                        <!-- both scripts for calendar must follow the input field --> 
+                                        <script type="text/javascript">
+                                            Calendar.setup({
+                                                inputField:"acqui_date",
+                                                ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                button         :   "button2",
+                                                align          :   "Tl"
+                                            });
+                                        </script>
+                                        <script type="text/javascript">
+                                            Calendar.setup({
+                                                inputField     :   "acqui_date",
+                                                ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                button         :   "acqui_date",
+                                                align          :   "Tl"
+                                            });
+                                        </script>
+                                    </li>
+                                    <li>
+                                        <label for="frequency">Frequency: (*)</label>
+                                        <select name="frequency" size="1" id="frequency">
+                                            <option value="">-- please choose --</option>
+                                            <!--TMPL_LOOP Name="frequencies"-->
+                                                <option value="<!--TMPL_VAR Name="id"-->" <!--TMPL_IF name="selected"--> selected="selected" <!-- /TMPL_IF -->>
+                                                    <!--TMPL_VAR Name="label"-->
+                                                </option>
+                                            <!--/TMPL_LOOP-->
+                                        </select>
+                                    </li>
+                                    <li>
+                                        <label for="manuallist"> Manual history:</label>
+                                        <input type="checkbox" name="manualhist" id="manuallist" value="1" />
+                                    </li>
+                                    <li>
+                                        <label for="subtype">Subscription length:</label>
+                                        <select name="subtype" id="subtype2">
+                                            <!-- TMPL_LOOP NAME="subtype" -->
+                                                <option value="<!-- TMPL_VAR NAME="name" -->" <!-- TMPL_IF NAME="selected" --> selected="selected" <!-- /TMPL_IF --> >
+                                                    <!-- TMPL_VAR NAME="name" -->
+                                                </option>
+                                            <!-- /TMPL_LOOP -->
+                                        </select>
+                                        <input type="text" name="sublength" id="sublength" value="<!-- TMPL_VAR name="sublength" -->" size="3" /> (enter amount in numerals)
+                                        <input type="hidden" name="issuelengthcount">
+                                    </li>
+                                    <li>
+                                        <label for="startdate"> Subscription start date: (*)</label>
+                                        <input type="text" name="startdate" value="<!-- TMPL_VAR name="startdate" -->" size="13" maxlength="10" id="beginning_date" readonly="readonly" />
+                                        <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button1" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                                        <!-- both scripts for calendar must follow the input field --> 
+                                        <script type="text/javascript">
+                                            Calendar.setup({
+                                                inputField   : "beginning_date",
+                                                ifFormat     : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                button       : "button1",
+                                                align        : "Tl"
+                                            });
+                                        </script>
+                                        <script type="text/javascript">
+                                            Calendar.setup({
+                                                inputField   : "beginning_date",
+                                                ifFormat     : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                button       : "beginning_date",
+                                                align        : "Tl"
+                                            });
+                                        </script>
+                                    </li>
+                                    <li>
+                                        <label for="enddate">Subscription end date:</label>
+                                        <input type="text" name="enddate" value="<!-- TMPL_VAR name="enddate" -->" size="13" maxlength="10" id="enddate" readonly="readonly" />
+                                        <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button3" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                                        <!-- both scripts for calendar must follow the input field --> 
+                                        <script type="text/javascript">
+                                            Calendar.setup({
+                                                inputField   : "enddate",
+                                                ifFormat     : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                button       : "button3",
+                                                align        : "Tl"
+                                            });
+                                        </script>
+                                        <script type="text/javascript">
+                                            Calendar.setup({
+                                                inputField   : "enddate",
+                                                ifFormat     : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                button       : "enddate",
+                                                align        : "Tl"
+                                            });
+                                        </script>
+                                    </li>
                                     <li>
                                         <label for="numberpattern"> Numbering pattern:</label>
                                         <select name="numbering_pattern" size="1" id="numberpattern">
