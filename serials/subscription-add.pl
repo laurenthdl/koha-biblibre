@@ -292,12 +292,6 @@ sub redirect_add_subscription {
     my $startdate = format_date_in_iso( $query->param('startdate') );
     my $enddate = format_date_in_iso( $query->param('enddate') );
     my $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));
-    my $histenddate = format_date_in_iso($query->param('histenddate'));
-    my $histstartdate = format_date_in_iso($query->param('histstartdate'));
-    my $recievedlist = $query->param('recievedlist');
-    my $missinglist = $query->param('missinglist');
-    my $opacnote = $query->param('opacnote');
-    my $librariannote = $query->param('librariannote');
     my $subscriptionid = NewSubscription(
         $auser, $branchcode, $aqbooksellerid, $cost, $aqbudgetid, $biblionumber,
         $startdate, $periodicity, $dow, $numberlength, $weeklength,
@@ -307,7 +301,6 @@ sub redirect_add_subscription {
         ($manualhistory ? $manualhistory : 0), $internalnotes, $serialsadditems,
         $staffdisplaycount, $opacdisplaycount, $graceperiod, $location, $enddate
     );
-    ModSubscriptionHistory ($subscriptionid,$histstartdate,$histenddate,$recievedlist,$missinglist,$opacnote,$librariannote);
 
     print $query->redirect("/cgi-bin/koha/serials/subscription-detail.pl?subscriptionid=$subscriptionid");
     return;
@@ -355,13 +348,6 @@ sub redirect_mod_subscription {
     my $manualhistory   = $query->param('manualhist');
     my $serialsadditems = $query->param('serialsadditems');
 
-    # subscription history
-    my $histenddate       = format_date_in_iso( $query->param('histenddate') );
-    my $histstartdate     = format_date_in_iso( $query->param('histstartdate') );
-    my $recievedlist      = $query->param('recievedlist');
-    my $missinglist       = $query->param('missinglist');
-    my $opacnote          = $query->param('opacnote');
-    my $librariannote     = $query->param('librariannote');
     my $staffdisplaycount = $query->param('staffdisplaycount');
     my $opacdisplaycount  = $query->param('opacdisplaycount');
     my $graceperiod       = $query->param('graceperiod') || 0;
@@ -384,7 +370,6 @@ sub redirect_mod_subscription {
         $manualhistory, $internalnotes, $serialsadditems, $staffdisplaycount,
         $opacdisplaycount, $graceperiod, $location, $enddate, $subscriptionid
     );
-    ModSubscriptionHistory( $subscriptionid, $histstartdate, $histenddate, $recievedlist, $missinglist, $opacnote, $librariannote );
     print $query->redirect("/cgi-bin/koha/serials/subscription-detail.pl?subscriptionid=$subscriptionid");
     return;
 }

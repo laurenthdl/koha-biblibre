@@ -42,7 +42,8 @@ BEGIN {
       &NewSubscription    &ModSubscription    &DelSubscription    &GetSubscriptions
       &GetSubscription    &CountSubscriptionFromBiblionumber      &GetSubscriptionsFromBiblionumber
       &SearchSubscriptions
-      &GetFullSubscriptionsFromBiblionumber   &GetFullSubscription &ModSubscriptionHistory
+      &GetFullSubscriptionsFromBiblionumber   &GetFullSubscription
+      &GetSubscriptionHistoryFromSubscriptionId &ModSubscriptionHistory
       &HasSubscriptionStrictlyExpired &HasSubscriptionExpired &GetExpirationDate &abouttoexpire
       &GetSubscriptionFrequencies
       &GetSubscriptionNumberpatterns
@@ -163,20 +164,21 @@ sub GetLateIssues {
 
 =head2 GetSubscriptionHistoryFromSubscriptionId
 
-$sth = GetSubscriptionHistoryFromSubscriptionId()
-this function prepares the SQL request and returns the statement handle
-After this function, don't forget to execute it by using $sth->execute($subscriptionid)
+$history = GetSubscriptionHistoryFromSubscriptionId()
 
 =cut
 
-sub GetSubscriptionHistoryFromSubscriptionId() {
+sub GetSubscriptionHistoryFromSubscriptionId {
+    my $subscriptionid = shift;
     my $dbh   = C4::Context->dbh;
     my $query = qq|
         SELECT *
         FROM   subscriptionhistory
         WHERE  subscriptionid = ?
     |;
-    return $dbh->prepare($query);
+    my $sth = $dbh->prepare($query);
+    $sth->execute($subscriptionid);
+    return $sth->fetchrow_hashref;
 }
 
 =head2 GetSerialStatusFromSerialId
