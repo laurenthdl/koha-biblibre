@@ -4339,6 +4339,11 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
               ON DUPLICATE KEY update maxissueqty=defaults.maxissueqty, holdrestricted=defaults.holdallowed'
     );
     $dbh->do(
+        'INSERT IGNORE INTO issuingrules (branchcode, categorycode, itemtype,holdrestricted,maxissueqty)
+                    SELECT branchcode,categorycode,"*",maxissueqty from borrower_branch_circ_rules defaults
+              ON DUPLICATE KEY update maxissueqty=defaults.maxissueqty'
+    );
+    $dbh->do(
         'INSERT IGNORE INTO issuingrules (branchcode, categorycode, itemtype,holdrestricted)
                     SELECT "*","*",itemtype,holdallowed from default_branch_item_rules defaults 
               ON DUPLICATE KEY update holdrestricted=defaults.holdallowed'
