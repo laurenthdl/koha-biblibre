@@ -7,6 +7,8 @@
 
 var globalnumpatterndata;
 var globalfreqdata;
+var advancedpatternlocked;
+var patternneedtobetested = 0;
 
 function isDefined(variable){
     return (typeof(window[variable]) == 'undefined')? false : true;
@@ -52,6 +54,10 @@ function Find_ISSN(f)
     window.open('issn-search.pl','FindABibIndex','width=800,height=400,toolbar=no,scrollbars=yes');
 }
 
+function Clear(id) {
+    $("#"+id).val('');
+}
+
 function Check_page1() {
     if ( $("#aqbooksellerid").val().length == 0) {
         input_box = confirm(_("If you wish to claim late or missing issues you must link this subscription to a vendor. Click OK to ignore or Cancel to return and enter a vendor"));
@@ -83,6 +89,14 @@ function Check_page2(){
     if(($("#sublength").val().length == 0 && $("#enddate").val().length == 0)
     || ($("#sublength").val().length != 0 && $("#enddate").val().length != 0)){
         alert(_("You must choose a subscription length or an end date, but not them two."));
+        return false;
+    }
+    if(advancedpatternlocked == 0){
+        alert(_("You have modified the advanced prediction pattern. Please save your work or cancel modifications."));
+        return false;
+    }
+    if(patternneedtobetested){
+        alert(_("Please click on 'Test prediction pattern' before saving subscription."));
         return false;
     }
 
@@ -125,9 +139,12 @@ function displaymoreoptions() {
     $("#lastvaluetemp1").val('');
     $("#lastvaluetemp2").val('');
     $("#lastvaluetemp3").val('');
+    $("#innerlooptemp1").val('');
+    $("#innerlooptemp2").val('');
+    $("#innerlooptemp3").val('');
 
     if(globalnumpatterndata.label1) {
-        $("#headerX").html(globalnumpatterndata.label1);
+        $("#headerX").html(unescape(globalnumpatterndata.label1));
         $("#headerX").show();
         $("#beginsX").show();
         $("#innerX").show();
@@ -137,7 +154,7 @@ function displaymoreoptions() {
         $("#innerX").hide();
     }
     if(globalnumpatterndata.label2) {
-        $("#headerY").html(globalnumpatterndata.label2);
+        $("#headerY").html(unescape(globalnumpatterndata.label2));
         $("#headerY").show();
         $("#beginsY").show();
         $("#innerY").show();
@@ -147,7 +164,7 @@ function displaymoreoptions() {
         $("#innerY").hide();
     }
     if(globalnumpatterndata.label3) {
-        $("#headerZ").html(globalnumpatterndata.label3);
+        $("#headerZ").html(unescape(globalnumpatterndata.label3));
         $("#headerZ").show();
         $("#beginsZ").show();
         $("#innerZ").show();
@@ -165,6 +182,9 @@ function showPredictionPattern() {
     var lastvaluetemp2 = $("#lastvaluetemp2").val();
     var lastvaluetemp3 = $("#lastvaluetemp3").val();
     var firstacquidate = $("#acqui_date").val();
+    var enddate = $("#enddate").val();
+    var subtype = $("#subtype").val();
+    var sublength = $("#sublength").val();
     var error = 0;
     var error_msg = "";
     if(frequencyid == undefined || frequencyid == ""){
@@ -194,24 +214,27 @@ function showPredictionPattern() {
             'lastvaluetemp1':lastvaluetemp1,
             'lastvaluetemp2':lastvaluetemp2,
             'lastvaluetemp3':lastvaluetemp3,
-            'firstacquidate':firstacquidate
+            'firstacquidate':firstacquidate,
+            'enddate':enddate,
+            'subtype':subtype,
+            'sublength':sublength
         },
         async: false,
         dataType: "text",
         success: function(data) {
             $("#displayexample").html(data);
+            patternneedtobetested = 0;
         }
     });
 }
 
-var advancedpatternlocked;
 
 function toggleAdvancedPattern() {
     $("#advancedpredictionpattern").toggle();
 }
 
 function modifyAdvancedPattern() {
-    $("#patternname").attr("readonly", false);
+    $("#patternname").attr("readonly", false).val('');
     $("#numberingmethod").attr("readonly", false);
     $("#label1").attr("readonly", false);
     $("#label2").attr("readonly", false);
@@ -239,9 +262,12 @@ function modifyAdvancedPattern() {
     $("#numbering3").attr("readonly", false);
 
     $("#restoreadvancedpatternbutton").show();
-    $("#testadvancedpatternbutton").show();
     $("#saveadvancedpatternbutton").show();
     $("#modifyadvancedpatternbutton").hide();
+
+    document.getElementById("testpatternbutton").onclick = function(){
+        testAdvancedPattern();
+    }
 
     advancedpatternlocked = 0;
 }
@@ -249,9 +275,9 @@ function modifyAdvancedPattern() {
 function restoreAdvancedPattern() {
     $("#patternname").attr("readonly", true).val(unescape(globalnumpatterndata.label));
     $("#numberingmethod").attr("readonly", true).val(unescape(globalnumpatterndata.numberingmethod));
-    $("#label1").attr("readonly", true).val(globalnumpatterndata.label1);
-    $("#label2").attr("readonly", true).val(globalnumpatterndata.label2);
-    $("#label3").attr("readonly", true).val(globalnumpatterndata.label3);
+    $("#label1").attr("readonly", true).val(unescape(globalnumpatterndata.label1));
+    $("#label2").attr("readonly", true).val(unescape(globalnumpatterndata.label2));
+    $("#label3").attr("readonly", true).val(unescape(globalnumpatterndata.label3));
     $("#lastvalue1").attr("readonly", true).val($("#lastvaluetemp1").val());
     $("#lastvalue2").attr("readonly", true).val($("#lastvaluetemp2").val());
     $("#lastvalue3").attr("readonly", true).val($("#lastvaluetemp3").val());
@@ -275,10 +301,12 @@ function restoreAdvancedPattern() {
     $("#numbering3").attr("readonly", true).val(globalnumpatterndata.numbering3);
 
     $("#restoreadvancedpatternbutton").hide();
-    $("#testadvancedpatternbutton").hide();
     $("#saveadvancedpatternbutton").hide();
     $("#modifyadvancedpatternbutton").show();
 
+    document.getElementById("testpatternbutton").onclick = function(){
+        showPredictionPattern();
+    }
     advancedpatternlocked = 1;
 }
 
@@ -288,6 +316,9 @@ function testAdvancedPattern() {
         data: {
             'custompattern' : true,
             'firstacquidate': $("#acqui_date").val(),
+            'enddate'       : $("#enddate").val(),
+            'subtype'       : $("#subtype").val(),
+            'sublength'     : $("#sublength").val(),
             'frequency'     : $("#frequency").val(),
             'numberingmethod' : $("#numberingmethod").val(),
             'lastvalue1'    : $("#lastvalue1").val(),
@@ -320,6 +351,39 @@ function testAdvancedPattern() {
     });
 }
 
+function saveAdvancedPattern() {
+    $.getJSON("create-numberpattern.pl",{
+            "patternname"   :$("#patternname").val(),
+            "numberingmethod":$("#numberingmethod").val(),
+            "label1"        :$("#label1").val(),
+            "label2"        :$("#label2").val(),
+            "label3"        :$("#label3").val(),
+            "add1"          :$("#add1").val(),
+            "add2"          :$("#add2").val(),
+            "add3"          :$("#add3").val(),
+            "every1"        :$("#every1").val(),
+            "every2"        :$("#every2").val(),
+            "every3"        :$("#every3").val(),
+            "setto1"        :$("#setto1").val(),
+            "setto2"        :$("#setto2").val(),
+            "setto3"        :$("#setto3").val(),
+            "whenmorethan1" :$("#whenmorethan1").val(),
+            "whenmorethan2" :$("#whenmorethan2").val(),
+            "whenmorethan3" :$("#whenmorethan3").val(),
+            "numbering1"    :$("#numbering1").val(),
+            "numbering2"    :$("#numbering2").val(),
+            "numbering3"    :$("#numbering3").val(),
+            ajax:'true'
+        },
+        function(data){
+            $("#numberpattern").append("<option value=\""+data.numberpatternid+"\">"+$("#patternname").val()+"</option>");
+            $("#numberpattern").val(data.numberpatternid);
+            numberpatternload();
+        }
+    );
+
+}
+
 function show_page_1() {
     $("#page_1").show();
     $("#page_2").hide();
@@ -335,9 +399,11 @@ function show_page_2() {
 
 $(document).ready(function() {
     $("select#frequency").change(function(){
+        patternneedtobetested = 1;
         frequencyload();
     });
     $("select#numberpattern").change(function(){
+        patternneedtobetested = 1;
         numberpatternload();
     });
     $("#lastvaluetemp1").keyup(function(){
@@ -547,7 +613,7 @@ $(document).ready(function() {
                                     </li>
                                     <li>
                                         <label for="subtype">Subscription length:</label>
-                                        <select name="subtype" id="subtype2">
+                                        <select name="subtype" id="subtype">
                                             <!-- TMPL_LOOP NAME="subtype" -->
                                                 <option value="<!-- TMPL_VAR NAME="name" -->" <!-- TMPL_IF NAME="selected" --> selected="selected" <!-- /TMPL_IF --> >
                                                     <!-- TMPL_VAR NAME="name" -->
@@ -582,6 +648,7 @@ $(document).ready(function() {
                                     <li>
                                         <label for="enddate">Subscription end date:</label>
                                         <input type="text" name="enddate" value="<!-- TMPL_VAR name="enddate" -->" size="13" maxlength="10" id="enddate" readonly="readonly" />
+                                        <a title="Clear" style="cursor:pointer" onclick="Clear('enddate');">&Chi;</a>
                                         <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button3" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
                                         <!-- both scripts for calendar must follow the input field --> 
                                         <script type="text/javascript">
@@ -642,7 +709,7 @@ $(document).ready(function() {
                                     <div id="advancedpredictionpattern" style="display:none">
                                       <li>
                                         <label for="patternname">Pattern name: (*)</label>
-                                        <input id="patternname" type="text" readonly="readonly" />
+                                        <input id="patternname" name="patternname" type="text" readonly="readonly" />
                                       </li>
                                       <li>
                                         <label for="numberingmethod">Numbering formula:</label>
@@ -654,13 +721,19 @@ $(document).ready(function() {
                                                     <th colspan="4">Advanced prediction pattern</td>
                                                 </tr>
                                                 <tr>
-                                                    <th>&nbsp;</td>
-                                                    <th><input type="text" readonly="readonly" id="label1" /></td>
-                                                    <th><input type="text" readonly="readonly" id="label2" /></td>
-                                                    <th><input type="text" readonly="readonly" id="label3" /></td>
+                                                    <th>&nbsp;</th>
+                                                    <th>X</th>
+                                                    <th>Y</th>
+                                                    <th>Z</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <tr>
+                                                    <td>Label</td>
+                                                    <td><input type="text" readonly="readonly" id="label1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="label2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="label3" /></td>
+                                                </tr>
                                                 <tr>
                                                     <td>Begins with</td>
                                                     <td><input type="text" readonly="readonly" id="lastvalue1" name="lastvalue1" /></td>
@@ -714,8 +787,8 @@ $(document).ready(function() {
                             </fieldset>
                             <fieldset class="action">
                                 <input type="button" value="<< Previous" onclick="show_page_1();" style="float:left;"/>
-                                <input type="button" value="Test prediction pattern" onclick="showPredictionPattern();" />
-                                <input type="button" value="Save subscription" onclick="if (Check_page2) submit();" style="float:right;" accesskey="w" />
+                                <input id="testpatternbutton" type="button" value="Test prediction pattern" onclick="showPredictionPattern();" />
+                                <input type="button" value="Save subscription" onclick="if (Check_page2()) submit();" style="float:right;" accesskey="w" />
                             </fieldset>
                         </div>
                     </div>

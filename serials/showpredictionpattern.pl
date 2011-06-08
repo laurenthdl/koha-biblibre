@@ -31,7 +31,7 @@ use strict;
 use warnings;
 
 use CGI;
-use Date::Calc qw(Today Day_of_Year Week_of_Year Day_of_Week Days_in_Year);
+use Date::Calc qw(Today Day_of_Year Week_of_Year Day_of_Week Days_in_Year Delta_Days Add_Delta_Days Add_Delta_YM);
 use C4::Auth;
 use C4::Output;
 use C4::Serials;
@@ -43,13 +43,16 @@ my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
     query           => $input,
     type            => 'intranet',
     authnotrequired => 0,
-    flagsrequired   => { 'catalogue' => '*' },
+    flagsrequired   => { 'serials' => '*' },
     debug           => 1,
 } );
 
 my %val = ();
 my $frequencyid = $input->param('frequency');
 my $firstacquidate = $input->param('firstacquidate');
+my $enddate = $input->param('enddate');
+my $subtype = $input->param('subtype');
+my $sublength = $input->param('sublength');
 my $custompattern = $input->param('custompattern');
 
 my $debug = 0;
@@ -80,7 +83,6 @@ if($custompattern){
         innerloop2      => $input->param('innerloop2') // '',
         innerloop3      => $input->param('innerloop3') // '',
     );
-    warn Data::Dumper::Dumper \%val;
     $template->param(custompattern => 1);
 } else {
     $debug = 1;
@@ -152,15 +154,21 @@ my %subscription = (
     countissuesperunit  => 0,
 );
 
-my $date;
 if(!defined $firstacquidate || $firstacquidate eq ''){
     my ($year, $month, $day) = Today();
-    $date = C4::Dates->new("$year-$month-$day", "iso");
+    $firstacquidate = C4::Dates->new("$year-$month-$day", "iso");
 } else {
-    $date = C4::Dates->new($firstacquidate);
+    $firstacquidate = C4::Dates->new($firstacquidate);
 }
+my $firstacquidate_iso = $firstacquidate->output("iso");
+my $date_iso = $firstacquidate_iso;
+my $enddate_iso;
+if($enddate){
+    $enddate_iso = C4::Dates->new($enddate)->output("iso");
+}
+my $date = C4::Dates->new($firstacquidate->output());
 
-my $issuenumber;
+my $issuenumber = 1;
 my ($year, $month, $day) = split("-", $date->output("iso"));
 my $frequency = GetSubscriptionFrequency($frequencyid);
 if ($frequency->{'unit'} eq "day") {
@@ -172,6 +180,7 @@ if ($frequency->{'unit'} eq "day") {
     if($issue_of_week > $frequency->{'issuesperunit'}){
         $issue_of_week = $frequency->{'issuesperunit'};
     }
+    $subscription{'countissuesperunit'} = $issue_of_week - 1;
     $issuenumber = ($wkno - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + $issue_of_week;
 } elsif ($frequency->{'unit'} eq "month") {
     $issuenumber = ($month - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + 1;
@@ -188,24 +197,37 @@ push @predictions_loop, {
     issuenumber => $issuenumber,
     dow => Day_of_Week(split /-/, $date->output("iso")),
 };
-my $i = 1;
-my $date_iso = $date->output("iso");
-while( $date_iso =~ /^(\d{4})/ && $1 == $year && $i < 1000 ){
-    ($calculated, $val{'lastvalue1'}, $val{'lastvalue2'}, $val{'lastvalue3'}, $val{'innerloop1'}, $val{'innerloop2'}, $val{'innerloop3'}) = GetNextSeq(\%val);
-    $date = GetNextDate($date->output("iso"), \%subscription, 1);
-    $issuenumber++;
-    push @predictions_loop, {
-        number => $calculated,
-        publicationdate => $date->output(),
-        issuenumber => $issuenumber,
-        dow => Day_of_Week(split /-/, $date->output("iso")),
-    };
-    $date_iso = $date->output("iso");
-    $i++;
-}
 
-if($date_iso =~ /^(\d{4})/ && $1 != $year){
-    pop @predictions_loop;
+my $i = 1;
+while( ( ($sublength && ( ($subtype eq "issues" && $i < $sublength)
+                   || ($subtype eq "weeks" && $date_iso
+                       && Delta_Days( split(/-/, $date_iso),
+                           Add_Delta_Days( split(/-/, $firstacquidate_iso), 7*$sublength - 1 ) ) > 0 )
+                   || ($subtype eq "months" && $date_iso
+                       && (Delta_Days( split(/-/, $date_iso),
+                           Add_Delta_YM( split(/-/, $firstacquidate_iso), 0, $sublength) ) - 1) > 0 ) ) )
+    || (!$sublength && $enddate_iso && $date_iso && Delta_Days( split(/-/, $date_iso), split(/-/, $enddate_iso) ) > 0 ) )
+    || (!$sublength && !$enddate && $i < 1000) )
+{
+    ($calculated, $val{'lastvalue1'}, $val{'lastvalue2'}, $val{'lastvalue3'}, $val{'innerloop1'}, $val{'innerloop2'}, $val{'innerloop3'}) = GetNextSeq(\%val);
+    $issuenumber++;
+    my %line = (
+        number => $calculated,
+        issuenumber => $issuenumber,
+    );
+    if(defined $date){
+        $date = GetNextDate($date->output("iso"), \%subscription, 1);
+    }
+    if(defined $date){
+        $line{'publicationdate'} = $date->output();
+        $line{'dow'} = Day_of_Week(split /-/, $date->output("iso"));
+        $date_iso = $date->output("iso");
+    } else {
+        undef $date_iso;
+    }
+    push @predictions_loop, \%line;
+
+    $i++;
 }
 
 $template->param(

@@ -1,4 +1,4 @@
-package C4::Numberpattern;
+package C4::Serials::Numberpattern;
 
 # Copyright 2000-2002 Biblibre SARL
 #
@@ -21,8 +21,6 @@ use strict;
 
 #use warnings; FIXME - Bug 2505
 use C4::Context;
-use C4::SQLHelper qw<:all>;
-use C4::Debug;
 
 use vars qw($VERSION @ISA @EXPORT);
 
@@ -34,10 +32,6 @@ BEGIN {
     @ISA    = qw(Exporter);
     @EXPORT = qw(
 
-      &GetNumberpatterns
-      &GetNumberpattern
-      &new
-      &all
       &AddNumberpattern
       &ModNumberpattern
       &DelNumberpattern
@@ -45,15 +39,19 @@ BEGIN {
     );
 }
 
-# -------------------------------------------------------------------
-sub new {
-    my ( $class, $opts ) = @_;
-    bless $opts => $class;
-}
-
 sub AddNumberpattern {
-    my ( $class, $numberpattern ) = @_;
-    return InsertInTable( "subscription_numberpatterns", $numberpattern );
+    my ($label, $numberingmethod, $label1, $label2, $label3, $add1, $add2, $add3, $every1, $every2, $every3, $setto1, $setto2, $setto3, $whenmorethan1, $whenmorethan2, $whenmorethan3, $numbering1, $numbering2, $numbering3) = @_;
+
+    my $query = qq{
+        INSERT INTO subscription_numberpatterns (label, numberingmethod, label1, label2, label3, add1, add2, add3, every1, every2, every3, setto1, setto2, setto3, whenmorethan1, whenmorethan2, whenmorethan3, numbering1, numbering2, numbering3)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    };
+
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($label, $numberingmethod, $label1, $label2, $label3, $add1, $add2, $add3, $every1, $every2, $every3, $setto1, $setto2, $setto3, $whenmorethan1, $whenmorethan2, $whenmorethan3, $numbering1, $numbering2, $numbering3);
+
+    return $dbh->last_insert_id(undef, undef, "subscription_numberpatterns", undef);
 }
 
 # -------------------------------------------------------------------
@@ -68,58 +66,6 @@ sub DelNumberpattern {
     return DeleteInTable( "subscription_numberpatterns", $numberpattern );
 }
 
-sub all {
-    my ($class) = @_;
-    my $dbh = C4::Context->dbh;
-    return map { $class->new($_) } @{
-        $dbh->selectall_arrayref(
-
-            # The subscription_numberpattern table is small enough for
-            # `SELECT *` to be harmless.
-            "SELECT * FROM subscription_numberpatterns ORDER BY description",
-            { Slice => {} },
-        )
-      };
-}
-
-=head3 GetNumberpattern
-
-=over 4
-
-&GetNumberpattern($freq_id);
-
-gets numberpattern where $freq_id is the identifier
-
-=back
-
-=cut
-
-# -------------------------------------------------------------------
-sub GetNumberpattern {
-    my ($numpattern_id) = @_;
-    return undef unless $num_patternid;
-    my $results = SearchInTable( "subscription_numberpatterns", { numberpattern_id => $freq_id }, undef, undef, undef, undef, "wide" );
-    return undef unless ($results);
-    return $$results[0];
-}
-
-=head3 GetFrequencies
-
-=over 4
-
-&GetFrequencies($filter, $order_by);
-
-gets frequencies restricted on filters
-
-=back
-
-=cut
-
-# -------------------------------------------------------------------
-sub GetNumberPatterns {
-    my ( $filters, $orderby ) = @_;
-    return SearchInTable( "subscription_numberpatterns", $filters, $orderby, undef, undef, undef, "wide" );
-}
 
 END { }    # module clean-up code here (global destructor)
 

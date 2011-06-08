@@ -51,7 +51,13 @@ function Check_boxes(dow) {
     <!-- TMPL_LOOP NAME="predictions_loop" -->
       <tr>
         <td><!-- TMPL_VAR NAME="number" --></td>
-        <td><!-- TMPL_VAR NAME="publicationdate" --></td>
+        <td>
+          <!-- TMPL_IF NAME="publicationdate" -->
+            <!-- TMPL_VAR NAME="publicationdate" -->
+          <!-- TMPL_ELSE -->
+            unknown
+          <!-- /TMPL_IF -->
+        </td>
         <!-- TMPL_UNLESS NAME="custompattern" -->
         <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" data-dow="<!-- TMPL_VAR NAME='dow' -->" /></td>
         <!-- /TMPL_UNLESS -->
