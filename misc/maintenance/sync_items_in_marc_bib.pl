@@ -22,12 +22,10 @@ $| = 1;
 my $want_help = 0;
 my $do_update = 0;
 my $wherestrings;
-my $selectitems;
 
 my $result = GetOptions(
     'run-update' => \$do_update,
     'where=s@'   => \$wherestrings,
-    'items'   => \$selectitems,
     'h|help'     => \$want_help,
 );
 
@@ -53,13 +51,7 @@ $dbh->commit();
 exit 0;
 
 sub process_bibs {
-    my $sql;
-    if ($selectitems){
-        $sql = "SELECT DISTINCT(biblionumber) FROM items ";
-    }
-    else {
-        $sql = "SELECT biblionumber FROM biblio JOIN biblioitems USING (biblionumber)";
-    }
+    my $sql = "SELECT biblionumber FROM biblio JOIN biblioitems USING (biblionumber)";
     $sql .= "WHERE " . join( " AND ", @$wherestrings ) if ($wherestrings);
     $sql .= " ORDER BY biblionumber ASC";
     my $sth = $dbh->prepare($sql);
@@ -156,7 +148,6 @@ not in sync with the items table.
 Parameters:
     --run-update            run the synchronization
     --where condition       selects the biblios on a criterium (Repeatable)
-    --items                 performs the biblionumber selection on items table rather than biblio JOIN biblioitems
     --help or -h            show this message.
 _USAGE_
 }
