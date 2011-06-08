@@ -2129,21 +2129,20 @@ sub MoveItemFromBiblio {
     $sth->execute($tobiblio);
     my ($tobiblioitem) = $sth->fetchrow();
     $sth = $dbh->prepare("UPDATE items SET biblioitemnumber = ?, biblionumber = ? WHERE itemnumber = ? AND biblionumber = ?");
-    my $return = $sth->execute( $tobiblioitem, $tobiblio, $itemnumber, $frombiblio );
-    if ( $return == 1 ) {
-
-        # Checking if the item we want to move is in an order
+    my $return = $sth->execute($tobiblioitem, $tobiblio, $itemnumber, $frombiblio);
+    if ($return == 1) {
+        ModZebra( $tobiblio, "specialUpdate", "biblioserver", undef, undef );
+        ModZebra( $frombiblio, "specialUpdate", "biblioserver", undef, undef );
+	    # Checking if the item we want to move is in an order 
         my $order = GetOrderFromItemnumber($itemnumber);
-        if ($order) {
-
-            # Replacing the biblionumber within the order if necessary
-            $order->{'biblionumber'} = $tobiblio;
-            ModOrder($order);
-        }
-
-    } else {
-        return undef;
-    }
+	    if ($order) {
+		    # Replacing the biblionumber within the order if necessary
+		    $order->{'biblionumber'} = $tobiblio;
+	        ModOrder($order);
+	    }
+        return $tobiblio;
+	}
+    return;
 }
 
 =head2 DelItemCheck
@@ -2223,12 +2222,8 @@ sub _koha_modify_item {
         $error .= "ERROR in _koha_modify_item $query" . $dbh->errstr;
         warn $error;
     }
-<<<<<<< HEAD
-    return ( $item->{'itemnumber'}, $error );
-=======
     ModZebra( $item->{biblionumber}, "specialUpdate", "biblioserver", undef, undef );
     return ($item->{'itemnumber'},$error);
->>>>>>> 3584c44... Bug 5579: remove items from MARC bib
 }
 
 =head2 _koha_delete_item
@@ -2386,11 +2381,7 @@ sub _replace_item_field_in_biblio {
     }
 
     # save the record
-<<<<<<< HEAD
-    ModBiblioMarc( $completeRecord, $biblionumber, $frameworkcode );
-=======
     #ModBiblioMarc($completeRecord, $biblionumber, $frameworkcode);
->>>>>>> 3584c44... Bug 5579: remove items from MARC bib
 }
 
 =head2 _repack_item_errors
