@@ -26,13 +26,13 @@ use C4::Biblio;
 use C4::Items;
 use C4::Koha;
 use C4::External::Syndetics qw(get_syndetics_editions);
-use C4::Logguer;
+use C4::Logger;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;

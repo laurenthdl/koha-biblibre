@@ -22,7 +22,7 @@ use Digest::MD5 qw(md5_base64);
 
 use C4::Debug;
 use C4::Context;
-use C4::Logguer;
+use C4::Logger;
 use C4::Members qw(AddMember changepassword);
 use C4::Members::Attributes;
 use C4::Members::AttributeTypes;
@@ -33,7 +33,7 @@ use Net::LDAP::Filter;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;

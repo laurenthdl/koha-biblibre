@@ -30,10 +30,10 @@ use XML::Simple;
 use XML::Dumper;
 use Switch;
 use C4::Debug;
-use C4::Logguer;
+use C4::Logger;
 use utf8;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
 

@@ -31,14 +31,14 @@ use C4::Dates qw/format_date/;
 use C4::Log;    # logaction
 use C4::ClassSource;
 use C4::Charset;
-use C4::Logguer;
+use C4::Logger;
 require C4::Search;
 require C4::Heading;
 require C4::Serials;
 
 use vars qw($VERSION @ISA @EXPORT);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION = 1.00;

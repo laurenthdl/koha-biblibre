@@ -37,9 +37,9 @@ use C4::Dates qw(format_date);
 use C4::Scrubber;
 use C4::Biblio;
 use C4::Tags qw(add_tag get_approval_rows get_tag_rows remove_tag);
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my %newtags       = ();
 my @deltags       = ();

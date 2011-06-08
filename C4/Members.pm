@@ -28,13 +28,13 @@ use C4::Overdues;
 use C4::Reserves;
 use C4::Accounts;
 use C4::Biblio;
-use C4::Logguer;
+use C4::Logger;
 use C4::SQLHelper qw(InsertInTable UpdateInTable SearchInTable);
 use C4::Members::Attributes qw(SearchIdMatchingAttribute GetBorrowerAttributes);
 
 our ( $VERSION, @ISA, @EXPORT, @EXPORT_OK, $debug );
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION = 3.02;

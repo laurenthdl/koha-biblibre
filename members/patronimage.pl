@@ -25,9 +25,9 @@ use Modern::Perl;
 use CGI;    #qw(:standard escapeHTML);
 use C4::Context;
 use C4::Members;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 $| = 1;
 

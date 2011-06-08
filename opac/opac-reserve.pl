@@ -31,9 +31,9 @@ use C4::Overdues;
 use C4::Branch;    # GetBranches
 use C4::Debug;
 use C4::Items;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 my $query = new CGI;
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
     {   template_name   => "opac-reserve.tmpl",

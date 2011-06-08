@@ -37,7 +37,7 @@ use YAML;
 use URI::Escape;
 use C4::MarcFramework;
 use C4::Search::Engine;
-use C4::Logguer;
+use C4::Logger;
 use C4::Charset;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $DEBUG);
@@ -48,7 +48,7 @@ BEGIN {
     $DEBUG = ( $ENV{DEBUG} ) ? 1 : 0;
 }
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 =head1 NAME
 

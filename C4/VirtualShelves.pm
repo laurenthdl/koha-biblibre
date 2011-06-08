@@ -27,12 +27,12 @@ use C4::Context;
 use C4::Circulation;
 use C4::Debug;
 use C4::Members;
-use C4::Logguer;
+use C4::Logger;
 require C4::Auth;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
 

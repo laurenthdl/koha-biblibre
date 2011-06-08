@@ -34,8 +34,8 @@ use C4::Items qw(GetItemInfosOf get_itemnumbers_of);
 use C4::Koha qw(GetItemTypes);    # XXX subfield_is_koha_internal_p
 use C4::Creators::Lib qw(html_table);
 use C4::Debug;
-use C4::Logguer;
-my $log = C4::Logguer->new();
+use C4::Logger;
+my $log = C4::Logger->new();
 
 BEGIN {
     $debug = $debug || $cgi_debug;

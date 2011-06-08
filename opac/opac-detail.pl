@@ -38,7 +38,7 @@ use C4::Serials;
 use C4::Members;
 use C4::VirtualShelves;
 use C4::XSLT;
-use C4::Logguer;
+use C4::Logger;
 use List::MoreUtils qw/any none/;
 
 BEGIN {
@@ -48,7 +48,7 @@ BEGIN {
     }
 }
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 my $query = new CGI;
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
     {   template_name   => "opac-detail.tmpl",

@@ -27,9 +27,9 @@ use C4::Context;
 use C4::Koha;
 use C4::Letters;
 use C4::Serials;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 my $query = new CGI;
 my $op    = $query->param('op') || '';
 my $dbh   = C4::Context->dbh;

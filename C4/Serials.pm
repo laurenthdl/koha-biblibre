@@ -29,12 +29,12 @@ use C4::Items;
 use C4::Search;
 use C4::Letters;
 use C4::Log;    # logaction
-use C4::Logguer;
+use C4::Logger;
 use C4::Debug;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION = 3.01;    # set version for version checking

@@ -56,7 +56,7 @@ use C4::Form::MessagingPreferences;
 use C4::Overdues qw/CheckBorrowerDebarred/;
 use JSON;
 use List::MoreUtils qw/uniq/;
-use C4::Logguer;
+use C4::Logger;
 
 use vars qw($debug);
 
@@ -64,7 +64,7 @@ BEGIN {
     $debug = $ENV{DEBUG} || 0;
 }
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $dbh = C4::Context->dbh;
 

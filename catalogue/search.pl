@@ -101,9 +101,9 @@ use C4::VirtualShelves qw(GetRecentShelves);
 use POSIX qw(ceil floor);
 use C4::Branch;    # GetBranches
 use Data::Pagination;
-require C4::Logguer;
+require C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 # create a new CGI object
 # FIXME: no_undef_params needs to be tested

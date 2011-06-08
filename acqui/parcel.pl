@@ -58,13 +58,13 @@ use C4::Budgets;
 use C4::Bookseller;
 use C4::Biblio;
 use C4::Items;
-use C4::Logguer;
+use C4::Logger;
 use CGI;
 use C4::Output;
 use C4::Dates qw/format_date format_date_in_iso/;
 use JSON;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $input      = new CGI;
 my $supplierid = $input->param('supplierid');

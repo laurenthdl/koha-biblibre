@@ -26,7 +26,7 @@ use C4::Dates qw(format_date format_date_in_iso);
 use C4::SQLHelper qw(:all);
 use C4::Debug;
 use C4::Letters;
-use C4::Logguer;
+use C4::Logger;
 use List::MoreUtils qw<any>;
 use base 'Exporter';    # parent would be better there
 our $VERSION = 3.01;
@@ -46,7 +46,7 @@ our @EXPORT  = qw<
 use C4::Dates qw(format_date_in_iso);
 use vars qw($VERSION @ISA @EXPORT);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
 

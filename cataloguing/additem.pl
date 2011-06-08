@@ -28,12 +28,12 @@ use C4::Koha;      # XXX subfield_is_koha_internal_p
 use C4::Branch;    # XXX subfield_is_koha_internal_p
 use C4::ClassSource;
 use C4::Dates;
-use C4::Logguer;
+use C4::Logger;
 use List::MoreUtils qw/any/;
 use Storable qw(thaw freeze);
 use URI::Escape;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 use MARC::File::XML;
 

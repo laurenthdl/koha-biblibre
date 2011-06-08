@@ -34,8 +34,8 @@ use C4::Matcher;
 use C4::BackgroundJob;
 use C4::Labels::Batch 1.000000;
 use C4::Branch qw(get_branch_code_from_name);
-use C4::Logguer;
-my $log = C4::Logguer->new();
+use C4::Logger;
+my $log = C4::Logger->new();
 
 my $script_name = "/cgi-bin/koha/tools/manage-marc-import.pl";
 

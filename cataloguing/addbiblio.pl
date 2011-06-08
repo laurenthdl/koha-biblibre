@@ -33,13 +33,13 @@ use C4::Branch;    # XXX subfield_is_koha_internal_p
 use C4::ClassSource;
 use C4::ImportBatch;
 use C4::Charset;
-use C4::Logguer;
+use C4::Logger;
 
 use Date::Calc qw(Today);
 use MARC::File::USMARC;
 use MARC::File::XML;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 if ( C4::Context->preference('marcflavour') eq 'UNIMARC' ) {
     MARC::File::XML->default_record_format('UNIMARC');

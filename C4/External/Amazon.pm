@@ -24,14 +24,14 @@ use LWP::Simple;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 use C4::Koha;
-use C4::Logguer;
+use C4::Logger;
 use URI::Escape;
 use POSIX;
 use Digest::SHA qw(hmac_sha256_base64);
 
 use vars qw($VERSION @ISA @EXPORT);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;

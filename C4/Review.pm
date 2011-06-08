@@ -20,11 +20,11 @@ package C4::Review;
 use Modern::Perl;
 
 use C4::Context;
-use C4::Logguer;
+use C4::Logger;
 
 use vars qw($VERSION @ISA @EXPORT);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
 

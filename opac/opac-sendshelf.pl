@@ -31,9 +31,9 @@ use C4::Items;
 use C4::Output;
 use C4::VirtualShelves;
 use C4::Members;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 my $query = new CGI;
 
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(

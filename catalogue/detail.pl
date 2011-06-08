@@ -36,9 +36,9 @@ use C4::Search;     # enabled_staff_search_views
 use C4::Search::Query;
 use C4::VirtualShelves;
 use C4::XSLT;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $query = CGI->new();
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(

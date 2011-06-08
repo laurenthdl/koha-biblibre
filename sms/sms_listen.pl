@@ -7,7 +7,7 @@ use C4::Auth;
 use C4::Context;
 use C4::Members;
 use C4::Circulation;
-use C4::Logguer;
+use C4::Logger;
 
 my ( $res, $ua );
 my %commands;
@@ -18,7 +18,7 @@ my $errorcode;
 my $smsid;
 my $wait = 600;                ## 10 mn. wait between sms checking
 my $dbh  = C4::Context->dbh;
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 STARTAGAIN:
 ( $res, $ua ) = get_sms_auth();

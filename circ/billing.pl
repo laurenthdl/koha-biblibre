@@ -25,9 +25,9 @@ use C4::Auth;
 use C4::Dates qw/format_date format_date_in_iso/;
 use C4::Debug;
 use Date::Calc qw/Today Add_Delta_YM/;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 my $input     = new CGI;
 my $order     = $input->param('order') || '';
 my $startdate = $input->param('from') || '';

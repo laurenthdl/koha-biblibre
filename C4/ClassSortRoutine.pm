@@ -23,11 +23,11 @@ require Exporter;
 use Class::Factory::Util;
 use C4::Context;
 use C4::Koha;
-use C4::Logguer;
+use C4::Logger;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 # set the version for version checking
 $VERSION = 3.00;

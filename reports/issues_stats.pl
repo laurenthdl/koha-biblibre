@@ -32,7 +32,7 @@ use C4::Circulation;
 use C4::Reports;
 use C4::Dates qw/format_date format_date_in_iso/;
 use C4::Members;
-use C4::Logguer;
+use C4::Logger;
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ plugin that shows circulation stats
 
 =cut
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 my $input          = new CGI;
 my $fullreportname = "reports/issues_stats.tmpl";
 my $do_it          = $input->param('do_it');

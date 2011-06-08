@@ -18,10 +18,10 @@ package C4::Context;
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 use Modern::Perl;
-#use C4::Logguer;
+#use C4::Logger;
 use vars qw($VERSION $AUTOLOAD $context @context_stack);
 
-#my $log = C4::Logguer->new();
+#my $log = C4::Logger->new();
 
 eval {
     my $servers = C4::Context->config('memcached_servers');

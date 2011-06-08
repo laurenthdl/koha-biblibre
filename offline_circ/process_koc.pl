@@ -32,12 +32,12 @@ use C4::Members;
 use C4::Stats;
 use C4::UploadedFile;
 use C4::BackgroundJob;
-use C4::Logguer;
+use C4::Logger;
 use Date::Calc qw( Add_Delta_Days Date_to_Days );
 
 use constant DEBUG => 0;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 # this is the file version number that we're coded against.
 my $FILE_VERSION = '1.0';

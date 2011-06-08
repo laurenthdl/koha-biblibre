@@ -31,9 +31,9 @@ use C4::Dates qw/format_date/;
 use C4::Members;
 use C4::Members::Attributes;
 use C4::Branch;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $query = new CGI;
 

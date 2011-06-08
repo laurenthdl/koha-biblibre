@@ -29,9 +29,9 @@ use autouse 'C4::Branch' => qw(get_branch_code_from_name);
 use C4::Creators 1.000000;
 use C4::Patroncards 1.000000;
 use C4::Labels 1.000000;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $cgi = new CGI;
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(

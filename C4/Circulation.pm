@@ -33,7 +33,7 @@ use C4::Overdues;
 use C4::ItemCirculationAlertPreference;
 use C4::Message;
 use C4::Debug;
-use C4::Logguer;
+use C4::Logger;
 use YAML;
 use Date::Calc qw(
   Today
@@ -55,7 +55,7 @@ use Data::Dumper;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;

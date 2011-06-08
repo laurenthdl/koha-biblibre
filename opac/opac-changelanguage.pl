@@ -17,13 +17,13 @@
 
 use Modern::Perl;
 use C4::Output qw(setlanguagecookie);
-use C4::Logguer;
+use C4::Logger;
 use CGI;
 
 my $query    = new CGI;
 my $language = $query->param('language');
 my $url      = $query->referer();
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 $log->info("Language : $query // $language // $url");
 setlanguagecookie( $query, $language, $url );

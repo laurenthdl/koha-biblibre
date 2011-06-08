@@ -20,7 +20,7 @@ package C4::Members::AttributeTypes;
 use Modern::Perl;
 
 use C4::Context;
-use C4::Logguer;
+use C4::Logger;
 
 use vars qw($VERSION);
 

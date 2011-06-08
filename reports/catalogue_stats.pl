@@ -26,7 +26,7 @@ use C4::Output;
 use C4::Koha;
 use C4::Reports;
 use C4::Circulation;
-use C4::Logguer;
+use C4::Logger;
 =head1 NAME
 
 plugin that shows a stats on borrowers
@@ -37,7 +37,7 @@ plugin that shows a stats on borrowers
 
 =cut
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 our $debug = 0;
 my $input          = new CGI;
 my $fullreportname = "reports/catalogue_stats.tmpl";

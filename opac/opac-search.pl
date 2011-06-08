@@ -42,9 +42,9 @@ use Storable qw(thaw freeze);
 use Data::Pagination;
 use C4::XSLT;
 use C4::Charset;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 # create a new CGI object
 # FIXME: no_undef_params needs to be tested

@@ -30,9 +30,9 @@ use C4::Context;
 use autouse 'C4::Members' => qw(GetPatronImage GetMember);
 use C4::Creators 1.000000;
 use C4::Patroncards 1.000000;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $cgi = new CGI;
 

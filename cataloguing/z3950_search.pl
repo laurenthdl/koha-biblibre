@@ -28,10 +28,10 @@ use C4::Context;
 use C4::Breeding;
 use C4::Koha;
 use C4::Charset;
-use C4::Logguer;
+use C4::Logger;
 use ZOOM;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 my $input         = new CGI;
 my $dbh           = C4::Context->dbh;
 my $error         = $input->param('error');

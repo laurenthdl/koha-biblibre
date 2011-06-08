@@ -26,10 +26,10 @@ use C4::AuthoritiesMarc;
 use C4::Koha;
 use C4::Search;
 use C4::Search::Query;
-use C4::Logguer;
+use C4::Logger;
 use Data::Pagination;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $query        = new CGI;
 my $op           = $query->param('op');

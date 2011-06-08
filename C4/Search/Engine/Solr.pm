@@ -24,7 +24,7 @@ use C4::Biblio;
 use C4::Branch;
 use C4::Koha;
 use C4::AuthoritiesMarc;
-use C4::Logguer;
+use C4::Logger;
 use Data::SearchEngine::Solr;
 use Data::SearchEngine::Query;
 use Data::SearchEngine::Item;
@@ -35,7 +35,7 @@ use List::MoreUtils qw(uniq);
 
 extends 'Data::SearchEngine::Solr';
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 =head1 NAME
 

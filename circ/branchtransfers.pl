@@ -32,9 +32,9 @@ use C4::Auth qw/:DEFAULT get_session/;
 use C4::Branch;    # GetBranches
 use C4::Koha;
 use C4::Members;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 ###############################################
 #  Getting state

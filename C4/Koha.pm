@@ -19,13 +19,13 @@ package C4::Koha;
 
 use Modern::Perl;
 use C4::Context;
-use C4::Logguer;
+use C4::Logger;
 use C4::Output;
 use URI::Split qw(uri_split);
 
 use vars qw($VERSION @ISA @EXPORT $DEBUG);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION = 3.01;

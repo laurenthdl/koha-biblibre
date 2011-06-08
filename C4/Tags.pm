@@ -21,12 +21,12 @@ use Exporter;
 
 use C4::Context;
 use C4::Debug;
-use C4::Logguer;
+use C4::Logger;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use vars qw($ext_dict $select_all @fields);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION   = 0.03;

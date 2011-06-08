@@ -31,12 +31,12 @@ use C4::Branch;
 require C4::Reserves;
 use C4::Charset;
 use C4::Acquisition;
-use C4::Logguer;
+use C4::Logger;
 use List::MoreUtils qw/any/;
 
 use vars qw($VERSION @ISA @EXPORT);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION = 3.01;

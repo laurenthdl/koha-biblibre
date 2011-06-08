@@ -21,11 +21,11 @@ package C4::Boolean;
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 use Modern::Perl;
-use C4::Logguer;
+use C4::Logger;
 
 use POSIX;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 

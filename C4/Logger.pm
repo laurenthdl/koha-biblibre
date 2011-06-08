@@ -1,4 +1,4 @@
-package C4::Logguer;
+package C4::Logger;
 
 # Copyright 2009 Biblibre SARL
 #
@@ -19,10 +19,8 @@ package C4::Logguer;
 
 use Modern::Perl;
 use Log::LogLite;
-require C4::Context;
 
-my $LOG_DIR = C4::Context->preference('logdir');
-#my $LOG_DIR = "/home/jonathan/workspace/sites/koha_master/var/log";#C4::Context->preference('logdir');
+my $LOG_DIR = "/home/jonathan/workspace/sites/koha_master/var/log";#C4::Context->preference('logdir');
 my $KOHA_LOG_FILE = $LOG_DIR . "/koha.log";
 my $OPAC_LOG_FILE = $LOG_DIR . "/opac.log";
 my $CRITICAL_LOG_LEVEL = 2;
@@ -39,7 +37,7 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self = {};
     my $file = shift || $ENV{LOG} || 'koha';
-    $self->{LEVEL} = shift || $NORMAL_LOG_LEVEL;#C4::Context->preference("DebugLevel") || $NORMAL_LOG_LEVEL;
+    $self->{LEVEL} = shift || $DEBUG_LOG_LEVEL;#shift || conf->log || $NORMAL_LOG_LEVEL;
 
     if ( $file eq 'koha' ) {
         $self->{FILE_PATH} = $KOHA_LOG_FILE;

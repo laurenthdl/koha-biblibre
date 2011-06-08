@@ -40,9 +40,9 @@ use C4::ImportBatch;
 use C4::Matcher;
 use C4::UploadedFile;
 use C4::BackgroundJob;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 my $input = new CGI;
 my $dbh   = C4::Context->dbh;
 $dbh->{AutoCommit} = 0;

@@ -34,9 +34,9 @@ use C4::Debug;
 
 use C4::Members qw/GetMember/;    #needed for permissions checking for changing basketgroup of a basket
 
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 =head1 NAME
 

@@ -24,7 +24,7 @@ use Carp;
 use C4::Context;
 use C4::Debug;
 use C4::Dates;
-use C4::Logguer;
+use C4::Logger;
 
 use vars qw($VERSION @ISA);
 use vars qw($debug $cgi_debug);    # from C4::Debug, of course
@@ -40,7 +40,7 @@ INIT {
     $width  = 4;                   # FIXME: 4 is too small for sizeable or multi-branch libraries.
 }
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 # Generates barcode where hb = home branch Code, yymm = year/month catalogued, incr = incremental number,
 # 	increment resets yearly -fbcit

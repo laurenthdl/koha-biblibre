@@ -28,14 +28,14 @@ use C4::Members;
 use C4::Log;
 use C4::SMS;
 use C4::Debug;
-use C4::Logguer;
+use C4::Logger;
 use Date::Calc qw( Add_Delta_Days );
 use Encode;
 use Carp;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;

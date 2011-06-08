@@ -13,9 +13,9 @@ use C4::Output;
 use C4::Debug;
 use C4::Creators 1.000000;
 use C4::Patroncards 1.000000;
-use C4::Logguer;
+use C4::Logger;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $cgi = CGI->new;
 

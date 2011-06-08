@@ -22,12 +22,12 @@ use Modern::Perl;
 use MARC::Charset qw/marc8_to_utf8/;
 use Text::Iconv;
 use C4::Debug;
-use C4::Logguer;
+use C4::Logger;
 use Unicode::Normalize;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
 

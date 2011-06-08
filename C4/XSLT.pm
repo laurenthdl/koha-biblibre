@@ -26,7 +26,7 @@ use C4::Items;
 use C4::Koha;
 use C4::Biblio;
 use C4::Circulation;
-use C4::Logguer;
+use C4::Logger;
 use C4::Reserves;
 use Encode;
 use XML::LibXML;
@@ -35,7 +35,7 @@ use LWP::Simple;
 
 use vars qw($VERSION @ISA @EXPORT);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;

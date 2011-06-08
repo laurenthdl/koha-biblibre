@@ -18,13 +18,13 @@ package C4::Debug;
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 use Modern::Perl;
-use C4::Logguer;
+use C4::Logger;
 use Exporter;
 
 # use CGI;
 use vars qw($VERSION @ISA @EXPORT $debug $cgi_debug);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 # use vars qw(@EXPORT_OK %EXPORT_TAGS);
 

@@ -28,7 +28,7 @@ use C4::Output;
 use C4::Koha;       # GetItemTypes
 use C4::Reports;    # GetDelimiterChoices
 use C4::Circulation;
-use C4::Logguer;
+use C4::Logger;
 
 # use Date::Manip;  # TODO: add not borrowed since date X criteria
 use Data::Dumper;
@@ -39,7 +39,7 @@ Report that shows unborrowed items.
 
 =cut
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 my $input    = new CGI;
 my $do_it    = $input->param('do_it');

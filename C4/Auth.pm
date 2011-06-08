@@ -32,12 +32,12 @@ use C4::Branch;    # GetBranches
 use C4::VirtualShelves;
 use POSIX qw/strftime/;
 use List::MoreUtils qw/ any /;
-use C4::Logguer;
+use C4::Logger;
 
 # use utf8;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug $ldap $cas $caslogout);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
     sub psgi_env { any { /^psgi\./ } keys %ENV }

@@ -22,12 +22,12 @@ use List::MoreUtils qw(first_value any);
 use C4::Context;
 use C4::Dates qw(format_date_in_iso);
 use C4::Debug;
-use C4::Logguer;
+use C4::Logger;
 use YAML;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 eval {
     my $servers = C4::Context->config('memcached_servers');

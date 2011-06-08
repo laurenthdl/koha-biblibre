@@ -22,12 +22,12 @@ use Modern::Perl;
 use Text::CSV;    # Don't be tempted to use Text::CSV::Unicode -- even in binary mode it fails.
 use C4::Context;
 use C4::Members::AttributeTypes;
-use C4::Logguer;
+use C4::Logger;
 
 use vars qw($VERSION @ISA @EXPORT_OK @EXPORT %EXPORT_TAGS);
 our ( $csv, $AttributeTypes );
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
 

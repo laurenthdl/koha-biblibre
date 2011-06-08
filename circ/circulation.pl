@@ -35,7 +35,7 @@ use C4::Biblio;
 use C4::Reserves;
 use C4::Context;
 use C4::Debug;
-use C4::Logguer;
+use C4::Logger;
 use List::MoreUtils qw/any/;
 use CGI::Session;
 use C4::Items;
@@ -49,7 +49,7 @@ use Date::Calc qw(
 );
 use List::MoreUtils qw/uniq/;
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 #
 # PARAMETERS READING

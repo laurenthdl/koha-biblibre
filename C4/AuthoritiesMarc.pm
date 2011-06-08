@@ -29,12 +29,12 @@ use C4::Charset;
 use List::MoreUtils qw/none first_index/;
 use C4::Debug;
 use C4::Search::Query;
-use C4::Logguer;
+use C4::Logger;
 require C4::Search;
 
 use vars qw($VERSION @ISA @EXPORT);
 
-my $log = C4::Logguer->new();
+my $log = C4::Logger->new();
 
 BEGIN {
 
