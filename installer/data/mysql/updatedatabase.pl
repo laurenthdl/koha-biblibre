@@ -5924,6 +5924,20 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.06.00.033";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    if ( column_exists( 'serialid', 'aqorders' ) ) {
+        $dbh->do(q{ALTER TABLE `aqorders` DROP COLUMN `serialid`;});
+    }
+    if ( column_exists( 'subscription', 'aqorders' ) ) {
+        $dbh->do(q{ALTER TABLE `aqorders` DROP COLUMN `subscription`;});
+    }
+    $dbh->do(q{ALTER TABLE `aqorders` ADD COLUMN `subscriptionid` INT(11) DEFAULT NULL;});
+    $dbh->do(q{ALTER TABLE `aqorders` ADD CONSTRAINT `aqorders_subscriptionid` FOREIGN KEY (`subscriptionid`) REFERENCES `subscription` (`subscriptionid`) ON DELETE CASCADE ON UPDATE CASCADE;});
+    print "Upgrade to $DBversion done (DROP serialid and subscription fields and ADD subscriptionid.)\n";
+    SetVersion ($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
@@ -6001,5 +6015,14 @@ sub count_column_from_table{
 	my ($resultcolumn) = $sthcolumn->fetchrow;
 	return $resultcolumn || 0;
 	}
+
+sub column_exists {
+    my ( $column_name, $table ) = @_;
+    my $sth = $dbh->prepare("SHOW COLUMNS FROM $table WHERE Field=?");
+    $sth->execute($column_name);
+    my ($col) = $sth->fetchrow;
+    return $col ? 1 : 0;
+}
+
 exit;
 
