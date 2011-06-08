@@ -52,6 +52,10 @@ function Find_ISSN(f)
     window.open('issn-search.pl','FindABibIndex','width=800,height=400,toolbar=no,scrollbars=yes');
 }
 
+function Clear(id) {
+    $("#"+id).val('');
+}
+
 function Check_page1() {
     if ( $("#aqbooksellerid").val().length == 0) {
         input_box = confirm(_("If you wish to claim late or missing issues you must link this subscription to a vendor. Click OK to ignore or Cancel to return and enter a vendor"));
@@ -125,6 +129,9 @@ function displaymoreoptions() {
     $("#lastvaluetemp1").val('');
     $("#lastvaluetemp2").val('');
     $("#lastvaluetemp3").val('');
+    $("#innerlooptemp1").val('');
+    $("#innerlooptemp2").val('');
+    $("#innerlooptemp3").val('');
 
     if(globalnumpatterndata.label1) {
         $("#headerX").html(globalnumpatterndata.label1);
@@ -165,6 +172,9 @@ function showPredictionPattern() {
     var lastvaluetemp2 = $("#lastvaluetemp2").val();
     var lastvaluetemp3 = $("#lastvaluetemp3").val();
     var firstacquidate = $("#acqui_date").val();
+    var enddate = $("#enddate").val();
+    var subtype = $("#subtype").val();
+    var sublength = $("#sublength").val();
     var error = 0;
     var error_msg = "";
     if(frequencyid == undefined || frequencyid == ""){
@@ -194,7 +204,10 @@ function showPredictionPattern() {
             'lastvaluetemp1':lastvaluetemp1,
             'lastvaluetemp2':lastvaluetemp2,
             'lastvaluetemp3':lastvaluetemp3,
-            'firstacquidate':firstacquidate
+            'firstacquidate':firstacquidate,
+            'enddate':enddate,
+            'subtype':subtype,
+            'sublength':sublength
         },
         async: false,
         dataType: "text",
@@ -211,7 +224,7 @@ function toggleAdvancedPattern() {
 }
 
 function modifyAdvancedPattern() {
-    $("#patternname").attr("readonly", false);
+    $("#patternname").attr("readonly", false).val('');
     $("#numberingmethod").attr("readonly", false);
     $("#label1").attr("readonly", false);
     $("#label2").attr("readonly", false);
@@ -239,9 +252,12 @@ function modifyAdvancedPattern() {
     $("#numbering3").attr("readonly", false);
 
     $("#restoreadvancedpatternbutton").show();
-    $("#testadvancedpatternbutton").show();
     $("#saveadvancedpatternbutton").show();
     $("#modifyadvancedpatternbutton").hide();
+
+    document.getElementById("testpatternbutton").onclick = function(){
+        testAdvancedPattern();
+    }
 
     advancedpatternlocked = 0;
 }
@@ -275,10 +291,12 @@ function restoreAdvancedPattern() {
     $("#numbering3").attr("readonly", true).val(globalnumpatterndata.numbering3);
 
     $("#restoreadvancedpatternbutton").hide();
-    $("#testadvancedpatternbutton").hide();
     $("#saveadvancedpatternbutton").hide();
     $("#modifyadvancedpatternbutton").show();
 
+    document.getElementById("testpatternbutton").onclick = function(){
+        showPredictionPattern();
+    }
     advancedpatternlocked = 1;
 }
 
@@ -288,6 +306,9 @@ function testAdvancedPattern() {
         data: {
             'custompattern' : true,
             'firstacquidate': $("#acqui_date").val(),
+            'enddate'       : $("#enddate").val(),
+            'subtype'       : $("#subtype").val(),
+            'sublength'     : $("#sublength").val(),
             'frequency'     : $("#frequency").val(),
             'numberingmethod' : $("#numberingmethod").val(),
             'lastvalue1'    : $("#lastvalue1").val(),
@@ -537,7 +558,7 @@ $(document).ready(function() {
                                     </li>
                                     <li>
                                         <label for="subtype">Subscription length:</label>
-                                        <select name="subtype" id="subtype2">
+                                        <select name="subtype" id="subtype">
                                             <!-- TMPL_LOOP NAME="subtype" -->
                                                 <option value="<!-- TMPL_VAR NAME="name" -->" <!-- TMPL_IF NAME="selected" --> selected="selected" <!-- /TMPL_IF --> >
                                                     <!-- TMPL_VAR NAME="name" -->
@@ -572,6 +593,7 @@ $(document).ready(function() {
                                     <li>
                                         <label for="enddate">Subscription end date:</label>
                                         <input type="text" name="enddate" value="<!-- TMPL_VAR name="enddate" -->" size="13" maxlength="10" id="enddate" readonly="readonly" />
+                                        <a title="Clear" style="cursor:pointer" onclick="Clear('enddate');">&Chi;</a>
                                         <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button3" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
                                         <!-- both scripts for calendar must follow the input field --> 
                                         <script type="text/javascript">
@@ -644,13 +666,19 @@ $(document).ready(function() {
                                                     <th colspan="4">Advanced prediction pattern</td>
                                                 </tr>
                                                 <tr>
-                                                    <th>&nbsp;</td>
-                                                    <th><input type="text" readonly="readonly" id="label1" /></td>
-                                                    <th><input type="text" readonly="readonly" id="label2" /></td>
-                                                    <th><input type="text" readonly="readonly" id="label3" /></td>
+                                                    <th>&nbsp;</th>
+                                                    <th>X</th>
+                                                    <th>Y</th>
+                                                    <th>Z</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <tr>
+                                                    <td>Label</td>
+                                                    <td><input type="text" readonly="readonly" id="label1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="label2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="label3" /></td>
+                                                </tr>
                                                 <tr>
                                                     <td>Begins with</td>
                                                     <td><input type="text" readonly="readonly" id="lastvalue1" name="lastvalue1" /></td>
@@ -704,7 +732,7 @@ $(document).ready(function() {
                             </fieldset>
                             <fieldset class="action">
                                 <input type="button" value="<< Previous" onclick="show_page_1();" style="float:left;"/>
-                                <input type="button" value="Test prediction pattern" onclick="showPredictionPattern();" />
+                                <input id="testpatternbutton" type="button" value="Test prediction pattern" onclick="showPredictionPattern();" />
                                 <input type="button" value="Save subscription" onclick="if (Check_page2) submit();" style="float:right;" accesskey="w" />
                             </fieldset>
                         </div>
