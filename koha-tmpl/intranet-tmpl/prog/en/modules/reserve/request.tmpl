@@ -205,8 +205,8 @@ function checkMultiHold() {
       <h3>Cannot Place Hold</h3>
   	  <ul>
         <!-- TMPL_IF NAME="maxreserves" -->
-          <li><strong>Too Many Holds: </strong> <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->"><!-- TMPL_VAR NAME="borrowerfirstname" --> <!-- TMPL_VAR NAME="borrowersurname" --> </a> has too many holds.</li>
-        <!-- /TMPL_IF -->
+			<li><strong>Too Many Holds: </strong> <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->"><!-- TMPL_VAR NAME="borrowerfirstname" --> <!-- TMPL_VAR NAME="borrowersurname" --> </a> has too many holds.
+          		<br/><!-- TMPL_VAR NAME="current_reserve_count" --> / <!-- TMPL_VAR NAME="max_reserve_allowed" --></li>        <!-- /TMPL_IF -->
         <!-- TMPL_IF NAME="alreadyreserved" -->
           <li><a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->"><!-- TMPL_VAR NAME="borrowerfirstname" --> <!-- TMPL_VAR NAME="borrowersurname" --></a> <strong>already has a hold</strong> on this item </li>
         <!-- /TMPL_IF -->
@@ -366,7 +366,7 @@ function checkMultiHold() {
                 <!-- TMPL_ELSIF NAME="none_available" -->
                     <input type="submit" disabled="disabled" value="Place Hold" />
                 <!-- TMPL_ELSE -->
-                    <input type="submit" value="Place Hold" />
+                    <input type="submit" <!-- TMPL_IF NAME="maxreserves" --> disabled="disabled" <!-- /TMPL_IF --> value="Place Hold" />
                 <!-- /TMPL_IF -->
             <!-- /TMPL_IF -->
         </fieldset>
@@ -550,7 +550,7 @@ function checkMultiHold() {
             <!-- TMPL_ELSIF NAME="none_available" -->
                 <input type="submit" disabled="disabled" value="Place Hold" />
             <!-- TMPL_ELSE -->
-                <input type="submit" value="Place Hold" />
+                <input type="submit" <!-- TMPL_IF NAME="maxreserves" --> disabled="disabled" <!-- /TMPL_IF --> value="Place Hold" />
             <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
     </fieldset>

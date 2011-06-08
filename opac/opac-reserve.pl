@@ -206,14 +206,14 @@ if ( $query->param('place_reserve') ) {
         # holdingbranch, force the value $rank and $found.
         my $rank = $biblioData->{rank};
         if ( $itemNum ne '' ) {
-            $canreserve = 1 if CanItemBeReserved( $borrowernumber, $itemNum );
+            $canreserve = 1 if CanItemBeReserved( $borrowernumber, $itemNum ,$branch);
             $rank = '0' unless C4::Context->preference('ReservesNeedReturns');
             my $item = GetItem($itemNum);
             if ( $item->{'holdingbranch'} eq $branch ) {
                 $found = 'W' unless C4::Context->preference('ReservesNeedReturns');
             }
         } else {
-            $canreserve = 1 if CanBookBeReserved( $borrowernumber, $biblioNum );
+            $canreserve = 1 if CanBookBeReserved( $borrowernumber, $biblioNum, $branch );
 
             # Inserts a null into the 'itemnumber' field of 'reserves' table.
             $itemNum = undef;
