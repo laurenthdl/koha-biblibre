@@ -7,6 +7,8 @@
 
 var globalnumpatterndata;
 var globalfreqdata;
+var advancedpatternlocked;
+var patternneedtobetested = 0;
 
 function isDefined(variable){
     return (typeof(window[variable]) == 'undefined')? false : true;
@@ -89,6 +91,14 @@ function Check_page2(){
         alert(_("You must choose a subscription length or an end date, but not them two."));
         return false;
     }
+    if(advancedpatternlocked == 0){
+        alert(_("You have modified the advanced prediction pattern. Please save your work or cancel modifications."));
+        return false;
+    }
+    if(patternneedtobetested){
+        alert(_("Please click on 'Test prediction pattern' before saving subscription."));
+        return false;
+    }
 
     return true;
 }
@@ -134,7 +144,7 @@ function displaymoreoptions() {
     $("#innerlooptemp3").val('');
 
     if(globalnumpatterndata.label1) {
-        $("#headerX").html(globalnumpatterndata.label1);
+        $("#headerX").html(unescape(globalnumpatterndata.label1));
         $("#headerX").show();
         $("#beginsX").show();
         $("#innerX").show();
@@ -144,7 +154,7 @@ function displaymoreoptions() {
         $("#innerX").hide();
     }
     if(globalnumpatterndata.label2) {
-        $("#headerY").html(globalnumpatterndata.label2);
+        $("#headerY").html(unescape(globalnumpatterndata.label2));
         $("#headerY").show();
         $("#beginsY").show();
         $("#innerY").show();
@@ -154,7 +164,7 @@ function displaymoreoptions() {
         $("#innerY").hide();
     }
     if(globalnumpatterndata.label3) {
-        $("#headerZ").html(globalnumpatterndata.label3);
+        $("#headerZ").html(unescape(globalnumpatterndata.label3));
         $("#headerZ").show();
         $("#beginsZ").show();
         $("#innerZ").show();
@@ -213,11 +223,11 @@ function showPredictionPattern() {
         dataType: "text",
         success: function(data) {
             $("#displayexample").html(data);
+            patternneedtobetested = 0;
         }
     });
 }
 
-var advancedpatternlocked;
 
 function toggleAdvancedPattern() {
     $("#advancedpredictionpattern").toggle();
@@ -265,9 +275,9 @@ function modifyAdvancedPattern() {
 function restoreAdvancedPattern() {
     $("#patternname").attr("readonly", true).val(unescape(globalnumpatterndata.label));
     $("#numberingmethod").attr("readonly", true).val(unescape(globalnumpatterndata.numberingmethod));
-    $("#label1").attr("readonly", true).val(globalnumpatterndata.label1);
-    $("#label2").attr("readonly", true).val(globalnumpatterndata.label2);
-    $("#label3").attr("readonly", true).val(globalnumpatterndata.label3);
+    $("#label1").attr("readonly", true).val(unescape(globalnumpatterndata.label1));
+    $("#label2").attr("readonly", true).val(unescape(globalnumpatterndata.label2));
+    $("#label3").attr("readonly", true).val(unescape(globalnumpatterndata.label3));
     $("#lastvalue1").attr("readonly", true).val($("#lastvaluetemp1").val());
     $("#lastvalue2").attr("readonly", true).val($("#lastvaluetemp2").val());
     $("#lastvalue3").attr("readonly", true).val($("#lastvaluetemp3").val());
@@ -341,6 +351,39 @@ function testAdvancedPattern() {
     });
 }
 
+function saveAdvancedPattern() {
+    $.getJSON("create-numberpattern.pl",{
+            "patternname"   :$("#patternname").val(),
+            "numberingmethod":$("#numberingmethod").val(),
+            "label1"        :$("#label1").val(),
+            "label2"        :$("#label2").val(),
+            "label3"        :$("#label3").val(),
+            "add1"          :$("#add1").val(),
+            "add2"          :$("#add2").val(),
+            "add3"          :$("#add3").val(),
+            "every1"        :$("#every1").val(),
+            "every2"        :$("#every2").val(),
+            "every3"        :$("#every3").val(),
+            "setto1"        :$("#setto1").val(),
+            "setto2"        :$("#setto2").val(),
+            "setto3"        :$("#setto3").val(),
+            "whenmorethan1" :$("#whenmorethan1").val(),
+            "whenmorethan2" :$("#whenmorethan2").val(),
+            "whenmorethan3" :$("#whenmorethan3").val(),
+            "numbering1"    :$("#numbering1").val(),
+            "numbering2"    :$("#numbering2").val(),
+            "numbering3"    :$("#numbering3").val(),
+            ajax:'true'
+        },
+        function(data){
+            $("#numberpattern").append("<option value=\""+data.numberpatternid+"\">"+$("#patternname").val()+"</option>");
+            $("#numberpattern").val(data.numberpatternid);
+            numberpatternload();
+        }
+    );
+
+}
+
 function show_page_1() {
     $("#page_1").show();
     $("#page_2").hide();
@@ -356,9 +399,11 @@ function show_page_2() {
 
 $(document).ready(function() {
     $("select#frequency").change(function(){
+        patternneedtobetested = 1;
         frequencyload();
     });
     $("select#numberpattern").change(function(){
+        patternneedtobetested = 1;
         numberpatternload();
     });
     $("#lastvaluetemp1").keyup(function(){
@@ -654,7 +699,7 @@ $(document).ready(function() {
                                     <div id="advancedpredictionpattern" style="display:none">
                                       <li>
                                         <label for="patternname">Pattern name: (*)</label>
-                                        <input id="patternname" type="text" readonly="readonly" />
+                                        <input id="patternname" name="patternname" type="text" readonly="readonly" />
                                       </li>
                                       <li>
                                         <label for="numberingmethod">Numbering formula:</label>
@@ -733,7 +778,7 @@ $(document).ready(function() {
                             <fieldset class="action">
                                 <input type="button" value="<< Previous" onclick="show_page_1();" style="float:left;"/>
                                 <input id="testpatternbutton" type="button" value="Test prediction pattern" onclick="showPredictionPattern();" />
-                                <input type="button" value="Save subscription" onclick="if (Check_page2) submit();" style="float:right;" accesskey="w" />
+                                <input type="button" value="Save subscription" onclick="if (Check_page2()) submit();" style="float:right;" accesskey="w" />
                             </fieldset>
                         </div>
                     </div>

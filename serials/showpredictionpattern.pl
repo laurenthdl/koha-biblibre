@@ -180,6 +180,7 @@ if ($frequency->{'unit'} eq "day") {
     if($issue_of_week > $frequency->{'issuesperunit'}){
         $issue_of_week = $frequency->{'issuesperunit'};
     }
+    $subscription{'countissuesperunit'} = $issue_of_week - 1;
     $issuenumber = ($wkno - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + $issue_of_week;
 } elsif ($frequency->{'unit'} eq "month") {
     $issuenumber = ($month - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + 1;
@@ -198,12 +199,6 @@ push @predictions_loop, {
 };
 
 my $i = 1;
-if($sublength){
-    warn "SUBLENGTH $sublength";
-}
-if($enddate){
-    warn "ENDDATE $enddate";
-}
 while( ( ($sublength && ( ($subtype eq "issues" && $i < $sublength)
                    || ($subtype eq "weeks" && $date_iso
                        && Delta_Days( split(/-/, $date_iso),
