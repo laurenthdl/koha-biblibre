@@ -257,7 +257,7 @@ my $ordermodif;     # Is this an order modification?
 		    my ($t, $st);
 		    for my $tablefield (qw/branchcode quantity listprice uncertainprice rrp ecost notes supplierreference sort1 sort2/) {
 			($t, $st) = GetMarcFromKohaField("aqorders.$tablefield", 'ACQ');
-			$_->update($st, $$orderinfo{$tablefield}) if ($$orderinfo{$tablefield});
+			$_->update($st, $$orderinfo{$tablefield}) if ($$orderinfo{$tablefield} and $st);
 		    }
 		    ModBiblio($record, $$orderinfo{biblionumber}, 'ACQ');
 		}
