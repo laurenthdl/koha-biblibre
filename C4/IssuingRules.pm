@@ -81,20 +81,20 @@ memoize('GetIssuingRule');
 
 sub GetIssuingRule {
     my ( $categorycode, $itemtype, $branchcode ) = @_;
-    $categorycode ||= "*";
-    $itemtype     ||= "*";
-    $branchcode   ||= "*";
+    $categorycode ||= "Default";
+    $itemtype     ||= "Default";
+    $branchcode   ||= "Default";
 
     # This configuration table defines the order of inheritance. We'll loop over it.
     my @attempts = (
-        [ "*",           "*",       "*" ],
-        [ "*",           $itemtype, "*" ],
-        [ $categorycode, "*",       "*" ],
-        [ $categorycode, $itemtype, "*" ],
-        [ "*",           "*",       $branchcode ],
-        [ "*",           $itemtype, $branchcode ],
-        [ $categorycode, "*",       $branchcode ],
-        [ $categorycode, $itemtype, $branchcode ],
+        [ "Default",           "Default",       "Default" ],
+        [ "Default",           $itemtype,       "Default" ],
+        [ $categorycode,       "Default",       "Default" ],
+        [ $categorycode,       $itemtype,       "Default" ],
+        [ "Default",           "Default",       $branchcode ],
+        [ "Default",           $itemtype,       $branchcode ],
+        [ $categorycode,       "Default",       $branchcode ],
+        [ $categorycode,       $itemtype,       $branchcode ],
     );
 
     # This complex query returns a nested hashref, so we can access a rule using :
@@ -102,7 +102,7 @@ sub GetIssuingRule {
     # this will be usefull in the inheritance computation code
     my $dbh   = C4::Context->dbh;
     my $rules = $dbh->selectall_hashref(
-        "SELECT * FROM issuingrules where branchcode IN ('*',?) and itemtype IN ('*', ?) and categorycode IN ('*',?)",
+        "SELECT * FROM issuingrules where branchcode IN ('Default',?) and itemtype IN ('Default', ?) and categorycode IN ('Default',?)",
         [ "branchcode", "itemtype", "categorycode" ],
         undef, ( $branchcode, $itemtype, $categorycode )
     );
