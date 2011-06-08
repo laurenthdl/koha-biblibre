@@ -175,7 +175,8 @@ $(document).ready(function() {
         <form method="get" action="/cgi-bin/koha/admin/smart-rules.pl" id="selectlibrary">
         Select a library :
             <select name="branchcode" id="branchcode" style="width:20em;">
-                <option value="*">Default</option>
+                <option value="Default">Default</option>
+                <!--TMPL_IF Name="GlobalBranchSelected"--><option value="*" selected="selected">Global</option><!--TMPL_ELSE--><option value="*">Global</option><!--/TMPL_IF-->
             <!-- TMPL_LOOP NAME="branchloop" -->
                 <!-- TMPL_IF NAME="selected" --><option value="<!-- TMPL_VAR NAME="value" -->" selected="selected"><!-- TMPL_VAR NAME="branchname" --></option><!-- TMPL_ELSE --><option value="<!-- TMPL_VAR NAME="value" -->"><!-- TMPL_VAR NAME="branchname" --></option><!-- /TMPL_IF -->
             <!-- /TMPL_LOOP -->
@@ -229,7 +230,11 @@ $(document).ready(function() {
                                         <!-- TMPL_IF NAME="default_humancategorycode" -->
                                             <em>Default</em>
                                         <!-- TMPL_ELSE -->
+                                        <!-- TMPL_IF NAME="global_humancategorycode" -->
+                                            <em>Global</em>
+                                        <!-- TMPL_ELSE -->
                                             <!-- TMPL_VAR NAME="humancategorycode" -->
+                                        <!-- /TMPL_IF -->
                                         <!-- /TMPL_IF -->
                                     </td>
                                     <td class="itemtype">
@@ -237,7 +242,11 @@ $(document).ready(function() {
                                         <!-- TMPL_IF NAME="default_humanitemtype" -->
                                             <em>Default</em>
                                         <!-- TMPL_ELSE -->
+                                        <!-- TMPL_IF NAME="global_humanitemtype" -->
+                                            <em>Global</em>
+                                        <!-- TMPL_ELSE -->
                                             <!-- TMPL_VAR NAME="humanitemtype" -->
+                                        <!-- /TMPL_IF -->
                                         <!-- /TMPL_IF -->
                                     </td>
                                     <!-- TMPL_IF NAME="herited_maxissueqty" -->
@@ -355,7 +364,8 @@ $(document).ready(function() {
                                 <tr>
                                     <td>
                                         <select name="categorycode" id="categorycode" style="width:12em;">
-                                            <option value="*">Default</option>
+                                            <option value="Default">Default</option>
+                                            <option value="*">Global</option>
                                         <!-- TMPL_LOOP NAME="categoryloop" -->
                                             <!-- TMPL_IF Name="selected"-->
                                             <option value="<!-- TMPL_VAR NAME="categorycode" -->" selected="selected"><!-- TMPL_VAR NAME="description" --></option>
@@ -366,7 +376,8 @@ $(document).ready(function() {
                                     </td>
                                     <td>
                                         <select name="itemtype" style="width:12em;">
-                                            <option value="*">Default</option>
+                                            <option value="Default">Default</option>
+                                            <option value="*">Global</option>
                                         <!-- TMPL_LOOP NAME="itemtypeloop" -->
                                             <!-- TMPL_IF Name="selected"-->
                                             <option value="<!-- TMPL_VAR NAME="itemtype" -->" selected="selected"><!-- TMPL_VAR NAME="description" --></option>
