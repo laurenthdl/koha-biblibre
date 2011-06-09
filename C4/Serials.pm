@@ -1065,6 +1065,7 @@ sub GetExpirationDate {
 
     # we don't do the same test if the subscription is based on X numbers or on X weeks/months
     $enddate = $startdate || $subscription->{startdate};
+    $enddate = C4::Dates->new($enddate, "iso");
     my @date = split( /-/, $enddate );
     return if ( scalar(@date) != 3 || not check_date(@date) );
     if ( ( $subscription->{periodicity} % 16 ) > 0 ) {
@@ -1074,7 +1075,7 @@ sub GetExpirationDate {
 
             #calculate the date of the last issue.
             for ( my $i = 1 ; $i <= $length ; $i++ ) {
-                $enddate = GetNextDate( $enddate, $subscription );
+                $enddate = GetNextDate( $enddate->output("iso"), $subscription );
             }
         } elsif ( $subscription->{monthlength} ) {
             if ( $$subscription{startdate} ) {
