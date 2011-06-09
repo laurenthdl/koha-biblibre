@@ -199,22 +199,9 @@ push @predictions_loop, {
 };
 
 my $i = 1;
-while( ( ($sublength && ( ($subtype eq "issues" && $i < $sublength)
-                   || ($subtype eq "weeks" && $date_iso
-                       && Delta_Days( split(/-/, $date_iso),
-                           Add_Delta_Days( split(/-/, $firstacquidate_iso), 7*$sublength - 1 ) ) > 0 )
-                   || ($subtype eq "months" && $date_iso
-                       && (Delta_Days( split(/-/, $date_iso),
-                           Add_Delta_YM( split(/-/, $firstacquidate_iso), 0, $sublength) ) - 1) > 0 ) ) )
-    || (!$sublength && $enddate_iso && $date_iso && Delta_Days( split(/-/, $date_iso), split(/-/, $enddate_iso) ) > 0 ) )
-    || (!$sublength && !$enddate && $i < 1000) )
-{
-    ($calculated, $val{'lastvalue1'}, $val{'lastvalue2'}, $val{'lastvalue3'}, $val{'innerloop1'}, $val{'innerloop2'}, $val{'innerloop3'}) = GetNextSeq(\%val);
-    $issuenumber++;
-    my %line = (
-        number => $calculated,
-        issuenumber => $issuenumber,
-    );
+while( $i < 1000 ) {
+    my %line;
+
     if(defined $date){
         $date = GetNextDate($date->output("iso"), \%subscription, 1);
     }
@@ -225,6 +212,24 @@ while( ( ($sublength && ( ($subtype eq "issues" && $i < $sublength)
     } else {
         undef $date_iso;
     }
+
+    # Check if we don't have exceed end date
+    if($sublength){
+        if($subtype eq "issues" && $i >= $sublength){
+            last;
+        } elsif($subtype eq "weeks" && $date_iso && Delta_Days( split(/-/, $date_iso), Add_Delta_Days( split(/-/, $firstacquidate_iso), 7*$sublength - 1 ) ) < 0) {
+            last;
+        } elsif($subtype eq "months" && $date_iso && (Delta_Days( split(/-/, $date_iso), Add_Delta_YM( split(/-/, $firstacquidate_iso), 0, $sublength) ) - 1) < 0 ) {
+            last;
+        }
+    } elsif($enddate_iso && $date_iso && Delta_Days( split(/-/, $date_iso), split(/-/, $enddate_iso) ) < 0 ) {
+        last;
+    }
+
+    ($calculated, $val{'lastvalue1'}, $val{'lastvalue2'}, $val{'lastvalue3'}, $val{'innerloop1'}, $val{'innerloop2'}, $val{'innerloop3'}) = GetNextSeq(\%val);
+    $issuenumber++;
+    $line{'number'} = $calculated;
+    $line{'issuenumber'} = $issuenumber;
     push @predictions_loop, \%line;
 
     $i++;
