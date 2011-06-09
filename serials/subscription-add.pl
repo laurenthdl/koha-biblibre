@@ -97,7 +97,13 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
         foreach my $length_unit qw(numberlength weeklength monthlength) {
             if ( $subs->{$length_unit} ) {
                 $sub_length = $subs->{$length_unit};
-                $sub_on     = $length_unit;
+                if($length_unit eq "numberlength"){
+                    $sub_on = "issues";
+                }elsif($length_unit eq "weeklength"){
+                    $sub_on = "weeks";
+                }elsif($length_unit eq "monthlength"){
+                    $sub_on = "months";
+                }
                 last;
             }
         }
@@ -287,7 +293,7 @@ sub redirect_add_subscription {
     my $enddate = $query->param('enddate');
     my $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));
     if(!defined $enddate || $enddate eq '') {
-        $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
+        $enddate = _guess_enddate($firstacquidate, $periodicity, $numberlength, $weeklength, $monthlength);
     }
 
     my $subscriptionid = NewSubscription(
@@ -350,7 +356,7 @@ sub redirect_mod_subscription {
 
     # Guess end date
     if(!defined $enddate || $enddate eq '') {
-        $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
+        $enddate = _guess_enddate($firstacquidate, $periodicity, $numberlength, $weeklength, $monthlength);
     }
 
     #  If it's  a mod, we need to check the current 'expected' issue, and mod it in the serials table if necessary.
