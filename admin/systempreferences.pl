@@ -71,7 +71,6 @@ my %tabsysprefs;
 $tabsysprefs{acquisitions}              = "Acquisitions";
 $tabsysprefs{gist}                      = "Acquisitions";
 $tabsysprefs{emailPurchaseSuggestions}  = "Acquisitions";
-$tabsysprefs{RenewSerialAddsSuggestion} = "Acquisitions";
 $tabsysprefs{AcqCreateItem}             = "Acquisitions";
 $tabsysprefs{OrderPdfFormat}            = "Acquisitions";
 $tabsysprefs{OrderPdfTemplate}          = "Acquisitions";
@@ -367,7 +366,6 @@ $tabsysprefs{OPACSerialIssueDisplayCount}  = "Serials";
 $tabsysprefs{StaffSerialIssueDisplayCount} = "Serials";
 $tabsysprefs{OPACDisplayExtendedSubInfo}   = "Serials";
 $tabsysprefs{OPACSubscriptionDisplay}      = "Serials";
-$tabsysprefs{RenewSerialAddsSuggestion}    = "Serials";
 $tabsysprefs{SubscriptionHistory}          = "Serials";
 
 # LOGFeatures

@@ -1744,6 +1744,7 @@ CREATE TABLE `subscription` (
   `opacdisplaycount` VARCHAR(10) NULL,
   `graceperiod` int(11) NOT NULL default '0',
   `enddate` date default NULL,
+  `reneweddate` date default NULL,
   PRIMARY KEY  (`subscriptionid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
