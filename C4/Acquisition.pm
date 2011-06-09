@@ -58,6 +58,7 @@ BEGIN {
       &NewOrder &DelOrder &ModOrder &GetPendingOrders &GetOrder &GetOrders
       &GetCancelledOrders &GetOrderNumber &GetLateOrders
       &GetOrderFromItemnumber &SearchOrder &GetHistory &GetRecentAcqui
+      &GetLastOrderNotReceivedFromSubscriptionid &GetLastOrderReceivedFromSubscriptionid
       &ModReceiveOrder &ModOrderBiblioitemNumber
 
       &NewOrderItem &ModOrderItem &GetOrderItemnumbers
@@ -93,6 +94,49 @@ sub GetOrderFromItemnumber {
 
     my $order = $sth->fetchrow_hashref;
     return ($order);
+
+}
+
+sub GetLastOrderNotReceivedFromSubscriptionid {
+    my ( $subscriptionid ) = @_;
+    my $dbh                = C4::Context->dbh;
+    my $query              = qq|
+        SELECT * FROM aqorders
+        LEFT JOIN subscription
+            ON ( aqorders.subscriptionid = subscription.subscriptionid )
+        WHERE aqorders.subscriptionid = ?
+            AND aqorders.datereceived IS NULL
+        LIMIT 1
+    |;
+    my $sth = $dbh->prepare( $query );
+    $sth->execute( $subscriptionid );
+    my $order = $sth->fetchrow_hashref;
+    return $order;
+}
+
+sub GetLastOrderReceivedFromSubscriptionid {
+    my ( $subscriptionid ) = @_;
+    my $dbh                = C4::Context->dbh;
+    my $query              = qq|
+        SELECT * FROM aqorders
+        LEFT JOIN subscription
+            ON ( aqorders.subscriptionid = subscription.subscriptionid )
+        WHERE aqorders.subscriptionid = ?
+            AND aqorders.datereceived =
+                (
+                    SELECT MAX( aqorders.datereceived )
+                    FROM aqorders
+                    LEFT JOIN subscription
+                        ON ( aqorders.subscriptionid = subscription.subscriptionid )
+                        WHERE aqorders.subscriptionid = ?
+                            AND aqorders.datereceived IS NOT NULL
+                )
+        LIMIT 1
+    |;
+    my $sth = $dbh->prepare( $query );
+    $sth->execute( $subscriptionid, $subscriptionid );
+    my $order = $sth->fetchrow_hashref;
+    return $order;
 
 }
 

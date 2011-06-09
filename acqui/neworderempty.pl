@@ -103,6 +103,7 @@ my $suggestionid      = $input->param('suggestionid');
 my $close             = $input->param('close');
 my $uncertainprice    = $input->param('uncertainprice');
 my $import_batch_id   = $input->param('import_batch_id');      # if this is filled, we come from a staged file, and we will return here after saving the order !
+my $subscriptionid    = $input->param('subscriptionid');
 my $data;
 my $new = 'no';
 my $suggestion;
@@ -320,6 +321,26 @@ if ( C4::Context->preference('AcqCreateItem') eq 'ordering' && !$ordernumber ) {
 # Get the item types list, but only if item_level_itype is YES. Otherwise, it will be in the item, no need to display it in the biblio
 my @itemtypes = C4::ItemType->all unless C4::Context->preference('item-level_itypes');
 
+my ( $order, $bookseller, $tmpl_infos );
+if ( defined $subscriptionid ) {
+    my $lastOrderReceived = GetLastOrderReceivedFromSubscriptionid $subscriptionid;
+    if ( defined $lastOrderReceived ) {
+        $budget_id = $$lastOrderReceived{budgetid};
+        $$data{listprice} = $$lastOrderReceived{listprice};
+        $$data{uncertainprice} = $$lastOrderReceived{uncertainprice};
+        $$data{gstrate} = $$lastOrderReceived{gsrate};
+        $$data{discount} = $$lastOrderReceived{discount};
+
+        $$data{rrp} = $$lastOrderReceived{rrp};
+        $$data{ecost} = $$lastOrderReceived{ecost};
+        $$data{quantity} = $$lastOrderReceived{quantity};
+        $$data{unitprice} = $$lastOrderReceived{unitprice};
+        $$data{notes} = $$lastOrderReceived{notes};
+        $$data{sort1} = $$lastOrderReceived{sort1};
+        $$data{sort2} = $$lastOrderReceived{sort2};
+    }
+}
+
 # fill template
 $template->param(
     close       => $close,
@@ -394,6 +415,7 @@ $template->param(
     publishercode        => $data->{'publishercode'},
     place                => $data->{'place'},
     import_batch_id      => $import_batch_id,
+    subscriptionid       => $subscriptionid,
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;

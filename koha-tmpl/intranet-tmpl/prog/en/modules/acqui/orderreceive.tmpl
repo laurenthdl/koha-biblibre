@@ -151,6 +151,7 @@ $(document).ready(function() {
           </tbody>
         </table>
     </fieldset>
+    <!-- TMPL_UNLESS NAME="subscriptionid" -->
     <fieldset class="rows">
         <legend>Item</legend>
         <!-- TMPL_IF name="NoACQframework" -->
@@ -194,6 +195,7 @@ $(document).ready(function() {
 
         <!--/TMPL_LOOP--> <!-- /items -->
     </fieldset>
+    <!-- /TMPL_UNLESS -->
     <!-- /TMPL_IF --> <!-- items -->
     <!-- /TMPL_IF --> <!-- AcqCreateItemOrdering -->
     <input type="hidden" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" />
@@ -212,7 +214,7 @@ $(document).ready(function() {
         <li>
             <label for="quantityto">Quantity to receive: </label>
             <span class="label">
-                <input type="text" id="quantity_to_receive" name="quantity" value="<!-- TMPL_VAR NAME="quantity" -->" <!-- TMPL_IF name="edit" --> READONLY <!-- /TMPL_IF -->/>
+                <input type="text" id="quantity_to_receive" name="quantity" value="<!-- TMPL_VAR NAME="quantity" -->" <!-- TMPL_IF name="edit" --> READONLY <!-- /TMPL_IF --><!-- TMPL_IF NAME="subscriptionid" --> READONLY <!-- /TMPL_IF --> />
             </span>
         </li>
         <li><label for="quantity">Quantity received: </label>
@@ -230,7 +232,7 @@ $(document).ready(function() {
                 <!-- /TMPL_IF -->
             <!-- TMPL_ELSE -->
                 <!-- TMPL_IF name="items" -->
-                    <input READONLY type="text" id="quantity" size="20" name="quantityrec" value="0" />
+                    <input READONLY type="text" id="quantity" size="20" name="quantityrec" value="<!-- TMPL_IF NAME="subscriptionid" -->1<!-- TMPL_ELSE -->0<!-- /TMPL_IF -->" />
                 <!-- TMPL_ELSE -->
                     <input type="text" size="20" id="quantity" name="quantityrec" value="0" />
                 <!-- /TMPL_IF -->
