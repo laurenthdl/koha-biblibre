@@ -96,7 +96,8 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
         $template->param($subs);
         $template->param( "dow" . $subs->{'dow'} => 1 ) if defined $subs->{'dow'};
         $template->param(
-            $op               => 1,
+            $op         => 1,
+            sublength   => 1,
         );
     }
 }
