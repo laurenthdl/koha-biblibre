@@ -51,7 +51,7 @@ my $invoicenumber   = $input->param('invoicenumber');
 my $supplier        = $input->param('supplier');
 my $billingdatefrom = $input->param('billingdatefrom');
 my $billingdateto   = $input->param('billingdateto');
-my $isbnean         = $input->param('isbnean');
+my $isbneanissn     = $input->param('isbneanissn');
 my $title           = $input->param('title');
 my $author          = $input->param('author');
 my $publisher       = $input->param('publisher');
@@ -64,7 +64,7 @@ if($op eq "do_search") {
     my $billingdatefrom_iso = C4::Dates->new($billingdatefrom)->output("iso");
     my $billingdateto_iso = C4::Dates->new($billingdateto)->output("iso");
     my @invoices = GetInvoices($invoicenumber, $supplier, $billingdatefrom_iso,
-        $billingdateto_iso, $isbnean, $title, $author, $publisher,
+        $billingdateto_iso, $isbneanissn, $title, $author, $publisher,
         $publicationyear, $branch);
     foreach (@invoices) {
         my $billingdate = C4::Dates->new($_->{'billingdate'}, "iso");
@@ -75,6 +75,7 @@ if($op eq "do_search") {
             suppliername    => $_->{'suppliername'},
             receivedbiblios => $_->{'receivedbiblios'},
             receiveditems   => $_->{'receiveditems'},
+            subscriptionid  => $_->{subscriptionid},
             invoiceclosedate => $invoiceclosedate->output(),
         );
         push @results_loop, \%row;
@@ -126,7 +127,7 @@ $template->param(
     suppliername    => $suppliername,
     billingdatefrom => $billingdatefrom,
     billingdateto   => $billingdateto,
-    isbnean         => $isbnean,
+    isbneanissn     => $isbneanissn,
     title           => $title,
     author          => $author,
     publisher       => $publisher,
