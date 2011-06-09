@@ -8,9 +8,8 @@
    <input type="hidden" name="searched" value="1" /> 
    <label for="ISSN_filter">ISSN:</label> <input type="text" size="10" maxlength="11" name="ISSN_filter" id="ISSN_filter" value="<!-- TMPL_VAR name="ISSN_filter" -->" /> 
    <label for="title_filter">Title:</label> <input type="text" size="20" maxlength="40" name="title_filter" id="title_filter" value="<!-- TMPL_VAR name="title_filter" -->" />
-   <label for="EAN_filter">EAN:</label> <input type="text" size="20" maxlength="40" name="EAN_filter" id="EAN_filter" value="<!-- TMPL_VAR name="EAN_filter" -->" />
-   
    <input type="submit" value="Search" class="submit" />
+   <a href="/cgi-bin/koha/serials/advancedsearch.pl">Advanced Search</a>
 </form>
 	</div>
     <!-- TMPL_INCLUDE NAME="patron-search-box.inc" -->
