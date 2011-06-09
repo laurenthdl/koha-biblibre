@@ -1,9 +1,19 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions &rsaquo; Invoices</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/javascript">
 //<![CDATA[
+function updateRowsVisibility(show_only_renewed) {
+    if ( show_only_renewed ) {
+        $("#resultst [data-subscriptionid='']").hide();
+    } else {
+        $("#resultst > tbody > tr").show();
+    }
+    $("#resultst").trigger("sorton", [$("#resultst")[0].config.sortList]);
+}
+
 $(document).ready(function() {
     Calendar.setup({
         inputField: "billingdatefrom",
@@ -15,6 +25,17 @@ $(document).ready(function() {
         ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
         button: "billingdatetoCalendar"
     });
+    $("#resultst").tablesorter({
+        widgets : ['zebra'],
+        headers: {
+            6: { sorter: false },
+        }
+    });
+    $("#show_only_subscription").click(function(){
+        updateRowsVisibility($(this+":checked").val());
+    });
+    $("#show_only_subscription").attr('checked', false);
+    updateRowsVisibility(false);
 });
 //]]>
 </script>
@@ -33,6 +54,10 @@ $(document).ready(function() {
     <div class="yui-b">
       <h1>Invoices</h1>
       <!-- TMPL_IF NAME="do_search" -->
+        <label for="show_only_subscription">
+            <input type="checkbox" style="vertical-align: middle;" id="show_only_subscription" />
+            Show only subscriptions
+        </label>
         <!-- TMPL_IF NAME="results_loop" -->
           <table id="resultst">
             <thead>
@@ -48,7 +73,7 @@ $(document).ready(function() {
             </thead>
             <tbody>
               <!-- TMPL_LOOP NAME="results_loop" -->
-                <tr>
+                <tr data-subscriptionid="<!-- TMPL_VAR NAME="subscriptionid" -->">
                   <td><!-- TMPL_VAR NAME="invoicenumber" --></td>
                   <td><!-- TMPL_VAR NAME="suppliername" --></td>
                   <td><!-- TMPL_VAR NAME="billingdate" --></td>
@@ -99,8 +124,8 @@ $(document).ready(function() {
                   </li>
                 <!-- /TMPL_IF -->
               <!-- /TMPL_IF -->
-              <!-- TMPL_IF NAME="isbnean" -->
-                <li>ISBN/EAN: <!-- TMPL_VAR NAME="isbnean" --></li>
+              <!-- TMPL_IF NAME="isbneanissn" -->
+                <li>ISBN/EAN/ISSN: <!-- TMPL_VAR NAME="isbneanissn" --></li>
               <!-- /TMPL_IF -->
               <!-- TMPL_IF NAME="title" -->
                 <li>Title: <!-- TMPL_VAR NAME="title" --></li>
@@ -165,8 +190,8 @@ $(document).ready(function() {
             </fieldset>
           </li>
           <li>
-            <label for="isbnean">ISBN / EAN:</label>
-            <input type="text" id="isbnean" name="isbnean" value="<!-- TMPL_VAR NAME='isbnean' -->" />
+            <label for="isbneanissn">ISBN / EAN / ISSN:</label>
+            <input type="text" id="isbneanissn" name="isbneanissn" value="<!-- TMPL_VAR NAME='isbneanissn' -->" />
           </li>
           <li>
             <label for="title">Title:</label>

@@ -1870,7 +1870,7 @@ sub GetParcels {
 
 =over 4
 
-$invoices = &GetInvoices($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbnean, $title, $author, $publisher, $publicationyear, $branch);
+$invoices = &GetInvoices($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbneanissn, $title, $author, $publisher, $publicationyear, $branch);
 get a lists of invoices
 
 =over 2
@@ -1894,9 +1894,9 @@ Return a reference-to-hash list containing invoices informations as such :
 =cut
 
 sub GetInvoices {
-    my ($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbnean,
+    my ($invoicenumber, $supplier, $billingdatefrom, $billingdateto, $isbneanissn,
         $title, $author, $publisher, $publicationyear, $branch) = @_;
-    
+
     my $dbh = C4::Context->dbh;
     my $query = qq{
         SELECT aqorders.booksellerinvoicenumber AS invoicenumber,
@@ -1904,7 +1904,8 @@ sub GetInvoices {
                SUM(aqorders.quantityreceived) AS receiveditems,
                aqorders.billingdate,
                aqorders.invoiceclosedate,
-               aqbooksellers.name AS suppliername
+               aqbooksellers.name AS suppliername,
+               aqorders.subscriptionid
         FROM aqorders
             LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
             LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
@@ -1932,9 +1933,9 @@ sub GetInvoices {
         push @where_strs, "aqorders.billingdate<=?";
         push @args, $billingdateto;
     }
-    if($isbnean) {
-        push @where_strs, "(biblioitems.isbn=? OR biblioitems.ean=?)";
-        push @args, $isbnean, $isbnean;
+    if($isbneanissn) {
+        push @where_strs, "(biblioitems.isbn=? OR biblioitems.ean=? OR biblioitems.issn=?)";
+        push @args, $isbneanissn, $isbneanissn, $isbneanissn;
     }
     if($title) {
         push @where_strs, "biblio.title LIKE ?";
