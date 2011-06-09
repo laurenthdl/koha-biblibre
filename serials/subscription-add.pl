@@ -59,7 +59,6 @@ my @subscription_types = ( 'issues', 'weeks', 'months' );
 my @sub_type_data;
 
 my $subs;
-my $firstissuedate;
 my $nextexpected;
 
 if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
@@ -80,7 +79,6 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
         carp "Attempt to modify subscription $subscriptionid by " . C4::Context->userenv->{'id'} . " not allowed";
         print $query->redirect("/cgi-bin/koha/serials/subscription-detail.pl?subscriptionid=$subscriptionid");
     }
-    $firstissuedate = $subs->{firstacquidate};    # in iso format.
     for (qw(startdate firstacquidate histstartdate enddate histenddate)) {
         next unless defined $subs->{$_};
 
@@ -94,7 +92,6 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
     $subs->{'letter'} = '' unless ( $subs->{'letter'} );
     letter_loop( $subs->{'letter'}, $template );
     $nextexpected = GetNextExpected($subscriptionid);
-    $nextexpected->{'isfirstissue'} = defined $nextexpected->{planneddate} ? $nextexpected->{planneddate}->output('iso') eq $firstissuedate : undef;
     $subs->{nextacquidate} = defined $nextexpected->{planneddate} and $op eq 'mod' ? $nextexpected->{planneddate}->output() : undef;
     unless ( $op eq 'modsubscription' ) {
         foreach my $length_unit qw(numberlength weeklength monthlength) {
@@ -109,12 +106,6 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
         $template->param( "dow" . $subs->{'dow'} => 1 ) if defined $subs->{'dow'};
         $template->param(
             $op               => 1,
-            "subtype_$sub_on" => 1,
-            sublength         => $sub_length,
-            history => ( $op eq 'mod' ),
-            "periodicity" . $subs->{'periodicity'}     => 1,
-            "numberpattern" . $subs->{'numberpattern'} => 1,
-            firstacquiyear => defined $firstissuedate ? substr( $firstissuedate, 0, 4 ) : undef,
         );
     }
     if ( $op eq 'dup' ) {
@@ -324,6 +315,7 @@ sub redirect_mod_subscription {
     my $biblionumber   = $query->param('biblionumber');
     my $aqbudgetid     = $query->param('aqbudgetid');
     my $startdate      = format_date_in_iso( $query->param('startdate') );
+    my $firstacquidate = format_date_in_iso( $query->param('firstacquidate') );
     my $nextacquidate =
       $query->param('nextacquidate')
       ? format_date_in_iso( $query->param('nextacquidate') )
@@ -363,14 +355,11 @@ sub redirect_mod_subscription {
     #  If it's  a mod, we need to check the current 'expected' issue, and mod it in the serials table if necessary.
     if ($nextexpected->{'planneddate'} && $nextacquidate ne $nextexpected->{planneddate}->output('iso') ) {
         ModNextExpected( $subscriptionid, C4::Dates->new( $nextacquidate, 'iso' ) );
-
-        # if we have not received any issues yet, then we also must change the firstacquidate for the subs.
-        $firstissuedate = $nextacquidate if ( $nextexpected->{isfirstissue} );
     }
 
     ModSubscription(
         $auser, $branchcode, $aqbooksellerid, $cost, $aqbudgetid, $startdate,
-        $periodicity, $firstissuedate, $dow, join(";",@irregularity),
+        $periodicity, $firstacquidate, $dow, join(";",@irregularity),
         $numberpattern, $numberlength, $weeklength, $monthlength, $lastvalue1,
         $innerloop1, $lastvalue2, $innerloop2, $lastvalue3, $innerloop3,
         $status, $biblionumber, $callnumber, $notes, $letter, $hemisphere,
