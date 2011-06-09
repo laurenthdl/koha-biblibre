@@ -188,20 +188,20 @@ function showPredictionPattern() {
     var error = 0;
     var error_msg = "";
     if(frequencyid == undefined || frequencyid == ""){
-        error_msg += "- Frequency is not defined\n";
+        error_msg += _("- Frequency is not defined\n");
         error ++;
     }
     if(numberpatternid == undefined || numberpatternid == ""){
-        error_msg += "- Number pattern is not defined\n";
+        error_msg += _("- Number pattern is not defined\n");
         error ++;
     }
     if(firstacquidate == undefined || firstacquidate == ""){
-        error_msg += "- First publication date is not defined\n";
+        error_msg += _("- First publication date is not defined\n");
         error ++;
     }
 
     if(error){
-        alert("Cannot test prediction pattern for the following reason(s):\n\n"
+        alert(_("Cannot test prediction pattern for the following reason(s):\n\n")
             + error_msg);
         return false;
     }
@@ -720,9 +720,9 @@ $(document).ready(function() {
                                             <tbody>
                                                 <tr>
                                                     <td>Label</td>
-                                                    <td><input type="text" readonly="readonly" id="label1" /></td>
-                                                    <td><input type="text" readonly="readonly" id="label2" /></td>
-                                                    <td><input type="text" readonly="readonly" id="label3" /></td>
+                                                    <td><input type="text" readonly="readonly" id="label1" name="label1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="label2" name="label2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="label3" name="label3" /></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Begins with</td>
