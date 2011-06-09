@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 use CGI;
-use Date::Calc qw(Today Day_of_Year Week_of_Year Add_Delta_Days);
+use Date::Calc qw(Today Day_of_Year Week_of_Year Add_Delta_Days Add_Delta_YM);
 use C4::Koha;
 use C4::Biblio;
 use C4::Auth;
@@ -53,27 +53,6 @@ my ( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
         debug           => 1,
     }
 );
-
-my $weekarrayjs='';
-my $count = 0;
-# FIXME - This assumes first pub date of today().
-# You can't enter past-date irregularities.
-my ($year, $month, $day) = Today;
-my $firstday   =  Day_of_Year($year,$month,$day);
-my ($wkno,$yr) = Week_of_Year($year,$month,$day); # week starting monday
-my $weekno = $wkno;
-for(my $i=$firstday;$i<($firstday+365);$i=$i+7){
-        #$count = $i;
-        #if($wkno > 52){$year++; $wkno=1;}
-        #if($count>365){$count=$i-365;}    
-        my ($y,$m,$d) = Add_Delta_Days($year,1,1,$i - 1);
-#warn "$y-$m-$d";
-        #BUGFIX padding add_delta_days() date
-        my $output  =  sprintf("%04d-%02d-%02d",$y , $m, $d );
-        $weekarrayjs .= "'Wk $wkno: ". format_date($output) ."',";
-        $wkno++;    
-}
-chop($weekarrayjs);
 
 my $sub_on;
 my @subscription_types = ( 'issues', 'weeks', 'months' );
@@ -173,7 +152,6 @@ $template->param(
     branchloop               => $branchloop,
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
-my $count = 0;
 
 # prepare template variables common to all $op conditions:
 $template->param( 'dateformat_' . C4::Context->preference('dateformat') => 1, );
@@ -250,7 +228,35 @@ sub letter_loop {
 
 sub _get_sub_length {
     my ( $type, $length ) = @_;
-    return ( $type eq 'numberlength' ? $length : 0, $type eq 'weeklength' ? $length : 0, $type eq 'monthlength' ? $length : 0, );
+    return ( $type eq 'issues' ? $length : 0, $type eq 'weeks' ? $length : 0, $type eq 'months' ? $length : 0, );
+}
+
+sub _guess_enddate {
+    my ($startdate_iso, $frequencyid, $numberlength, $weeklength, $monthlength) = @_;
+    my ($year, $month, $day);
+    my $enddate;
+    if($numberlength != 0) {
+        my $frequency = GetSubscriptionFrequency($frequencyid);
+        if($frequency->{'unit'} eq 'day') {
+            ($year, $month, $day) = Add_Delta_Days(split(/-/, $startdate_iso), $numberlength * $frequency->{'unitsperissue'} / $frequency->{'issuesperunit'});
+        } elsif($frequency->{'unit'} eq 'week') {
+            ($year, $month, $day) = Add_Delta_Days(split(/-/, $startdate_iso), $numberlength * 7 * $frequency->{'unitsperissue'} / $frequency->{'issuesperunit'});
+        } elsif($frequency->{'unit'} eq 'month') {
+            ($year, $month, $day) = Add_Delta_YM(split(/-/, $startdate_iso), 0, $numberlength * $frequency->{'unitsperissue'} / $frequency->{'issuesperunit'});
+        } elsif($frequency->{'unit'} eq 'year') {
+            ($year, $month, $day) = Add_Delta_YM(split(/-/, $startdate_iso), $numberlength * $frequency->{'unitsperissue'} / $frequency->{'issuesperunit'}, 0);
+        }
+    } elsif($weeklength != 0) {
+        ($year, $month, $day) = Add_Delta_Days(split(/-/, $startdate_iso), $weeklength * 7);
+    } elsif($monthlength != 0) {
+        ($year, $month, $day) = Add_Delta_YM(split(/-/, $startdate_iso), 0, $monthlength);
+    }
+    if(defined $year) {
+        $enddate = sprintf("%04d-%02d-%02d", $year, $month, $day);
+    } else {
+        $enddate = "3000-01-01";    # just to be sure we can receive serials
+    }
+    return $enddate;
 }
 
 sub redirect_add_subscription {
@@ -266,16 +272,12 @@ sub redirect_add_subscription {
     my $graceperiod    = $query->param('graceperiod') || 0;
 
     my ( $numberlength, $weeklength, $monthlength ) = _get_sub_length( $query->param('subtype'), $query->param('sublength') );
-    my $lastvaluetemp1    = $query->param('lastvaluetemp1');
-    my $lastvaluetemp2    = $query->param('lastvaluetemp2');
-    my $lastvaluetemp3    = $query->param('lastvaluetemp3');
-    my $predictivemodel   = ComputePredictiveModel($periodicity, $numberpattern, $lastvaluetemp1, $lastvaluetemp2, $lastvaluetemp3);
-    my $lastvalue1        = $predictivemodel->{'lastvalue1'};
-    my $lastvalue2        = $predictivemodel->{'lastvalue2'};
-    my $lastvalue3        = $predictivemodel->{'lastvalue3'};
-    my $innerloop1        = $predictivemodel->{'innerloop1'};
-    my $innerloop2        = $predictivemodel->{'innerloop2'};
-    my $innerloop3        = $predictivemodel->{'innerloop3'};
+    my $lastvalue1        = $query->param('lastvalue1');
+    my $lastvalue2        = $query->param('lastvalue2');
+    my $lastvalue3        = $query->param('lastvalue3');
+    my $innerloop1        = $query->param('innerloop1');
+    my $innerloop2        = $query->param('innerloop2');
+    my $innerloop3        = $query->param('innerloop3');
     my $numberingmethod   = $query->param('numberingmethod');
     my $status            = 1;
     my $biblionumber      = $query->param('biblionumber');
@@ -290,8 +292,12 @@ sub redirect_add_subscription {
     my $opacdisplaycount  = $query->param('opacdisplaycount');
     my $location          = $query->param('location');
     my $startdate = format_date_in_iso( $query->param('startdate') );
-    my $enddate = format_date_in_iso( $query->param('enddate') );
+    my $enddate = $query->param('enddate');
     my $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));
+    if(!defined $enddate || $enddate eq '') {
+        $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
+    }
+
     my $subscriptionid = NewSubscription(
         $auser, $branchcode, $aqbooksellerid, $cost, $aqbudgetid, $biblionumber,
         $startdate, $periodicity, $dow, $numberlength, $weeklength,
@@ -322,22 +328,18 @@ sub redirect_mod_subscription {
       $query->param('nextacquidate')
       ? format_date_in_iso( $query->param('nextacquidate') )
       : format_date_in_iso( $query->param('startdate') );
-    my $enddate = format_date_in_iso( $query->param('enddate') );
+    my $enddate = $query->param('enddate');
     my $periodicity = $query->param('frequency');
     my $dow         = $query->param('dow');
 
     my ( $numberlength, $weeklength, $monthlength ) = _get_sub_length( $query->param('subtype'), $query->param('sublength') );
     my $numberpattern   = $query->param('numbering_pattern');
-    my $lastvaluetemp1    = $query->param('lastvaluetemp1');
-    my $lastvaluetemp2    = $query->param('lastvaluetemp2');
-    my $lastvaluetemp3    = $query->param('lastvaluetemp3');
-    my $predictivemodel   = ComputePredictiveModel($periodicity, $numberpattern, $lastvaluetemp1, $lastvaluetemp2, $lastvaluetemp3);
-    my $lastvalue1        = $predictivemodel->{'lastvalue1'};
-    my $lastvalue2        = $predictivemodel->{'lastvalue2'};
-    my $lastvalue3        = $predictivemodel->{'lastvalue3'};
-    my $innerloop1        = $predictivemodel->{'innerloop1'};
-    my $innerloop2        = $predictivemodel->{'innerloop2'};
-    my $innerloop3        = $predictivemodel->{'innerloop3'};
+    my $lastvalue1        = $query->param('lastvalue1');
+    my $lastvalue2        = $query->param('lastvalue2');
+    my $lastvalue3        = $query->param('lastvalue3');
+    my $innerloop1        = $query->param('innerloop1');
+    my $innerloop2        = $query->param('innerloop2');
+    my $innerloop3        = $query->param('innerloop3');
     my $numberingmethod = $query->param('numberingmethod');
     my $status          = 1;
     my $callnumber      = $query->param('callnumber');
@@ -352,6 +354,11 @@ sub redirect_mod_subscription {
     my $opacdisplaycount  = $query->param('opacdisplaycount');
     my $graceperiod       = $query->param('graceperiod') || 0;
     my $location          = $query->param('location');
+
+    # Guess end date
+    if(!defined $enddate || $enddate eq '') {
+        $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
+    }
 
     #  If it's  a mod, we need to check the current 'expected' issue, and mod it in the serials table if necessary.
     if ( $nextacquidate ne $nextexpected->{planneddate}->output('iso') ) {
