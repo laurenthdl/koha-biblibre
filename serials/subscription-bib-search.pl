@@ -63,8 +63,16 @@ my $query                 = $input->param('q') || '*:*';
 my $dbh                   = C4::Context->dbh;
 my $count                 = 20;
 my $page                  = $input->param('page') || 1;
+my $itype_or_itemtype     = C4::Context->preference("item-level_itypes") ? 'itype' : 'itemtype';
 my $advanced_search_types = C4::Context->preference("AdvancedSearchTypes");
-my $itype_or_itemtype     = C4::Context->preference("item-level_itypes") ? 'str_itype' : 'str_itemtype';
+my $itype_or_ccode;
+if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
+    $itype_or_ccode = 'itype';
+} else {
+    $itype_or_ccode = 'ccode';
+}
+
+my $itype_indexname = C4::Search::Query::getIndexName($itype_or_ccode);
 
 my ( $template, $loggedinuser, $cookie );
 
@@ -74,24 +82,29 @@ if ( $op eq "do_search" && $query ) {
     my $filters = { recordtype => 'biblio' };
 
     # add the itemtype limit if applicable
-    my $itemtypelimit = $input->param('itemtypelimit');
+    my $itemtypelimit = $input->param('itypes');
     if ( $itemtypelimit ) {
-        if ( ! $advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
-            $filters->{$itype_or_itemtype} = "\"$itemtypelimit\"";
-        } else {
-            $filters->{$advanced_search_types} = "\"$itemtypelimit\"";
-        }
+        $filters->{$itype_indexname} = "\"$itemtypelimit\"";
     }
 
     my $res = SimpleSearch( $query, $filters, $page, $count);
-    my @results = map { GetBiblio $_->{'values'}->{'recordid'} } @{ $res->items };
 
-    my $pager = Data::Pagination->new(
-        $res->{'pager'}->{'total_entries'},
-        $count,
-        20,
-        $page,
-    );
+    my (@results, $pager);
+    if ($res){
+        foreach ( @{ $res->items }) {
+            my $bib = GetBiblio $_->{'values'}->{'recordid'};
+            $bib->{'issn'} = $_->{'values'}->{'str_issn'};
+            push @results, $bib;
+        }
+
+
+        $pager = Data::Pagination->new(
+            $res->{'pager'}->{'total_entries'},
+            $count,
+            20,
+            $page,
+        );
+    }
 
     ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
         template_name   => "serials/result.tmpl",
@@ -110,7 +123,8 @@ if ( $op eq "do_search" && $query ) {
         PAGE_NUMBERS  => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
         follower_params  => [ { ind => 'op'           , val => $op            },
                               { ind => 'q'            , val => $query         },
-                              { ind => 'itemtypelimit', val => $itemtypelimit } ],
+                              { ind => 'idx', val => $itype_indexname },
+                              { ind => 'q', val=>$itemtypelimit} ],
     );
 
 } else {
