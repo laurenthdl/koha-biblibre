@@ -295,6 +295,8 @@ $(document).ready(function()
 	</ol>
     </fieldset>	
 
+    <!-- From a suggestion, we have not items -->
+    <!-- TMPL_UNLESS NAME="subscriptionid" -->
     <!-- TMPL_IF name="items" -->
     <fieldset class="rows">
         <legend>Item</legend>
@@ -346,20 +348,21 @@ $(document).ready(function()
 
         <!--/TMPL_LOOP--> <!-- /items -->
     </fieldset>
+    <!-- /TMPL_UNLESS -->
     <!-- /TMPL_IF --> <!-- items -->
     <fieldset class="rows">
         <legend>Accounting Details</legend>
         <ol>
             <li>
                 <!-- TMPL_IF name="close" -->
-            <span class="label required">Quantity: </span>
+                    <span class="label required">Quantity: </span>
                     <input type="hidden" size="20" name="quantity" value="<!-- TMPL_VAR NAME="quantity" -->" /><!-- TMPL_VAR NAME="quantity" -->
                 <!-- TMPL_ELSE -->
-                <label class="required" for="quantity">Quantity: </label>
+                    <label class="required" for="quantity">Quantity: </label>
                     <!-- TMPL_IF name="items" -->
                         <input type="text" readonly="readonly" size="20" id="quantity" name="quantity" value="0" onchange="updateCosts();" />
                     <!-- TMPL_ELSE -->
-                        <input type="text" size="20" id="quantity" name="quantity" value="<!-- TMPL_VAR name="quantityrec" -->" onchange="updateCosts();" />
+                        <input type="text" size="20" id="quantity" name="quantity" <!-- TMPL_IF NAME="subscriptionid" -->value="1" READONLY<!-- TMPL_ELSE -->value="<!-- TMPL_VAR name="quantityrec" -->"<!-- /TMPL_IF  --> onchange="updateCosts();" />
                     <!-- /TMPL_IF -->
                 <!--/TMPL_IF-->
                 <!-- origquantityrec only here for javascript compatibility (additem.js needs it, useless here, usefull when receiveing an order -->
@@ -492,14 +495,19 @@ $(document).ready(function()
                     <input type="text" id="sort2" size="20" name="sort2" value="<!-- TMPL_VAR NAME="sort2" -->" />
                 <!--/TMPL_IF -->
             </li>
-</ol>
+        </ol>
     </fieldset>
     <fieldset class="action">
+        <input type="hidden" name="subscriptionid" value="<!-- TMPL_VAR NAME="subscriptionid" -->" />
         <input type="submit" value="Save" />
         <!-- TMPL_IF name="suggestionid" -->
-          <a class="cancel" href="/cgi-bin/koha/acqui/newordersuggestion.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">Cancel</a>
+            <a class="cancel" href="/cgi-bin/koha/acqui/newordersuggestion.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">Cancel</a>
         <!-- TMPL_ELSE -->
-          <a class="cancel" href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->">Cancel</a>
+            <!-- TMPL_IF NAME="subscriptionid" -->
+                <a class="cancel" href="/cgi-bin/koha/acqui/newordersubscription.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">Cancel</a>
+            <!-- TMPL_ELSE -->
+                <a class="cancel" href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->">Cancel</a>
+            <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
     </fieldset>
 </form>

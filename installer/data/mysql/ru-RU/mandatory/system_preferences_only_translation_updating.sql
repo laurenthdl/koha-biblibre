@@ -694,9 +694,6 @@ UPDATE systempreferences SET explanation='Если установлено, вы�
 -- UPDATE systempreferences SET explanation='' WHERE variable='OPACSubscriptionDisplay';
 -- 	Specify how to display subscription information in the OPAC
 
-UPDATE systempreferences SET explanation='Если включено, добавляет новое предложение при восстановлении подписки серийного издания' WHERE variable='RenewSerialAddsSuggestion';
--- 	If ON, adds a new suggestion at serial subscription renewal 
-
 -- UPDATE systempreferences SET explanation='Рівень інформативності для хронології періодичних видань у електронічному каталозі' WHERE variable='SubscriptionHistory';
 -- 	Define the display preference for serials issue history in OPAC
 
