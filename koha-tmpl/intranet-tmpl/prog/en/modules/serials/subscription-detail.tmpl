@@ -98,6 +98,36 @@ function popup(subscriptionid) {
         <!-- TMPL_IF name="hasRouting" --><li><span class="label">Routing:</span> yes</li><!-- /TMPL_IF -->
         </ul>
     </div>
+    <!-- TMPL_IF NAME="order_exists" -->
+        <div id="acquisition_details">
+            <h2>Acquisition details</h2>
+            <ul>
+                <li>Fund : 
+                    <table>
+                        <thead>
+                            <tr><th></th><th>ecost Exc. Taxes</th><th>ecost Inc. Taxes</th><th>GST %</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Ordered amount</td>
+                                <td><!-- TMPL_VAR NAME="ecostgste_ordered" --></td>
+                                <td><!-- TMPL_VAR NAME="ecostgsti_ordered" --></td>
+                                <td><!-- TMPL_VAR NAME="gstgsti_ordered" --></td>
+                                <td><a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->">See basket informations</a></td>
+                            </tr>
+                            <tr>
+                                <td>Spent amount</td>
+                                <td><!-- TMPL_VAR NAME="ecostgste_spent" --></td>
+                                <td><!-- TMPL_VAR NAME="ecostgsti_spent" --></td>
+                                <td><!-- TMPL_VAR NAME="gstgsti_spent" --></td>
+                                <td><a href="/cgi-bin/koha/acqui/invoice.pl?invoicenumber=<!-- TMPL_VAR NAME='invoicenumber' -->">See invoice informations</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </li>
+            </ul>
+        </div>
+    <!-- /TMPL_IF -->
     <div id="subscription_planning">
         <h2>Planning</h2>
             <p><label>Beginning date:</label> <!-- TMPL_VAR name="startdate" -->

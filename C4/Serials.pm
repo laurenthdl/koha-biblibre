@@ -59,6 +59,7 @@ BEGIN {
       &check_routing &updateClaim &removeMissingIssue
       &CountIssues &HasItems
 
+      subscriptionCurrentlyOnOrder
     );
 }
 
@@ -703,7 +704,7 @@ sub SearchSubscriptions {
         $query .= " WHERE " . join(" AND ", @where_strs);
     }
     warn $query;
-    warn join(",", @where_args);
+    warn join(",", @where_args) if @where_args;
     my $dbh = C4::Context->dbh;
     my $sth = $dbh->prepare($query);
     $sth->execute(@where_args);
@@ -1397,23 +1398,10 @@ sub ReNewSubscription {
     $sth->execute( $subscription->{biblionumber} );
     my $biblio = $sth->fetchrow_hashref;
 
-    if ( C4::Context->preference("RenewSerialAddsSuggestion") ) {
-
-        NewSuggestion(
-            {   'suggestedby'   => $user,
-                'title'         => $subscription->{bibliotitle},
-                'author'        => $biblio->{author},
-                'publishercode' => $biblio->{publishercode},
-                'note'          => $biblio->{note},
-                'biblionumber'  => $subscription->{biblionumber}
-            }
-        );
-    }
-
     # renew subscription
     $query = qq|
         UPDATE subscription
-        SET    startdate=?,numberlength=?,weeklength=?,monthlength=?
+        SET    startdate=?,numberlength=?,weeklength=?,monthlength=?,reneweddate=NOW()
         WHERE  subscriptionid=?
     |;
     $sth = $dbh->prepare($query);
@@ -2420,6 +2408,24 @@ sub itemdata {
     my $data = $sth->fetchrow_hashref;
     $sth->finish;
     return ($data);
+}
+
+=head2
+    $bool = subscriptionCurrentlyOnOrder( $subscriptionid );
+    Return 1 if subscription is already on order
+    else 0
+=cut
+sub subscriptionCurrentlyOnOrder {
+    my ( $subscriptionid ) = @_;
+    my $dbh = C4::Context->dbh;
+    my $query = qq|
+        SELECT COUNT(*) FROM aqorders
+        WHERE subscriptionid = ?
+            AND datereceived IS NULL
+    |;
+    my $sth = $dbh->prepare( $query );
+    $sth->execute($subscriptionid);
+    return $sth->fetchrow_array;
 }
 
 1;

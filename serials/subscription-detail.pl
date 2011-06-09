@@ -18,7 +18,9 @@
 use strict;
 use warnings;
 use CGI;
+use C4::Acquisition;
 use C4::Auth;
+use C4::Bookseller;
 use C4::Koha;
 use C4::Dates qw/format_date/;
 use C4::Serials;
@@ -93,7 +95,7 @@ $totalissues-- if $totalissues;    # the -1 is to have 0 if this is a new subscr
 
 # the subscription must be deletable if there is NO issues for a reason or another (should not happend, but...)
 
-my ( $user, $sessionID, $flags );
+my ( $user, $sessionID );
 ( $user, $cookie, $sessionID, $flags ) = checkauth( $query, 0, { catalogue => 1 }, "intranet" );
 
 # COMMENT hdl : IMHO, we should think about passing more and more data hash to template->param rather than duplicating code a new coding Guideline ?
@@ -117,6 +119,31 @@ if ( !$subs->{periodicity} ) {
     $subs->{periodicity} = '0';
 }
 my $default_bib_view = get_default_view();
+
+my ( $order, $bookseller, $tmpl_infos );
+if ( defined $subscriptionid ) {
+    my $lastOrderNotReceived = GetLastOrderNotReceivedFromSubscriptionid $subscriptionid;
+    my $lastOrderReceived = GetLastOrderReceivedFromSubscriptionid $subscriptionid;
+    if ( defined $lastOrderNotReceived ) {
+        my $basket = GetBasket $$lastOrderNotReceived{basketno};
+        my $bookseller = GetBookSellerFromId $$basket{booksellerid};
+        ( $$tmpl_infos{ecostgsti_ordered}, $$tmpl_infos{ecostgste_ordered} ) = get_value_with_gst_params ( $$lastOrderNotReceived{ecost}, $$lastOrderNotReceived{gstrate}, $bookseller );
+        $$tmpl_infos{ecostgsti_ordered} = sprintf( "%.2f", $$tmpl_infos{ecostgsti_ordered} );
+        $$tmpl_infos{ecostgste_ordered} = sprintf( "%.2f", $$tmpl_infos{ecostgste_ordered} );
+        $$tmpl_infos{gstgsti_ordered} = sprintf( "%.2f", $$lastOrderNotReceived{gstrate} * 100 );
+        $$tmpl_infos{basketno} = $$lastOrderNotReceived{basketno};
+    }
+    if ( defined $lastOrderReceived ) {
+        my $basket = GetBasket $$lastOrderReceived{basketno};
+        my $bookseller = GetBookSellerFromId $$basket{booksellerid};
+        ( $$tmpl_infos{ecostgsti_spent}, $$tmpl_infos{ecostgste_spent} ) = get_value_with_gst_params ( $$lastOrderReceived{ecost}, $$lastOrderReceived{gstrate}, $bookseller );
+        $$tmpl_infos{ecostgsti_spent} = sprintf( "%.2f", $$tmpl_infos{ecostgsti_spent} );
+        $$tmpl_infos{ecostgste_spent} = sprintf( "%.2f", $$tmpl_infos{ecostgste_spent} );
+        $$tmpl_infos{gstgsti_spent} = sprintf( "%.2f", $$lastOrderReceived{gstrate} * 100 );
+        $$tmpl_infos{invoicenumber} = $$lastOrderReceived{booksellerinvoicenumber};
+    }
+}
+
 $template->param(
     subscriptionid => $subscriptionid,
     serialslist    => \@serialslist,
@@ -138,6 +165,9 @@ $template->param(
     intranetcolorstylesheet                  => C4::Context->preference('intranetcolorstylesheet'),
     irregular_issues                         => scalar @irregular_issues,
     default_bib_view                         => $default_bib_view,
+    order_exists                             => defined $subscriptionid ? 1 : 0,
+    basketno                                 => $$order{basketno},
+    %$tmpl_infos,
 );
 
 output_html_with_http_headers $query, $cookie, $template->output;
@@ -153,5 +183,39 @@ sub get_default_view {
         return 'labeledMARCdetail';
     } else {
         return 'detail';
+    }
+}
+
+# FIXME function duplicated from acqui/parcel.pl
+sub get_value_with_gst_params {
+    my $value = shift;
+    my $gstrate = shift;
+    my $bookseller = shift;
+    if ( $bookseller->{listincgst} ) {
+        return ( $value, $value / ( 1 + $gstrate ) );
+    } else {
+        return ( $value * ( 1 + $gstrate ), $value );
+    }
+}
+
+sub get_gste {
+    my $value = shift;
+    my $gstrate = shift;
+    my $bookseller = shift;
+    if ( $bookseller->{invoiceincgst} ) {
+        return $value / ( 1 + $gstrate );
+    } else {
+        return $value;
+    }
+}
+
+sub get_gst {
+    my $value = shift;
+    my $gstrate = shift;
+    my $bookseller = shift;
+    if ( $bookseller->{invoiceincgst} ) {
+        return $value / ( 1 + $gstrate ) * $gstrate;
+    } else {
+        return $value * ( 1 + $gstrate ) - $value;
     }
 }

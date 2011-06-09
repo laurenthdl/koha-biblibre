@@ -174,6 +174,7 @@ if ( $count == 1 ) {
         biblionumber          => $order->{'biblionumber'},
         ordernumber           => $order->{'ordernumber'},
         biblioitemnumber      => $order->{'biblioitemnumber'},
+        subscriptionid        => $order->{subscriptionid},
         supplierid            => $supplierid,
         freight               => $freight,
         gstrate               => $gstrate,
