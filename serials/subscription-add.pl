@@ -347,7 +347,7 @@ sub redirect_mod_subscription {
     }
 
     #  If it's  a mod, we need to check the current 'expected' issue, and mod it in the serials table if necessary.
-    if ( $nextacquidate ne $nextexpected->{planneddate}->output('iso') ) {
+    if ($nextexpected->{'planneddate'} && $nextacquidate ne $nextexpected->{planneddate}->output('iso') ) {
         ModNextExpected( $subscriptionid, C4::Dates->new( $nextacquidate, 'iso' ) );
 
         # if we have not received any issues yet, then we also must change the firstacquidate for the subs.
