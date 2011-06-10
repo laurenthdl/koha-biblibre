@@ -43,6 +43,7 @@ BEGIN {
       &DelBudget
       &GetBudgetSpent
       &GetBudgetOrdered
+      &GetBudgetName
       &GetUsersFromBudget
       &GetPeriodsCount
       &GetChildBudgetsSpent
@@ -341,6 +342,20 @@ sub GetBudgetOrdered {
     $sth->execute($budget_id);
     my $sum = $sth->fetchrow_array;
     return $sum;
+}
+
+sub GetBudgetName {
+    my ( $budget_id ) = @_;
+    my $dbh         = C4::Context->dbh;
+    my $sth         = $dbh->prepare(
+        qq|
+        SELECT budget_name
+        FROM aqbudgets
+        WHERE budget_id = ?
+    |);
+
+    $sth->execute($budget_id);
+    return $sth->fetchrow_array;
 }
 
 # -------------------------------------------------------------------

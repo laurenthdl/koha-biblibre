@@ -1744,6 +1744,7 @@ CREATE TABLE `subscription` (
   `opacdisplaycount` VARCHAR(10) NULL,
   `graceperiod` int(11) NOT NULL default '0',
   `enddate` date default NULL,
+  `reneweddate` date default NULL,
   PRIMARY KEY  (`subscriptionid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2558,12 +2559,15 @@ CREATE TABLE `aqorders` (
   `parent_ordernumber` int(11) default NULL,
   `claims_count` int(11) default 0,
   `claimed_date` date default NULL,
+  `subscriptionid` int(11) default NULL,
   PRIMARY KEY  (`ordernumber`),
   KEY `basketno` (`basketno`),
   KEY `biblionumber` (`biblionumber`),
   KEY `budget_id` (`budget_id`),
+  KEY `aqorders_subscriptionid` (`subscriptionid`),
   CONSTRAINT `aqorders_ibfk_1` FOREIGN KEY (`basketno`) REFERENCES `aqbasket` (`basketno`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `aqorders_ibfk_2` FOREIGN KEY (`biblionumber`) REFERENCES `biblio` (`biblionumber`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `aqorders_ibfk_2` FOREIGN KEY (`biblionumber`) REFERENCES `biblio` (`biblionumber`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `aqorders_subscriptionid` FOREIGN KEY (`subscriptionid`) REFERENCES `subscription` (`subscriptionid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
