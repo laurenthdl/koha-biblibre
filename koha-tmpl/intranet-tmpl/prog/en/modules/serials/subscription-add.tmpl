@@ -136,13 +136,6 @@ function displaymoreoptions() {
         $("#moreoptionst").hide();
     }
 
-    $("#lastvaluetemp1").val('');
-    $("#lastvaluetemp2").val('');
-    $("#lastvaluetemp3").val('');
-    $("#innerlooptemp1").val('');
-    $("#innerlooptemp2").val('');
-    $("#innerlooptemp3").val('');
-
     if(globalnumpatterndata.label1) {
         $("#headerX").html(unescape(globalnumpatterndata.label1));
         $("#headerX").show();
@@ -152,6 +145,8 @@ function displaymoreoptions() {
         $("#headerX").hide();
         $("#beginsX").hide();
         $("#innerX").hide();
+        $("#lastvaluetemp1").val('');
+        $("#innerlooptemp1").val('');
     }
     if(globalnumpatterndata.label2) {
         $("#headerY").html(unescape(globalnumpatterndata.label2));
@@ -162,6 +157,8 @@ function displaymoreoptions() {
         $("#headerY").hide();
         $("#beginsY").hide();
         $("#innerY").hide();
+        $("#lastvaluetemp2").val('');
+        $("#innerlooptemp2").val('');
     }
     if(globalnumpatterndata.label3) {
         $("#headerZ").html(unescape(globalnumpatterndata.label3));
@@ -172,62 +169,10 @@ function displaymoreoptions() {
         $("#headerZ").hide();
         $("#beginsZ").hide();
         $("#innerZ").hide();
+        $("#lastvaluetemp3").val('');
+        $("#innerlooptemp3").val('');
     }
 }
-
-function showPredictionPattern() {
-    var frequencyid = $("#frequency").val();
-    var numberpatternid = $("#numberpattern").val();
-    var lastvaluetemp1 = $("#lastvaluetemp1").val();
-    var lastvaluetemp2 = $("#lastvaluetemp2").val();
-    var lastvaluetemp3 = $("#lastvaluetemp3").val();
-    var firstacquidate = $("#acqui_date").val();
-    var enddate = $("#enddate").val();
-    var subtype = $("#subtype").val();
-    var sublength = $("#sublength").val();
-    var error = 0;
-    var error_msg = "";
-    if(frequencyid == undefined || frequencyid == ""){
-        error_msg += _("- Frequency is not defined\n");
-        error ++;
-    }
-    if(numberpatternid == undefined || numberpatternid == ""){
-        error_msg += _("- Number pattern is not defined\n");
-        error ++;
-    }
-    if(firstacquidate == undefined || firstacquidate == ""){
-        error_msg += _("- First publication date is not defined\n");
-        error ++;
-    }
-
-    if(error){
-        alert(_("Cannot test prediction pattern for the following reason(s):\n\n")
-            + error_msg);
-        return false;
-    }
-
-    $.ajax({
-        url: "showpredictionpattern.pl",
-        data: {
-            'frequency':frequencyid,
-            'numberpattern':numberpatternid,
-            'lastvaluetemp1':lastvaluetemp1,
-            'lastvaluetemp2':lastvaluetemp2,
-            'lastvaluetemp3':lastvaluetemp3,
-            'firstacquidate':firstacquidate,
-            'enddate':enddate,
-            'subtype':subtype,
-            'sublength':sublength
-        },
-        async: false,
-        dataType: "text",
-        success: function(data) {
-            $("#displayexample").html(data);
-            patternneedtobetested = 0;
-        }
-    });
-}
-
 
 function toggleAdvancedPattern() {
     $("#advancedpredictionpattern").toggle();
@@ -265,10 +210,6 @@ function modifyAdvancedPattern() {
     $("#saveadvancedpatternbutton").show();
     $("#modifyadvancedpatternbutton").hide();
 
-    document.getElementById("testpatternbutton").onclick = function(){
-        testAdvancedPattern();
-    }
-
     advancedpatternlocked = 0;
 }
 
@@ -304,17 +245,38 @@ function restoreAdvancedPattern() {
     $("#saveadvancedpatternbutton").hide();
     $("#modifyadvancedpatternbutton").show();
 
-    document.getElementById("testpatternbutton").onclick = function(){
-        showPredictionPattern();
-    }
     advancedpatternlocked = 1;
 }
 
-function testAdvancedPattern() {
+function testPredictionPattern() {
+    var frequencyid = $("#frequency").val();
+    var firstacquidate = $("#acqui_date").val();
+    var error = 0;
+    var error_msg = "";
+    if(frequencyid == undefined || frequencyid == ""){
+        error_msg += _("- Frequency is not defined\n");
+        error ++;
+    }
+    if(firstacquidate == undefined || firstacquidate == ""){
+        error_msg += _("- First publication date is not defined\n");
+        error ++;
+    }
+
+    if(error){
+        alert(_("Cannot test prediction pattern for the following reason(s):\n\n")
+            + error_msg);
+        return false;
+    }
+
+    var custompattern = 0;
+    if(advancedpatternlocked == 0) {
+        custompattern = 1;
+    }
+
     $.ajax({
         url: "showpredictionpattern.pl",
         data: {
-            'custompattern' : true,
+            'custompattern' : custompattern,
             'firstacquidate': $("#acqui_date").val(),
             'enddate'       : $("#enddate").val(),
             'subtype'       : $("#subtype").val(),
@@ -692,15 +654,15 @@ $(document).ready(function() {
                                             <tbody>
                                                 <tr>
                                                     <td>Begins with</td>
-                                                    <td id="beginsX"><input type="text" id="lastvaluetemp1" name="lastvaluetemp1" /></td>
-                                                    <td id="beginsY"><input type="text" id="lastvaluetemp2" name="lastvaluetemp2" /></td>
-                                                    <td id="beginsZ"><input type="text" id="lastvaluetemp3" name="lastvaluetemp3" /></td>
+                                                    <td id="beginsX"><input type="text" id="lastvaluetemp1" name="lastvaluetemp1" value="<!-- TMPL_VAR NAME='lastvalue1' -->" /></td>
+                                                    <td id="beginsY"><input type="text" id="lastvaluetemp2" name="lastvaluetemp2" value="<!-- TMPL_VAR NAME='lastvalue2' -->" /></td>
+                                                    <td id="beginsZ"><input type="text" id="lastvaluetemp3" name="lastvaluetemp3" value="<!-- TMPL_VAR NAME='lastvalue3' -->" /></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Inner counter</td>
-                                                    <td id="innerX"><input type="text" id="innerlooptemp1" name="innerlooptemp1" /></td>
-                                                    <td id="innerY"><input type="text" id="innerlooptemp2" name="innerlooptemp2" /></td>
-                                                    <td id="innerZ"><input type="text" id="innerlooptemp3" name="innerlooptemp3" /></td>
+                                                    <td id="innerX"><input type="text" id="innerlooptemp1" name="innerlooptemp1" value="<!-- TMPL_VAR NAME='innerloop1' -->" /></td>
+                                                    <td id="innerY"><input type="text" id="innerlooptemp2" name="innerlooptemp2" value="<!-- TMPL_VAR NAME='innerloop2' -->" /></td>
+                                                    <td id="innerZ"><input type="text" id="innerlooptemp3" name="innerlooptemp3" value="<!-- TMPL_VAR NAME='innerloop3' -->" /></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -787,7 +749,7 @@ $(document).ready(function() {
                             </fieldset>
                             <fieldset class="action">
                                 <input type="button" value="<< Previous" onclick="show_page_1();" style="float:left;"/>
-                                <input id="testpatternbutton" type="button" value="Test prediction pattern" onclick="showPredictionPattern();" />
+                                <input id="testpatternbutton" type="button" value="Test prediction pattern" onclick="testPredictionPattern();" />
                                 <input type="button" value="Save subscription" onclick="if (Check_page2()) submit();" style="float:right;" accesskey="w" />
                             </fieldset>
                         </div>
