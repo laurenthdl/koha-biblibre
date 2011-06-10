@@ -1151,7 +1151,8 @@ sub ModSerialStatus {
 
         # next date (calculated from actual date & frequency parameters)
         my $nextpublisheddate = GetNextDate( $publisheddate, $val );
-        NewIssue( $newserialseq, $subscriptionid, $val->{'biblionumber'}, 1, $nextpublisheddate->output("iso"), $nextpublisheddate->output("iso") );
+        my $nextpubdate = ($nextpublisheddate) ? $nextpublisheddate->output("iso") : undef;
+        NewIssue( $newserialseq, $subscriptionid, $val->{'biblionumber'}, 1, $nextpubdate, $nextpubdate );
         $query = "UPDATE subscription SET lastvalue1=?, lastvalue2=?, lastvalue3=?, innerloop1=?, innerloop2=?, innerloop3=?
                     WHERE  subscriptionid = ?";
         $sth = $dbh->prepare($query);
