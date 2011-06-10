@@ -188,9 +188,7 @@ if ( $ordernumber eq '' ) {    # create order
     $budget_id    = $data->{'budget_id'};
 
     #get basketno and supplierno. too!
-    my $data2 = GetBasket( $data->{'basketno'} );
-    $basketno     = $data2->{'basketno'};
-    $booksellerid = $data2->{'booksellerid'};
+    $basket = GetBasket( $data->{'basketno'} );
 }
 
 $suggestion = GetSuggestionInfo($suggestionid) if $suggestionid;
@@ -331,7 +329,7 @@ if ( defined $subscriptionid ) {
         $budget_id = $$lastOrderReceived{budgetid};
         $$data{listprice} = $$lastOrderReceived{listprice};
         $$data{uncertainprice} = $$lastOrderReceived{uncertainprice};
-        $$data{gstrate} = $$lastOrderReceived{gsrate};
+        $$data{gstrate} = $$lastOrderReceived{gstrate};
         $$data{discount} = $$lastOrderReceived{discount};
 
         $$data{rrp} = $$lastOrderReceived{rrp};
@@ -341,6 +339,8 @@ if ( defined $subscriptionid ) {
         $$data{notes} = $$lastOrderReceived{notes};
         $$data{sort1} = $$lastOrderReceived{sort1};
         $$data{sort2} = $$lastOrderReceived{sort2};
+
+        $basket = GetBasket( $input->param('basketno') );
     }
 }
 

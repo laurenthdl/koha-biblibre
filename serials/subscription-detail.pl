@@ -21,6 +21,7 @@ use CGI;
 use C4::Acquisition;
 use C4::Auth;
 use C4::Bookseller;
+use C4::Budgets;
 use C4::Koha;
 use C4::Dates qw/format_date/;
 use C4::Serials;
@@ -130,8 +131,9 @@ if ( defined $subscriptionid ) {
         ( $$tmpl_infos{ecostgsti_ordered}, $$tmpl_infos{ecostgste_ordered} ) = get_value_with_gst_params ( $$lastOrderNotReceived{ecost}, $$lastOrderNotReceived{gstrate}, $bookseller );
         $$tmpl_infos{ecostgsti_ordered} = sprintf( "%.2f", $$tmpl_infos{ecostgsti_ordered} );
         $$tmpl_infos{ecostgste_ordered} = sprintf( "%.2f", $$tmpl_infos{ecostgste_ordered} );
-        $$tmpl_infos{gstgsti_ordered} = sprintf( "%.2f", $$lastOrderNotReceived{gstrate} * 100 );
+        $$tmpl_infos{budget_name_ordered} = GetBudgetName $$lastOrderNotReceived{budget_id};
         $$tmpl_infos{basketno} = $$lastOrderNotReceived{basketno};
+        $$tmpl_infos{ordered_exists} = 1;
     }
     if ( defined $lastOrderReceived ) {
         my $basket = GetBasket $$lastOrderReceived{basketno};
@@ -139,8 +141,9 @@ if ( defined $subscriptionid ) {
         ( $$tmpl_infos{ecostgsti_spent}, $$tmpl_infos{ecostgste_spent} ) = get_value_with_gst_params ( $$lastOrderReceived{ecost}, $$lastOrderReceived{gstrate}, $bookseller );
         $$tmpl_infos{ecostgsti_spent} = sprintf( "%.2f", $$tmpl_infos{ecostgsti_spent} );
         $$tmpl_infos{ecostgste_spent} = sprintf( "%.2f", $$tmpl_infos{ecostgste_spent} );
-        $$tmpl_infos{gstgsti_spent} = sprintf( "%.2f", $$lastOrderReceived{gstrate} * 100 );
+        $$tmpl_infos{budget_name_spent} = GetBudgetName $$lastOrderReceived{budget_id};
         $$tmpl_infos{invoicenumber} = $$lastOrderReceived{booksellerinvoicenumber};
+        $$tmpl_infos{spent_exists} = 1;
     }
 }
 
@@ -165,7 +168,7 @@ $template->param(
     intranetcolorstylesheet                  => C4::Context->preference('intranetcolorstylesheet'),
     irregular_issues                         => scalar @irregular_issues,
     default_bib_view                         => $default_bib_view,
-    order_exists                             => defined $subscriptionid ? 1 : 0,
+    show_acquisition_details                 => defined $$tmpl_infos{ordered_exists} || defined $$tmpl_infos{spent_exists} ? 1 : 0,
     basketno                                 => $$order{basketno},
     %$tmpl_infos,
 );

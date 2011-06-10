@@ -148,7 +148,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 my $orderinfo = $input->Vars;
 $orderinfo->{'list_price'} ||= 0;
 $orderinfo->{'uncertainprice'} ||= 0;
-
+$$orderinfo{subscriptionid} ||= undef;
 
 my $user = $input->remote_user;
 
@@ -165,6 +165,7 @@ if ($$orderinfo{booksellerid}) {
     my $bookseller = GetBookSellerFromId($$orderinfo{booksellerid});
     $supplierreference = $bookseller->{name};
 }
+
 
 # Do we have to add order informations to the marc record?
 my ($ordertag, $ordersubtag) = GetMarcFromKohaField('aqorders.ordernumber', 'ACQ'); 
