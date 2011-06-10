@@ -1762,7 +1762,7 @@ sub HasSubscriptionExpired {
     my $subscription     = GetSubscription($subscriptionid);
     if ( ( $subscription->{periodicity} % 16 ) > 0 ) {
         my $expirationdate = $subscription->{enddate} || GetExpirationDate($subscriptionid);
-        return 0 if(!defined $expirationdate || $expirationdate eq '');
+        return 0 if(!defined $expirationdate || $expirationdate eq '' || $expirationdate eq '0000-00-00');
         my $query = qq|
             SELECT max(planneddate)
             FROM   serial
