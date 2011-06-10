@@ -652,9 +652,10 @@ sub GetSubscriptions {
 
 =head2 SearchSubscriptions
 
-@results = SearchSubscriptions($title, $issn, $ean, $publisher, $supplier, $branch);
+@results = SearchSubscriptions($title, $issn, $ean, $publisher, $supplier, $branch, $minold, $maxold);
 
 this function gets all subscriptions which have title like $title, ISSN like $issn, EAN like $ean, publisher like $publisher, supplier like $supplier AND branchcode eq $branch.
+$minold and $maxold are values in days. It allows to get active and inactive subscription apart.
 
 return:
 a table of hashref. Each hash containt the subscription.
@@ -662,7 +663,7 @@ a table of hashref. Each hash containt the subscription.
 =cut
 
 sub SearchSubscriptions {
-    my ($title, $issn, $ean, $publisher, $supplier, $branch) = @_;
+    my ($title, $issn, $ean, $publisher, $supplier, $branch, $minold, $maxold) = @_;
 
     my $query = qq{
         SELECT subscription.*, subscriptionhistory.*, biblio.*, biblioitems.issn
@@ -697,6 +698,14 @@ sub SearchSubscriptions {
     if($branch){
         push @where_strs, "subscription.branchcode = ?";
         push @where_args, "$branch";
+    }
+    if ($minold) {
+        push @where_strs, "TO_DAYS(NOW()) - TO_DAYS(subscription.enddate) > ?" if ($minold);
+        push @where_args, "$minold" if ($minold);
+    }
+    if ($maxold) {
+        push @where_strs, "TO_DAYS(NOW()) - TO_DAYS(subscription.enddate) <= ?" if ($maxold);
+        push @where_args, "$maxold" if ($maxold);
     }
 
     if(@where_strs){
