@@ -93,16 +93,18 @@ if (@serialseqs) {
     }
     $template->param( 'information' => \@information );
 }
-my @subscriptions;
+my @activesubs;
+my @inactivesubs;
 if ($searched) {
-    @subscriptions = SearchSubscriptions($title, $ISSN, $EAN, $publisher, $supplier, $branch);
+    # Getting active subscriptions (enddate must not exceed 2 years from today in the past)
+    @activesubs = SearchSubscriptions($title, $ISSN, $EAN, $publisher, $supplier, $branch, undef, 730);
+    # Getting inactive subscriptions (enddate is more than 2 years in the past)
+    @inactivesubs = SearchSubscriptions($title, $ISSN, $EAN, $publisher, $supplier, $branch, 730, undef);
 }
 
-my @subs_loop = ();
-foreach my $sub (@subscriptions) {
-    my $enddate = C4::Dates->new($sub->{'enddate'}, "iso");
-    $sub->{'enddate'} = $enddate->output();
-
+my @asubs_loop = ();
+my @isubs_loop = ();
+foreach my $sub (@activesubs, @inactivesubs) {
     if( $flags->{'superlibrarian'} == 1
      || $template->{'param_map'}->{'CAN_user_serials_superserials'}
      || !defined $sub->{'branchcode'}
@@ -112,14 +114,29 @@ foreach my $sub (@subscriptions) {
     } else {
         $sub->{'cannotedit'} = 1;
     }
+}
+
+foreach my $sub (@activesubs) {
     unless($sub->{'cannotedit'}){
-        push @subs_loop, $sub;
+        push @asubs_loop, $sub;
     }
 }
 
+foreach my $sub (@inactivesubs) {
+    unless($sub->{'cannotedit'}){
+        push @isubs_loop, $sub;
+    }
+}
+
+foreach my $subs (@activesubs, @inactivesubs) {
+    my $enddate = C4::Dates->new($subs->{'enddate'}, "iso");
+    $subs->{'enddate'} = $enddate->output();
+}
+
+
 # to toggle between create or edit routing list options
 if ($routing) {
-    for my $subscription (@subscriptions) {
+    for my $subscription (@activesubs, @inactivesubs) {
         $subscription->{routingedit} = check_routing( $subscription->{subscriptionid} );
     }
 }
@@ -137,7 +154,8 @@ foreach (sort keys %$branches){
 }
 
 $template->param(
-    subs_loop     => \@subs_loop,
+    asubs_loop    => \@asubs_loop,
+    isubs_loop    => \@isubs_loop,
     title_filter  => $title,
     ISSN_filter   => $ISSN,
     EAN_filter    => $EAN,
