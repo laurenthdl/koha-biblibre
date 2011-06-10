@@ -1705,27 +1705,14 @@ CREATE TABLE `subscription` (
   `numberlength` int(11) default 0,
   `periodicity` tinyint(4) default 0,
   `dow` varchar(100) default '',
-  `numberingmethod` varchar(100) default '',
   `notes` mediumtext,
   `status` varchar(100) NOT NULL default '',
-  `add1` int(11) default 0,
-  `every1` int(11) default 0,
-  `whenmorethan1` int(11) default 0,
-  `setto1` int(11) default NULL,
   `lastvalue1` int(11) default NULL,
-  `add2` int(11) default 0,
-  `every2` int(11) default 0,
-  `whenmorethan2` int(11) default 0,
-  `setto2` int(11) default NULL,
-  `lastvalue2` int(11) default NULL,
-  `add3` int(11) default 0,
-  `every3` int(11) default 0,
   `innerloop1` int(11) default 0,
+  `lastvalue2` int(11) default NULL,
   `innerloop2` int(11) default 0,
-  `innerloop3` int(11) default 0,
-  `whenmorethan3` int(11) default 0,
-  `setto3` int(11) default NULL,
   `lastvalue3` int(11) default NULL,
+  `innerloop3` int(11) default 0,
   `issuesatonce` tinyint(3) NOT NULL default 1,
   `firstacquidate` date default NULL,
   `manualhistory` tinyint(1) NOT NULL default 0,
@@ -1778,6 +1765,57 @@ CREATE TABLE `subscriptionroutinglist` (
   `subscriptionid` int(11) default NULL,
   PRIMARY KEY  (`routingid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `subscription_frequencies`
+--
+
+DROP TABLE IF EXISTS `subscription_frequencies`;
+CREATE TABLE `subscription_frequencies` (
+  `id` tinyint(4) NOT NULL AUTO_INCREMENT,
+  `description` tinytext NOT NULL,
+  `displayorder` tinyint(4) DEFAULT NULL,
+  `unit` enum('day','week','month','year') DEFAULT NULL,
+  `unitsperissue` smallint(6) NOT NULL DEFAULT '1',
+  `issuesperunit` smallint(6) NOT NULL DEFAULT '1',
+  `expectedissuesayear` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `subscription_numberpatterns`
+--
+
+DROP TABLE IF EXISTS `subscription_numberpatterns`;
+CREATE TABLE `subscription_numberpatterns` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `label` varchar(256) NOT NULL,
+  `displayorder` tinyint(4) DEFAULT NULL,
+  `description` text NOT NULL,
+  `numberingmethod` text NOT NULL,
+  `label1` text DEFAULT NULL,
+  `basedon1` ENUM('value2','value3','frequency','dow','dom','doy','week','month','year') DEFAULT NULL,
+  `add1` int(11) DEFAULT NULL,
+  `every1` int(11) DEFAULT NULL,
+  `whenmorethan1` int(11) DEFAULT NULL,
+  `setto1` int(11) DEFAULT NULL,
+  `numbering1` text DEFAULT NULL,
+  `label2` text DEFAULT NULL,
+  `basedon2` ENUM('value3','frequency','dow','dom','doy','week','month','year') DEFAULT NULL,
+  `add2` int(11) DEFAULT NULL,
+  `every2` int(11) DEFAULT NULL,
+  `whenmorethan2` int(11) DEFAULT NULL,
+  `setto2` int(11) DEFAULT NULL,
+  `numbering2` text DEFAULT NULL,
+  `label3` text DEFAULT NULL,
+  `basedon3` ENUM('frequency','dow','dom','doy','week','month','year') DEFAULT NULL,
+  `add3` int(11) DEFAULT NULL,
+  `every3` int(11) DEFAULT NULL,
+  `whenmorethan3` int(11) DEFAULT NULL,
+  `setto3` int(11) DEFAULT NULL,
+  `numbering3` text DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for table `suggestions`

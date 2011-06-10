@@ -5924,6 +5924,122 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.06.00.032";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("DROP TABLE IF EXISTS `subscription_frequencies`");
+    $dbh->do("CREATE TABLE `subscription_frequencies` (
+        `id` tinyint(4) NOT NULL AUTO_INCREMENT,
+        `description` tinytext NOT NULL,
+        `displayorder` tinyint(4) DEFAULT NULL,
+        `unit` enum('day','week','month','year') DEFAULT NULL,
+        `unitsperissue` smallint(6) NOT NULL DEFAULT '1',
+        `issuesperunit` smallint(6) NOT NULL DEFAULT '1',
+        `expectedissuesayear` int(11) NOT NULL DEFAULT '1',
+        PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+
+    $dbh->do("DROP TABLE IF EXISTS `subscription_numberpatterns`");
+    $dbh->do("CREATE TABLE `subscription_numberpatterns` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `label` varchar(256) NOT NULL,
+        `displayorder` tinyint(4) DEFAULT NULL,
+        `description` text NOT NULL,
+        `numberingmethod` text NOT NULL,
+        `label1` text DEFAULT NULL,
+        `basedon1` ENUM('value2','value3','frequency','dow','dom','doy','week','month','year') DEFAULT NULL,
+        `add1` int(11) DEFAULT NULL,
+        `every1` int(11) DEFAULT NULL,
+        `whenmorethan1` int(11) DEFAULT NULL,
+        `setto1` int(11) DEFAULT NULL,
+        `numbering1` text DEFAULT NULL,
+        `label2` text DEFAULT NULL,
+        `basedon2` ENUM('value3','frequency','dow','dom','doy','week','month','year') DEFAULT NULL,
+        `add2` int(11) DEFAULT NULL,
+        `every2` int(11) DEFAULT NULL,
+        `whenmorethan2` int(11) DEFAULT NULL,
+        `setto2` int(11) DEFAULT NULL,
+        `numbering2` text DEFAULT NULL,
+        `label3` text DEFAULT NULL,
+        `basedon3` ENUM('frequency','dow','dom','doy','week','month','year') DEFAULT NULL,
+        `add3` int(11) DEFAULT NULL,
+        `every3` int(11) DEFAULT NULL,
+        `whenmorethan3` int(11) DEFAULT NULL,
+        `setto3` int(11) DEFAULT NULL,
+        `numbering3` text DEFAULT NULL,
+        PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB  DEFAULT CHARSET=utf8");
+
+    $dbh->do("INSERT INTO `subscription_frequencies` (`id`, `description`, `unit`, `unitsperissue`, `issuesperunit`, `expectedissuesayear`, `displayorder`) VALUES
+        (1, '1/day', 'day', 1, 1, 365, 6),
+        (2, '1/week', 'week', 1, 1, 52, 8),
+        (3, '1/2 weeks', 'week', 2, 1, 26, 9),
+        (4, '1/3 weeks', 'week', 3, 1, 17, 10),
+        (5, '1/month', 'month', 1, 1, 12, 11),
+        (6, '1/2 months', 'month', 2, 1, 6, 12),
+        (7, '1/3 months', 'month', 3, 1, 4, 13),
+        (8, '1/quarter', 'year', 1, 4, 4, 14),
+        (9, '2/year', 'year', 1, 2, 2, 15),
+        (10, '1/year', 'year', 1, 1, 1, 16),
+        (11, '1/2 year', 'year', 2, 1, 0, 17),
+        (12, '2 per day', 'day', 1, 2, 730, 5),
+        (13, '3 per week', 'week', 1, 3, 156, 7),
+        (16, 'Without Periodicity', NULL, 1, 1, 0, 19),
+        (32, 'Irregular', NULL, 1, 1, 0, 18),
+        (48, 'unknown', NULL, 1, 1, 0, 20)");
+
+    $dbh->do("INSERT INTO `subscription_numberpatterns`
+    (`id`, `label`, `displayorder`, `description`, `numberingmethod`,
+    `label1`, `basedon1`, `add1`, `every1`, `whenmorethan1`, `setto1`, `numbering1`,
+    `label2`, `basedon2`, `add2`, `every2`, `whenmorethan2`, `setto2`, `numbering2`,
+    `label3`, `basedon3`, `add3`, `every3`, `whenmorethan3`, `setto3`, `numbering3`)
+    VALUES
+    (1, 'Number', 1, 'Simple Numbering method', 'No.{X}',
+    'Number', NULL, 1, 1, 99999, 1, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+
+    (2, 'Volume, Number, Issue', 2, 'Volume Number Issue 1', 'Vol.{X}, Number {Y}, Issue {Z}',
+    'Volume', 'value2', 1, NULL, 99999, 1, NULL,
+    'Number', 'value3', 1, NULL, 99999, 1, NULL,
+    'Issue', NULL, 1, 1, 99999, 1, NULL),
+
+    (3, 'Volume, Number', 3, 'Volume Number 1', 'Vol {X}, No {Y}',
+    'Volume', 'value2', 1, NULL, 99999, 1, NULL,
+    'Number', NULL, 1, 1, 99999, 1, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+
+    (4, 'Seasonal', 4, 'Season Year ', '{X} {Y}',
+    'Season', NULL, 1, 1, 4, 1, 'season',
+    'Year', 'year', NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+
+    (5, 'Year/Number', 4, 'Year Number 1', 'Year {X}/Number {Y}',
+    'Year', 'year', NULL, NULL, NULL, NULL, NULL,
+    'Number', NULL, 1, 1, 99999, 1, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
+
+    $dbh->do("ALTER TABLE `subscription`
+        DROP COLUMN `numberingmethod`,
+        DROP COLUMN `add1`,
+        DROP COLUMN `every1`,
+        DROP COLUMN `whenmorethan1`,
+        DROP COLUMN `setto1`,
+        DROP COLUMN `add2`,
+        DROP COLUMN `every2`,
+        DROP COLUMN `whenmorethan2`,
+        DROP COLUMN `setto2`,
+        DROP COLUMN `add3`,
+        DROP COLUMN `every3`,
+        DROP COLUMN `whenmorethan3`,
+        DROP COLUMN `setto3`,
+        MODIFY COLUMN `numberpattern` INT(11) DEFAULT NULL,
+        ADD CONSTRAINT `subscription_ibfk_1` FOREIGN KEY (`periodicity`) REFERENCES `subscription_frequencies` (`id`),
+        ADD CONSTRAINT `subscription_ibfk_2` FOREIGN KEY (`numberpattern`) REFERENCES `subscription_numberpatterns` (`id`)");
+
+    print "Upgrade to $DBversion done (Add subscription_frequencies and subscription_numberpatterns tables)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.033";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     if ( column_exists( 'serialid', 'aqorders' ) ) {

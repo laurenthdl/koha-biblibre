@@ -1,0 +1,162 @@
+<h2>Prediction pattern</h1>
+<!-- TMPL_UNLESS NAME="custompattern" -->
+<p><em>Please check issues that are NOT published (irregularities)</em></p>
+<!-- TMPL_IF NAME="daily_options" -->
+<script type="text/javascript">
+//<![CDATA[
+function Check_boxes(dow) {
+    if($(":checkbox[data-dow='"+dow+"']:first").attr("checked") == true) {
+        $("#predictionst :checkbox[data-dow='"+dow+"']").each(function(){
+            $(this).attr('checked', true);
+            $(this).attr('disabled', true);
+        });
+    } else {
+        $("#predictionst :checkbox[data-dow='"+dow+"']").each(function(){
+            $(this).attr('checked', false);
+            $(this).attr('disabled', false);
+        });
+    }
+}
+//]]>
+</script>
+<p><em>If there is a day (or more) in the week where issues are never published, you can check corresponding boxes below.</em></p>
+<input type="checkbox" id="monday" data-dow="1" onchange="Check_boxes(1);" />
+<label for="monday">Monday</label>
+<input type="checkbox" id="tuesday" data-dow="2" onchange="Check_boxes(2);" />
+<label for="tuesday">Tuesday</label>
+<input type="checkbox" id="wednesday" data-dow="3" onchange="Check_boxes(3);" />
+<label for="wednesday">Wednesday</label>
+<input type="checkbox" id="thursday" data-dow="4" onchange="Check_boxes(4);" />
+<label for="thursday">Thursday</label>
+<input type="checkbox" id="friday" data-dow="5" onchange="Check_boxes(5);" />
+<label for="friday">Friday</label>
+<input type="checkbox" id="saturday" data-dow="6" onchange="Check_boxes(6);" />
+<label for="saturday">Saturday</label>
+<input type="checkbox" id="sunday" data-dow="7" onchange="Check_boxes(7);" />
+<label for="sunday">Sunday</label>
+<!-- /TMPL_IF -->
+<!-- /TMPL_UNLESS -->
+<!-- TMPL_IF NAME="predictions_loop" -->
+<table id="predictionst">
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Publication Date</th>
+      <!-- TMPL_UNLESS NAME="custompattern" -->
+      <th>Not published</th>
+      <!-- /TMPL_UNLESS -->
+    </tr>
+  </thead>
+  <tbody>
+    <!-- TMPL_LOOP NAME="predictions_loop" -->
+      <tr>
+        <td><!-- TMPL_VAR NAME="number" --></td>
+        <td>
+          <!-- TMPL_IF NAME="publicationdate" -->
+            <!-- TMPL_VAR NAME="publicationdate" -->
+          <!-- TMPL_ELSE -->
+            unknown
+          <!-- /TMPL_IF -->
+        </td>
+        <!-- TMPL_UNLESS NAME="custompattern" -->
+        <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" data-dow="<!-- TMPL_VAR NAME='dow' -->" /></td>
+        <!-- /TMPL_UNLESS -->
+      </tr>
+    <!-- /TMPL_LOOP -->
+  </tbody>
+</table>
+<!-- /TMPL_IF -->
+
+<!-- TMPL_IF NAME="debug" -->
+<h4>For debug purposes only:</h4>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>numberpattern</td>
+      <td><!-- TMPL_VAR NAME="calcnumberpattern" --></td>
+    </tr>
+    <tr>
+      <td>numberingmethod</td>
+      <td><!-- TMPL_VAR NAME="calcnumberingmethod" --></td>
+    </tr>
+    <tr>
+      <td>lastvalue1</td>
+      <td><!-- TMPL_VAR NAME="calclastvalue1" --></td>
+    </tr>
+    <tr>
+      <td>lastvalue2</td>
+      <td><!-- TMPL_VAR NAME="calclastvalue2" --></td>
+    </tr>
+    <tr>
+      <td>lastvalue3</td>
+      <td><!-- TMPL_VAR NAME="calclastvalue3" --></td>
+    </tr>
+    <tr>
+      <td>innerloop1</td>
+      <td><!-- TMPL_VAR NAME="calcinnerloop1" --></td>
+    </tr>
+    <tr>
+      <td>innerloop2</td>
+      <td><!-- TMPL_VAR NAME="calcinnerloop2" --></td>
+    </tr>
+    <tr>
+      <td>innerloop3</td>
+      <td><!-- TMPL_VAR NAME="calcinnerloop3" --></td>
+    </tr>
+    <tr>
+      <td>add1</td>
+      <td><!-- TMPL_VAR NAME="calcadd1" --></td>
+    </tr>
+    <tr>
+      <td>add2</td>
+      <td><!-- TMPL_VAR NAME="calcadd2" --></td>
+    </tr>
+    <tr>
+      <td>add3</td>
+      <td><!-- TMPL_VAR NAME="calcadd3" --></td>
+    </tr>
+    <tr>
+      <td>setto1</td>
+      <td><!-- TMPL_VAR NAME="calcsetto1" --></td>
+    </tr>
+    <tr>
+      <td>setto2</td>
+      <td><!-- TMPL_VAR NAME="calcsetto2" --></td>
+    </tr>
+    <tr>
+      <td>setto3</td>
+      <td><!-- TMPL_VAR NAME="calcsetto3" --></td>
+    </tr>
+    <tr>
+      <td>every1</td>
+      <td><!-- TMPL_VAR NAME="calcevery1" --></td>
+    </tr>
+    <tr>
+      <td>every2</td>
+      <td><!-- TMPL_VAR NAME="calcevery2" --></td>
+    </tr>
+    <tr>
+      <td>every3</td>
+      <td><!-- TMPL_VAR NAME="calcevery3" --></td>
+    </tr>
+    <tr>
+      <td>whenmorethan1</td>
+      <td><!-- TMPL_VAR NAME="calcwhenmorethan1" --></td>
+    </tr>
+    <tr>
+      <td>whenmorethan2</td>
+      <td><!-- TMPL_VAR NAME="calcwhenmorethan2" --></td>
+    </tr>
+    <tr>
+      <td>whenmorethan3</td>
+      <td><!-- TMPL_VAR NAME="calcwhenmorethan3" --></td>
+    </tr>
+  </tbody>
+</table>
+<!-- /TMPL_IF -->

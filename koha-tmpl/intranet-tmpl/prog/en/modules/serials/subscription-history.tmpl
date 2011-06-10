@@ -1,0 +1,58 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Serials &rsaquo; Subscription history</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+</head>
+
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+<!-- TMPL_INCLUDE NAME="serials-search.inc" -->
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/serials/serials-home.pl">Serials</a> &rsaquo; Subscription history</div>
+
+<div id="doc3" class="yui-t2">
+
+<div id="bd">
+  <div id="yui-main">
+    <div class="yui-b">
+      <h1>Subscription history for <!-- TMPL_VAR NAME="title" --></h1>
+        <div id="subscription_form_history">
+          <form method="post" action="/cgi-bin/koha/serials/subscription-history.pl">
+            <input type="hidden" name="op" value="mod" />
+            <input type="hidden" name="subscriptionid" value="<!-- TMPL_VAR name="subscriptionid" -->" />
+            <p>Hint : you can update the serial history manually. This can be useful for an old subscription or to clean the existing history. Modify those fields with care, as future serial recieve will continue to update them automatically.</p>
+            <table>
+              <tr>
+                <td>Subscription start date</td>
+                <td><input type="text" name="histstartdate" value="<!-- TMPL_VAR name="histstartdate" -->" /> (start date of the 1st subscription)</td>
+              </tr>
+              <tr>
+                <td>Subscription end date</td>
+                <td><input type="text" name="histenddate" value="<!-- TMPL_VAR name="histenddate" -->" />(if empty, subscription is still active)</td>
+              </tr>
+              <tr>
+                <td>Received issues</td>
+                <td><textarea name="receivedlist" cols="60" rows="5"><!-- TMPL_VAR name="receivedlist" --></textarea></td>
+              </tr>
+              <tr>
+                <td>Missing issues</td>
+                <td><textarea name="missinglist" cols="60" rows="5"><!-- TMPL_VAR name="missinglist" --></textarea></td>
+              </tr>
+              <tr>
+                <td>Note for OPAC</td>
+                <td><textarea name="opacnote" cols="60" rows="5"><!-- TMPL_VAR name="opacnote" --></textarea></td>
+              </tr>
+              <tr>
+                <td>Note for staff</td>
+                <td><textarea name="librariannote" cols="60" rows="5"><!-- TMPL_VAR name="librariannote" --></textarea></td>
+              </tr>
+            </table>
+            <input type="submit" value="Save subscription history"  />
+          </form>
+        </div>
+    </div>
+  </div>
+  <div class="yui-b">
+    <!-- TMPL_INCLUDE NAME="serials-menu.inc" -->
+  </div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
