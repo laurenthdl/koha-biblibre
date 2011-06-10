@@ -131,6 +131,7 @@ sub GetLastOrderReceivedFromSubscriptionid {
                         WHERE aqorders.subscriptionid = ?
                             AND aqorders.datereceived IS NOT NULL
                 )
+        ORDER BY ordernumber DESC
         LIMIT 1
     |;
     my $sth = $dbh->prepare( $query );
