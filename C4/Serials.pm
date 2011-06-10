@@ -1016,13 +1016,13 @@ sub GetExpirationDate {
         } elsif ( $subscription->{monthlength} ) {
             if ( $$subscription{startdate} ) {
                 my @enddate = Add_Delta_YM( $date[0], $date[1], $date[2], 0, $subscription->{monthlength} );
-                $enddate = sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] );
+                $enddate = C4::Dates->new(sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] ), "iso");
             }
         } elsif ( $subscription->{weeklength} ) {
             if ( $$subscription{startdate} ) {
                 my @date = split( /-/, $subscription->{startdate} );
                 my @enddate = Add_Delta_Days( $date[0], $date[1], $date[2], $subscription->{weeklength} * 7 );
-                $enddate = sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] );
+                $enddate = C4::Dates->new(sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] ), "iso");
             }
         }
         return $enddate->output("iso");
