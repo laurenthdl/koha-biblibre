@@ -1067,7 +1067,7 @@ sub GetExpirationDate {
     # we don't do the same test if the subscription is based on X numbers or on X weeks/months
     $enddate = $startdate || $subscription->{startdate};
     $enddate = C4::Dates->new($enddate, "iso");
-    my @date = split( /-/, $enddate );
+    my @date = split( /-/, $enddate->output("iso") );
     return if ( scalar(@date) != 3 || not check_date(@date) );
     if ( ( $subscription->{periodicity} % 16 ) > 0 ) {
  
@@ -1090,7 +1090,7 @@ sub GetExpirationDate {
                 $enddate = sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] );
             }
         }
-        return $enddate;
+        return $enddate->output("iso");
     } else {
         return;
     }
@@ -1472,7 +1472,8 @@ this function renew a subscription with values given on input args.
 =cut
 
 sub ReNewSubscription {
-    my ( $subscriptionid, $user, $startdate, $numberlength, $weeklength, $monthlength, $note ) = @_;
+    my ( $subscriptionid, $user, $startdate, $firstacquidate, $subtype, $sublength ) = @_;
+
     my $dbh          = C4::Context->dbh;
     my $subscription = GetSubscription($subscriptionid);
     my $query        = qq|
@@ -1485,16 +1486,18 @@ sub ReNewSubscription {
     $sth->execute( $subscription->{biblionumber} );
     my $biblio = $sth->fetchrow_hashref;
 
+    my $numberlength = ($subtype eq "issues") ? $sublength : 0;
+    my $weeklength = ($subtype eq "weeks") ? $sublength : 0;
+    my $monthlength = ($subtype eq "months") ? $sublength : 0;
     # renew subscription
     $query = qq|
         UPDATE subscription
-        SET    startdate=?,numberlength=?,weeklength=?,monthlength=?,reneweddate=NOW()
+        SET    startdate=?,firstacquidate=?,numberlength=?,weeklength=?,monthlength=?
         WHERE  subscriptionid=?
     |;
     $sth = $dbh->prepare($query);
-    $sth->execute( $startdate, $numberlength, $weeklength, $monthlength, $subscriptionid );
-    my $enddate = GetExpirationDate($subscriptionid);
-    $debug && warn "enddate :$enddate";
+    $sth->execute( $startdate, $firstacquidate, $numberlength, $weeklength, $monthlength, $subscriptionid );
+    my $enddate = GetExpirationDate($subscriptionid, $firstacquidate);
     $query = qq|
         UPDATE subscription
         SET    enddate=?
@@ -1509,6 +1512,7 @@ sub ReNewSubscription {
     |;
     $sth = $dbh->prepare($query);
     $sth->execute( $enddate, $subscriptionid );
+    $sth->finish;
 
     logaction( "SERIAL", "RENEW", $subscriptionid, "" ) if C4::Context->preference("SubscriptionLog");
     return;
