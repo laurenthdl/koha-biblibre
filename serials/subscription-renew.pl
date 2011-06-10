@@ -49,19 +49,17 @@ use CGI;
 use Carp;
 use C4::Koha;
 use C4::Auth;
-use C4::Dates qw/format_date/;
+use C4::Dates qw/format_date format_date_in_iso/;
 use C4::Context;
 use C4::Auth;
 use C4::Output;
 use C4::Serials;
 
 my $query = new CGI;
-my $dbh   = C4::Context->dbh;
 
-my $mode           = $query->param('mode');
 my $op             = $query->param('op') || q{};
 my $subscriptionid = $query->param('subscriptionid');
-my $done           = 0;                                 # for after form has been submitted
+
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     {   template_name   => "serials/subscription-renew.tmpl",
         query           => $query,
@@ -73,13 +71,16 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 );
 
 if ( $op eq "renew" ) {
+    my $startdate = $query->param('startdate');
+    my $firstacquidate = $query->param('firstacquidate');
+    my $subtype = $query->param('subtype');
+    my $sublength = $query->param('sublength');
     ReNewSubscription(
         $subscriptionid, $loggedinuser,
-        C4::Dates->new( $query->param('startdate') )->output('iso'),
-        $query->param('numberlength'),
-        $query->param('weeklength'),
-        $query->param('monthlength'),
-        $query->param('note')
+        format_date_in_iso($startdate),
+        format_date_in_iso($firstacquidate),
+        $subtype,
+        $sublength
     );
 }
 
@@ -89,15 +90,35 @@ if ( $subscription->{'cannotedit'} ) {
     print $query->redirect("/cgi-bin/koha/serials/subscription-detail.pl?subscriptionid=$subscriptionid");
 }
 
+my @subtypes = qw(issues weeks months);
+my $sublength;
+my @subtypes_loop;
+foreach my $subtype (@subtypes) {
+    my $selected;
+    if($subtype eq "issues" && $subscription->{'numberlength'} > 0) {
+        $selected = 1;
+        $sublength = $subscription->{'numberlength'};
+    } elsif($subtype eq "weeks" && $subscription->{'weeklength'} > 0) {
+        $selected = 1;
+        $sublength = $subscription->{'weeklength'};
+    } elsif($subtype eq "months" && $subscription->{'monthlength'} > 0) {
+        $selected = 1;
+        $sublength = $subscription->{'monthlength'};
+    }
+
+    push @subtypes_loop, {
+        value   => $subtype,
+        selected => $selected,
+    }
+}
+
 $template->param(
     startdate => format_date( $subscription->{enddate} || POSIX::strftime( "%Y-%m-%d", localtime ) ),
-    numberlength   => $subscription->{numberlength},
-    weeklength     => $subscription->{weeklength},
-    monthlength    => $subscription->{monthlength},
+    subtypes_loop  => \@subtypes_loop,
+    sublength      => $sublength,
     subscriptionid => $subscriptionid,
     bibliotitle    => $subscription->{bibliotitle},
     $op            => 1,
-    popup          => ( $query->param('mode') eq "popup" ),
 );
 
 # Print the page

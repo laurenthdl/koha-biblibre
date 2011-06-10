@@ -18,20 +18,34 @@
   //]]>
 </script>
 <!--TMPL_ELSE-->
-      <div id="bd">
+<div id="bd">
 <form name="f" action="/cgi-bin/koha/serials/subscription-renew.pl" method="post">
-		<input type="hidden" name="op" value="renew" />
-		<input type="hidden" name="subscriptionid" value="<!-- TMPL_VAR name="subscriptionid" -->" />
-		<fieldset class="rows"><legend>Subscription renewal for <!-- TMPL_VAR name="bibliotitle" --></legend>
-		<ol><li><label for="startdate">Start date: </label><input type="text" id="startdate" name="startdate" value="<!-- TMPL_VAR name="startdate" -->" /></li>
-		<li><fieldset>
-		<legend>Subscription length:</legend>
-		<ol><li><label for="numberlength">Number of num:</label><input type="text" id="numberlength" name="numberlength" value="<!-- TMPL_VAR name="numberlength" -->" /></li>
-		<li><label for="weeklength">Number of weeks: </label><input type="text" id="weeklength" name="weeklength" value="<!-- TMPL_VAR name="weeklength" -->" /></li>
-		<li><label for="monthlength">Number of months: </label><input type="text" id="monthlength" name="monthlength" value="<!-- TMPL_VAR name="monthlength" -->" /></li></ol></fieldset></li>
-		<li><label for="note">Note for the librarian that will manage your renewal request: </label>
-		<textarea name="note" id="note" rows="5" cols="50"></textarea></li></ol></fieldset>
-		<fieldset class="action"><input type="submit" value="Submit" class="button" /></fieldset>
+  <input type="hidden" name="op" value="renew" />
+  <input type="hidden" name="subscriptionid" value="<!-- TMPL_VAR name="subscriptionid" -->" />
+  <fieldset class="rows"><legend>Subscription renewal for <!-- TMPL_VAR name="bibliotitle" --></legend>
+    <ol>
+      <li>
+        <label for="startdate">Start date: </label>
+        <input type="text" id="startdate" name="startdate" value="<!-- TMPL_VAR name="startdate" -->" />
+      </li>
+      <li>
+        <label for="firstacquidate">First issue publication date: </label>
+        <input type="text" id="firstacquidate" name="firstacquidate" value="<!-- TMPL_VAR NAME='startdate' -->" />
+      </li>
+      <li>
+        <label for="sublength">Subscription length:</label>
+        <select id="subtype" name="subtype">
+          <!-- TMPL_LOOP NAME="subtypes_loop" -->
+            <!-- TMPL_IF NAME="selected" -->
+              <option value="<!-- TMPL_VAR NAME='value' -->" selected="selected"><!-- TMPL_VAR NAME="value" --></option>
+            <!-- TMPL_ELSE -->
+              <option value="<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME="value" --></option>
+            <!-- /TMPL_IF -->
+          <!-- /TMPL_LOOP -->
+        </select>
+        <input type="text" id="sublength" name="sublength" value="<!-- TMPL_VAR NAME='sublength' -->" />
+      </li>
+  <fieldset class="action"><input type="submit" value="Submit" class="button" /></fieldset>
 </form>
 </div>
 <!-- /TMPL_IF -->
