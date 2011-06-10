@@ -238,7 +238,7 @@ sub _guess_enddate {
     if(defined $year) {
         $enddate = sprintf("%04d-%02d-%02d", $year, $month, $day);
     } else {
-        $enddate = "";    # just to be sure we can receive serials
+        undef $enddate;
     }
     return $enddate;
 }
