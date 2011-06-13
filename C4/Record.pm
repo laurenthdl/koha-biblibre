@@ -33,10 +33,13 @@ use XML::LibXML;
 use C4::Biblio;                     #marc2bibtex
 use C4::Csv;                        #marc2csv
 use C4::Koha;                       #marc2csv
+use C4::Logger;
 use YAML;                           #marcrecords2csv
 use Text::CSV::Encoded;             #marc2csv
 
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logger->new();
 
 # set the version for version checking
 $VERSION = 3.00;

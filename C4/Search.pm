@@ -1727,7 +1727,10 @@ sub getItemsInfos {
             $item->{'branchname'} = $branches->{ $item->{$otherbranch} };
         }
 
-        my $prefix = $item->{$hbranch} . '--' . $item->{location} . $item->{itype} . $item->{itemcallnumber};
+        my $prefix = ( defined $item->{$hbranch}         ? $item->{$hbranch} . '--' : "" )
+                   . ( defined $item->{location}       ? $item->{location}        : "" )
+                   . ( defined $item->{itype}          ? $item->{itype}           : "" )
+                   . ( defined $item->{itemcallnumber} ? $item->{itemcallnumber}  : "" );
 
         # For each grouping of items (onloan, available, unavailable), we build a key to store relevant info about that item
         if ( $item->{onloan} ) {
@@ -1794,13 +1797,16 @@ sub getItemsInfos {
                 || $item->{notforloan}
                 || $item->{hideatopac}
                 || $reservestatus eq 'Waiting'
-                || ( $transfertwhen ne '' ) ) {
+                || ( defined $transfertwhen && $transfertwhen ne '' ) ) {
                 $wthdrawn_count++        if $item->{wthdrawn};
                 $itemlost_count++        if $item->{itemlost};
                 $itemdamaged_count++     if $item->{damaged};
                 $item_in_transit_count++ if $transfertwhen ne '';
                 $item_onhold_count++     if $reservestatus eq 'Waiting';
-                $item->{status} = $item->{wthdrawn} . "-" . $item->{itemlost} . "-" . $item->{damaged} . "-" . $item->{notforloan};
+                $item->{status} = ( defined $item->{wthdrawn}   ? $item->{wthdrawn} . "-" : "")
+                                . ( defined $item->{itemlost}   ? $item->{itemlost} . "-" : "")
+                                . ( defined $item->{damaged}    ? $item->{damaged}  . "-" : "")
+                                . ( defined $item->{notforloan} ? $item->{notforloan}     : "" );
                 #if only reserved or/and in transit, item can be hold
                 $can_place_holds = 1 unless ($item->{withdrawn} || $item->{itemlost} || $item->{damaged});
                 $other_count++;
@@ -1814,7 +1820,7 @@ sub getItemsInfos {
                 $other_items->{$key}->{notforloan} = GetAuthorisedValueDesc( '', '', $item->{notforloan}, '', '', $notforloan_authorised_value )
                   if $notforloan_authorised_value and $item->{notforloan};
                 $other_items->{$key}->{count}++ if $item->{$hbranch};
-                $other_items->{$key}->{location} = $shelflocations->{ $item->{location} };
+                $other_items->{$key}->{location} = $shelflocations->{ $item->{location} } if defined $item->{location};
                 $other_items->{$key}->{imageurl} = getitemtypeimagelocation( $interface, $itemtypes->{ $item->{itype} }->{imageurl} );
             }
 
@@ -1826,7 +1832,7 @@ sub getItemsInfos {
                 foreach (qw(branchname itemcallnumber hideatopac)) {
                     $available_items->{$prefix}->{$_} = $item->{$_};
                 }
-                $available_items->{$prefix}->{location} = $shelflocations->{ $item->{location} };
+                $available_items->{$prefix}->{location} = $shelflocations->{ $item->{location} } if defined $item->{location};
                 $available_items->{$prefix}->{imageurl} = getitemtypeimagelocation( $interface, $itemtypes->{ $item->{itype} }->{imageurl} );
             }
         }
@@ -1847,6 +1853,7 @@ sub getItemsInfos {
     }
 
     my $biblio = GetBiblioData($biblionumber);
+    $biblio->{itemtype} //= "";
 
     my $marcflavour = C4::Context->preference("marcflavour");
 
@@ -1897,7 +1904,7 @@ sub getItemsInfos {
     $biblio->{intransitcount}       = $item_in_transit_count;
     $biblio->{onholdcount}          = $item_onhold_count;
     $biblio->{orderedcount}         = $ordered_count;
-    $biblio->{isbn} =~ s/-//g;    # deleting - in isbn to enable amazon content
+    $biblio->{isbn} =~ s/-//g if defined $biblio->{isbn};    # deleting - in isbn to enable amazon content
 
     SetUTF8Flag( $marcrecord ) if $marcrecord;
 

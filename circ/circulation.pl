@@ -107,7 +107,7 @@ my %return_failed;
 for (@failedrenews) { $renew_failed{$_} = decode_json( shift @renewerrors ); }
 for (@failedreturns) { $return_failed{ GetItemnumberFromBarcode($_) } = decode_json( shift @returnerrors ); }
 
-my $findborrower = $query->param('findborrower');
+my $findborrower = $query->param('findborrower') || '';
 $findborrower =~ s|,| |g;
 my $borrowernumber = $query->param('borrowernumber');
 
@@ -185,19 +185,19 @@ if ($duedatespec_allow) {
 my $todaysdate = C4::Dates->new->output( 'iso' );
 
 # check and see if we should print
-if ( $barcode eq '' && $print eq 'maybe' ) {
+if ( $barcode eq '' && $print ~~ 'maybe' ) {
     $print = 'yes';
 }
 
 my $inprocess = ( $barcode eq '' ) ? '' : $query->param('inprocess');
-if ( $barcode eq '' && $query->param('charges') eq 'yes' ) {
+if ( $barcode eq '' && $query->param('charges') ~~ 'yes' ) {
     $template->param(
         PAYCHARGES     => 'yes',
         borrowernumber => $borrowernumber
     );
 }
 
-if ( $print eq 'yes' && $borrowernumber ne '' ) {
+if ( $print ~~ 'yes' && $borrowernumber ~~ '' ) {
     printslip($borrowernumber);
     $query->param( 'borrowernumber', '' );
     $borrowernumber = '';
@@ -648,7 +648,7 @@ my $flags = $borrower->{'flags'};
 $log->debug($flags, 1);
 foreach my $flag ( sort keys %$flags ) {
     $template->param( flagged => 1 );
-    $flags->{$flag}->{'message'} =~ s#\n#<br />#g;
+    $flags->{$flag}->{'message'} =~ s#\n#<br />#g if defined $flags->{$flag}->{'message'};
     if ( $flags->{$flag}->{'noissues'} ) {
         $template->param(
             flagged  => 1,
@@ -754,7 +754,7 @@ if ($bor_messages_loop) { $template->param( flagged => 1 ); }
 # Computes full borrower address
 my ( undef, $roadttype_hashref ) = &GetRoadTypes();
 my $address = $borrower->{'streetnumber'} . ' ' if ( $borrower->{'streetnumber'} );
-$address .= $roadttype_hashref->{ $borrower->{'streettype'} } . ' ' if ( $roadttype_hashref->{ $borrower->{'streettype'} } );
+$address .= $roadttype_hashref->{ $borrower->{'streettype'} } . ' ' if defined $borrower->{'streettype'};
 $address .= $borrower->{'address'};
 
 $duedatespec = "" if not( $stickyduedate or scalar $confirm_required );

@@ -70,7 +70,7 @@ my $dbh = C4::Context->dbh;
 
 my $input = new CGI;
 $debug or $debug = $input->param('debug') || 0;
-my $print          = $input->param('print');
+my $print          = $input->param('print') || "";
 my $override_limit = $input->param("override_limit") || 0;
 my @failedrenews   = $input->param('failedrenew');
 my @failedreturns  = $input->param('failedreturn');

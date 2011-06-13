@@ -36,7 +36,7 @@ sub new {
     my $proto = shift;
     my $class = ref($proto) || $proto;
     my $self = {};
-    my $file = shift || $ENV{LOG} || 'koha';
+    my $file = shift || defined $ENV{LOG} ? $ENV{LOG} : undef || 'koha';
     $self->{LEVEL} = shift || $DEBUG_LOG_LEVEL;#shift || conf->log || $NORMAL_LOG_LEVEL;
 
     if ( $file eq 'koha' ) {
@@ -44,7 +44,7 @@ sub new {
     } elsif ( $file eq 'opac' ) {
         $self->{FILE_PATH} = $OPAC_LOG_FILE;
     } else {
-        $self->{FILE_PATH} = $ENV{LOG};
+        $self->{FILE_PATH} = $file;
     }
     $self->{LOGGER} = Log::LogLite->new($self->{FILE_PATH}, $self->{LEVEL});
 

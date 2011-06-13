@@ -123,7 +123,7 @@ foreach my $borrower ( @$results[ $from .. $to - 1 ] ) {
         overdues => $od,
         issues   => $issue,
         odissue  => "$od/$issue",
-        fines    => sprintf( "%.2f", $fines ),
+        fines    => defined $fines ? sprintf( "%.2f", $fines ) : undef,
     );
     push( @resultsdata, \%row );
 }
@@ -144,7 +144,7 @@ my %parameters = (
     'resultsperpage' => $resultsperpage,
     'type'           => 'intranet'
 );
-my $base_url = 'member.pl?&amp;' . join( '&amp;', map { "$_=$parameters{$_}" } ( keys %parameters ) );
+my $base_url = 'member.pl?&amp;' . join( '&amp;', map { defined $parameters{$_} ? "$_=$parameters{$_}" : "" } ( keys %parameters ) );
 
 my @letters = map { { letter => $_ } } ( 'A' .. 'Z' );
 $template->param( letters => \@letters );
