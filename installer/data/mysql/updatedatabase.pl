@@ -6062,6 +6062,14 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+$DBversion = "3.06.00.035";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("ALTER TABLE serial
+        ADD publisheddatetext VARCHAR(100) DEFAULT NULL AFTER publisheddate");
+    print "Upgrade to $DBversion done (Add publisheddatetext field to serial table).\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.037";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('FinesDependsOnGracePeriod',0,'','If Yes, fines begin after grace delay. If No, fines begin just after return','YesNo')");

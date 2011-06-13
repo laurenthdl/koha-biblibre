@@ -369,6 +369,7 @@ sub GetFullSubscription {
             serial.serialseq,
             serial.planneddate, 
             serial.publisheddate, 
+            serial.publisheddatetext,
             serial.status, 
             serial.notes as notes,
             year(IF(serial.publisheddate="00-00-0000",serial.planneddate,serial.publisheddate)) as year,
@@ -529,6 +530,7 @@ sub GetFullSubscriptionsFromBiblionumber {
             serial.serialseq,
             serial.planneddate, 
             serial.publisheddate, 
+            serial.publisheddatetext,
             serial.status, 
             serial.notes as notes,
             year(IF(serial.publisheddate="00-00-0000",serial.planneddate,serial.publisheddate)) as year,
@@ -1153,7 +1155,7 @@ sub ModSubscriptionHistory {
 
 =head2 ModSerialStatus
 
-ModSerialStatus($serialid,$serialseq, $planneddate,$publisheddate,$status,$notes)
+ModSerialStatus($serialid,$serialseq, $planneddate,$publisheddate,$publisheddatetext,$status,$notes)
 
 This function modify the serial status. Serial status is a number.(eg 2 is "arrived")
 Note : if we change from "waited" to something else,then we will have to create a new "waited" entry
@@ -1161,7 +1163,7 @@ Note : if we change from "waited" to something else,then we will have to create 
 =cut
 
 sub ModSerialStatus {
-    my ( $serialid, $serialseq, $planneddate, $publisheddate, $status, $notes ) = @_;
+    my ( $serialid, $serialseq, $planneddate, $publisheddate, $publisheddatetext, $status, $notes ) = @_;
 
     #It is a usual serial
     # 1st, get previous status :
@@ -1176,9 +1178,9 @@ sub ModSerialStatus {
     if ( $status == 6 ) {
         DelIssue( { 'serialid' => $serialid, 'subscriptionid' => $subscriptionid, 'serialseq' => $serialseq } );
     } else {
-        my $query = 'UPDATE serial SET serialseq=?,publisheddate=?,planneddate=?,status=?,notes=? WHERE  serialid = ?';
+        my $query = 'UPDATE serial SET serialseq=?,publisheddate=?,publisheddatetext=?,planneddate=?,status=?,notes=? WHERE  serialid = ?';
         $sth = $dbh->prepare($query);
-        $sth->execute( $serialseq, $publisheddate, $planneddate, $status, $notes, $serialid );
+        $sth->execute( $serialseq, $publisheddate, $publisheddatetext, $planneddate, $status, $notes, $serialid );
         $query = "SELECT * FROM   subscription WHERE  subscriptionid = ?";
         $sth   = $dbh->prepare($query);
         $sth->execute($subscriptionid);
@@ -1526,17 +1528,17 @@ returns the serial id
 =cut
 
 sub NewIssue {
-    my ( $serialseq, $subscriptionid, $biblionumber, $status, $planneddate, $publisheddate, $notes ) = @_;
+    my ( $serialseq, $subscriptionid, $biblionumber, $status, $planneddate, $publisheddate, $publisheddatetext, $notes ) = @_;
     ### FIXME biblionumber CAN be provided by subscriptionid. So Do we STILL NEED IT ?
 
     my $dbh   = C4::Context->dbh;
     my $query = qq|
         INSERT INTO serial
-            (serialseq,subscriptionid,biblionumber,status,publisheddate,planneddate,notes)
-        VALUES (?,?,?,?,?,?,?)
+            (serialseq,subscriptionid,biblionumber,status,publisheddate,publisheddatetext,planneddate,notes)
+        VALUES (?,?,?,?,?,?,?,?)
     |;
     my $sth = $dbh->prepare($query);
-    $sth->execute( $serialseq, $subscriptionid, $biblionumber, $status, $publisheddate, $planneddate, $notes );
+    $sth->execute( $serialseq, $subscriptionid, $biblionumber, $status, $publisheddate, $publisheddatetext, $planneddate, $notes );
     my $serialid = $dbh->{'mysql_insertid'};
     $query = qq|
         SELECT missinglist,recievedlist
