@@ -64,6 +64,8 @@ foreach (sort keys %$branches){
 
 $template->param(
     branches_loop            => \@branches_loop,
+    unfolded_search          => 1,
+    searchform_action        => "/cgi-bin/koha/serials/serials-home.pl",
     debug                    => $debug || $input->param('debug') || 0,
 );
 
