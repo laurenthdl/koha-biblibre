@@ -45,8 +45,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 
 my $dbh          = C4::Context->dbh;
 my $error        = $input->param('error');
-my $biblionumber = $input->param('biblionumber');
-$biblionumber = 0 unless $biblionumber;
+my $biblionumber = $input->param('biblionumber') || 0;
 my $frameworkcode = $input->param('frameworkcode');
 my $title        = $input->param('title');
 my $author       = $input->param('author');
@@ -135,8 +134,9 @@ if ( $op ne "do_search" ) {
     my $nterms;
     my $pagesize = 20;
     my @server_page;
-    for(my $i = 0; $i < @id; $i++){
-        $server_page[$i] = $input->param("server".$i."_page") || 1;
+    for(my $i = 0 ; $i < scalar(@id) ; $i++){
+            $server_page[$i] = $input->param("server".$i."_page");
+            $server_page[$i] ||= defined $page && $tab == $i ? $page : 1;
     }
     if ( $isbn || $issn ) {
         $term = $isbn if ($isbn);
@@ -216,8 +216,6 @@ if ( $op ne "do_search" ) {
         warn "doing the search" if $DEBUG;
         $oResult[$z] = $oConnection[$z]->search_pqf($query)
           || $DEBUG && warn( "somthing went wrong: " . $oConnection[$s]->errmsg() );
-
-        # $oResult[$z] = $oConnection[$z]->search_pqf($query);
     }
 
     sub displayresults {
@@ -284,6 +282,8 @@ if ( $op ne "do_search" ) {
                             $row_data{author}       = $oldbiblio->{author};
                             $row_data{breedingid}   = $breedingid;
                             $row_data{biblionumber} = $biblionumber;
+                            $row_data{basketno}     = $basketno;
+                            $row_data{booksellerid} = $booksellerid;
                             push( @serverresultsloop, \%row_data );
 
                         } else {
@@ -316,7 +316,9 @@ if ( $op ne "do_search" ) {
                         { ind => 'subject', val => $subject },
                         { ind => 'dewey', val => $dewey },
                         { ind => 'stdid', val => $stdid },
-                        { ind => 'biblionumber', val => $biblionumber }
+                        { ind => 'biblionumber', val => $biblionumber },
+                        { ind => 'basketno', val => $basketno },
+                        { ind => 'booksellerid', val => $booksellerid },
                     );
                     push @pager_params, map { { ind => 'id', val => $_ } } @id;
                     for( my $i = 0; $i < @oResult; $i++){
@@ -328,9 +330,9 @@ if ( $op ne "do_search" ) {
                         server_name => $servername[$k],
                         previous_page => $pager->{prev_page},
                         next_page => $pager->{next_page},
-                        PAGE_NUMBERS => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
+                        PAGE_NUMBERS => [ map { { page => $_, current => $_ == $server_page[$k] } } @{ $pager->{'numbers_of_set'} } ],
                         follower_params => \@pager_params,
-                        serverresultsloop => \@serverresultsloop
+                        serverresultsloop => \@serverresultsloop,
                     } );
                 }    #$numresults
             }
@@ -342,12 +344,10 @@ if ( $op ne "do_search" ) {
             server        => $servername[$k],
             numberpending => $numberpending,
             tab           => $tab,
-            page          => $page,
         );
 
         output_html_with_http_headers $input, $cookie, $template->output if $numberpending == 0;
 
-        #  	print  $template->output  if $firstresult !=1;
         $firstresult++;
     }
     displayresults();
