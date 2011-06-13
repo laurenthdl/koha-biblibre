@@ -65,31 +65,14 @@ if($booksellerto){
 
 # Transfer order and exit
 if( $basketno && $ordernumber) {
-    my ($year, $month, $day) = Today();
-    my $today = "$year-$month-$day";
     my $order = GetOrder( $ordernumber );
     my $basket = GetBasket($order->{basketno});
     my $booksellerfrom = GetBookSellerFromId($basket->{booksellerid});
     my $bookselleridfrom = $booksellerfrom->{id};
-    $basket = GetBasket($basketno);
-    my $booksellerto = GetBookSellerFromId($basket->{booksellerid});
 
-    $order->{internalnotes} = "Cancelled and transfered to $booksellerto->{name} on $today";
-    ModOrder($order);
-    DelOrder($order->{biblionumber}, $order->{ordernumber});
+    TransferOrder($ordernumber, $basketno);
 
-    delete $order->{ordernumber};
-    delete $order->{datecancellationprinted};
-    delete $order->{cancelledby};
-    $order->{basketno} = $basketno;
-    $order->{internalnotes} = "Transfered from $booksellerfrom->{name} on $today";
-    NewOrder($order);
-} elsif ( $bookselleridto && $ordernumber) {
-    my $order = GetOrder( $ordernumber );
-    my $basketfrom = GetBasket( $order->{basketno} );
-    my $booksellerfrom = GetBookSellerFromId( $basketfrom->{booksellerid} );
-    $booksellerfromname = $booksellerfrom->{name};
-    print $input->redirect("cgi-bin/koha/acqui/parcels.pl?supplierid=$bookselleridfrom");
+    print $input->redirect("/cgi-bin/koha/acqui/parcels.pl?supplierid=$bookselleridfrom");
     exit;
 # Show open baskets for this bookseller
 } elsif ( $bookselleridto && $ordernumber) {
