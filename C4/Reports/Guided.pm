@@ -17,8 +17,7 @@ package C4::Reports::Guided;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
+use Modern::Perl;
 #use warnings; FIXME - Bug 2505 this module needs a lot of repair to run clean under warnings
 use CGI;
 use Carp;
@@ -30,7 +29,6 @@ use C4::Output;
 use C4::Dates;
 use XML::Simple;
 use XML::Dumper;
-use Switch;
 use C4::Debug;
 use utf8;
 #use open qw(:std :utf8);
@@ -311,8 +309,8 @@ sub get_criteria {
     foreach my $localcrit (@$crit) {
         my ( $value, $type )   = split( /\|/, $localcrit );
         my ( $table, $column ) = split( /\./, $value );
-        switch ($type) {
-            case 'textrange' {
+        given ($type) {
+            when ( 'textrange' ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'from'}        = "from_" . $value;
@@ -322,7 +320,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            case 'date' {
+            when ( 'date' ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'date'}        = 1;
@@ -330,7 +328,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            case 'daterange' {
+            when ( 'daterange' ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'from'}        = "from_" . $value;
@@ -340,7 +338,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            else {
+            default {
                 my $query = "SELECT distinct($column) as availablevalues FROM $table";
                 my $sth   = $dbh->prepare($query);
                 $sth->execute();
@@ -354,10 +352,14 @@ sub get_criteria {
                 $list = 'ccode'        if $column eq 'ccode';
 
                 # TODO : improve to let the librarian choose the description at runtime
-                push @values, { availablevalues => "<<$column" . ( $list ? "|$list" : '' ) . ">>" };
+                push @values, {
+                    availablevalues => "<<$column" . ( $list ? "|$list" : '' ) . ">>",
+                    display_value   => "<<$column" . ( $list ? "|$list" : '' ) . ">>"
+                };
                 while ( my $row = $sth->fetchrow_hashref() ) {
-                    push @values, $row;
                     if ( $row->{'availablevalues'} eq '' ) { $row->{'default'} = 1 }
+                    else { $row->{display_value} = _get_display_value( $row->{'availablevalues'}, $column ); }
+                    push @values, $row;
                 }
                 $sth->finish();
 
@@ -369,7 +371,6 @@ sub get_criteria {
                 push @criteria_array, \%temp;
 
             }
-
         }
     }
     return ( \@criteria_array );
@@ -735,6 +736,21 @@ sub _get_column_defs {
     close COLUMNS;
     return \%columns;
 }
+
+sub _get_display_value {
+    my ( $original_value, $column ) = @_;
+    given ( $column ) {
+        when ("periodicity") {
+            my $dbh = C4::Context->dbh();
+            my $query = "SELECT description FROM subscription_frequencies WHERE id = ?";
+            my $sth   = $dbh->prepare($query);
+            $sth->execute($original_value);
+            return $sth->fetchrow;
+        }
+    }
+    return $original_value;
+}
+
 1;
 __END__
 
