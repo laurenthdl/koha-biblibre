@@ -182,7 +182,9 @@ $(document).ready(function() {
 <!--TMPL_UNLESS Name="onesubscription"-->
                 <th># Subs</th>
 <!--/TMPL_UNLESS-->
-                <th>Date published
+                <th>Date published (date)
+                </th>
+                <th>Date published (text)
                 </th>
                 <th>Date received
                 </th>
@@ -204,6 +206,9 @@ $(document).ready(function() {
 <!--/TMPL_UNLESS-->
                 <td>
                     <!-- TMPL_VAR Name="publisheddate" -->
+                </td>
+                <td>
+                    <!-- TMPL_VAR NAME="publisheddatetext" -->
                 </td>
                 <td>
                     <!-- TMPL_VAR Name="planneddate" -->

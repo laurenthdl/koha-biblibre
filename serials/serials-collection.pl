@@ -64,14 +64,14 @@ if ( $op eq 'gennext' && @subscriptionid ) {
     }
 
     my $sth = $dbh->prepare(
-        "SELECT publisheddate, serialid, serialseq, planneddate
-							FROM serial WHERE status = 1 AND subscriptionid = ?"
+        "SELECT publisheddate, publisheddatetext, serialid, serialseq, planneddate
+                        FROM serial WHERE status = 1 AND subscriptionid = ?"
     );
     $sth->execute($subscriptionid);
 
     # modify actual expected issue, to generate the next
     if ( my $issue = $sth->fetchrow_hashref ) {
-        ModSerialStatus( $issue->{serialid}, $issue->{serialseq}, $issue->{planneddate}, $issue->{publisheddate}, 3, "" );
+        ModSerialStatus( $issue->{serialid}, $issue->{serialseq}, $issue->{planneddate}, $issue->{publisheddate}, $issue->{'publisheddatetext'}, 3, "" );
     } else {
         my $expected = GetNextExpected($subscriptionid);
         my ( $newserialseq, $newlastvalue1, $newlastvalue2, $newlastvalue3, $newinnerloop1, $newinnerloop2, $newinnerloop3 ) = GetNextSeq($subscription);

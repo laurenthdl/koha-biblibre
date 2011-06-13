@@ -369,6 +369,7 @@ sub GetFullSubscription {
             serial.serialseq,
             serial.planneddate, 
             serial.publisheddate, 
+            serial.publisheddatetext,
             serial.status, 
             serial.notes as notes,
             year(IF(serial.publisheddate="00-00-0000",serial.planneddate,serial.publisheddate)) as year,
@@ -525,6 +526,7 @@ sub GetFullSubscriptionsFromBiblionumber {
             serial.serialseq,
             serial.planneddate, 
             serial.publisheddate, 
+            serial.publisheddatetext,
             serial.status, 
             serial.notes as notes,
             year(IF(serial.publisheddate="00-00-0000",serial.planneddate,serial.publisheddate)) as year,
@@ -1150,7 +1152,7 @@ sub ModSubscriptionHistory {
 
 =head2 ModSerialStatus
 
-ModSerialStatus($serialid,$serialseq, $planneddate,$publisheddate,$status,$notes)
+ModSerialStatus($serialid,$serialseq, $planneddate,$publisheddate,$publisheddatetext,$status,$notes)
 
 This function modify the serial status. Serial status is a number.(eg 2 is "arrived")
 Note : if we change from "waited" to something else,then we will have to create a new "waited" entry
@@ -1158,7 +1160,7 @@ Note : if we change from "waited" to something else,then we will have to create 
 =cut
 
 sub ModSerialStatus {
-    my ( $serialid, $serialseq, $planneddate, $publisheddate, $status, $notes ) = @_;
+    my ( $serialid, $serialseq, $planneddate, $publisheddate, $publisheddatetext, $status, $notes ) = @_;
 
     #It is a usual serial
     # 1st, get previous status :
@@ -1181,9 +1183,9 @@ sub ModSerialStatus {
             if ( not $planneddate or $planneddate eq '0000-00-00' ) { $planneddate = C4::Dates->new()->output('iso') };
             if ( not $publisheddate or $publisheddate eq '0000-00-00' ) { $publisheddate = C4::Dates->new()->output('iso') };
         }
-        my $query = 'UPDATE serial SET serialseq=?,publisheddate=?,planneddate=?,status=?,notes=? WHERE  serialid = ?';
+        my $query = 'UPDATE serial SET serialseq=?,publisheddate=?,publisheddatetext=?,planneddate=?,status=?,notes=? WHERE  serialid = ?';
         $sth = $dbh->prepare($query);
-        $sth->execute( $serialseq, $publisheddate, $planneddate, $status, $notes, $serialid );
+        $sth->execute( $serialseq, $publisheddate, $publisheddatetext, $planneddate, $status, $notes, $serialid );
         $query = "SELECT * FROM   subscription WHERE  subscriptionid = ?";
         $sth   = $dbh->prepare($query);
         $sth->execute($subscriptionid);
@@ -1539,17 +1541,17 @@ returns the serial id
 =cut
 
 sub NewIssue {
-    my ( $serialseq, $subscriptionid, $biblionumber, $status, $planneddate, $publisheddate, $notes ) = @_;
+    my ( $serialseq, $subscriptionid, $biblionumber, $status, $planneddate, $publisheddate, $publisheddatetext, $notes ) = @_;
     ### FIXME biblionumber CAN be provided by subscriptionid. So Do we STILL NEED IT ?
 
     my $dbh   = C4::Context->dbh;
     my $query = qq|
         INSERT INTO serial
-            (serialseq,subscriptionid,biblionumber,status,publisheddate,planneddate,notes)
-        VALUES (?,?,?,?,?,?,?)
+            (serialseq,subscriptionid,biblionumber,status,publisheddate,publisheddatetext,planneddate,notes)
+        VALUES (?,?,?,?,?,?,?,?)
     |;
     my $sth = $dbh->prepare($query);
-    $sth->execute( $serialseq, $subscriptionid, $biblionumber, $status, $publisheddate, $planneddate, $notes );
+    $sth->execute( $serialseq, $subscriptionid, $biblionumber, $status, $publisheddate, $publisheddatetext, $planneddate, $notes );
     my $serialid = $dbh->{'mysql_insertid'};
     $query = qq|
         SELECT missinglist,recievedlist
@@ -2517,6 +2519,24 @@ sub itemdata {
     return ($data);
 }
 
+=head2
+    $bool = subscriptionCurrentlyOnOrder( $subscriptionid );
+    Return 1 if subscription is already on order
+    else 0
+=cut
+sub subscriptionCurrentlyOnOrder {
+    my ( $subscriptionid ) = @_;
+    my $dbh = C4::Context->dbh;
+    my $query = qq|
+        SELECT COUNT(*) FROM aqorders
+        WHERE subscriptionid = ?
+            AND datereceived IS NULL
+    |;
+    my $sth = $dbh->prepare( $query );
+    $sth->execute($subscriptionid);
+    return $sth->fetchrow_array;
+}
+
 =head2 _numeration
 
   $string = &_numeration($value,$num_type,$locale);
@@ -2571,24 +2591,6 @@ sub _numeration {
     }
     setlocale(LC_TIME,$initlocale);
     return $string;
-}
-
-=head2
-    $bool = subscriptionCurrentlyOnOrder( $subscriptionid );
-    Return 1 if subscription is already on order
-    else 0
-=cut
-sub subscriptionCurrentlyOnOrder {
-    my ( $subscriptionid ) = @_;
-    my $dbh = C4::Context->dbh;
-    my $query = qq|
-        SELECT COUNT(*) FROM aqorders
-        WHERE subscriptionid = ?
-            AND datereceived IS NULL
-    |;
-    my $sth = $dbh->prepare( $query );
-    $sth->execute($subscriptionid);
-    return $sth->fetchrow_array;
 }
 
 1;

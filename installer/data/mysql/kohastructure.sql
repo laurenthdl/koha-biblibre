@@ -1623,6 +1623,7 @@ CREATE TABLE `serial` (
   `planneddate` date default NULL,
   `notes` text,
   `publisheddate` date default NULL,
+  `publisheddatetext` varchar(100) default NULL,
   `itemnumber` text default NULL,
   `claimdate` date default NULL,
   `claims_count` int(11) default 0,

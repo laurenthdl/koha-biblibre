@@ -79,6 +79,7 @@ my @serialids       = $query->param('serialid');
 my @serialseqs      = $query->param('serialseq');
 my @planneddates    = $query->param('planneddate');
 my @publisheddates  = $query->param('publisheddate');
+my @publisheddatestext = $query->param('publisheddatetext');
 my @status          = $query->param('status');
 my @notes           = $query->param('notes');
 my @subscriptionids = $query->param('subscriptionid');
@@ -195,11 +196,12 @@ if ( $op and $op eq 'serialchangestatus' ) {
                     $status[$i],
                     format_date_in_iso( $planneddates[$i] ),
                     format_date_in_iso( $publisheddates[$i] ),
+                    $publisheddatestext[$i],
                     $notes[$i]
                 );
             }
         } elsif ( $serialids[$i] ) {
-            ModSerialStatus( $serialids[$i], $serialseqs[$i], format_date_in_iso( $planneddates[$i] ), format_date_in_iso( $publisheddates[$i] ), $status[$i], $notes[$i] );
+            ModSerialStatus( $serialids[$i], $serialseqs[$i], format_date_in_iso( $planneddates[$i] ), format_date_in_iso( $publisheddates[$i] ), $publisheddatestext[$i], $status[$i], $notes[$i] );
         }
     }
     my @moditems = $query->param('moditem');
@@ -313,6 +315,7 @@ foreach (@$location) {
     $locationlib = $_->{'lib'} if $_->{'selected'};
 }
 my $default_bib_view = get_default_view();
+my $todaystring = C4::Dates->new()->output();
 
 $template->param(
     serialsadditems  => $serialdatalist[0]->{'serialsadditems'},
@@ -323,6 +326,7 @@ $template->param(
     serialslist      => \@serialdatalist,
     default_bib_view => $default_bib_view,
     location         => $locationlib,
+    today            => $todaystring,
 );
 output_html_with_http_headers $query, $cookie, $template->output;
 
