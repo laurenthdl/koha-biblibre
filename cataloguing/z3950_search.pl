@@ -51,6 +51,7 @@ my $srchany       = $input->param('srchany');
 my $random        = $input->param('random') || rand(1000000000);    # this var is not useful anymore just kept for rel2_2 compatibility
 my $op            = $input->param('op');
 my $tab           = $input->param('tab');
+my $page          = $input->param('page');
 my $numberpending;
 my $attr = '';
 my $term;
@@ -113,8 +114,9 @@ if ( $op ne "do_search" ) {
     my $nterms;
     my $pagesize = 20;
     my @server_page;
-    for(my $i = 0; $i < @id; $i++){
-        $server_page[$i] = $input->param("server".$i."_page") || 1;
+    for(my $i = 0 ; $i < scalar(@id) ; $i++){
+        $server_page[$i] = $input->param("server".$i."_page");
+        $server_page[$i] ||= defined $page && $tab == $i ? $page : 1;
     }
     if ( $isbn || $issn ) {
         $term = $isbn if ($isbn);
@@ -192,8 +194,6 @@ if ( $op ne "do_search" ) {
         warn "doing the search" if $DEBUG;
         $oResult[$z] = $oConnection[$z]->search_pqf($query)
           || $DEBUG && warn( "somthing went wrong: " . $oConnection[$s]->errmsg() );
-
-        # $oResult[$z] = $oConnection[$z]->search_pqf($query);
     }
 
   AGAIN:
@@ -287,7 +287,7 @@ if ( $op ne "do_search" ) {
                     previous_page => $pager->{prev_page},
                     next_page => $pager->{next_page},
                     PAGE_NUMBERS => [ map { { page => $_, current => $_ == $server_page[$k] } } @{ $pager->{'numbers_of_set'} } ],
-                    pager_params => \@pager_params,
+                    follower_params => \@pager_params,
                     serverresultsloop => \@serverresultsloop
                 } );
             }    #$numresults
