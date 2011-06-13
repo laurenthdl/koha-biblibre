@@ -97,9 +97,6 @@ function deleteItemBlock(node_a, index) {
     }
 }
 
-function cloneItemBlock(index) {
-    var original = $("#" + index); //original <div>
-
 function addItemInList(index) {
     $("#items_list").show();
     var tr = constructTrNode(index);
