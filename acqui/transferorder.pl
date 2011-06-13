@@ -66,7 +66,7 @@ if($booksellerto){
 # Transfer order and exit
 if( $basketno && $ordernumber) {
     my ($year, $month, $day) = Today();
-    my $today = format_date_in_iso("$month/$day/$year");
+    my $today = "$year-$month-$day";
     my $order = GetOrder( $ordernumber );
     my $basket = GetBasket($order->{basketno});
     my $booksellerfrom = GetBookSellerFromId($basket->{booksellerid});
