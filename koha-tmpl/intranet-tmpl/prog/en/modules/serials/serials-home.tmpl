@@ -101,6 +101,7 @@ Serials updated :
 </ul>
 
 <div id="active">
+<!-- TMPL_IF NAME="advsearched" --><!-- TMPL_INCLUDE NAME="subscriptions-search.inc" --><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="asubs_loop" -->
     <table id="asrlt">
 	<thead>
@@ -177,6 +178,7 @@ Serials updated :
 <!-- /TMPL_IF -->
 </div>
 <div id="inactive">
+<!-- TMPL_IF NAME="advsearched" --><!-- TMPL_INCLUDE NAME="subscriptions-search.inc" --><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="isubs_loop" -->
     <table id="isrlt">
 	<thead>

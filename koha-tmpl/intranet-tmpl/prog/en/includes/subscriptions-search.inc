@@ -1,8 +1,13 @@
+
 <div id="advsearch">
-    <form action="" method="get">
+    <form action="<!-- TMPL_VAR NAME="searchform_action" -->" method="get">
         <fieldset class="brief">
+            <!-- TMPL_IF NAME="unfolded_search" -->
+            <div>
+            <!-- TMPL_ELSE -->
             <a id="unfold_advsearch" style="cursor:pointer" onclick="$('#advsearch_form').slideToggle(400);">Advanced search</a>
             <div id="advsearch_form" style="display:none">
+            <!-- /TMPL_IF -->
             <ol>
               <li>
                 <label for="issn">ISSN:</label>
@@ -39,6 +44,7 @@
               </li>
             </ol>
             <input type="hidden" name="searched" value="1" />
+            <input type="hidden" name="advsearched" value="1" />
             <!-- TMPL_IF NAME="booksellerid" -->
                 <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME="booksellerid" -->" />
             <!-- /TMPL_IF -->
