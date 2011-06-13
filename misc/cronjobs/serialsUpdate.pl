@@ -79,7 +79,7 @@ while ( my $issue = $sth->fetchrow_hashref ) {
                 && check_date( $tyear, $tmonth, $tday )
                 && Date_to_Days( $year, $month, $day ) < Date_to_Days( $tyear, $tmonth, $tday ) ) {
 
-                ModSerialStatus( $issue->{serialid}, $issue->{serialseq}, $issue->{planneddate}, $issue->{publisheddate}, 3, "Automatically set to late" );
+                ModSerialStatus( $issue->{serialid}, $issue->{serialseq}, $issue->{planneddate}, $issue->{publisheddate}, $issue->{'publisheddatetext'}, 3, "Automatically set to late" );
                 print $issue->{serialid} . " update\n";
             }
         } else {

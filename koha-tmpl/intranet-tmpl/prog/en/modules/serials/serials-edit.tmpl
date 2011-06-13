@@ -139,6 +139,25 @@ $(document).ready(function() {
             return false;
         }
     });
+    // planneddate = today if status == arrived
+    //             = publisheddate otherwise
+    $('select[name="status"]').each(function(){
+        this.onchange = function(){
+            var id = $(this).attr('id').replace('status', '');
+            if($(this).val() == 2){
+                $("#planneddate" + id).val("<!-- TMPL_VAR NAME='today' -->");
+            }else{
+                $("#planneddate" + id).val( $("#publisheddate" + id).val() );
+            }
+        };
+    });
+    // planneddatetext = planneddate if planneddatetext is empty
+    $('input[name="publisheddatetext"]').each(function(){
+        if($(this).val().length == 0){
+            var id = $(this).attr('id').replace('publisheddatetext', '');
+            $(this).val( $("#publisheddate" + id).val() );
+        }
+    });
 });
 //]]>
 </script>
@@ -180,15 +199,16 @@ $(document).ready(function() {
 </div>
 <!--/TMPL_IF -->
 
- <input type="hidden" name="op" value="serialchangestatus" />
-	<table>
-	<tr>
-		<th>Numbered</th>
-		<th>Published on</th>
-		<th>Expected on</th>
-		<th>Status</th>
-		<th>Notes</th>
-	</tr>
+<input type="hidden" name="op" value="serialchangestatus" />
+  <table>
+  <tr>
+    <th>Numbered</th>
+    <th>Published on (date)</th>
+    <th>Published on (text)</th>
+    <th>Expected on</th>
+    <th>Status</th>
+    <th>Notes</th>
+  </tr>
 <!-- TMPL_LOOP name="serialslist" -->
     <!-- TMPL_UNLESS NAME="__odd__" -->
     <tr class="highlight">
@@ -204,10 +224,13 @@ $(document).ready(function() {
             Issue <input type="text" name="serialseq" id="serialseq<!-- TMPL_VAR name="serialid" -->" value="<!-- TMPL_VAR name="serialseq" -->" size="20" maxlength="100" />
         </td>
         <td>
-            <input type="text" name="publisheddate" value="<!-- TMPL_VAR name="publisheddate" -->" size="10" maxlength="15" />
+            <input type="text" name="publisheddate" id="publisheddate<!-- TMPL_VAR NAME='serialid' -->" value="<!-- TMPL_VAR name="publisheddate" -->" size="10" maxlength="15" />
         </td>
         <td>
-            <input type="text" name="planneddate" value="<!-- TMPL_VAR name="planneddate" -->" size="10" maxlength="15" />
+            <input type="text" name="publisheddatetext" id="publisheddatetext<!-- TMPL_VAR NAME='serialid' -->" value="<!-- TMPL_VAR name="publisheddatetext" -->" size="20" />
+        </td>
+        <td>
+            <input type="text" name="planneddate" id="planneddate<!-- TMPL_VAR NAME='serialid' -->" value="<!-- TMPL_VAR name="planneddate" -->" size="10" maxlength="15" />
         </td>
         <td>
             <!--TMPL_IF name="editdisable"-->
@@ -319,6 +342,8 @@ $(document).ready(function() {
         <td>
             <input type="text" name="publisheddate" value="<!-- TMPL_VAR name="publisheddate" -->" size="10" maxlength="15" />
         </td>
+        <td>
+          <input type="text" name="publisheddatetext" value="<!-- TMPL_VAR name='publisheddate' -->" size="20" />
         <td>
             <input type="text" name="planneddate" value="<!-- TMPL_VAR name="planneddate" -->" size="10" maxlength="15" />
         </td>
