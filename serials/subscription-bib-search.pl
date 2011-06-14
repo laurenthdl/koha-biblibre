@@ -58,37 +58,52 @@ use C4::Debug;
 use Data::Pagination;
 
 my $input                 = new CGI;
-my $op                    = $input->param('op');
-my $query                 = $input->param('q') || '*:*';
+my $op                    = $input->param('op') || 'search_form';
+my $query                 = $input->param('query') || '*:*';
 my $dbh                   = C4::Context->dbh;
 my $count                 = 20;
 my $page                  = $input->param('page') || 1;
 my $advanced_search_types = C4::Context->preference("AdvancedSearchTypes");
-my $itype_or_itemtype     = C4::Context->preference("item-level_itypes") ? 'str_itype' : 'str_itemtype';
+my $itype_or_ccode;
+if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
+    $itype_or_ccode = 'itype';
+} else {
+    $itype_or_ccode = 'ccode';
+}
+my $itemtypes = GetItemTypes;
 
 my ( $template, $loggedinuser, $cookie );
 
 # don't run the search if no search term !
 if ( $op eq "do_search" && $query ) {
 
-    my $filters = { recordtype => 'biblio' };
-
-    # add the itemtype limit if applicable
+    my $itype_indexname = C4::Search::Query::getIndexName($itype_or_ccode);
     my $itemtypelimit = $input->param('itemtypelimit');
-    if ( $itemtypelimit ) {
-        if ( ! $advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
-            $filters->{$itype_or_itemtype} = "\"$itemtypelimit\"";
-        } else {
-            $filters->{$advanced_search_types} = "\"$itemtypelimit\"";
-        }
-    }
+    my $filters = { recordtype => 'biblio' };
+    $$filters{$itype_indexname} = $itemtypelimit if $itemtypelimit;
 
-    my $res = SimpleSearch( $query, $filters, $page, $count);
+    my $sort_by = join(' ', grep { defined } (
+        C4::Search::Query::getIndexName(C4::Context->preference('defaultSortField'))
+                                      , C4::Context->preference('defaultSortOrder') ) );
+    $query = C4::Search::Query->normalSearch($query);
+    my $res = SimpleSearch( $query, $filters, $page, $count, $sort_by);
     my @results;
-    foreach ( @{ $res->items }) {
-	my $bib = GetBiblio $_->{'values'}->{'recordid'};
-	$bib->{'issn'} = $_->{'values'}->{'str_issn'};
-	push @results, $bib;
+    my $title_indexname = C4::Search::Query::getIndexName('title');
+    my $author_indexname = C4::Search::Query::getIndexName('author');
+    my $publisher_indexname = C4::Search::Query::getIndexName('publisher');
+    my $publicationyear_indexname = C4::Search::Query::getIndexName('pubdate');
+    my $issn_indexname = C4::Search::Query::getIndexName('issn');
+
+    for my $searchresult ( @{ $res->items } ) {
+        my $biblio = {
+            title => $$searchresult{values}{$title_indexname},
+            author => $$searchresult{values}{$author_indexname},
+            publisher => $$searchresult{values}{$publisher_indexname},
+            publicationyear => C4::Dates->new($$searchresult{values}{$publicationyear_indexname}, 'iso')->output(),
+            issn => $$searchresult{values}{$issn_indexname},
+            biblionumber => $$searchresult{values}{recordid},
+        };
+        push @results, $biblio;
     }
 
     my $pager = Data::Pagination->new(
@@ -114,16 +129,15 @@ if ( $op eq "do_search" && $query ) {
         total          => $res->{'pager'}->{'total_entries'},
         PAGE_NUMBERS  => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
         follower_params  => [ { ind => 'op'           , val => $op            },
-                              { ind => 'q'            , val => $query         },
+                              { ind => 'query'        , val => $query         },
                               { ind => 'itemtypelimit', val => $itemtypelimit } ],
     );
 
 } else {
     my @itemtypesloop;
 
-    if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
+    if ( $itype_or_ccode ne 'ccode' ) {
 
-        my $itemtypes = GetItemTypes;
         @itemtypesloop = map { {
             code        => $_,
             description => $itemtypes->{$_}->{'description'},

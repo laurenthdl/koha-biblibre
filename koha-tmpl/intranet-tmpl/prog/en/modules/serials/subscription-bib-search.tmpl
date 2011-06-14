@@ -9,13 +9,13 @@
             <form name="f" action="/cgi-bin/koha/serials/subscription-bib-search.pl" method="get">
                 <input type="hidden" name="op" value="do_search" />
                 <input type="hidden" name="type" value="intranet" />
-	        <fieldset class="rows">
-	            <ol>
-                        <li><label for="q">Keyword: </label>
-                        <input type="text" id="q"  name="q" /></li>
+                <fieldset class="rows">
+                    <ol>
+                        <li><label for="query">Keyword: </label>
+                        <input type="text" id="query"  name="query" /></li>
                         <li><label for="itemtypelimit">Limit type to: </label>
                             <select name="itemtypelimit" id="itemtypelimit">
-	                        <option value="">All</option>
+                                <option value="">All</option>
                                 <!--TMPL_LOOP NAME="itemtypeloop"-->
                                     <option value="<!--TMPL_VAR NAME="code" -->">
                                         <!--TMPL_VAR ESCAPE="HTML" NAME="description" -->
@@ -23,7 +23,7 @@
                                 <!--/TMPL_LOOP-->
                             </select>
                         </li>
-	            </ol>
+                    </ol>
                 </fieldset>
                 <fieldset class="action"><input type="submit" value="Search" /></fieldset>
             </form>
