@@ -482,6 +482,7 @@ $template->param(
     'search_desc'    => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => C4::Context->preference('OPACnumSearchResults') || 20,
+    author_indexname => C4::Search::Query::getIndexName('author'),
 );
 
 # VI. BUILD THE TEMPLATE
