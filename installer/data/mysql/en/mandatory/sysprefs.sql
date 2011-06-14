@@ -301,3 +301,4 @@ INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SolrAPI','http://localhost:8080/solr','','Solr web service URL.','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Search Engine','Choice');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SubscriptionDuplicateDroppedInput','','','List of fields which must not be rewritten when a subscription is duplicated (Separated by semicolon)','Free');
+INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('FinesDependsOnGracePeriod',0,'','If Yes, fines begin after grace delay. If No, fines begin just after return','YesNo');
