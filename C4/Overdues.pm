@@ -271,6 +271,7 @@ sub CalcFine {
     # correct for grace period.
     my $days_minus_grace = $daystocharge - $data->{'firstremind'};
     if ( $data->{'chargeperiod'} > 0 && $days_minus_grace > 0 ) {
+        $daystocharge = $days_minus_grace if C4::Context->preference("FinesDependsOnGracePeriod");
         $amount = int( $daystocharge / $data->{'chargeperiod'} ) * $data->{'fine'};
     } else {
 
