@@ -107,6 +107,13 @@ function frequencyload(){
     $.getJSON("subscription-frequency.pl",{"frequency_id":document.f.frequency.value,ajax:'true'},
         function(freqdata){
             globalfreqdata=freqdata;
+            if ( globalfreqdata.unit.length == 0 ) {
+                var option = $("#subtype option[value='issues']");
+                $(option).attr('selected', 'selected');
+                $("#subtype").attr('disabled', 'disabled')
+            } else {
+                $("#subtype").attr('disabled', '')
+            }
         }
     )
 }
