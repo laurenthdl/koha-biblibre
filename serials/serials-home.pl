@@ -57,6 +57,7 @@ my $supplier     = $query->param('supplier_filter');
 my $branch       = $query->param('branch_filter');
 my $routing      = $query->param('routing') || C4::Context->preference("RoutingSerials");
 my $searched     = $query->param('searched');
+my $advsearched  = $query->param('advsearched');
 my $biblionumber = $query->param('biblionumber');
 
 my @serialseqs     = $query->param('serialseq');
@@ -167,6 +168,8 @@ $template->param(
     branch_filter => $branch,
     branches_loop => \@branches_loop,
     done_searched => $searched,
+    advsearched => $advsearched,
+    unfolded_search => 1,
     routing       => $routing,
 );
 output_html_with_http_headers $query, $cookie, $template->output;
