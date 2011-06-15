@@ -1986,3 +1986,7 @@ select.advsearchoperator {
 .subjectSearch ul {
     padding-left: 0px; 
 }
+
+.facets_arrows {
+    text-align: center;
+}
