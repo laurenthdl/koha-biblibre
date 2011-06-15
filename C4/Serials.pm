@@ -27,6 +27,7 @@ use C4::Koha;
 use C4::Biblio;
 use C4::Branch;
 use C4::Items;
+use C4::Members;
 use C4::Search;
 use C4::Letters;
 use C4::Log;    # logaction
@@ -62,6 +63,7 @@ BEGIN {
       &AddSubscriptionRoutingList &ModSubscriptionRoutingList
       &DelSubscriptionRoutingList
       &GetSubscriptionRoutingList &GetSubscriptionRoutingLists
+      &GetSubscriptionRoutingListAsCSV
       &getroutinglist     &delroutingmember   &addroutingmember
       &reorder_members
       &check_routing &updateClaim &removeMissingIssue
@@ -2119,6 +2121,31 @@ sub GetSubscriptionRoutingLists {
 
     return $results;
 }
+
+sub GetSubscriptionRoutingListAsCSV {
+    my ($routinglistid) = @_;
+
+    my $csv = Text::CSV::Encoded->new( {encoding => "utf8" } );
+    my $output;
+
+    my @headers = qw(surname firstname);
+    $csv->combine(@headers);
+    $output .= $csv->string() . "\n";
+
+    my @borrowernumbers = getroutinglist($routinglistid);
+    my @borrowers;
+    foreach (@borrowernumbers) {
+        my $member = C4::Members::GetMemberDetails($_->{'borrowernumber'});
+        $csv->combine(
+            $member->{'surname'},
+            $member->{'firstname'},
+        );
+        $output .= $csv->string() . "\n";
+    }
+
+    return $output;
+}
+
 
 sub ModSubscriptionRoutingList {
     my ($routinglistid, $subscriptionid, $title, $notes, @borrowernumbers) = @_;
