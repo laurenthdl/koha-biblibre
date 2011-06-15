@@ -1464,6 +1464,7 @@ sub _FixFineDaysOnReturn {
     my $grace = $issuingrule->{firstremind};
 
     if ( $deltadays - $grace > 0 ) {
+        $deltadays -= $grace if C4::Context->preference("FinesDependsOnGracePeriod");
         my @newdate = Add_Delta_Days( Today(), $deltadays * $finedays );
         my $isonewdate = join( '-', @newdate );
         my ( $deby, $debm, $debd ) = split( /-/, $borrower->{debarred} );
