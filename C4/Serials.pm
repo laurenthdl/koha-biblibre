@@ -59,6 +59,9 @@ BEGIN {
       &UpdateClaimdateIssues
       &GetSuppliersWithLateIssues             &getsupplierbyserialid
       &GetDistributedTo   &SetDistributedTo
+      &AddSubscriptionRoutingList &ModSubscriptionRoutingList
+      &DelSubscriptionRoutingList
+      &GetSubscriptionRoutingList &GetSubscriptionRoutingLists
       &getroutinglist     &delroutingmember   &addroutingmember
       &reorder_members
       &check_routing &updateClaim &removeMissingIssue
@@ -2026,86 +2029,237 @@ sub getsupplierbyserialid {
     return $result;
 }
 
+sub AddSubscriptionRoutingList {
+    my ($subscriptionid, $title) = @_;
+
+    my $dbh = C4::Context->dbh();
+    my $query = qq{
+        INSERT INTO subscriptionroutinglists (subscriptionid, title)
+        VALUES (?, ?)
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($subscriptionid, $title);
+
+    return $dbh->last_insert_id(undef, undef, 'subscriptionroutinglists', undef);
+}
+
+sub GetSubscriptionRoutingList {
+    my ($routinglistid) = @_;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT *
+        FROM subscriptionroutinglists
+        WHERE routinglistid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($routinglistid);
+    my $result = $sth->fetchrow_hashref;
+
+    $query = qq{
+        SELECT COUNT(*) AS count
+        FROM subscriptionroutings
+        WHERE routinglistid = ?
+    };
+    $sth = $dbh->prepare($query);
+    $sth->execute($routinglistid);
+    ($result->{'count'}) = $sth->fetchrow_array;
+
+    return $result;
+}
+
+sub GetSubscriptionRoutingLists {
+    my ($subscriptionid) = @_;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT *
+        FROM subscriptionroutinglists
+        WHERE subscriptionid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($subscriptionid);
+    my $results = $sth->fetchall_arrayref( {} );
+
+    $query = qq{
+        SELECT COUNT(*) AS count
+        FROM subscriptionroutings
+        WHERE routinglistid = ?
+    };
+    $sth = $dbh->prepare($query);
+    foreach (@$results) {
+        $sth->execute($_->{'routinglistid'});
+        ($_->{'count'}) = $sth->fetchrow_array;
+    }
+
+    return $results;
+}
+
+sub ModSubscriptionRoutingList {
+    my ($routinglistid, $subscriptionid, $title, $notes, @borrowernumbers) = @_;
+
+    my $dbh = C4::Context->dbh;
+    my $query = 'UPDATE subscriptionroutinglists';
+    my @setstrings = ();
+    my @setargs = ();
+    if($subscriptionid) {
+        push @setstrings, 'subscriptionid = ?';
+        push @setargs, $subscriptionid;
+    }
+    if($title) {
+        push @setstrings, 'title = ?';
+        push @setargs, $title;
+    }
+    if($notes) {
+        push @setstrings, 'notes = ?';
+        push @setargs, $notes;
+    }
+
+    if(@setstrings) {
+        $query .= ' SET ' . join(',', @setstrings);
+        $query .= ' WHERE routinglistid = ?';
+        my $sth = $dbh->prepare($query);
+        $sth->execute(@setargs, $routinglistid);
+    }
+
+    if(@borrowernumbers > 0){
+        $query = qq{
+            DELETE FROM subscriptionroutings
+            WHERE routinglistid = ?
+        };
+        my $sth = $dbh->prepare($query);
+        $sth->execute($routinglistid);
+
+        $query = qq{
+            INSERT INTO subscriptionroutings (routinglistid, borrowernumber, ranking)
+            VALUES (?, ?, ?)
+        };
+        $sth = $dbh->prepare($query);
+        my $i = 1;
+        foreach (@borrowernumbers) {
+            $sth->execute($routinglistid, $_, $i);
+            $i++;
+        }
+    }
+}
+
+sub DelSubscriptionRoutingList {
+    my ($routinglistid) = @_;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        DELETE FROM subscriptionroutinglists
+        WHERE routinglistid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($routinglistid);
+
+    # just to be sure
+    $query = qq{
+        DELETE FROM subscriptionroutings
+        WHERE routinglistid = ?
+    };
+    $sth = $dbh->prepare($query);
+    $sth->execute($routinglistid);
+}
+
 =head2 check_routing
 
 $result = &check_routing($subscriptionid)
 
-this function checks to see if a serial has a routing list and returns the count of routingid
+this function checks to see if a subscription has routing lists and returns the number of routing lists.
 used to show either an 'add' or 'edit' link
 
 =cut
 
 sub check_routing {
     my ($subscriptionid) = @_;
-    my $dbh              = C4::Context->dbh;
-    my $sth              = $dbh->prepare(
-        "SELECT count(routingid) routingids FROM subscription LEFT JOIN subscriptionroutinglist 
-                              ON subscription.subscriptionid = subscriptionroutinglist.subscriptionid
-                              WHERE subscription.subscriptionid = ? ORDER BY ranking ASC
-                              "
-    );
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT COUNT(*) AS count
+        FROM subscriptionroutinglists
+        WHERE subscriptionid = ?
+    };
+    my $sth = $dbh->prepare($query);
     $sth->execute($subscriptionid);
-    my $line   = $sth->fetchrow_hashref;
-    my $result = $line->{'routingids'};
-    return $result;
+    my $result = $sth->fetchrow_hashref;
+    return $result->{'count'};
 }
 
 =head2 addroutingmember
 
-addroutingmember($borrowernumber,$subscriptionid)
+addroutingmember($borrowernumber, $routinglistid)
 
-this function takes a borrowernumber and subscriptionid and adds the member to the
-routing list for that serial subscription and gives them a rank on the list
-of either 1 or highest current rank + 1
+this function takes a borrowernumber and routinglistid and adds the
+member to the routing list and gives them a rank on the list of either 1 or
+highest current rank + 1
 
 =cut
 
 sub addroutingmember {
-    my ( $borrowernumber, $subscriptionid ) = @_;
+    my ( $routinglistid, $borrowernumber ) = @_;
     my $rank;
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare("SELECT max(ranking) rank FROM subscriptionroutinglist WHERE subscriptionid = ?");
-    $sth->execute($subscriptionid);
-    while ( my $line = $sth->fetchrow_hashref ) {
-        if ( $line->{'rank'} > 0 ) {
-            $rank = $line->{'rank'} + 1;
-        } else {
-            $rank = 1;
-        }
+    my $query = qq{
+        SELECT DISTINCT MAX(ranking) AS rankmax
+        FROM subscriptionroutings
+        WHERE routinglistid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($routinglistid);
+    my $line = $sth->fetchrow_hashref;
+    if ( $line && $line->{'rankmax'} > 0 ) {
+        $rank = $line->{'rankmax'} + 1;
+    } else {
+        $rank = 1;
     }
-    $sth = $dbh->prepare("INSERT INTO subscriptionroutinglist (subscriptionid,borrowernumber,ranking) VALUES (?,?,?)");
-    $sth->execute( $subscriptionid, $borrowernumber, $rank );
+
+    $query = qq{
+        INSERT INTO subscriptionroutings (routinglistid, borrowernumber, ranking)
+        VALUES (?, ?, ?)
+    };
+    $sth = $dbh->prepare($query);
+    $sth->execute( $routinglistid, $borrowernumber, $rank );
+
+    return;
 }
 
 =head2 reorder_members
 
-reorder_members($subscriptionid,$routingid,$rank)
+reorder_members($routinglistid, $borrowernumber, $rank)
 
 this function is used to reorder the routing list
 
-it takes the routingid of the member one wants to re-rank and the rank it is to move to
-- it gets all members on list puts their routingid's into an array
-- removes the one in the array that is $routingid
-- then reinjects $routingid at point indicated by $rank
-- then update the database with the routingids in the new order
+it takes the borrowernumber of the member one wants to re-rank and the rank it is to move to
+- it gets all members on list puts their borrowernumber into an array
+- removes the one in the array that is $borrowernumber
+- then reinjects $borrowernumber at point indicated by $rank
+- then update the database with the borrowernumbers in the new order
 
 =cut
 
 sub reorder_members {
-    my ( $subscriptionid, $routingid, $rank ) = @_;
+    my ( $routinglistid, $borrowernumber, $rank ) = @_;
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare("SELECT * FROM subscriptionroutinglist WHERE subscriptionid = ? ORDER BY ranking ASC");
-    $sth->execute($subscriptionid);
+    my $query = qq{
+        SELECT *
+        FROM subscriptionroutings
+        WHERE routinglistid = ?
+        ORDER BY ranking ASC
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($routinglistid);
     my @result;
     while ( my $line = $sth->fetchrow_hashref ) {
-        push( @result, $line->{'routingid'} );
+        push( @result, $line->{'borrowernumber'} );
     }
 
     # To find the matching index
     my $i;
     my $key = -1;    # to allow for 0 being a valid response
     for ( $i = 0 ; $i < @result ; $i++ ) {
-        if ( $routingid == $result[$i] ) {
+        if ( $borrowernumber == $result[$i] ) {
             $key = $i;    # save the index
             last;
         }
@@ -2113,73 +2267,90 @@ sub reorder_members {
 
     # if index exists in array then move it to new position
     if ( $key > -1 && $rank > 0 ) {
-        my $new_rank = $rank - 1;                       # $new_rank is what you want the new index to be in the array
+        # $new_rank is what you want the new index to be in the array
+        my $new_rank = $rank - 1;
         my $moving_item = splice( @result, $key, 1 );
         splice( @result, $new_rank, 0, $moving_item );
     }
+
+    $query = qq{
+        UPDATE subscriptionroutings
+        SET ranking = ?
+        WHERE routinglistid = ?
+          AND borrowernumber = ?
+    };
+    $sth = $dbh->prepare($query);
     for ( my $j = 0 ; $j < @result ; $j++ ) {
-        my $sth = $dbh->prepare( "UPDATE subscriptionroutinglist SET ranking = '" . ( $j + 1 ) . "' WHERE routingid = '" . $result[$j] . "'" );
-        $sth->execute;
+        $sth->execute($j+1, $routinglistid, $result[$j]);
     }
+
     return;
 }
 
 =head2 delroutingmember
 
-delroutingmember($routingid,$subscriptionid)
+delroutingmember($routinglistid, $borrowernumber)
 
-this function either deletes one member from routing list if $routingid exists otherwise
-deletes all members from the routing list
+this function either deletes one member from routing list if $borrowernumber
+exists otherwise deletes all members from the routing list
 
 =cut
 
 sub delroutingmember {
-
-    # if $routingid exists then deletes that row otherwise deletes all with $subscriptionid
-    my ( $routingid, $subscriptionid ) = @_;
+    my ( $routinglistid, $borrowernumber ) = @_;
     my $dbh = C4::Context->dbh;
-    if ($routingid) {
-        my $sth = $dbh->prepare("DELETE FROM subscriptionroutinglist WHERE routingid = ?");
-        $sth->execute($routingid);
-        reorder_members( $subscriptionid, $routingid );
+    if ($borrowernumber) {
+        my $query = qq{
+            DELETE FROM subscriptionroutings
+            WHERE routinglistid = ?
+              AND borrowernumber = ?
+        };
+        my $sth = $dbh->prepare($query);
+        $sth->execute($routinglistid, $borrowernumber);
+        reorder_members( $routinglistid, $borrowernumber );
     } else {
-        my $sth = $dbh->prepare("DELETE FROM subscriptionroutinglist WHERE subscriptionid = ?");
-        $sth->execute($subscriptionid);
+        my $query = qq{
+            DELETE FROM subscriptionroutings
+            WHERE routinglistid = ?
+        };
+        my $sth = $dbh->prepare($query);
+        $sth->execute($routinglistid);
     }
     return;
 }
 
 =head2 getroutinglist
 
-($count,@routinglist) = getroutinglist($subscriptionid)
+@routinglist = getroutinglist($routinglistid)
 
-this gets the info from the subscriptionroutinglist for $subscriptionid
+this gets the info from subscriptionroutings for $routinglistid
 
-return :
-a count of the number of members on routinglist
-the routinglist as an array. Each element of the array contains a hash_ref containing
-routingid - a unique id, borrowernumber, ranking, and biblionumber of subscription
+return the routinglist as an array.
+
+Each element of the array contains a hash_ref containing borrowernumber,
+ranking, and biblionumber of subscription
 
 =cut
 
 sub getroutinglist {
-    my ($subscriptionid) = @_;
-    my $dbh              = C4::Context->dbh;
-    my $sth              = $dbh->prepare(
-        "SELECT routingid, borrowernumber, ranking, biblionumber 
-            FROM subscription 
-            JOIN subscriptionroutinglist ON subscription.subscriptionid = subscriptionroutinglist.subscriptionid
-            WHERE subscription.subscriptionid = ? ORDER BY ranking ASC
-                              "
-    );
-    $sth->execute($subscriptionid);
+    my ($routinglistid) = @_;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT borrowernumber, ranking
+        FROM subscriptionroutings
+          LEFT JOIN subscriptionroutinglists ON subscriptionroutings.routinglistid = subscriptionroutinglists.routinglistid
+          LEFT JOIN subscription ON subscriptionroutinglists.subscriptionid = subscription.subscriptionid
+        WHERE subscriptionroutings.routinglistid = ?
+        ORDER BY ranking ASC
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($routinglistid);
     my @routinglist;
-    my $count = 0;
     while ( my $line = $sth->fetchrow_hashref ) {
-        $count++;
         push( @routinglist, $line );
     }
-    return ( $count, @routinglist );
+    return @routinglist;
 }
 
 =head2 countissuesfrom

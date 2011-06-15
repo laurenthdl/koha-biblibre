@@ -1,0 +1,186 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Serials &rsaquo; Routing list</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript">
+//<![CDATA[
+<!-- TMPL_UNLESS NAME="new" -->
+var max_rank = <!-- TMPL_VAR NAME="max_rank" -->;
+
+function IncMaxRank(){
+    max_rank = max_rank + 1;
+    var option = '<option value="' + max_rank + '">' + max_rank + '</option>';
+    $('select[name="ranking"]').append(option);
+}
+
+function DecMaxRank(){
+    max_rank = max_rank - 1;
+    $('select[name="ranking"] option[value="'+(max_rank+1)+'"]').remove();
+}
+
+function updateTable(){
+    var ids = $("#borrowersids").val().split(":");
+    // split returns an array with one empty string if string is empty
+    if(ids[0] == "")
+        ids.splice(0,1);
+
+    var new_trs = new Array();
+    for(var i=0; i<ids.length; i++){
+        var tr = $("#ranking"+ids[i]).parents("tr");
+        new_trs.push("<tr>"+$(tr).html()+"</tr>");
+    }
+    $("#borrowers tbody").html(new_trs.join(" "));
+    var i=0;
+    $("select[name='ranking']").each(function(){
+        $(this).val(i+1);
+        i++;
+        var borrowernumber = $(this).attr('id').replace("ranking","");
+        $(this).change(function(){
+            reorderBorrower(borrowernumber, $(this).val());
+        });
+    });
+    if(i < max_rank)
+        DecMaxRank();
+
+    if(max_rank == 0){
+        $("#borrowers").hide();
+        $("#noborrowersp").show();
+    }
+}
+
+// delete borrower if rank <= 0
+function reorderBorrower(borrowernumber, rank){
+    var ids = $("#borrowersids").val().split(":");
+    for(var i=0; i<ids.length; i++){
+        if(ids[i] == borrowernumber){
+            ids.splice(i, 1);
+            break;
+        }
+    }
+    if(rank > 0){
+      ids.splice(rank-1, 0, borrowernumber);
+    }
+    $("#borrowersids").val(ids.join(":"));
+    updateTable();
+}
+
+function addBorrower(borrowernumber, surname, firstname){
+    // Check if we have already this borrower
+    var ids = $("#borrowersids").val();
+    var re = new RegExp("(^"+borrowernumber+"$)|(^"+borrowernumber+":)|(:"+borrowernumber+"$)|(:"+borrowernumber+":)");
+    if(ids.match(re))
+        return;
+
+    IncMaxRank();
+    var tr = '<tr>';
+    tr += '<td>' + surname + ', ' + firstname + '</td>';
+    tr += '<td><select name="ranking" id="ranking' + borrowernumber + '">';
+    for(var i=0; i<(max_rank-1); i++){
+        tr += '<option value="' + (i+1) + '">' + (i+1) + '</option>';
+    }
+    tr += '<option selected="selected" value="' + (max_rank) + '">' + (max_rank) + '</option>';
+    tr += '</select></td>';
+    tr += '<td><a style="cursor:pointer" onclick="delBorrower('+borrowernumber+');">Delete</a></td>';
+    tr += '</tr>';
+    $("#borrowers tbody").append(tr);
+    $("#ranking"+borrowernumber).change(function(){
+        reorderBorrower(borrowernumber, $(this).val());
+    });
+
+    if(ids.length != 0)
+        ids += ':';
+    ids += borrowernumber;
+    $("#borrowersids").val(ids);
+
+    $("#borrowers").show();
+    $("#noborrowersp").hide();
+}
+
+function delBorrower(borrowernumber){
+    reorderBorrower(borrowernumber, 0);
+}
+
+function SearchMember(){
+    window.open("/cgi-bin/koha/serials/member-search.pl");
+}
+<!-- /TMPL_UNLESS -->
+
+//]]>
+</script>
+</head>
+
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+<!-- TMPL_INCLUDE NAME="serials-search.inc" -->
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/serials/serials-home.pl">Serials</a> &rsaquo; Routing list</div>
+
+<div id="doc3" class="yui-t2">
+
+<div id="bd">
+  <div id="yui-main">
+    <div class="yui-b">
+      <!-- TMPL_INCLUDE NAME="serials-toolbar.inc" -->
+      <!-- TMPL_IF NAME="new" -->
+        <h1>Create routing list</h1>
+
+        <form action="/cgi-bin/koha/serials/routinglist.pl" method="get">
+          <input type="hidden" name="op" value="savenew" />
+          <input type="hidden" name="subscriptionid" value="<!-- TMPL_VAR NAME='subscriptionid' -->" />
+          <label for="title">Title: </label>
+          <input type="text" id="title" name="title" />
+          <input type="submit" value="Save" />
+        </form>
+      <!-- TMPL_ELSE -->
+        <h1>Routing list '<!-- TMPL_VAR NAME="title" -->'</h1>
+        <a style="cursor:pointer" onclick="SearchMember();">Add a borrower</a>
+        <!-- TMPL_IF NAME="borrowers_loop" -->
+          <table id="borrowers">
+        <!-- TMPL_ELSE -->
+          <table id="borrowers" style="display:none">
+        <!-- /TMPL_IF -->
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Rank</th>
+                <th>&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- TMPL_LOOP NAME="borrowers_loop" -->
+                <tr>
+                  <td><!-- TMPL_VAR NAME="surname" -->, <!-- TMPL_VAR NAME="firstname" --></td>
+                  <td>
+                    <select name="ranking" id="ranking<!-- TMPL_VAR NAME='borrowernumber' -->">
+                      <!-- TMPL_LOOP NAME="ranking_loop" -->
+                        <!-- TMPL_IF NAME="selected" -->
+                          <option selected="selected" value="<!-- TMPL_VAR NAME='rank' -->"><!-- TMPL_VAR NAME="rank" --></option>
+                        <!-- TMPL_ELSE -->
+                          <option value="<!-- TMPL_VAR NAME='rank' -->"><!-- TMPL_VAR NAME="rank" --></option>
+                        <!-- /TMPL_IF -->
+                      <!-- /TMPL_LOOP -->
+                    </select>
+                  </td>
+                  <td><a style="cursor:pointer" onclick="delBorrower(<!-- TMPL_VAR NAME='borrowernumber' -->);">Delete</a></td>
+                </tr>
+              <!-- /TMPL_LOOP -->
+            </tbody>
+          </table>
+          <!-- TMPL_UNLESS NAME="borrowers_loop" -->
+            <p id="noborrowersp">There is no borrowers in this routing list.</p>
+          <!-- /TMPL_UNLESS -->
+          <form action="/cgi-bin/koha/serials/routinglist.pl" method="post">
+            <input type="hidden" id="borrowersids" name="borrowersids" value="<!-- TMPL_VAR NAME='borrowersids' -->" />
+            <input type="hidden" name="op" value="mod" />
+            <input type="hidden" name="routinglistid" value="<!-- TMPL_VAR NAME='routinglistid' -->" />
+            <label for="notes">Notes: </label><br />
+            <textarea id="notes" name="notes"><!-- TMPL_VAR NAME="notes" --></textarea><br />
+            <input type="submit" value="Save" />
+          </form>
+      <!-- /TMPL_IF --><!-- new -->
+    </div>
+  </div>
+  <div class="yui-b">
+    <!-- TMPL_INCLUDE NAME="serials-menu.inc" -->
+  </div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
