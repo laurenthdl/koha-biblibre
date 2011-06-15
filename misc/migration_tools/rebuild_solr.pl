@@ -19,12 +19,12 @@ if ( C4::Context->preference("SearchEngine") ne 'Solr' ) {
 
 #Setup
 
-my ( $reset, $number, $recordtype, $biblionumber, $optimize, $info, $want_help );
+my ( $reset, $number, $recordtype, $biblionumbers, $optimize, $info, $want_help );
 GetOptions(
     'r'   => \$reset,
     'n:s' => \$number,
     't:s' => \$recordtype,
-    'w:s' => \$biblionumber,
+    'w:s' => \$biblionumbers,
     'o'   => \$optimize,
     'i'   => \$info,
     'h|help' => \$want_help,
@@ -50,8 +50,9 @@ if ($reset){
   }
 }
 
-if (defined $biblionumber){
-    &IndexBiblio($biblionumber);
+if (defined $biblionumbers){
+    if (not defined $recordtype) { print "You must specify a recordtype\n"; exit 1;}
+    &IndexBiblio($_) for split ',', $biblionumbers;
 } elsif  (defined $recordtype) {
     &IndexData;
     &Optimize;
