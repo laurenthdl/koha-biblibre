@@ -2031,6 +2031,14 @@ sub getsupplierbyserialid {
     return $result;
 }
 
+=head2 AddSubscriptionRoutingList
+
+$routinglistid = &AddSubscriptionRoutingList($subscriptionid, $title);
+
+this function create a new routing list for a subscription.
+
+=cut
+
 sub AddSubscriptionRoutingList {
     my ($subscriptionid, $title) = @_;
 
@@ -2045,6 +2053,13 @@ sub AddSubscriptionRoutingList {
     return $dbh->last_insert_id(undef, undef, 'subscriptionroutinglists', undef);
 }
 
+=head2 GetSubscriptionRoutingList
+
+$routinglist = &GetSubscriptionRoutingList($routinglistid);
+
+this function get infos from subscriptionroutinglists table.
+
+=cut
 sub GetSubscriptionRoutingList {
     my ($routinglistid) = @_;
 
@@ -2069,6 +2084,14 @@ sub GetSubscriptionRoutingList {
 
     return $result;
 }
+
+=head2 GetSubscriptionRoutingLists
+
+$routinglists = &GetSubscriptionRoutingLists($subscriptionid);
+
+this function get all routing lists for a subscription.
+
+=cut
 
 sub GetSubscriptionRoutingLists {
     my ($subscriptionid) = @_;
@@ -2097,6 +2120,14 @@ sub GetSubscriptionRoutingLists {
     return $results;
 }
 
+=head2 GetSubscriptionRoutingListAsCSV
+
+$csv_output = &GetSubscriptionRoutingListAsCSV($routinglistid);
+
+this function return the routing list as a CSV file.
+
+=cut
+
 sub GetSubscriptionRoutingListAsCSV {
     my ($routinglistid) = @_;
 
@@ -2121,6 +2152,13 @@ sub GetSubscriptionRoutingListAsCSV {
     return $output;
 }
 
+=head2 ModSubscriptionRoutingList
+
+&ModSubscriptionRoutingList($routinglistid, $subscriptionid, $title, $notes, @borrowernumbers);
+
+this function modifies a routing list.
+
+=cut
 
 sub ModSubscriptionRoutingList {
     my ($routinglistid, $subscriptionid, $title, $notes, @borrowernumbers) = @_;
@@ -2169,6 +2207,14 @@ sub ModSubscriptionRoutingList {
         }
     }
 }
+
+=head2 DelSubscriptionRoutingList
+
+&DelSubscriptionRoutingList($routinglistid);
+
+this function delete a routing list.
+
+=cut
 
 sub DelSubscriptionRoutingList {
     my ($routinglistid) = @_;
