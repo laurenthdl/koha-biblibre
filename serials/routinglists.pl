@@ -49,7 +49,15 @@ my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
 my $subscriptionid = $input->param('subscriptionid');
 my $op = $input->param('op');
 
-if($op && $op eq "del") {
+if($op && $op eq "export") {
+    my $routinglistid = $input->param('routinglistid');
+    print $input->header(
+        -type       => 'text/csv',
+        -attachment => 'routinglist' . $routinglistid . '.csv',
+    );
+    print GetSubscriptionRoutingListAsCSV($routinglistid);
+    exit;
+} elsif($op && $op eq "del") {
     my $routinglistid = $input->param('routinglistid');
     if(!defined $subscriptionid){
         my $routinglist = GetSubscriptionRoutingList($routinglistid);

@@ -27,6 +27,7 @@ use C4::Koha;
 use C4::Biblio;
 use C4::Branch;
 use C4::Items;
+use C4::Members;
 use C4::Search;
 use C4::Letters;
 use C4::Log;    # logaction
@@ -62,6 +63,7 @@ BEGIN {
       &AddSubscriptionRoutingList &ModSubscriptionRoutingList
       &DelSubscriptionRoutingList
       &GetSubscriptionRoutingList &GetSubscriptionRoutingLists
+      &GetSubscriptionRoutingListAsCSV
       &getroutinglist     &delroutingmember   &addroutingmember
       &reorder_members
       &check_routing &updateClaim &removeMissingIssue
@@ -2054,6 +2056,14 @@ sub getsupplierbyserialid {
     return $result;
 }
 
+=head2 AddSubscriptionRoutingList
+
+$routinglistid = &AddSubscriptionRoutingList($subscriptionid, $title);
+
+this function create a new routing list for a subscription.
+
+=cut
+
 sub AddSubscriptionRoutingList {
     my ($subscriptionid, $title) = @_;
 
@@ -2068,6 +2078,13 @@ sub AddSubscriptionRoutingList {
     return $dbh->last_insert_id(undef, undef, 'subscriptionroutinglists', undef);
 }
 
+=head2 GetSubscriptionRoutingList
+
+$routinglist = &GetSubscriptionRoutingList($routinglistid);
+
+this function get infos from subscriptionroutinglists table.
+
+=cut
 sub GetSubscriptionRoutingList {
     my ($routinglistid) = @_;
 
@@ -2092,6 +2109,14 @@ sub GetSubscriptionRoutingList {
 
     return $result;
 }
+
+=head2 GetSubscriptionRoutingLists
+
+$routinglists = &GetSubscriptionRoutingLists($subscriptionid);
+
+this function get all routing lists for a subscription.
+
+=cut
 
 sub GetSubscriptionRoutingLists {
     my ($subscriptionid) = @_;
@@ -2119,6 +2144,46 @@ sub GetSubscriptionRoutingLists {
 
     return $results;
 }
+
+=head2 GetSubscriptionRoutingListAsCSV
+
+$csv_output = &GetSubscriptionRoutingListAsCSV($routinglistid);
+
+this function return the routing list as a CSV file.
+
+=cut
+
+sub GetSubscriptionRoutingListAsCSV {
+    my ($routinglistid) = @_;
+
+    my $csv = Text::CSV::Encoded->new( {encoding => "utf8" } );
+    my $output;
+
+    my @headers = qw(surname firstname);
+    $csv->combine(@headers);
+    $output .= $csv->string() . "\n";
+
+    my @borrowernumbers = getroutinglist($routinglistid);
+    my @borrowers;
+    foreach (@borrowernumbers) {
+        my $member = C4::Members::GetMemberDetails($_->{'borrowernumber'});
+        $csv->combine(
+            $member->{'surname'},
+            $member->{'firstname'},
+        );
+        $output .= $csv->string() . "\n";
+    }
+
+    return $output;
+}
+
+=head2 ModSubscriptionRoutingList
+
+&ModSubscriptionRoutingList($routinglistid, $subscriptionid, $title, $notes, @borrowernumbers);
+
+this function modifies a routing list.
+
+=cut
 
 sub ModSubscriptionRoutingList {
     my ($routinglistid, $subscriptionid, $title, $notes, @borrowernumbers) = @_;
@@ -2167,6 +2232,14 @@ sub ModSubscriptionRoutingList {
         }
     }
 }
+
+=head2 DelSubscriptionRoutingList
+
+&DelSubscriptionRoutingList($routinglistid);
+
+this function delete a routing list.
+
+=cut
 
 sub DelSubscriptionRoutingList {
     my ($routinglistid) = @_;
