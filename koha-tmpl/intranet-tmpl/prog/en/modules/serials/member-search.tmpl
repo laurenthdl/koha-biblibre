@@ -4,9 +4,8 @@
 <script type="text/javascript">
 <!--
 
-function add_member(subscriptionid,borrowernumber){
-     var myurl = "routing.pl?subscriptionid="+subscriptionid+"&borrowernumber="+borrowernumber+"&op=add";
-     window.opener.location.href = myurl;
+function add_member(borrowernumber, surname, firstname){
+     window.opener.addBorrower(borrowernumber, surname, firstname);
 }
 
 //-->
@@ -64,8 +63,7 @@ function add_member(subscriptionid,borrowernumber){
 		<td><!-- TMPL_VAR NAME="cardnumber" --> </td>
 		<td><!-- TMPL_VAR NAME="surname" -->, <!-- TMPL_VAR NAME="firstname" --> </td>
 		<td><!-- TMPL_VAR NAME="branchcode" --> </td>
-		<td><a onclick="add_member(<!-- TMPL_VAR
-		NAME="subscriptionid" -->,<!-- TMPL_VAR NAME="borrowernumber" -->); return false" href="/cgi-bin/koha/serials/routing.pl?subscriptionid=<!-- TMPL_VAR NAME="subscriptionid" -->&amp;borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->&amp;op=add">Add</a></td></tr>
+		<td><a style="cursor:pointer" onclick="add_member(<!-- TMPL_VAR NAME='borrowernumber' -->, '<!-- TMPL_VAR NAME='surname' -->', '<!-- TMPL_VAR NAME='firstname' -->'); return false">Add</a></td></tr>
 		<!-- /TMPL_LOOP -->
 	</tbody>
 </table>
