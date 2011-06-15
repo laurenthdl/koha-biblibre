@@ -283,3 +283,4 @@ INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES (
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('BlockRenewWhenOverdue','0','Bloque les renouvellement quand en retard','','YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SolrAPI','http://localhost:8080/solr','','URL du service web Solr.','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Moteur de recherche','Choice');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numFacetsDisplay','100','Correspond au nombre maximum de facettes à afficher pour un index','','Integer')

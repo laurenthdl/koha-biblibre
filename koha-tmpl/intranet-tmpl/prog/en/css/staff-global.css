@@ -1961,3 +1961,7 @@ select.advsearchoperator {
     color: red;
     margin-left: 1%;
 }
+
+.facets_arrows {
+    text-align: center;
+}

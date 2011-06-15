@@ -152,7 +152,7 @@ my $categories = GetBranchCategories( undef, 'searchdomain' );
 
 $template->param( branchloop => \@branch_loop, searchdomainloop => $categories );
 
-$template->param( holdingbranch_index => C4::Search::Query::getIndexName('holdingbranch') );
+$template->param( holdingbranch_indexname => C4::Search::Query::getIndexName('holdingbranch') );
 
 # load the Type stuff
 my $itemtypes = GetItemTypes;
@@ -178,27 +178,6 @@ if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
 }
 
 my $itype_indexname = C4::Search::Query::getIndexName($itype_or_ccode);
-# If @itypes exists, we delete idx, op and q in the corresponding arrays
-# => Advsearch of filter by itypes
-# Else we must push in @itypes values existing in @operands
-# => Facets, sort, pagination
-if ( @itypes ) {
-    for my $i (0..$#indexes){
-        if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
-            splice @indexes, $i, 1;
-            splice @operands, $i, 1;
-            splice @operators, $i - 1, 1;
-        }
-    }
-} else {
-    for my $i (0..$#indexes){
-        if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
-            $operands[$i] =~ m/\(([^\)]*)\)/;
-            push @itypes, map { $_ } split ' OR ', $1 ;
-        }
-    }
-}
-
 # Build itemtypesloop
 # Set selected itypes
 if ( $itype_or_ccode ne 'ccode' ) {
@@ -206,7 +185,7 @@ if ( $itype_or_ccode ne 'ccode' ) {
         my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
             number      => $cnt++,
-            index       => $itype_indexname,
+            indexname   => $itype_indexname,
             code        => $thisitemtype,
             selected    => $selected,
             description => $itemtypes->{$thisitemtype}->{'description'},
@@ -221,7 +200,7 @@ if ( $itype_or_ccode ne 'ccode' ) {
         my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
             number      => $cnt++,
-            index       => $itype_indexname,
+            indexname   => $itype_indexname,
             code        => $thisitemtype->{authorised_value},
             selected    => $selected,
             description => $thisitemtype->{'lib'},
@@ -291,7 +270,7 @@ if ( $template_type eq 'advsearch' ) {
 
     # load the language limits (for search)
     $template->param( search_languages_loop => getAllLanguagesAuthorizedValues() );
-    $template->param( lang_index => C4::Search::Query::getIndexName('lang') );
+    $template->param( lang_indexname => C4::Search::Query::getIndexName('lang') );
 
     # use the global setting by default
     if ( C4::Context->preference("expandedSearchOption") == 1 ) {
@@ -324,34 +303,20 @@ for (my $i = $#indexes; $i >= 0; $i--) {
   splice @indexes,$i,1 if $i > $#operands;
 }
 
-# construct query as itype:(@itypes[0] OR @itypes[1]) - item type advanced search
-my $itype_val_str="";
-if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
-    $itype_val_str = join ' OR ', @itypes ;
-    $itype_val_str = "($itype_val_str)";
-    if ( not @indexes ) {
-        $operands[0] .= " AND " if $operands[0];
-        $operands[0] .= "$itype_or_ccode:$itype_val_str";
-    } else {
-        push @operators, "AND";
-        push @operands, $itype_val_str;
-        push @indexes, $itype_or_ccode;
-    }
-}
-
 my %filters;
 # This array is used to build facets GUI
 my @tplfilters;
 for my $filter ( $cgi->param('filters') ) {
     my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
-    $filters{$k} = $v;
+    push @{$filters{$k}}, $v;
     $v =~ s/"//g;
     push @tplfilters, {
         'ind' => $k,
         'val' => $v,
     };
 }
-$filters{recordtype} = 'biblio';
+
+push @{$filters{recordtype}}, 'biblio';
 $template->param('filters' => \@tplfilters );
 
 
@@ -401,7 +366,7 @@ my $pager = Data::Pagination->new(
     $page,
 );
 
-# This array is used to build pagination, facets links and itypes, sort form
+# This array is used to build pagination, facets links, sort form
 my @follower_params = map { {
     ind => 'filters',
     val => $_->{'ind'}.':"'.$_->{'val'}.'"'
@@ -444,7 +409,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
         for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
             my $value = $facet->[$i++];
             my $count = $facet->[$i];
-            utf8::encode($value);            
+            utf8::encode($value);
             my $lib;
             if ( $code =~/branch/ ) {
                 $lib = GetBranchName $value;
@@ -460,21 +425,21 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
                 'lib'     => $lib,
                 'value'   => $value,
                 'count'   => $count,
-                'active'  => $filters{$index} && $filters{$index} eq "\"$value\"",
+                'active'  => $filters{$index} && grep /"$value"/, @{ $filters{$index} },
                 'filters' => \@tplfilters,
             };
         }
         push @facets, {
-            'index'  => $index,
-            'label'  => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
-            'values' => \@values,
+            'indexname' => $index,
+            'label'     => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
+            'values'    => \@values,
         };
     }
 }
 
 $template->param(
     'total'          => $res->{'pager'}->{'total_entries'},
-    'opacfacets'     => 1,
+    'facets'         => 1,
     'SEARCH_RESULTS' => \@results,
     'facets_loop'    => \@facets,
     'query'          => $q,
@@ -483,6 +448,7 @@ $template->param(
     'availability'   => $filters{'int_availability'},
     'count'          => C4::Context->preference('OPACnumSearchResults') || 20,
     author_indexname => C4::Search::Query::getIndexName('author'),
+    availability_indexname => C4::Search::Query::getIndexName('availability'),
 );
 
 # VI. BUILD THE TEMPLATE

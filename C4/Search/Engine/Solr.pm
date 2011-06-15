@@ -339,16 +339,17 @@ sub SimpleSearch {
 
     $sc->options->{'facet'}          = 'true';
     $sc->options->{'facet.mincount'} = 1;
-    $sc->options->{'facet.limit'}    = 10;
-    $sc->options->{'facet.field'}    = GetFacetedIndexes($filters->{recordtype});
+    $sc->options->{'facet.limit'}    = C4::Context->preference("numFacetsDisplay") || 10;
+    $sc->options->{'facet.field'}    = GetFacetedIndexes($filters->{recordtype}[0]);
     $sc->options->{'sort'}           = $sort;
 
     # Construct filters
-    $sc->options->{'fq'} = [ 
-        map { 
-            utf8::decode($filters->{$_});
-            "$_:".$filters->{$_}
-        } keys %$filters 
+    $sc->options->{'fq'} = [
+        map {
+            my $filter_str = join ' AND ', @{ $filters->{$_} };
+            utf8::decode($filter_str);
+            "$_:$filter_str";
+        } keys %$filters
     ];
 
     utf8::decode($q);
@@ -383,7 +384,7 @@ sub IndexRecord {
 
     my @list_of_plugins = GetSearchPlugins;
     for my $id ( @$recordids ) {
-        
+
         my $record;
         my $frameworkcode;
         my $recordid = "${recordtype}_$id";
@@ -466,8 +467,9 @@ sub IndexRecord {
             }
 
             # Add index str for facets if it's not exist
+            # FIXME Only for field we want to facet (cf table indexes)
             if ( $index->{'faceted'} and @values > 0 and $index->{'type'} ne 'str' ) {
-                $solrrecord->set_value("str_".$index->{'code'}, $values[0]);
+                $solrrecord->set_value("str_".$index->{'code'}, \@values);
             }
         }
         push @recordpush, $solrrecord;
