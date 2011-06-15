@@ -323,7 +323,8 @@ function popup(subscriptionid) {
         <tr>
             <th>Issue number</th>
             <th>Planned date</th>
-            <th>Published date</th>
+            <th>Published on (date)</th>
+            <th>Published on (text)</th>
             <th>Status</th>
         </tr>
         <!-- TMPL_LOOP name="serialslist" -->
@@ -336,6 +337,9 @@ function popup(subscriptionid) {
                 </td>
                 <td>
                     <!-- TMPL_VAR name="publisheddate" -->
+                </td>
+                <td>
+                    <!-- TMPL_VAR NAME="publisheddatetext" -->
                 </td>
                 <td>
                         <!--TMPL_IF name="status1" -->

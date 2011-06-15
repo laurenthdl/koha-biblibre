@@ -852,7 +852,7 @@ sub GetSerials {
     my $counter = 0;
     $count = 5 unless ($count);
     my @serials;
-    my $query = "SELECT serialid,serialseq, status, publisheddate, planneddate,notes, routingnotes
+    my $query = "SELECT serialid,serialseq, status, publisheddate, publisheddatetext, planneddate,notes, routingnotes
                         FROM   serial
                         WHERE  subscriptionid = ? AND status NOT IN (2,4,5) 
                         ORDER BY IF(publisheddate<>'0000-00-00',publisheddate,planneddate) DESC";
@@ -867,7 +867,7 @@ sub GetSerials {
     }
 
     # OK, now add the last 5 issues arrives/missing
-    $query = "SELECT   serialid,serialseq, status, planneddate, publisheddate,notes, routingnotes
+    $query = "SELECT   serialid,serialseq, status, planneddate, publisheddate, publisheddatetext ,notes, routingnotes
        FROM     serial
        WHERE    subscriptionid = ?
        AND      (status in (2,4,5))
