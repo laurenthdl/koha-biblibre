@@ -1,0 +1,66 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Serials &rsaquo; Routing lists</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript">
+//<![CDATA[
+
+function previewSlip(routinglistid){
+    window.open("/cgi-bin/koha/serials/routing-preview-slip.pl?routinglistid="+routinglistid, 'PreviewSlip');
+}
+
+function confirmDelete(){
+    return confirm(_("Are you sure you want to delete this routing list?"));
+}
+
+//]]>
+</script>
+</head>
+
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+<!-- TMPL_INCLUDE NAME="serials-search.inc" -->
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/serials/serials-home.pl">Serials</a> &rsaquo; Routing lists</div>
+
+<div id="doc3" class="yui-t2">
+
+<div id="bd">
+  <div id="yui-main">
+    <div class="yui-b">
+      <!-- TMPL_INCLUDE NAME="serials-toolbar.inc" -->
+      <h1>Routing lists for <em><!-- TMPL_VAR NAME="title" --></em></h1>
+
+      <a href="/cgi-bin/koha/serials/routinglist.pl?op=new&subscriptionid=<!-- TMPL_VAR NAME='subscriptionid' -->">New routing list</a>
+
+      <!-- TMPL_IF NAME="routinglists_loop" -->
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>No. of borrowers</th>
+            <th>Notes</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- TMPL_LOOP NAME="routinglists_loop" -->
+            <tr>
+              <td><a href="/cgi-bin/koha/serials/routinglist.pl?routinglistid=<!-- TMPL_VAR NAME='routinglistid' -->"><!-- TMPL_VAR NAME="title" --></a></td>
+              <td><!-- TMPL_VAR NAME="count" --></td>
+              <td><!-- TMPL_VAR NAME="notes" --></td>
+              <td><a style="cursor:pointer" onclick="previewSlip(<!-- TMPL_VAR NAME='routinglistid' -->);">Preview</a> | <a style="text-decoration:none" onclick="return confirmDelete();" href="/cgi-bin/koha/serials/routinglists.pl?op=del&routinglistid=<!-- TMPL_VAR NAME='routinglistid' -->">Delete</a></td>
+            </tr>
+          <!-- /TMPL_LOOP -->
+        </tbody>
+      </table>
+      <!-- TMPL_ELSE -->
+        <p>There is no routing lists for this subscription.</p>
+      <!-- /TMPL_IF -->
+
+    </div>
+  </div>
+  <div class="yui-b">
+    <!-- TMPL_INCLUDE NAME="serials-menu.inc" -->
+  </div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->

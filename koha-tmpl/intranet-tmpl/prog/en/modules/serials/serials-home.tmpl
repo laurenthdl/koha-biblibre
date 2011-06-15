@@ -112,7 +112,7 @@ Serials updated :
             <th>Call number</th>
             <th>Expiration date</th>
             <!-- TMPL_IF NAME="routing" -->
-              <th>Routing list</th>
+              <th>Routing lists</th>
             <!-- /TMPL_IF -->        
             <th colspan="2">&nbsp;</th>
         </tr>
@@ -150,10 +150,10 @@ Serials updated :
                   &nbsp;        
                 <!-- TMPL_ELSE -->
                     <!--TMPL_IF Name="routingedit"-->
-                        <a href="/cgi-bin/koha/serials/routing.pl?subscriptionid=<!-- TMPL_VAR name="subscriptionid" -->">Edit</a>
+                        <a href="/cgi-bin/koha/serials/routinglists.pl?subscriptionid=<!-- TMPL_VAR name='subscriptionid' -->">Edit</a>
                         (<!-- TMPL_VAR NAME="routingedit" -->)
                 	<!-- TMPL_ELSE -->
-						<a href="/cgi-bin/koha/serials/routing.pl?subscriptionid=<!-- TMPL_VAR name="subscriptionid" -->&amp;op=new">New</a>
+						<a href="/cgi-bin/koha/serials/routinglist.pl?op=new&amp;subscriptionid=<!-- TMPL_VAR name='subscriptionid' -->">New</a>
 					<!--/TMPL_IF-->
                 <!-- /TMPL_IF -->
                 </td>

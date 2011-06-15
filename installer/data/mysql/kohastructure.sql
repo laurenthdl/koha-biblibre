@@ -1755,16 +1755,31 @@ CREATE TABLE `subscriptionhistory` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `subscriptionroutinglist`
+-- Table structure for table `subscriptionroutinglists`
 --
 
-DROP TABLE IF EXISTS `subscriptionroutinglist`;
-CREATE TABLE `subscriptionroutinglist` (
-  `routingid` int(11) NOT NULL auto_increment,
-  `borrowernumber` int(11) default NULL,
-  `ranking` int(11) default NULL,
-  `subscriptionid` int(11) default NULL,
-  PRIMARY KEY  (`routingid`)
+DROP TABLE IF EXISTS `subscriptionroutinglists`;
+CREATE TABLE `subscriptionroutinglists` (
+    `routinglistid` int(11) NOT NULL AUTO_INCREMENT,
+    `subscriptionid` int(11) NOT NULL,
+    `title` varchar(256) NOT NULL,
+    `notes` text default NULL,
+    PRIMARY KEY (`routinglistid`),
+    CONSTRAINT `subscriptionroutinglists_ibfk_1` FOREIGN KEY (`subscriptionid`) REFERENCES `subscription` (`subscriptionid`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for `subscriptionroutings`
+--
+
+DROP TABLE IF EXISTS `subscriptionroutings`;
+CREATE TABLE `subscriptionroutings` (
+    `routinglistid` int(11) NOT NULL,
+    `borrowernumber` int(11) NOT NULL,
+    `ranking` int(11) DEFAULT NULL,
+    PRIMARY KEY (`routinglistid`, `borrowernumber`),
+    CONSTRAINT `subscriptionroutings_ibfk_1` FOREIGN KEY (`routinglistid`) REFERENCES `subscriptionroutinglists` (`routinglistid`) ON DELETE CASCADE,
+    CONSTRAINT `subscriptionroutings_ibfk_2` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

@@ -1,6 +1,12 @@
 <div id="toolbar"><script type="text/javascript">
 	//<![CDATA[
 
+    function confirm_deletion() {
+        var is_confirmed = confirm(_("Are you sure you want to delete this subscription?"));
+        if (is_confirmed) {
+            window.location="subscription-detail.pl?subscriptionid=<!-- TMPL_VAR name="subscriptionid" -->&op=del";
+        }
+    }
 	// prepare DOM for YUI Toolbar
 
 	 $(document).ready(function() {

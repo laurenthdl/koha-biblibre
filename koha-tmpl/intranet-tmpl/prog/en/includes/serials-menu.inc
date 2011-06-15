@@ -3,9 +3,9 @@
 <li><a href="serials-collection.pl?subscriptionid=<!-- TMPL_VAR name="subscriptionid" -->">Serial Collection</a></li>
 <!-- TMPL_IF NAME="CAN_user_serials_routing" -->
 <!-- TMPL_IF NAME="routing" -->
-<li><a href="routing.pl?subscriptionid=<!-- TMPL_VAR NAME="subscriptionid" -->">Edit Routing List</a></li>
+<li><a href="routinglists.pl?subscriptionid=<!-- TMPL_VAR NAME="subscriptionid" -->">Edit Routing Lists</a></li>
 <!-- TMPL_ELSE -->
-<li><a href="routing.pl?subscriptionid=<!-- TMPL_VAR NAME="subscriptionid" -->&amp;op=new">Create Routing List</a></li>
+<li><a href="routinglist.pl?subscriptionid=<!-- TMPL_VAR NAME="subscriptionid" -->&amp;op=new">Create Routing List</a></li>
 <!-- /TMPL_IF -->
 <!-- /TMPL_IF -->
 </ul>

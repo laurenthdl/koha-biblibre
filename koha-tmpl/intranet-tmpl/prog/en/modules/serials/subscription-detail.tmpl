@@ -24,12 +24,6 @@ var textbox = '';
     }
 }
 
-function confirm_deletion() {
-    var is_confirmed = confirm(_("Are you sure you want to delete this subscription?"));
-    if (is_confirmed) {
-        window.location="subscription-detail.pl?subscriptionid=<!-- TMPL_VAR name="subscriptionid" -->&op=del";
-    }
-}
 function popup(subscriptionid) {
     newin=window.open("subscription-renew.pl?mode=popup&subscriptionid="+subscriptionid,'popup','width=590,height=440,toolbar=false,scrollbars=yes');
 }
