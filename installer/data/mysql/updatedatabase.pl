@@ -6067,6 +6067,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("ALTER TABLE serial
         ADD publisheddatetext VARCHAR(100) DEFAULT NULL AFTER publisheddate");
     print "Upgrade to $DBversion done (Add publisheddatetext field to serial table).\n";
+    SetVersion ($DBversion);
 }
 
 $DBversion = "3.06.00.036";
