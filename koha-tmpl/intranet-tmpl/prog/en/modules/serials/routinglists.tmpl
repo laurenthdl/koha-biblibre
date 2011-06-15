@@ -48,7 +48,10 @@ function confirmDelete(){
               <td><a href="/cgi-bin/koha/serials/routinglist.pl?routinglistid=<!-- TMPL_VAR NAME='routinglistid' -->"><!-- TMPL_VAR NAME="title" --></a></td>
               <td><!-- TMPL_VAR NAME="count" --></td>
               <td><!-- TMPL_VAR NAME="notes" --></td>
-              <td><a style="cursor:pointer" onclick="previewSlip(<!-- TMPL_VAR NAME='routinglistid' -->);">Preview</a> | <a style="text-decoration:none" onclick="return confirmDelete();" href="/cgi-bin/koha/serials/routinglists.pl?op=del&routinglistid=<!-- TMPL_VAR NAME='routinglistid' -->">Delete</a></td>
+              <td>
+                <a style="cursor:pointer" onclick="previewSlip(<!-- TMPL_VAR NAME='routinglistid' -->);">Preview</a> |
+                <a style="text-decoration:none" href="/cgi-bin/koha/serials/routinglists.pl?op=export&routinglistid=<!-- TMPL_VAR NAME='routinglistid' -->">Export</a> |
+                <a style="text-decoration:none" onclick="return confirmDelete();" href="/cgi-bin/koha/serials/routinglists.pl?op=del&routinglistid=<!-- TMPL_VAR NAME='routinglistid' -->">Delete</a></td>
             </tr>
           <!-- /TMPL_LOOP -->
         </tbody>
