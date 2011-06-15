@@ -326,6 +326,7 @@ $template->param('filters' => \@tplfilters );
 my $limit_yr = $cgi->param('limit-yr');
 if ( $limit_yr ) {
     my $op;
+    my $pubdate_indexname = C4::Search::Query::getIndexName('pubdate');    
     if ( $limit_yr =~ /\d{4}-\d{4}/ ) {
         my ( $yr1, $yr2 ) = split( /-/, $limit_yr );
         $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $yr1 ) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate( $yr2 ) . '"]';
@@ -342,11 +343,11 @@ if ( $limit_yr ) {
     }
     if ( not @indexes ) {
         $operands[0] .= " AND " if $operands[0];
-        $operands[0] .= "$op";
+        $operands[0] .= "$pubdate_indexname:$op";
     } else {
         push @operands, $op;
         push @operators, 'AND';
-        push @indexes, "date_pubdate";
+        push @indexes, $pubdate_indexname;
     }
 }
 
