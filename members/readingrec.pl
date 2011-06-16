@@ -83,6 +83,7 @@ foreach my $issue ( @{$issues} ) {
     $line{classification}  = $issue->{'classification'} || $issue->{'itemcallnumber'};
     $line{date_due}        = format_date( $issue->{'date_due'} );
     $line{returndate}      = format_date( $issue->{'returndate'} );
+    $line{dayslate}        = $issue->{'dayslate'}>0 ? $issue->{'dayslate'} : 0;
     $line{issuedate}       = format_date( $issue->{'issuedate'} );
     $line{issuingbranch}   = GetBranchName( $issue->{'branchcode'} );
     $line{renewals}        = $issue->{'renewals'};
