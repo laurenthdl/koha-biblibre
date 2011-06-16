@@ -103,6 +103,7 @@ $template->param(
     max_rank => scalar(@borrowers),
     title => $routinglist->{'title'},
     notes => $routinglist->{'notes'},
+    subscriptionid => $routinglist->{'subscriptionid'},
     routinglistid => $routinglistid,
 );
 
