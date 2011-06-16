@@ -82,6 +82,7 @@ if ( $op eq "renew" ) {
         $subtype,
         $sublength
     );
+    ModNextExpected($subscriptionid, C4::Dates->new($firstacquidate));
 }
 
 my $subscription = GetSubscription($subscriptionid);
@@ -112,8 +113,12 @@ foreach my $subtype (@subtypes) {
     }
 }
 
+my $nextexpected = GetNextExpected($subscriptionid);
+my $startdate = $subscription->{'enddate'} || $nextexpected->{'planneddate'}->output("iso") || POSIX::strftime("%Y-%m-%d", localtime);
+$startdate = format_date($startdate);
+
 $template->param(
-    startdate => format_date( $subscription->{enddate} || POSIX::strftime( "%Y-%m-%d", localtime ) ),
+    startdate => $startdate,
     subtypes_loop  => \@subtypes_loop,
     sublength      => $sublength,
     subscriptionid => $subscriptionid,

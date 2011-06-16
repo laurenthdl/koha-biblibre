@@ -2147,7 +2147,8 @@ sub countissuesfrom {
             SELECT count(*)
             FROM   serial
             WHERE  subscriptionid=?
-            AND serial.publisheddate>?
+            AND (serial.publisheddate>=?
+              OR serial.status = 1)
         |;
     my $sth = $dbh->prepare($query);
     $sth->execute( $subscriptionid, $startdate );
