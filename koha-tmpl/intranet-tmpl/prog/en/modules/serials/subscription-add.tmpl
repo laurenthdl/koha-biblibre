@@ -110,9 +110,9 @@ function frequencyload(){
             if ( globalfreqdata.unit.length == 0 ) {
                 var option = $("#subtype option[value='issues']");
                 $(option).attr('selected', 'selected');
-                $("#subtype").attr('disabled', 'disabled')
+                $("#subtype option[value!='issues']").attr('disabled', 'disabled')
             } else {
-                $("#subtype").attr('disabled', '')
+                $("#subtype option").attr('disabled', '')
             }
         }
     )
