@@ -6528,7 +6528,7 @@ msgstr "Titre (Z-A)"
 
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:445
 msgid "Title Notes"
-msgstr "Note"
+msgstr "Plus d'infos"
 
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:126
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:273
