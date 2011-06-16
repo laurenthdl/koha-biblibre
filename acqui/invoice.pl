@@ -140,25 +140,21 @@ sub get_infos {
     $line{basketno}       = $basketno;
     $line{budget_name}    = $budget->{budget_name};
     if ( $bookseller->{'listincgst'} ) {
-        $line{rrpgsti} = sprintf( "%.2f", $line{rrp} );
         $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
-        $line{rrpgste} = sprintf( "%.2f", $line{rrp} / ( 1 + ( $line{gstgsti} / 100 ) ) );
         $line{gstgste} = sprintf( "%.2f", $line{gstgsti} / ( 1 + ( $line{gstgsti} / 100 ) ) );
-        $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
-        $line{ecostgsti} = sprintf( "%.2f", $line{ecost} );
-        $line{ecostgste} = sprintf( "%.2f", $line{ecost} / ( 1 + ( $line{gstgsti} / 100 ) ) );
-        $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{ecostgste} );
-        $line{totalgsti} = sprintf( "%.2f", $order->{quantity} * $line{ecostgsti} );
+        $line{actualcostgsti} = sprintf( "%.2f", $line{unitprice} );
+        $line{actualcostgste} = sprintf( "%.2f", $line{unitprice} / ( 1 + ( $line{gstgsti} / 100 ) ) );
+        $line{gstvalue} = sprintf( "%.2f", ( $line{rrpgsti} - $line{rrpgste} ) * $line{quantity});
+        $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{actualcostgste} );
+        $line{totalgsti} = sprintf( "%.2f", $order->{quantity} * $line{actualcostgsti} );
     } else {
-        $line{rrpgsti} = sprintf( "%.2f", $line{rrp} * ( 1 + ( $line{gstrate} ) ) );
-        $line{rrpgste} = sprintf( "%.2f", $line{rrp} );
         $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );
         $line{gstgste} = sprintf( "%.2f", $line{gstrate} * 100 );
-        $line{gstvalue} = sprintf( "%.2f", $line{rrpgsti} - $line{rrpgste} );
-        $line{ecostgsti} = sprintf( "%.2f", $line{ecost} * ( 1 + ( $line{gstrate} ) ) );
-        $line{ecostgste} = sprintf( "%.2f", $line{ecost} );
-        $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{ecostgste} );
-        $line{totalgsti} = sprintf( "%.2f", $order->{quantity} * $line{ecostgsti} );
+        $line{actualcostgsti} = sprintf( "%.2f", $line{unitprice} * ( 1 + ( $line{gstrate} ) ) );
+        $line{actualcostgste} = sprintf( "%.2f", $line{unitprice} );
+        $line{gstvalue} = sprintf( "%.2f", ( $line{rrpgsti} - $line{rrpgste} ) * $line{quantity});
+        $line{totalgste} = sprintf( "%.2f", $order->{quantity} * $line{actualcostgste} );
+        $line{totalgsti} = sprintf( "%.2f", $order->{quantity} * $line{actualcostgsti} );
     }
 
     if ( $line{uncertainprice} ) {
