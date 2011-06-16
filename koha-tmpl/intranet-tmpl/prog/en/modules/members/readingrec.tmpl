@@ -4,10 +4,16 @@
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.pager.js"></script>
 <script type="text/javascript" id="js">$(document).ready(function() {
-	$("#table_readingrec").tablesorter({
-		sortList: [[1,0]],
-	}).tablesorterPager({container: $("#pagertable_readingrec"),positionFixed: false,size: 20});
-}); </script>
+    $("#table_readingrec").tablesorter({
+        sortList: [[1,0]],
+        widgets: ['zebra']
+    }).tablesorterPager({
+        container: $("#pagertable_readingrec"),
+        positionFixed: false,
+        size: 20
+    });
+});
+</script>
 </head>
 <body>
 <!-- TMPL_INCLUDE NAME="header.inc" -->
@@ -64,13 +70,22 @@
 	<th>
 		<a href="readingrec.pl?borrowernumber=<!-- TMPL_VAR name="borrowernumber" -->&amp;order=returndate%20DESC&amp;limit=<!-- TMPL_VAR name="limit" -->">Return Date</a>
 	</th>
+  <th>Days late</th>
 </thead>
 <!-- TMPL_LOOP name="loop_reading" -->
-<!-- TMPL_UNLESS NAME="__odd__" -->
-    <!-- TMPL_IF NAME="returndate" --><tr class="highlight"><!-- TMPL_ELSE --><tr class="highlight onissue"><!-- /TMPL_IF -->
-<!-- TMPL_ELSE -->
-    <!-- TMPL_IF NAME="returndate" --><tr><!-- TMPL_ELSE --><tr class="onissue"><!-- /TMPL_IF -->
-<!-- /TMPL_UNLESS -->
+  <!-- TMPL_IF NAME="returndate" -->
+    <!-- TMPL_IF NAME="dayslate" -->
+      <tr style="color:red">
+    <!-- TMPL_ELSE -->
+      <tr>
+    <!-- /TMPL_IF -->
+  <!-- TMPL_ELSE -->
+    <!-- TMPL_IF NAME="dayslate" -->
+      <tr class="onissue" style="color:red">
+    <!-- TMPL_ELSE -->
+      <tr class="onissue">
+    <!-- /TMPL_IF -->
+  <!-- /TMPL_IF -->
         <td>
             <!-- TMPL_VAR name="issuestimestamp" -->
         </td>
@@ -100,6 +115,7 @@
             Checked Out
         <!-- /TMPL_IF -->
 	</td>
+  <td><!-- TMPL_VAR NAME="dayslate" --></td>
 </tr>
 <!-- /TMPL_LOOP -->
 </table>

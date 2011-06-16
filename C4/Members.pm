@@ -1111,14 +1111,14 @@ sub GetAllIssues {
 
     #FIXME: sanity-check order and limit
     my $dbh   = C4::Context->dbh;
-    my $query = "SELECT *, issues.timestamp as issuestimestamp, issues.renewals AS renewals,items.renewals AS totalrenewals,items.timestamp AS itemstimestamp 
+    my $query = "SELECT *, issues.timestamp as issuestimestamp, issues.renewals AS renewals,items.renewals AS totalrenewals,items.timestamp AS itemstimestamp, DATEDIFF(NOW(), date_due) AS dayslate
   FROM issues 
   LEFT JOIN items on items.itemnumber=issues.itemnumber
   LEFT JOIN biblio ON items.biblionumber=biblio.biblionumber
   LEFT JOIN biblioitems ON items.biblioitemnumber=biblioitems.biblioitemnumber
   WHERE borrowernumber=? 
   UNION ALL
-  SELECT *, old_issues.timestamp as issuestimestamp, old_issues.renewals AS renewals,items.renewals AS totalrenewals,items.timestamp AS itemstimestamp 
+  SELECT *, old_issues.timestamp as issuestimestamp, old_issues.renewals AS renewals,items.renewals AS totalrenewals,items.timestamp AS itemstimestamp, DATEDIFF(returndate, date_due) AS dayslate
   FROM old_issues 
   LEFT JOIN items on items.itemnumber=old_issues.itemnumber
   LEFT JOIN biblio ON items.biblionumber=biblio.biblionumber
