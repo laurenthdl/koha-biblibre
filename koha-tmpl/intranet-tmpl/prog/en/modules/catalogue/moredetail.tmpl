@@ -50,8 +50,16 @@
 	    <!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="collection" --><li><span class="label">Collection:</span> <!-- TMPL_VAR NAME="collection" --></li> <!-- /TMPL_IF -->
             <li><span class="label">Item Callnumber:</span> <!-- TMPL_VAR NAME="itemcallnumber" -->&nbsp;</li>
-            <!-- TMPL_IF NAME="copyvol" --><li><span class="label">Copy / Vol :</span> <!-- TMPL_VAR NAME="copyvol" -->&nbsp;</li> <!-- /TMPL_IF -->
+            <!--sb-->
+            <li><span class="label">Stock number:</span> <!--TMP_VAR NAME="stocknumber" -->&nbsp;</li>
+            <!-- /sb -->
+	    <!-- TMPL_IF NAME="copyvol" --><li><span class="label">Copy / Vol :</span> <!-- TMPL_VAR NAME="copyvol" -->&nbsp;</li> <!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="replacementprice" --><li><span class="label">Replacement Price:</span> <!-- TMPL_VAR NAME="replacementprice" -->&nbsp;</li> <!-- /TMPL_IF -->
+            <!-- sb -->
+            <!-- TMPL_IF NAME="materials" --><li><span class="label">Materials:</span> <!-- TMPL_VAR NAME="materials" -->&nbsp;</li><!-- /TMPL_IF-->
+            <!-- TMPL_IF NAME="statisticvalue" --><li><span class="label">Statistic Value :</span> <!-- TMPL_VAR NAME="statisticvalue"-->&nbsp;<!-- /TMPL_IF-->
+            <!-- TMPL_IF NAME="copynumber" --><li><span class="label">Copynumber :</span> <!-- TMPL_VAR NAME="copynumber" -->&nbsp;<!-- /TMPL_IF -->
+            <!--/sb-->
             </ol></div>
             <div class="listgroup"><h4>Acquisition Details</h4>
               <ol class="bibliodetails">
