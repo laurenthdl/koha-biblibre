@@ -68,7 +68,7 @@ function addBorrower(borrowernumber, surname, firstname){
     var ids = $("#borrowersids").val();
     var re = new RegExp("(^"+borrowernumber+"$)|(^"+borrowernumber+":)|(:"+borrowernumber+"$)|(:"+borrowernumber+":)");
     if(ids.match(re))
-        return;
+        return -1;
 
     IncMaxRank();
     var tr = '<tr>';
@@ -93,6 +93,8 @@ function addBorrower(borrowernumber, surname, firstname){
 
     $("#borrowers").show();
     $("#noborrowersp").hide();
+
+    return 0;
 }
 
 function delBorrower(borrowernumber){
@@ -100,7 +102,8 @@ function delBorrower(borrowernumber){
 }
 
 function SearchMember(){
-    window.open("/cgi-bin/koha/serials/member-search.pl");
+    window.open("/cgi-bin/koha/serials/member-search.pl", 'MemberSearch',
+      'menubar=no,status=no,toolbar=no');
 }
 <!-- /TMPL_UNLESS -->
 
@@ -175,6 +178,7 @@ function SearchMember(){
             <label for="notes">Notes: </label><br />
             <textarea id="notes" name="notes"><!-- TMPL_VAR NAME="notes" --></textarea><br />
             <input type="submit" value="Save" />
+            <input type="button" value="Cancel" onclick="window.location.href='/cgi-bin/koha/serials/routinglists.pl?subscriptionid=<!-- TMPL_VAR NAME="subscriptionid" -->';" />
           </form>
       <!-- /TMPL_IF --><!-- new -->
     </div>
