@@ -5,7 +5,9 @@
 <!--
 
 function add_member(borrowernumber, surname, firstname){
-     window.opener.addBorrower(borrowernumber, surname, firstname);
+    if(window.opener.addBorrower(borrowernumber, surname, firstname) < 0){
+        alert(_("This borrower is already in the list."));
+    }
 }
 
 //-->

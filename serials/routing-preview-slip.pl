@@ -68,6 +68,7 @@ $template->param(
     title           => $biblio->{'title'},
     memberloop      => \@memberloop,
     routingnotes    => $routinglist->{'notes'},
+    routinglisttitle=> $routinglist->{'title'},
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;
