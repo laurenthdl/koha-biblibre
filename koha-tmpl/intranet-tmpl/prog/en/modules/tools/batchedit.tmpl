@@ -8,32 +8,31 @@
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
      var CGIBIN = "/cgi-bin/koha/";
-     
-     function fieldChanged(){
-        var field = $('#fieldchoice').val();
+
+     function fieldChanged(fieldid, subfieldid){
+        var field    = $('#'+fieldid).val();
         $.ajax({
-        	url: CGIBIN + 'tools/batchedit.pl?field=' + field,
-        	dataType: 'json',
+            url: CGIBIN + 'tools/batchedit.pl?field=' + field,
+            dataType: 'json',
             success: function(data){
-            	$("#subfieldchoice option").remove();
-            
-        	    var subfield = $('#subfieldchoice'); 
-                	$("<option>").attr("value", "@")
+                $("#"+subfieldid+" option").remove();
+                var subfield = $('#'+subfieldid);
+                $("<option>").attr("value", "@")
                                  .text( _('Whole field'))
-                                 .appendTo('#subfieldchoice');
+                                 .appendTo('#'+subfieldid);
                 for( var i=0; i < data.length ; i++){
-                	$("<option>").attr("value", data[i].subfield)
+                    $("<option>").attr("value", data[i].subfield)
                                  .text(data[i].subfield)
-                                 .appendTo('#subfieldchoice');
+                                 .appendTo('#'+subfieldid);
                 }
                 subfieldChanged();
             }
         });
      }
 
-     function subfieldChanged(){
-        var field    = $('#fieldchoice').val();
-        var subfield = $('#subfieldchoice').val();
+     function subfieldChanged(fieldid, subfieldid){
+        var field    = $('#'+fieldid).val();
+        var subfield = $('#'+subfieldid).val();
         $.ajax({
         	url: CGIBIN + 'tools/batchedit.pl?field=' + field + '&subfield=' + subfield,
         	dataType: 'json',
@@ -67,17 +66,31 @@
         
      }
 
+     function actionChanged(){
+        var action = $("#actionchoice").val();
+        if ( action == "dup" || action == "dup_w" ) {
+            $("#tofieldchoice").attr('disabled', '');
+            $("#tosubfieldchoice").attr('disabled', '');
+        } else {
+            $("#tofieldchoice").attr('disabled', 'disabled');
+            $("#tosubfieldchoice").attr('disabled', 'disabled');
+        }
+     }
+
      function addRule(){
         var actionlabel = {
                 mod: _('Modify'),
                 del: _('Delete'),
-                add: _('Create')
+                add: _('Create'),
+                dup: _('Duplicate')
                 };
         var repvallabel  = $('#repvalchoice :selected').text()  || $("#repvalchoice").val();
-        
+
         var field    = $('#fieldchoice').val();
         var subfield = $('#subfieldchoice').val();
         var action   = $('#actionchoice').val();
+        var tofield    = $('#tofieldchoice').val();
+        var tosubfield = $('#tosubfieldchoice').val();
         var nocond   = $('#nocond').attr('checked')||(! $('#condvalchoice').val().length);
 
         if( ! nocond ) {
@@ -92,11 +105,12 @@
                 + '<td><input type="hidden" name="field" value="'    + field + '" />'    + field               + '</td>'
                 + '<td><input type="hidden" name="subfield" value="' + subfield + '" />' + subfield            + '</td>'
                 + '<td><input type="hidden" name="action" value="'   + action + '" />'   + actionlabel[action] + '</td>'
+                + '<td><input type="hidden" name="tofield" value="'    + tofield + '" />'    + tofield               + '</td>'
+                + '<td><input type="hidden" name="tosubfield" value="' + tosubfield + '" />' + tosubfield            + '</td>'
                 + '<td><input type="hidden" name="condval" value="'  + condval + '" />'  
-                    + condvallabel        
+                    + condvallabel
                     + '<input type="hidden" name="nocondval" value="' + nocond + '" />'
                 + '</td>'
-                
                 + '<td><input type="hidden" name="repval" value="'   + repval + '" />'   + repvallabel         + '</td>'
                 + '<td><input type="button" value="Delete" onclick="deleteRule(this)" /></td>'
             + '</tr>';
@@ -180,29 +194,41 @@
 <table id="rulestable">
     <thead>
         <tr>
-            <th>Field</th><th>Subfield</th><th>Action</th><th>Condition Value</th><th>Value</th><th>&nbsp;</th>
+            <th>Field</th><th>Subfield</th><th>Action</th><th>To field</th><th>To subfield</th><th>Condition Value</th><th>Value</th><th>&nbsp;</th>
         </tr>
     </thead>
         <tr>
             <td>
-                <select name="fieldchoice" id="fieldchoice" onchange="fieldChanged();">
+                <select name="fieldchoice" id="fieldchoice" onchange="fieldChanged('fieldchoice', 'subfieldchoice');">
 <!-- TMPL_LOOP NAME="marcfields" -->
                     <option value="<!-- TMPL_VAR NAME="tag" -->"><!-- TMPL_VAR NAME="tag" --></option>
 <!-- /TMPL_LOOP -->
                 </select>
             </td>
             <td>
-                <select name="subfieldchoice" id="subfieldchoice" onchange="subfieldChanged();">
+                <select name="subfieldchoice" id="subfieldchoice" onchange="subfieldChanged('fieldchoice', 'subfieldchoice');">
                 
                 </select>
             </td>
             <td>
-                <select name="actionchoice" id="actionchoice">
+                <select name="actionchoice" id="actionchoice" onchange="actionChanged();">
                     <option value="mod">Modify subfield</option>
                     <option value="add">Create subfield</option>
                     <option value="addfield">Create field and subfield</option>
                     <option value="del">Delete subfield</option>
+                    <option value="dup">Duplicate subfield</option>
+                    <option value="dup_w">Duplicate subfield within field</option>
                 </select>
+            </td>
+            <td>
+                <select name="fieldchoice" id="tofieldchoice" onchange="fieldChanged('tofieldchoice', 'tosubfieldchoice');" disabled='disabled'>
+                    <!-- TMPL_LOOP NAME="marcfields" -->
+                        <option value="<!-- TMPL_VAR NAME="tag" -->"><!-- TMPL_VAR NAME="tag" --></option>
+                    <!-- /TMPL_LOOP -->
+                </select>
+            </td>
+            <td>
+                <select name="subfieldchoice" id="tosubfieldchoice" onchange="subfieldChanged('tofieldchoice', 'tosubfieldchoice');" disabled='disabled'></select>
             </td>
             <td id="condvaltd">
                 <input type="text" name="condvalchoice" id="condvalchoice" />
