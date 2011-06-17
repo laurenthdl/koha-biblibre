@@ -361,6 +361,7 @@ $(document).ready(function()
                     <label class="required" for="quantity">Quantity: </label>
                     <!-- TMPL_IF name="items" -->
                         <input type="text" readonly="readonly" size="20" id="quantity" name="quantity" value="0" onchange="updateCosts();" />
+                        <input type="text" readonly="readonly" size="20" id="quantity" name="quantity" <!-- TMPL_IF NAME="subscriptionid" -->value="1"<!-- TMPL_ELSE -->value="0"<!-- /TMPL_IF --> onchange="updateCosts();" />
                     <!-- TMPL_ELSE -->
                         <input type="text" size="20" id="quantity" name="quantity" <!-- TMPL_IF NAME="subscriptionid" -->value="1" READONLY<!-- TMPL_ELSE -->value="<!-- TMPL_VAR name="quantityrec" -->"<!-- /TMPL_IF  --> onchange="updateCosts();" />
                     <!-- /TMPL_IF -->

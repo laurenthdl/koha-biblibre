@@ -1509,7 +1509,7 @@ sub ReNewSubscription {
     # renew subscription
     $query = qq|
         UPDATE subscription
-        SET    startdate=?,firstacquidate=?,numberlength=?,weeklength=?,monthlength=?
+        SET    startdate=?,firstacquidate=?,numberlength=?,weeklength=?,monthlength=?,reneweddate=NOW()
         WHERE  subscriptionid=?
     |;
     $sth = $dbh->prepare($query);

@@ -322,7 +322,7 @@ if ( C4::Context->preference('AcqCreateItem') eq 'ordering' && !$ordernumber ) {
 # Get the item types list, but only if item_level_itype is YES. Otherwise, it will be in the item, no need to display it in the biblio
 my @itemtypes = C4::ItemType->all unless C4::Context->preference('item-level_itypes');
 
-my ( $order, $bookseller, $tmpl_infos );
+my ( $order, $tmpl_infos );
 if ( defined $subscriptionid ) {
     my $lastOrderReceived = GetLastOrderReceivedFromSubscriptionid $subscriptionid;
     if ( defined $lastOrderReceived ) {
