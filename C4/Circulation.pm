@@ -2227,7 +2227,7 @@ sub DeleteTransfer {
 $rows = AnonymiseIssueHistory($borrowernumber,$date)
 
 This function write NULL instead of C<$borrowernumber> given on input arg into the table issues.
-if C<$borrowernumber> is not set, it will delete the issue history for all borrower older than C<$date>.
+if C<$borrowernumber> is not set, it will delete the issue history for all borrower older than C<$date>, except for late returns.
 
 return the number of affected rows.
 
@@ -2242,6 +2242,7 @@ sub AnonymiseIssueHistory {
         SET    borrowernumber = NULL
         WHERE  returndate < '" . $date . "'
           AND borrowernumber IS NOT NULL
+          AND DATEDIFF(returndate, date_due) <= 0
     ";
     $query .= " AND borrowernumber = '" . $borrowernumber . "'" if defined $borrowernumber;
     my $rows_affected = $dbh->do($query);
