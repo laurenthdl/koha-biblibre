@@ -1077,7 +1077,7 @@ sub GetExpirationDate {
     # we don't do the same test if the subscription is based on X numbers or on X weeks/months
     $enddate = $startdate || $subscription->{startdate};
     $enddate = C4::Dates->new($enddate, "iso");
-    my @date = split( /-/, $enddate );
+    my @date = split( /-/, $enddate->output("iso") );
     return if ( scalar(@date) != 3 || not check_date(@date) );
     if ( ( $subscription->{periodicity} % 16 ) > 0 ) {
  
@@ -1091,16 +1091,16 @@ sub GetExpirationDate {
         } elsif ( $subscription->{monthlength} ) {
             if ( $$subscription{startdate} ) {
                 my @enddate = Add_Delta_YM( $date[0], $date[1], $date[2], 0, $subscription->{monthlength} );
-                $enddate = sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] );
+                $enddate = C4::Dates->new(sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] ), "iso");
             }
         } elsif ( $subscription->{weeklength} ) {
             if ( $$subscription{startdate} ) {
                 my @date = split( /-/, $subscription->{startdate} );
                 my @enddate = Add_Delta_Days( $date[0], $date[1], $date[2], $subscription->{weeklength} * 7 );
-                $enddate = sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] );
+                $enddate = C4::Dates->new(sprintf( "%04d-%02d-%02d", $enddate[0], $enddate[1], $enddate[2] ), "iso");
             }
         }
-        return $enddate;
+        return $enddate->output("iso");
     } else {
         return;
     }
@@ -1234,7 +1234,8 @@ sub ModSerialStatus {
 
         # next date (calculated from actual date & frequency parameters)
         my $nextpublisheddate = GetNextDate( $publisheddate, $val );
-        NewIssue( $newserialseq, $subscriptionid, $val->{'biblionumber'}, 1, $nextpublisheddate->output("iso"), $nextpublisheddate->output("iso") );
+        my $nextpubdate = ($nextpublisheddate) ? $nextpublisheddate->output("iso") : undef;
+        NewIssue( $newserialseq, $subscriptionid, $val->{'biblionumber'}, 1, $nextpubdate, $nextpubdate );
         $query = "UPDATE subscription SET lastvalue1=?, lastvalue2=?, lastvalue3=?, innerloop1=?, innerloop2=?, innerloop3=?
                     WHERE  subscriptionid = ?";
         $sth = $dbh->prepare($query);
@@ -1482,7 +1483,8 @@ this function renew a subscription with values given on input args.
 =cut
 
 sub ReNewSubscription {
-    my ( $subscriptionid, $user, $startdate, $numberlength, $weeklength, $monthlength, $note ) = @_;
+    my ( $subscriptionid, $user, $startdate, $firstacquidate, $subtype, $sublength ) = @_;
+
     my $dbh          = C4::Context->dbh;
     my $subscription = GetSubscription($subscriptionid);
     my $query        = qq|
@@ -1498,13 +1500,12 @@ sub ReNewSubscription {
     # renew subscription
     $query = qq|
         UPDATE subscription
-        SET    startdate=?,numberlength=?,weeklength=?,monthlength=?,reneweddate=NOW()
+        SET    startdate=?,firstacquidate=?,numberlength=?,weeklength=?,monthlength=?,reneweddate=NOW()
         WHERE  subscriptionid=?
     |;
     $sth = $dbh->prepare($query);
-    $sth->execute( $startdate, $numberlength, $weeklength, $monthlength, $subscriptionid );
-    my $enddate = GetExpirationDate($subscriptionid);
-    $debug && warn "enddate :$enddate";
+    $sth->execute( $startdate, $firstacquidate, $numberlength, $weeklength, $monthlength, $subscriptionid );
+    my $enddate = GetExpirationDate($subscriptionid, $firstacquidate);
     $query = qq|
         UPDATE subscription
         SET    enddate=?
@@ -1519,6 +1520,7 @@ sub ReNewSubscription {
     |;
     $sth = $dbh->prepare($query);
     $sth->execute( $enddate, $subscriptionid );
+    $sth->finish;
 
     logaction( "SERIAL", "RENEW", $subscriptionid, "" ) if C4::Context->preference("SubscriptionLog");
     return;
@@ -1768,6 +1770,7 @@ sub HasSubscriptionExpired {
     my $subscription     = GetSubscription($subscriptionid);
     if ( ( $subscription->{periodicity} % 16 ) > 0 ) {
         my $expirationdate = $subscription->{enddate} || GetExpirationDate($subscriptionid);
+        return 0 if(!defined $expirationdate || $expirationdate eq '' || $expirationdate eq '0000-00-00');
         my $query = qq|
             SELECT max(planneddate)
             FROM   serial
@@ -2216,7 +2219,8 @@ sub countissuesfrom {
             SELECT count(*)
             FROM   serial
             WHERE  subscriptionid=?
-            AND serial.publisheddate>=?
+            AND (serial.publisheddate>=?
+              OR serial.status = 1)
         |;
     my $sth = $dbh->prepare($query);
     $sth->execute( $subscriptionid, $startdate );
