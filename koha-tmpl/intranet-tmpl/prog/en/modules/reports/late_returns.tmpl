@@ -71,7 +71,7 @@
             </tbody>
           </table>
         <!-- TMPL_ELSE -->
-          <p>There is no borrowers named like '<!-- TMPL_VAR NAME="search" -->'</p>
+          <p>There is no results for '<!-- TMPL_VAR NAME="search" -->'</p>
           <p><a href="/cgi-bin/koha/reports/late_returns.pl">Make a new search</a></p>
         <!-- /TMPL_IF -->
       <!-- /TMPL_IF --> <!-- /display_borrowers_search_results -->
@@ -81,7 +81,7 @@
         <form action="" method="post">
           <input type="hidden" name="op" value="search" />
           <fieldset>
-            <label for="search">Name :</label>
+            <label for="search">Cardnumber :</label>
             <input type="text" name="search" id="search" />
             <input type="submit" value="Search" />
           </fieldset>

@@ -67,7 +67,6 @@ if($op eq "execute") {
     my $results = $sth->fetchall_arrayref( {} );
     $sth->finish;
     my @issues_loop = ();
-    warn Data::Dumper::Dumper ($results);
     foreach (@$results) {
         my %line = %{ $_ };
         $line{'dayslate'} = 0 if($line{'dayslate'} < 0);
@@ -76,7 +75,6 @@ if($op eq "execute") {
         $line{'returndate'} = C4::Dates->new($line{'returndate'}, "iso")->output();
         push @issues_loop, \%line;
     }
-    warn Data::Dumper::Dumper (\@issues_loop);
 
     $query = qq{
         SELECT surname, firstname
@@ -96,7 +94,11 @@ if($op eq "execute") {
     );
 } elsif ($op eq "search") {
     my $search = $input->param('search');
-    my (undef, $results) = SearchMember($search, "surname,firstname");
+    my ($resultscount, $results) = SearchMember($search, "surname,firstname");
+    if($resultscount == 1){
+        print $input->redirect("/cgi-bin/koha/reports/late_returns.pl?op=execute&borrowernumber=".$results->[0]->{'borrowernumber'});
+        exit;
+    }
     $template->param(
         display_borrowers_search_results => 1,
         results_loop => $results,
