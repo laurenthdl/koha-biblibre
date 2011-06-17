@@ -1,7 +1,12 @@
 function addItem( node ) {
     var index = $(node).parent().attr('id');
     var current_qty = parseInt($("#quantity").val());
-    var max_qty = parseInt($("#quantity_to_receive").val());
+    var max_qty;
+    if($("#quantity_to_receive").length != 0){
+        max_qty = parseInt($("#quantity_to_receive").val());
+    } else  {
+        max_qty = 99999;
+    }
     if ( $("#items_list table").find('tr[idblock="' + index + '"]').length == 0 ) {
         if ( current_qty < max_qty ) {
             if ( current_qty < max_qty - 1 )
@@ -42,7 +47,11 @@ function constructTrNode(index) {
     var callnumber = $("#" + index).find("[name='kohafield'][value='items.itemcallnumber']").prevAll("[name='field_value']")[0];
     callnumber = $(callnumber).val();
     var notforloan = $("#" + index).find("[name='kohafield'][value='items.notforloan']").prevAll("[name='field_value']")[0];
-    notforloan = $(notforloan).val();
+    // if notforloan is linked to an authorised_value, get text instead of value
+    var notforloantext = $(notforloan).find("option:selected").text();
+    if(notforloantext.length == 0){
+        notforloantext = $(notforloan).val();
+    }
     var barcode = $('#' + index).find("[name='kohafield'][value='items.barcode']").prevAll("[name='field_value']")[0];
     barcode = $(barcode).val();
     var show_link = "<a href='#items' onclick='showItem(\"" + index + "\");'>Show</a>";
@@ -51,7 +60,7 @@ function constructTrNode(index) {
     result += "<td>" + homebranch + "</td>";
     result += "<td>" + loc + "</td>";
     result += "<td>" + callnumber + "</td>";
-    result += "<td>" + notforloan + "</td>";
+    result += "<td>" + notforloantext + "</td>";
     result += "<td>" + barcode + "</td>";
     result += "<td>" + show_link + "</td>";
     result += "<td>" + del_link + "</td>";
@@ -69,7 +78,12 @@ function addItemInList(index) {
 function deleteItemBlock(node_a, index) {
     $("#" + index).remove();
     var current_qty = parseInt($("#quantity").val());
-    var max_qty = parseInt($("#quantity_to_receive").val());
+    var max_qty;
+    if($("#quantity_to_receive").length != 0) {
+        max_qty = parseInt($("#quantity_to_receive").val());
+    } else {
+        max_qty = 99999;
+    }
     $("#quantity").val(current_qty - 1);
     $(node_a).parents('tr').remove();
     if(current_qty - 1 == 0)

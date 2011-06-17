@@ -313,7 +313,10 @@ if ( C4::Context->preference('AcqCreateItem') eq 'ordering' && !$ordernumber ) {
     my @itemloop;
     push @itemloop, $cell;
 
-    $template->param( items => \@itemloop );
+    $template->param(
+        items => \@itemloop,
+        AcqCreateItemOrdering => 1,
+    );
 }
 
 # Get the item types list, but only if item_level_itype is YES. Otherwise, it will be in the item, no need to display it in the biblio

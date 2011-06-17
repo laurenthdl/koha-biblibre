@@ -22,7 +22,7 @@ function Check(form) {
         // Remove last itemblock if it is not in items_list
         var lastitemblock = $("#outeritemblock > div:last");
         var tobedeleted = true;
-        var listitems = $("#items_list li");
+        var listitems = $("#items_list tr");
         $(listitems).each(function(){
             if($(this).attr('idblock') == $(lastitemblock).attr('id')){
                 tobedeleted = false;
