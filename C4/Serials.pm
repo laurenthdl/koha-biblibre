@@ -1497,6 +1497,9 @@ sub ReNewSubscription {
     $sth->execute( $subscription->{biblionumber} );
     my $biblio = $sth->fetchrow_hashref;
 
+    my $numberlength = ($subtype eq "issues") ? $sublength : 0;
+    my $weeklength = ($subtype eq "weeks") ? $sublength : 0;
+    my $monthlength = ($subtype eq "months") ? $sublength : 0;
     # renew subscription
     $query = qq|
         UPDATE subscription
