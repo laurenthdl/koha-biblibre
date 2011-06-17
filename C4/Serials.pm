@@ -2159,6 +2159,18 @@ sub GetSubscriptionRoutingListAsCSV {
     my $csv = Text::CSV::Encoded->new( {encoding => "utf8" } );
     my $output;
 
+    my $routinglist = GetSubscriptionRoutingList($routinglistid);
+    my $subscription = GetSubscription($routinglist->{'subscriptionid'});
+    my $biblio = GetBiblio($subscription->{'biblionumber'});
+
+    $csv->combine("Subscription title:", $biblio->{'title'});
+    $output .= $csv->string() . "\n";
+    $csv->combine("Routing list title:", $routinglist->{'title'});
+    $output .= $csv->string() . "\n";
+
+    $csv->combine("", "");
+    $output .= $csv->string() . "\n";
+
     my @headers = qw(surname firstname);
     $csv->combine(@headers);
     $output .= $csv->string() . "\n";
@@ -2173,6 +2185,12 @@ sub GetSubscriptionRoutingListAsCSV {
         );
         $output .= $csv->string() . "\n";
     }
+
+    $csv->combine("", "");
+    $output .= $csv->string() . "\n";
+
+    $csv->combine("Notes:", $routinglist->{'notes'});
+    $output .= $csv->string() . "\n";
 
     return $output;
 }
