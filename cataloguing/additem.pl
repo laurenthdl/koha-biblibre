@@ -672,6 +672,7 @@ $template->param(
     itemtagsubfield  => $itemtagsubfield,
     op               => $nextop,
     opisadd          => ( $nextop eq "saveitem" ) ? 0 : 1,
+    popup            => $input->param('popup'),
     C4::Search::enabled_staff_search_views,
 );
 foreach my $error (@errors) {
