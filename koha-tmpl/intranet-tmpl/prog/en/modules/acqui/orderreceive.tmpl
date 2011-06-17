@@ -41,6 +41,11 @@ function Check(form) {
     return true;
 }
 
+function editItemPopup(biblionumber, itemnumber){
+    window.open("/cgi-bin/koha/cataloguing/additem.pl?popup=1&op=edititem&biblionumber="+biblionumber+"&itemnumber="+itemnumber+"#edititem");
+    return false;
+}
+
 $(document).ready(function() {
     <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
         UpdateQty($("#recv_form"));
@@ -124,7 +129,7 @@ $(document).ready(function() {
                   <td><!-- TMPL_VAR NAME="itemcallnumber" --></td>
                   <td><!-- TMPL_VAR NAME="notforloan" --></td>
                   <td><!-- TMPL_VAR NAME="barcode" -->
-                  <td><a href="/cgi-bin/koha/cataloguing/additem.pl?op=edititem&biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->&itemnumber=<!-- TMPL_VAR NAME='itemnumber' -->#edititem">Edit</a></td>
+                  <td><a href="/cgi-bin/koha/cataloguing/additem.pl?op=edititem&biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->&itemnumber=<!-- TMPL_VAR NAME='itemnumber' -->#edititem" onclick="return editItemPopup(<!-- TMPL_VAR NAME='biblionumber' -->, <!-- TMPL_VAR NAME='itemnumber' -->);">Edit</a></td>
                 </tr>
                 <!-- /TMPL_LOOP -->
               </tbody>
