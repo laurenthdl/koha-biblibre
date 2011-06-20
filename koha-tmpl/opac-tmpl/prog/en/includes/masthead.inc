@@ -45,34 +45,34 @@
         <option value="">Library Catalog</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_ti" -->
-        <option selected="selected" value="ti">Title</option>
+        <option selected="selected" value="title">Title</option>
 		<!-- TMPL_ELSE -->
-        <option value="ti">Title</option>
+        <option value="title">Title</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_au" -->
-        <option selected="selected" value="au">Author</option>
+        <option selected="selected" value="author">Author</option>
 		<!-- TMPL_ELSE -->
-        <option value="au">Author</option>
+        <option value="author">Author</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_su" -->
-        <option selected="selected" value="su">Subject</option>
+        <option selected="selected" value="subject">Subject</option>
 		<!-- TMPL_ELSE -->
-        <option value="su">Subject</option>
+        <option value="subject">Subject</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_nb" -->
-		<option selected="selected" value="nb">ISBN</option>
+		<option selected="selected" value="isbn">ISBN</option>
 		<!-- TMPL_ELSE -->
-		<option value="nb">ISBN</option>
+		<option value="isbn">ISBN</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_se" -->
-        <option selected="selected" value="se">Series</option>
+        <option selected="selected" value="title-series">Series</option>
 		<!-- TMPL_ELSE -->
-        <option value="se">Series</option>
+        <option value="title-series">Series</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_callnum" -->
-        <option selected="selected" value="callnum">Call Number</option>
+        <option selected="selected" value="callnumber">Call Number</option>
 		<!-- TMPL_ELSE -->
-        <option value="callnum">Call Number</option>
+        <option value="callnumber">Call Number</option>
 		<!-- /TMPL_IF --></select>
         <!-- TMPL_IF NAME="tag" -->
                 <input type="text" id = "transl1" name="q" value="" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>

@@ -472,6 +472,9 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
             if ( $code =~/itype/ ) {
                 $lib = GetSupportName $value;
             }
+            if ( $code =~ /pubdate/ ) {
+                $lib = C4::Dates->new($value, 'iso')->output('iso');
+            }
             if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
                 $lib = GetAuthorisedValueLib $avlist,$value;
             }
