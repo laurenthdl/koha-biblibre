@@ -6077,6 +6077,50 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.039";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+        INSERT INTO `authorised_values` (category, authorised_value, lib)
+        VALUES ('SNPREFIX', 'A', 'A'),
+               ('SNPREFIX', 'ARC', 'ARC'),
+               ('SNPREFIX', 'B', 'B'),
+               ('SNPREFIX', 'C', 'C'),
+               ('SNPREFIX', 'D', 'D'),
+               ('SNPREFIX', 'DS', 'DS'),
+               ('SNPREFIX', 'E', 'E'),
+               ('SNPREFIX', 'EM', 'EM'),
+               ('SNPREFIX', 'EMT', 'EMT'),
+               ('SNPREFIX', 'ENS', 'ENS'),
+               ('SNPREFIX', 'F', 'F'),
+               ('SNPREFIX', 'L', 'L'),
+               ('SNPREFIX', 'M', 'M'),
+               ('SNPREFIX', 'MEM', 'MEM'),
+               ('SNPREFIX', 'MET', 'MET'),
+               ('SNPREFIX', 'PH', 'PH'),
+               ('SNPREFIX', 'R', 'R'),
+               ('SNPREFIX', 'RO', 'RO'),
+               ('SNPREFIX', 'S', 'S'),
+               ('SNPREFIX', 'TSE', 'TSE'),
+               ('SNPREFIX', 'U', 'U'),
+               ('SNPREFIX', 'V', 'V'),
+               ('SNPREFIX', 'W', 'W'),
+               ('SNPREFIX', 'XA', 'XA'),
+               ('SNPREFIX', 'XB', 'XB'),
+               ('SNPREFIX', 'XBL', 'XBL'),
+               ('SNPREFIX', 'XC', 'XC'),
+               ('SNPREFIX', 'XD', 'XD'),
+               ('SNPREFIX', 'XEE', 'XEE'),
+               ('SNPREFIX', 'XEI', 'XEI'),
+               ('SNPREFIX', 'XFG', 'XFG'),
+               ('SNPREFIX', 'XFL', 'XFL'),
+               ('SNPREFIX', 'XG', 'XG'),
+               ('SNPREFIX', 'Y', 'Y'),
+               ('SNPREFIX', 'Z', 'Z')
+    ");
+    print "Upgrade to $DBversion done (Add authorised values SNPREFIX for stocknumbers prefixes)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
