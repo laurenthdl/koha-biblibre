@@ -19,21 +19,29 @@ if ( C4::Context->preference("SearchEngine") ne 'Solr' ) {
 
 #Setup
 
-my ( $reset, $number, $recordtype, $biblionumber, $optimize, $want_help );
+my ( $reset, $number, $recordtype, $biblionumber, $optimize, $info, $want_help );
 GetOptions(
     'r'   => \$reset,
     'n:s' => \$number,
     't:s' => \$recordtype,
     'w:s' => \$biblionumber,
     'o'   => \$optimize,
+    'i'   => \$info,
     'h|help' => \$want_help,
 );
 my $debug = C4::Context->preference("DebugLevel");
 my $solrurl = C4::Context->preference("SolrAPI");
 
+my $ping = &PingCommand;
+if (!defined $ping) {
+    print "Solr is Down\n";
+    exit(1);
+}
+
 #Script
 
 &PrintHelp if ($want_help);
+&PrintInfo if ($info);
 if ($reset){
   if ($recordtype){
       &ResetIndex("recordtype:".$recordtype);
@@ -91,6 +99,11 @@ sub CommitCommand {
     my $urlreturns = get $solrurl.$commiturl;
 }
 
+sub PingCommand {
+    my $pingurl = "/admin/ping";
+    my $urlreturns = get $solrurl.$pingurl;
+}
+
 sub ResetCommand {
     my ($query) = @_;
     my $deleteurl = "/update?stream.body=%3Cdelete%3E%3Cquery%3E".$query."%3C/query%3E%3C/delete%3E";
@@ -108,6 +121,14 @@ sub CountAllDocs {
     my $xmlsimple = XML::Simple->new();
     my $data = $xmlsimple->XMLin($urlreturns);
     return $data->{result}->{numFound};
+}
+
+sub PrintInfo {
+    my $count = &CountAllDocs;
+    print <<_USAGE_;
+SolrAPI = $solrurl
+How many indexed documents = $count;
+_USAGE_
 }
 
 sub PrintHelp {
@@ -130,6 +151,8 @@ Parameters:
     -w 101                  index biblio with biblionumber equals 101
 
     -o                      launch optimize command at the end of indexing
+
+    -i                      gives solr install information: SolrAPI value and count all documents indexed
 
     --help or -h            show this message.
 _USAGE_
