@@ -1,0 +1,82 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Cataloguing &rsaquo; Stock number plugin</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<style type="text/css">
+<!--
+#custom-doc {
+  text-align: center;
+  margin-left: 25%;
+  margin-right: 25%;
+}
+
+#custom-doc ul{
+  width: 50%;
+  margin: auto;
+}
+
+#custom-doc ul li{
+  text-align: left;
+  list-style-type: none;
+  white-space: nowrap;
+}
+
+#custom-doc ul li label{
+  font-weight: bold;
+}
+-->
+</style>
+<!-- TMPL_IF NAME="search_and_retrieve" -->
+<script type="text/javascript">
+//<![CDATA[
+  $(document).ready(function(){
+    window.opener.document.getElementById('<!-- TMPL_VAR NAME="field_number" -->').value = '<!-- TMPL_VAR NAME="return" -->';
+    window.close();
+  });
+//]]>
+</script>
+<!-- /TMPL_IF -->
+</head>
+
+<body>
+  <div id="custom-doc">
+    <h1>Stock number plugin</h1>
+    <!-- TMPL_IF NAME="prefixes_loop" -->
+      <form action="/cgi-bin/koha/cataloguing/plugin_launcher.pl" method="get">
+        <input type="hidden" name="plugin_name" value="stocknumberujm.pl" />
+        <input type="hidden" name="op" value="search_and_retrieve" />
+        <input type="hidden" name="field_number" value="<!-- TMPL_VAR NAME='field_number' -->" />
+        <ul><li>
+        <label for="prefix">Prefix:</label>
+        <select id="prefix" name="prefix">
+          <!-- TMPL_LOOP NAME="prefixes_loop" -->
+            <option value="<!-- TMPL_VAR NAME='authorised_value' -->">
+              <!-- TMPL_VAR NAME='authorised_value' -->
+            </option>
+          <!-- /TMPL_LOOP -->
+        </select>
+        </li><li>
+        <label for="branch">Branch:</label>
+        <select id="branch" name="branch">
+          <!-- TMPL_LOOP NAME="branches_loop" -->
+            <!-- TMPL_IF NAME="selected" -->
+              <option selected="selected" value="<!-- TMPL_VAR NAME='branchcode' -->">
+            <!-- TMPL_ELSE -->
+              <option value="<!-- TMPL_VAR NAME='branchcode' -->">
+            <!-- /TMPL_IF -->
+              <!-- TMPL_VAR NAME="branchname" -->
+            </option>
+          <!-- /TMPL_LOOP -->
+        </select>
+        </li></ul>
+        <br />
+        <input type="submit" value="OK" />
+      </form>
+    <!-- TMPL_ELSE -->
+      <p>
+        There is no defined prefix.
+        Please add one in 'SNPREFIX' authorised values.
+      </p>
+    <!-- /TMPL_IF -->
+  </div><!-- /custom-doc -->
+</body>
+</html>
