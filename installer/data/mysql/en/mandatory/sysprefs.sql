@@ -302,3 +302,4 @@ INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Search Engine','Choice');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SubscriptionDuplicateDroppedInput','','','List of fields which must not be rewritten when a subscription is duplicated (Separated by semicolon)','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('FinesDependsOnGracePeriod',0,'','If Yes, fines begin after grace delay. If No, fines begin just after return','YesNo');
+INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OPACHoldNextInLibrary','','','Allows the borrower to place a hold on the first available item for a given library','YesNo');
