@@ -284,3 +284,4 @@ INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SolrAPI','http://localhost:8080/solr','','URL du service web Solr.','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Moteur de recherche','Choice');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SubscriptionDuplicateDroppedInput','','','Liste des champs à ne pas dupliquer lors de la duplication d\'un abonnement (séparés par un point-virgule)','Free');
+INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OPACHoldNextInLibrary','','','Permet à un usage de placer une réservation sur le premier exemplaire disponible pour une bibliothèque donnée','YesNo')

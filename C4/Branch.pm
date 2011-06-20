@@ -51,6 +51,7 @@ BEGIN {
       &GetBranch
       &GetBranches
       &GetBranchesLoop
+      &GetBranchesLoopPerBiblio
       &GetBranchDetail
       &get_branchinfos_of
       &ModBranch
@@ -186,6 +187,31 @@ sub GetBranchesLoop (;$$) {    # since this is what most pages want anyway
     }
     return \@loop;
 }
+
+
+# Returns the branches that have at least an item for this biblionumber
+sub GetBranchesLoopPerBiblio  { 
+
+    my $biblionumber = shift;
+    my $dbh = C4::Context->dbh;
+    my $sth;
+
+    my $query = "select distinct branchcode, branchname from branches,items where branches.branchcode=items.holdingbranch and items.biblionumber=? order by branchname";
+    $sth = $dbh->prepare($query);
+    $sth->execute($biblionumber);
+
+    my @loop;
+    while (my ($branchcode, $branchname) = $sth->fetchrow_array) {
+        push @loop,
+          { value      => $branchcode,
+            branchname => $branchname,
+            branchcode => $branchcode
+          };
+    }
+    return \@loop;
+
+}
+
 
 =head2 GetBranchName
 
