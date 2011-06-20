@@ -89,7 +89,7 @@ if ($item) {
 
     # 	if the document is not in his homebranch location and there is not reservation after, we transfer it
     if ( $fbr ne $tbr and not $nextreservinfo ) {
-        ModItemTransfer( $item, $fbr, $tbr );
+        ModItemTransfer( $item, $fbr, $tbr )  unless (C4::Context->preference('OPACHoldNextInLibrary'));
     }
 }
 if ( C4::Context->preference('IndependantBranches') ) {

@@ -1357,7 +1357,7 @@ sub AddReturn {
           ) {
             $debug and warn sprintf "about to call ModItemTransfer(%s, %s, %s)", $item->{'itemnumber'}, $branch, $hbr;
             $debug and warn "item: " . Dumper($item);
-            ModItemTransfer( $item->{'itemnumber'}, $branch, $hbr );
+            ModItemTransfer( $item->{'itemnumber'}, $branch, $hbr ) unless (C4::Context->preference('OPACHoldNextInLibrary'));
             $messages->{'WasTransfered'} = 1;
         } else {
             $messages->{'NeedsTransfer'} = 1;    # TODO: instead of 1, specify branchcode that the transfer SHOULD go to, $item->{homebranch}
@@ -2340,7 +2340,7 @@ sub updateWrongTransfer {
     $sth->finish;
 
     # second step create a new line of branchtransfer to the right location .
-    ModItemTransfer( $itemNumber, $FromLibrary, $waitingAtLibrary );
+    ModItemTransfer( $itemNumber, $FromLibrary, $waitingAtLibrary ) unless (C4::Context->preference('OPACHoldNextInLibrary'));
 
     #third step changing holdingbranch of item
     UpdateHoldingbranch( $FromLibrary, $itemNumber );
