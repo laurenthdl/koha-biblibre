@@ -235,6 +235,12 @@ OPAC:
                   yes: Allow
                   no: "Don't allow"
             - patrons to place holds on items from the OPAC.
+       -
+            - pref: OPACHoldNextInLibrary
+              choices:
+                  yes: Allow
+                  no: "Don't allow"
+            - patrons to place holds on the first available item for a given library from the OPAC.
         -
             - Do search rebound on
             - pref: OPACSearchReboundBy

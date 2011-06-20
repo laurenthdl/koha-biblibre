@@ -46,6 +46,7 @@ my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
     }
 );
 my $OPACDisplayRequestPriority = ( C4::Context->preference("OPACDisplayRequestPriority") ) ? 1 : 0;
+my $OPACHoldNextInLibrary = C4::Context->preference("OPACHoldNextInLibrary");
 
 sub get_out ($$$) {
     output_html_with_http_headers( shift, shift, shift );    # $query, $cookie, $template->output;
@@ -58,6 +59,8 @@ my ($borr) = GetMemberDetails($borrowernumber);
 # get branches and itemtypes
 my $branches  = GetBranches();
 my $itemTypes = GetItemTypes();
+
+
 
 # There are two ways of calling this script, with a single biblio num
 # or multiple biblio nums.
@@ -159,15 +162,16 @@ if ( $query->param('place_reserve') ) {
             $item = '';
         }
         my $branch = $query->param('branch');
-        $selectedItems = "$bib/$item/$branch/";
+        my $availbranch = $query->param('availablebranch');
+        $selectedItems = "$bib/$item/$branch/$availbranch";
     }
 
     my @selectedItems = split /\//, $selectedItems;
 
-    # Make sure there is a biblionum/itemnum/branch triplet for each item.
+    # Make sure there is a biblionum/itemnum/branch/availbranch triplet for each item.
     # The itemnum can be 'any', meaning next available.
     my $selectionCount = @selectedItems;
-    if ( ( $selectionCount == 0 ) || ( ( $selectionCount % 3 ) != 0 ) ) {
+    if ( ( $selectionCount == 0 ) || ( ( $selectionCount % 4 ) != 0 ) ) {
         $template->param( message => 1, bad_data => 1 );
         &get_out( $query, $cookie, $template->output );
     }
@@ -176,6 +180,7 @@ if ( $query->param('place_reserve') ) {
         my $biblioNum = shift(@selectedItems);
         my $itemNum   = shift(@selectedItems);
         my $branch    = shift(@selectedItems);    # i.e., branch code, not name
+        my $nextavailablebranch  = shift(@selectedItems);    # i.e., branch code, not name
 
         my $singleBranchMode = $template->param('singleBranchMode');
         if ($singleBranchMode) {
@@ -212,7 +217,8 @@ if ( $query->param('place_reserve') ) {
         }
 
         # Here we actually do the reserveration. Stage 3.
-        AddReserve( $branch, $borrowernumber, $biblioNum, 'a', [$biblioNum], $rank, $startdate, $expiration_date, $notes, $biblioData->{'title'}, $itemNum, $found )
+        warn "canreserve $canreserve";
+        AddReserve( $branch, $borrowernumber, $biblioNum, 'a', [$biblioNum], $rank, $startdate, $expiration_date, $notes, $biblioData->{'title'}, $itemNum, $found, $nextavailablebranch )
           if ($canreserve);
     }
 
@@ -293,7 +299,8 @@ foreach my $biblioNum (@biblionumbers) {
     my $record = GetMarcBiblio($biblioNum);
 
     # Init the bib item with the choices for branch pickup
-    my %biblioLoopIter = ( branchChoicesLoop => $CGIbranchloop );
+    my $CGIavailbranchloop = GetBranchesLoopPerBiblio($biblioNum);
+    my %biblioLoopIter = ( branchChoicesLoop => $CGIbranchloop, availBranchChoicesLoop => $CGIavailbranchloop );
 
     # Get relevant biblio data.
     my $biblioData = $biblioDataHash{$biblioNum};
@@ -489,6 +496,7 @@ $template->param( itemtable_colspan => $itemTableColspan );
 # display infos
 $template->param( bibitemloop => $biblioLoop );
 $template->param( showpriority => 1 ) if $OPACDisplayRequestPriority;
+$template->param( onlynextat => 1 ) if $OPACHoldNextInLibrary;
 
 # can set reserve date in future
 if (   C4::Context->preference('AllowHoldDateInFuture')

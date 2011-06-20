@@ -59,6 +59,7 @@ C4::Reserves - Koha functions for dealing with reservation.
   - priority >0      : then the reserve is at 1st stage, and not yet affected to any item.
              =0      : then the reserve is being dealed
   - found : NULL       : means the patron requested the 1st available, and we haven't choosen the item
+                         (if firstavailable branch is not null, we'll check only for this branch)
             W(aiting)  : the reserve has an itemnumber affected, and is on the way
             F(inished) : the reserve has been completed, and is done
   - itemnumber : empty : the reserve is still unaffected to an item
@@ -136,12 +137,12 @@ BEGIN {
 
 =item AddReserve
 
-    AddReserve($branch,$borrowernumber,$biblionumber,$constraint,$bibitems,$priority,$resdate,$expdate,$notes,$title,$checkitem,$found)
+    AddReserve($branch,$borrowernumber,$biblionumber,$constraint,$bibitems,$priority,$resdate,$expdate,$notes,$title,$checkitem,$found, $firstavailablebranch)
 
 =cut
 
 sub AddReserve {
-    my ( $branch, $borrowernumber, $biblionumber, $constraint, $bibitems, $priority, $resdate, $expdate, $notes, $title, $checkitem, $found ) = @_;
+    my ( $branch, $borrowernumber, $biblionumber, $constraint, $bibitems, $priority, $resdate, $expdate, $notes, $title, $checkitem, $found, $firstavailablebranch ) = @_;
     my $fee   = GetReserveFee( $borrowernumber, $biblionumber, $constraint, $bibitems );
     my $dbh   = C4::Context->dbh;
     my $const = lc substr( $constraint, 0, 1 );
@@ -182,13 +183,13 @@ sub AddReserve {
     my $query = qq/
         INSERT INTO reserves
             (borrowernumber,biblionumber,reservedate,branchcode,constrainttype,
-            priority,reservenotes,itemnumber,found,waitingdate,expirationdate)
+            priority,reservenotes,itemnumber,found,waitingdate,expirationdate, firstavailablebranch)
         VALUES
              (?,?,?,?,?,
-             ?,?,?,?,?,?)
+             ?,?,?,?,?,?,?)
     /;
     my $sth = $dbh->prepare($query);
-    $sth->execute( $borrowernumber, $biblionumber, $resdate, $branch, $const, $priority, $notes, $checkitem, $found, $waitingdate, $expdate );
+    $sth->execute( $borrowernumber, $biblionumber, $resdate, $branch, $const, $priority, $notes, $checkitem, $found, $waitingdate, $expdate, $firstavailablebranch );
 
     # Send e-mail to librarian if syspref is active
     if ( C4::Context->preference("emailLibrarianWhenHoldIsPlaced") ) {
@@ -1820,6 +1821,7 @@ sub _Findgroupreserve {
                reserves.reservenotes AS reservenotes,
                reserves.priority AS priority,
                reserves.timestamp AS timestamp,
+               reserves.firstavailablebranch AS fistavailablebranch,
                biblioitems.biblioitemnumber AS biblioitemnumber,
                reserves.itemnumber          AS itemnumber
         FROM reserves
@@ -1851,6 +1853,7 @@ sub _Findgroupreserve {
                reserves.reservenotes AS reservenotes,
                reserves.priority AS priority,
                reserves.timestamp AS timestamp,
+               reserves.firstavailablebranch AS fistavailablebranch,
                biblioitems.biblioitemnumber AS biblioitemnumber,
                reserves.itemnumber          AS itemnumber
         FROM reserves
@@ -1881,6 +1884,7 @@ sub _Findgroupreserve {
                reserves.reservenotes AS reservenotes,
                reserves.priority AS priority,
                reserves.timestamp AS timestamp,
+               reserves.firstavailablebranch AS fistavailablebranch,
                reserveconstraints.biblioitemnumber AS biblioitemnumber,
                reserves.itemnumber                 AS itemnumber
         FROM reserves
