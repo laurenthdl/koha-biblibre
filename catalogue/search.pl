@@ -170,6 +170,7 @@ my @itypes = $cgi->param('itypes');
 my @indexes = $cgi->param('idx');
 my @operators = $cgi->param('op');
 my @operands = $cgi->param('q');
+$operands[0] = '[* TO *]' if not defined $operands[0];
 
 if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
     $itype_or_ccode = 'itype';
@@ -433,10 +434,12 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
                 'filters' => \@tplfilters,
             };
         }
+
         push @facets, {
             'indexname' => $index,
             'label'     => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
             'values'    => \@values,
+            'size'      => scalar(@values),
         };
     }
 }

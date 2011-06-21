@@ -159,6 +159,7 @@ my @itypes = $cgi->param('itypes');
 my @indexes = $cgi->param('idx');
 my @operators = $cgi->param('op');
 my @operands = $cgi->param('q');
+$operands[0] = '[* TO *]' if not defined $operands[0];
 
 my $query_cgi = "q=" .       join("&q=", @operands);
 $query_cgi   .= "&itypes=" . join("&itypes=", @itypes)  if (@itypes);
@@ -515,6 +516,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
             'indexname'  => $index,
             'label'      => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
             'values'     => \@values,
+            'size'      => scalar(@values),
         };
     }
 }
