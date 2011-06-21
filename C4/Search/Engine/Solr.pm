@@ -358,7 +358,6 @@ sub SimpleSearch {
         } keys %$filters
     ];
 
-    warn Data::Dumper::Dumper $sc;
     utf8::decode($q);
     my $sq = Data::SearchEngine::Query->new(
         page  => $page,
