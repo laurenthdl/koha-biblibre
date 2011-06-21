@@ -381,12 +381,12 @@ is($got, $expected, qq{Test just one \" (buildQuery)});
 BEGIN { $tests += 5 } # Test for date index
 $q = qq{pubdate:2000};
 $got = C4::Search::Query->normalSearch($q);
-$expected = qq{$pubdateindex:2000-01-01T00:00:00Z};
+$expected = qq{$pubdateindex:"2000-01-01T00:00:00Z"};
 is($got, $expected, qq{Date index format with 1 date (normalSearch)});
 
 $q = qq{pubdate:2000 OR pubdate:2001};
 $got = C4::Search::Query->normalSearch($q);
-$expected = qq{$pubdateindex:2000-01-01T00:00:00Z OR date_pubdate:2001-01-01T00:00:00Z};
+$expected = qq{$pubdateindex:"2000-01-01T00:00:00Z" OR date_pubdate:"2001-01-01T00:00:00Z"};
 is($got, $expected, qq{Date index format with 1 date (normalSearch)});
 
 #$q = qq{pubdate:[2000 TO 2011]}; # NOT SUPPORTED !
@@ -398,14 +398,14 @@ is($got, $expected, qq{Date index format with 1 date (normalSearch)});
 @$indexes = ("pubdate");
 @$operators = ();
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
-$expected = qq{$pubdateindex:2000-01-01T00:00:00Z};
+$expected = qq{$pubdateindex:"2000-01-01T00:00:00Z"};
 is($got, $expected, qq{Date index format with 1 date(buildQuery)});
 
 @$operands = (qq{2000 2001 2002});
 @$indexes = ("pubdate");
 @$operators = ();
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
-$expected = qq{($pubdateindex:2000-01-01T00:00:00Z AND date_pubdate:2001-01-01T00:00:00Z AND date_pubdate:2002-01-01T00:00:00Z)};
+$expected = qq{($pubdateindex:"2000-01-01T00:00:00Z" AND date_pubdate:"2001-01-01T00:00:00Z" AND date_pubdate:"2002-01-01T00:00:00Z")};
 is($got, $expected, qq{Date index format with x dates (buildQuery)});
 
 @$operands = (qq{[2000 TO 2011]});
