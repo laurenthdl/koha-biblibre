@@ -282,7 +282,8 @@ Search function for Solr Engine.
 
 params: 
   $q           = solr's query
-  $filters     = hashref (ex: {recordtype=>'biblio'})
+  $filters     = hashref (ex: {recordtype => 'biblio'}
+                or {ste_author => ['knuth', 'pratt'] }
   $page        = page number for pagination
   $max_results = max returned results
   $sort        = field sorting
@@ -337,18 +338,25 @@ sub SimpleSearch {
 
     my $sc = GetSolrConnection;
 
+    my $recordtype = ref($filters->{recordtype}) eq 'ARRAY'
+                    ? $filters->{recordtype}[0]
+                    : $filters->{recordtype}
+                if defined $filters && defined $filters->{recordtype};
     $sc->options->{'facet'}          = 'true';
     $sc->options->{'facet.mincount'} = 1;
-    $sc->options->{'facet.limit'}    = 10;
-    $sc->options->{'facet.field'}    = GetFacetedIndexes($filters->{recordtype});
+    $sc->options->{'facet.limit'}    = C4::Context->preference("numFacetsDisplay") || 10;
+    $sc->options->{'facet.field'}    = GetFacetedIndexes($recordtype);
     $sc->options->{'sort'}           = $sort;
 
     # Construct filters
-    $sc->options->{'fq'} = [ 
-        map { 
-            utf8::decode($filters->{$_});
-            "$_:".$filters->{$_}
-        } keys %$filters 
+    $sc->options->{'fq'} = [
+        map {
+            my $filter_str = ref($filters->{$_}) eq 'ARRAY'
+                            ? join ' AND ', @{ $filters->{$_} }
+                            : $filters->{$_};
+            utf8::decode($filter_str);
+            "$_:$filter_str";
+        } keys %$filters
     ];
 
     utf8::decode($q);
@@ -383,7 +391,7 @@ sub IndexRecord {
 
     my @list_of_plugins = GetSearchPlugins;
     for my $id ( @$recordids ) {
-        
+
         my $record;
         my $frameworkcode;
         my $recordid = "${recordtype}_$id";
@@ -466,8 +474,9 @@ sub IndexRecord {
             }
 
             # Add index str for facets if it's not exist
+            # FIXME Only for field we want to facet (cf table indexes)
             if ( $index->{'faceted'} and @values > 0 and $index->{'type'} ne 'str' ) {
-                $solrrecord->set_value("str_".$index->{'code'}, $values[0]);
+                $solrrecord->set_value("str_".$index->{'code'}, \@values);
             }
         }
         push @recordpush, $solrrecord;
