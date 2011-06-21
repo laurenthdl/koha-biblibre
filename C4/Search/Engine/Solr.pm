@@ -338,7 +338,7 @@ sub SimpleSearch {
 
     my $sc = GetSolrConnection;
 
-    my $recordtype = ref($filters->{recordtype}) eq 'Array'
+    my $recordtype = ref($filters->{recordtype}) eq 'ARRAY'
                     ? $filters->{recordtype}[0]
                     : $filters->{recordtype}
                 if defined $filters && defined $filters->{recordtype};
@@ -351,7 +351,7 @@ sub SimpleSearch {
     # Construct filters
     $sc->options->{'fq'} = [
         map {
-            my $filter_str = ref($filters->{$_}) eq 'Array'
+            my $filter_str = ref($filters->{$_}) eq 'ARRAY'
                             ? join ' AND ', @{ $filters->{$_} }
                             : $filters->{$_};
             utf8::decode($filter_str);
@@ -359,6 +359,7 @@ sub SimpleSearch {
         } keys %$filters
     ];
 
+    warn Data::Dumper::Dumper $sc;
     utf8::decode($q);
     my $sq = Data::SearchEngine::Query->new(
         page  => $page,
