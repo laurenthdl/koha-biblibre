@@ -2163,15 +2163,7 @@ sub GetSubscriptionRoutingListAsCSV {
     my $subscription = GetSubscription($routinglist->{'subscriptionid'});
     my $biblio = GetBiblio($subscription->{'biblionumber'});
 
-    $csv->combine("Subscription title:", $biblio->{'title'});
-    $output .= $csv->string() . "\n";
-    $csv->combine("Routing list title:", $routinglist->{'title'});
-    $output .= $csv->string() . "\n";
-
-    $csv->combine("", "");
-    $output .= $csv->string() . "\n";
-
-    my @headers = qw(surname firstname);
+    my @headers = ("Subscription title", "Routing list", qw(Surname Firstname Notes));
     $csv->combine(@headers);
     $output .= $csv->string() . "\n";
 
@@ -2180,17 +2172,14 @@ sub GetSubscriptionRoutingListAsCSV {
     foreach (@borrowernumbers) {
         my $member = C4::Members::GetMemberDetails($_->{'borrowernumber'});
         $csv->combine(
+            $biblio->{'title'},
+            $routinglist->{'title'},
             $member->{'surname'},
             $member->{'firstname'},
+            $routinglist->{'notes'},
         );
         $output .= $csv->string() . "\n";
     }
-
-    $csv->combine("", "");
-    $output .= $csv->string() . "\n";
-
-    $csv->combine("Notes:", $routinglist->{'notes'});
-    $output .= $csv->string() . "\n";
 
     return $output;
 }
