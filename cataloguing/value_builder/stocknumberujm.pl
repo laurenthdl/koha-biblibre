@@ -69,7 +69,7 @@ function Focus$field_number(subfield_managed, id, force) {
 }
 
 function Clic$field_number(id) {
-    window.open("../cataloguing/plugin_launcher.pl?plugin_name=stocknumberujm.pl&field_number=$field_number", 'StockNumberStE', 'menubar=false, toolbar=false, scrollbars=yes');
+    window.open("../cataloguing/plugin_launcher.pl?plugin_name=stocknumberujm.pl&field_number=$field_number", 'StockNumberStE', 'menubar=false, toolbar=false, scrollbars=yes, width=600, height=500');
     return 1;
 }
 //]]>
