@@ -45,7 +45,7 @@
                     <a class="facets_up" href="#" alt="show less facets" onclick="show_less_facets(this); return false;" style="display:none;">
                         <img src="<!-- TMPL_VAR NAME="themelang" -->/../images/more-up-arrow.gif" alt="show less facets" />
                     </a>
-                    <a class="facets_down" href="#" alt="show more facets" onclick="show_more_facets(this); return false;">
+                    <a class="facets_down" href="#" alt="show more facets" onclick="show_more_facets(this); return false;" <!-- TMPL_IF EXPR="size <= 10" -->style="display:none;"<!-- /TMPL_IF --> data-size="<!-- TMPL_VAR NAME="size"-->" >
                         <img src="<!-- TMPL_VAR NAME="themelang" -->/../images/more-arrow.gif" alt="show more facets" />
                     </a>
                 </div>
