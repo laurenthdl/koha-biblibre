@@ -4,7 +4,8 @@ function show_more_facets(link_down) {
     for ( var i = num_visible ; i < num_visible + 10 && i < children.length; i++ ) {
         $(children[i]).show();
     }
-    if ( num_visible + 10 >= 100 ) {
+    var max_facets = $(link_down).attr('data-size');
+    if ( num_visible + 10 >= max_facets ) {
         $(link_down).hide();
     } else {
         $(link_down).show();
