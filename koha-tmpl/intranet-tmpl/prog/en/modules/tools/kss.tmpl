@@ -50,6 +50,8 @@
 
     <div id="minfos">
 	    <h3>Master informations</h3>
+            <h3>Log file</h3>
+            <a href="/cgi-bin/koha/tools/kss-logs.pl" onclick="javascript:window.open('/cgi-bin/koha/tools/kss-logs.pl', 'ksslogs'); return false;">See full log file</a>
 	    <h3>Last synchronisation details:</h3>
 	    <!-- TMPL_IF NAME="stats_loop" -->
 		<!-- TMPL_LOOP NAME="stats_loop" -->
@@ -213,6 +215,8 @@
 
     <div id="cinfos">
 	    <h3>Client informations</h3>
+            <h3>Log file</h3>
+            <a href="/cgi-bin/koha/tools/kss-logs.pl" onclick="javascript:window.open('/cgi-bin/koha/tools/kss-logs.pl', 'ksslogs'); return false;">See full log file</a>
 	    <h3>Last synchronisation details for <!-- TMPL_VAR NAME="hostname" -->:</h3>
 		    <ul>
 		      <li>Execution time: <!-- TMPL_VAR NAME="last_log_start_time" --> => <!-- TMPL_VAR NAME="last_log_end_time" --></li>
