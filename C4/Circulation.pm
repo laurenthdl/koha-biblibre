@@ -2236,16 +2236,28 @@ return the number of affected rows.
 sub AnonymiseIssueHistory {
     my $date           = shift;
     my $borrowernumber = shift;
-    my $dbh            = C4::Context->dbh;
-    my $query          = "
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
         UPDATE old_issues
-        SET    borrowernumber = NULL
-        WHERE  returndate < '" . $date . "'
-          AND borrowernumber IS NOT NULL
-          AND DATEDIFF(returndate, date_due) <= 0
-    ";
-    $query .= " AND borrowernumber = '" . $borrowernumber . "'" if defined $borrowernumber;
-    my $rows_affected = $dbh->do($query);
+        LEFT JOIN borrowers USING(borrowernumber)
+        SET old_issues.borrowernumber = NULL
+        WHERE old_issues.returndate < ?
+          AND old_issues.borrowernumber IS NOT NULL
+          AND (borrowers.debarred IS NULL
+            OR (borrowers.debarred IS NOT NULL
+              AND DATEDIFF(old_issues.returndate, old_issues.date_due) <= 0
+            )
+          )
+    };
+    my @args;
+    push @args, $date;
+    if(defined $borrowernumber){
+        $query .= " AND borrowernumber = ?";
+        push @args, $borrowernumber;
+    }
+    my $sth = $dbh->prepare($query);
+    my $rows_affected = $sth->execute(@args);
     return $rows_affected;
 }
 
