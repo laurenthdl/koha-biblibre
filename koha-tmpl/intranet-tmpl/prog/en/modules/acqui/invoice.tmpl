@@ -77,16 +77,11 @@
       <table id="orderst">
         <thead>
           <tr>
-            <th>Order line</th>
-            <th>Order</th>
-            <th>Basket</th>
             <th>Summary</th>
             <th>Publisher</th>
             <th>Branch</th>
-            <th class="gste">RRP Exclude Taxes</th>
-            <th class="gste">ecost Exclude Taxes</th>
-            <th class="gsti">RRP Include Taxes</th>
-            <th class="gsti">ecost Include Taxes</th>
+            <th class="gste">Actual cost Exclude Taxes</th>
+            <th class="gsti">Actual cost Include Taxes</th>
             <th>Qty.</th>
             <th class="gste">Total Excludes Taxes</th>
             <th class="gsti">Total Include Taxes</th>
@@ -101,9 +96,6 @@
             <!-- TMPL_ELSE -->
               <tr>
             <!-- /TMPL_IF -->
-              <td><!-- TMPL_VAR NAME="orderline" --></td>
-              <td><!-- TMPL_VAR NAME="ordernumber" --></td>
-              <td><!-- TMPL_VAR NAME="basketno" --></td>
               <td><p><!-- TMPL_VAR NAME="title" -->
                 <!-- TMPL_IF NAME="author" -->
                   <br /><em>by</em> <!-- TMPL_VAR NAME="author" -->
@@ -119,10 +111,8 @@
                 <!-- /TMPL_IF -->
               </td>
               <td><p><!-- TMPL_VAR NAME="branchcode" --></p></td>
-              <td class="number gste"><!-- TMPL_VAR NAME="rrpgste" --></td>
-              <td class="number gste"><!-- TMPL_VAR NAME="ecostgste" --></td>
-              <td class="number gsti"><!-- TMPL_VAR NAME="rrpgsti" --></td>
-              <td class="number gsti"><!-- TMPL_VAR NAME="ecostgsti" --></td>
+              <td class="number gste"><!-- TMPL_VAR NAME="actualcostgste" --></td>
+              <td class="number gsti"><!-- TMPL_VAR NAME="actualcostgsti" --></td>
               <td class="number"><!-- TMPL_VAR NAME="quantity" --></td>
               <td class="number gste"><!-- TMPL_VAR NAME="totalgste" --></td>
               <td class="number gsti"><!-- TMPL_VAR NAME="totalgsti" --></td>
@@ -134,8 +124,8 @@
         <tfoot>
             <!-- TMPL_LOOP NAME="book_foot_loop" -->
                 <tr>
-                    <th colspan='6'>Total (GST <!--TMPL_VAR NAME="gstgsti" --> %)</th>
-                    <th class="gste"/><th class="gste"/><th class="gsti"/><th class="gsti"/>
+                    <th colspan='3'>Total (GST <!--TMPL_VAR NAME="gstgsti" --> %)</th>
+                    <th class="gste"/><th class="gsti"/>
                     <th><!--TMPL_VAR NAME="quantity" --></th>
                     <th class="gste"><!--TMPL_VAR NAME="totalgste" --></th>
                     <th class="gsti"><!--TMPL_VAR NAME="totalgsti" --></th>
@@ -144,8 +134,8 @@
                 </tr>
             <!-- /TMPL_LOOP -->
             <tr>
-                <th colspan='6'>Total (<!-- TMPL_VAR NAME="currency" -->)</th>
-                <th class="gste"/><th class="gste"/><th class="gsti"/><th class="gsti"/>
+                <th colspan='3'>Total (<!-- TMPL_VAR NAME="currency" -->)</th>
+                <th class="gste"/><th class="gsti"/>
                 <th><!--TMPL_VAR NAME="total_quantity" --></th>
                 <th class="gste"><!--TMPL_VAR NAME="total_gste" --></th>
                 <th class="gsti"><!--TMPL_VAR NAME="total_gsti" --></th>

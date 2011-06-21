@@ -103,13 +103,13 @@ function popup(subscriptionid) {
             <h2>Acquisition details</h2>
             <table>
                 <thead>
-                    <tr><th></th><th>ecost Exc. Taxes</th><th>ecost Inc. Taxes</th><th>fund</th><th></th></tr>
+                    <tr><th></th><th>Price Exc. Taxes</th><th>Price Inc. Taxes</th><th>fund</th><th></th></tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>Ordered amount</td>
-                        <td><!-- TMPL_VAR NAME="ecostgste_ordered" --></td>
-                        <td><!-- TMPL_VAR NAME="ecostgsti_ordered" --></td>
+                        <td><!-- TMPL_VAR NAME="valuegste_ordered" --></td>
+                        <td><!-- TMPL_VAR NAME="valuegsti_ordered" --></td>
                         <td><!-- TMPL_VAR NAME="budget_name_ordered" --></td>
                         <td>
                             <!-- TMPL_IF NAME="ordered_exists" -->
@@ -119,8 +119,8 @@ function popup(subscriptionid) {
                     </tr>
                     <tr>
                         <td>Spent amount</td>
-                        <td><!-- TMPL_VAR NAME="ecostgste_spent" --></td>
-                        <td><!-- TMPL_VAR NAME="ecostgsti_spent" --></td>
+                        <td><!-- TMPL_VAR NAME="valuegste_spent" --></td>
+                        <td><!-- TMPL_VAR NAME="valuegsti_spent" --></td>
                         <td><!-- TMPL_VAR NAME="budget_name_spent" --></td>
                         <td>
                             <!-- TMPL_IF NAME="spent_exists" -->

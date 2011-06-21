@@ -128,9 +128,9 @@ if ( defined $subscriptionid ) {
     if ( defined $lastOrderNotReceived ) {
         my $basket = GetBasket $$lastOrderNotReceived{basketno};
         my $bookseller = GetBookSellerFromId $$basket{booksellerid};
-        ( $$tmpl_infos{ecostgsti_ordered}, $$tmpl_infos{ecostgste_ordered} ) = get_value_with_gst_params ( $$lastOrderNotReceived{ecost}, $$lastOrderNotReceived{gstrate}, $bookseller );
-        $$tmpl_infos{ecostgsti_ordered} = sprintf( "%.2f", $$tmpl_infos{ecostgsti_ordered} );
-        $$tmpl_infos{ecostgste_ordered} = sprintf( "%.2f", $$tmpl_infos{ecostgste_ordered} );
+        ( $$tmpl_infos{valuegsti_ordered}, $$tmpl_infos{valuegste_ordered} ) = get_value_with_gst_params ( $$lastOrderNotReceived{ecost}, $$lastOrderNotReceived{gstrate}, $bookseller );
+        $$tmpl_infos{valuegsti_ordered} = sprintf( "%.2f", $$tmpl_infos{valuegsti_ordered} );
+        $$tmpl_infos{valuegste_ordered} = sprintf( "%.2f", $$tmpl_infos{valuegste_ordered} );
         $$tmpl_infos{budget_name_ordered} = GetBudgetName $$lastOrderNotReceived{budget_id};
         $$tmpl_infos{basketno} = $$lastOrderNotReceived{basketno};
         $$tmpl_infos{ordered_exists} = 1;
@@ -138,9 +138,9 @@ if ( defined $subscriptionid ) {
     if ( defined $lastOrderReceived ) {
         my $basket = GetBasket $$lastOrderReceived{basketno};
         my $bookseller = GetBookSellerFromId $$basket{booksellerid};
-        ( $$tmpl_infos{ecostgsti_spent}, $$tmpl_infos{ecostgste_spent} ) = get_value_with_gst_params ( $$lastOrderReceived{ecost}, $$lastOrderReceived{gstrate}, $bookseller );
-        $$tmpl_infos{ecostgsti_spent} = sprintf( "%.2f", $$tmpl_infos{ecostgsti_spent} );
-        $$tmpl_infos{ecostgste_spent} = sprintf( "%.2f", $$tmpl_infos{ecostgste_spent} );
+        ( $$tmpl_infos{valuegsti_spent}, $$tmpl_infos{valuegste_spent} ) = get_value_with_gst_params ( $$lastOrderReceived{unitprice}, $$lastOrderReceived{gstrate}, $bookseller );
+        $$tmpl_infos{valuegsti_spent} = sprintf( "%.2f", $$tmpl_infos{valuegsti_spent} );
+        $$tmpl_infos{valuegste_spent} = sprintf( "%.2f", $$tmpl_infos{valuegste_spent} );
         $$tmpl_infos{budget_name_spent} = GetBudgetName $$lastOrderReceived{budget_id};
         $$tmpl_infos{invoicenumber} = $$lastOrderReceived{booksellerinvoicenumber};
         $$tmpl_infos{spent_exists} = 1;
