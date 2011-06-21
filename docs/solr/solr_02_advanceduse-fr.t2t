@@ -153,10 +153,10 @@ Concrêtement si nous avons une notice qui a un titre du type #nsb la petite #ns
 - srt_ste_title contiendra: "maison dans la prairie" (et le tri se fera sur cette valeur)
 
 
-=== Traitement des intervalles de date "PubDate" ===
+=== Traitement des intervalles de date "Date" ===
 
 Dans le cas de la date de publication, certaines valeurs peuvent être de la forme "2001-2004". Le besoin fonctionnel est d'indexer les 4 années: 2001, 2002, 2003 et 2004. C'est ce que permet de faire ce plugin.
-
+Ce plugin peut être affecté à n'importe quel champ de type date. L'index doit être mappé avec des champs pour qu'il soit opérationnel.
 
 === Calcul du nombre de notices liées "UsedInXBiblios" ===
 
