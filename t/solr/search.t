@@ -21,6 +21,7 @@ is(C4::Context->preference("SearchEngine"), 'Solr', "Test search engine = Solr")
 my $titleindex = C4::Search::Query::getIndexName("title");
 my $authorindex = C4::Search::Query::getIndexName("author");
 my $eanindex = C4::Search::Query::getIndexName("ean");
+my $pubdateindex = C4::Search::Query::getIndexName("pubdate");
 
 BEGIN { $tests += 20 } # 'Normal' search
 @$operands[0] = "title:maudits"; # Solr indexes
@@ -342,20 +343,13 @@ $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = "m?th?matiqu? AND fo* AND ?a?";
 is($got, $expected, qq{Test wildCard ? and * on multiples operands and positions});
 
-BEGIN { $tests += 4 } # [ TO ] format
-@$operands = (qq{["1900-01-01T00:00:00Z" TO "2011-01-01T00:00:00Z"]});
+BEGIN { $tests += 3 } # [ TO ] format
+@$operands = (qq{[1900-01-01T00:00:00Z TO 2011-01-01T00:00:00Z]});
 @$indexes = ("pubdate");
 @$operators = ();
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
-$expected = qq{date_pubdate:["1900-01-01T00\\:00\\:00Z" TO "2011-01-01T00\\:00\\:00Z"]};
+$expected = qq{date_pubdate:[1900-01-01T00:00:00Z TO 2011-01-01T00:00:00Z]};
 is($got, $expected, qq{Test date with [ TO ] format});
-
-@$operands = (qq{["1900-01-01T00\\:00\\:00Z" TO "2011-01-01T00\\:00\\:00Z"]});
-@$indexes = ("pubdate");
-@$operators = ();
-$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
-$expected = qq{date_pubdate:["1900-01-01T00\\:00\\:00Z" TO "2011-01-01T00\\:00\\:00Z"]};
-is($got, $expected, qq{Test date with [ TO ] format (and colons already escaped)});
 
 @$operands = (qq{[* TO *]});
 @$indexes = ("title");
@@ -383,4 +377,41 @@ is($got, $expected, qq{Test just one \" (normalSearch)});
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = qq{($titleindex:"foo \\"bar")};
 is($got, $expected, qq{Test just one \" (buildQuery)});
+
+BEGIN { $tests += 5 } # Test for date index
+$q = qq{pubdate:2000};
+$got = C4::Search::Query->normalSearch($q);
+$expected = qq{$pubdateindex:2000-01-01T00:00:00Z};
+is($got, $expected, qq{Date index format with 1 date (normalSearch)});
+
+$q = qq{pubdate:2000 OR pubdate:2001};
+$got = C4::Search::Query->normalSearch($q);
+$expected = qq{$pubdateindex:2000-01-01T00:00:00Z OR date_pubdate:2001-01-01T00:00:00Z};
+is($got, $expected, qq{Date index format with 1 date (normalSearch)});
+
+#$q = qq{pubdate:[2000 TO 2011]}; # NOT SUPPORTED !
+#$got = C4::Search::Query->normalSearch($q);
+#$expected = qq{$pubdateindex:[2000-01-01T00:00:00Z TO 2011-01-01T00:00:00Z]};
+#is($got, $expected, qq{Date index format with 1 date (normalSearch)});
+
+@$operands = (qq{2000});
+@$indexes = ("pubdate");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{$pubdateindex:2000-01-01T00:00:00Z};
+is($got, $expected, qq{Date index format with 1 date(buildQuery)});
+
+@$operands = (qq{2000 2001 2002});
+@$indexes = ("pubdate");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{($pubdateindex:2000-01-01T00:00:00Z AND date_pubdate:2001-01-01T00:00:00Z AND date_pubdate:2002-01-01T00:00:00Z)};
+is($got, $expected, qq{Date index format with x dates (buildQuery)});
+
+@$operands = (qq{[2000 TO 2011]});
+@$indexes = ("pubdate");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{$pubdateindex:[2000-01-01T00:00:00Z TO 2011-01-01T00:00:00Z]};
+is($got, $expected, qq{Date index format with x dates (buildQuery)});
 
