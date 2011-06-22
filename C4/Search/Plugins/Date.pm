@@ -33,31 +33,30 @@ sub ComputeValue {
 
     my @dates = ();
     my @values = ();
-    for my $field ( keys %$mapping ) {
-        for my $subfield ( @{$$mapping{$field}} ) {
-            my @tmp = ();
-            my $f = $record->field($field);
-            next if not $f;
-            my $sf = $f->subfield($subfield);
-            next if not $sf;
-            while ( $sf =~ m/\d{4}-\d{4}/g ) {
-                my @d = split('-', $&);
-                for ( my $i = $d[0] ; $i <= $d[1] ; $i++ ) {
-                    push @tmp, C4::Search::Engine::Solr::NormalizeDate($i);
+    for my $tag ( keys (%$mapping) ) {
+        for my $code ( @{$$mapping{$tag}} ) {
+            for my $f ( $record->field($tag) ) {
+                for my $sf ($f->subfield($code)){
+                    my @tmp = ();
+                    while ( $sf =~ m/\d{4}-\d{4}/g ) {
+                        my @d = split('-', $&);
+                        for ( my $i = $d[0] ; $i <= $d[1] ; $i++ ) {
+                            push @tmp, C4::Search::Engine::Solr::NormalizeDate($i);
+                        }
+                    }
+                    if ( @tmp ) {
+                        push @dates, @tmp;
+                        next;
+                    }
+
+                    while ( $sf =~ m/\d{4}/g ) {
+                        push @tmp, C4::Search::Engine::Solr::NormalizeDate($&);
+                    }
+                    push @dates, @tmp;
                 }
             }
-            if ( @tmp ) {
-                push @dates, @tmp;
-                next;
-            }
-
-            while ( $sf =~ m/\d{4}/g ) {
-                push @tmp, C4::Search::Engine::Solr::NormalizeDate($&);
-            }
-            push @dates, @tmp;
         }
     }
-
     return @dates;
 }
 

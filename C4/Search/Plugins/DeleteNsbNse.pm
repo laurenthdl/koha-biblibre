@@ -33,38 +33,36 @@ our $VERSION = 3.0.1;
 =cut
 
 sub GetSF {
-    my ($record, $mappings) = @_;
+    my ($record, $mapping) = @_;
 
     my @values = ();
-    for my $field ( keys (%$mappings) ) {
-        for my $subfield ( @{$$mappings{$field}} ) {
-            my $f = $record->field($field);
-            next if not $f;
-            my $sf = $f->subfield($subfield);
-            next if not $sf;
-
-            push @values, $sf;
+    for my $tag ( keys (%$mapping) ) {
+        for my $code ( @{$$mapping{$tag}} ) {
+            for my $f ( $record->field($tag) ) {
+                for my $sf ($f->subfield($code)){
+                    push @values, $sf;
+                }
+            }
         }
     }
-
     return @values;
 }
 
 sub ComputeValue {
-    my ($record, $mappings) = @_;
+    my ($record, $mapping) = @_;
 
     return map {
         nsb_clean($_)
-    } GetSF($record, $mappings);
+    } GetSF($record, $mapping);
 
 }
 
 sub ComputeSrtValue {
-    my ($record, $mappings) = @_;
+    my ($record, $mapping) = @_;
 
     return map {
         nsb_rm_content($_)
-    } GetSF($record, $mappings);
+    } GetSF($record, $mapping);
 
 }
 1;
