@@ -42,13 +42,13 @@ use C4::Output;
 use CGI;
 use C4::Koha;
 use YAML;
-use File::Slurp qw(slurp read_file);
-use File::Basename;
+use File::ReadBackwards;
 
 use Koha_Synchronize_System::tools::kss;
 
 
 my $debug       = 1;
+my $size        = 10000;
 my $input       = new CGI;
 my $dbh         = C4::Context->dbh;
 my $CONFIG_NAME = $ENV{'KOHA_CONF'};
@@ -72,11 +72,15 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 my $master = $$conf{cron}{master};
 $template->param('master' => $master);
 
-# Getting log file
+# Getting log file, the last $size lines from the end
 my $logfile = $$conf{abspath}{logfile_stderr};
-my @logarray = reverse(read_file($logfile));
-my $logcontent = join('', @logarray);
-
+my $i = 0;
+my $logcontent;
+my $bw = File::ReadBackwards->new($logfile);
+while (defined (my $log_line = $bw->readline) and $i < $size) {
+    $logcontent .= $log_line;
+    $i++;
+}
 
 $template->param(logcontent => $logcontent);
 $template->param("Debug" => $debug);
