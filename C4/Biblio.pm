@@ -3610,7 +3610,7 @@ sub get_biblio_authorised_values {
 =cut
 
 sub BatchModField {
-    my ( $record, $field, $subfield, $action, $condval, $nocond, $repval ) = @_;
+    my ( $record, $field, $subfield, $action, $tofield, $tosubfield, $condval, $nocond, $repval ) = @_;
 
     return -1 unless $record;
     $condval=NormalizeString($condval);
@@ -3625,6 +3625,29 @@ sub BatchModField {
         my $new_field = MARC::Field->new($field,'','', 
                                          $subfield => $repval);
         $record->insert_fields_ordered($new_field);
+        return 1;
+    } elsif( $action eq "dup" or $action eq "dup_w" ) {
+        return 0 if $action eq "dup_w" && $subfield ne $tosubfield;
+
+        my @original_values = ();
+        for my $f ($record->field( $field )){
+            push @original_values, $_ for $f->subfield( $subfield );
+        }
+        my $rfs = $record->field( $tofield );
+        if ( not $rfs ) {
+            my @subfields;
+            for my $val ( @original_values ) {
+                push @subfields, $tosubfield => NormalizeString( $val ) if $val =~ /$condition/ || $nocond eq "true";
+            }
+            my $new_field = MARC::Field->new( $tofield, '', '', @subfields);
+            $record->insert_fields_ordered($new_field);
+        } else {
+            for my $rf ( $record->field( $tofield ) ) {
+                for my $val (@original_values ) {
+                    $rf->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ /$condition/ || $nocond eq "true";
+                }
+            }
+        }
         return 1;
     } else {
         my $done=0;
