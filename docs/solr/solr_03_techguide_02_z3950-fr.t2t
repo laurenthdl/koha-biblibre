@@ -10,9 +10,59 @@ Documentation disponible sur http://descartes.biblibre.com/solr/install/solr_03_
 
 = Serveur Z3950  = 
 
+Suite aux développements liés au nouveau moteur d'indexation, Solr, il a été décidé de retravailler sur un serveur Z3950, les essais avec les librairies existantes ayant été infructueux. Dans le principe, ce développement permet de mettre à disposition un serveur Z3950 qui va savoir requêter un moteur Solr pour la recherche. Afin de répondre à la majeure partie des besoins de nos clients, nous sommes partis sur la base de logs de serveurs existants pour couvrir les requêtes souvent utilisées.
+
 
 == Présentation ==
 
+Le développement se découpe en 3 parties:
+- Net::Z3950::SimpleServer librairie cpan sur laquelle s'appuie le développement pour le fonctionnement du serveur, elle met à disposition des fonctions qui sont à implémenter (search fetch) http://search.cpan.org/~mirk/Net-Z3950-SimpleServer-1.12/SimpleServer.pm
+- Regexp::Grammars::Z3950::RPN grammaire développée en interne qui, à partir d'une requête RPN, génère un arbre
+- RPN2Solr qui coordonne l'ensemble des librairies et spécifie les fonctions nécessaires au serveur en transformant l'arbre en requête Solr par exemple
+
+Le serveur peut retourner les formats suivants:
+- usmarc
+- xml
+
+La configuration des index dans Solr permet une correspondance index solr / ccl / rpn voir http://pro/.../solr/indexes.pl
+
+== Requêtes supportées ==
+
+Documents de référence:
+- http://www.indexdata.com/yaz/doc/tools.html
+- http://www.loc.gov/z3950/agency/defns/bib1.html
+
+Le serveur supporte une bonne partie de la norme bib-1.
+
+Requêtes traitées:
+- opérateurs AND, OR, NOT
+- ...
+
+Limitations:
+- @attrset non supporté
+- troncature gauche non supporté
+- > et < strictement non supportés
+- index tout mots = 1016 = all_fields non configurable
+- proximité non supportée
+
+Voici quelques exemples de requêtes traduites (les noms d'index solr sont donnés à titre indicatif puisque configurables)
+```
+ @attr 1=1016 tata
+    => all_fields:'tata'
+ @attr 1=4 tata
+    => ste_title:'tata'
+ jean
+    => all_fields:'jean'
+ @and @attr 1=4 foo @attr 1=7 bar
+    =>  ste_title:'foo' AND str_isbn:'bar'
+ @and @attr 1=4 foo @or @attr 1=7 bar1 @attr 1=7 bar2
+    => ste_index:'foo' AND ( str_isbn:'bar1' OR str_isbn:'bar2'
+ @attr 2=5 @attr 1=4 foo
+    => ste_title:['foo' TO *]
+ @and @and bang @and @or @attr 2=3 @attr 1=4 "foo bar" @attr 1=4 "bar foo" @attr 2=6 @attr 1=4 "foo foo" @attr 2=5 @attr 1=1003 middle
+    => all_fields:'bang' AND ( ( ste_title:'foo bar' OR ste_title:'bar foo' ) AND !ste_title:'foo foo' ) ) AND ste_author:['middle' TO *]
+```
+ ... voir C4/RPN2Solr/t/01-string_conversions.t qui est un fichier de test qui documente et vérifie les cas possibles
 
 
 == Installation et lancement du serveur ==
@@ -24,5 +74,3 @@ Tester son bon fonctionnement (pour exemple):
 yaz-client localhost:9998/biblios
 f jean
 ```
-
-
