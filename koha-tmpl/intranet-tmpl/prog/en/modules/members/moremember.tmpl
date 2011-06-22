@@ -254,7 +254,7 @@ $(document).ready(function() {
 
 <div id="patron-information">
 
-     <!-- TMPL_UNLESS NAME="I" --><!-- TMPL_IF NAME="othernames" -->&ldquo;<!-- TMPL_VAR NAME="othernames" -->&rdquo;<!-- /TMPL_IF -->
+     <!-- TMPL_UNLESS NAME="I" --><!-- TMPL_IF NAME="othernames" -->Other name : <!-- TMPL_VAR NAME="othernames" --><!-- /TMPL_IF -->
 
 <p class="address">
 	<!-- TMPL_VAR NAME="address" --><br />
@@ -350,6 +350,7 @@ $(document).ready(function() {
 <!-- TMPL_UNLESS NAME="no_patron_attribute_types" -->
 <div id="patron-extended-attributes">
 <h3>Additional attributes and identifiers</h3>
+<!-- TMPL_IF NAME="patron_attributes" -->
 <table id="table_additionalattributes">
     <thead>
         <th>Type</th>
@@ -368,6 +369,7 @@ $(document).ready(function() {
     </tr>
     <!-- /TMPL_LOOP -->
 </table>
+<!-- /TMPL_IF -->
 <div class="action"><a href="memberentry.pl?op=modify&amp;borrowernumber=<!-- TMPL_VAR NAME="borrowernumber" -->&amp;step=4">Edit</a></div>
 </div>
 <!-- /TMPL_UNLESS -->
@@ -428,7 +430,9 @@ $(document).ready(function() {
       <li><span class="label">Address 2: </span><!-- TMPL_VAR NAME="B_address2" --></li>
       <li><span class="label">City, State: </span><!-- TMPL_VAR NAME="B_city" --></li>
       <li><span class="label">Zip/Postal Code: </span><!-- TMPL_VAR NAME="B_zipcode" --></li>
-      <li><span class="label">Country: </span><!-- TMPL_VAR NAME="B_country" --></li></ol></div>
+      <li><span class="label">Country: </span><!-- TMPL_VAR NAME="B_country" --></li></ol>
+      <li><span class="label">Phone: </span><!-- TMPL_VAR NAME="B_phone" --></li></ol>
+      <li><span class="label">Email: </span><!-- TMPL_VAR NAME="B_email" --></li></ol></div>
     <!-- /TMPL_UNLESS --><!-- /TMPL_UNLESS -->
      <!-- TMPL_IF NAME="C" -->
    <div class="rows"> <ol><li><span class="label">Surname: </span><!-- TMPL_VAR NAME="contactname" --></li>
