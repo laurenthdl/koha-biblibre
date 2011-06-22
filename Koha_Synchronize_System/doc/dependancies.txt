@@ -3,6 +3,7 @@ Modern::Perl
 Locale::gettext
 Net::Ping
 File::Slurp
+File::ReadBackwards
 
 System:
 service (sysvinit-utils)
