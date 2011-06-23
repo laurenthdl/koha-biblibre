@@ -83,13 +83,25 @@
                 <input type="text" id = "transl1" name="q" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
             <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
-   <!-- TMPL_IF NAME="OpacAddMastheadLibraryPulldown" -->
-      <select name="filters" id="masthead_search" class="left" style="max-width:10em;width:10em;">
-         <option value="">All Libraries</option>
-         <!-- TMPL_LOOP NAME="BranchesLoop" -->
-            <option <!-- TMPL_IF name="mylibraryfirst" --><!-- TMPL_IF NAME="selected" -->selected="selected"<!-- /TMPL_IF --><!-- /TMPL_IF --> value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
-         <!-- /TMPL_LOOP -->
-      </select>
+    <!-- TMPL_IF NAME="OpacAddMastheadLibraryPulldown" -->
+        <select name="filters" id="masthead_branchsearch" class="left" style="max-width:10em;width:10em;">
+            <!-- TMPL_IF NAME="branchsearchexistsincookie" -->
+                <option value="" <!-- TMPL_IF EXPR="branchsearch eq ''" -->selected="selected"<!-- /TMPL_IF -->>All Libraries</option>
+            <!-- TMPL_ELSE -->
+                <option value="">All Libraries</option>
+            <!-- /TMPL_IF -->
+            <!-- TMPL_LOOP NAME="BranchesLoop" -->
+                <option 
+                <!-- TMPL_IF NAME="branchsearchexistsincookie" -->
+                    <!-- TMPL_IF EXPR="branchsearch eq value" -->selected="selected"<!-- /TMPL_IF -->
+                <!-- TMPL_ELSE -->
+                    <!-- TMPL_IF name="mylibraryfirst" -->
+                        <!-- TMPL_IF NAME="selected" -->selected="selected"<!-- /TMPL_IF -->
+                    <!-- /TMPL_IF -->
+                <!-- /TMPL_IF -->
+                value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+            <!-- /TMPL_LOOP -->
+        </select>
    <!-- TMPL_ELSE -->
       <!-- TMPL_UNLESS NAME="opac_limit_override" -->
           <!-- TMPL_IF name="mylibraryfirst" --> 
