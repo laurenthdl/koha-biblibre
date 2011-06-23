@@ -7,10 +7,20 @@
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
-     var CGIBIN = "/cgi-bin/koha/";
+    $(document).ready(function() {
+        $("#fieldchoice,#tofieldchoice").change(function(){
+                fieldChanged(this);
+        });
+        $("#subfieldchoice,#tosubfieldchoice").change(function(){
+                subfieldChanged(this);
+        });
+    });
 
-     function fieldChanged(fieldid, subfieldid){
-        var field    = $('#'+fieldid).val();
+    var CGIBIN = "/cgi-bin/koha/";
+    function fieldChanged(caller){
+        var fieldid = $(caller).attr('id');
+        var subfieldid = $(caller).parent().next().find("select.subfield").attr('id');
+        var field = $('#'+fieldid).val();
         $.ajax({
             url: CGIBIN + 'tools/batchedit.pl?field=' + field,
             dataType: 'json',
@@ -25,13 +35,23 @@
                                  .text(data[i].subfield)
                                  .appendTo('#'+subfieldid);
                 }
-                subfieldChanged();
+                $(subfield).change();
             }
         });
+        var action = $("#actionchoice").val();
+        if ( action == "dup_w" && fieldid != "tofieldchoice" ) {
+            var val = $(caller).find("option:selected").val();
+            $("#tofieldchoice option[value='" + val + "']").attr('disabled', '');
+            $("#tofieldchoice option[value='" + val + "']").attr('selected', 'selected');
+            $("#tofieldchoice option[value!='" + val + "']").attr('disabled', 'disabled');
+            $("#tofieldchoice").change();
+        }
      }
 
-     function subfieldChanged(fieldid, subfieldid){
-        var field    = $('#'+fieldid).val();
+     function subfieldChanged(caller){
+        var fieldid = $(caller).attr('id');
+        var subfieldid = $(caller).parent().next().find("select.subfield").attr('id');
+        var field = $('#'+fieldid).val();
         var subfield = $('#'+subfieldid).val();
         $.ajax({
         	url: CGIBIN + 'tools/batchedit.pl?field=' + field + '&subfield=' + subfield,
@@ -74,6 +94,15 @@
         } else {
             $("#tofieldchoice").attr('disabled', 'disabled');
             $("#tosubfieldchoice").attr('disabled', 'disabled');
+        }
+
+        if ( action == "dup_w" ) {
+            var val = $("#fieldchoice option:selected").val();
+            $("#tofieldchoice option[value='" + val + "']").attr('selected', 'selected');
+            $("#tofieldchoice option[value!='" + val + "']").attr('disabled', 'disabled');
+            $("#tofieldchoice").change();
+        } else {
+            $("#tofieldchoice option").attr('disabled', '');
         }
      }
 
@@ -199,14 +228,14 @@
     </thead>
         <tr>
             <td>
-                <select name="fieldchoice" id="fieldchoice" onchange="fieldChanged('fieldchoice', 'subfieldchoice');">
+                <select name="fieldchoice" id="fieldchoice" class='field'>
 <!-- TMPL_LOOP NAME="marcfields" -->
                     <option value="<!-- TMPL_VAR NAME="tag" -->"><!-- TMPL_VAR NAME="tag" --></option>
 <!-- /TMPL_LOOP -->
                 </select>
             </td>
             <td>
-                <select name="subfieldchoice" id="subfieldchoice" onchange="subfieldChanged('fieldchoice', 'subfieldchoice');">
+                <select name="subfieldchoice" id="subfieldchoice" class='subfield'>
                 
                 </select>
             </td>
@@ -221,14 +250,14 @@
                 </select>
             </td>
             <td>
-                <select name="fieldchoice" id="tofieldchoice" onchange="fieldChanged('tofieldchoice', 'tosubfieldchoice');" disabled='disabled'>
+                <select name="fieldchoice" id="tofieldchoice" class='field' disabled='disabled'>
                     <!-- TMPL_LOOP NAME="marcfields" -->
                         <option value="<!-- TMPL_VAR NAME="tag" -->"><!-- TMPL_VAR NAME="tag" --></option>
                     <!-- /TMPL_LOOP -->
                 </select>
             </td>
             <td>
-                <select name="subfieldchoice" id="tosubfieldchoice" onchange="subfieldChanged('tofieldchoice', 'tosubfieldchoice');" disabled='disabled'></select>
+                <select name="subfieldchoice" id="tosubfieldchoice" class='subfield' disabled='disabled'></select>
             </td>
             <td id="condvaltd">
                 <input type="text" name="condvalchoice" id="condvalchoice" />
