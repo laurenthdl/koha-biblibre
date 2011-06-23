@@ -45,34 +45,34 @@
         <option value="">Library Catalog</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_ti" -->
-        <option selected="selected" value="ti">Title</option>
+        <option selected="selected" value="title">Title</option>
 		<!-- TMPL_ELSE -->
-        <option value="ti">Title</option>
+        <option value="title">Title</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_au" -->
-        <option selected="selected" value="au">Author</option>
+        <option selected="selected" value="author">Author</option>
 		<!-- TMPL_ELSE -->
-        <option value="au">Author</option>
+        <option value="author">Author</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_su" -->
-        <option selected="selected" value="su">Subject</option>
+        <option selected="selected" value="subject">Subject</option>
 		<!-- TMPL_ELSE -->
-        <option value="su">Subject</option>
+        <option value="subject">Subject</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_nb" -->
-		<option selected="selected" value="nb">ISBN</option>
+		<option selected="selected" value="isbn">ISBN</option>
 		<!-- TMPL_ELSE -->
-		<option value="nb">ISBN</option>
+		<option value="isbn">ISBN</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_se" -->
-        <option selected="selected" value="se">Series</option>
+        <option selected="selected" value="title-series">Series</option>
 		<!-- TMPL_ELSE -->
-        <option value="se">Series</option>
+        <option value="title-series">Series</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_callnum" -->
-        <option selected="selected" value="callnum">Call Number</option>
+        <option selected="selected" value="callnumber">Call Number</option>
 		<!-- TMPL_ELSE -->
-        <option value="callnum">Call Number</option>
+        <option value="callnumber">Call Number</option>
 		<!-- /TMPL_IF --></select>
         <!-- TMPL_IF NAME="tag" -->
                 <input type="text" id = "transl1" name="q" value="" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
@@ -83,13 +83,25 @@
                 <input type="text" id = "transl1" name="q" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
             <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
-   <!-- TMPL_IF NAME="OpacAddMastheadLibraryPulldown" -->
-      <select name="filters" id="masthead_search" class="left" style="max-width:10em;width:10em;">
-         <option value="">All Libraries</option>
-         <!-- TMPL_LOOP NAME="BranchesLoop" -->
-            <option <!-- TMPL_IF name="mylibraryfirst" --><!-- TMPL_IF NAME="selected" -->selected="selected"<!-- /TMPL_IF --><!-- /TMPL_IF --> value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
-         <!-- /TMPL_LOOP -->
-      </select>
+    <!-- TMPL_IF NAME="OpacAddMastheadLibraryPulldown" -->
+        <select name="filters" id="masthead_branchsearch" class="left" style="max-width:10em;width:10em;">
+            <!-- TMPL_IF NAME="branchsearchexistsincookie" -->
+                <option value="" <!-- TMPL_IF EXPR="branchsearch eq ''" -->selected="selected"<!-- /TMPL_IF -->>All Libraries</option>
+            <!-- TMPL_ELSE -->
+                <option value="">All Libraries</option>
+            <!-- /TMPL_IF -->
+            <!-- TMPL_LOOP NAME="BranchesLoop" -->
+                <option 
+                <!-- TMPL_IF NAME="branchsearchexistsincookie" -->
+                    <!-- TMPL_IF EXPR="branchsearch eq value" -->selected="selected"<!-- /TMPL_IF -->
+                <!-- TMPL_ELSE -->
+                    <!-- TMPL_IF name="mylibraryfirst" -->
+                        <!-- TMPL_IF NAME="selected" -->selected="selected"<!-- /TMPL_IF -->
+                    <!-- /TMPL_IF -->
+                <!-- /TMPL_IF -->
+                value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+            <!-- /TMPL_LOOP -->
+        </select>
    <!-- TMPL_ELSE -->
       <!-- TMPL_UNLESS NAME="opac_limit_override" -->
           <!-- TMPL_IF name="mylibraryfirst" --> 

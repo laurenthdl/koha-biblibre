@@ -477,6 +477,14 @@ sub get_template_and_user {
             SyndeticsSeries                => C4::Context->preference("SyndeticsSeries"),
             SyndeticsCoverImageSize        => C4::Context->preference("SyndeticsCoverImageSize"),
         );
+
+        my $branchsearch = $in->{'query'}->cookie('BranchSearch');
+        if ( $branchsearch ) {
+            $branchsearch = uri_unescape($branchsearch);
+            $template->param( branchsearch => thaw $branchsearch );
+            $template->param( branchsearchexistsincookie => 1 ); # Thanks to HTML Template ......
+        }
+
     }
     $template->param( listloop => [ { shelfname => "Freelist", shelfnumber => 110 } ] );
     return ( $template, $borrowernumber, $cookie, $flags );

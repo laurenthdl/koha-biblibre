@@ -1647,7 +1647,10 @@ sub ModReceiveOrder {
 	# Removing MARC order field if exists
 	DelMarcOrder($biblionumber, $ordernumber);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/stetienne/ft/MT7137
     return $datereceived;
 }
 
@@ -1762,6 +1765,7 @@ sub DelOrder {
     my @itemnumbers = GetItemnumbersFromOrder( $ordernumber );
     C4::Items::DelItem( $dbh, $bibnum, $_ ) for @itemnumbers;
     DelBiblio(($bibnum)) if C4::Items::GetItemsCount( $bibnum ) == 0;
+
 }
 
 =head3 DelMarcOrder
