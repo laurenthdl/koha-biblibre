@@ -1647,10 +1647,7 @@ sub ModReceiveOrder {
 	# Removing MARC order field if exists
 	DelMarcOrder($biblionumber, $ordernumber);
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/stetienne/ft/MT7137
     return $datereceived;
 }
 
