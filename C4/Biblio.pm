@@ -3627,7 +3627,7 @@ sub BatchModField {
         $record->insert_fields_ordered($new_field);
         return 1;
     } elsif( $action eq "dup" or $action eq "dup_w" ) {
-        return 0 if $action eq "dup_w" && $subfield ne $tosubfield;
+        return 0 if $action eq "dup_w" and $field ne $tofield;
 
         my @original_values = ();
         for my $f ($record->field( $field )){
