@@ -193,7 +193,11 @@ sub ModSubscriptionFrequency {
     unless(
       ref($frequency) eq 'HASH'
       && defined $frequency->{'id'} && $frequency->{'id'} > 0
-      && defined $frequency->{'description'} && $frequency->{'description'} ne ''
+      && (
+        (defined $frequency->{'description'}
+        && $frequency->{'description'} ne '')
+        || !defined $frequency->{'description'}
+      )
     ) {
         return undef;
     }
