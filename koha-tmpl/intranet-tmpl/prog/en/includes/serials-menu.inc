@@ -18,4 +18,6 @@
 	<!-- TMPL_IF NAME="CAN_user_serials_check_expiration" -->
 	<li><a href="/cgi-bin/koha/serials/checkexpiration.pl">Check Expiration</a></li>
 	<!-- /TMPL_IF -->
+    <li><a href="/cgi-bin/koha/serials/subscription-frequencies.pl">Manage frequencies</a></li>
+    <li><a href="/cgi-bin/koha/serials/subscription-numberpatterns.pl">Manage number patterns</a></li>
 </ul>

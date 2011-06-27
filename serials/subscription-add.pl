@@ -29,7 +29,7 @@ use C4::Output;
 use C4::Context;
 use C4::Branch;    # GetBranches
 use C4::Serials;
-use C4::Serials::PredictiveModel;
+use C4::Serials::Frequency;
 use C4::Letters;
 use Carp;
 
@@ -181,9 +181,9 @@ if ( $op eq 'addsubscription' ) {
             $template->param( bibliotitle => $bib->{title} );
         }
     }
-    my $frequencies = GetSubscriptionFrequencies;
+    my @frequencies = GetSubscriptionFrequencies;
     my @frqloop;
-    foreach my $thisfrq (@$frequencies) {
+    foreach my $thisfrq (@frequencies) {
         my $selected = 1 if $thisfrq->{'id'} eq $subs->{'periodicity'};
         my %row =(id => $thisfrq->{'id'},
                     selected => $selected,
