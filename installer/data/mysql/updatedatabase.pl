@@ -6083,7 +6083,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("
         CREATE TABLE `invoices` (
             `invoicenumber` varchar(255) UNIQUE NOT NULL,
-            `shipmentcost` decimal(28,6) DEFAULT NULL,
+            `shipmentcost` decimal(8,2) DEFAULT NULL,
             `shipment_budget_id` int(11) DEFAULT NULL,
             CONSTRAINT `invoices_shipment_budget_id` FOREIGN KEY (`shipment_budget_id`) REFERENCES `aqbudgets` (`budget_id`) ON DELETE SET NULL ON UPDATE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
