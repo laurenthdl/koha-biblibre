@@ -58,7 +58,6 @@ my @column_name = map {
     name => $_
 }, @keys;
 
-
 # Template engine is very stupid !
 # FIXME When another tmpl engine will be use
 my @real_datas;
@@ -83,11 +82,27 @@ for my $d (@datas) {
     push @real_datas, $hash;
 }
 
+# Gettings sums
+my $count_total_issues = 0;
+my $count_total_issues_returned = 0;
+my $count_total_precedent_state = 0;
+my $count_total_actual_state = 0;
+for my $d (@real_datas) {
+   $count_total_issues += $d->{'count_total_issues_today'};
+   $count_total_issues_returned += $d->{'count_total_issues_returned_today'};
+   $count_total_precedent_state += $d->{'count_precedent_state'};
+   $count_total_actual_state += ($d->{'count_precedent_state'} - $d->{'count_total_issues_returned_today'} + $d->{'count_total_issues_today'});
+}
+
 $template->param(
     statisticsview => 1,
     datas          => \@real_datas,
     column_name    => \@column_name,
     length_keys    => scalar(@keys),
+    count_total_issues => $count_total_issues,
+    count_total_issues_returned => $count_total_issues_returned,
+    count_total_precedent_state => $count_total_precedent_state,
+    count_total_actual_state => $count_total_actual_state,
 );
 
 sub replace_key {
