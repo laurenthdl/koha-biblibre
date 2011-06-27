@@ -47,8 +47,6 @@ BEGIN {
       &GetFullSubscriptionsFromBiblionumber   &GetFullSubscription
       &GetSubscriptionHistoryFromSubscriptionId &ModSubscriptionHistory
       &HasSubscriptionStrictlyExpired &HasSubscriptionExpired &GetExpirationDate &abouttoexpire
-      &GetSubscriptionNumberpatterns
-      &GetSubscriptionNumberpattern
 
       &GetSeq &GetNextSeq &NewIssue           &ItemizeSerials    &GetSerials
       &GetLatestSerials   &ModSerialStatus    &GetNextDate       &GetSerials2
@@ -730,59 +728,6 @@ sub SearchSubscriptions {
     $sth->finish;
 
     return @$results;
-}
-
-=head2 GetSubscriptionNumberpattern
-
-=over 4
-
-%$result = GetSubscriptionNumberpattern($numpatternid);
-this function get the data of the subscription numberpatterns which id is $numpatternid
-
-=back
-
-=cut
-
-sub GetSubscriptionNumberpattern {
-    my $numpatternid=shift;
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_numberpatterns
-        where id=?
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute($numpatternid);
-    my $results=$sth->fetchrow_hashref;
-    return $results;
-}
-
-=head2 GetSubscriptionNumberpatterns
-
-=over 4
-
-@$results = GetSubscriptionNumberpatterns;
-this function get all subscription number patterns entered in table
-
-=back
-
-=cut
-
-sub GetSubscriptionNumberpatterns {
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_numberpatterns
-        ORDER by displayorder
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute;
-    my $results=$sth->fetchall_arrayref({});
-    return $results;
 }
 
 =head2 GetSerials

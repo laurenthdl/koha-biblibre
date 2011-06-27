@@ -30,6 +30,7 @@ use C4::Context;
 use C4::Branch;    # GetBranches
 use C4::Serials;
 use C4::Serials::Frequency;
+use C4::Serials::Numberpattern;
 use C4::Letters;
 use Carp;
 
@@ -193,9 +194,9 @@ if ( $op eq 'addsubscription' ) {
     }
     $template->param(frequencies => \@frqloop);
 
-    my $numpatterns = GetSubscriptionNumberpatterns;
+    my @numpatterns = GetSubscriptionNumberpatterns;
     my @numberpatternloop;
-    foreach my $thisnumpattern (@$numpatterns) {
+    foreach my $thisnumpattern (@numpatterns) {
         my $selected = 1 if $thisnumpattern->{'id'} eq $subs->{'numberpattern'};
         my %row =(id => $thisnumpattern->{'id'},
                     selected => $selected,
