@@ -2570,6 +2570,18 @@ CREATE TABLE `aqorderdelivery` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `invoices`
+--
+
+DROP TABLE IF EXISTS `invoices`;
+CREATE TABLE `invoices` (
+  `invoicenumber` varchar(255) UNIQUE NOT NULL,
+  `shipmentcost` decimal(8,2) DEFAULT NULL,
+  `shipment_budget_id` int(11) DEFAULT NULL,
+  CONSTRAINT `invoices_shipment_budget_id` FOREIGN KEY (`shipment_budget_id`) REFERENCES `aqbudgets` (`budget_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `aqorders`
 --
 
@@ -2584,7 +2596,7 @@ CREATE TABLE `aqorders` (
   `totalamount` decimal(28,6) default NULL,
   `datereceived` date default NULL,
   `billingdate` date default NULL,
-  `booksellerinvoicenumber` mediumtext,
+  `booksellerinvoicenumber` varchar(255) default NULL,
   `invoiceclosedate` date default NULL,
   `freight` decimal(28,6) default NULL,
   `unitprice` decimal(28,6) default NULL,

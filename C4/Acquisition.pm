@@ -2150,15 +2150,17 @@ sub GetInvoice {
     my $invoicenumber = shift;
 
     my $query = qq{
-        SELECT aqorders.booksellerinvoicenumber,
+        SELECT invoices.*,
+               aqorders.booksellerinvoicenumber,
                aqorders.billingdate,
                aqorders.invoiceclosedate,
                aqbooksellers.name
-        FROM aqorders
+        FROM invoices
+            LEFT JOIN aqorders invoices.invoicenumber = aqorders.booksellerinvoicenumber
             LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
             LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
         WHERE aqorders.booksellerinvoicenumber = ?
-        LIMIT 0,1
+        LIMIT 1
     };
     my $dbh = C4::Context->dbh;
     my $sth = $dbh->prepare($query);
@@ -2193,9 +2195,18 @@ Return a reference-to-hash containing invoices informations as such :
 
 sub GetInvoiceDetails {
     my $invoicenumber = shift;
-    my $details = {};
 
+    my $dbh = C4::Context->dbh;
     my $query = qq{
+        SELECT *
+        FROM invoices
+        WHERE invoicenumber = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($invoicenumber);
+    my $details = $sth->fetchrow_hashref;
+
+    $query = qq{
         SELECT aqorders.*,
                biblio.author,
                biblio.title,
@@ -2213,19 +2224,20 @@ sub GetInvoiceDetails {
             LEFT JOIN biblioitems ON aqorders.biblioitemnumber = biblioitems.biblioitemnumber
         WHERE aqorders.booksellerinvoicenumber = ?
     };
-    my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare($query);
+    $sth = $dbh->prepare($query);
     $sth->execute($invoicenumber);
     $details->{'orders'} = $sth->fetchall_arrayref( {} );
-    $sth->finish;
 
-    $details->{'invoicenumber'} = $details->{'orders'}->[0]->{'booksellerinvoicenumber'};
-    $details->{'suppliername'} = $details->{'orders'}->[0]->{'suppliername'};
-    $details->{'supplierid'} = $details->{'orders'}->[0]->{'supplierid'};
-    $details->{'basketno'} = $details->{'orders'}->[0]->{'basketno'};
-    $details->{'billingdate'} = $details->{'orders'}->[0]->{'billingdate'};
-    $details->{'invoiceclosedate'} = $details->{'orders'}->[0]->{'invoiceclosedate'};
-    $details->{'datereceived'} = $details->{'orders'}->[0]->{'datereceived'};
+    #FIXME: These fields (except suppliername) have to be moved
+    #       into invoices table
+    foreach (qw(suppliername supplierid billingdate invoiceclosedate datereceived)) {
+        if(not exists $details->{$_}) {
+            $details->{$_} = $details->{'orders'}->[0]->{'$_'};
+        }
+    }
+    if(not exists $details->{'invoicenumber'}){
+        $details->{'invoicenumber'} = $details->{'orders'}->[0]->{'booksellerinvoicenumber'};
+    }
 
     return $details;
 }
@@ -2301,7 +2313,7 @@ sub ReopenInvoice {
 
 =over 2
 
-Modify an invoice with values contained in hash. $invoiceinfos{'invoicenumber'} must to be set.
+Modify an invoice with values contained in hash. $invoiceinfos{'invoicenumber'} must be set.
 
 =back
 
@@ -2310,21 +2322,68 @@ Modify an invoice with values contained in hash. $invoiceinfos{'invoicenumber'} 
 sub ModInvoice {
     my %invoice = @_;
 
-    my $query = "UPDATE aqorders SET";
-    if( $invoice{'invoicenumber'} ) {
-        my @args = ();
-        foreach (keys %invoice) {
-            if( $_ ne 'invoicenumber') {
-                $query .= " $_ = ?";
-                push @args, $invoice{$_};
+    my $invoicenumber = $invoice{'invoicenumber'};
+
+    if( $invoicenumber ) {
+        # Temporary solution until all invoices infos are moved into invoices table
+        my %invoice2;
+        foreach (qw(shipmentcost shipment_budget_id)) {
+            if(exists $invoice{$_}) {
+                $invoice2{$_} = $invoice{$_};
+                delete $invoice{$_};
             }
         }
-        $query .= " WHERE booksellerinvoicenumber = ?";
-        push @args, $invoice{'invoicenumber'};
+
         my $dbh = C4::Context->dbh;
-        my $sth = $dbh->prepare($query);
-        $sth->execute(@args);
-        $sth->finish;
+        my @set_strings;
+        my @set_args;
+        foreach (keys %invoice) {
+            if( $_ ne 'invoicenumber') {
+                push @set_strings, "$_ = ?";
+                push @set_args, $invoice{$_};
+            }
+        }
+        if( scalar(@set_args) > 0){
+            my $query = "UPDATE aqorders";
+            $query .= " SET ". join(", ", @set_strings);
+            $query .= " WHERE booksellerinvoicenumber = ?";
+            my $sth = $dbh->prepare($query);
+            $sth->execute(@set_args, $invoicenumber);
+        }
+
+        @set_strings = ();
+        @set_args = ();
+        foreach (keys %invoice2) {
+            if( $_ ne 'invoicenumber') {
+                push @set_strings, " $_ = ?";
+                push @set_args, $invoice2{$_};
+            }
+        }
+        if( scalar(@set_args) > 0) {
+            my $query = "UPDATE invoices";
+            $query .= " SET ". join(", ", @set_strings);
+            $query .= " WHERE invoicenumber = ?";
+            my $sth = $dbh->prepare($query);
+            my $rv = $sth->execute(@set_args, $invoicenumber);
+            if($rv == 0) {
+                # 0 rows were affected, which means that this invoice
+                # is not in invoices table.
+                # We need to insert it.
+                $query = "INSERT INTO invoices";
+                my @field_names;
+                my @values;
+                foreach (keys %invoice2) {
+                    if( $_ ne 'invoicenumber') {
+                        push @field_names, $_;
+                        push @values, $invoice2{$_};
+                    }
+                }
+                $query .= " (invoicenumber, " . join(", ", @field_names) . ")";
+                $query .= " VALUES (?, ?, ?)";
+                $sth = $dbh->prepare($query);
+                $sth->execute($invoicenumber, @values);
+            }
+        }
     }
 }
 
