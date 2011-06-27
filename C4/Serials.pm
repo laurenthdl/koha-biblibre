@@ -1183,7 +1183,7 @@ sub ModSerialStatus {
             if ( not $planneddate or $planneddate eq '0000-00-00' ) { $planneddate = C4::Dates->new()->output('iso') };
             if ( not $publisheddate or $publisheddate eq '0000-00-00' ) { $publisheddate = C4::Dates->new()->output('iso') };
         }
-        my $query = 'UPDATE serial SET serialseq=?,publisheddate=?,planneddate=?,status=?,notes=? WHERE  serialid = ?';
+        my $query = 'UPDATE serial SET serialseq=?,publisheddate=?,publisheddatetext=?,planneddate=?,status=?,notes=? WHERE  serialid = ?';
         $sth = $dbh->prepare($query);
         $sth->execute( $serialseq, $publisheddate, $publisheddatetext, $planneddate, $status, $notes, $serialid );
         $query = "SELECT * FROM   subscription WHERE  subscriptionid = ?";
