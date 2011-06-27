@@ -77,12 +77,14 @@ if($op && $op eq 'savenew') {
     my $frequency;
     foreach (qw/ description unit issuesperunit unitsperissue expectedissuesayear displayorder /) {
         $frequency->{$_} = $input->param($_);
+        $frequency->{$_} = undef if $frequency->{$_} eq '';
     }
     AddSubscriptionFrequency($frequency);
 } elsif($op && $op eq 'savemod') {
     my $frequency;
     foreach (qw/ id description unit issuesperunit unitsperissue expectedissuesayear displayorder /) {
         $frequency->{$_} = $input->param($_);
+        $frequency->{$_} = undef if $frequency->{$_} eq '';
     }
     ModSubscriptionFrequency($frequency);
 } elsif($op && $op eq 'del') {

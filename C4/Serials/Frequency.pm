@@ -190,7 +190,11 @@ Only id is mandatory.
 sub ModSubscriptionFrequency {
     my $frequency = shift;
 
-    unless(ref($frequency) eq 'HASH' && defined $frequency->{'id'} && $frequency->{'id'} > 0) {
+    unless(
+      ref($frequency) eq 'HASH'
+      && defined $frequency->{'id'} && $frequency->{'id'} > 0
+      && defined $frequency->{'description'} && $frequency->{'description'} ne ''
+    ) {
         return undef;
     }
 
