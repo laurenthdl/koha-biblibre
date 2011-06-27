@@ -129,9 +129,6 @@ foreach my $sub (@inactivesubs) {
     }
 }
 
-warn Data::Dumper::Dumper(@isubs_loop);
-warn Data::Dumper::Dumper(@asubs_loop);
-
 foreach my $subs (@activesubs, @inactivesubs) {
     my $enddate = C4::Dates->new($subs->{'enddate'}, "iso");
     $subs->{'enddate'} = $enddate->output();
