@@ -526,7 +526,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
             if ( $code =~/branch/ ) {
                 $lib = GetBranchName $value;
             }
-            if ( $code =~/itype/ ) {
+            if ( $code =~/itype/  or $code =~ /ccode/ ) {
                 $lib = GetSupportName $value;
             }
             if ( $code =~ /pubdate/ ) {
