@@ -2550,6 +2550,10 @@ sub GetNextDate {
                     warn "year month day : $year $month $day $subscription->{subscriptionid} : $@";
                 }
                 else {
+                    # Sometimes, the first days of a year are in the last week
+                    # of previous year. In this case, set $year to be $year-1
+                    # in order to calculate next date properly.
+                    $year = $yr;
                     my $daycount = 7 / $freqdata->{'issuesperunit'};
                     while ($irregularities{$wkno*$freqdata->{'issuesperunit'}+$tmpsubscription->{'countissuesperunit'}*(($freqdata->{'issuesperunit'}-1)!=0)+ $freqdata->{"unitsperissue"} }) {
                             if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
