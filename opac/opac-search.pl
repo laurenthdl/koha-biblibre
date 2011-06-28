@@ -109,31 +109,6 @@ if ( C4::Context->preference('BakerTaylorEnabled') ) {
     );
 }
 
-# GET
-my $branchsearch = $cgi->param("branchsearch");
-# POST # FIXME index name dependent
-# if filters holdingbranch exists
-my @holdingbranch = @params ? grep /holdingbranch/, @params : "";
-# Get branchcode
-@holdingbranch = split ':', $holdingbranch[0] if @holdingbranch;
-my $holdingbranch = @holdingbranch ? $holdingbranch[1] : undef;
-# Remove double quotes
-$holdingbranch =~ s/"(\S*)"/$1/ if defined $holdingbranch;
-# Set to empty string (all libraries) if no $holdingbranch and @params (ie. filters=)
-# else undef => we can't put branch into the cookie
-$holdingbranch = ( @params ) ? "" : undef if not defined $holdingbranch;
-
-if ( defined $branchsearch or defined $holdingbranch) {
-    my $branch = defined $branchsearch ? $branchsearch : $holdingbranch;
-    my $branchsearchcookie = $cgi->cookie(
-        -name => 'BranchSearch',
-        -value   => uri_escape( freeze( \$branch ) ),
-        -expires => ''
-    );
-    $cookie = [ $cookie, $branchsearchcookie ];
-    $template->param( branchsearch => $branch );
-    $template->param( branchsearchexistsincookie => 1 );
-}
 # load the branches
 my $mybranch = ( C4::Context->preference('SearchMyLibraryFirst') && C4::Context->userenv && C4::Context->userenv->{branch} ) ? C4::Context->userenv->{branch} : '';
 my $branches = GetBranches();    # used later in *getRecords, probably should be internalized by those functions after caching in C4::Branch is established

@@ -478,12 +478,45 @@ sub get_template_and_user {
             SyndeticsCoverImageSize        => C4::Context->preference("SyndeticsCoverImageSize"),
         );
 
-        my $branchsearch = $in->{'query'}->cookie('BranchSearch');
-        if ( $branchsearch ) {
-            $branchsearch = uri_unescape($branchsearch);
-            $template->param( branchsearch => thaw $branchsearch );
-            $template->param( branchsearchexistsincookie => 1 ); # Thanks to HTML Template ......
+        if ( C4::Context->preference('EnableOpacSearchHistory') ) {
+            # Cookie
+            my $cookiebranchsearch =thaw uri_unescape $in->{'query'}->cookie('BranchSearch');
+            # GET
+            my $branchsearch = $in->{query}->param("branchsearch");
+            # POST # FIXME index name dependent
+            # if filters holdingbranch exists
+            my @filters = $in->{query}->param("filters");
+            my @holdingbranch = @filters ? grep /holdingbranch/, @filters : "";
+            # Get branchcode
+            @holdingbranch = split ':', $holdingbranch[0] if @holdingbranch;
+            my $holdingbranch = @holdingbranch ? $holdingbranch[1] : undef;
+            # Remove double quotes
+            $holdingbranch =~ s/"(\S*)"/$1/ if defined $holdingbranch;
+            # Set to empty string (all libraries) if no $holdingbranch and @filters (ie. filters=)
+            # else undef => we can't put branch into the cookie
+            $holdingbranch = ( @filters ) ? "" : undef if not defined $holdingbranch;
+
+            if ( defined $branchsearch
+                    or defined $holdingbranch
+                    or defined $cookiebranchsearch ) {
+                my $branch = defined $branchsearch
+                            ? $branchsearch
+                            : defined $holdingbranch
+                                ? $holdingbranch
+                                : $cookiebranchsearch;
+                my $branchsearchcookie = $in->{query}->cookie(
+                    -name => 'BranchSearch',
+                    -value   => uri_escape( freeze( \$branch ) ),
+                    -expires => ''
+                );
+                warn "sent to tmpl $branch";
+                $template->param( branchsearch => $branch );
+                $template->param( branchsearchexistsincookie => 1 );
+                $cookie = [ $cookie, $branchsearchcookie ];
+            }
         }
+
+
 
     }
     $template->param( listloop => [ { shelfname => "Freelist", shelfnumber => 110 } ] );
