@@ -104,7 +104,7 @@ if ( $op eq 'do_search' ) {
 
     # If no resuls, we search on summary index
     # In fact, we search string returned by autocompletion
-    if ( not $results->pager->total_entries ){
+    if ( not $results->{pager}->{total_entries} ){
         my $indexes = ();
         my $operands = ();
         my $operators = ();
