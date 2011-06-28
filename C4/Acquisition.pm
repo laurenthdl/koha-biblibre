@@ -2232,7 +2232,7 @@ sub GetInvoiceDetails {
     #       into invoices table
     foreach (qw(suppliername supplierid billingdate invoiceclosedate datereceived)) {
         if(not exists $details->{$_}) {
-            $details->{$_} = $details->{'orders'}->[0]->{'$_'};
+            $details->{$_} = $details->{'orders'}->[0]->{$_};
         }
     }
     if(not exists $details->{'invoicenumber'}){
