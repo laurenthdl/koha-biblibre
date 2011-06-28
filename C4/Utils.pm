@@ -3,8 +3,7 @@ package C4::Utils;
 # Useful code I didn't feel like duplicating all over the place.
 #
 
-use strict;
-use warnings;
+use Modern::Perl;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug);
 
 BEGIN {

@@ -15,9 +15,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Output;
 use C4::Auth;
@@ -26,6 +24,9 @@ use C4::Stats;
 use C4::Accounts;
 use C4::Debug;
 use Date::Manip;
+use C4::Logger;
+
+my $log = C4::Logger->new();
 
 my $input = new CGI;
 my $time  = $input->param('time');
@@ -49,17 +50,16 @@ my $date  = ParseDate($time);
 my $date2 = ParseDate($time2);
 $date  = UnixDate( $date,  '%Y-%m-%d' );
 $date2 = UnixDate( $date2, '%Y-%m-%d' );
-$debug and warn "MASON: TIME: $time, $time2";
-$debug and warn "MASON: DATE: $date, $date2";
+$log->debug("MASON: TIME: $time, $time2");
+$log->debug("MASON: DATE: $date, $date2");
 
 # get a list of every payment
 my @payments = TotalPaid( $date, $date2 );
 
 my $count = @payments;
 
-$debug and warn "MASON: number of payments=$count\n";
+$log->debug("MASON: number of payments=$count");
 
-my $i            = 0;
 my $totalcharges = 0;
 my $totalcredits = 0;
 my $totalpaid    = 0;
@@ -107,7 +107,7 @@ foreach my $payment (@payments) {
 
         }
         $totalpaid = $totalpaid + $payment->{'value'};
-        $debug and warn "totalpaid = $totalpaid";
+        $log->debug("totalpaid = $totalpaid");
     } else {
         ++$totalwritten;
     }
@@ -117,7 +117,7 @@ foreach my $payment (@payments) {
 #get credits and append to the bottom of payments
 my @credits = getcredits( $date, $date2 );
 
-my $count = @credits;
+$count = @credits;
 my $i     = 0;
 
 while ( $i < $count ) {

@@ -17,9 +17,7 @@ package C4::Items;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use Carp;
 use C4::Context;
@@ -33,9 +31,12 @@ use C4::Branch;
 require C4::Reserves;
 use C4::Charset;
 use C4::Acquisition;
+use C4::Logger;
 use List::MoreUtils qw/any/;
 
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION = 3.01;
@@ -155,7 +156,6 @@ sub GetItem {
         my $ssth = $dbh->prepare("SELECT serialseq,publisheddate from serialitems left join serial on serialitems.serialid=serial.serialid where serialitems.itemnumber=?");
         $ssth->execute( $data->{'itemnumber'} );
         ( $data->{'serialseq'}, $data->{'publisheddate'} ) = $ssth->fetchrow_array();
-        warn $data->{'serialseq'}, $data->{'publisheddate'};
     }
 
     #if we don't have an items.itype, use biblioitems.itemtype.
@@ -376,7 +376,7 @@ sub AddItemBatchFromMarc {
         _set_defaults_for_add($item);
         _set_derived_columns_for_add($item);
         my ( $itemnumber, $error ) = _koha_new_item( $item, $item->{barcode} );
-        warn $error if $error;
+        $log->error($error) if $error;
         push @itemnumbers, $itemnumber;    # FIXME not checking error
         $item->{'itemnumber'} = $itemnumber;
 
@@ -1567,8 +1567,8 @@ sub GetHiddenItemnumbers {
 	$hidingrules = YAML::Load($yaml);
     };
     if ($@) {
-	warn "Unable to parse OpacHiddenItems syspref : $@";
-	return ();
+        $log->warning("Unable to parse OpacHiddenItems syspref : $@");
+        return ();
     } else {
 
         my $dbh = C4::Context->dbh;
@@ -1637,7 +1637,6 @@ sub get_item_authorised_values {
     my $itemlevel_authorised_values = C4::Context->dbh->selectall_hashref( $query, 'authorised_value' );
     my $iteminfo = GetItem($itemnumber);
 
-    # warn( Data::Dumper->Dump( [ $itemlevel_authorised_values ], [ 'itemlevel_authorised_values' ] ) );
     my $return;
     foreach my $this_authorised_value ( keys %$itemlevel_authorised_values ) {
         my $field = $itemlevel_authorised_values->{$this_authorised_value}->{'kohafield'};
@@ -1647,7 +1646,6 @@ sub get_item_authorised_values {
         }
     }
 
-    # warn( Data::Dumper->Dump( [ $return ], [ 'return' ] ) );
     return $return;
 }
 
@@ -1682,12 +1680,10 @@ sub get_authorised_value_images {
 
     my $authorised_value_list = GetAuthorisedValues();
 
-    # warn ( Data::Dumper->Dump( [ $authorised_value_list ], [ 'authorised_value_list' ] ) );
     foreach my $this_authorised_value (@$authorised_value_list) {
         if ( exists $authorised_values->{ $this_authorised_value->{'category'} }
             && $authorised_values->{ $this_authorised_value->{'category'} } eq $this_authorised_value->{'authorised_value'} ) {
 
-            # warn ( Data::Dumper->Dump( [ $this_authorised_value ], [ 'this_authorised_value' ] ) );
             if ( $this_authorised_value->{'imageurl'} ) {
                 push @imagelist,
                   { imageurl => C4::Koha::getitemtypeimagelocation( 'intranet', $this_authorised_value->{'imageurl'} ),
@@ -1699,7 +1695,6 @@ sub get_authorised_value_images {
         }
     }
 
-    # warn ( Data::Dumper->Dump( [ \@imagelist ], [ 'imagelist' ] ) );
     return \@imagelist;
 
 }
@@ -2275,7 +2270,7 @@ sub _koha_modify_item {
     $sth->execute(@bind);
     if ( C4::Context->dbh->errstr ) {
         $error .= "ERROR in _koha_modify_item $query" . $dbh->errstr;
-        warn $error;
+        $log->error($error);
     }
     return ( $item->{'itemnumber'}, $error );
 }

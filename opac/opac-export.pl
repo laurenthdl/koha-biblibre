@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 use HTML::Template::Pro;
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Record;
 use C4::Auth;

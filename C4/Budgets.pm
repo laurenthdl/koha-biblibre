@@ -17,9 +17,7 @@ package C4::Budgets;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Context;
 use C4::Dates qw(format_date format_date_in_iso);
 use C4::SQLHelper qw<:all>;
@@ -488,7 +486,6 @@ sub GetBudgetFirstChild {
    my $sth= $dbh->prepare($query);
     $sth->execute();
     my $data = $sth->fetchall_arrayref({});
-    #warn Data::Dumper::Dumper($data);
     return $data;
 }
 # -------------------------------------------------------------------
@@ -502,7 +499,6 @@ sub GetBudgetParent {
     my $sth= $dbh->prepare($query);
     $sth->execute();
     my $data = $sth->fetchall_arrayref({});
-    #warn Data::Dumper::Dumper($data);
     return $data;
 }
 # -------------------------------------------------------------------
@@ -524,7 +520,6 @@ sub GetBudgetSecondChild {
     my $sth= $dbh->prepare($query);
     $sth->execute();
     my $data = $sth->fetchall_arrayref({});
-    #warn Data::Dumper::Dumper($data);
     return $data;
 }
 # -------------------------------------------------------------------
@@ -584,7 +579,6 @@ sub GetBudgetHierarchy {
         }
     }
     $query .= " WHERE " . join( ' AND ', @where_strings ) if @where_strings;
-    $debug && warn $query, join( ",", @bind_params );
     my $sth = $dbh->prepare($query);
     $sth->execute(@bind_params);
     my $results = $sth->fetchall_arrayref( {} );

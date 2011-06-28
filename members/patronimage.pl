@@ -20,12 +20,14 @@
 #
 #
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;    #qw(:standard escapeHTML);
 use C4::Context;
 use C4::Members;
+use C4::Logger;
+
+my $log = C4::Logger->new();
 
 $| = 1;
 
@@ -53,12 +55,12 @@ if ( $data->param('crdnum') ) {
     $cardnumber = shift;
 }
 
-warn "Cardnumber passed in: $cardnumber" if $DEBUG;
+$log->debug("Cardnumber passed in: $cardnumber");
 
 my ( $imagedata, $dberror ) = GetPatronImage($cardnumber);
 
 if ($dberror) {
-    warn "Database Error!";
+    $log->error("Database Error!");
     exit;
 }
 
@@ -69,7 +71,7 @@ if ($imagedata) {
     print $data->header( -type => $imagedata->{'mimetype'}, -'Cache-Control' => 'no-store', -Content_Length => length( $imagedata->{'imagefile'} ) ), $imagedata->{'imagefile'};
     exit;
 } else {
-    warn "No image exists for $cardnumber";
+    $log->warning("No image exists for $cardnumber");
     exit;
 }
 

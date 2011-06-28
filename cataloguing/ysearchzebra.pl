@@ -24,7 +24,7 @@
 
 =cut
 
-use strict;
+use Modern::Perl;
 
 use CGI;
 use C4::Context;

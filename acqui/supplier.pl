@@ -39,8 +39,7 @@ To know the bookseller this script has to display details.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Auth;
 use C4::Acquisition;
 use C4::Contract;

@@ -20,9 +20,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Output;
 use C4::Print;
@@ -37,6 +35,7 @@ use C4::Biblio;
 use C4::Reserves;
 use C4::Context;
 use C4::Debug;
+use C4::Logger;
 use List::MoreUtils qw/any/;
 use CGI::Session;
 use C4::Items;
@@ -49,6 +48,8 @@ use Date::Calc qw(
   Date_to_Days
 );
 use List::MoreUtils qw/uniq/;
+
+my $log = C4::Logger->new();
 
 #
 # PARAMETERS READING
@@ -106,7 +107,7 @@ my %return_failed;
 for (@failedrenews) { $renew_failed{$_} = decode_json( shift @renewerrors ); }
 for (@failedreturns) { $return_failed{ GetItemnumberFromBarcode($_) } = decode_json( shift @returnerrors ); }
 
-my $findborrower = $query->param('findborrower');
+my $findborrower = $query->param('findborrower') || '';
 $findborrower =~ s|,| |g;
 my $borrowernumber = $query->param('borrowernumber');
 
@@ -134,7 +135,6 @@ my $organisation   = $query->param('organisations');
 my $print          = $query->param('print');
 my $newexpiry      = $query->param('dateexpiry');
 my $debt_confirmed = $query->param('debt_confirmed') || 0;    # Don't show the debt error dialog twice
-$debug && warn $newexpiry;
 
 # Check if stickyduedate is turned off
 if ($barcode) {
@@ -185,19 +185,19 @@ if ($duedatespec_allow) {
 my $todaysdate = C4::Dates->new->output( 'iso' );
 
 # check and see if we should print
-if ( $barcode eq '' && $print eq 'maybe' ) {
+if ( $barcode eq '' && $print ~~ 'maybe' ) {
     $print = 'yes';
 }
 
 my $inprocess = ( $barcode eq '' ) ? '' : $query->param('inprocess');
-if ( $barcode eq '' && $query->param('charges') eq 'yes' ) {
+if ( $barcode eq '' && $query->param('charges') ~~ 'yes' ) {
     $template->param(
         PAYCHARGES     => 'yes',
         borrowernumber => $borrowernumber
     );
 }
 
-if ( $print eq 'yes' && $borrowernumber ne '' ) {
+if ( $print ~~ 'yes' && $borrowernumber ~~ '' ) {
     printslip($borrowernumber);
     $query->param( 'borrowernumber', '' );
     $borrowernumber = '';
@@ -645,10 +645,10 @@ if ($borrowerslist) {
 
 #title
 my $flags = $borrower->{'flags'};
-$debug && warn Dump($flags);
+$log->debug($flags, 1);
 foreach my $flag ( sort keys %$flags ) {
     $template->param( flagged => 1 );
-    $flags->{$flag}->{'message'} =~ s#\n#<br />#g;
+    $flags->{$flag}->{'message'} =~ s#\n#<br />#g if defined $flags->{$flag}->{'message'};
     if ( $flags->{$flag}->{'noissues'} ) {
         $template->param(
             flagged  => 1,
@@ -754,7 +754,7 @@ if ($bor_messages_loop) { $template->param( flagged => 1 ); }
 # Computes full borrower address
 my ( undef, $roadttype_hashref ) = &GetRoadTypes();
 my $address = $borrower->{'streetnumber'} . ' ' if ( $borrower->{'streetnumber'} );
-$address .= $roadttype_hashref->{ $borrower->{'streettype'} } . ' ' if ( $roadttype_hashref->{ $borrower->{'streettype'} } );
+$address .= $roadttype_hashref->{ $borrower->{'streettype'} } . ' ' if defined $borrower->{'streettype'};
 $address .= $borrower->{'address'};
 
 $duedatespec = "" if not( $stickyduedate or scalar $confirm_required );

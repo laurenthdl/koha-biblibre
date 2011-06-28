@@ -25,8 +25,7 @@ C4::Scrubber is used to remove all markup content from the sumitted text.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use CGI::Cookie;    # need to check cookies before having CGI parse the POST request
 
@@ -38,6 +37,9 @@ use C4::Dates qw(format_date);
 use C4::Scrubber;
 use C4::Biblio;
 use C4::Tags qw(add_tag get_approval_rows get_tag_rows remove_tag);
+use C4::Logger;
+
+my $log = C4::Logger->new();
 
 my %newtags       = ();
 my @deltags       = ();
@@ -81,7 +83,7 @@ unless ( C4::Context->preference('TagsEnabled') ) {
         if (/^newtag(.*)/) {
             my $biblionumber = $1;
             unless ( $biblionumber =~ /^\d+$/ ) {
-                $debug and warn "$_ references non numerical biblionumber '$biblionumber'";
+                $log->debug("$_ references non numerical biblionumber '$biblionumber'");
                 push @errors, { +'badparam' => $_ };
                 push @globalErrorIndexes, $#errors;
                 next;
@@ -146,7 +148,7 @@ if ( scalar @newtags_keys ) {
             } else {
                 push @errors,                    { failed_add_tag => $clean_tag };
                 push @{ $bibResults->{errors} }, { failed_add_tag => $clean_tag };
-                $debug and warn "add_tag($biblionumber,$clean_tag,$loggedinuser...) returned bad result (" . ( defined $result ? $result : 'UNDEF' ) . ")";
+                $log->debug("add_tag($biblionumber,$clean_tag,$loggedinuser...) returned bad result (" . ( defined $result ? $result : 'UNDEF' ) . ")");
             }
         }
         $perBibResults->{$biblionumber} = $bibResults;

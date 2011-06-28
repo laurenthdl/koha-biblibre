@@ -17,8 +17,7 @@ package C4::Acquisition;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Context;
 use C4::Debug;
 use C4::Dates qw(format_date format_date_in_iso);
@@ -1122,8 +1121,6 @@ sub ModOrderItem {
 
     my $query = "UPDATE aqorders_items set itemnumber=? where itemnumber=? and ordernumber=?";
     my @params = ( $orderiteminfo->{'newitemnumber'}, $orderiteminfo->{'itemnumber'}, $orderiteminfo->{'ordernumber'} );
-    warn $query;
-    warn Data::Dumper::Dumper(@params);
     my $sth = $dbh->prepare($query);
     $sth->execute(@params);
     return 0;
@@ -1185,9 +1182,6 @@ sub ModReceiveOrder {
     my ( $biblionumber, $ordernumber, $quantrec, $user, $cost, $invoiceno, $freight, $rrp, $budget_id, $datereceived ) = @_;
     my $dbh = C4::Context->dbh;
 
-    #     warn "DATE BEFORE : $daterecieved";
-    #    $daterecieved=POSIX::strftime("%Y-%m-%d",CORE::localtime) unless $daterecieved;
-    #     warn "DATE REC : $daterecieved";
     $datereceived = C4::Dates->output('iso') unless $datereceived;
     my $suggestionid = GetSuggestionFromBiblionumber( $dbh, $biblionumber );
     if ($suggestionid) {
@@ -1729,7 +1723,6 @@ sub GetHistory {
             }
         }
         $query .= " ORDER BY id";
-        warn $query;
         my $sth = $dbh->prepare($query);
         $sth->execute(@query_params);
         my $cnt = 1;

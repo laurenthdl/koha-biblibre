@@ -1,4 +1,4 @@
-package C4::Logguer;
+package C4::Logger;
 
 # Copyright 2009 Biblibre SARL
 #
@@ -17,15 +17,10 @@ package C4::Logguer;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use base 'Exporter';
-our @EXPORT    = qw();
-our @EXPORT_OK = qw($log_opac $log_koha);
-
-use C4::Context;
+use Modern::Perl;
 use Log::LogLite;
-my $LOG_DIR = C4::Context->config('logdir');
 
+my $LOG_DIR = "/home/jonathan/workspace/sites/koha_master/var/log";#C4::Context->preference('logdir');
 my $KOHA_LOG_FILE = $LOG_DIR . "/koha.log";
 my $OPAC_LOG_FILE = $LOG_DIR . "/opac.log";
 my $CRITICAL_LOG_LEVEL = 2;
@@ -35,20 +30,25 @@ my $NORMAL_LOG_LEVEL   = 5;
 my $INFO_LOG_LEVEL     = 6;
 my $DEBUG_LOG_LEVEL    = 7;
 
-our $log_koha = C4::Logguer->new($KOHA_LOG_FILE, 7);
-our $log_opac = C4::Logguer->new($OPAC_LOG_FILE, 7);
-
 use Data::Dumper;
 
 sub new {
     my $proto = shift;
     my $class = ref($proto) || $proto;
     my $self = {};
-    $self->{FILE_PATH} = shift;
-    $self->{LEVEL} = shift || $NORMAL_LOG_LEVEL;
-    $self->{LOGGER} = Log::LogLite->new($self->{FILE_PATH}, $self->{LEVEL});
-    return bless( $self );
+    my $file = shift || defined $ENV{LOG} ? $ENV{LOG} : undef || 'koha';
+    $self->{LEVEL} = shift || $DEBUG_LOG_LEVEL;#shift || conf->log || $NORMAL_LOG_LEVEL;
 
+    if ( $file eq 'koha' ) {
+        $self->{FILE_PATH} = $KOHA_LOG_FILE;
+    } elsif ( $file eq 'opac' ) {
+        $self->{FILE_PATH} = $OPAC_LOG_FILE;
+    } else {
+        $self->{FILE_PATH} = $file;
+    }
+    $self->{LOGGER} = Log::LogLite->new($self->{FILE_PATH}, $self->{LEVEL});
+
+    return bless( $self );
 }
 
 sub write {
@@ -137,3 +137,4 @@ sub called_by {
     return $str;
 } # of called_by
 
+1;

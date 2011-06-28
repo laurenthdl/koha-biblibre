@@ -16,8 +16,7 @@
 # Suite 330, Boston, MA  02111-1307 USA
 #
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Output;
 use C4::Auth;

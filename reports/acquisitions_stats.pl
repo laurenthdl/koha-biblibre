@@ -19,9 +19,7 @@
 
 # test comment
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Auth;
 use CGI;
 use C4::Context;
@@ -117,7 +115,6 @@ if ($do_it) {
     my $req;
     $req = $dbh->prepare("SELECT distinctrow id,name FROM aqbooksellers ORDER BY name");
     $req->execute;
-    my @select;
     push @select, "";
     $select{''} = "All Suppliers";
 

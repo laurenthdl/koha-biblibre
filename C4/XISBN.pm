@@ -18,6 +18,7 @@ package C4::XISBN;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+use Modern::Perl;
 use XML::Simple;
 
 #use LWP::Simple;
@@ -25,13 +26,13 @@ use C4::Biblio;
 use C4::Items;
 use C4::Koha;
 use C4::External::Syndetics qw(get_syndetics_editions);
+use C4::Logger;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;
@@ -146,7 +147,7 @@ sub _get_url {
 
     my $response = $ua->get($url);
     if ( $response->is_success ) {
-        warn "WARNING could not retrieve $service_type $url" unless $response;
+        $log->warning("WARNING could not retrieve $service_type $url") unless $response;
         if ($response) {
             my $xmlsimple = XML::Simple->new();
             my $content   = $xmlsimple->XMLin(
@@ -157,7 +158,7 @@ sub _get_url {
             return $content;
         }
     } else {
-        warn "WARNING: URL Request Failed " . $response->status_line . "\n";
+        $log->warning("WARNING: URL Request Failed " . $response->status_line);
     }
 
 }

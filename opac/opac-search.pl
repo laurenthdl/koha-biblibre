@@ -19,8 +19,8 @@
 
 # Script to perform searching
 # Mostly copied from search.pl, see POD there
-use strict;    # always use
-use warnings;
+
+use Modern::Perl;
 
 ## STEP 1. Load things that are used in both search page and
 # results page and decide which template to load, operations
@@ -42,8 +42,9 @@ use Storable qw(thaw freeze);
 use Data::Pagination;
 use C4::XSLT;
 use C4::Charset;
-use 5.10.0;
+use C4::Logger;
 
+my $log = C4::Logger->new();
 
 # create a new CGI object
 # FIXME: no_undef_params needs to be tested
@@ -359,7 +360,6 @@ my $tag = $cgi->param('tag');
 if ($tag) {
     $query_desc = "tag=$tag";
     $query_cgi  = "tag=$tag";
-    warn $tag;
     my $taglist = get_tags( { term => $tag, approved => 1 } );
     my @biblionumber = map { $_->{biblionumber} } @$taglist;
     my $biblionumber_indexname = C4::Search::Query::getIndexName('recordid');
@@ -374,7 +374,7 @@ $query_desc = $q if not $tag;
 
 # perform the search
 $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
-C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q:";
+$log->debug("OpacSolrSimpleSearch:q=$q:");
 
 if (!$res){
     $template->param(query_error => "Bad request! help message ?");

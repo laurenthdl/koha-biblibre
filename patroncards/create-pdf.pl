@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use Graphics::Magick;
@@ -31,6 +30,9 @@ use C4::Context;
 use autouse 'C4::Members' => qw(GetPatronImage GetMember);
 use C4::Creators 1.000000;
 use C4::Patroncards 1.000000;
+use C4::Logger;
+
+my $log = C4::Logger->new();
 
 my $cgi = new CGI;
 
@@ -131,21 +133,21 @@ foreach my $item ( @{$items} ) {
                     next PROCESS_IMAGES;
                 } elsif ( $images->{$_}->{'data_source'}->[0]->{'image_source'} eq 'patronimages' ) {
                     ( $image_data, $error ) = GetPatronImage($card_number);
-                    warn sprintf( 'No image exists for borrower number %s.', $borrower_number ) if !$image_data;
+                    $log->warning(sprintf( 'No image exists for borrower number %s.', $borrower_number )) if !$image_data;
                     next PROCESS_IMAGES if !$image_data;
                 } elsif ( $images->{$_}->{'data_source'}->[0]->{'image_source'} eq 'creator_images' ) {
                     my $dbh = C4::Context->dbh();
                     $dbh->{LongReadLen} = 1000000;    # allows us to read approx 1MB
                     $image_data = $dbh->selectrow_hashref("SELECT imagefile FROM creator_images WHERE image_name = \'$$layout_xml{'images'}{$_}{'data_source'}{'image_name'}\'");
-                    warn sprintf( 'Database returned the following error: %s.', $error ) if $error;
-                    warn sprintf( 'Image does not exists in db table %s.', $$layout_xml{'images'}{$_}{'data_source'}{'image_source'} ) if !$image_data;
+                    $log->error(sprintf( 'Database returned the following error: %s.', $error )) if $error;
+                    $log->warning(sprintf( 'Image does not exists in db table %s.', $$layout_xml{'images'}{$_}{'data_source'}{'image_source'} )) if !$image_data;
                     next PROCESS_IMAGES if !$image_data;
                 } else {
-                    warn sprintf( 'No retrieval method for image source %s.', $$layout_xml{'images'}{$_}{'data_source'}{'image_source'} );
+                    $log->warning(sprintf( 'No retrieval method for image source %s.', $$layout_xml{'images'}{$_}{'data_source'}{'image_source'} ));
                     next PROCESS_IMAGES;
                 }
             } else {
-                warn sprintf( "Unrecognized image data source: %s", $images->{$_}->{'data_source'} );
+                $log->warning(sprintf( "Unrecognized image data source: %s", $images->{$_}->{'data_source'} ));
                 next PROCESS_IMAGES;
             }
 
@@ -180,7 +182,7 @@ foreach my $item ( @{$items} ) {
             $images->{$_}->{'data'} = $image->ImageToBlob();
 
             my $err = $patron_card->draw_image($pdf);
-            warn sprintf( "Error encountered while attempting to draw image %s, %s", $_, $err ) if $err;
+            $log->error(sprintf( "Error encountered while attempting to draw image %s, %s", $_, $err )) if $err;
         }
         $patron_card->draw_text($pdf);
     }

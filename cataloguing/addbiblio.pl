@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Output;
 use C4::Auth;
@@ -35,10 +33,13 @@ use C4::Branch;    # XXX subfield_is_koha_internal_p
 use C4::ClassSource;
 use C4::ImportBatch;
 use C4::Charset;
+use C4::Logger;
 
 use Date::Calc qw(Today);
 use MARC::File::USMARC;
 use MARC::File::XML;
+
+my $log = C4::Logger->new();
 
 if ( C4::Context->preference('marcflavour') eq 'UNIMARC' ) {
     MARC::File::XML->default_record_format('UNIMARC');
@@ -420,7 +421,7 @@ sub create_input {
                             <a href=\"#\" class=\"buttonDot\" onclick=\"Clic$function_name('$subfield_data{id}'); return false;\" tabindex=\"1\" title=\"Tag Editor\">...</a>
                     $javascript";
         } else {
-            warn "Plugin Failed: $plugin";
+            $log->warning("Plugin Failed: $plugin");
 
             # supply default input form
             $subfield_data{marc_value} = "<input type=\"text\"
@@ -758,8 +759,6 @@ AND (authtypecode IS NOT NULL AND authtypecode<>\"\")|
                     $marcrecordauth->insert_fields_ordered( MARC::Field->new( '670', '', '', 'a' => $cite ) );
                 }
 
-                #          warn "AUTH RECORD ADDED : ".$marcrecordauth->as_formatted;
-
                 my $authid = AddAuthority( $marcrecordauth, '', $data->{authtypecode} );
                 $countcreated++;
                 $field->add_subfields( '9' => $authid );
@@ -928,7 +927,7 @@ if ( $op eq "addbiblio" ) {
 
     my $error = &DelBiblio($biblionumber);
     if ($error) {
-        warn "ERROR when DELETING BIBLIO $biblionumber : $error";
+        $log->error("ERROR when DELETING BIBLIO $biblionumber : $error");
         print "Content-Type: text/html\n\n<html><body><h1>ERROR when DELETING BIBLIO $biblionumber : $error</h1></body></html>";
         exit;
     }

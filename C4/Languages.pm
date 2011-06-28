@@ -18,9 +18,7 @@ package C4::Languages;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use Carp;
 use C4::Context;
 use List::MoreUtils qw/any uniq/;
@@ -299,7 +297,7 @@ sub _build_languages_arrayref {
         my $language_subtags_hashref = regex_lang_subtags($translated_language);
 
         # group this language, key by langtag
-        $language_subtags_hashref->{'sublanguage_current'} = 1 if $translated_language eq $current_language;
+        $language_subtags_hashref->{'sublanguage_current'} = 1 if defined $current_language && $translated_language eq $current_language;
         $language_subtags_hashref->{'rfc4646_subtag'}      = $translated_language;
         $language_subtags_hashref->{'enabled'}             = 1;
         $language_subtags_hashref->{'native_description'}  = language_get_description( $language_subtags_hashref->{language}, $language_subtags_hashref->{language}, 'language' );
@@ -322,7 +320,7 @@ sub _build_languages_arrayref {
             language           => $key,
             sublanguages_loop  => $value,
             plural             => $track_language_groups->{$key} > 1 ? 1 : 0,
-            current            => $current_language_regex->{language} eq $key ? 1 : 0,
+            current            => defined $current_language_regex->{langage} && $current_language_regex->{language} eq $key ? 1 : 0,
             group_enabled      => 1
         };
     }
@@ -335,7 +333,6 @@ sub language_get_description {
     my $desc;
     my $sth = $dbh->prepare("SELECT description FROM language_descriptions WHERE subtag=? AND lang=? AND type=?");
 
-    #warn "QUERY: SELECT description FROM language_descriptions WHERE subtag=$script AND lang=$lang AND type=$type";
     $sth->execute( $script, $lang, $type );
     while ( my $descriptions = $sth->fetchrow_hashref ) {
         $desc = $descriptions->{'description'};
@@ -424,7 +421,7 @@ sub regex_lang_subtags {
 #my $root = qr{(?: ($language) (?: $s ($script) )? 40% (?: $s ($region) )? 40% (?: $s ($variant) )? 10% (?: $s ($extension) )? 5% (?: $s ($privateuse) )? 5% ) 90% | ($grandfathered) 5% | ($privateuse) 5% };
 
     $string =~
-      qr{^ (?:($language)) (?:$s($script))? (?:$s($region))?  (?:$s($variant))?  (?:$s($extension))?  (?:$s($privateuse))? $}xi;    # |($grandfathered) | ($privateuse) $}xi;
+      qr{^ (?:($language)) (?:$s($script))? (?:$s($region))?  (?:$s($variant))?  (?:$s($extension))?  (?:$s($privateuse))? $}xi if defined $string;    # |($grandfathered) | ($privateuse) $}xi;
     my %subtag = (
         'rfc4646_subtag' => $string,
         'language'       => $1,
@@ -490,7 +487,6 @@ sub accept_language {
     my %secondaryLanguages = ();
     foreach my $language (@$supportedLanguages) {
 
-        # warn "Language supported: " . $language->{language};
         my $subtag = $language->{rfc4646_subtag};
         $supportedLanguages{ lc($subtag) } = $subtag;
         if ( $subtag =~ /^([^-]+)-?/ ) {

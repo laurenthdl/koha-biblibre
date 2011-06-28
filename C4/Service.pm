@@ -39,8 +39,7 @@ This module packages several useful functions for JSON webservices.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Auth qw( check_api_auth );

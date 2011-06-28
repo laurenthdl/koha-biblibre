@@ -17,15 +17,17 @@ package C4::Members::Attributes;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use Text::CSV;    # Don't be tempted to use Text::CSV::Unicode -- even in binary mode it fails.
 use C4::Context;
 use C4::Members::AttributeTypes;
+use C4::Logger;
 
 use vars qw($VERSION @ISA @EXPORT_OK @EXPORT %EXPORT_TAGS);
 our ( $csv, $AttributeTypes );
+
+my $log = C4::Logger->new();
 
 BEGIN {
 
@@ -279,11 +281,11 @@ sub extended_attributes_merge {
     my @merged = @$old;
     foreach my $att (@$new) {
         unless ( $att->{code} ) {
-            warn "Cannot merge element: no 'code' defined";
+            $log->warning("Cannot merge element: no 'code' defined");
             next;
         }
         unless ( $AttributeTypes->{ $att->{code} } ) {
-            warn "Cannot merge element: unrecognized code = '$att->{code}'";
+            $log->warning("Cannot merge element: unrecognized code = '$att->{code}'");
             next;
         }
         unless ( $AttributeTypes->{ $att->{code} }->{repeatable} and $keep ) {

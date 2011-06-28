@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Context;
@@ -50,7 +48,6 @@ unless ( -r $cgidir and -d $cgidir ) {
     $cgidir = C4::Context->intranetdir . "/reports/";
 }
 my $plugin = $cgidir . $report_name . ".plugin";
-warn "PLUGIN:" . $plugin;
 require $plugin;
 if ($do_it) {
     my $results = calculate( \@values );

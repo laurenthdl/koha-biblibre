@@ -17,10 +17,10 @@ package C4::Members::AttributeTypes;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
+use Modern::Perl;
 
-#use warnings; FIXME - Bug 2505
 use C4::Context;
+use C4::Logger;
 
 use vars qw($VERSION);
 

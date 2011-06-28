@@ -41,8 +41,7 @@ The date to filter on.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Serials;    # GetExpirationDate

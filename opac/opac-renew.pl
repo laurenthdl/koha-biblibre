@@ -4,8 +4,7 @@
 # adapted for use in the hlt opac by finlay@katipo.co.nz 29/11/2002
 #script to renew items from the web
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Circulation;

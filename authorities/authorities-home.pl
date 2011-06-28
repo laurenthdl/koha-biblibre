@@ -26,7 +26,10 @@ use C4::AuthoritiesMarc;
 use C4::Koha;
 use C4::Search;
 use C4::Search::Query;
+use C4::Logger;
 use Data::Pagination;
+
+my $log = C4::Logger->new();
 
 my $query        = new CGI;
 my $op           = $query->param('op');
@@ -58,7 +61,7 @@ if ( $op eq "do_search" ) {
     my $q = "$index:$value";
     $q = C4::Search::Query->normalSearch($q);
     my $results = SimpleSearch($q, $filters, $page, $count, $orderby);
-    C4::Context->preference("DebugLevel") eq '2' && warn "AuthSolrSimpleSearch:q=$q:";
+    $log->debug("AuthSolrSimpleSearch:q=$q:");
 
     my $pager = Data::Pagination->new(
         $results->{pager}->{total_entries},

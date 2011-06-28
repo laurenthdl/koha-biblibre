@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Koha;
@@ -127,8 +126,6 @@ foreach my $subscription (@$subscriptiondescs) {
     $biblionumber = $subscription->{'bibnum'} unless ($biblionumber);
 }
 
-# warn "title : $title yearmax : $yearmax nombre d'elements dans le tableau :".scalar(@$subscriptions);
-#  use Data::Dumper; warn Dumper($subscriptions);
 my $locationlib;
 foreach (@$location) {
     $locationlib = $_->{'lib'} if $_->{'selected'};

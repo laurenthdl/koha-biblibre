@@ -18,8 +18,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use Text::CSV_XS;
@@ -30,6 +29,9 @@ use C4::Auth qw(get_template_and_user);
 use C4::Output qw(output_html_with_http_headers);
 use C4::Creators 1.000000;
 use C4::Patroncards 1.000000;
+use C4::Logger;
+
+my $log = C4::Logger->new();
 
 my $cgi = new CGI;
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -77,7 +79,7 @@ sub _set_selected {
 }
 
 if ( $op eq 'edit' ) {
-    warn sprintf( "Error performing '%s': No 'layout_id' passed in.", $op ) unless ($layout_id);
+    $log->error(sprintf( "Error performing '%s': No 'layout_id' passed in.", $op )) unless ($layout_id);
     $layout = C4::Patroncards::Layout->retrieve( layout_id => $layout_id );
     $layout_xml = XMLin( $layout->get_attr('layout_xml'), ForceArray => 1 );
 
@@ -249,7 +251,7 @@ if ( $op eq 'edit' ) {
     output_html_with_http_headers $cgi, $cookie, $template->output;
     exit;
 } else {    # trap unsupported operation here
-    warn sprintf( "Unsupported operation type submitted: %s", $op );
+    $log->error(sprintf( "Unsupported operation type submitted: %s", $op ));
     print $cgi->redirect("manage.pl?card_element=layout&element_id=$layout_id&error=201");
     exit;
 }

@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Context;
 use C4::AuthoritiesMarc;
 use utf8;

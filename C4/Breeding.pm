@@ -17,8 +17,7 @@ package C4::Breeding;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Biblio;
 use C4::Koha;
@@ -102,7 +101,6 @@ sub ImportBreeding {
         my ( $marcrecord, $charset_result, $charset_errors );
         ( $marcrecord, $charset_result, $charset_errors ) = MarcToUTF8Record( $marcarray[$i] . "\x1D", C4::Context->preference("marcflavour"), $encoding );
 
-        #         warn "$i : $marcarray[$i]";
         # FIXME - currently this does nothing
         my @warnings = $marcrecord->warnings();
 

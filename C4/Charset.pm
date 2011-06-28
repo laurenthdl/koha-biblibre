@@ -17,15 +17,17 @@ package C4::Charset;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use MARC::Charset qw/marc8_to_utf8/;
 use Text::Iconv;
 use C4::Debug;
+use C4::Logger;
 use Unicode::Normalize;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+my $log = C4::Logger->new();
 
 BEGIN {
 
@@ -354,9 +356,9 @@ sub SetMarcUnicodeFlag {
         } else {
             $marc_record->insert_grouped_field( MARC::Field->new( 100, '', '', "a" => $string ) );
         }
-        $debug && warn "encodage: ", substr( $marc_record->subfield( 100, 'a' ), $encodingposition, 8 );
+        $log->debug("encodage: ", substr( $marc_record->subfield( 100, 'a' ), $encodingposition, 8 ));
     } else {
-        warn "Unrecognized marcflavour: $marc_flavour";
+        $log->warning("Unrecognized marcflavour: $marc_flavour");
     }
 }
 
@@ -529,7 +531,7 @@ sub _marc_marc8_to_utf8 {
 
             # if warning doesn't come from MARC::Charset, just
             # pass it on
-            warn $msg;
+            $log->warning($msg);
         }
     };
 

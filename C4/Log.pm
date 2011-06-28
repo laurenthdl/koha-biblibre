@@ -19,8 +19,7 @@ package C4::Log;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Context;
 use C4::Dates qw(format_date);
@@ -234,7 +233,6 @@ sub GetLogs {
         push( @parameters, "%" . $info . "%" );
     }
 
-    warn $query, join( "/", @parameters );
     my $sth = $dbh->prepare($query);
     $sth->execute(@parameters);
 

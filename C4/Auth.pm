@@ -17,9 +17,7 @@ package C4::Auth;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use Digest::MD5 qw(md5_base64);
 use Storable qw(thaw freeze);
 use URI::Escape;
@@ -34,9 +32,12 @@ use C4::Branch;    # GetBranches
 use C4::VirtualShelves;
 use POSIX qw/strftime/;
 use List::MoreUtils qw/ any /;
+use C4::Logger;
 
 # use utf8;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug $ldap $cas $caslogout);
+
+my $log = C4::Logger->new();
 
 BEGIN {
     sub psgi_env { any { /^psgi\./ } keys %ENV }
@@ -251,7 +252,7 @@ sub get_template_and_user {
 
         # Logged-in opac search history
         # If the requested template is an opac one and opac search history is enabled
-        if ( $in->{'type'} == "opac" && C4::Context->preference('EnableOpacSearchHistory') ) {
+        if ( $in->{'type'} eq "opac" && C4::Context->preference('EnableOpacSearchHistory') ) {
             my $dbh   = C4::Context->dbh;
             my $query = "SELECT COUNT(*) FROM search_history WHERE userid=?";
             my $sth   = $dbh->prepare($query);
@@ -388,7 +389,7 @@ sub get_template_and_user {
             IntranetXSLTResultsDisplay                                                 => C4::Context->preference("IntranetXSLTResultsDisplay"),
         );
     } else {
-        warn "template type should be OPAC, here it is=[" . $in->{'type'} . "]" unless ( $in->{'type'} eq 'opac' );
+        $log->warning( "template type should be OPAC, here it is=[" . $in->{'type'} . "]" ) unless ( $in->{'type'} eq 'opac' );
 
         #TODO : replace LibraryName syspref with 'system name', and remove this html processing
         my $LibraryNameTitle = C4::Context->preference("LibraryName");
@@ -568,15 +569,15 @@ sub _version_check ($$) {
     # and so we must redirect to OPAC maintenance page or to the WebInstaller
     # also, if OpacMaintenance is ON, OPAC should redirect to maintenance
     if ( C4::Context->preference('OpacMaintenance') && $type eq 'opac' ) {
-        warn "OPAC Install required, redirecting to maintenance";
+        $log->info("OPAC Install required, redirecting to maintenance");
         print $query->redirect("/cgi-bin/koha/maintenance.pl");
     }
     unless ( $version = C4::Context->preference('Version') ) {    # assignment, not comparison
         if ( $type ne 'opac' ) {
-            warn "Install required, redirecting to Installer";
+            $log->info("Install required, redirecting to Installer");
             print $query->redirect("/cgi-bin/koha/installer/install.pl");
         } else {
-            warn "OPAC Install required, redirecting to maintenance";
+            $log->info("OPAC Install required, redirecting to maintenance");
             print $query->redirect("/cgi-bin/koha/maintenance.pl");
         }
         safe_exit;
@@ -594,10 +595,10 @@ sub _version_check ($$) {
     if ( $version < $kohaversion ) {
         my $warning = "Database update needed, redirecting to %s. Database is $version and Koha is $kohaversion";
         if ( $type ne 'opac' ) {
-            warn sprintf( $warning, 'Installer' );
+            $log->info( sprintf( $warning, 'Installer' ) );
             print $query->redirect("/cgi-bin/koha/installer/install.pl?step=3");
         } else {
-            warn sprintf( "OPAC: " . $warning, 'maintenance' );
+            $log->info( sprintf( "OPAC: " . $warning, 'maintenance' ) );
             print $query->redirect("/cgi-bin/koha/maintenance.pl");
         }
         safe_exit;
@@ -606,14 +607,14 @@ sub _version_check ($$) {
 
 sub _session_log {
     (@_) or return 0;
-    open L, ">>/tmp/sessionlog" or warn "ERROR: Cannot append to /tmp/sessionlog";
+    open L, ">>/tmp/sessionlog" or $log->error("ERROR: Cannot append to /tmp/sessionlog");
     printf L join( "\n", @_ );
     close L;
 }
 
 sub checkauth {
     my $query = shift;
-    $debug and warn "Checking Auth";
+    $log->debug("Checking Auth");
 
     # $authnotrequired will be set for scripts which will run without authentication
     my $authnotrequired = shift;
@@ -668,13 +669,13 @@ sub checkauth {
             $ip          = $session->param('ip');
             $lasttime    = $session->param('lasttime');
             $userid      = $session->param('id');
-            $sessiontype = $session->param('sessiontype');
+            $sessiontype = $session->param('sessiontype') // "";
         }
         if ( ( $query->param('koha_login_context') ) && ( $query->param('userid') ne $session->param('id') ) ) {
 
             #if a user enters an id ne to the id in the current session, we need to log them in...
             #first we need to clear the anonymous session...
-            $debug and warn "query id = " . $query->param('userid') . " but session id = " . $session->param('id');
+            $log->debug("query id = " . $query->param('userid') . " but session id = " . $session->param('id'));
             $session->flush;
             $session->delete();
             C4::Context->_unset_userenv($sessionID);
@@ -884,7 +885,7 @@ sub checkauth {
 
             # if we are here this is an anonymous session; add public lists to it and a few other items...
             # anonymous sessions are created only for the OPAC
-            $debug and warn "Initiating an anonymous session...";
+            $log->debug("Initiating an anonymous session...");
 
             # Grab the public shelves and add to the session...
             my $row_count = 20;    # FIXME:This probably should be a syspref

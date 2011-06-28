@@ -43,9 +43,7 @@ the items attached to the biblio
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use C4::Auth;
 use C4::Context;
@@ -184,13 +182,10 @@ for ( my $tabloop = 0 ; $tabloop <= 10 ; $tabloop++ ) {
                 $subfield_data{long_desc}  = $tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{lib};
                 $subfield_data{link}       = $tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{link};
 
-              #                 warn "tag : ".$tagslib->{$fields[$x_i]->tag()}." subfield :".$tagslib->{$fields[$x_i]->tag()}->{$subf[$i][0]}."lien koha? : "$subfield_data{link};
                 if ( $tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{isurl} ) {
                     $subfield_data{marc_value} = $subf[$i][1];
                     $subfield_data{is_url}     = 1;
                 } elsif ( $tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{kohafield} eq "biblioitems.isbn" ) {
-
-#                    warn " tag : ".$tagslib->{$fields[$x_i]->tag()}." subfield :".$tagslib->{$fields[$x_i]->tag()}->{$subf[$i][0]}. "ISBN : ".$subf[$i][1]."PosttraitementISBN :".DisplayISBN($subf[$i][1]);
                     $subfield_data{marc_value} = $subf[$i][1];
                 } else {
                     if ( $tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{authtypecode} ) {

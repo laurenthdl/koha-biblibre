@@ -17,8 +17,7 @@ package C4::Stats;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 require Exporter;
 use C4::Context;
 use C4::Debug;
@@ -102,7 +101,6 @@ sub TotalPaid {
     if ($spreadsheet) {
         $query .= " ORDER BY branch, type";
     }
-    $debug and warn "TotalPaid query: $query";
     my $sth = $dbh->prepare($query);
     $sth->execute();
     return @{ $sth->fetchall_arrayref( {} ) };

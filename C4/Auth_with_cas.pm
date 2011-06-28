@@ -17,17 +17,19 @@ package C4::Auth_with_cas;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Debug;
 use C4::Context;
 use C4::Utils qw( :all );
+use C4::Logger;
 use Authen::CAS::Client;
 use CGI;
 use FindBin;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $debug);
+
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;
@@ -103,7 +105,7 @@ sub login_cas_url {
 # Checks for password correctness
 # In our case : is there a ticket, is it valid and does it match one of our users ?
 sub checkpw_cas {
-    $debug and warn "checkpw_cas";
+    $log->debug("checkpw_cas");
     my ( $dbh, $ticket, $query ) = @_;
     my $retnumber;
     my $uri = $ENV{'SCRIPT_URI'};
@@ -115,7 +117,7 @@ sub checkpw_cas {
 
     # If we got a ticket
     if ($ticket) {
-        $debug and warn "Got ticket : $ticket";
+        $log->debug("Got ticket : $ticket");
 
         # We try to validate it
         my $val = $cas->service_validate($uri, $ticket );
@@ -124,7 +126,7 @@ sub checkpw_cas {
         if ( $val->is_success() ) {
 
             my $userid = $val->user();
-            $debug and warn "User CAS authenticated as: $userid";
+            $log->debug("User CAS authenticated as: $userid");
 
             # Does it match one of our users ?
             my $sth = $dbh->prepare("select cardnumber from borrowers where userid=?");
@@ -141,10 +143,10 @@ sub checkpw_cas {
             }
 
             # If we reach this point, then the user is a valid CAS user, but not a Koha user
-            $debug and warn "User $userid is not a valid Koha user";
+            $log->debug("User $userid is not a valid Koha user");
 
         } else {
-            $debug and warn "Invalid session ticket : $ticket";
+            $log->debug("Invalid session ticket : $ticket");
             return 0;
         }
     }
@@ -153,7 +155,7 @@ sub checkpw_cas {
 
 # Proxy CAS auth
 sub check_api_auth_cas {
-    $debug and warn "check_api_auth_cas";
+    $log->debug("check_api_auth_cas");
     my ( $dbh, $PT, $query ) = @_;
     my $retnumber;
     my $url = $query->url();
@@ -170,9 +172,9 @@ sub check_api_auth_cas {
         if ( $r->is_success ) {
 
             # We've got a username !
-            $debug and warn "User authenticated as: ", $r->user, "\n";
-            $debug and warn "Proxied through:\n";
-            $debug and warn "  $_\n" for $r->proxies;
+            $log->debug("User authenticated as: ", $r->user);
+            $log->debug("Proxied through:");
+            $log->debug("  $_") for $r->proxies;
 
             my $userid = $r->user;
 
@@ -192,10 +194,10 @@ sub check_api_auth_cas {
             }
 
             # If we reach this point, then the user is a valid CAS user, but not a Koha user
-            $debug and warn "User $userid is not a valid Koha user";
+            $log->debug("User $userid is not a valid Koha user");
 
         } else {
-            $debug and warn "Proxy Ticket authentication failed";
+            $log->debug("Proxy Ticket authentication failed");
             return 0;
         }
     }

@@ -1,7 +1,6 @@
 #!/usr/bin/perl
-use strict;
 
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 require Exporter;
 
 use C4::Output;

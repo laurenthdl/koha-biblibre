@@ -86,9 +86,7 @@ There are several types of queries needed in the process of search and retrieve:
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 ## load Koha modules
 use C4::Context;
@@ -103,6 +101,9 @@ use C4::VirtualShelves qw(GetRecentShelves);
 use POSIX qw(ceil floor);
 use C4::Branch;    # GetBranches
 use Data::Pagination;
+require C4::Logger;
+
+my $log = C4::Logger->new();
 
 # create a new CGI object
 # FIXME: no_undef_params needs to be tested
@@ -115,6 +116,7 @@ my ( $template, $borrowernumber, $cookie );
 my $template_name;
 my $template_type;
 if ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) ) {
+    $template_type = 'results';
     $template_name = 'catalogue/results.tmpl';
 } else {
     $template_name = 'catalogue/advsearch.tmpl';
@@ -387,7 +389,7 @@ if ( $limit_yr ) {
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 
 my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
-C4::Context->preference("DebugLevel") eq '2' && warn "ProSolrSimpleSearch:q=$q:";
+$log->debug("ProSolrSimpleSearch:q=$q:");
 
 if (!$res){
     $template->param(query_error => "Bad request! help message ?");
@@ -495,7 +497,8 @@ $template->param(
 
 my $row_count = 10;    # FIXME:This probably should be a syspref
 my ( $pubshelves, $total ) = GetRecentShelves( 2, $row_count, undef );
-my ( $barshelves, $total ) = GetRecentShelves( 1, undef,      $borrowernumber );
+my $barshelves;
+( $barshelves, $total ) = GetRecentShelves( 1, undef,      $borrowernumber );
 
 my @pubshelves = @{$pubshelves};
 my @barshelves = @{$barshelves};

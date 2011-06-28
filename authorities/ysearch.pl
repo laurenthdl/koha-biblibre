@@ -24,9 +24,7 @@
 
 =cut
 
-use strict;
-
-use warnings;
+use Modern::Perl;
 use CGI;
 use Text::Undiacritic qw(undiacritic);
 use Encode;

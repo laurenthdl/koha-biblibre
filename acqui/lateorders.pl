@@ -41,8 +41,7 @@ To know on which branch this script have to display late order.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Bookseller;
 use C4::Auth;

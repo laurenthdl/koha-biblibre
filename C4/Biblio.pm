@@ -17,8 +17,7 @@ package C4::Biblio;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 # use utf8;
 use MARC::Record;
@@ -32,11 +31,14 @@ use C4::Dates qw/format_date/;
 use C4::Log;    # logaction
 use C4::ClassSource;
 use C4::Charset;
+use C4::Logger;
 require C4::Search;
 require C4::Heading;
 require C4::Serials;
 
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION = 1.00;
@@ -815,7 +817,6 @@ sub GetISBDView {
 
     foreach my $isbdfield ( split( /#/, $bloc ) ) {
 
-        #         $isbdfield= /(.?.?.?)/;
         $isbdfield =~ /(\d\d\d)([^\|])?\|(.*)\|(.*)\|(.*)/;
         my $fieldvalue = $1 || 0;
         my $subfvalue  = $2 || "";
@@ -823,15 +824,11 @@ sub GetISBDView {
         my $analysestring = $4;
         my $textafter     = $5;
 
-        #         warn "==> $1 / $2 / $3 / $4";
-        #         my $fieldvalue=substr($isbdfield,0,3);
         if ( $fieldvalue > 0 ) {
             my $hasputtextbefore = 0;
             my @fieldslist       = $record->field($fieldvalue);
             @fieldslist = sort { $a->subfield($holdingbrtagsubf) cmp $b->subfield($holdingbrtagsubf) } @fieldslist if ( $fieldvalue eq $holdingbrtagf );
 
-            #         warn "ERROR IN ISBD DEFINITION at : $isbdfield" unless $fieldvalue;
-            #             warn "FV : $fieldvalue";
             if ( $subfvalue ne "" ) {
                 foreach my $field (@fieldslist) {
                     foreach my $subfield ( $field->subfield($subfvalue) ) {
@@ -1094,9 +1091,8 @@ sub GetMarcBiblio {
 
     if ($marcxml) {
         $record = eval { MARC::Record::new_from_xml( $marcxml, "utf8", C4::Context->preference('marcflavour') ) };
-        if ($@) { warn " problem with :$biblionumber : $@ \n$marcxml"; }
+        $log->error(" problem with :$biblionumber : $@ \n$marcxml") if $@;
 
-        #      $record = MARC::Record::new_from_usmarc( $marc) if $marc;
         return $record;
     } else {
         return undef;
@@ -1145,7 +1141,7 @@ sub GetCOinSBiblio {
     if ( !$record ) {
 
         # can't get a valid MARC::Record object, bail out at this point
-        warn "We called GetMarcBiblio with a biblionumber that doesn't exist biblionumber=$biblionumber";
+        $log->warning("We called GetMarcBiblio with a biblionumber that doesn't exist biblionumber=$biblionumber");
         return;
     }
     my $pos7 = substr $record->leader(), 7, 1;
@@ -1637,7 +1633,6 @@ sub GetMarcSeries {
         #$marcsubjct = {MARCSUBJCT => $value,};
         my @subfields = $field->subfields();
 
-        #warn "subfields:".join " ", @$subfields;
         my $counter = 0;
         my @link_loop;
         for my $series_subfield (@subfields) {
@@ -1849,7 +1844,7 @@ sub TransformHtmlToXml {
             if ( @$indicator[$j] ) {
                 $ind2 = _default_ind_to_space($indicator2);
             } else {
-                warn "Indicator in @$tags[$i] is empty";
+                $log->warning("Indicator in @$tags[$i] is empty");
                 $ind2 = " ";
             }
             if ( !$first ) {
@@ -1889,7 +1884,7 @@ sub TransformHtmlToXml {
             if ( @$indicator[$j] ) {
                 $ind2 = _default_ind_to_space($indicator2);
             } else {
-                warn "Indicator in @$tags[$i] is empty";
+                $log->warning("Indicator in @$tags[$i] is empty");
                 $ind2 = " ";
             }
             if ( @$values[$i] eq "" ) {
@@ -1906,7 +1901,6 @@ sub TransformHtmlToXml {
     $xml .= "</datafield>\n" if @$tags > 0;
     if ( C4::Context->preference('marcflavour') eq 'UNIMARC' and !$unimarc_and_100_exist ) {
 
-        #     warn "SETTING 100 for $auth_type";
         my $string = strftime( "%Y%m%d", localtime(time) );
 
         # set 50 to position 26 is biblios, 13 if authorities
@@ -2469,7 +2463,7 @@ sub PrepareItemrecordDisplay {
                                 <a href="#" class="buttonDot" onclick="Clic$function_name('$subfield_data{id}'); return false;" title="Tag Editor">...</a>
                                 $javascript];
                         } else {
-                            warn "Plugin Failed: $plugin";
+                            $log->error("Plugin Failed: $plugin");
                             $subfield_data{marc_value} = qq(<input tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255" />); # supply default input form
                         }
                 }
@@ -2552,7 +2546,6 @@ sub ModZebra {
         } else {
 
             # it's a deletion, delete the record...
-            # warn "DELETE the record $biblionumber on $server".$record->as_formatted;
             %result = _DelBiblioNoZebra( $biblionumber, $oldRecord, $server );
         }
 
@@ -2642,7 +2635,7 @@ sub _DelBiblioNoZebra {
         # for authorities, the "title" is the $a mainentry
         my ( $auth_type_tag, $auth_type_sf ) = C4::AuthoritiesMarc::get_auth_type_location();
         my $authref = C4::AuthoritiesMarc::GetAuthType( $record->subfield( $auth_type_tag, $auth_type_sf ) );
-        warn "ERROR : authtype undefined for " . $record->as_formatted unless $authref;
+        $log->error("ERROR : authtype undefined for " . $record->as_formatted) unless $authref;
         $title = $record->subfield( $authref->{auth_tag_to_report}, 'a' );
         $index{'mainmainentry'} = $authref->{'auth_tag_to_report'} . 'a';
         $index{'mainentry'}     = $authref->{'auth_tag_to_report'} . '*';
@@ -2672,7 +2665,6 @@ sub _DelBiblioNoZebra {
             # otherwise, store it in __RAW__ index
             foreach my $key ( keys %index ) {
 
-                #                 warn "examining $key index : ".$index{$key}." for $tag $subfieldcode";
                 if ( $index{$key} =~ /$tag\*/ or $index{$key} =~ /$tag$subfieldcode/ ) {
                     $indexed = 1;
                     my $line = lc $subfield->[1];
@@ -2692,8 +2684,6 @@ sub _DelBiblioNoZebra {
 
                             # it exists
                             if ($existing_biblionumbers) {
-
-                                #                                 warn " existing for $key $_: $existing_biblionumbers";
                                 $result{$key}->{$_} = $existing_biblionumbers;
                                 $result{$key}->{$_} =~ s/$biblionumber,$title\-(\d);//;
                             }
@@ -2751,11 +2741,10 @@ sub _AddBiblioNoZebra {
         $title = lc( $record->subfield( $titletag, $titlesubfield ) );
     } else {
 
-        # warn "server : $server";
         # for authorities, the "title" is the $a mainentry
         my ( $auth_type_tag, $auth_type_sf ) = C4::AuthoritiesMarc::get_auth_type_location();
         my $authref = C4::AuthoritiesMarc::GetAuthType( $record->subfield( $auth_type_tag, $auth_type_sf ) );
-        warn "ERROR : authtype undefined for " . $record->as_formatted unless $authref;
+        $log->error("ERROR : authtype undefined for " . $record->as_formatted) unless $authref;
         $title = $record->subfield( $authref->{auth_tag_to_report}, 'a' );
         $index{'mainmainentry'} = $authref->{auth_tag_to_report} . 'a';
         $index{'mainentry'}     = $authref->{auth_tag_to_report} . '*';
@@ -2780,12 +2769,10 @@ sub _AddBiblioNoZebra {
             my $subfieldcode = $subfield->[0];
             my $indexed      = 0;
 
-            #             warn "INDEXING :".$subfield->[1];
             # check each index to see if the subfield is stored somewhere
             # otherwise, store it in __RAW__ index
             foreach my $key ( keys %index ) {
 
-                #                 warn "examining $key index : ".$index{$key}." for $tag $subfieldcode";
                 if ( $index{$key} =~ /$tag\*/ or $index{$key} =~ /$tag$subfieldcode/ ) {
                     $indexed = 1;
                     my $line = lc $subfield->[1];
@@ -2798,7 +2785,6 @@ sub _AddBiblioNoZebra {
                         next unless $_;    # skip  empty values (multiple spaces)
                                            # if the entry is already here, improve weight
 
-                        #                         warn "managing $_";
                         if ( exists $result{$key}->{$_} && $result{$key}->{"$_"} =~ /$biblionumber,\Q$title\E\-(\d+);/ ) {
                             my $weight = $1 + 1;
                             $result{$key}->{"$_"} =~ s/$biblionumber,\Q$title\E\-(\d+);//g;
@@ -2819,7 +2805,6 @@ sub _AddBiblioNoZebra {
                                 # create a new ligne for this entry
                             } else {
 
-                                #                             warn "INSERT : $server / $key / $_";
                                 $dbh->do( 'INSERT INTO nozebra SET server=' . $dbh->quote($server) . ', indexname=' . $dbh->quote($key) . ',value=' . $dbh->quote($_) );
                                 $result{$key}->{"$_"} .= "$biblionumber,$title-1;";
                             }
@@ -3062,12 +3047,11 @@ sub _koha_add_biblio {
     my $biblionumber = $dbh->{'mysql_insertid'};
     if ( $dbh->errstr ) {
         $error .= "ERROR in _koha_add_biblio $query" . $dbh->errstr;
-        warn $error;
+        $log->error($error);
     }
 
     $sth->finish();
 
-    #warn "LEAVING _koha_add_biblio: ".$biblionumber."\n";
     return ( $biblionumber, $error );
 }
 
@@ -3110,7 +3094,7 @@ sub _koha_modify_biblio {
 
     if ( $dbh->errstr || !$biblio->{'biblionumber'} ) {
         $error .= "ERROR in _koha_modify_biblio $query" . $dbh->errstr;
-        warn $error;
+        $log->error($error);
     }
     return ( $biblio->{'biblionumber'}, $error );
 }
@@ -3179,7 +3163,7 @@ sub _koha_modify_biblioitem_nonmarc {
     );
     if ( $dbh->errstr ) {
         $error .= "ERROR in _koha_modify_biblioitem_nonmarc $query" . $dbh->errstr;
-        warn $error;
+        $log->error($error);
     }
     return ( $biblioitem->{'biblioitemnumber'}, $error );
 }
@@ -3247,7 +3231,7 @@ sub _koha_add_biblioitem {
 
     if ( $dbh->errstr ) {
         $error .= "ERROR in _koha_add_biblioitem $query" . $dbh->errstr;
-        warn $error;
+        $log->error($error);
     }
     $sth->finish();
     return ( $bibitemnum, $error );
@@ -3561,7 +3545,6 @@ sub get_biblio_authorised_values {
     foreach my $tag ( keys(%$tagslib) ) {
         foreach my $subfield ( keys( %{ $tagslib->{$tag} } ) ) {
 
-            # warn "checking $subfield. type is: " . ref $tagslib->{ $tag }{ $subfield };
             if ( 'HASH' eq ref $tagslib->{$tag}{$subfield} ) {
                 if ( defined $tagslib->{$tag}{$subfield}{'authorised_value'} && exists $bibliolevel_authorised_values->{ $tagslib->{$tag}{$subfield}{'authorised_value'} } ) {
                     if ( defined $record->field($tag) ) {
@@ -3575,7 +3558,6 @@ sub get_biblio_authorised_values {
         }
     }
 
-    # warn ( Data::Dumper->Dump( [ $authorised_values ], [ 'authorised_values' ] ) );
     return $authorised_values;
 }
 

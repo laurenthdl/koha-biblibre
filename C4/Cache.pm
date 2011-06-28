@@ -40,8 +40,7 @@ package C4::Cache;
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use Carp;
 
 use base qw(Class::Accessor);

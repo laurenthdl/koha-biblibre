@@ -15,8 +15,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Auth;    # checkauth, getborrowernumber.
 use C4::Koha;
@@ -32,9 +31,9 @@ use C4::Overdues;
 use C4::Branch;    # GetBranches
 use C4::Debug;
 use C4::Items;
+use C4::Logger;
 
-# use Data::Dumper;
-
+my $log = C4::Logger->new();
 my $query = new CGI;
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
     {   template_name   => "opac-reserve.tmpl",
@@ -316,8 +315,6 @@ foreach my $biblioNum (@biblionumbers) {
     }
 
     foreach my $itemInfo ( @{ $biblioData->{itemInfos} } ) {
-        $debug and warn $itemInfo->{'notforloan'};
-
         # Get reserve fee.
         my $fee = GetReserveFee( undef, $borrowernumber, $itemInfo->{'biblionumber'}, 'a', ( $itemInfo->{'biblioitemnumber'} ) );
         $itemInfo->{'reservefee'} = sprintf "%.02f", ( $fee ? $fee : 0.0 );
@@ -395,7 +392,7 @@ foreach my $biblioNum (@biblionumbers) {
             $itemLoopIter->{ReservedForFirstname}      = $ItemBorrowerReserveInfo->{'firstname'};
             $itemLoopIter->{ExpectedAtLibrary}         = $expectedAt;
             $itemLoopIter->{ReservedForThisBorrower}   = ( $reservedfor eq $borrowernumber );
-            warn "ReservedForThisBorrower: " . $itemLoopIter->{ReservedForThisBorrower};
+            $log->debug("ReservedForThisBorrower: " . $itemLoopIter->{ReservedForThisBorrower});
         }
 
         $itemLoopIter->{notforloan}     = $itemInfo->{notforloan};
@@ -461,7 +458,7 @@ foreach my $biblioNum (@biblionumbers) {
 #    $biblioLoopIter{multi} = $canReserveMultiple;
     if ( $biblioLoopIter{already_reserved} && !$canReserveMultiple ) {
         $biblioLoopIter{holdable} = undef;
-        warn "Already_Reserved";
+        $log->info("Already_Reserved");
     }
     if ( not CanBookBeReserved( $borrowernumber, $biblioNum ) ) {
         $template->param( message => 1 );

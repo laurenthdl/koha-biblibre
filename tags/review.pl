@@ -19,8 +19,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use warnings;
-use strict;
+use Modern::Perl;
 use Data::Dumper;
 use POSIX;
 use CGI;

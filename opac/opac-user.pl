@@ -15,9 +15,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use CGI;
 
@@ -184,7 +182,6 @@ $template->param( branchloop => \@branch_loop );
 # now the reserved items....
 my @reserves = GetReservesFromBorrowernumber($borrowernumber);
 foreach my $res (@reserves) {
-    warn $res->{'waitingdate'};
     $res->{'reservedate'} = format_date( $res->{'reservedate'} );
 
     if ( $res->{'expirationdate'} ne '0000-00-00' ) {
@@ -208,9 +205,6 @@ foreach my $res (@reserves) {
         $res->{'priority'} = '' if $res->{'priority'} eq '0';
     }
 }
-
-# use Data::Dumper;
-# warn Dumper(@reserves);
 
 $template->param( RESERVES          => \@reserves );
 $template->param( reserves_count    => $#reserves + 1 );

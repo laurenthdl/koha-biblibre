@@ -15,8 +15,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Auth;
@@ -50,7 +49,5 @@ $template->param(
     categoryloop => \@categories,
 );
 $template->param( "AddPatronLists_" . C4::Context->preference("AddPatronLists") => "1", );
-my @letters = map { { letter => $_ } } ( 'A' .. 'Z' );
-$template->param( letters => \@letters );
 
 output_html_with_http_headers $query, $cookie, $template->output;

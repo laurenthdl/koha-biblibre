@@ -23,6 +23,7 @@ use C4::Context;
 use C4::Biblio;
 use C4::Branch;
 use C4::Koha;
+use C4::Logger;
 use Data::SearchEngine::Solr;
 use Data::SearchEngine::Query;
 use Data::SearchEngine::Item;
@@ -32,6 +33,8 @@ use Moose;
 use List::MoreUtils qw(uniq);
 
 extends 'Data::SearchEngine::Solr';
+
+my $log = C4::Logger->new();
 
 =head1 NAME
 
@@ -359,7 +362,7 @@ sub SimpleSearch {
 
     # Get results
     my $result = eval { $sc->search( $sq ) };
-    warn $@ if $@;
+    $log->error($@) if $@;
 
     return $result if (ref($result) eq "Data::SearchEngine::Solr::Results");
 }
@@ -403,7 +406,7 @@ sub IndexRecord {
 
         $solrrecord->set_value( 'recordtype', $recordtype );
         $solrrecord->set_value( 'recordid'  , $id );
-        warn $id;
+        $log->info("Reindex biblionumber $id");
 
         for my $index ( @$indexes ) {
 

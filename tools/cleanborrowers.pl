@@ -31,9 +31,7 @@ This script allows to do 2 things.
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Output;

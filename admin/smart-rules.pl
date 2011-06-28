@@ -138,7 +138,7 @@ for my $rule (@issuingrules) {
 }
 
 # Get the issuing rules list...
-my @issuingrules = GetIssuingRulesByBranchCode($branchcode);
+@issuingrules = GetIssuingRulesByBranchCode($branchcode);
 
 # ...and refine its data, row by row.
 for my $rule (@issuingrules) {

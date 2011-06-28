@@ -15,8 +15,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Auth;
@@ -37,8 +36,9 @@ use C4::Search;     # enabled_staff_search_views
 use C4::Search::Query;
 use C4::VirtualShelves;
 use C4::XSLT;
+use C4::Logger;
 
-# use Smart::Comments;
+my $log = C4::Logger->new();
 
 my $query = CGI->new();
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
@@ -254,7 +254,7 @@ if ( C4::Context->preference("virtualshelves") ) {
 # XISBN Stuff
 if ( C4::Context->preference("FRBRizeEditions") == 1 ) {
     eval { $template->param( XISBNS => get_xisbns($isbn) ); };
-    if ($@) { warn "XISBN Failed $@"; }
+    $log->warning("XISBN Failed $@") if $@;
 }
 if ( C4::Context->preference("AmazonEnabled") == 1 ) {
     $template->param( AmazonTld => get_amazon_tld() );

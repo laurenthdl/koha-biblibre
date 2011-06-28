@@ -17,12 +17,13 @@ package C4::Installer;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 our $VERSION = 3.00;
 use C4::Context;
+use C4::Logger;
+
+my $log = C4::Logger->new();
 
 =head1 NAME
 
@@ -140,13 +141,13 @@ sub marc_framework_sql_list {
     my $dir = C4::Context->config('intranetdir') . "/installer/data/$self->{dbms}/$lang/marcflavour/" . lc($marcflavour);
     unless ( opendir( MYDIR, $dir ) ) {
         if ( $lang eq 'en' ) {
-            warn "cannot open MARC frameworks directory $dir";
+            $log->warning("cannot open MARC frameworks directory $dir");
         } else {
 
             # if no translated MARC framework is available,
             # default to English
             $dir = C4::Context->config('intranetdir') . "/installer/data/$self->{dbms}/en/marcflavour/" . lc($marcflavour);
-            opendir( MYDIR, $dir ) or warn "cannot open English MARC frameworks directory $dir";
+            opendir( MYDIR, $dir ) or $log->warning("cannot open English MARC frameworks directory $dir");
             $defaulted_to_en = 1;
         }
     }
@@ -222,13 +223,13 @@ sub sample_data_sql_list {
     my $dir = C4::Context->config('intranetdir') . "/installer/data/$self->{dbms}/$lang";
     unless ( opendir( MYDIR, $dir ) ) {
         if ( $lang eq 'en' ) {
-            warn "cannot open sample data directory $dir";
+            $log->warning("cannot open sample data directory $dir");
         } else {
 
             # if no sample data is available,
             # default to English
             $dir = C4::Context->config('intranetdir') . "/installer/data/$self->{dbms}/en";
-            opendir( MYDIR, $dir ) or warn "cannot open English sample data directory $dir";
+            opendir( MYDIR, $dir ) or $log->warning("cannot open English sample data directory $dir");
             $defaulted_to_en = 1;
         }
     }
@@ -388,7 +389,6 @@ sub load_sql_in_order {
     $systempreference = '' unless defined $systempreference;    # avoid warning
     foreach my $file (@fnames) {
 
-        #      warn $file;
         undef $/;
         my $error = $self->load_sql($file);
         my @file = split qr(\/|\\), $file;
@@ -410,8 +410,6 @@ sub load_sql_in_order {
     my $fwk_language;
     for my $each_language (@$all_languages) {
 
-        #       warn "CODE".$each_language->{'language_code'};
-        #       warn "LANG:".$lang;
         if ( $lang eq $each_language->{'language_code'} ) {
             $fwk_language = $each_language->{language_locale_name};
         }
@@ -510,11 +508,11 @@ sub set_version_syspref {
     # remove the 3 last . to have a Perl number
     $kohaversion =~ s/(.*\..*)\.(.*)\.(.*)/$1$2$3/;
     if ( C4::Context->preference('Version') ) {
-        warn "UPDATE Version";
+        $log->info("UPDATE Version");
         my $finish = $self->{'dbh'}->prepare("UPDATE systempreferences SET value=? WHERE variable='Version'");
         $finish->execute($kohaversion);
     } else {
-        warn "INSERT Version";
+        $log->info("INSERT Version");
         my $finish =
           $self->{'dbh'}->prepare(
 "INSERT into systempreferences (variable,value,explanation) values ('Version',?,'The Koha database version. WARNING: Do not change this value manually, it is maintained by the webinstaller')"
@@ -576,8 +574,8 @@ sub load_sql {
     }
 
     #   errors thrown while loading installer data should be logged
-    warn "C4::Installer::load_sql returned the following errors while attempting to load $filename:\n";
-    warn $error;
+    $log->error("C4::Installer::load_sql returned the following errors while attempting to load $filename:");
+    $log->error($error);
     return $error;
 }
 
@@ -605,18 +603,15 @@ sub get_file_path_from_name {
 
     my ( $defaulted_to_en, $list ) = $self->sample_data_sql_list($lang);
 
-    # warn( Data::Dumper->Dump( [ $list ], [ 'list' ] ) );
-
     my @found;
     foreach my $frameworklist (@$list) {
         push @found, grep { $_->{'fwkfile'} =~ /$partialname$/ } @{ $frameworklist->{'frameworks'} };
     }
 
-    # warn( Data::Dumper->Dump( [ \@found ], [ 'found' ] ) );
     if ( 0 == scalar @found ) {
         return;
     } elsif ( 1 < scalar @found ) {
-        warn "multiple results found for $partialname";
+        $log->warning("multiple results found for $partialname");
         return;
     } else {
         return $found[0]->{'fwkfile'};

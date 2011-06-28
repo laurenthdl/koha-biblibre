@@ -30,9 +30,7 @@
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use YAML;
 use C4::Context;
@@ -58,9 +56,7 @@ use C4::Form::MessagingPreferences;
 use C4::Overdues qw/CheckBorrowerDebarred/;
 use JSON;
 use List::MoreUtils qw/uniq/;
-
-#use Smart::Comments;
-#use Data::Dumper;
+use C4::Logger;
 
 use vars qw($debug);
 
@@ -68,11 +64,13 @@ BEGIN {
     $debug = $ENV{DEBUG} || 0;
 }
 
+my $log = C4::Logger->new();
+
 my $dbh = C4::Context->dbh;
 
 my $input = new CGI;
 $debug or $debug = $input->param('debug') || 0;
-my $print          = $input->param('print');
+my $print          = $input->param('print') || "";
 my $override_limit = $input->param("override_limit") || 0;
 my @failedrenews   = $input->param('failedrenew');
 my @failedreturns  = $input->param('failedreturn');
@@ -130,7 +128,7 @@ foreach (qw(dateenrolled dateexpiry dateofbirth)) {
     my $userdate = $data->{$_};
     $debug and printf STDERR "%s : %s", $_, $userdate;
     unless ($userdate && $userdate ne "0000-00-00") {
-        $debug and warn sprintf "Empty \$data{%12s}", $_;
+        $log->debug(sprintf "Empty \$data{%12s}", $_);
         $data->{$_} = '';
         $template->param( $_ => $data->{$_} );
         next;
@@ -192,7 +190,7 @@ if ( $category_type eq 'A' ) {
             }
         );
     }
-    warn Data::Dumper::Dumper(@guaranteedata);
+    $log->debug(\@guaranteedata, 1);
     $template->param( guaranteeloop => \@guaranteedata );
     ( $template->param( adultborrower => 1 ) ) if ( $category_type eq 'A' );
 } 
@@ -240,14 +238,12 @@ my $issuecount  = scalar(@$issue);
 my $relissuecount  = scalar(@$relissue) if ($relissue);
 my $roaddetails = &GetRoadTypeDetails( $data->{'streettype'} );
 my $today       = POSIX::strftime( "%Y-%m-%d", localtime );       # iso format
-my @issuedata;
 my @borrowers_with_issues;
 my $overdues_exist = 0;
 my $totalprice     = 0;
 
 my @issuedata = build_issue_data($issue, $issuecount);
 my @relissuedata = build_issue_data($relissue, $relissuecount);
-#warn Data::Dumper::Dumper(@issuedata);
 
 sub build_issue_data {
     my $issue = shift;

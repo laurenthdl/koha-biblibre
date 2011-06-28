@@ -18,14 +18,13 @@
 # wrriten 15/10/2002 by finlay@katipo.oc.nz
 # script to display borrowers account details in the opac
 
-use strict;
+use Modern::Perl;
 use CGI;
 use C4::Members;
 use C4::Circulation;
 use C4::Auth;
 use C4::Output;
 use C4::Dates qw/format_date/;
-use warnings;
 
 my $query = new CGI;
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(

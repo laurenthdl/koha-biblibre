@@ -51,19 +51,20 @@ To filter the results list on this given date.
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Auth;
 use C4::Acquisition;
 use C4::Budgets;
 use C4::Bookseller;
 use C4::Biblio;
 use C4::Items;
+use C4::Logger;
 use CGI;
 use C4::Output;
 use C4::Dates qw/format_date format_date_in_iso/;
 use JSON;
+
+my $log = C4::Logger->new();
 
 my $input      = new CGI;
 my $supplierid = $input->param('supplierid');
@@ -172,8 +173,6 @@ if ( $action eq "cancelorder" ) {
     }
 
     if ( $error_delitem || $error_delbiblio ) {
-        warn $error_delitem;
-        warn $error_delbiblio;
         if ($error_delitem)   { $template->param( error_delitem   => 1 ); }
         if ($error_delbiblio) { $template->param( error_delbiblio => 1 ); }
     } else {
@@ -224,7 +223,7 @@ for ( my $i = 0 ; $i < $countlines ; $i++ ) {
 
 # FIXME - each order in a  parcel holds the freight for the whole parcel. This means if you receive a parcel with items from multiple budgets, you'll see the freight charge in each budget..
     if ( $i > 0 && $totalfreight != $parcelitems[$i]->{'freight'} ) {
-        warn "FREIGHT CHARGE MISMATCH!!";
+        $log->warning("FREIGHT CHARGE MISMATCH!!");
     }
     $totalfreight = $parcelitems[$i]->{'freight'};
     $totalquantity += $parcelitems[$i]->{'quantityreceived'};

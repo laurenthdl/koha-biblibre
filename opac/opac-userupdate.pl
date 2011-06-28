@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use Mail::Sendmail;
@@ -32,6 +31,9 @@ use C4::Dates qw/format_date/;
 use C4::Members;
 use C4::Members::Attributes;
 use C4::Branch;
+use C4::Logger;
+
+my $log = C4::Logger->new();
 
 my $query = new CGI;
 
@@ -60,7 +62,7 @@ my $update;
 my $updateemailaddress = $lib->{'branchemail'};
 $updateemailaddress = C4::Context->preference('KohaAdminEmailAddress') unless ( $updateemailaddress =~ /\w+@\w+/ );
 if ( !$updateemailaddress || $updateemailaddress eq '' ) {
-    warn "KohaAdminEmailAddress system preference not set.  Couldn't send patron update information for $borr->{'firstname'} $borr->{'surname'} (#$borrowernumber)\n";
+    $log->warning("KohaAdminEmailAddress system preference not set.  Couldn't send patron update information for $borr->{'firstname'} $borr->{'surname'} (#$borrowernumber)");
     my ($template) = get_template_and_user(
         {   template_name   => "kohaerror.tmpl",
             query           => $query,
@@ -133,13 +135,13 @@ EOF
     if ( sendmail %mail ) {
 
         # do something if it works....
-        warn "Mail sent ok\n";
+        $log->debug("Mail sent ok");
         print $query->redirect('/cgi-bin/koha/opac-user.pl?patronupdate=sent');
         exit;
     } else {
 
         # do something if it doesnt work....
-        warn "Error sending mail: $Mail::Sendmail::error \n";
+        $log->error("Error sending mail: $Mail::Sendmail::error");
     }
 }
 

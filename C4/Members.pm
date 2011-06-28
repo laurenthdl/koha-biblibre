@@ -17,9 +17,7 @@ package C4::Members;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Context;
 use C4::Dates qw(format_date_in_iso);
 use Digest::MD5 qw(md5_base64);
@@ -30,10 +28,13 @@ use C4::Overdues;
 use C4::Reserves;
 use C4::Accounts;
 use C4::Biblio;
+use C4::Logger;
 use C4::SQLHelper qw(InsertInTable UpdateInTable SearchInTable);
 use C4::Members::Attributes qw(SearchIdMatchingAttribute GetBorrowerAttributes);
 
 our ( $VERSION, @ISA, @EXPORT, @EXPORT_OK, $debug );
+
+my $log = C4::Logger->new();
 
 BEGIN {
     $VERSION = 3.02;
@@ -585,7 +586,7 @@ sub GetMember {
             $select .= "$_ IS NULL";
         }
     }
-    $debug && warn $select, " ", values %information;
+    $log->debug($select . " " . values %information);
     my $sth = $dbh->prepare("$select");
     $sth->execute( map { $information{$_} } keys %information );
     my $data = $sth->fetchall_arrayref( {} );
@@ -711,7 +712,6 @@ sub GetMemberIssuesAndFines {
     my $dbh              = C4::Context->dbh;
     my $query            = "SELECT COUNT(*) FROM issues WHERE borrowernumber = ?";
 
-    $debug and warn $query . "\n";
     my $sth = $dbh->prepare($query);
     $sth->execute($borrowernumber);
     my $issue_count = $sth->fetchrow_arrayref->[0];
@@ -1063,8 +1063,8 @@ sub GetPendingIssues {
            biblioitems.url,
            issues.timestamp AS timestamp,
            issues.renewals  AS renewals,
-	   issues.borrowernumber AS borrowernumber,
-            items.renewals  AS totalrenewals
+           issues.borrowernumber AS borrowernumber,
+           items.renewals  AS totalrenewals
     FROM   issues
     LEFT JOIN items       ON items.itemnumber       =      issues.itemnumber
     LEFT JOIN biblio      ON items.biblionumber     =      biblio.biblionumber
@@ -1679,7 +1679,6 @@ sub DelMember {
     my $dbh            = C4::Context->dbh;
     my $borrowernumber = shift;
 
-    #warn "in delmember with $borrowernumber";
     return unless $borrowernumber;    # borrowernumber is mandatory.
 
     my $query = qq|DELETE 
@@ -1716,7 +1715,8 @@ sub SetMemberInfosInTemplate {
 
     # Computes full borrower address
     my ( undef, $roadttype_hashref ) = &GetRoadTypes();
-    my $address = $borrower->{'streetnumber'} . ' ' . $roadttype_hashref->{ $borrower->{'streettype'} } . ' ' . $borrower->{'address'};
+    my $address = defined $borrower->{'streetnumber'} ? $borrower->{'streetnumber'} . ' ' . $roadttype_hashref->{ $borrower->{'streettype'} } . ' ' : '';
+    $address .= $borrower->{'address'};
     $template->param(
         is_child => ( $borrower->{'category_type'} eq 'C' ),
         address => $address,
@@ -1726,7 +1726,7 @@ sub SetMemberInfosInTemplate {
     foreach (qw(dateenrolled dateexpiry dateofbirth)) {
         my $userdate = $borrower->{$_};
         unless ($userdate && $userdate ne "0000-00-00") {
-            $debug and warn sprintf "Empty \$data{%12s}", $_;
+            $log->debug(sprintf "Empty \$data{%12s}", $_);
             $borrower->{$_} = '';
             $template->param( $_ => $borrower->{$_} );
             next;
@@ -1746,8 +1746,8 @@ sub getFullBorrowerAddress {
     # Computes full borrower address
     my ( undef, $roadttype_hashref ) = &GetRoadTypes();
     my $address1="";
-    if(($borrower->{'streetnumber'}) ne ''){$address1=$address1.$borrower->{'streetnumber'}.' ';}
-    if(($roadttype_hashref->{ $borrower->{'streettype'} }) ne ""){$address1=$address1.$roadttype_hashref->{ $borrower->{'streettype'} }.' ';}
+    if( defined $borrower->{'streenumber'} && $borrower->{'streetnumber'} ne ''){$address1=$address1.$borrower->{'streetnumber'}.' ';}
+    if( defined $borrower->{'streenumber'} && ($roadttype_hashref->{ $borrower->{'streettype'} }) ne ""){$address1=$address1.$roadttype_hashref->{ $borrower->{'streettype'} }.' ';}
     $address1=$address1.$borrower->{'address'};
     return $address1;
 }
@@ -1856,13 +1856,13 @@ Returns the mimetype and binary image data of the image for the patron with the 
 
 sub GetPatronImage {
     my ($cardnumber) = @_;
-    warn "Cardnumber passed to GetPatronImage is $cardnumber" if $debug;
+    $log->debug("Cardnumber passed to GetPatronImage is $cardnumber");
     my $dbh   = C4::Context->dbh;
     my $query = 'SELECT mimetype, imagefile FROM patronimage WHERE cardnumber = ?';
     my $sth   = $dbh->prepare($query);
     $sth->execute($cardnumber);
     my $imagedata = $sth->fetchrow_hashref;
-    warn "Database error!" if $sth->errstr;
+    $log->error("Database error!") if $sth->errstr;
     return $imagedata, $sth->errstr;
 }
 
@@ -1877,12 +1877,12 @@ NOTE: This function is good for updating images as well as inserting new images 
 
 sub PutPatronImage {
     my ( $cardnumber, $mimetype, $imgfile ) = @_;
-    warn "Parameters passed in: Cardnumber=$cardnumber, Mimetype=$mimetype, " . ( $imgfile ? "Imagefile" : "No Imagefile" ) if $debug;
+    $log->debug("Parameters passed in: Cardnumber=$cardnumber, Mimetype=$mimetype, " . ( $imgfile ? "Imagefile" : "No Imagefile" ));
     my $dbh   = C4::Context->dbh;
     my $query = "INSERT INTO patronimage (cardnumber, mimetype, imagefile) VALUES (?,?,?) ON DUPLICATE KEY UPDATE imagefile = ?;";
     my $sth   = $dbh->prepare($query);
     $sth->execute( $cardnumber, $mimetype, $imgfile, $imgfile );
-    warn "Error returned inserting $cardnumber.$mimetype." if $sth->errstr;
+    $log->error("Error returned inserting $cardnumber.$mimetype.") if $sth->errstr;
     return $sth->errstr;
 }
 
@@ -1896,13 +1896,13 @@ Removes the image for the patron with the supplied cardnumber.
 
 sub RmPatronImage {
     my ($cardnumber) = @_;
-    warn "Cardnumber passed to GetPatronImage is $cardnumber" if $debug;
+    $log->debug("Cardnumber passed to GetPatronImage is $cardnumber");
     my $dbh   = C4::Context->dbh;
     my $query = "DELETE FROM patronimage WHERE cardnumber = ?;";
     my $sth   = $dbh->prepare($query);
     $sth->execute($cardnumber);
     my $dberror = $sth->errstr;
-    warn "Database error!" if $sth->errstr;
+    $log->error("Database error!") if $sth->errstr;
     return $dberror;
 }
 
@@ -1973,7 +1973,6 @@ sub GetBorrowersWhoHaveNotBorrowedSince {
                   AND currentissue IS NULL";
         push @query_params, $filterdate;
     }
-    warn $query if $debug;
     my $sth = $dbh->prepare($query);
     if ( scalar(@query_params) > 0 ) {
         $sth->execute(@query_params);
@@ -2017,7 +2016,6 @@ sub GetBorrowersWhoHaveNeverBorrowed {
         $query .= " AND borrowers.branchcode= ?";
         push @query_params, $filterbranch;
     }
-    warn $query if $debug;
 
     my $sth = $dbh->prepare($query);
     if ( scalar(@query_params) > 0 ) {
@@ -2066,7 +2064,6 @@ sub GetBorrowersWithIssuesHistoryOlderThan {
         push @query_params, $filterbranch;
     }
     $query .= " GROUP BY borrowernumber ";
-    warn $query if $debug;
     my $sth = $dbh->prepare($query);
     $sth->execute(@query_params);
     my @results;

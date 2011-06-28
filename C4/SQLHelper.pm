@@ -17,15 +17,17 @@ package C4::SQLHelper;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use List::MoreUtils qw(first_value any);
 use C4::Context;
 use C4::Dates qw(format_date_in_iso);
 use C4::Debug;
+use C4::Logger;
 use YAML;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
+
+my $log = C4::Logger->new();
 
 eval {
     my $servers = C4::Context->config('memcached_servers');
@@ -147,10 +149,10 @@ sub SearchInTable {
         $sql .= qq{ LIMIT } . join( ",", @$limit );
     }
 
-    $debug && $values && warn $sql, " ", join( ",", @$values );
+    $values && $log->debug($sql . " " . join( ",", @$values ));
     $sth = $dbh->prepare_cached($sql);
     eval { $sth->execute(@$values) };
-    warn $@ if ( $@ && $debug );
+    $log->warning($@) if $@;
     my $results = $sth->fetchall_arrayref( {} );
     return $results;
 }
@@ -173,10 +175,10 @@ sub InsertInTable {
     my ( $keys, $values ) = _filter_hash( $tablename, $data, ( $withprimarykeys ? "exact" : 0 ) );
     my $query = qq{ INSERT INTO $tablename SET  } . join( ", ", @$keys );
 
-    $debug && warn $query, join( ",", @$values );
+    $log->debug($query . join( ",", @$values ));
     my $sth = $dbh->prepare_cached($query);
     eval { $sth->execute(@$values) };
-    warn $@ if ( $@ && $debug );
+    $log->warning($@) if $@;
 
     return $dbh->last_insert_id( undef, undef, $tablename, undef );
 }
@@ -203,12 +205,12 @@ sub UpdateInTable {
     my $query = qq{     UPDATE $tablename
             SET  } . join( ",", @$keys ) . qq{
             WHERE } . join( " AND ", map { "$_=?" } @field_ids );
-    $debug && warn $query, join( ",", @$values, @ids );
+    $log->debug($query . join( ",", @$values, @ids ));
 
     my $sth = $dbh->prepare_cached($query);
     my $result;
     eval { $result = $sth->execute( @$values, @ids ) };
-    warn $@ if ( $@ && $debug );
+    $log->debug($@) if $@;
     return $result;
 }
 
@@ -233,11 +235,11 @@ sub DeleteInTable {
             local $" = ') AND (';
             qq{ DELETE FROM $tablename WHERE (@$keys)};
         };
-        $debug && warn $query, join( ",", @$values );
+        $log->debug($query . join( ",", @$values ));
         my $sth = $dbh->prepare_cached($query);
         my $result;
         eval { $result = $sth->execute(@$values) };
-        warn $@ if ( $@ && $debug );
+        $log->warning($@) if $@;
         return $result;
     }
 }
@@ -368,7 +370,7 @@ sub _filter_fields {
             }
         }
     } else {
-        $debug && warn "filterstring : $filter_input";
+        $log->debug("filterstring : $filter_input");
         my ( $keys, $values ) = _filter_string( $tablename, $filter_input, $searchtype, $filtercolumns );
         if ($keys) {
             my $stringkey = "(" . join( ") AND (", @$keys ) . ")";

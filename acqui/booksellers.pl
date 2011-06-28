@@ -51,9 +51,8 @@ the C<basket> we have to close if op is equal to 'close'.
 
 =cut
 
-use strict;
+use Modern::Perl;
 
-#use warnings; FIXME - Bug 2505
 use C4::Auth;
 use C4::Biblio;
 use C4::Output;

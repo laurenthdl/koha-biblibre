@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Koha;
 use C4::Output;
@@ -42,7 +41,6 @@ if ( $input->param('op') and $input->param('op') eq 'edit' ) {
     my @field    = $input->param('field');
     my @subfield = $input->param('subfield');
     my @index    = $input->param('index');
-    #warn Data::Dumper::Dumper(\@field, \@subfield, \@index);
     my @indexes;
     for ( 0..@field-1 ) {
         push @indexes, {
@@ -51,7 +49,6 @@ if ( $input->param('op') and $input->param('op') eq 'edit' ) {
             'index'    => $index[$_],
         }
     }
-    #warn Data::Dumper::Dumper(\@indexes);
     C4::Search::Engine::Solr::SetMappings($ressource_type, \@indexes);
 }
 

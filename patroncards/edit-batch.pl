@@ -18,9 +18,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
-use vars qw($debug);
+use Modern::Perl;
 
 use CGI;
 use autouse 'Data::Dumper' => qw(Dumper);
@@ -30,6 +28,9 @@ use C4::Output qw(output_html_with_http_headers);
 use C4::Branch qw(get_branch_code_from_name);
 use C4::Creators 1.000000;
 use C4::Patroncards 1.000000;
+use C4::Logger;
+
+my $log = C4::Logger->new();
 
 my $cgi = new CGI;
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -104,14 +105,14 @@ if ( $op eq 'remove' ) {
     $batch = C4::Patroncards::Batch->retrieve( batch_id => $batch_id );
 } elsif ( $op eq 'new' ) {
     if ( $branch_code eq '' ) {
-        warn sprintf( 'Batch edit interface called with an invalid/non-existent branch code: %s', $branch_code ? $branch_code : 'NULL' );
+        $log->error(sprintf( 'Batch edit interface called with an invalid/non-existent branch code: %s', $branch_code ? $branch_code : 'NULL' ));
         print $cgi->redirect("manage.pl?card_element=batch&error=203");
         exit;
     }
     $batch = C4::Patroncards::Batch->new( branch_code => $branch_code );
     $batch_id = $batch->get_attr('batch_id');
 } else {
-    warn sprintf( 'Batch edit interface called an unsupported operation: %s', $op );
+    $log->warning(sprintf( 'Batch edit interface called an unsupported operation: %s', $op ));
     print $cgi->redirect("manage.pl?card_element=batch&error=202");
     exit;
 }

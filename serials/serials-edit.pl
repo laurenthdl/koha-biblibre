@@ -60,8 +60,7 @@ op can be :
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Dates qw/format_date format_date_in_iso/;
@@ -244,7 +243,6 @@ if ( $op and $op eq 'serialchangestatus' ) {
                     $itemhash{$item}->{'indicator'}, $itemhash{$item}->{'ind_tag'}
                 );
 
-                #           warn $xml;
                 my $bib_record = MARC::Record::new_from_xml( $xml, 'UTF-8' );
                 if ( $item =~ /^N/ ) {
 

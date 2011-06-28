@@ -58,7 +58,7 @@ sub plugin_javascript {
     my $sth = $dbh->prepare($query);
     $sth->execute($branchcode,$branchcode."_%");
     my ($nextnum) = $sth->fetchrow; 
-    my $nextnum = $branchcode . '_' . $nextnum;
+    $nextnum = $branchcode . '_' . $nextnum;
 
     my $scr = <<END_OF_JS;
 if (\$('#' + id).val() == '' || force) {

@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Context;
 use C4::Output;
@@ -68,7 +67,6 @@ if ( $ratio == 0 ) {
 
 my $dbh = C4::Context->dbh;
 my ( $sqlorderby, $sqldatewhere ) = ( "", "" );
-$debug and warn format_date_in_iso($startdate) . "\n" . format_date_in_iso($enddate);
 my @query_params = ();
 if ($startdate) {
     $sqldatewhere .= " AND reservedate >= ?";

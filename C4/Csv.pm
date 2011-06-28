@@ -19,8 +19,7 @@ package C4::Csv;
 #
 #
 
-#use strict;
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use C4::Context;
 use vars qw($VERSION @ISA @EXPORT);
@@ -44,7 +43,7 @@ sub GetCsvProfiles {
     my $dbh   = C4::Context->dbh;
     my $query = "SELECT * FROM export_format";
 
-    $sth = $dbh->prepare($query);
+    my $sth = $dbh->prepare($query);
     $sth->execute;
 
     $sth->fetchall_arrayref( {} );
@@ -57,7 +56,7 @@ sub GetCsvProfile {
     my $dbh   = C4::Context->dbh;
     my $query = "SELECT * FROM export_format WHERE export_format_id=?";
 
-    $sth = $dbh->prepare($query);
+    my $sth = $dbh->prepare($query);
     $sth->execute($id);
 
     return ( $sth->fetchrow_hashref );
@@ -70,7 +69,7 @@ sub GetMarcFieldsForCsv {
     my $dbh   = C4::Context->dbh;
     my $query = "SELECT marcfields FROM export_format WHERE export_format_id=?";
 
-    $sth = $dbh->prepare($query);
+    my $sth = $dbh->prepare($query);
     $sth->execute($id);
 
     return ( $sth->fetchrow_hashref )->{marcfields};

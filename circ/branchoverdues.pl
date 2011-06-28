@@ -16,9 +16,7 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Context;
 use CGI;
 use C4::Output;
@@ -94,8 +92,6 @@ if ( $input->param('action') eq 'add' ) {
 
 my @overduesloop;
 my @getoverdues = GetOverduesForBranch( $default, $location );
-use Data::Dumper;
-$debug and warn "HERE : $default / $location" . Dumper(@getoverdues);
 
 # search for location authorised value
 my ( $tag, $subfield ) = GetMarcFromKohaField( 'items.location', '' );

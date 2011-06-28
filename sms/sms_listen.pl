@@ -1,13 +1,13 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::SMS;
 use C4::Auth;
 use C4::Context;
 use C4::Members;
 use C4::Circulation;
+use C4::Logger;
 
 my ( $res, $ua );
 my %commands;
@@ -18,6 +18,7 @@ my $errorcode;
 my $smsid;
 my $wait = 600;                ## 10 mn. wait between sms checking
 my $dbh  = C4::Context->dbh;
+my $log = C4::Logger->new();
 
 STARTAGAIN:
 ( $res, $ua ) = get_sms_auth();
@@ -29,14 +30,14 @@ if ( $res->{pRetCode} == 200 ) {
     print "connected\n";
 } else {
     kill_sms( $ua, $res->{pSessionId} );
-    warn( error_codes( $res->{pErrCode} ), $res->{pErrcode} );
+    $log->error( error_codes( $res->{pErrCode} ), $res->{pErrcode} );
 
     #	sleep $wait;
     goto FINISH;
 }
 if ( $errorcode && $errorcode != -9005 ) {
     kill_sms( $ua, $res->{pSessionId} );
-    warn error_codes($errorcode);
+    $log->error(error_codes($errorcode));
 
     # sleep $wait;
     goto FINISH;

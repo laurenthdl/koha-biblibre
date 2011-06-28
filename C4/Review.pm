@@ -17,12 +17,14 @@ package C4::Review;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Context;
+use C4::Logger;
 
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logger->new();
 
 BEGIN {
 
@@ -103,7 +105,7 @@ sub getreviews {
     my ( $biblionumber, $approved ) = @_;
     my $dbh   = C4::Context->dbh;
     my $query = "SELECT * FROM reviews WHERE biblionumber=? and approved=? order by datereviewed desc";
-    my $sth   = $dbh->prepare($query) || warn $dbh->err_str;
+    my $sth   = $dbh->prepare($query) || $log->error($dbh->err_str);
     $sth->execute( $biblionumber, $approved );
     return $sth->fetchall_arrayref( {} );
 }

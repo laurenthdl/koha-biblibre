@@ -30,8 +30,7 @@ my $success = C4::SMS->send_sms( message     => 'This is my text message',
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use C4::Context;
 
@@ -74,8 +73,6 @@ sub send_sms {
     my $driver = exists $params->{'driver'} ? $params->{'driver'} : $self->driver();
     return unless $driver;
 
-    # warn "using driver: $driver to send message to $params->{'destination'}";
-
     # Create a sender
     my $sender = SMS::Send->new(
         $driver,
@@ -89,7 +86,6 @@ sub send_sms {
         text => $params->{'message'},
     );
 
-    # warn 'failure' unless $sent;
     return $sent;
 }
 

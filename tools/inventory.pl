@@ -18,8 +18,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 #need to open cgi and get the fh before anything else opens a new cgi context (see C4::Auth)
 use CGI;
@@ -53,9 +52,6 @@ my $branchcode = $input->param('branchcode');
 my $branch     = $input->param('branch');
 my $op         = $input->param('op');
 my $res;                                            #contains the results loop
-
-# warn "uploadbarcodes : ".$uploadbarcodes;
-# use Data::Dumper; warn Dumper($input);
 
 my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
     {   template_name   => "tools/inventory.tmpl",
@@ -146,7 +142,6 @@ if ( $uploadbarcodes && length($uploadbarcodes) > 0 ) {
     my $dbh = C4::Context->dbh;
     my $date = format_date_in_iso( $input->param('setdate') ) || C4::Dates->today('iso');
 
-    # 	warn "$date";
     my $strsth  = "select * from issues, items where items.itemnumber=issues.itemnumber and items.barcode =?";
     my $qonloan = $dbh->prepare($strsth);
     $strsth = "select * from items where items.barcode =? and items.wthdrawn = 1";

@@ -17,9 +17,7 @@ package C4::Reports::Guided;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505 this module needs a lot of repair to run clean under warnings
+use Modern::Perl;
 use CGI;
 use Carp;
 
@@ -32,11 +30,10 @@ use XML::Simple;
 use XML::Dumper;
 use Switch;
 use C4::Debug;
+use C4::Logger;
 use utf8;
-#use open qw(:std :utf8);
 
-# use Smart::Comments;
-# use Data::Dumper;
+my $log = C4::Logger->new();
 
 BEGIN {
 
@@ -402,11 +399,11 @@ sub get_criteria {
 sub select_2_select_count_value ($) {
     my $sql = shift or return;
     my $countsql = select_2_select_count($sql);
-    $debug and warn "original query: $sql\ncount query: $countsql\n";
+    $log->debug("original query: $sql\ncount query: $countsql");
     my $sth1 = C4::Context->dbh->prepare($countsql);
     $sth1->execute();
     my $total = $sth1->fetchrow();
-    $debug and warn "total records for this query: $total\n";
+    $log->debug("total records for this query: $total");
     return $total;
 }
 
@@ -456,7 +453,7 @@ sub execute_query ($;$$$) {
 
     # Grab offset/limit from user supplied LIMIT and drop the LIMIT so we can control pagination
     ( $sql, $useroffset, $userlimit ) = strip_limit($sql);
-    $debug and warn sprintf "User has supplied (OFFSET,) LIMIT = %s, %s", $useroffset, ( defined($userlimit) ? $userlimit : 'UNDEF' );
+    $log->debug(sprintf "User has supplied (OFFSET,) LIMIT = %s, %s", $useroffset, ( defined($userlimit) ? $userlimit : 'UNDEF' ));
     $offset += $useroffset;
     if ( defined($userlimit) ) {
         if ( $offset + $limit > $userlimit ) {

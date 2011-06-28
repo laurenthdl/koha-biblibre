@@ -18,8 +18,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use warnings;
-use strict;
+use Modern::Perl;
 use CGI;
 
 use C4::Auth;
@@ -29,7 +28,10 @@ use C4::Context;
 use C4::Breeding;
 use C4::Koha;
 use C4::Charset;
+use C4::Logger;
 use ZOOM;
+
+my $log = C4::Logger->new();
 
 my $input = new CGI;
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
@@ -47,7 +49,6 @@ my $error        = $input->param('error');
 my $biblionumber = $input->param('biblionumber');
 $biblionumber = 0 unless $biblionumber;
 my $frameworkcode = $input->param('frameworkcode');
-warn($frameworkcode);
 my $title        = $input->param('title');
 my $author       = $input->param('author');
 my $isbn         = $input->param('isbn');
@@ -160,13 +161,13 @@ if ( $op ne "do_search" ) {
     for my $i ( 1 .. $nterms - 1 ) {
         $query = "\@and " . $query;
     }
-    warn "query " . $query if $DEBUG;
+    $log->debug("query " . $query);;
 
     foreach my $servid (@id) {
         my $sth = $dbh->prepare("select * from z3950servers where id=?");
         $sth->execute($servid);
         while ( $server = $sth->fetchrow_hashref ) {
-            warn "serverinfo " . join( ':', %$server ) if $DEBUG;
+            $log->debug("serverinfo " . join( ':', %$server ));
             my $noconnection = 0;
             my $option1      = new ZOOM::Options();
             $option1->option( 'async' => 1 );
@@ -177,10 +178,10 @@ if ( $op ne "do_search" ) {
               if $server->{password};
             $option1->option( 'preferredRecordSyntax', $server->{syntax} );
             $oConnection[$s] = create ZOOM::Connection($option1)
-              || $DEBUG && warn( "" . $oConnection[$s]->errmsg() );
-            warn( "server data", $server->{name}, $server->{port} ) if $DEBUG;
+              || $log->warning("" . $oConnection[$s]->errmsg() );
+            $log->debug("server data" . $server->{name} . $server->{port} );
             $oConnection[$s]->connect( $server->{host}, $server->{port} )
-              || $DEBUG && warn( "" . $oConnection[$s]->errmsg() );
+              || $log->warning("" . $oConnection[$s]->errmsg() );
             $serverhost[$s] = $server->{host};
             $servername[$s] = $server->{name};
             $encoding[$s]   = ( $server->{encoding} ? $server->{encoding} : "iso-5426" );
@@ -191,9 +192,9 @@ if ( $op ne "do_search" ) {
     my $firstresult = 1;
 
     for ( my $z = 0 ; $z < $s ; $z++ ) {
-        warn "doing the search" if $DEBUG;
+        $log->debug("doing the search");
         $oResult[$z] = $oConnection[$z]->search_pqf($query)
-          || $DEBUG && warn( "somthing went wrong: " . $oConnection[$s]->errmsg() );
+          || $log->warning("somthing went wrong: " . $oConnection[$s]->errmsg());
 
         # $oResult[$z] = $oConnection[$z]->search_pqf($query);
     }
@@ -203,19 +204,16 @@ if ( $op ne "do_search" ) {
         my $event;
         while ( ( $k = ZOOM::event( \@oConnection ) ) != 0 ) {
             $event = $oConnection[ $k - 1 ]->last_event();
-            warn( "connection ", $k - 1, ": event $event (", ZOOM::event_str($event), ")\n" )
-              if $DEBUG;
+            $log->debug("connection " . $k - 1 . ": event $event (" . ZOOM::event_str($event));
             last if $event == ZOOM::Event::ZEND;
         }
 
         if ( $k != 0 ) {
             $k--;
-            warn $serverhost[$k] if $DEBUG;
+            $log->debug($serverhost[$k]);
             my ( $error, $errmsg, $addinfo, $diagset ) = $oConnection[$k]->error_x();
             if ($error) {
-                warn "$k $serverhost[$k] error $query: $errmsg ($error) $addinfo\n"
-                  if $DEBUG;
-
+                $log->error("$k $serverhost[$k] error $query: $errmsg ($error) $addinfo");
             } else {
                 my $numresults = $oResult[$k]->size();
                 my $i;

@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Output;
@@ -223,8 +221,6 @@ sub calculate {
         # $colfilter[0] = @$filters[8] if ($column =~ /timestamp/ ) ; FIXME
         # $colfilter[0] = @$filters[9] if ($column =~ /timestamp/ ) ; FIXME Only this line would have effect.
 
-        #warn "filtre col ".$colfilter[0]." ".$colfilter[1];
-
         # loop cols.
         if ( $column eq "Day" ) {
 
@@ -298,8 +294,6 @@ sub calculate {
     my @table;
     for ( my $i = 1 ; $i <= $line ; $i++ ) {
         foreach ( keys %columns ) {
-
-            #			warn " init table : $row->{rowtitle} / $_ ";
             $table[$i]->{ $_ || "total" }->{'name'} = 0;
         }
     }

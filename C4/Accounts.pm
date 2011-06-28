@@ -17,9 +17,7 @@ package C4::Accounts;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Context;
 use C4::Stats;
 use C4::Members;
@@ -217,7 +215,7 @@ sub makepayment {
         returnlost( $borrowernumber, $data->{'itemnumber'} );
     }
      
-    my $sth = $dbh->prepare("SELECT max(id) AS lastinsertid FROM accountlines");
+    $sth = $dbh->prepare("SELECT max(id) AS lastinsertid FROM accountlines");
     $sth->execute();
     my $datalastinsertid = $sth->fetchrow_hashref;
     $sth->finish;

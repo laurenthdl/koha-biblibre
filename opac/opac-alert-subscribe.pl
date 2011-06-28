@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use C4::Auth;
@@ -28,7 +27,9 @@ use C4::Context;
 use C4::Koha;
 use C4::Letters;
 use C4::Serials;
+use C4::Logger;
 
+my $log = C4::Logger->new();
 my $query = new CGI;
 my $op    = $query->param('op') || '';
 my $dbh   = C4::Context->dbh;
@@ -56,7 +57,8 @@ if ( $op eq 'alert_confirmed' ) {
     }
 } elsif ( $op eq 'cancel_confirmed' ) {
     my $alerts = getalert( $loggedinuser, $alerttype, $externalid );
-    warn "CANCEL confirmed : $loggedinuser, $alerttype, $externalid" . Data::Dumper::Dumper($alerts);
+    $log->info("CANCEL confirmed : $loggedinuser, $alerttype, $externalid");
+    $log->info($alerts, 1);
     foreach (@$alerts) {    # we are supposed to have only 1 result, but just in case...
         delalert( $_->{alertid} );
     }

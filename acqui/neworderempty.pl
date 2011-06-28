@@ -64,8 +64,7 @@ the item's id in the breeding reservoir
 
 =cut
 
-use warnings;
-use strict;
+use Modern::Perl;
 use CGI;
 
 use C4::Context;
@@ -292,7 +291,6 @@ if ( C4::Context->preference('AcqCreateItem') eq 'ordering' && !$ordernumber ) {
     # prepare empty item form
     my $cell = PrepareItemrecordDisplay( '', '', '', 'ACQ' );
 
-    #     warn "==> ".Data::Dumper::Dumper($cell);
     unless ($cell) {
         $cell = PrepareItemrecordDisplay( '', '', '', '' );
         $template->param( 'NoACQframework' => 1 );

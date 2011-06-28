@@ -20,9 +20,7 @@ package C4::Record;
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 #
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 # please specify in which methods a given module is used
 use MARC::Record;                   # marc2marcxml, marcxml2marc, html2marc, changeEncoding
@@ -35,10 +33,13 @@ use XML::LibXML;
 use C4::Biblio;                     #marc2bibtex
 use C4::Csv;                        #marc2csv
 use C4::Koha;                       #marc2csv
+use C4::Logger;
 use YAML;                           #marcrecords2csv
 use Text::CSV::Encoded;             #marc2csv
 
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logger->new();
 
 # set the version for version checking
 $VERSION = 3.00;
@@ -135,8 +136,8 @@ sub marc2marcxml {
         # check the record for warnings
         my @warnings = $marc_record_obj->warnings();
         if (@warnings) {
-            warn "\nWarnings encountered while processing ISO-2709 record with title \"" . $marc_record_obj->title() . "\":\n";
-            foreach my $warn (@warnings) { warn "\t" . $warn }
+            $log->warning("Warnings encountered while processing ISO-2709 record with title \"" . $marc_record_obj->title() . "\":");
+            foreach my $warn (@warnings) { $log->warning("\t" . $warn); }
         }
         unless ($encoding) { $encoding = "UTF-8" }
         ;    # set default encoding
@@ -159,8 +160,8 @@ sub marc2marcxml {
             # check the record for warning flags again (warnings() will be cleared already if there was an error, see above block
             @warnings = $marc_record_obj->warnings();
             if (@warnings) {
-                warn "\nWarnings encountered while processing ISO-2709 record with title \"" . $marc_record_obj->title() . "\":\n";
-                foreach my $warn (@warnings) { warn "\t" . $warn }
+                $log->warning("Warnings encountered while processing ISO-2709 record with title \"" . $marc_record_obj->title() . "\":");
+                foreach my $warn (@warnings) { $log->warning("\t" . $warn); }
             }
         }
 
@@ -374,8 +375,6 @@ sub marc2csv {
     if ( -e $configfile ) {
         ( $preprocess, $postprocess, $fieldprocessing ) = YAML::LoadFile($configfile);
     }
-
-    warn $fieldprocessing;
 
     # Preprocessing
     eval $preprocess if ($preprocess);
@@ -608,7 +607,6 @@ sub html2marcxml {
         if ( ( @$tags[$i] ne $prevtag ) ) {
             $j++ unless ( @$tags[$i] eq "" );
 
-            #warn "IND:".substr(@$indicator[$j],0,1).substr(@$indicator[$j],1,1)." ".@$tags[$i];
             if ( !$first ) {
                 $marcxml .= "</datafield>\n";
                 if ( ( @$tags[$i] > 10 ) && ( @$values[$i] ne "" ) ) {
@@ -657,7 +655,6 @@ sub html2marcxml {
     }
     $marcxml .= MARC::File::XML::footer();
 
-    #warn $marcxml;
     return ( $error, $marcxml );
 }
 
@@ -696,7 +693,6 @@ sub html2marc {
     for ( my $i = 0 ; $i < @$rtags ; $i++ ) {
 
         # rebuild MARC::Record
-        #           warn "0=>".@$rtags[$i].@$rsubfields[$i]." = ".@$rvalues[$i].": ";
         if ( @$rtags[$i] ne $prevtag ) {
             if ( $prevtag < 10 ) {
                 if ($prevvalue) {
@@ -735,7 +731,6 @@ sub html2marc {
                     );
                 }
 
-                #           warn "1=>".@$rtags[$i].@$rsubfields[$i]." = ".@$rvalues[$i].": ".$field->as_formatted;
             }
             $prevtag = @$rtags[$i];
         } else {
@@ -744,21 +739,15 @@ sub html2marc {
             } else {
                 if ( length( @$rvalues[$i] ) > 0 ) {
                     $field->add_subfields( @$rsubfields[$i] => @$rvalues[$i] );
-
-                    #           warn "2=>".@$rtags[$i].@$rsubfields[$i]." = ".@$rvalues[$i].": ".$field->as_formatted;
                 }
             }
             $prevtag = @$rtags[$i];
         }
     }
 
-    #}
     # the last has not been included inside the loop... do it now !
-    #use Data::Dumper;
-    #warn Dumper($field->{_subfields});
     $record->add_fields($field) if ( ($field) && $field ne "" );
 
-    #warn "HTML2MARC=".$record->as_formatted;
     return $record;
 }
 

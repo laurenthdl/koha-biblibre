@@ -25,9 +25,7 @@ script to execute returns of books
 
 =cut
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use CGI;
 use C4::Context;
@@ -188,10 +186,7 @@ my $calendar    = C4::Calendar->new( branchcode => $userenv_branch );
 my $today       = C4::Dates->new();
 my $today_iso   = $today->output('iso');
 my $dropboxdate = $calendar->addDate( $today, -1 );
-if ($debug) {
-    use YAML;
-    warn Dump( $query->Vars );
-}
+
 if ($dotransfer) {
 
     # An item has been returned to a branch other than the homebranch, and the librarian has chosen to initiate a transfer
@@ -286,12 +281,11 @@ $template->param( inputloop => \@inputloop );
 
 
 # Is there a circulation note?
-my $itemnumber = GetItemnumberFromBarcode($barcode);
+$itemnumber = GetItemnumberFromBarcode($barcode);
 my $biblionumber = GetBiblionumberFromItemnumber($itemnumber);
 my $record = GetMarcBiblio($biblionumber);
 my $frameworkcode = GetFrameworkCode($biblionumber);
 my $circnotefield = GetRecordValue('circnote', $record, $frameworkcode);
-warn Data::Dumper::Dumper($circnotefield);
 if (defined @$circnotefield[0]) {
    $template->param(circnote => @$circnotefield[0]->{'subfield'});
 }
@@ -619,7 +613,7 @@ $template->param(
     soundon        => C4::Context->preference("SoundOn"),
 );
 
-my $itemnumber = GetItemnumberFromBarcode( $query->param('barcode') );
+$itemnumber = GetItemnumberFromBarcode( $query->param('barcode') );
 if ($itemnumber) {
     my ( $holdingBranch, $collectionBranch ) = GetCollectionItemBranches($itemnumber);
     if ( !( $holdingBranch eq $collectionBranch ) ) {

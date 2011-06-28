@@ -1,12 +1,10 @@
 #!/usr/bin/perl
 
-#use CGI;
+use Modern::Perl;
 use YAML qw/LoadFile Dump/;
 use IO::Socket::INET;
 use Socket qw(:DEFAULT :crlf);
 use FindBin qw/$Bin/;
-use warnings;
-use strict;
 my $configfile = $ENV{CONFIG_MAGNETISE} || qq($Bin/etc/magnetise.yaml);
 my $ip         = $ARGV[0];
 my $op         = $ARGV[1];

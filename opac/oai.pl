@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 
 use CGI qw/:standard -oldstyle_urls/;
@@ -53,8 +52,7 @@ my $repository = C4::OAI::Repository->new();
 #
 package C4::OAI::ResumptionToken;
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 use HTTP::OAI;
 
@@ -94,8 +92,7 @@ sub new {
 
 package C4::OAI::Identify;
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 use HTTP::OAI;
 use C4::Context;
@@ -131,8 +128,7 @@ sub new {
 
 package C4::OAI::ListMetadataFormats;
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 use HTTP::OAI;
 
@@ -178,8 +174,7 @@ sub new {
 
 package C4::OAI::Record;
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 use HTTP::OAI;
 use HTTP::OAI::Metadata::OAI_DC;
@@ -214,8 +209,7 @@ sub new {
 
 package C4::OAI::GetRecord;
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 use HTTP::OAI;
 
@@ -257,8 +251,7 @@ sub new {
 
 package C4::OAI::ListIdentifiers;
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 use HTTP::OAI;
 
@@ -306,8 +299,7 @@ sub new {
 
 package C4::OAI::ListRecords;
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 use HTTP::OAI;
 
@@ -357,8 +349,7 @@ package C4::OAI::Repository;
 
 use base ("HTTP::OAI::Repository");
 
-use strict;
-use warnings;
+use Modern::Perl;
 use diagnostics;
 
 use HTTP::OAI;

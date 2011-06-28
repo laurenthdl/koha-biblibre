@@ -197,7 +197,7 @@ if ( $op eq 'add_form' ) {
     $sth->execute($itemtype);
     $total += $sth->fetchrow_hashref->{total};
 
-    my $sth = $dbh->prepare( "select itemtype,description,rentalcharge from itemtypes where itemtype=?" );
+    $sth = $dbh->prepare( "select itemtype,description,rentalcharge from itemtypes where itemtype=?" );
     $sth->execute($itemtype);
     my $data = $sth->fetchrow_hashref;
     $template->param(

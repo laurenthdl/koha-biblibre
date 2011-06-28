@@ -17,9 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Context;
@@ -139,7 +137,6 @@ if ($do_it) {
 
     my @mime = ( C4::Context->preference("MIME") );
 
-    # warn 'MIME(s): ' . join ' ', @mime;
     my $CGIextChoice = CGI::scrolling_list(
         -name     => 'MIME',
         -id       => 'MIME',
@@ -187,11 +184,6 @@ sub calculate {
 
     # Filters
     my $linefilter = "";
-
-    #	warn "filtres ".@filters[0];
-    #	warn "filtres ".@filters[4];
-    #	warn "filtres ".@filters[5];
-    #	warn "filtres ".@filters[6];
 
     $linefilter = @$filters[0] if ( $line =~ /categorycode/ );
     $linefilter = @$filters[1] if ( $line =~ /zipcode/ );
@@ -328,11 +320,8 @@ sub calculate {
     #Initialization of cell values.....
     my %table;
 
-    #	warn "init table";
     foreach my $row (@loopline) {
         foreach my $col (@loopcol) {
-
-            #			warn " init table : $row->{rowtitle} / $col->{coltitle} ";
             $table{ $row->{rowtitle} }->{ $col->{coltitle} } = 0;
         }
         $table{ $row->{rowtitle} }->{totalrow}         = 0;
@@ -375,7 +364,6 @@ sub calculate {
     my $emptycol;
     while ( my ( $row, $col, $value ) = $dbcalc->fetchrow ) {
 
-        #		warn "filling table $row / $col / $value ";
         $emptycol = 1         if ( !defined($col) );
         $col      = "zzEMPTY" if ( !defined($col) );
         $row      = "zzEMPTY" if ( !defined($row) );
@@ -408,11 +396,8 @@ sub calculate {
         my $total = 0;
         foreach my $row (@looprow) {
             $total += $table{ ( $row->{rowtitle} eq "NULL" ) ? "zzEMPTY" : $row->{rowtitle} }->{ ( $col->{coltitle} eq "NULL" ) ? "zzEMPTY" : $col->{coltitle} };
-
-            #			warn "value added ".$table{$row->{rowtitle}}->{$col->{coltitle}}. "for line ".$row->{rowtitle};
         }
 
-        #		warn "summ for column ".$col->{coltitle}."  = ".$total;
         push @loopfooter, { 'totalcol' => $total };
     }
 

@@ -17,8 +17,7 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
-use strict;
-use warnings;
+use Modern::Perl;
 use C4::Auth;
 use CGI;
 use C4::Output;
@@ -127,9 +126,6 @@ elsif ( $phase eq 'New Term step 4' ) {
             $tmp_hash{'text'} = 1;
         }
 
-        #		else {
-        #			warn $type;#
-        #			}
         push @column_loop, \%tmp_hash;
     }
 

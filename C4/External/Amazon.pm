@@ -18,19 +18,20 @@ package C4::External::Amazon;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+use Modern::Perl;
 use XML::Simple;
 use LWP::Simple;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 use C4::Koha;
+use C4::Logger;
 use URI::Escape;
 use POSIX;
 use Digest::SHA qw(hmac_sha256_base64);
 
-use strict;
-use warnings;
-
 use vars qw($VERSION @ISA @EXPORT);
+
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;
@@ -117,8 +118,6 @@ sub get_amazon_details {
     my $upc = GetNormalizedUPC( $record, $marcflavour );
     my $ean = GetNormalizedEAN( $record, $marcflavour );
 
-    # warn "ISBN: $isbn | UPC: $upc | EAN: $ean";
-
     # Choose the appropriate and available item identifier
     my ( $id_type, $item_id ) =
         defined($isbn) && length($isbn) == 13 ? ( 'EAN', $isbn )
@@ -155,11 +154,11 @@ sub get_amazon_details {
           qq{http://webservices.amazon} . get_amazon_tld() . "/onca/xml?" . join( "&", sort @params ) . qq{&Signature=} . uri_escape( SignRequest(@params), "^A-Za-z0-9\-_.~" );
     } else {
         $url = qq{http://webservices.amazon} . get_amazon_tld() . "/onca/xml?" . join( "&", sort @params );
-        warn "MUST set AWSPrivateKey syspref after 2009-08-15 in order to access Amazon web services";
+        $log->warning("MUST set AWSPrivateKey syspref after 2009-08-15 in order to access Amazon web services");
     }
 
     my $content = get($url);
-    warn "could not retrieve $url" unless $content;
+    $log->warning("could not retrieve $url") unless $content;
     my $xmlsimple = XML::Simple->new();
     my $response = $xmlsimple->XMLin( $content, forcearray => [qw(SimilarProduct EditorialReview Review Item)], ) unless !$content;
     return $response;

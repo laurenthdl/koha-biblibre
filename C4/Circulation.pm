@@ -17,9 +17,7 @@ package C4::Circulation;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 use C4::Context;
 use C4::Stats;
 use C4::Reserves;
@@ -35,6 +33,7 @@ use C4::Overdues;
 use C4::ItemCirculationAlertPreference;
 use C4::Message;
 use C4::Debug;
+use C4::Logger;
 use YAML;
 use Date::Calc qw(
   Today
@@ -55,6 +54,8 @@ use C4::Log;       # logaction
 use Data::Dumper;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+my $log = C4::Logger->new();
 
 BEGIN {
     require Exporter;
@@ -199,8 +200,7 @@ sub decode {
     my $l = ( $#s + 1 ) % 4;
     if ($l) {
         if ( $l == 1 ) {
-
-            # warn "Error: Cuecat decode parsing failed!";
+            $log->error("Error: Cuecat decode parsing failed!");
             return;
         }
         $l = 4 - $l;
@@ -839,7 +839,6 @@ sub CanBookBeIssued {
         # issued to someone else
         my $currborinfo = C4::Members::GetMemberDetails( $issue->{borrowernumber} );
 
-        #        warn "=>.$currborinfo->{'firstname'} $currborinfo->{'surname'} ($currborinfo->{'cardnumber'})";
         $needsconfirmation{ISSUED_TO_ANOTHER} = "$currborinfo->{'reservedate'} : $currborinfo->{'firstname'} $currborinfo->{'surname'} ($currborinfo->{'cardnumber'})";
     }
 
@@ -959,12 +958,10 @@ sub AddIssue {
                     ModReserveFill($res);
                 } elsif ( $restype eq "Waiting" ) {
 
-                    # warn "Waiting";
                     # The item is on reserve and waiting, but has been
                     # reserved by some other patron.
                 } elsif ( $restype eq "Reserved" ) {
 
-                    # warn "Reserved";
                     # The item is reserved by someone else.
                     if ($cancelreserve) {    # cancel reserves on this item
                         CancelReserve( $res->{'reservenumber'} );
@@ -1161,7 +1158,7 @@ patron who last borrowed the book.
 sub AddReturn {
     my ( $barcode, $branch, $exemptfine, $dropbox, $force ) = @_;
     if ( $branch and not GetBranchDetail($branch) ) {
-        warn "AddReturn error: branch '$branch' not found.  Reverting to " . C4::Context->userenv->{'branch'};
+        $log->error("AddReturn error: branch '$branch' not found.  Reverting to " . C4::Context->userenv->{'branch'});
         undef $branch;
     }
     $branch = C4::Context->userenv->{'branch'} unless $branch;    # we trust userenv to be a safe fallback/default
@@ -1178,7 +1175,6 @@ sub AddReturn {
     }
     my $issue = GetItemIssue($itemnumber);
 
-    #   warn Dumper($iteminformation);
     if ( $issue and $issue->{borrowernumber} ) {
         $borrower = C4::Members::GetMemberDetails( $issue->{borrowernumber} )
           or die "Data inconsistency: barcode $barcode (itemnumber:$itemnumber) claims to be issued to non-existant borrowernumber '$issue->{borrowernumber}'\n"
@@ -1209,9 +1205,9 @@ sub AddReturn {
         $branches->{$hbr}->{PE} and $messages->{'IsPermanent'} = $hbr;
     }
     my $branchtransferfield = C4::Context->preference("BranchTransferLimitsType") eq "ccode" ? "ccode" : "itype";
-    $debug && warn "$branch, $hbr, ", C4::Context->preference("BranchTransferLimitsType"), " ,", $item->{$branchtransferfield};
-    $debug && warn Dump($item);
-    $debug && warn IsBranchTransferAllowed( $branch, $hbr, $item->{ C4::Context->preference("BranchTransferLimitsType") } );
+    $log->debug("$branch, $hbr, ", C4::Context->preference("BranchTransferLimitsType"), " ,", $item->{$branchtransferfield});
+    $log->debug($item, 1);
+    $log->debug(IsBranchTransferAllowed( $branch, $hbr, $item->{ C4::Context->preference("BranchTransferLimitsType") } ));
 
     # if indy branches and returning to different branch, refuse the return
     if (   !$force
@@ -1241,7 +1237,7 @@ sub AddReturn {
 
     # case of a return of document (deal with issues and holdingbranch)
     if ($doreturn) {
-        $borrower or warn "AddReturn without current borrower";
+        $borrower or $log->warning("AddReturn without current borrower");
         my $circControlBranch;
         if ($dropbox) {
             $circControlBranch = _GetCircControlBranch( $item, $borrower );
@@ -1301,7 +1297,7 @@ sub AddReturn {
 
         # fix up the overdues in accounts...
         my $fix = _FixOverduesOnReturn( $borrowernumber, $item->{itemnumber}, $exemptfine, $dropbox );
-        defined($fix) or warn "_FixOverduesOnReturn($borrowernumber, $item->{itemnumber}...) failed!";    # zero is OK, check defined
+        defined($fix) or $log->warning("_FixOverduesOnReturn($borrowernumber, $item->{itemnumber}...) failed!");    # zero is OK, check defined
 
         # fix fine days
         my $debardate = _FixFineDaysOnReturn( $borrower, $item, $issue->{date_due} );
@@ -1355,8 +1351,8 @@ sub AddReturn {
             or ( C4::Context->preference("UseBranchTransferLimits")
                 and !IsBranchTransferAllowed( $branch, $hbr, $item->{$branchtransferfield} ) )
           ) {
-            $debug and warn sprintf "about to call ModItemTransfer(%s, %s, %s)", $item->{'itemnumber'}, $branch, $hbr;
-            $debug and warn "item: " . Dumper($item);
+            $log->debug(sprintf "about to call ModItemTransfer(%s, %s, %s)", $item->{'itemnumber'}, $branch, $hbr);
+            $log->debug("item: "); $log->debug($item, 1);
             ModItemTransfer( $item->{'itemnumber'}, $branch, $hbr );
             $messages->{'WasTransfered'} = 1;
         } else {
@@ -1499,11 +1495,11 @@ Internal function, called only by AddReturn
 sub _FixOverduesOnReturn {
     my ( $borrowernumber, $item );
     unless ( $borrowernumber = shift ) {
-        warn "_FixOverduesOnReturn() not supplied valid borrowernumber";
+        $log->warning("_FixOverduesOnReturn() not supplied valid borrowernumber");
         return;
     }
     unless ( $item = shift ) {
-        warn "_FixOverduesOnReturn() not supplied valid itemnumber";
+        $log->warning("_FixOverduesOnReturn() not supplied valid itemnumber");
         return;
     }
     my ( $exemptfine, $dropbox ) = @_;
@@ -1965,7 +1961,7 @@ sub AddRenewal {
     my $issuedata = $sth->fetchrow_hashref;
     $sth->finish;
     if ( $datedue && !$datedue->output('iso') ) {
-        warn "Invalid date passed to AddRenewal.";
+        $log->warning("Invalid date passed to AddRenewal.");
         return undef;
     }
 
@@ -2303,18 +2299,12 @@ sub SendCirculationAlert {
     C4::Letters::parseletter( $letter, 'branches',    $branch );
     my @transports = @{ $borrower_preferences->{transports} };
 
-    # warn "no transports" unless @transports;
     for (@transports) {
 
-        # warn "transport: $_";
         my $message = C4::Message->find_last_message( $borrower, $type, $_ );
         if ( !$message ) {
-
-            #warn "create new message";
             C4::Message->enqueue( $letter, $borrower, $_ );
         } else {
-
-            #warn "append to old message";
             $message->append($letter);
             $message->update;
         }
@@ -2602,7 +2592,6 @@ sub GetOfflineOperation {
 
 sub AddOfflineOperation {
 	my $dbh = C4::Context->dbh;
-	warn Data::Dumper::Dumper(@_);
 	my $sth = $dbh->prepare("INSERT INTO pending_offline_operations VALUES('',?,?,?,?,?,?)");
 	$sth->execute( @_ );
 	return "Added.";

@@ -24,17 +24,18 @@ package C4::Output;
 # NOTE: I'm pretty sure this module is deprecated in favor of
 # templates.
 
-use strict;
-
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use C4::Context;
 use C4::Languages qw(getTranslatedLanguages get_bidi regex_lang_subtags language_get_description accept_language );
 use C4::Dates qw(format_date);
 use C4::Budgets qw(GetCurrency);
+use C4::Logger;
 
 use HTML::Template::Pro;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+my $log = C4::Logger->new();
 
 BEGIN {
 
@@ -94,7 +95,7 @@ sub _get_template_file {
 
 sub gettemplate {
     my ( $tmplbase, $interface, $query ) = @_;
-    ($query) or warn "no query in gettemplate";
+    ($query) or $log->warning("no query in gettemplate");
     my $path = C4::Context->preference('intranet_includes') || 'includes';
     my $opacstylesheet = C4::Context->preference('opacstylesheet');
     my ( $htdocs, $theme, $lang, $filename ) = _get_template_file( $tmplbase, $interface, $query );
@@ -142,7 +143,7 @@ sub gettemplate {
 # FIXME - POD
 sub themelanguage {
     my ( $htdocs, $tmpl, $interface, $query ) = @_;
-    ($query) or warn "no query in themelanguage";
+    ($query) or $log->warning("no query in themelanguage");
 
     # Set some defaults for language and theme
     # First, check the user's preferences
@@ -186,19 +187,13 @@ sub themelanguage {
     foreach my $th (@themes) {
         foreach my $la (@languages) {
 
-            #for ( my $pass = 1 ; $pass <= 2 ; $pass += 1 ) {
-            # warn "$htdocs/$th/$la/modules/$interface-"."tmpl";
-            #$la =~ s/([-_])/ $1 eq '-'? '_': '-' /eg if $pass == 2;
             if ( -e "$htdocs/$th/$la/modules/$tmpl" ) {
-
-                #".($interface eq 'intranet'?"modules":"")."/$tmpl" ) {
                 $theme = $th;
                 $lang  = $la;
                 last THEME;
             }
             last unless $la =~ /[-_]/;
 
-            #}
         }
     }
     return ( $theme, $lang );
@@ -304,8 +299,6 @@ sub pagination_bar {
     $base_url =~ s/$delim*\b$startfrom_name=(\d+)//g;    # remove previous pagination var
     unless ( defined $current_page and $current_page > 0 and $current_page <= $nb_pages ) {
         $current_page = ($1) ? $1 : 1;                   # pull current page from param in URL, else default to 1
-                                                         # $debug and	# FIXME: use C4::Debug;
-                                                         # warn "with QUERY_STRING:" .$ENV{QUERY_STRING}. "\ncurrent_page:$current_page\n1:$1  2:$2  3:$3";
     }
     $base_url =~ s/($delim)+/$1/g;                       # compress duplicate delims
     $base_url =~ s/$delim;//g;                           # remove empties

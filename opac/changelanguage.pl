@@ -15,15 +15,16 @@
 # Koha; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA  02111-1307 USA
 
-#use strict;
-#use warnings; FIXME - Bug 2505
+use Modern::Perl;
 
 use C4::Output;
+use C4::Logger;
 use CGI;
 
 my $query    = new CGI;
 my $language = $query->param('language');
 my $url      = $query->referer();
+my $log = C4::Logger->new();
 
-warn "Language : $query // $language // $url";
+$log->info("Language : $query // $language // $url");
 setlanguagecookie( $query, $language, $url );
