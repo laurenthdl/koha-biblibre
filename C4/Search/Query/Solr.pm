@@ -21,7 +21,6 @@ use warnings;
 use 5.10.0;
 
 use C4::Search::Query;
-use C4::Search::Engine::Solr;
 
 =head1 NAME
 

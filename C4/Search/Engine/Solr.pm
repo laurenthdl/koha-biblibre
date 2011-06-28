@@ -23,7 +23,6 @@ use C4::Context;
 use C4::Biblio;
 use C4::Branch;
 use C4::Koha;
-use C4::AuthoritiesMarc;
 use Data::SearchEngine::Solr;
 use Data::SearchEngine::Query;
 use Data::SearchEngine::Item;
