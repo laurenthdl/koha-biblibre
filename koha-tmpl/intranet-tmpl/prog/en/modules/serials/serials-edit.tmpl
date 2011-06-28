@@ -144,10 +144,20 @@ $(document).ready(function() {
     $('select[name="status"]').each(function(){
         this.onchange = function(){
             var id = $(this).attr('id').replace('status', '');
+            var planneddate;
+            var publisheddate;
+            if(id == "addNEW"){
+                var tr = $(this).parents('tr');
+                planneddate = $(tr).find('input[name="planneddate"]');
+                publisheddate = $(tr).find('input[name="publisheddate"]');
+            } else {
+                planneddate = $("#planneddate" + id);
+                publisheddate = $("#publisheddate" + id);
+            }
             if($(this).val() == 2){
-                $("#planneddate" + id).val("<!-- TMPL_VAR NAME='today' -->");
+                $(planneddate).val("<!-- TMPL_VAR NAME='today' -->");
             }else{
-                $("#planneddate" + id).val( $("#publisheddate" + id).val() );
+                $(planneddate).val( $(publisheddate).val() );
             }
         };
     });
