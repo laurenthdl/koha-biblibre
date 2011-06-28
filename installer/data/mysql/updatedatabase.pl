@@ -5999,23 +5999,18 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 
     (2, 'Volume, Number, Issue', 2, 'Volume Number Issue 1', 'Vol.{X}, Number {Y}, Issue {Z}',
-    'Volume', 'value2', 1, NULL, 99999, 1, NULL,
-    'Number', 'value3', 1, NULL, 99999, 1, NULL,
-    'Issue', NULL, 1, 1, 99999, 1, NULL),
+    'Volume', NULL, 1, 48, 99999, 1, NULL,
+    'Number', NULL, 1, 4, 12, 1, NULL,
+    'Issue', NULL, 1, 1, 4, 1, NULL),
 
     (3, 'Volume, Number', 3, 'Volume Number 1', 'Vol {X}, No {Y}',
-    'Volume', 'value2', 1, NULL, 99999, 1, NULL,
-    'Number', NULL, 1, 1, 99999, 1, NULL,
+    'Volume', NULL, 1, 12, 99999, 1, NULL,
+    'Number', NULL, 1, 1, 12, 1, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 
     (4, 'Seasonal', 4, 'Season Year ', '{X} {Y}',
     'Season', NULL, 1, 1, 4, 1, 'season',
-    'Year', 'year', NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-
-    (5, 'Year/Number', 4, 'Year Number 1', 'Year {X}/Number {Y}',
-    'Year', 'year', NULL, NULL, NULL, NULL, NULL,
-    'Number', NULL, 1, 1, 99999, 1, NULL,
+    'Year', NULL, 1, 4, 99999, 1, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
 
     $dbh->do("ALTER TABLE `subscription`
@@ -6068,6 +6063,70 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
         ADD publisheddatetext VARCHAR(100) DEFAULT NULL AFTER publisheddate");
     print "Upgrade to $DBversion done (Add publisheddatetext field to serial table).\n";
     SetVersion ($DBversion);
+}
+
+$DBversion = "3.06.00.036";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("DROP TABLE IF EXISTS `subscriptionroutinglists`");
+    $dbh->do("
+        CREATE TABLE `subscriptionroutinglists` (
+            `routinglistid` int(11) NOT NULL AUTO_INCREMENT,
+            `subscriptionid` int(11) NOT NULL,
+            `title` varchar(256) NOT NULL,
+            `notes` text default NULL,
+            PRIMARY KEY (`routinglistid`),
+            CONSTRAINT `subscriptionroutinglists_ibfk_1` FOREIGN KEY (`subscriptionid`) REFERENCES `subscription` (`subscriptionid`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+    ");
+    $dbh->do("DROP TABLE IF EXISTS `subscriptionroutings`");
+    $dbh->do("
+        CREATE TABLE `subscriptionroutings` (
+            `routinglistid` int(11) NOT NULL,
+            `borrowernumber` int(11) NOT NULL,
+            `ranking` int(11) DEFAULT NULL,
+            PRIMARY KEY (`routinglistid`, `borrowernumber`),
+            CONSTRAINT `subscriptionroutings_ibfk_1` FOREIGN KEY (`routinglistid`) REFERENCES `subscriptionroutinglists` (`routinglistid`) ON DELETE CASCADE,
+            CONSTRAINT `subscriptionroutings_ibfk_2` FOREIGN KEY (`borrowernumber`) REFERENCES `borrowers` (`borrowernumber`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+    ");
+
+    # Migrate data from old subscriptionroutinglist table
+    my $query = qq{
+        SELECT DISTINCT `subscriptionid`
+        FROM `subscriptionroutinglist`
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute();
+    my $results = $sth->fetchall_arrayref( {} );
+    $query = qq{
+        INSERT INTO `subscriptionroutinglists` (`subscriptionid`, `title`)
+        VALUES (?, ?)
+    };
+    $sth = $dbh->prepare($query);
+    foreach ( @$results ) {
+        $sth->execute($_->{'subscriptionid'}, "import");
+        my $routinglistid = $dbh->last_insert_id(undef, undef, 'subscriptionroutinglists', undef);
+        $query = qq{
+            SELECT `borrowernumber`, `ranking`
+            FROM `subscriptionroutinglist`
+            WHERE `subscriptionid` = ?
+        };
+        my $sth2 = $dbh->prepare($query);
+        $sth2->execute($_->{'subscriptionid'});
+        my $routings = $sth2->fetchall_arrayref( {} );
+        $query = qq{
+            INSERT INTO `subscriptionroutings` (`routinglistid`, `borrowernumber`, `ranking`)
+            VALUES(?, ?, ?)
+        };
+        $sth2 = $dbh->prepare($query);
+        foreach (@$routings) {
+            $sth2->execute($routinglistid, $_->{'borrowernumber'}, $_->{'ranking'});
+        }
+    }
+
+    $dbh->do("DROP TABLE IF EXISTS `subscriptionroutinglist`");
+    print "Upgrade to $DBversion done (Replace subscriptionroutinglist by subscriptionroutinglists and subscriptionroutings).\n";
+    SetVersion($DBversion);
 }
 
 $DBversion = "3.06.00.036";

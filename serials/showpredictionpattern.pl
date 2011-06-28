@@ -35,7 +35,7 @@ use Date::Calc qw(Today Day_of_Year Week_of_Year Day_of_Week Days_in_Year Delta_
 use C4::Auth;
 use C4::Output;
 use C4::Serials;
-use C4::Serials::PredictiveModel;
+use C4::Serials::Frequency;
 
 my $input = new CGI;
 my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
