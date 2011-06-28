@@ -33,6 +33,7 @@ BEGIN {
     @EXPORT = qw(
         &GetSubscriptionNumberpatterns
         &GetSubscriptionNumberpattern
+        &GetSubscriptionNumberpatternByName
         &AddSubscriptionNumberpattern
         &ModSubscriptionNumberpattern
         &DelSubscriptionNumberpattern
@@ -90,6 +91,31 @@ sub GetSubscriptionNumberpattern {
     return $sth->fetchrow_hashref;
 }
 
+=head3 GetSubscriptionNumberpatternByName
+
+=over 4
+
+$result = GetSubscriptionNumberpatternByName($name);
+this function get the data of the subscription numberpatterns which name is $name
+
+=back
+
+=cut
+
+sub GetSubscriptionNumberpatternByName {
+    my $name = shift;
+    my $dbh = C4::Context->dbh;
+    my $query = qq(
+        SELECT *
+        FROM subscription_numberpatterns
+        WHERE label = ?
+    );
+    my $sth = $dbh->prepare($query);
+    my $rv = $sth->execute($name);
+
+    return $sth->fetchrow_hashref;
+}
+
 =head3 AddSubscriptionNumberpattern
 
 =over 4
@@ -121,9 +147,10 @@ sub AddSubscriptionNumberpattern {
 
     my @keys;
     my @values;
-    foreach (qw/ label numberingmethod label1 label2 label3 add1 add2 add3
-      every1 every2 every3 setto1 setto2 setto3 whenmorethan1 whenmorethan2
-      whenmorethan3 numbering1 numbering2 numbering3 /) {
+    foreach (qw/ label description numberingmethod displayorder
+      label1 label2 label3 add1 add2 add3 every1 every2 every3
+      setto1 setto2 setto3 whenmorethan1 whenmorethan2 whenmorethan3
+      numbering1 numbering2 numbering3 /) {
         if(exists $numberpattern->{$_}) {
             push @keys, $_;
             push @values, $numberpattern->{$_};
@@ -183,9 +210,10 @@ sub ModSubscriptionNumberpattern {
 
     my @keys;
     my @values;
-    foreach (qw/ label numberingmethod label1 label2 label3 add1 add2 add3
-      every1 every2 every3 setto1 setto2 setto3 whenmorethan1 whenmorethan2
-      whenmorethan3 numbering1 numbering2 numbering3 /) {
+    foreach (qw/ label description numberingmethod displayorder
+      label1 label2 label3 add1 add2 add3 every1 every2 every3
+      setto1 setto2 setto3 whenmorethan1 whenmorethan2 whenmorethan3
+      numbering1 numbering2 numbering3 /) {
         if(exists $numberpattern->{$_}) {
             push @keys, $_;
             push @values, $numberpattern->{$_};
