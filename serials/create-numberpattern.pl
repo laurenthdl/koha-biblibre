@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use CGI;
+use C4::Context;
 use C4::Serials::Numberpattern;
 use URI::Escape;
 use strict;
@@ -17,7 +18,24 @@ foreach (qw/ numberingmethod label1 label2 label3 add1 add2 add3
 # patternname is label in database
 $numberpattern->{'label'} = $input->param('patternname');
 
-my $numberpatternid = AddSubscriptionNumberpattern($numberpattern);
+# Check if pattern already exist in database
+my $dbh = C4::Context->dbh;
+my $query = qq{
+    SELECT id
+    FROM subscription_numberpatterns
+    WHERE STRCMP(label, ?) = 0
+};
+my $sth = $dbh->prepare($query);
+my $rv = $sth->execute($numberpattern->{'label'});
+my $numberpatternid;
+if($rv == 0) {
+    # Pattern does not exists
+    $numberpatternid = AddSubscriptionNumberpattern($numberpattern);
+} else {
+    ($numberpatternid) = $sth->fetchrow_array;
+    $numberpattern->{'id'} = $numberpatternid;
+    ModSubscriptionNumberpattern($numberpattern);
+}
 
 binmode STDOUT, ":utf8";
 print $input->header(-type => 'text/plain', -charset => 'UTF-8');

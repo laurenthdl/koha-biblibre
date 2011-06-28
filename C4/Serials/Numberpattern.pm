@@ -160,7 +160,7 @@ Modifies a numberpattern
 
 =cut
 
-sub ModNumberpattern {
+sub ModSubscriptionNumberpattern {
     my $numberpattern = shift;
 
     unless(
@@ -195,7 +195,7 @@ sub ModNumberpattern {
     my $dbh = C4::Context->dbh;
     my $query = "UPDATE subscription_numberpatterns";
     $query .= ' SET ' . join(' = ?,', @keys) . ' = ?';
-    $query .= 'WHERE id = ?';
+    $query .= ' WHERE id = ?';
     my $sth = $dbh->prepare($query);
 
     return $sth->execute(@values, $numberpattern->{'id'});
@@ -213,7 +213,7 @@ Delete a number pattern
 
 =cut
 
-sub DelNumberpattern {
+sub DelSubscriptionNumberpattern {
     my $numberpatternid = shift;
 
     my $dbh = C4::Context->dbh;

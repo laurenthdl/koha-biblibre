@@ -322,36 +322,53 @@ function testPredictionPattern() {
 }
 
 function saveAdvancedPattern() {
-    $.getJSON("create-numberpattern.pl",{
-            "patternname"   :$("#patternname").val(),
-            "numberingmethod":$("#numberingmethod").val(),
-            "label1"        :$("#label1").val(),
-            "label2"        :$("#label2").val(),
-            "label3"        :$("#label3").val(),
-            "add1"          :$("#add1").val(),
-            "add2"          :$("#add2").val(),
-            "add3"          :$("#add3").val(),
-            "every1"        :$("#every1").val(),
-            "every2"        :$("#every2").val(),
-            "every3"        :$("#every3").val(),
-            "setto1"        :$("#setto1").val(),
-            "setto2"        :$("#setto2").val(),
-            "setto3"        :$("#setto3").val(),
-            "whenmorethan1" :$("#whenmorethan1").val(),
-            "whenmorethan2" :$("#whenmorethan2").val(),
-            "whenmorethan3" :$("#whenmorethan3").val(),
-            "numbering1"    :$("#numbering1").val(),
-            "numbering2"    :$("#numbering2").val(),
-            "numbering3"    :$("#numbering3").val(),
-            ajax:'true'
-        },
-        function(data){
-            $("#numberpattern").append("<option value=\""+data.numberpatternid+"\">"+$("#patternname").val()+"</option>");
-            $("#numberpattern").val(data.numberpatternid);
-            numberpatternload();
+    // Check if patternname already exists, and modify pattern
+    // instead of creating it if so
+    var found = 0;
+    $("#numberpattern option").each(function(){
+        if($(this).text() == $("#patternname").val()){
+            found = 1;
+            return false;
         }
-    );
+    });
+    var cnfrm = 1;
+    if(found){
+        cnfrm = confirm(_("This pattern already exists. Do you want to modify it"));
+    }
 
+    if(cnfrm) {
+        $.getJSON("create-numberpattern.pl",{
+                "patternname"   :$("#patternname").val(),
+                "numberingmethod":$("#numberingmethod").val(),
+                "label1"        :$("#label1").val(),
+                "label2"        :$("#label2").val(),
+                "label3"        :$("#label3").val(),
+                "add1"          :$("#add1").val(),
+                "add2"          :$("#add2").val(),
+                "add3"          :$("#add3").val(),
+                "every1"        :$("#every1").val(),
+                "every2"        :$("#every2").val(),
+                "every3"        :$("#every3").val(),
+                "setto1"        :$("#setto1").val(),
+                "setto2"        :$("#setto2").val(),
+                "setto3"        :$("#setto3").val(),
+                "whenmorethan1" :$("#whenmorethan1").val(),
+                "whenmorethan2" :$("#whenmorethan2").val(),
+                "whenmorethan3" :$("#whenmorethan3").val(),
+                "numbering1"    :$("#numbering1").val(),
+                "numbering2"    :$("#numbering2").val(),
+                "numbering3"    :$("#numbering3").val(),
+                ajax:'true'
+            },
+            function(data){
+                if(found == 0){
+                    $("#numberpattern").append("<option value=\""+data.numberpatternid+"\">"+$("#patternname").val()+"</option>");
+                }
+                $("#numberpattern").val(data.numberpatternid);
+                numberpatternload();
+            }
+        );
+    }
 }
 
 function show_page_1() {
@@ -633,9 +650,7 @@ $(document).ready(function() {
                                         <select name="numbering_pattern" size="1" id="numberpattern">
                                             <option value="">-- please choose --</option>
                                             <!--TMPL_LOOP Name="numberpatterns"-->
-                                                <option value="<!--TMPL_VAR Name="id"-->" <!--TMPL_IF name="selected"--> selected="selected" <!-- /TMPL_IF -->>
-                                                    <!--TMPL_VAR Name="label"-->
-                                                </option>
+                                                <option value="<!--TMPL_VAR Name="id"-->" <!--TMPL_IF name="selected"--> selected="selected" <!-- /TMPL_IF -->><!--TMPL_VAR Name="label"--></option>
                                             <!--/TMPL_LOOP-->
                                         </select>
                                     </li>
