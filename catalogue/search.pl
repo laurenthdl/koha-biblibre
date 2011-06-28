@@ -308,6 +308,7 @@ my %filters;
 # This array is used to build facets GUI
 my @tplfilters;
 for my $filter ( $cgi->param('filters') ) {
+    next if not $filter;
     my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
     push @{$filters{$k}}, $v;
     $v =~ s/"//g;
@@ -430,7 +431,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
                 'lib'     => $lib,
                 'value'   => $value,
                 'count'   => $count,
-                'active'  => $filters{$index} && grep /"$value"/, @{ $filters{$index} },
+                'active'  => ( $filters{$index} && grep /"$value"/, [ $filters{$index} ] ) ? 1 : 0,
                 'filters' => \@tplfilters,
             };
         }
