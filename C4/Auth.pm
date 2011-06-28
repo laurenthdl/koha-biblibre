@@ -509,7 +509,6 @@ sub get_template_and_user {
                     -value   => uri_escape( freeze( \$branch ) ),
                     -expires => ''
                 );
-                warn "sent to tmpl $branch";
                 $template->param( branchsearch => $branch );
                 $template->param( branchsearchexistsincookie => 1 );
                 $cookie = [ $cookie, $branchsearchcookie ];
