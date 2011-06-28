@@ -507,7 +507,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
                 'lib'     => $lib,                
                 'value'   => $value,
                 'count'   => $count,
-                'active'  => $filters{$index} && $filters{$index} eq "\"$value\"",
+                'active'  => $filters{$index} && grep /"$value"/, @{ $filters{$index} },
                 'filters' => \@tplfilters,
             };
         }
