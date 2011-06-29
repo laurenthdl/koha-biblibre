@@ -30,7 +30,7 @@ use C4::Items;
 use C4::Search;
 use C4::Circulation;
 use C4::Accounts;
-
+use C4::Debug;
 # for _koha_notify_reserve
 use C4::Members::Messaging;
 use C4::Members;
@@ -104,6 +104,7 @@ BEGIN {
       &GetReservesToBranch
       &GetReservesControlBranch
       &GetReserveCount
+      &GetReserveIssueRuleCount
       &GetReserveFee
       &GetReserveInfo
       &GetReserveStatus
@@ -404,7 +405,86 @@ sub BorrowerHasReserve {
     my $data = $sth->fetchrow_hashref();
     return $data->{'hasReserve'};
 }
+=item TooManyReseserves
 
+$error = &TooManyReseserves($borrowernumber, $itemnumber)
+
+=cut
+
+sub TooManyReseserves {
+	
+    my ( $borrowernumber, $branchcode ) = @_;
+ 	my $dbh             = C4::Context->dbh;
+
+    my $branchfield;
+       
+     # we retrieve borrowers and items informations #
+   
+    my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber); 
+    
+    
+    
+
+    my $controlbranch = C4::Context->preference('ReservesControlBranch');
+    my $branchfield=C4::Context->preference("HomeOrHoldingBranch")||"homebranch";
+    
+    my $cat_borrower = $borrower->{'categorycode'};    
+   
+      
+    #By default, Patron is supposed not to be able to borrow
+    my $toomanyReserves = 0;
+
+    
+            my $issuing_rule = GetIssuingRule( $cat_borrower, '*', $branchcode );
+            
+            
+            # if a rule is found and has a loan limit set, count
+            # how many loans the patron already has that meet that
+            # rule
+            #warn Data::Dumper::Dumper($issuing_rule);
+            if ( defined($issuing_rule) and defined( $issuing_rule->{'reservesallowed'} ) ) {
+            	
+                my @bind_params;
+                my $count_query = "SELECT COUNT(*) FROM reserves
+                                   JOIN items USING (itemnumber) ";
+				
+				# matching rule has the global item type, so count all the items issued for that branch
+                # and for that user
+                $count_query .= " WHERE 1 ";
+               
+
+                $count_query .= " AND borrowernumber = ? ";
+                push @bind_params, $borrower->{'borrowernumber'};
+                
+                my $rule_branch = $issuing_rule->{branchcode};
+                if ( $rule_branch ne "*" ) {
+					if ( $controlbranch eq 'PatronLibrary' ) {
+                        ;    # if branch is the patron's home branch, then count all reserve by patron
+                    } else {
+                        $count_query .= " AND items.$branchfield = ? ";
+                        push @bind_params, $branchcode;
+                    }
+                }
+
+                $debug and warn $count_query;
+
+                my $count_sth = $dbh->prepare($count_query);
+               
+                $count_sth->execute(@bind_params);
+                my ($current_reserve_count) = $count_sth->fetchrow_array;
+                $debug && warn " Issuingrule : cat type branch max",@$issuing_rule{qw(categorycode itemtype branchcode reservesallowed)};
+                $debug && warn " cat type branch $cat_borrower, * , $branchcode";
+                $debug and warn "reserve count for $cat_borrower, * , $branchcode",$current_reserve_count;
+
+                my $max_reserve_allowed = $issuing_rule->{'reservesallowed'};
+                if ( $current_reserve_count >= $max_reserve_allowed ) {
+                    return 1, $current_reserve_count, $max_reserve_allowed;
+                } 
+            }
+        
+    
+    return $toomanyReserves;
+}
 =item CanBookBeReserved
 
 $error = &CanBookBeReserved($borrowernumber, $biblionumber)
@@ -415,10 +495,11 @@ sub CanBookBeReserved {
     my ( $borrowernumber, $biblionumber ) = @_;
 
     my @items = GetItemsInfo($biblionumber);
-    foreach my $item (@items) {
-        return 1 if CanItemBeReserved( $borrowernumber, $item->{itemnumber} );
-    }
-    return 0;
+    my ($toomanyReserves, $current_reserve_count, $max_reserve_allowed) = TooManyReseserves( $borrowernumber, '*' );
+    
+    return 0, $current_reserve_count, $max_reserve_allowed if ($toomanyReserves);
+    
+    return 1;  
 }
 
 =item CanItemBeReserved
@@ -433,46 +514,49 @@ sub CanItemBeReserved {
     my ( $borrowernumber, $itemnumber ) = @_;
 
     my $dbh             = C4::Context->dbh;
-    my $allowedreserves = 0;
-    my $reservecount    = "0";
+    
     my $branchfield;
     my $branchcode;
-    
-    my $controlbranch = C4::Context->preference('ReservesControlBranch');
-
+       
+	
     # we retrieve borrowers and items informations #
     my $item     = C4::Items::GetItem($itemnumber);
-    my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber);     
+    my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber); 
     
-    if( $controlbranch eq "ItemHomeLibrary" ){
-        my $field=C4::Context->preference("HomeOrHoldingBranch")||"homebranch";
-        $branchfield = "items.$field";
-        $branchcode = $item->{$field};
-    }elsif( $controlbranch eq "PatronLibrary" ){
-        $branchcode = $borrower->{branchcode};
-    }else{
-        $branchcode = C4::Context->userenv->{'branch'};
-    }
+    
+    $branchcode = GetReservesControlBranch($borrower,$item);
+    
+    my $branchfield=C4::Context->preference("HomeOrHoldingBranch")||"homebranch";
+    
+    my $cat_borrower = $borrower->{'categorycode'};    
+    
+
+
+    my $itype = ( C4::Context->preference('item-level_itypes') )
+      ? $item->{'itype'}        # item-level
+      : $item->{'itemtype'};    # biblio-level
+
+
     
     # We see if he have right or not to reserve this item(Y or N), we don't care about the number of reserves allowed
     # if he have no rule set, he have not right
-    my $issuingrule = GetIssuingRule($borrower->{categorycode}, $item->{'itype'}, $branchcode);
-    return 0 if( defined $issuingrule->{reservesallowed} && not $issuingrule->{reservesallowed} ); 
+    my $issuingrule = GetIssuingRule($cat_borrower, $itype, $branchcode);
+  
+    my ($reserves_total_rule) = GetReserveIssueRuleCount($borrower, $issuingrule, $branchcode);
+   
     
-    # We retrieve the count of reserves allowed for this category code
-    $issuingrule  = GetIssuingRule ($borrower->{categorycode}, "*", "*");
-    $reservecount = GetReserveCount($borrowernumber);
+    return 0 if( (defined $issuingrule->{reservesallowed} && not $issuingrule->{reservesallowed}) or $reserves_total_rule >= $issuingrule->{'reservesallowed'}   ); 
 
-    return 0 if ($issuingrule->{reservesallowed}==0 || 
-                ($issuingrule->{holdrestricted}== 1 && !($branchcode eq $borrower->{branchcode}))
-                );
-
-    # we check if it's ok or not
-    if( $reservecount < $issuingrule->{reservesallowed} ){
-        return 1;
-    } else {
-        return 0;
-    }
+    return 0 if ($issuingrule->{holdrestricted} == 1 && ($branchcode ne $borrower->{branchcode})); 		
+    
+     if (!$issuingrule->{allowonshelfholds}){
+            	
+          return 0 if (!$item->{onloan} or not defined ($item->{onloan}));
+          return 0 if (GetReserveStatus($itemnumber) eq "W");
+     }
+     return 0 if TooManyReseserves( $borrowernumber, $branchcode );
+     
+	return 1;
 }
 
 =item GetMaxPickupDelay
@@ -598,6 +682,94 @@ sub GetReserveCount {
     $sth->execute($borrowernumber);
     my $row = $sth->fetchrow_hashref;
     return $row->{counter};
+}
+
+=item GetReserveIssueRuleCount
+
+$number = &GetReserveIssueRuleCount($borrowernumber, $itemtype, $branchcode);
+
+Devuelve la cantidad de reservas realizadas de items total de una regla dada.
+
+=cut
+
+sub GetReserveIssueRuleCount {
+    my ($borrower, $issuing_rule,$branchcode) = @_;
+	
+	my @bind_params = ();
+	
+	my $controlbranch = C4::Context->preference('ReservesControlBranch');
+	my $branchfield=C4::Context->preference("HomeOrHoldingBranch")||"homebranch";
+	
+    my $dbh = C4::Context->dbh;
+
+     my @bind_params;
+                
+                my $count_query = "SELECT COUNT(*) FROM reserves
+                                   JOIN items USING (itemnumber) ";
+
+                my $rule_itemtype = $issuing_rule->{itemtype};
+                if ( $rule_itemtype eq "Default" ) {
+
+                    # matching rule has the default item type, so count all the items issued for that branch no
+                    # those existing loans that don't fall under a more
+                    # specific rule Not QUITE
+                    # Is just quite the opposite of default rule: No rule No check out
+                    if (C4::Context->preference('item-level_itypes')) {
+                        $count_query .= " WHERE items.itype NOT IN (
+                                                SELECT itemtype FROM issuingrules
+                                                WHERE branchcode = ?
+                                                AND   (categorycode = ? OR categorycode = ?)
+                                                AND   itemtype NOT IN ( 'Default','*')
+                                           )";
+                    } else {
+                        $count_query .= " JOIN  biblioitems USING (biblionumber)
+                                            WHERE biblioitems.itemtype NOT IN (
+                                                SELECT itemtype FROM issuingrules
+                                                WHERE branchcode = ?
+                                                AND   (categorycode = ? OR categorycode = ?)
+                                                AND   itemtype NOT IN ('Default','*')
+                                           )";
+                    }
+                    push @bind_params, $issuing_rule->{branchcode};
+                    push @bind_params, $issuing_rule->{categorycode};
+                    push @bind_params, $borrower->{'categorycode'};
+                }
+                elsif ( $rule_itemtype eq "*" ) {
+                    # matching rule has the global item type, so count all the items issued for that branch
+                    # and for that user
+                        $count_query .= " WHERE 1 ";
+                } else {
+                    # rule has specific item type, so count loans of that
+                    # specific item type
+                    if ( C4::Context->preference('item-level_itypes') ) {
+                        $count_query .= " WHERE items.itype = ? ";
+                    } else {
+                        $count_query .= " JOIN  biblioitems USING (biblionumber) 
+                                      WHERE biblioitems.itemtype= ? ";
+                    }
+                    push @bind_params, $rule_itemtype;
+                }
+
+                $count_query .= " AND borrowernumber = ? ";
+                push @bind_params, $borrower->{'borrowernumber'};
+                my $rule_branch = $issuing_rule->{branchcode};
+                if ( $rule_branch ne "*" ) {
+					if ( $controlbranch eq 'PatronLibrary' ) {
+                        ;    # if branch is the patron's home branch, then count all reserve by patron
+                    } else {
+                        $count_query .= " AND items.$branchfield = ? ";
+                        push @bind_params, $branchcode;
+                    }
+                }
+
+                $debug and warn $count_query;
+
+                my $count_sth = $dbh->prepare($count_query);
+                $count_sth->execute(@bind_params);
+                my ($current_reserve_count) = $count_sth->fetchrow_array;
+                
+                return $current_reserve_count;
+    
 }
 
 =item GetReserveNumber
@@ -866,7 +1038,7 @@ sub GetReserveStatus {
 
     my $dbh = C4::Context->dbh;
 
-    my $itemstatus = $dbh->prepare("SELECT found FROM reserves WHERE itemnumber = ?");
+    my $itemstatus = $dbh->prepare("SELECT found FROM reserves WHERE itemnumber = ? order by priority");
 
     $itemstatus->execute($itemnumber);
     my ($found) = $itemstatus->fetchrow_array;
@@ -1521,12 +1693,14 @@ sub IsAvailableForItemLevelRequest {
                                $item->{wthdrawn} or
                                $notforloan_per_itemtype;
 
-
-    if (CanHoldOnShelf($itemnumber)) {
-        return $available_per_item;
-    } else {
-        return ($available_per_item and ($item->{onloan} or GetReserveStatus($itemnumber) eq "W"));
-    }
+	#XERCODE
+    #if (CanHoldOnShelf($itemnumber)) {
+    #    return $available_per_item;
+    #} else {
+    #    return ($available_per_item and ($item->{onloan} or GetReserveStatus($itemnumber) eq "W"));
+    #}
+ 	
+ 	return $available_per_item;   
 }
 
 =item AlterPriority
