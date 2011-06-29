@@ -1,5 +1,8 @@
 <h2>Prediction pattern</h1>
 <!-- TMPL_UNLESS NAME="custompattern" -->
+<!-- TMPL_IF NAME='not_consistent_end_date' -->
+  <p><em>End date is not consistent with subscription length.</em></p>
+<!-- /TMPL_IF -->
 <p><em>Please check issues that are NOT published (irregularities)</em></p>
 <!-- TMPL_IF NAME="daily_options" -->
 <script type="text/javascript">

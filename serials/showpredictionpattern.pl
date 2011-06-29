@@ -212,5 +212,8 @@ if($frequency->{'unit'} eq 'day' && $frequency->{'unitsperissue'} == 1) {
     );
 }
 
+if($date_iso && $enddate_iso && $date_iso ne $enddate_iso) {
+    $template->param(not_consistent_end_date => 1);
+}
 
 output_html_with_http_headers $input, $cookie, $template->output;

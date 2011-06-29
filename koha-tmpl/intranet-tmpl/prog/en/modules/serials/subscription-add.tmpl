@@ -86,9 +86,8 @@ function Check_page2(){
         alert(_("You must choose a start date"));
         return false;
     }
-    if(($("#sublength").val().length == 0 && $("#enddate").val().length == 0)
-    || ($("#sublength").val().length != 0 && $("#enddate").val().length != 0)){
-        alert(_("You must choose a subscription length or an end date, but not them two."));
+    if(($("#sublength").val().length == 0 && $("#enddate").val().length == 0)){
+        alert(_("You must choose a subscription length or an end date."));
         return false;
     }
     if(advancedpatternlocked == 0){
