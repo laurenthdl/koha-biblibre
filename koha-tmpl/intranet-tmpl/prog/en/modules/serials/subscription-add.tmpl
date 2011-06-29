@@ -684,7 +684,13 @@ $(document).ready(function() {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>Begins with</td>
+                                                    <td>
+                                                      <!-- TMPL_IF NAME='mod' -->
+                                                        Last value
+                                                      <!-- TMPL_ELSE -->
+                                                        Begins with
+                                                      <!-- /TMPL_IF -->
+                                                    </td>
                                                     <td id="beginsX"><input type="text" id="lastvaluetemp1" name="lastvaluetemp1" value="<!-- TMPL_VAR NAME='lastvalue1' -->" /></td>
                                                     <td id="beginsY"><input type="text" id="lastvaluetemp2" name="lastvaluetemp2" value="<!-- TMPL_VAR NAME='lastvalue2' -->" /></td>
                                                     <td id="beginsZ"><input type="text" id="lastvaluetemp3" name="lastvaluetemp3" value="<!-- TMPL_VAR NAME='lastvalue3' -->" /></td>
