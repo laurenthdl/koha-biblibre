@@ -223,7 +223,8 @@ foreach my $biblionumber (@biblionumbers) {
 
     my $dat = GetBiblioData($biblionumber);
 
-    if ( not CanBookBeReserved( $borrowerinfo->{borrowernumber}, $biblionumber ) ) {
+     my ($canBookBeReserve, $current_reserve_count, $max_reserve_allowed )= CanBookBeReserved( $borrowerinfo->{borrowernumber}, $biblionumber );
+    if ( not $canBookBeReserve ) {
         $warnings    = 1;
         $maxreserves = 1;
     }
@@ -253,7 +254,9 @@ foreach my $biblionumber (@biblionumbers) {
         alreadyreserved => $alreadyreserved,
         messages        => $messages,
         warnings        => $warnings,
-        maxreserves     => $maxreserves
+        maxreserves     => $maxreserves,
+        current_reserve_count => $current_reserve_count,
+        max_reserve_allowed => $max_reserve_allowed
     );
 
     # FIXME think @optionloop, is maybe obsolete, or  must be switchable by a systeme preference fixed rank or not
