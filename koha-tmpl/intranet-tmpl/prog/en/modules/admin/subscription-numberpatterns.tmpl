@@ -24,7 +24,7 @@ function testPattern() {
     }
 
     $.ajax({
-        url: "showpredictionpattern.pl",
+        url: "/cgi-bin/koha/serials/showpredictionpattern.pl",
         data: {
             'custompattern' : 1,
             'firstacquidate': $("#firstacquidate").val(),
@@ -74,7 +74,7 @@ $(document).ready(function() {
 <!-- TMPL_INCLUDE NAME="header.inc" -->
 <!-- TMPL_INCLUDE NAME="serials-search.inc" -->
 
-<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/serials/serials-home.pl">Serials</a> &rsaquo; Number patterns</div>
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/admin/admin-home.pl">Serials</a> &rsaquo; Number patterns</div>
 
 <div id="doc3" class="yui-t2">
 
@@ -98,7 +98,7 @@ $(document).ready(function() {
               </div>
             <!-- /TMPL_IF -->
           <!-- /TMPL_IF -->
-          <form action="/cgi-bin/koha/serials/subscription-numberpatterns.pl" method="post">
+          <form action="/cgi-bin/koha/admin/subscription-numberpatterns.pl" method="post">
             <div class="yui-u first">
               <!-- TMPL_IF NAME='new' -->
                 <input type="hidden" name="op" value="savenew" />
@@ -177,7 +177,7 @@ $(document).ready(function() {
               <fieldset class="action">
                 <input type="submit" value="Save" />
                 <input type="reset" value="Reset" />
-                <input type="button" value="Cancel" onclick="window.location = '/cgi-bin/koha/serials/subscription-numberpatterns.pl';" />
+                <input type="button" value="Cancel" onclick="window.location = '/cgi-bin/koha/admin/subscription-numberpatterns.pl';" />
               </fieldset>
             </form>
           </div>
@@ -243,7 +243,7 @@ $(document).ready(function() {
           </div>
         <!-- TMPL_ELSE -->
           <h1>Number patterns</h1>
-          <a href="/cgi-bin/koha/serials/subscription-numberpatterns.pl?op=new">New number pattern</a>
+          <a href="/cgi-bin/koha/admin/subscription-numberpatterns.pl?op=new">New number pattern</a>
           <!-- TMPL_IF NAME='numberpatterns_loop' -->
             <table id="numberpatternst">
               <thead>
@@ -263,8 +263,8 @@ $(document).ready(function() {
                     <td><!-- TMPL_VAR NAME='numberingmethod' --></td>
                     <td><!-- TMPL_VAR NAME='displayorder' --></td>
                     <td>
-                      <a href="/cgi-bin/koha/serials/subscription-numberpatterns.pl?op=mod&id=<!-- TMPL_VAR NAME='id' -->">Edit</a> |
-                      <a href="/cgi-bin/koha/serials/subscription-numberpatterns.pl?op=del&id=<!-- TMPL_VAR NAME='id' -->">Delete</a>
+                      <a href="/cgi-bin/koha/admin/subscription-numberpatterns.pl?op=mod&id=<!-- TMPL_VAR NAME='id' -->">Edit</a> |
+                      <a href="/cgi-bin/koha/admin/subscription-numberpatterns.pl?op=del&id=<!-- TMPL_VAR NAME='id' -->">Delete</a>
                     </td>
                   </tr>
                 <!-- /TMPL_LOOP -->
@@ -278,7 +278,7 @@ $(document).ready(function() {
     </div>
   </div>
   <div class="yui-b">
-    <!-- TMPL_INCLUDE NAME="serials-menu.inc" -->
+    <!-- TMPL_INCLUDE NAME="admin-menu.inc" -->
   </div>
 </div>
 <!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->

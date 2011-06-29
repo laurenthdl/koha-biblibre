@@ -38,11 +38,11 @@ use C4::Serials::Frequency;
 
 my $input = new CGI;
 my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
-    template_name   => 'serials/subscription-numberpatterns.tmpl',
+    template_name   => 'admin/subscription-numberpatterns.tmpl',
     query           => $input,
     type            => 'intranet',
     authnotrequired => 0,
-    flagsrequired   => { 'serials' => '*' },
+    flagsrequired   => { 'parameters' => 1 },
     debug           => 1,
 } );
 

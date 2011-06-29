@@ -17,7 +17,7 @@ $(document).ready(function() {
 <!-- TMPL_INCLUDE NAME="header.inc" -->
 <!-- TMPL_INCLUDE NAME="serials-search.inc" -->
 
-<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/serials/serials-home.pl">Serials</a> &rsaquo; Frequencies</div>
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/admin/admin-home.pl">Administration</a> &rsaquo; Frequencies</div>
 
 <div id="doc3" class="yui-t2">
 
@@ -30,7 +30,7 @@ $(document).ready(function() {
         <!-- TMPL_ELSE -->
           <h1>Modify frequency: <!-- TMPL_VAR NAME="description" --></h1>
         <!-- /TMPL_IF -->
-        <form action="/cgi-bin/koha/serials/subscription-frequencies.pl" method="post">
+        <form action="/cgi-bin/koha/admin/subscription-frequencies.pl" method="post">
           <!-- TMPL_IF NAME="mod" -->
             <input type="hidden" name="id" value="<!-- TMPL_VAR NAME='id' -->" />
             <input type="hidden" name="op" value="savemod" />
@@ -78,11 +78,11 @@ $(document).ready(function() {
           </fieldset>
           <fieldset class="action">
             <input type="submit" value="Save" />
-            <input type="button" value="Cancel" onclick="window.location='/cgi-bin/koha/serials/subscription-frequencies.pl'" />
+            <input type="button" value="Cancel" onclick="window.location='/cgi-bin/koha/admin/subscription-frequencies.pl'" />
           </fieldset>
         </form>
       <!-- TMPL_ELSE -->
-        <a href="/cgi-bin/koha/serials/subscription-frequencies.pl?op=new">New frenquency</a>
+        <a href="/cgi-bin/koha/admin/subscription-frequencies.pl?op=new">New frenquency</a>
 
         <!-- TMPL_IF NAME="frequencies_loop" -->
           <h1>Frenquencies</h1>
@@ -108,8 +108,8 @@ $(document).ready(function() {
                   <td><!-- TMPL_VAR NAME="expectedissuesayear" --></td>
                   <td><!-- TMPL_VAR NAME="displayorder" --></td>
                   <td>
-                    <a href="/cgi-bin/koha/serials/subscription-frequencies.pl?op=mod&frequencyid=<!-- TMPL_VAR NAME='id' -->">Modify</a> |
-                    <a href="/cgi-bin/koha/serials/subscription-frequencies.pl?op=del&frequencyid=<!-- TMPL_VAR NAME='id' -->" onclick="return confirmDelete();">Delete</a>
+                    <a href="/cgi-bin/koha/admin/subscription-frequencies.pl?op=mod&frequencyid=<!-- TMPL_VAR NAME='id' -->">Modify</a> |
+                    <a href="/cgi-bin/koha/admin/subscription-frequencies.pl?op=del&frequencyid=<!-- TMPL_VAR NAME='id' -->" onclick="return confirmDelete();">Delete</a>
                   </td>
                 </tr>
               <!-- /TMPL_LOOP -->
@@ -123,7 +123,7 @@ $(document).ready(function() {
     </div>
   </div>
   <div class="yui-b">
-    <!-- TMPL_INCLUDE NAME="serials-menu.inc" -->
+    <!-- TMPL_INCLUDE NAME="admin-menu.inc" -->
   </div>
 </div>
 <!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->
