@@ -59,11 +59,13 @@ sub ComputeValue {
                 for my $afieldtoindex ( @afieldstoindex ) {
                     for my $afield ( $arecord->field( $afieldtoindex ) ) {
                         my @asubfields = $afield->subfields;
+                        my $tempauthor;
                         for my $f (@asubfields) {
                             if ($f->[0] ~~ @asubfieldstoindex) {
-                                push @values, $f->[1]  ;
+                                $tempauthor .= $f->[1]." ";
                             }
                         }
+                        push @values, $tempauthor;
                     }
                 }
             }
