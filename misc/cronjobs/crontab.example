@@ -80,3 +80,7 @@ KOHA_CRON_PATH = /home/liblime/kohaclone/misc/cronjobs
 
 # clean up databases nightly.  Be sure not to run this with --sessions during a time when the system is in use!
 16 1 * * * $KOHA_CRON_PATH/cleanup_database.pl --sessions --zebraqueue 10
+
+# solr configuration
+00 21 * * * perl /home/koha/src/misc/migration_tools/rebuild_solr.pl -t biblio -o
+*/5 8-19 * * * /home/koha/bin/syncitems.sh

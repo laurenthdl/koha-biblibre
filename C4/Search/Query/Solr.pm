@@ -103,7 +103,7 @@ sub BuildTokenString {
         if (
             $string =~ / /
                 and not ( $string =~ /^\(.*\)$/ and ( $string =~ / OR / or $string =~ / AND / or $string =~ / NOT / ) )
-                and not $string =~ /[.*TO.*]/ ) {
+                and not $string =~ /\[.*TO.*\]/ ) {
             my @dqs; #double-quoted string
             while ( $string =~ /"(?:[^"\\]++|\\.)*+"/g ) {
                 push @dqs, $&;
@@ -112,10 +112,22 @@ sub BuildTokenString {
 
             my @words = split ' ', $string;
             my $join = join qq{ AND } , map {
-                qq{$index:$_};
+                my $value = $_;
+                if ( $index =~ /^date_/ ) {
+                    $value =~ s/\\:/:/g;
+                    $value = C4::Search::Engine::Solr::NormalizeDate($value);
+                }
+                qq{$index:$value};
             } (@dqs, @words);
             $r .= qq{($join)};
         } else {
+            if ( $index =~ /^date_/ ) {
+                $string =~ s/\\:/:/g;
+                $string = C4::Search::Engine::Solr::NormalizeDate($string) if not $string =~ /\[.*TO.*\]/;
+                $string = "[" . C4::Search::Engine::Solr::NormalizeDate($1) . " TO " . C4::Search::Engine::Solr::NormalizeDate($2) . "]"
+                    if $string =~ /\[(.*)\sTO\s(.*)\]/;
+            }
+
             $r = "$index:$string";
         }
     }else{

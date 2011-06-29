@@ -2658,6 +2658,11 @@ sub ProcessOfflineReturn {
                 undef,
                 $operation->{timestamp},
             );
+            ModItem(
+                { renewals => 0, onloan => undef },
+                $issue->{'biblionumber'},
+                $itemnumber
+            );
             return "Success.";
         } else {
             return "Item not issued.";

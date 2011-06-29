@@ -23,7 +23,6 @@ use C4::Context;
 use C4::Biblio;
 use C4::Branch;
 use C4::Koha;
-use C4::AuthoritiesMarc;
 use Data::SearchEngine::Solr;
 use Data::SearchEngine::Query;
 use Data::SearchEngine::Item;
@@ -504,7 +503,9 @@ sub DeleteRecordIndex {
 
 #duplicate code with C4::Date::output('iso') ?
 sub NormalizeDate {
-    given( shift ) {
+    my $date = shift;
+    given( $date ) {
+        when( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/ ) {  return $date  }
         when( /^(\d{2}).(\d{2}).(\d{4})$/ ) { return "$3-$2-$1T00:00:00Z" }
         when( /^(\d{4}).(\d{2})$/         ) { return "$1-$2-01T00:00:00Z" }
         when( /^(\d{2}).(\d{4})$/         ) { return "$2-$1-01T00:00:00Z" }

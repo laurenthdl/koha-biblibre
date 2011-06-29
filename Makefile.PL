@@ -238,7 +238,7 @@ my $target_map = {
   './offline_circ'		=> 'INTRANET_CGI_DIR',
   './edithelp.pl'               => 'INTRANET_CGI_DIR',
   './etc'                       => { target => 'KOHA_CONF_DIR', trimdir => -1 },
-  './etc/solr'                  => { target => 'SOLR_CONF_DIR', trimdir => -1 },
+#  './etc/solr'                  => { target => 'SOLR_CONF_DIR', trimdir => -1 },
   './help.pl'                   => 'INTRANET_CGI_DIR',
   './installer-CPAN.pl'         => 'NONE',
   './installer'                 => 'INTRANET_CGI_DIR',
@@ -428,7 +428,7 @@ if ($config{'INSTALL_MODE'} ne "dev") {
 
 my %test_suite_override_dirs = (
     KOHA_CONF_DIR  => ['etc'],
-    SOLR_CONF_DIR  => ['etc', 'solr'],
+#    SOLR_CONF_DIR  => ['etc', 'solr'],
     LOG_DIR        => ['var', 'log'],
     SCRIPT_DIR     => ['bin'],
 );
@@ -1029,7 +1029,7 @@ sub get_target_directories {
         $dirmap{'OPAC_WWW_DIR'} = File::Spec->catdir(@basedir, $package, 'opac', 'htdocs');
         $dirmap{'PERL_MODULE_DIR'} = File::Spec->catdir(@basedir, $package, 'lib');
         $dirmap{'KOHA_CONF_DIR'} = File::Spec->catdir(@basedir, $package, 'etc');
-        $dirmap{'SOLR_CONF_DIR'} = File::Spec->catdir(@basedir, $package, 'etc', 'solr');
+#        $dirmap{'SOLR_CONF_DIR'} = File::Spec->catdir(@basedir, $package, 'etc', 'solr');
         $dirmap{'MISC_DIR'} = File::Spec->catdir(@basedir, $package, 'misc');
         $dirmap{'SCRIPT_DIR'} = File::Spec->catdir(@basedir, $package, 'bin');
         $dirmap{'SCRIPT_NONDEV_DIR'} = $dirmap{'SCRIPT_DIR'};
@@ -1053,7 +1053,7 @@ sub get_target_directories {
         $dirmap{'PERL_MODULE_DIR'} = File::Spec->catdir($curdir);
         $skipdirs{'PERL_MODULE_DIR'} = 1;
         $dirmap{'KOHA_CONF_DIR'} = File::Spec->catdir(@basedir, $package, 'etc');
-        $dirmap{'SOLR_CONF_DIR'} = File::Spec->catdir(@basedir, $package, 'etc', 'solr');
+#        $dirmap{'SOLR_CONF_DIR'} = File::Spec->catdir(@basedir, $package, 'etc', 'solr');
         $dirmap{'MISC_DIR'} = File::Spec->catdir(@basedir, $package, 'misc');
         $dirmap{'SCRIPT_DIR'} = File::Spec->catdir(@basedir, $package, 'bin');
         $dirmap{'SCRIPT_NONDEV_DIR'} = $dirmap{'SCRIPT_DIR'};
@@ -1071,7 +1071,7 @@ sub get_target_directories {
         $dirmap{'OPAC_WWW_DIR'} = File::Spec->catdir(@basedir, $package, 'opac', 'htdocs');
         $dirmap{'PERL_MODULE_DIR'} = File::Spec->catdir(@basedir, $package, 'lib');
         $dirmap{'KOHA_CONF_DIR'} = File::Spec->catdir(File::Spec->rootdir(), 'etc', $package);
-        $dirmap{'SOLR_CONF_DIR'} = File::Spec->catdir(File::Spec->rootdir(), 'etc', $package, 'solr');
+#        $dirmap{'SOLR_CONF_DIR'} = File::Spec->catdir(File::Spec->rootdir(), 'etc', $package, 'solr');
         $dirmap{'MISC_DIR'} = File::Spec->catdir(@basedir, $package, 'misc');
         $dirmap{'SCRIPT_DIR'} = File::Spec->catdir(@basedir, $package, 'bin');
         $dirmap{'SCRIPT_NONDEV_DIR'} = $dirmap{'SCRIPT_DIR'};
@@ -1235,7 +1235,7 @@ install :: all install_koha set_koha_ownership set_koha_permissions warn_koha_en
 				$install .= "\t\$(NOECHO) chmod -R u+w \$(KOHA_DEST_$key)\n"
 					unless exists $skip_directories->{$key};
 			}
-            $install .= "\t\$(NOECHO) chmod -R 777 \$(KOHA_DEST_SOLR_CONF_DIR)/data\n"
+#            $install .= "\t\$(NOECHO) chmod -R 777 \$(KOHA_DEST_SOLR_CONF_DIR)/data\n"
 	}
 	elsif ($^O eq 'MSWin32' ) {	# On Win32, the install probably needs to be done under the user account koha will be running as...
 								# We can attempt some creative things with command line utils such as CACLS which allows permission
