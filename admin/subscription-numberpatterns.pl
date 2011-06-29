@@ -38,11 +38,11 @@ use C4::Serials::Frequency;
 
 my $input = new CGI;
 my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
-    template_name   => 'serials/subscription-numberpatterns.tmpl',
+    template_name   => 'admin/subscription-numberpatterns.tmpl',
     query           => $input,
     type            => 'intranet',
     authnotrequired => 0,
-    flagsrequired   => { 'serials' => '*' },
+    flagsrequired   => { 'parameters' => 1 },
     debug           => 1,
 } );
 
@@ -109,6 +109,7 @@ if($op && ($op eq 'new' || $op eq 'mod')) {
         $op => 1,
         frequencies_loop => \@frequencies,
         subtypes_loop => \@subtypes,
+        DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
     );
     output_html_with_http_headers $input, $cookie, $template->output;
     exit;

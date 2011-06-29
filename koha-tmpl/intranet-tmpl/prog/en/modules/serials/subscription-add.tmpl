@@ -137,14 +137,24 @@ function displaymoreoptions() {
         return false;
     }
 
-    if(globalnumpatterndata.label1 || globalnumpatterndata.label2 || globalnumpatterndata.label3) {
+    var X = 0, Y = 0, Z = 0;
+    var numberingmethod = unescape(globalnumpatterndata.numberingmethod);
+    if(numberingmethod.match(/{X}/)) X = 1;
+    if(numberingmethod.match(/{Y}/)) Y = 1;
+    if(numberingmethod.match(/{Z}/)) Z = 1;
+
+    if(X || Y || Z) {
         $("#moreoptionst").show();
     } else {
         $("#moreoptionst").hide();
     }
 
-    if(globalnumpatterndata.label1) {
-        $("#headerX").html(unescape(globalnumpatterndata.label1));
+    if(X) {
+        if(globalnumpatterndata.label1) {
+            $("#headerX").html(unescape(globalnumpatterndata.label1));
+        } else {
+            $("#headerX").html("X");
+        }
         $("#headerX").show();
         $("#beginsX").show();
         $("#innerX").show();
@@ -155,8 +165,12 @@ function displaymoreoptions() {
         $("#lastvaluetemp1").val('');
         $("#innerlooptemp1").val('');
     }
-    if(globalnumpatterndata.label2) {
-        $("#headerY").html(unescape(globalnumpatterndata.label2));
+    if(Y) {
+        if(globalnumpatterndata.label2) {
+            $("#headerY").html(unescape(globalnumpatterndata.label2));
+        } else {
+            $("#headerY").html("Y");
+        }
         $("#headerY").show();
         $("#beginsY").show();
         $("#innerY").show();
@@ -167,8 +181,12 @@ function displaymoreoptions() {
         $("#lastvaluetemp2").val('');
         $("#innerlooptemp2").val('');
     }
-    if(globalnumpatterndata.label3) {
-        $("#headerZ").html(unescape(globalnumpatterndata.label3));
+    if(Z) {
+        if(globalnumpatterndata.label3) {
+            $("#headerZ").html(unescape(globalnumpatterndata.label3));
+        } else {
+            $("#headerZ").html("Z");
+        }
         $("#headerZ").show();
         $("#beginsZ").show();
         $("#innerZ").show();
@@ -688,7 +706,13 @@ $(document).ready(function() {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>Begins with</td>
+                                                    <td>
+                                                      <!-- TMPL_IF NAME='mod' -->
+                                                        Last value
+                                                      <!-- TMPL_ELSE -->
+                                                        Begins with
+                                                      <!-- /TMPL_IF -->
+                                                    </td>
                                                     <td id="beginsX"><input type="text" id="lastvaluetemp1" name="lastvaluetemp1" value="<!-- TMPL_VAR NAME='lastvalue1' -->" /></td>
                                                     <td id="beginsY"><input type="text" id="lastvaluetemp2" name="lastvaluetemp2" value="<!-- TMPL_VAR NAME='lastvalue2' -->" /></td>
                                                     <td id="beginsZ"><input type="text" id="lastvaluetemp3" name="lastvaluetemp3" value="<!-- TMPL_VAR NAME='lastvalue3' -->" /></td>
