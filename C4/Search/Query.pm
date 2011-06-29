@@ -194,6 +194,14 @@ sub splitToken {
         $attr = (@values)[1];
         $idx = getIndexName $idx if $idx;
 
+        if ( $idx =~ /^date_/ ) {
+            $operand =~ s/\\:/:/g;
+            my $date = C4::Search::Engine::Solr::NormalizeDate($operand) if not $operand =~ /\[.*TO.*\]/;
+            $operand = $date if defined $date;
+            $operand = "[" . C4::Search::Engine::Solr::NormalizeDate($1) . " TO " . C4::Search::Engine::Solr::NormalizeDate($2) . "]"
+                if $operand =~ /\[(.*)\sTO\s(.*)\]/;
+        }
+
         given ( $attr ) {
             when ( 'phr' ) {
                 # If phr on attr, we add ""
@@ -250,13 +258,13 @@ sub buildQuery {
             # 'Normal' search
             if ( not @$indexes ) {
                 return C4::Search::Query::Solr->normalSearch(@$operands[0]);
-            }else{
-                # Advanced search
-                for $idx (@$indexes){
-                    push @$new_indexes, getIndexName($idx ? $idx : 'all_fields');
-                }
-                $new_operands = $operands;
             }
+
+            # Advanced search
+            for $idx (@$indexes){
+                push @$new_indexes, getIndexName($idx ? $idx : 'all_fields');
+            }
+            $new_operands = $operands;
 
             return C4::Search::Query::Solr->buildQuery($new_indexes, $new_operands, $operators);
         }

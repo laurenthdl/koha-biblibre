@@ -1,4 +1,4 @@
-package C4::Search::Plugins::DeleteNsbNse;
+package C4::Search::Plugins::PubDate;
 
 # Copyright (C) 2010 BibLibre
 #
@@ -19,8 +19,6 @@ package C4::Search::Plugins::DeleteNsbNse;
 
 use strict;
 use warnings;
-use C4::AuthoritiesMarc;
-use C4::Charset;
 use base 'Exporter';
 
 our @EXPORT = qw/
@@ -28,41 +26,38 @@ our @EXPORT = qw/
     /;
 our $VERSION = 3.0.1;
 
-=head2 fonction
-    return values without nsb/nse characters
-=cut
+sub ComputeValue {
+    my ( $record, $mapping ) = @_;
 
-sub GetSF {
-    my ($record, $mapping) = @_;
+    return if (!defined $mapping);
 
+    my @dates = ();
     my @values = ();
     for my $tag ( keys (%$mapping) ) {
         for my $code ( @{$$mapping{$tag}} ) {
             for my $f ( $record->field($tag) ) {
                 for my $sf ($f->subfield($code)){
-                    push @values, $sf;
+                    my @tmp = ();
+                    while ( $sf =~ m/\d{4}-\d{4}/g ) {
+                        my @d = split('-', $&);
+                        for ( my $i = $d[0] ; $i <= $d[1] ; $i++ ) {
+                            push @tmp, C4::Search::Engine::Solr::NormalizeDate($i);
+                        }
+                    }
+                    if ( @tmp ) {
+                        push @dates, @tmp;
+                        next;
+                    }
+
+                    while ( $sf =~ m/\d{4}/g ) {
+                        push @tmp, C4::Search::Engine::Solr::NormalizeDate($&);
+                    }
+                    push @dates, @tmp;
                 }
             }
         }
     }
-    return @values;
+    return @dates;
 }
 
-sub ComputeValue {
-    my ($record, $mapping) = @_;
-
-    return map {
-        nsb_clean($_)
-    } GetSF($record, $mapping);
-
-}
-
-sub ComputeSrtValue {
-    my ($record, $mapping) = @_;
-
-    return map {
-        nsb_rm_content($_)
-    } GetSF($record, $mapping);
-
-}
 1;
