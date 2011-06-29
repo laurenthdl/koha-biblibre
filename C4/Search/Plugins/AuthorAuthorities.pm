@@ -29,7 +29,7 @@ our $VERSION = 3.0.1;
 
 # We want to concatenate values returned by ComputeValue with others mappings
 sub ConcatMappings {
-    1;
+    0;
 }
 
 =head2 fonction
@@ -46,7 +46,18 @@ sub ComputeValue {
     my @afieldstoindex = ( '400', '410', '700', '710' );
     my @asubfieldstoindex = ( 'a', 'b' );
 
+    # Plugin basic author
+
     my @values;
+    @values = map {
+        join(' ', (
+            $_->subfield('a'),
+            $_->subfield('b')
+        ));
+    } shift->field('7..');
+
+    #Adds authorities bind
+
     #for each $9 in field in $mapping take authority linked
     for my $bfieldtoindex ( @bfieldstoindex ) {
 
