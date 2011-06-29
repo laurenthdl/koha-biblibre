@@ -74,10 +74,12 @@ function Check_page1() {
 }
 
 function Check_page2(){
-    if($("#acqui_date").val().length == 0){
-        alert(_("You must choose a first publication date"));
-        return false;
-    }
+    <!-- TMPL_UNLESS NAME='more_than_one_serial' -->
+      if($("#acqui_date").val().length == 0){
+          alert(_("You must choose a first publication date"));
+          return false;
+      }
+    <!-- /TMPL_UNLESS -->
     if($("#frequency").val().length == 0){
         alert(_("You must choose a frequency"));
         return false;
@@ -536,26 +538,54 @@ $(document).ready(function() {
                                 <ol>
                                     <li>
                                         <label for="firstacquidate">First issue publication date: (*)</label>
-                                        <input type="text" name="firstacquidate" value="<!-- TMPL_VAR name="firstacquidate" -->" size="13" maxlength="10" id="acqui_date" readonly="readonly" />
-                                        <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button2" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-                                        <!-- both scripts for calendar must follow the input field --> 
-                                        <script type="text/javascript">
-                                            Calendar.setup({
-                                                inputField:"acqui_date",
-                                                ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                                button         :   "button2",
-                                                align          :   "Tl"
-                                            });
-                                        </script>
-                                        <script type="text/javascript">
-                                            Calendar.setup({
-                                                inputField     :   "acqui_date",
-                                                ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                                button         :   "acqui_date",
-                                                align          :   "Tl"
-                                            });
-                                        </script>
+                                        <!-- TMPL_UNLESS NAME='more_than_one_serial' -->
+                                          <input type="text" name="firstacquidate" value="<!-- TMPL_VAR name="firstacquidate" -->" size="13" maxlength="10" id="acqui_date" readonly="readonly" />
+                                          <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button2" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                                          <!-- both scripts for calendar must follow the input field --> 
+                                          <script type="text/javascript">
+                                              Calendar.setup({
+                                                  inputField:"acqui_date",
+                                                  ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                  button         :   "button2",
+                                                  align          :   "Tl"
+                                              });
+                                          </script>
+                                          <script type="text/javascript">
+                                              Calendar.setup({
+                                                  inputField     :   "acqui_date",
+                                                  ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                  button         :   "acqui_date",
+                                                  align          :   "Tl"
+                                              });
+                                          </script>
+                                        <!-- TMPL_ELSE -->
+                                          <!-- TMPL_VAR NAME='firstacquidate' -->
+                                          <input type="hidden" name="firstacquidate" value="<!-- TMPL_VAR NAME='firstacquidate' -->" />
+                                        <!-- /TMPL_UNLESS -->
                                     </li>
+                                    <!-- TMPL_IF NAME='more_than_one_serial' -->
+                                      <li>
+                                        <label for="nextacquidate">Next issue publication date:</label>
+                                        <input type="text" id="nextacquidate" name="nextacquidate" size="13" readonly="readonly" value="<!-- TMPL_VAR NAME='nextacquidate' -->" />
+                                        <img src="<!-- TMPL_VAR Name='themelang' -->/lib/calendar/cal.gif" id="nextacquidatebutton" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                                        <script type="text/javascript">
+                                          Calendar.setup({
+                                            inputField: "nextacquidate",
+                                            ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+                                            button: "nextacquidatebutton",
+                                            align: "Tl"
+                                          });
+                                        </script>
+                                        <script type="text/javascript">
+                                          Calendar.setup({
+                                            inputField: "nextacquidate",
+                                            ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+                                            button: "nextacquidate",
+                                            align: "Tl"
+                                          });
+                                        </script>
+                                      </li>
+                                    <!-- /TMPL_IF -->
                                     <li>
                                         <label for="frequency">Frequency: (*)</label>
                                         <select name="frequency" size="1" id="frequency">
