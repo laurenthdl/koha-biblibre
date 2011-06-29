@@ -32,5 +32,9 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
         debug           => 1,
     }
 );
+$template->param(
+QueryRemoveStopwords => C4::Context->preference("QueryRemoveStopwords")
+);
+
 
 output_html_with_http_headers $query, $cookie, $template->output;
