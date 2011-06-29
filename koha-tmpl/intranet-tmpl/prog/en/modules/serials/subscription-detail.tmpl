@@ -4,11 +4,6 @@
 <script type="text/javascript" language="javascript">
 <!--
 
-// the english words used in display purposes
-var text = new Array(_("Number"),_("Volume"),_("Issue"),_("Month"),_("Week"),_("Starting with:"),_("Rollover at:"),_("Choose Hemisphere:"),_("Northern"),_("Southern",
-"Autumn"),_("Winter"),_("Spring"),_("Summer"),_("Fall"),_("Season"),_("Year"));
-
-
 // to display the options section
 function options(x,y,z){
 var textbox = '';
@@ -147,12 +142,12 @@ function popup(subscriptionid) {
             <table>
             <tr><td><p>Starting with:</p></td>
                 <td align="center"><!--TMPL_VAR NAME="lastvalue1"--></td>
-            <!--TMPL_IF NAME="lastvalue2"-->
+            <!--TMPL_IF NAME="has_Y"-->
                 <td align="center">&nbsp; 
                     <!--TMPL_VAR NAME="lastvalue2"-->
                 </td>
             <!--/TMPL_IF-->
-            <!--TMPL_IF NAME="lastvalue3"-->
+            <!--TMPL_IF NAME="has_Z"-->
                 <td align="center">&nbsp; 
                     <!--TMPL_VAR NAME="lastvalue3"-->
                 </td>
@@ -160,12 +155,12 @@ function popup(subscriptionid) {
             </tr>
             <tr><td><p>Rollover:</p></td>
                 <td align="center"><!--TMPL_VAR NAME="whenmorethan1"--></td>
-            <!--TMPL_IF NAME="whenmorethan2"-->
+            <!--TMPL_IF NAME="has_Y"-->
                 <td align="center">&nbsp; 
                     <!--TMPL_VAR NAME="whenmorethan2"-->
                 </td>
             <!--/TMPL_IF-->
-            <!--TMPL_IF NAME="whenmorethan3"-->
+            <!--TMPL_IF NAME="has_Z"-->
                 <td align="center">&nbsp; 
                     <!--TMPL_VAR NAME="whenmorethan3"-->
                 </td>
