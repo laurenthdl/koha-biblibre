@@ -109,6 +109,7 @@ if($op && ($op eq 'new' || $op eq 'mod')) {
         $op => 1,
         frequencies_loop => \@frequencies,
         subtypes_loop => \@subtypes,
+        DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
     );
     output_html_with_http_headers $input, $cookie, $template->output;
     exit;
