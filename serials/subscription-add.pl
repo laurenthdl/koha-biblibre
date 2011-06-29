@@ -93,7 +93,7 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
     $subs->{'letter'} = '' unless ( $subs->{'letter'} );
     letter_loop( $subs->{'letter'}, $template );
     $nextexpected = GetNextExpected($subscriptionid);
-    $subs->{nextacquidate} = defined $nextexpected->{planneddate} and $op eq 'mod' ? $nextexpected->{planneddate}->output() : undef;
+    $subs->{nextacquidate} = (defined $nextexpected->{planneddate} and $op eq 'mod') ? $nextexpected->{planneddate}->output() : undef;
     unless ( $op eq 'modsubscription' ) {
         foreach my $length_unit qw(numberlength weeklength monthlength) {
             if ( $subs->{$length_unit} ) {
@@ -115,6 +115,11 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
             $op         => 1,
             sublength   => $sub_length,
         );
+
+        my ($serials_number) = GetSerials($subscriptionid);
+        if($serials_number > 1) {
+            $template->param(more_than_one_serial => 1);
+        }
     }
     if ( $op eq 'dup' ) {
         my $dont_copy_fields = C4::Context->preference('SubscriptionDuplicateDroppedInput');
