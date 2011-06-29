@@ -58,6 +58,11 @@
         	dataType: 'json',
             success: function(data){
 
+                var was_checked = '';
+                if ( $("#nocond").attr("checked") == true ) {
+                    was_checked = "checked='checked'";
+                };
+
         	    if( data.length > 0) {
         	    	$("#condvaltd").html('<select name="condvalchoice" id="condvalchoice" />');
         	    	$("<option>").attr("value", "")
@@ -76,14 +81,22 @@
                             .text(data[i].value)
                             .appendTo('#condvalchoice');
                     }
-        	    }else{
-                    $("#condvaltd").html('<input type="text" name="condvalchoice" id="condvalchoice" />');
-                    $("#repvaltd").html('<input type="text" name="repvalchoice"  id="repvalchoice" />');
-        	    }
-                $('<input type="checkbox" id="nocond" name="nocond" value="nocond" onClick="$(\'#condvalchoice\').attr(\'disabled\', ! $(\'#condvalchoice\').attr(\'disabled\') ) ">All</input>').appendTo("#condvaltd");
+                }else{
+                    var cond_was_disabled = '';
+                    if ( $("#condvalchoice").attr("disabled") == true) {
+                        cond_was_disabled = "disabled='disabled'";
+                    }
+                    var rep_was_disabled = '';
+                    if ( $("#repvaltd").attr("disabled") == true) {
+                        rep_was_disabled = "disabled='disabled'";
+                    }
+                    $("#condvaltd").html('<input type="text" name="condvalchoice" id="condvalchoice" '+cond_was_disabled+' />');
+                    $("#repvaltd").html('<input type="text" name="repvalchoice"  id="repvalchoice" '+rep_was_disabled+'/>');
+                }
+                $('<input type="checkbox" id="nocond" name="nocond" value="nocond" '+was_checked+' onClick="$(\'#condvalchoice\').attr(\'disabled\', ! $(\'#condvalchoice\').attr(\'disabled\') ) ">All</input>').appendTo("#condvaltd");
             }
         });
-        
+
      }
 
      function actionChanged(){
@@ -91,9 +104,11 @@
         if ( action == "dup" || action == "dup_w" ) {
             $("#tofieldchoice").attr('disabled', '');
             $("#tosubfieldchoice").attr('disabled', '');
+            $("#repvalchoice").attr('disabled', 'disabled');
         } else {
             $("#tofieldchoice").attr('disabled', 'disabled');
             $("#tosubfieldchoice").attr('disabled', 'disabled');
+            $("#repvalchoice").attr('disabled', '');
         }
 
         if ( action == "dup_w" ) {
@@ -111,7 +126,8 @@
                 mod: _('Modify'),
                 del: _('Delete'),
                 add: _('Create'),
-                dup: _('Duplicate')
+                dup: _('Duplicate'),
+                dup_w: _('Duplicate')
                 };
         var repvallabel  = $('#repvalchoice :selected').text()  || $("#repvalchoice").val();
 
@@ -134,12 +150,12 @@
                 + '<td><input type="hidden" name="field" value="'    + field + '" />'    + field               + '</td>'
                 + '<td><input type="hidden" name="subfield" value="' + subfield + '" />' + subfield            + '</td>'
                 + '<td><input type="hidden" name="action" value="'   + action + '" />'   + actionlabel[action] + '</td>'
-                + '<td><input type="hidden" name="tofield" value="'    + tofield + '" />'    + tofield               + '</td>'
-                + '<td><input type="hidden" name="tosubfield" value="' + tosubfield + '" />' + tosubfield            + '</td>'
                 + '<td><input type="hidden" name="condval" value="'  + condval + '" />'  
                     + condvallabel
                     + '<input type="hidden" name="nocondval" value="' + nocond + '" />'
                 + '</td>'
+                + '<td><input type="hidden" name="tofield" value="'    + tofield + '" />'    + tofield               + '</td>'
+                + '<td><input type="hidden" name="tosubfield" value="' + tosubfield + '" />' + tosubfield            + '</td>'
                 + '<td><input type="hidden" name="repval" value="'   + repval + '" />'   + repvallabel         + '</td>'
                 + '<td><input type="button" value="Delete" onclick="deleteRule(this)" /></td>'
             + '</tr>';
@@ -223,7 +239,7 @@
 <table id="rulestable">
     <thead>
         <tr>
-            <th>Field</th><th>Subfield</th><th>Action</th><th>To field</th><th>To subfield</th><th>Condition Value</th><th>Value</th><th>&nbsp;</th>
+            <th>Field</th><th>Subfield</th><th>Action</th><th>Condition Value</th><th>To field</th><th>To subfield</th><th>Value</th><th>&nbsp;</th>
         </tr>
     </thead>
         <tr>
@@ -249,6 +265,10 @@
                     <option value="dup_w">Duplicate subfield within field</option>
                 </select>
             </td>
+            <td id="condvaltd">
+                <input type="text" name="condvalchoice" id="condvalchoice" disabled="disabled" />
+                <input type="checkbox" id="nocond" name="nocond" value="nocond" onClick="$('#condvalchoice').attr('disabled', ! $('#condvalchoice').attr('disabled') ) " checked="checked" >All</input> 
+            </td>
             <td>
                 <select name="fieldchoice" id="tofieldchoice" class='field' disabled='disabled'>
                     <!-- TMPL_LOOP NAME="marcfields" -->
@@ -258,10 +278,6 @@
             </td>
             <td>
                 <select name="subfieldchoice" id="tosubfieldchoice" class='subfield' disabled='disabled'></select>
-            </td>
-            <td id="condvaltd">
-                <input type="text" name="condvalchoice" id="condvalchoice" />
-                <input type="checkbox" id="nocond" name="nocond" value="nocond" onClick="$('#condvalchoice').attr('disabled', ! $('#condvalchoice').attr('disabled') ) ">All</input> 
             </td>
             <td id="repvaltd">
                 <input type="text" name="repvalchoice" id="repvalchoice" />
