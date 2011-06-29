@@ -66,13 +66,19 @@ if($op && $op eq 'close') {
     ModInvoice(invoicenumber => $invoicenumber,
                billingdate   => C4::Dates->new($billingdate)->output("iso"));
     $template->param(billingdate_saved => 1);
+}elsif($op && $op eq 'modshipmentcost') {
+    my $shipmentcost = $input->param('shipmentcost');
+    my $shipment_budget_id = $input->param('shipment_budget_id');
+    ModInvoice(invoicenumber => $invoicenumber,
+               shipmentcost  => $shipmentcost,
+               shipment_budget_id => $shipment_budget_id);
+    $template->param(shipmentcost_saved => 1);
 }
 
 
 
 my $details = GetInvoiceDetails($invoicenumber);
 my ($bookseller) = GetBookSellerFromId($details->{supplierid});
-my $basketno = $details->{basketno};
 my @orders_loop = ();
 my $orders = $details->{'orders'};
 my $qty_total;
@@ -105,6 +111,14 @@ push @book_foot_loop, map {
     $_
 } values %foot;
 
+my $budgets = GetBudgets();
+my @budgets_loop;
+foreach (@$budgets) {
+    my %line = %{ $_ };
+    $line{'selected'} = 1 if($_->{'budget_id'} == $details->{'shipment_budget_id'});
+    push @budgets_loop, \%line;
+}
+
 $template->param(
     invoicenumber    => $details->{'invoicenumber'},
     suppliername     => $details->{'suppliername'},
@@ -112,15 +126,19 @@ $template->param(
     datereceived     => $details->{'datereceived'},
     billingdate      => C4::Dates->new($details->{'billingdate'}, "iso")->output(),
     invoiceclosedate => $details->{'invoiceclosedate'},
+    shipmentcost     => $details->{'shipmentcost'},
     orders_loop      => \@orders_loop,
     book_foot_loop   => \@book_foot_loop,
     total_quantity   => $total_quantity,
     total_gste       => sprintf( "%.2f", $total_gste ),
     total_gsti       => sprintf( "%.2f", $total_gsti ),
     total_gstvalue   => sprintf( "%.2f", $total_gstvalue ),
+    total_gste_shipment => sprintf("%.2f", $total_gste + $details->{'shipmentcost'}),
+    total_gsti_shipment => sprintf("%.2f", $total_gsti + $details->{'shipmentcost'}),
     invoiceincgst    => $bookseller->{invoiceincgst},
     currency         => $bookseller->{listprice},
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
+    budgets_loop     => \@budgets_loop,
 );
 
 # FIXME
@@ -137,7 +155,6 @@ sub get_infos {
 
     my %line = %{ $order };
     $line{order_received} = ( $qty == $order->{'quantityreceived'} );
-    $line{basketno}       = $basketno;
     $line{budget_name}    = $budget->{budget_name};
     if ( $bookseller->{'listincgst'} ) {
         $line{gstgsti} = sprintf( "%.2f", $line{gstrate} * 100 );

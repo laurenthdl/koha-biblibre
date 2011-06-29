@@ -320,10 +320,18 @@ sub GetBudgetSpent {
             datecancellationprinted IS NULL
     |
     );
-
     $sth->execute($budget_id);
     my $sum = $sth->fetchrow_array;
-    return $sum;
+
+    # Add shipment cost
+    $sth = $dbh->prepare(qq{
+        SELECT SUM(shipmentcost) AS sum
+        FROM invoices
+        WHERE shipment_budget_id = ?
+    });
+    $sth->execute($budget_id);
+    my ($sum2) = $sth->fetchrow_array;
+    return ($sum + $sum2);
 }
 
 # -------------------------------------------------------------------
@@ -338,7 +346,6 @@ sub GetBudgetOrdered {
             datecancellationprinted IS NULL
     |
     );
-
     $sth->execute($budget_id);
     my $sum = $sth->fetchrow_array;
     return $sum;
