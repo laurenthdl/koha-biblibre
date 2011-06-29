@@ -382,7 +382,6 @@ sub IndexRecord {
 
     my @list_of_plugins = GetSearchPlugins;
     for my $id ( @$recordids ) {
-        
         my $record;
         my $frameworkcode;
         my $recordid = "${recordtype}_$id";
@@ -406,67 +405,72 @@ sub IndexRecord {
         warn $id;
 
         for my $index ( @$indexes ) {
+            eval {
+                my @values;
+                my @srt_values;
+                my $mapping = GetSubfieldsForIndex( $index->{'code'} );
+                my $concatmappings = 1;
 
-            my @values;
-            my @srt_values;
-            my $mapping = GetSubfieldsForIndex( $index->{'code'} );
-            my $concatmappings = 1;
+                if ( $index->{'plugin'} ) {
+                    $concatmappings = &GetConcatMappingsValue( $index->{'plugin'}, \@list_of_plugins );
+                    my $plugin = LoadSearchPlugin( $index->{'plugin'}, \@list_of_plugins ) if $index->{'plugin'};
+                    @values = &$plugin( $record, $mapping );
 
-            if ( $index->{'plugin'} ) {
-                $concatmappings = &GetConcatMappingsValue( $index->{'plugin'}, \@list_of_plugins );
-                my $plugin = LoadSearchPlugin( $index->{'plugin'}, \@list_of_plugins ) if $index->{'plugin'};
-                @values = &$plugin( $record, $mapping );
+                    $plugin = LoadSearchPluginSrt( $index->{'plugin'}, \@list_of_plugins ) if $index->{'plugin'};
+                    eval {
+                        @srt_values = &$plugin( $record, $mapping );
+                    };
 
-                $plugin = LoadSearchPluginSrt( $index->{'plugin'}, \@list_of_plugins ) if $index->{'plugin'};
-                eval {
-                    @srt_values = &$plugin( $record, $mapping );
-                };
+                    if ($@) {
+                        @srt_values = @values;
+                    }
 
-                if ($@) {
-                    @srt_values = @values;
                 }
 
-            }
+                if ( $concatmappings ) {
+                    for my $tag ( sort keys %$mapping ) {
+                        for my $field ( $record->field( $tag ) ) {
+                            if ( $field->is_control_field ) {
+                                push @values, $field->data;
+                            } else {
 
-            if ( $concatmappings ) {
-                for my $tag ( sort keys %$mapping ) {
-                    for my $field ( $record->field( $tag ) ) {
-                        if ( $field->is_control_field ) {
-                            push @values, $field->data;
-                        } else {
+                                for my $code ( @{ $mapping->{$tag} } ) {
 
-                            for my $code ( @{ $mapping->{$tag} } ) {
+                                    my @sfvals = $code eq '*'
+                                               ? map { $_->[1] } $field->subfields
+                                               : map { $_      } $field->subfield( $code );
 
-                                my @sfvals = $code eq '*'
-                                           ? map { $_->[1] } $field->subfields
-                                           : map { $_      } $field->subfield( $code );
-
-                                for ( @sfvals ) {
-                                    $_ = NormalizeDate( $_ ) if $index->{'type'} eq 'date';
-                                    #$_ = FillSubfieldWithAuthorisedValues( $frameworkcode, $tag, $code, $_ ) if $recordtype eq "biblio";
-                                    push @values, $_ if $_;
+                                    for ( @sfvals ) {
+                                        $_ = NormalizeDate( $_ ) if $index->{'type'} eq 'date';
+                                        #$_ = FillSubfieldWithAuthorisedValues( $frameworkcode, $tag, $code, $_ ) if $recordtype eq "biblio";
+                                        push @values, $_ if $_;
+                                    }
                                 }
                             }
                         }
                     }
+                    if ( not $index->{plugin} ) {
+                        @srt_values = @values;
+                    }
                 }
-                if ( not $index->{plugin} ) {
-                    @srt_values = @values;
+                @values = uniq (@values); #Removes duplicates
+
+                $solrrecord->set_value(       $index->{'type'}."_".$index->{'code'},    \@values);
+                if ($index->{'sortable'} and @srt_values > 0 and $index->{'code'}=~/title/){
+                    $solrrecord->set_value("srt_".$index->{'type'}."_".$index->{'code'}, C4::Search::_remove_initial_stopwords($srt_values[0]));
                 }
-            }
-            @values = uniq (@values); #Removes duplicates
+                elsif ($index->{'sortable'} and @srt_values > 0){
+                    $solrrecord->set_value("srt_".$index->{'type'}."_".$index->{'code'}, $srt_values[0]);
+                }
 
-            $solrrecord->set_value(       $index->{'type'}."_".$index->{'code'},    \@values);
-            if ($index->{'sortable'} and @srt_values > 0 and $index->{'code'}=~/title/){
-                $solrrecord->set_value("srt_".$index->{'type'}."_".$index->{'code'}, C4::Search::_remove_initial_stopwords($srt_values[0]));
-            } 
-            elsif ($index->{'sortable'} and @srt_values > 0){ 
-                $solrrecord->set_value("srt_".$index->{'type'}."_".$index->{'code'}, $srt_values[0]);
-            }
-
-            # Add index str for facets if it's not exist
-            if ( $index->{'faceted'} and @values > 0 and $index->{'type'} ne 'str' ) {
-                $solrrecord->set_value("str_".$index->{'code'}, $values[0]);
+                # Add index str for facets if it's not exist
+                if ( $index->{'faceted'} and @values > 0 and $index->{'type'} ne 'str' ) {
+                    $solrrecord->set_value("str_".$index->{'code'}, $values[0]);
+                }
+            };
+            if ( $@ ) {
+                chomp $@;
+                warn "Error during indexation : recordid $id, index $index->{'code'} ( $@ )";
             }
         }
         push @recordpush, $solrrecord;
