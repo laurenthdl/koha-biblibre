@@ -3629,24 +3629,20 @@ sub BatchModField {
     } elsif( $action eq "dup" or $action eq "dup_w" ) {
         return 0 if $action eq "dup_w" and $field ne $tofield;
 
-        my @original_values = ();
-        for my $f ($record->field( $field )){
-            push @original_values, $_ for $f->subfield( $subfield );
-        }
         my $rfs = $record->field( $tofield );
         if ( not $rfs ) {
             my @subfields;
-            for my $val ( @original_values ) {
-                my $normalized = NormalizeString( $val );
-                push @subfields, $tosubfield => $normalized if $normalized =~ m/^$condition$/ || $nocond eq "true";
+            for my $f ($record->field( $field )){
+                for my $val ( $f->subfield( $subfield ) ) {
+                    push @subfields, $tosubfield => NormalizeString( $val ) if $val =~ m/$condition/ || $nocond eq "true";
+                }
             }
             my $new_field = MARC::Field->new( $tofield, '', '', @subfields);
             $record->insert_fields_ordered($new_field);
         } else {
             for my $rf ( $record->field( $tofield ) ) {
-                for my $val (@original_values ) {
-                    my $normalized = NormalizeString( $val );
-                    $rf->add_subfields( $tosubfield => $normalized ) if $normalized =~ m/^$condition$/ || $nocond eq "true";
+                for my $val ( $rf->subfield( $subfield ) ) {
+                    $rf->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
                 }
             }
         }
