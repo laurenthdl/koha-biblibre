@@ -281,7 +281,12 @@ sub get_template_and_user {
                         -value   => freeze( [] ),
                         -expires => ''
                     );
-                    $cookie = [ $cookie, $newsearchcookie ];
+
+                    if ( ref( $cookie ) eq 'ARRAY' ) {
+                        push @$cookie, $newsearchcookie
+                    } else {
+                        $cookie = [ $cookie, $newsearchcookie ];
+                    }
                 }
             }
         }
@@ -477,7 +482,55 @@ sub get_template_and_user {
             SyndeticsSeries                => C4::Context->preference("SyndeticsSeries"),
             SyndeticsCoverImageSize        => C4::Context->preference("SyndeticsCoverImageSize"),
         );
+
+        if ( C4::Context->preference('EnableOpacSearchHistory') ) {
+            # Cookie
+            my $cookiebranchsearch =thaw uri_unescape $in->{'query'}->cookie('BranchSearch');
+            # GET
+            my $branchsearch = $in->{query}->param("branchsearch");
+            # POST # FIXME index name dependent
+            # if filters holdingbranch exists
+            my @filters = $in->{query}->param("filters");
+            my @holdingbranch = @filters ? grep /holdingbranch/, @filters : "";
+            # Get branchcode
+            @holdingbranch = split ':', $holdingbranch[0] if @holdingbranch;
+            my $holdingbranch = @holdingbranch ? $holdingbranch[1] : undef;
+            # Remove double quotes
+            $holdingbranch =~ s/"(\S*)"/$1/ if defined $holdingbranch;
+            # Set to empty string (all libraries) if no $holdingbranch and @filters (ie. filters=)
+            # else undef => we can't put branch into the cookie
+            $holdingbranch = ( @filters ) ? "" : undef if not defined $holdingbranch;
+
+            if ( defined $branchsearch
+                    or defined $holdingbranch
+                    or defined $cookiebranchsearch ) {
+
+                my $branch = defined $branchsearch
+                            ? $branchsearch
+                            : defined $holdingbranch
+                                ? $holdingbranch
+                                : $cookiebranchsearch;
+
+                my $branchsearchcookie = $in->{query}->cookie(
+                    -name => 'BranchSearch',
+                    -value   => uri_escape( freeze( \$branch ) ),
+                    -expires => ''
+                );
+
+                $template->param( branchsearch => $branch );
+                $template->param( branchsearchexistsincookie => 1 );
+
+                if ( ref( $cookie ) eq 'ARRAY' ) {
+                    push @$cookie, $branchsearchcookie
+                } else {
+                    $cookie = [ $cookie, $branchsearchcookie ];
+                }
+            }
+        }
+
+
     }
+
     $template->param( listloop => [ { shelfname => "Freelist", shelfnumber => 110 } ] );
     return ( $template, $borrowernumber, $cookie, $flags );
 }

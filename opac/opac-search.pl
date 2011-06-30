@@ -432,7 +432,11 @@ if ( C4::Context->preference('EnableOpacSearchHistory') ) {
             -value   => uri_escape( freeze( \@recentSearches ) ),
             -expires => ''
         );
-        $cookie = [ $cookie, $newsearchcookie ];
+        if ( ref( $cookie ) eq 'ARRAY' ) {
+            push @$cookie, $newsearchcookie
+        } else {
+            $cookie = [ $cookie, $newsearchcookie ];
+        }
     } else {
 
         # To the session (the user is logged in)
