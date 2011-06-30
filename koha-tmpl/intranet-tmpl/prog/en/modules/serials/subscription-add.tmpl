@@ -276,17 +276,26 @@ function restoreAdvancedPattern() {
 
 function testPredictionPattern() {
     var frequencyid = $("#frequency").val();
-    var firstacquidate = $("#acqui_date").val();
+    var acquidate;
     var error = 0;
     var error_msg = "";
     if(frequencyid == undefined || frequencyid == ""){
         error_msg += _("- Frequency is not defined\n");
         error ++;
     }
-    if(firstacquidate == undefined || firstacquidate == ""){
-        error_msg += _("- First publication date is not defined\n");
+    <!-- TMPL_IF NAME='more_than_one_serial' -->
+      acquidate = $("#nextacquidate").val();
+      if(acquidate == undefined || acquidate == ""){
+        error_msg += _("- Next issue publication date is not defined\n");
         error ++;
-    }
+      }
+    <!-- TMPL_ELSE -->
+      acquidate = $("#firstacquidate").val();
+      if(acquidate == undefined || acquidate == ""){
+          error_msg += _("- First publication date is not defined\n");
+          error ++;
+      }
+    <!-- /TMPL_IF -->
 
     if(error){
         alert(_("Cannot test prediction pattern for the following reason(s):\n\n")
@@ -303,7 +312,7 @@ function testPredictionPattern() {
         url: "showpredictionpattern.pl",
         data: {
             'custompattern' : custompattern,
-            'firstacquidate': $("#acqui_date").val(),
+            'firstacquidate': acquidate,
             'enddate'       : $("#enddate").val(),
             'subtype'       : $("#subtype").val(),
             'sublength'     : $("#sublength").val(),
