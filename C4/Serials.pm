@@ -53,6 +53,7 @@ BEGIN {
       &ReNewSubscription  &GetLateIssues      &GetLateOrMissingIssues
       &GetSerialInformation                   &AddItem2Serial
       &PrepareSerialsData &GetNextExpected    &ModNextExpected
+      &GetSubscriptionIrregularities
 
       &UpdateClaimdateIssues
       &GetSuppliersWithLateIssues             &getsupplierbyserialid
@@ -1208,6 +1209,37 @@ sub ModNextExpected($$) {
     $sth->execute( $date->output('iso'), $date->output('iso'), $subscriptionid, 1 );
     return 0;
 
+}
+
+=head2 GetSubscriptionIrregularities
+
+=over4
+
+=item @irreg = &GetSubscriptionIrregularities($subscriptionid);
+get the list of irregularities for a subscription
+
+=back
+
+=cut
+
+sub GetSubscriptionIrregularities {
+    my $subscriptionid = shift;
+
+    return undef unless $subscriptionid;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT irregularity
+        FROM subscription
+        WHERE subscriptionid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($subscriptionid);
+
+    my ($result) = $sth->fetchrow_array;
+    my @irreg = split /;/, $result;
+
+    return @irreg;
 }
 
 =head2 ModSubscription

@@ -313,6 +313,9 @@ function testPredictionPattern() {
         data: {
             'custompattern' : custompattern,
             'firstacquidate': acquidate,
+            <!-- TMPL_IF NAME='mod' -->
+              'subscriptionid': $("input[name='subscriptionid']").val(),
+            <!-- /TMPL_IF -->
             'enddate'       : $("#enddate").val(),
             'subtype'       : $("#subtype").val(),
             'sublength'     : $("#sublength").val(),
