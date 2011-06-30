@@ -140,7 +140,13 @@ function popup(subscriptionid) {
               <!-- TMPL_VAR NAME="numberpattern" -->
             </p>
             <table>
-            <tr><td><p>Starting with:</p></td>
+            <tr><td><p>
+              <!-- TMPL_IF NAME='totalissues' -->
+                Last value:
+              <!-- TMPL_ELSE -->
+                Starting with:
+              <!-- /TMPL_IF -->
+                </p></td>
                 <td align="center"><!--TMPL_VAR NAME="lastvalue1"--></td>
             <!--TMPL_IF NAME="has_Y"-->
                 <td align="center">&nbsp; 
@@ -313,8 +319,6 @@ function popup(subscriptionid) {
             <tr><td><label>Missing issues</label></td><td><!-- TMPL_VAR name="missinglist" --></td></tr>
             <tr><td><label>Nonpublic note</label></td><td><!-- TMPL_VAR name="internalnotes" --></td></tr>
             <tr><td><label>Public note</label></td><td><!-- TMPL_VAR name="notes" --></td></tr>
-            <tr><td><label>Staff note</label></td><td><!-- TMPL_VAR name="librariannote" --></td></tr>
-            <tr><td><label>OPAC note</label></td><td><!-- TMPL_VAR name="opacnote" --></td></tr>
         </table>
     </div>
 
