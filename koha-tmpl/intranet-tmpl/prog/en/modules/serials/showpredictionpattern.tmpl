@@ -59,7 +59,11 @@ function Check_boxes(dow) {
           <!-- /TMPL_IF -->
         </td>
         <!-- TMPL_UNLESS NAME="custompattern" -->
-        <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" data-dow="<!-- TMPL_VAR NAME='dow' -->" /></td>
+          <!-- TMPL_IF NAME='not_published' -->
+            <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" data-dow="<!-- TMPL_VAR NAME='dow' -->" checked="checked" /></td>
+          <!-- TMPL_ELSE -->
+            <td style="text-align:center"><input type="checkbox" name="irregularity" value="<!-- TMPL_VAR NAME='issuenumber' -->" data-dow="<!-- TMPL_VAR NAME='dow' -->" /></td>
+          <!-- /TMPL_IF -->
         <!-- /TMPL_UNLESS -->
       </tr>
     <!-- /TMPL_LOOP -->

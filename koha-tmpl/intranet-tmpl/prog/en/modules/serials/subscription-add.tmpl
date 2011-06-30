@@ -302,6 +302,9 @@ function testPredictionPattern() {
         url: "showpredictionpattern.pl",
         data: {
             'custompattern' : custompattern,
+            <!-- TMPL_IF NAME='mod' -->
+              'subscriptionid': $("input[name='subscriptionid']").val(),
+            <!-- /TMPL_IF -->
             'firstacquidate': $("#acqui_date").val(),
             'enddate'       : $("#enddate").val(),
             'subtype'       : $("#subtype").val(),
