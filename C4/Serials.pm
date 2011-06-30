@@ -704,7 +704,7 @@ sub SearchSubscriptions {
         push @where_args, "$minold" if ($minold);
     }
     if ($maxold) {
-        push @where_strs, "TO_DAYS(NOW()) - TO_DAYS(subscription.enddate) <= ?" if ($maxold);
+        push @where_strs, "TO_DAYS(NOW()) - TO_DAYS(subscription.enddate) <= ? OR subscription.enddate IS NULL" if ($maxold);
         push @where_args, "$maxold" if ($maxold);
     }
 
