@@ -97,5 +97,6 @@ $template->param(
     basketno         => $basket->{'basketno'},
     basketname       => $basket->{'basketname'},
     booksellername   => $bookseller->{'name'},
+    unfolded_search  => 1,
 );
 output_html_with_http_headers $query, $cookie, $template->output;
