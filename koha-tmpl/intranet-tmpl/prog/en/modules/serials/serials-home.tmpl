@@ -28,18 +28,6 @@
 
         $('#subsearchresults > ul').tabs();
 
-	// Adding picnet table filter
-
-	// First of all, let's disable cookies so last time user selection won't be used again
-	// According to picnet documentation, the correct way to do it is by setting this option to false:
-	// var options = { enableCookies: false };
-	// $('#srlt').tableFilter(options);
-
-	// But it didn't work for me, so this is used instead:
-	$.cookie('isrlt_filters', null);
-	$.cookie('asrlt_filters', null);
-	$('#isrlt').tableFilter();
-	$('#asrlt').tableFilter();
  }); 
  //]]>
 </script>
