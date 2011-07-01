@@ -35,7 +35,7 @@ use Date::Calc qw(Today Day_of_Year Week_of_Year Day_of_Week Days_in_Year Delta_
 use C4::Auth;
 use C4::Output;
 use C4::Serials;
-use C4::Serials::PredictiveModel;
+use C4::Serials::Frequency;
 
 my $input = new CGI;
 my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
@@ -47,6 +47,7 @@ my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
     debug           => 1,
 } );
 
+my $subscriptionid = $input->param('subscriptionid');
 my $frequencyid = $input->param('frequency');
 my $firstacquidate = $input->param('firstacquidate');
 my $enddate = $input->param('enddate');
@@ -106,26 +107,13 @@ if($enddate){
 }
 my $date = C4::Dates->new($firstacquidate->output());
 
-my $issuenumber = 1;
-my ($year, $month, $day) = split("-", $date->output("iso"));
-my $frequency = GetSubscriptionFrequency($frequencyid);
-if ($frequency->{'unit'} eq "day") {
-    my $doy = Day_of_Year($year, $month, $day);
-    $issuenumber = ($doy - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + 1;
-} elsif ($frequency->{'unit'} eq "week") {
-    my ($wkno, $yr) = Week_of_Year($year, $month, $day);
-    my $issue_of_week = (Day_of_Week($year, $month, $day) - 1) / int( 7 / $frequency->{'issuesperunit'} ) + 1;
-    if($issue_of_week > $frequency->{'issuesperunit'}){
-        $issue_of_week = $frequency->{'issuesperunit'};
-    }
-    $subscription{'countissuesperunit'} = $issue_of_week - 1;
-    $issuenumber = ($wkno - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + $issue_of_week;
-} elsif ($frequency->{'unit'} eq "month") {
-    $issuenumber = ($month - 1) * $frequency->{'issuesperunit'} / $frequency->{'unitsperissue'} + 1;
-} elsif ( $frequency->{'unit'} eq "year") {
-    $issuenumber = (Day_of_Year($year, $month, $day) - 1) / ( Days_in_Year($year, 12) / $frequency->{'issuesperunit'} ) + 1;
+my $issuenumber;
+if(defined $subscriptionid) {
+    ($issuenumber) = GetSerials($subscriptionid);
+    $issuenumber = 1 if($issuenumber == 0);
+} else {
+    $issuenumber = 1;
 }
-$issuenumber = int($issuenumber);
 
 my @predictions_loop;
 my ($calculated) = GetSeq(\%val);
@@ -135,6 +123,17 @@ push @predictions_loop, {
     issuenumber => $issuenumber,
     dow => Day_of_Week(split /-/, $date->output("iso")),
 };
+my @irreg = ();
+if(defined $subscriptionid) {
+    @irreg = GetSubscriptionIrregularities($subscriptionid);
+    while(@irreg && $issuenumber > $irreg[0]) {
+        shift @irreg;
+    }
+    if(@irreg && $issuenumber == $irreg[0]){
+        $predictions_loop[0]->{'not_published'} = 1;
+        shift @irreg;
+    }
+}
 
 my $i = 1;
 while( $i < 1000 ) {
@@ -168,6 +167,10 @@ while( $i < 1000 ) {
     $issuenumber++;
     $line{'number'} = $calculated;
     $line{'issuenumber'} = $issuenumber;
+    if(@irreg && $issuenumber == $irreg[0]){
+        $line{'not_published'} = 1;
+        shift @irreg;
+    }
     push @predictions_loop, \%line;
 
     $i++;
@@ -177,6 +180,7 @@ $template->param(
     predictions_loop => \@predictions_loop,
 );
 
+my $frequency = GetSubscriptionFrequency($frequencyid);
 if($frequency->{'unit'} eq 'day' && $frequency->{'unitsperissue'} == 1) {
     my (@mondays, @tuesdays, @wednesdays, @thursdays, @fridays, @saturdays, @sundays);
     my $i = 0;

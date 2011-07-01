@@ -32,6 +32,7 @@ use C4::Search;
 use C4::Letters;
 use C4::Log;    # logaction
 use C4::Debug;
+use C4::Serials::Frequency;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
@@ -46,16 +47,13 @@ BEGIN {
       &GetFullSubscriptionsFromBiblionumber   &GetFullSubscription
       &GetSubscriptionHistoryFromSubscriptionId &ModSubscriptionHistory
       &HasSubscriptionStrictlyExpired &HasSubscriptionExpired &GetExpirationDate &abouttoexpire
-      &GetSubscriptionFrequencies
-      &GetSubscriptionNumberpatterns
-      &GetSubscriptionFrequency
-      &GetSubscriptionNumberpattern
 
       &GetSeq &GetNextSeq &NewIssue           &ItemizeSerials    &GetSerials
       &GetLatestSerials   &ModSerialStatus    &GetNextDate       &GetSerials2
       &ReNewSubscription  &GetLateIssues      &GetLateOrMissingIssues
       &GetSerialInformation                   &AddItem2Serial
       &PrepareSerialsData &GetNextExpected    &ModNextExpected
+      &GetSubscriptionIrregularities
 
       &UpdateClaimdateIssues
       &GetSuppliersWithLateIssues             &getsupplierbyserialid
@@ -733,112 +731,6 @@ sub SearchSubscriptions {
     return @$results;
 }
 
-=head2 GetSubscriptionFrequencies
-
-=over 4
-
-@$results = GetSubscriptionFrequencies;
-this function get all subscription frequencies entered in table
-
-=back
-
-=cut
-
-sub GetSubscriptionFrequencies {
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_frequencies
-        ORDER by displayorder
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute;
-    my $results=$sth->fetchall_arrayref({});
-    return $results;
-}
-
-=head2 GetSubscriptionFrequency
-
-=over 4
-
-%$results = GetSubscriptionFrequency($frqid);
-this function gets the data of the subscription frequency which id is $frqid
-
-=back
-
-=cut
-
-sub GetSubscriptionFrequency {
-    my ($frqid)=@_;
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_frequencies
-        where id=?
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute($frqid);
-    my $results=$sth->fetchrow_hashref;
-    return $results;
-}
-
-=head2 GetSubscriptionNumberpattern
-
-=over 4
-
-%$result = GetSubscriptionNumberpattern($numpatternid);
-this function get the data of the subscription numberpatterns which id is $numpatternid
-
-=back
-
-=cut
-
-sub GetSubscriptionNumberpattern {
-    my $numpatternid=shift;
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_numberpatterns
-        where id=?
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute($numpatternid);
-    my $results=$sth->fetchrow_hashref;
-    return $results;
-}
-
-=head2 GetSubscriptionNumberpatterns
-
-=over 4
-
-@$results = GetSubscriptionNumberpatterns;
-this function get all subscription number patterns entered in table
-
-=back
-
-=cut
-
-sub GetSubscriptionNumberpatterns {
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_numberpatterns
-        ORDER by displayorder
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute;
-    my $results=$sth->fetchall_arrayref({});
-    return $results;
-}
-
 =head2 GetSerials
 
 ($totalissues,@serials) = GetSerials($subscriptionid);
@@ -1317,6 +1209,37 @@ sub ModNextExpected($$) {
     $sth->execute( $date->output('iso'), $date->output('iso'), $subscriptionid, 1 );
     return 0;
 
+}
+
+=head2 GetSubscriptionIrregularities
+
+=over4
+
+=item @irreg = &GetSubscriptionIrregularities($subscriptionid);
+get the list of irregularities for a subscription
+
+=back
+
+=cut
+
+sub GetSubscriptionIrregularities {
+    my $subscriptionid = shift;
+
+    return undef unless $subscriptionid;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT irregularity
+        FROM subscription
+        WHERE subscriptionid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($subscriptionid);
+
+    my ($result) = $sth->fetchrow_array;
+    my @irreg = split /;/, $result;
+
+    return @irreg;
 }
 
 =head2 ModSubscription

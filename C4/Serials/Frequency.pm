@@ -1,4 +1,4 @@
-package C4::Frequency;
+package C4::Serials::Frequency;
 
 # Copyright 2000-2002 Biblibre SARL
 #
@@ -18,104 +18,31 @@ package C4::Frequency;
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 use strict;
+use warnings;
 
-#use warnings; FIXME - Bug 2505
 use C4::Context;
-use C4::SQLHelper qw<:all>;
-use C4::Debug;
 
 use vars qw($VERSION @ISA @EXPORT);
 
 BEGIN {
-
     # set the version for version checking
     $VERSION = 3.01;
     require Exporter;
     @ISA    = qw(Exporter);
     @EXPORT = qw(
-
-      &GetFrequencies
-      &GetFrequency
-      &new
-      &all
-      &AddFrequency
-      &ModFrequency
-      &DelFrequency
-
+      &GetSubscriptionFrequencies
+      &GetSubscriptionFrequency
+      &AddSubscriptionFrequency
+      &ModSubscriptionFrequency
+      &DelSubscriptionFrequency
     );
 }
 
-# -------------------------------------------------------------------
-my %count_issues_a_year = (
-    day     => 365,
-    week    => 52,
-    month   => 12,
-    quarter => 4,
-    year    => 1
-);
-
-sub new {
-    my ( $class, $opts ) = @_;
-    bless $opts => $class;
-}
-
-sub AddFrequency {
-    my ( $class, $frequency ) = @_;
-    return InsertInTable( "subscription_frequencies", $frequency );
-}
-
-# -------------------------------------------------------------------
-sub ModFrequency {
-    my ( $class, $frequency ) = @_;
-    return UpdateInTable( "subscription_frequencies", $frequency );
-}
-
-# -------------------------------------------------------------------
-sub DelFrequency {
-    my ( $class, $frequency ) = @_;
-    return DeleteInTable( "subscription_frequencies", $frequency );
-}
-
-sub all {
-    my ($class) = @_;
-    my $dbh = C4::Context->dbh;
-    return map { $class->new($_) } @{
-        $dbh->selectall_arrayref(
-
-            # The subscription_frequency table is small enough for
-            # `SELECT *` to be harmless.
-            "SELECT * FROM subscription_frequencies ORDER BY description",
-            { Slice => {} },
-        )
-      };
-}
-
-=head3 GetFrequency
+=head3 GetSubscriptionFrequencies
 
 =over 4
 
-&GetFrequency($freq_id);
-
-gets frequency where $freq_id is the identifier
-
-=back
-
-=cut
-
-# -------------------------------------------------------------------
-sub GetFrequency {
-    my ($freq_id) = @_;
-    return undef unless $freq_id;
-    my $results = SearchInTable( "subscription_frequencies", { frequency_id => $freq_id }, undef, undef, undef, undef, "wide" );
-    return undef unless ($results);
-    return $$results[0];
-}
-
-=head3 GetFrequencies
-
-=over 4
-
-&GetFrequencies($filter, $order_by);
+=item C<@frequencies> = &GetSubscriptionFrequencies();
 
 gets frequencies restricted on filters
 
@@ -123,15 +50,202 @@ gets frequencies restricted on filters
 
 =cut
 
-# -------------------------------------------------------------------
-sub GetFrequencies {
-    my ( $filters, $orderby ) = @_;
-    return SearchInTable( "subscription_frequencies", $filters, $orderby, undef, undef, undef, "wide" );
+sub GetSubscriptionFrequencies {
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT *
+        FROM subscription_frequencies
+        ORDER BY displayorder
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute();
+
+    my $results = $sth->fetchall_arrayref( {} );
+    return @$results;
 }
 
-END { }    # module clean-up code here (global destructor)
+=head3 GetSubscriptionFrequency
+
+=over 4
+
+=item $frequency = &GetSubscriptionFrequency($frequencyid);
+
+gets frequency where $frequencyid is the identifier
+
+=back
+
+=cut
+
+sub GetSubscriptionFrequency {
+    my ($frequencyid) = @_;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT *
+        FROM subscription_frequencies
+        WHERE id = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($frequencyid);
+
+    return $sth->fetchrow_hashref;
+}
+
+=head3 AddSubscriptionFrequency
+
+=over 4
+
+=item C<$frequencyid> = &AddSubscriptionFrequency($frequency);
+
+Add a new frequency
+
+=item C<$frequency> is a hashref that can contains the following keys
+
+=over 2
+
+=item * description
+
+=item * unit
+
+=item * issuesperunit
+
+=item * unitsperissue
+
+=item * expectedissuesayear
+
+=item * displayorder
+
+=back
+
+Only description is mandatory.
+
+=back
+
+=cut
+
+sub AddSubscriptionFrequency {
+    my $frequency = shift;
+
+    unless(ref($frequency) eq 'HASH' && defined $frequency->{'description'} && $frequency->{'description'} ne '') {
+        return undef;
+    }
+
+    my @keys;
+    my @values;
+    foreach (qw/ description unit issuesperunit unitsperissue expectedissuesayear displayorder /) {
+        if(exists $frequency->{$_}) {
+            push @keys, $_;
+            push @values, $frequency->{$_};
+        }
+    }
+
+    my $dbh = C4::Context->dbh;
+    my $query = "INSERT INTO subscription_frequencies";
+    $query .= '(' . join(',', @keys) . ')';
+    $query .= ' VALUES (' . ('?,' x (scalar(@keys)-1)) . '?)';
+    my $sth = $dbh->prepare($query);
+    my $rv = $sth->execute(@values);
+
+    if(defined $rv) {
+        return $dbh->last_insert_id(undef, undef, "subscription_frequencies", undef);
+    }
+
+    return $rv;
+}
+
+=head3 ModSubscriptionFrequency
+
+=over 4
+
+=item &ModSubscriptionFrequency($frequency);
+
+Modifies a frequency
+
+=item C<$frequency> is a hashref that can contains the following keys
+
+=over 2
+
+=item * id
+
+=item * description
+
+=item * unit
+
+=item * issuesperunit
+
+=item * unitsperissue
+
+=item * expectedissuesayear
+
+=item * displayorder
+
+=back
+
+Only id is mandatory.
+
+=back
+
+=cut
+
+sub ModSubscriptionFrequency {
+    my $frequency = shift;
+
+    unless(
+      ref($frequency) eq 'HASH'
+      && defined $frequency->{'id'} && $frequency->{'id'} > 0
+      && (
+        (defined $frequency->{'description'}
+        && $frequency->{'description'} ne '')
+        || !defined $frequency->{'description'}
+      )
+    ) {
+        return undef;
+    }
+
+    my @keys;
+    my @values;
+    foreach (qw/ description unit issuesperunit unitsperissue expectedissuesayear displayorder /) {
+        if(exists $frequency->{$_}) {
+            push @keys, $_;
+            push @values, $frequency->{$_};
+        }
+    }
+
+    my $dbh = C4::Context->dbh;
+    my $query = "UPDATE subscription_frequencies";
+    $query .= ' SET ' . join(' = ?,', @keys) . ' = ?';
+    $query .= ' WHERE id = ?';
+    my $sth = $dbh->prepare($query);
+
+    return $sth->execute(@values, $frequency->{'id'});
+}
+
+=head3 DelSubscriptionFrequency
+
+=over 4
+
+=item &DelSubscriptionFrequency($frequencyid);
+
+Delete a frequency
+
+=back
+
+=cut
+
+sub DelSubscriptionFrequency {
+    my $frequencyid = shift;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        DELETE FROM subscription_frequencies
+        WHERE id = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($frequencyid);
+}
 
 1;
+
 __END__
 
 =head1 AUTHOR

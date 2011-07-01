@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use CGI;
-use C4::Serials;
+use C4::Serials::Numberpattern;
 use URI::Escape;
 use strict;
 use warnings;

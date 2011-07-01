@@ -4,11 +4,6 @@
 <script type="text/javascript" language="javascript">
 <!--
 
-// the english words used in display purposes
-var text = new Array(_("Number"),_("Volume"),_("Issue"),_("Month"),_("Week"),_("Starting with:"),_("Rollover at:"),_("Choose Hemisphere:"),_("Northern"),_("Southern",
-"Autumn"),_("Winter"),_("Spring"),_("Summer"),_("Fall"),_("Season"),_("Year"));
-
-
 // to display the options section
 function options(x,y,z){
 var textbox = '';
@@ -130,55 +125,9 @@ function popup(subscriptionid) {
         <h2>Planning</h2>
             <p><label>Beginning date:</label> <!-- TMPL_VAR name="startdate" -->
             </p>
-            <p><label>Frequency (*):</label>
-                <!--TMPL_IF name="periodicity16" -->
-                        Without regularity
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity32" -->
-                        Irregular
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity0" -->
-                        Unknown
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity12" -->
-                        2/day
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity1" -->
-                        1/day
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity13" -->
-                        3/week
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity2" -->
-                        1/week
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity3" -->
-                        1/2 weeks
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity4" -->
-                        1/3 weeks
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity5" -->
-                        1/Month
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity6" -->
-                        1/2 Months (6/year)
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity7" -->
-                        1/quarter
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity8" -->
-                        1/quarter
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity9" -->
-                        2/year
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity10" -->
-                        1/year
-                <!-- /TMPL_IF -->
-                <!--TMPL_IF name="periodicity11" -->
-                        1/2 years
-                <!-- /TMPL_IF -->
+            <p>
+              <label>Frequency (*):</label>
+              <!-- TMPL_VAR NAME='frequency' -->
               Manual history :
                 <!--TMPL_IF Name="manualhistory"-->
                     <input type="checkbox" checked="checked" disabled="disabled" />
@@ -186,41 +135,19 @@ function popup(subscriptionid) {
                     <input type="checkbox" disabled="disabled" />
                 <!--/TMPL_IF-->
             </p>
-            <p><label>Number pattern:</label>
-                <!-- TMPL_IF name="numberpattern1" -->
-                    Number only
-                <!-- /TMPL_IF -->
-                <!-- TMPL_IF name="numberpattern2" -->
-                    Volume, Number, Issue
-                <!-- /TMPL_IF -->
-                <!-- TMPL_IF name="numberpattern3" -->
-                    Volume, Number
-                <!-- /TMPL_IF -->
-                <!-- TMPL_IF name="numberpattern4" -->
-                    Volume, Issue
-                <!-- /TMPL_IF -->
-                <!-- TMPL_IF name="numberpattern5" -->
-                    Number, Issue
-                <!-- /TMPL_IF -->
-                <!-- TMPL_IF name="numberpattern8" -->
-                    Year/Number
-                <!-- /TMPL_IF -->
-                <!-- TMPL_IF name="numberpattern6" -->
-                    Seasonal only
-                <!-- /TMPL_IF -->
-                <!-- TMPL_IF name="numberpattern7" -->
-                    None of the above
-                <!-- /TMPL_IF -->
+            <p>
+              <label>Number pattern:</label>
+              <!-- TMPL_VAR NAME="numberpattern" -->
             </p>
             <table>
             <tr><td><p>Starting with:</p></td>
                 <td align="center"><!--TMPL_VAR NAME="lastvalue1"--></td>
-            <!--TMPL_IF NAME="lastvalue2"-->
+            <!--TMPL_IF NAME="has_Y"-->
                 <td align="center">&nbsp; 
                     <!--TMPL_VAR NAME="lastvalue2"-->
                 </td>
             <!--/TMPL_IF-->
-            <!--TMPL_IF NAME="lastvalue3"-->
+            <!--TMPL_IF NAME="has_Z"-->
                 <td align="center">&nbsp; 
                     <!--TMPL_VAR NAME="lastvalue3"-->
                 </td>
@@ -228,12 +155,12 @@ function popup(subscriptionid) {
             </tr>
             <tr><td><p>Rollover:</p></td>
                 <td align="center"><!--TMPL_VAR NAME="whenmorethan1"--></td>
-            <!--TMPL_IF NAME="whenmorethan2"-->
+            <!--TMPL_IF NAME="has_Y"-->
                 <td align="center">&nbsp; 
                     <!--TMPL_VAR NAME="whenmorethan2"-->
                 </td>
             <!--/TMPL_IF-->
-            <!--TMPL_IF NAME="whenmorethan3"-->
+            <!--TMPL_IF NAME="has_Z"-->
                 <td align="center">&nbsp; 
                     <!--TMPL_VAR NAME="whenmorethan3"-->
                 </td>

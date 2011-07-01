@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use CGI;
+use C4::Context;
 use C4::Serials::Numberpattern;
 use URI::Escape;
 use strict;
@@ -8,32 +9,33 @@ use warnings;
 
 my $input = new CGI;
 
-my $patternname = $input->param('patternname');
-my $numberingmethod = $input->param('numberingmethod');
-my $label1 = $input->param('label1');
-my $label2 = $input->param('label2');
-my $label3 = $input->param('label3');
-my $add1 = $input->param('add1');
-my $add2 = $input->param('add2');
-my $add3 = $input->param('add3');
-my $every1 = $input->param('every1');
-my $every2 = $input->param('every2');
-my $every3 = $input->param('every3');
-my $setto1 = $input->param('setto1');
-my $setto2 = $input->param('setto2');
-my $setto3 = $input->param('setto3');
-my $whenmorethan1 = $input->param('whenmorethan1');
-my $whenmorethan2 = $input->param('whenmorethan2');
-my $whenmorethan3 = $input->param('whenmorethan3');
-my $numbering1 = $input->param('numbering1');
-my $numbering2 = $input->param('numbering2');
-my $numbering3 = $input->param('numbering3');
+my $numberpattern;
+foreach (qw/ numberingmethod label1 label2 label3 add1 add2 add3
+  every1 every2 every3 setto1 setto2 setto3 whenmorethan1 whenmorethan2
+  whenmorethan3 numbering1 numbering2 numbering3 /) {
+    $numberpattern->{$_} = $input->param($_);
+}
+# patternname is label in database
+$numberpattern->{'label'} = $input->param('patternname');
 
-my $numberpatternid = AddNumberpattern($patternname, $numberingmethod,
-    $label1, $label2, $label3, $add1, $add2, $add3,
-    $every1, $every2, $every3, $setto1, $setto2, $setto3,
-    $whenmorethan1, $whenmorethan2, $whenmorethan3,
-    $numbering1, $numbering2, $numbering3);
+# Check if pattern already exist in database
+my $dbh = C4::Context->dbh;
+my $query = qq{
+    SELECT id
+    FROM subscription_numberpatterns
+    WHERE STRCMP(label, ?) = 0
+};
+my $sth = $dbh->prepare($query);
+my $rv = $sth->execute($numberpattern->{'label'});
+my $numberpatternid;
+if($rv == 0) {
+    # Pattern does not exists
+    $numberpatternid = AddSubscriptionNumberpattern($numberpattern);
+} else {
+    ($numberpatternid) = $sth->fetchrow_array;
+    $numberpattern->{'id'} = $numberpatternid;
+    ModSubscriptionNumberpattern($numberpattern);
+}
 
 binmode STDOUT, ":utf8";
 print $input->header(-type => 'text/plain', -charset => 'UTF-8');

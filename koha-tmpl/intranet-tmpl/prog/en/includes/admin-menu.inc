@@ -42,6 +42,13 @@
 
 </ul>
 
+<h5>Serial parameters</h5>
+
+<ul>
+  <li><a href="/cgi-bin/koha/admin/subscription-frequencies.pl">Frequencies</a></li>
+  <li><a href="/cgi-bin/koha/admin/subscription-numberpatterns.pl">Number patterns</a></li>
+</ul>
+
 <h5>Additional parameters</h5>
 
 <ul>
