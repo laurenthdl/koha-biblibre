@@ -296,7 +296,7 @@ sub redirect_add_subscription {
     my $opacdisplaycount  = $query->param('opacdisplaycount');
     my $location          = $query->param('location');
     my $startdate = format_date_in_iso( $query->param('startdate') );
-    my $enddate = $query->param('enddate');
+    my $enddate = format_date_in_iso( $query->param('enddate') );
     my $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));
     if(!defined $enddate || $enddate eq '') {
         $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
@@ -333,7 +333,7 @@ sub redirect_mod_subscription {
       $query->param('nextacquidate')
       ? format_date_in_iso( $query->param('nextacquidate') )
       : format_date_in_iso( $query->param('startdate') );
-    my $enddate = $query->param('enddate');
+    my $enddate = format_date_in_iso( $query->param('enddate') );
     my $periodicity = $query->param('frequency');
     my $dow         = $query->param('dow');
 
