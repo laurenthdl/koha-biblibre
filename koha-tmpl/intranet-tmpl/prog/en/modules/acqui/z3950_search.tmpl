@@ -154,7 +154,11 @@
                 </tbody>
             </table>
             <!-- TMPL_ELSE -->
-                <p>Nothing found. <a href="javascript: history.back()">Try another search</a>.</p>
+              <!-- TMPL_IF NAME='error' -->
+                <p><strong>Error:</strong> <!-- TMPL_VAR NAME='error' --></p>
+              <!-- TMPL_ELSE -->
+                <p>Nothing found. <a href="/cgi-bin/koha/acqui/z3950_search.pl?basketno=<!-- TMPL_VAR NAME='basketno' -->&booksellerid=<!-- TMPL_VAR NAME='booksellerid' -->">Try another search</a>.</p>
+              <!-- /TMPL_IF -->
             <!-- /TMPL_IF -->
         </div>
         <!-- /TMPL_LOOP -->

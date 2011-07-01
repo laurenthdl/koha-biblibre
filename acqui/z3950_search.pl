@@ -62,7 +62,6 @@ my $booksellerid = $input->param('booksellerid');
 my $basketno     = $input->param('basketno');
 my $tab          = $input->param('tab');
 my $page         = $input->param('page');
-my $noconnection;
 my $numberpending;
 my $attr = '';
 my $term;
@@ -80,6 +79,8 @@ my $oldbiblio;
 my $errmsg;
 my @serverhost;
 my @servername;
+my @serverid;
+my @servertab;
 my @resultsloop = ();
 my $random        = $input->param('random');
 
@@ -129,15 +130,10 @@ if ( $op ne "do_search" ) {
     my @id = $input->param('id');
     my @oConnection;
     my @oResult;
-    my $s = 0;
     my $query;
     my $nterms;
     my $pagesize = 20;
     my @server_page;
-    for(my $i = 0 ; $i < scalar(@id) ; $i++){
-            $server_page[$i] = $input->param("server".$i."_page");
-            $server_page[$i] ||= defined $page && $tab == $i ? $page : 1;
-    }
     if ( $isbn || $issn ) {
         $term = $isbn if ($isbn);
         $term = $issn if ($issn);
@@ -184,30 +180,36 @@ if ( $op ne "do_search" ) {
     }
     warn "query " . $query if $DEBUG;
 
-    foreach my $servid (@id) {
-        my $sth = $dbh->prepare("select * from z3950servers where id=?");
-        $sth->execute($servid);
-        while ( $server = $sth->fetchrow_hashref ) {
-            warn "serverinfo " . join( ':', %$server ) if $DEBUG;
-            my $noconnection = 0;
-            my $option1      = new ZOOM::Options();
-            $option1->option( 'async' => 1 );
-            $option1->option( 'elementSetName', 'F' );
-            $option1->option( 'databaseName',   $server->{db} );
-            $option1->option( 'user',           $server->{userid} ) if $server->{userid};
-            $option1->option( 'password',       $server->{password} )
-              if $server->{password};
-            $option1->option( 'preferredRecordSyntax', $server->{syntax} );
-            $oConnection[$s] = create ZOOM::Connection($option1)
-              || $DEBUG && warn( "" . $oConnection[$s]->errmsg() );
-            warn( "server data", $server->{name}, $server->{port} ) if $DEBUG;
-            $oConnection[$s]->connect( $server->{host}, $server->{port} )
-              || $DEBUG && warn( "" . $oConnection[$s]->errmsg() );
-            $serverhost[$s] = $server->{host};
-            $servername[$s] = $server->{name};
-            $encoding[$s]   = ( $server->{encoding} ? $server->{encoding} : "iso-5426" );
-            $s++;
-        }    ## while fetch
+    my $squery = "SELECT * FROM z3950servers";
+    $squery .= " WHERE id IN(" . ("?," x (scalar(@id)-1)) . "?)";
+    $squery .= " ORDER BY rank, id ASC";
+    my $sth = $dbh->prepare($squery);
+    $sth->execute(@id);
+    my $servers = $sth->fetchall_arrayref({});
+    my $s = 0;
+    foreach my $server (@$servers) {
+        warn "serverinfo " . join( ':', %$server ) if $DEBUG;
+        my $option1      = new ZOOM::Options();
+        $option1->option( 'async' => 1 );
+        $option1->option( 'elementSetName', 'F' );
+        $option1->option( 'databaseName',   $server->{db} );
+        $option1->option( 'user',           $server->{userid} ) if $server->{userid};
+        $option1->option( 'password',       $server->{password} )
+          if $server->{password};
+        $option1->option( 'preferredRecordSyntax', $server->{syntax} );
+        $oConnection[$s] = create ZOOM::Connection($option1)
+          || $DEBUG && warn( "" . $oConnection[$s]->errmsg() );
+        warn( "server data", $server->{name}, $server->{port} ) if $DEBUG;
+        $oConnection[$s]->connect( $server->{host}, $server->{port} )
+          || $DEBUG && warn( "" . $oConnection[$s]->errmsg() );
+        $serverhost[$s] = $server->{host};
+        $servername[$s] = $server->{name};
+        $serverid[$s] = $server->{'id'};
+        $encoding[$s]   = ( $server->{encoding} ? $server->{encoding} : "iso-5426" );
+        $servertab[$server->{'id'}] = $s;
+        $server_page[$server->{'id'}] = $input->param("server".$server->{'id'}."_page");
+        $server_page[$server->{'id'}] ||= defined $page && $tab == $servertab[$server->{'id'}] ? $page : 1;
+        $s++;
     }    # foreach
     my $nremaining  = $s;
     my $firstresult = 1;
@@ -235,6 +237,12 @@ if ( $op ne "do_search" ) {
             if ($error) {
                 warn "$k $serverhost[$k] error $query: $errmsg ($error) $addinfo\n"
                   if $DEBUG;
+                push @resultsloop, {
+                    server_id => "server".$serverid[$k],
+                    server_tab => $servertab[$serverid[$k]],
+                    server_name => $servername[$k],
+                    error => $errmsg,
+                };
 
             } else {
                 my $numresults = $oResult[$k]->size();
@@ -242,8 +250,9 @@ if ( $op ne "do_search" ) {
                 my $result = '';
                 my @serverresultsloop = ();
                 if ( $numresults > 0 ) {
-                    my $first = ( $server_page[$k] - 1 ) * $pagesize;
+                    my $first = ( $server_page[$serverid[$k]] - 1 ) * $pagesize;
                     my $last = $first + ( ( $numresults - $first ) < $pagesize ? $numresults - $first : $pagesize );
+                    $oResult[$k]->records($first, $pagesize, 0);
                     for ( $i = $first ; $i < $last ; $i++ ) {
                         my $rec = $oResult[$k]->record($i);
                         if ($rec) {
@@ -297,12 +306,12 @@ if ( $op ne "do_search" ) {
                                 }
                             );
                         }    # $rec
-                    }    # upto 5 results
+                    }
                     my $pager = Data::Pagination->new(
                         $numresults,
                         $pagesize,
                         10,
-                        $server_page[$k]
+                        $server_page[$serverid[$k]]
                     );
                     my @pager_params = ();
                     push @pager_params, (
@@ -322,19 +331,27 @@ if ( $op ne "do_search" ) {
                     );
                     push @pager_params, map { { ind => 'id', val => $_ } } @id;
                     for( my $i = 0; $i < @oResult; $i++){
-                        push @pager_params, { ind => "server".$i."_page", val => $server_page[$i] } if ( $i != $k && $server_page[$i] != 1 );
+                        push @pager_params, { ind => "server".$serverid[$i]."_page", val => $server_page[$serverid[$i]] } if ( $i != $k && $server_page[$serverid[$i]] != 1 );
                     }
-                    push @pager_params, { ind => "tab", val => $k };
+                    push @pager_params, { ind => "tab", val => $servertab[$serverid[$k]] };
                     push( @resultsloop, {
-                        server_id => "server$k",
+                        server_id => "server".$serverid[$k],
+                        server_tab => $servertab[$serverid[$k]],
                         server_name => $servername[$k],
                         previous_page => $pager->{prev_page},
                         next_page => $pager->{next_page},
-                        PAGE_NUMBERS => [ map { { page => $_, current => $_ == $server_page[$k] } } @{ $pager->{'numbers_of_set'} } ],
+                        PAGE_NUMBERS => [ map { { page => $_, current => $_ == $server_page[$serverid[$k]] } } @{ $pager->{'numbers_of_set'} } ],
                         follower_params => \@pager_params,
                         serverresultsloop => \@serverresultsloop,
                     } );
-                }    #$numresults
+                    @resultsloop = sort {$a->{'server_tab'} <=> $b->{'server_tab'}} @resultsloop;
+                } else {
+                    push @resultsloop, {
+                        server_id => "server".$serverid[$k],
+                        server_tab => $servertab[$serverid[$k]],
+                        server_name => $servername[$k],
+                    };
+                }
             }
         }    # if $k !=0
 
@@ -351,7 +368,7 @@ if ( $op ne "do_search" ) {
         $firstresult++;
     }
     displayresults();
-    if ( --$nremaining > 0 ) {
+    while ( --$nremaining > 0 ) {
         displayresults();
     }
 }    ## if op=search
