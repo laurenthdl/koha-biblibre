@@ -3641,8 +3641,10 @@ sub BatchModField {
             $record->insert_fields_ordered($new_field);
         } else {
             for my $rf ( $record->field( $tofield ) ) {
-                for my $val ( $rf->subfield( $subfield ) ) {
-                    $rf->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
+                for my $f ($record->field( $field ) ) {
+                    for my $val ( $f->subfield( $subfield ) ) {
+                        $rf->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
+                    }
                 }
             }
         }
