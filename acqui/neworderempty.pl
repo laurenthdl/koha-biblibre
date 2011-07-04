@@ -414,7 +414,6 @@ $template->param(
     total                => sprintf( "%.2f", ( $data->{'ecost'} || 0 ) * ( $data->{'quantity'} || 0 ) ),
     ecost                => sprintf( "%.2f", $data->{'ecost'} ),
     unitprice            => sprintf( "%.2f", $data->{unitprice} ),
-    notes                => $data->{'notes'},
     publishercode        => $data->{'publishercode'},
     place                => $data->{'place'},
     import_batch_id      => $import_batch_id,
