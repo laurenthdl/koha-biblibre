@@ -39,4 +39,9 @@ sub ComputeValue {
     } shift->field('7..');
 }
 
+# We want to concatenate values returned by ComputeValue with others mappings
+sub ConcatMappings {
+    1;
+}
+
 1;
