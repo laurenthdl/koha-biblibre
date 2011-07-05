@@ -2,15 +2,12 @@
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
     <title>Koha &rsaquo; Serials &rsaquo; Claims</title>
     <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.uitablefilter.js"></script>
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME="themelang" -->/css/datatables.css" />
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/js/datatables.js"></script>
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
-	 $(document).ready(function() {
-		<!-- TMPL_UNLESS NAME="preview" -->$("#claimst").tablesorter({<!-- TMPL_IF EXPR="dateformat eq 'metric'" -->
-			dateFormat: 'uk',<!-- /TMPL_IF -->
-			headers: { 0: { sorter: false },1:{sorter:false}}
-		});<!-- /TMPL_UNLESS -->
+    $(document).ready(function() {
 	    $('#supplierid').change(function() {
     	    $('#claims').submit();
 	    });
@@ -52,14 +49,73 @@
 		return false;
 	    });	
 
-        $("#titlefilter").keyup(function() {
-            $.uiTableFilter($("#claimst"), $("#titlefilter").val())
-	    });
+        var claimst = $("#claimst").dataTable( {
+            "oLanguage": {
+                "sSearch": "Search all columns:",
+            },
+            "aaSorting": [ [3, 'asc'] ], // sorting on title by default
+            "aoColumnDefs": [
+                { "aTargets": [ 0 ], "bSortable": false }, // No sorting on first column
+                { "aTargets": [ '_all' ], "bSortable": true }
+            ],
+            "sPaginationType": "full_numbers",
+        } );
 
-        $("#branchfilter").keyup(function() {
-            $.uiTableFilter($("#claimst"), $("#branchfilter").val())
-	    });
-	 });
+        $('#begindate').change( function() {claimst.fnDraw(); } );
+
+        $('#enddate').change( function() { claimst.fnDraw(); } );
+
+        $("input.filter").keyup( function () {
+            claimst.fnFilter( this.value, $(this).attr("data-column_num") );
+        } );
+
+        var asInitVals = new Array();
+        $("input.filter").each( function (i) {
+            asInitVals[$(this).attr("data-column_num")] = this.value;
+        } );
+
+        $("input.filter").focus( function () {
+            if ( $(this).hasClass("search_init") ) {
+                $(this).removeClass("search_init");
+                this.value = "";
+            }
+        } );
+
+        $("input.filter").blur( function (i) {
+            if ( this.value == "" ) {
+                $(this).addClass("search_init");
+                this.value = asInitVals[$(this).attr("data-column_num")];
+            }
+        } );
+
+        function createSelect( data ) {
+            var r='<select><option value=""></option>', i, len=data.length;
+            for ( i=0 ; i<len ; i++ ) {
+                r += '<option value="'+data[i]+'">'+data[i]+'</option>';
+            }
+            return r+'</select>';
+        }
+
+        $("li.branchfilter").each( function () {
+            $(this).html( "Branch : " + createSelect( claimst.fnGetColumnData(2) ) );
+            $('select', this).change( function () {
+                claimst.fnFilter( $(this).val(), 2 );
+            } );
+        } );
+
+        $("li.statusfilter").each( function () {
+            $(this).html( "Status : " + createSelect( claimst.fnGetColumnData(5) ) );
+            $('select', this).change( function () {
+                claimst.fnFilter( $(this).val(), 5 );
+            } );
+        } );
+
+    });
+
+    function clearDate(nodeid) {
+        $("#"+nodeid).val("");
+        $("#"+nodeid).change();
+    }
 
 	// Checks if the form can be sent (at least one checkbox must be checked)
 	function checkForm() {
@@ -69,81 +125,12 @@
 	    }
 	}
 
-	// Filter by status
-	function filterByStatus() {
-	    selectedStatus = $("#statusfilter").val();
-	    if (selectedStatus == "all") {
-		clearFilters();
-	    } else {
-		$("table#claimst tbody tr").hide();
-		$("table#claimst tbody tr:contains(" + selectedStatus + ")").show();		    
-	    }
-	}
-
-	// Filter by branch
-	function filterByBranch() {
-	    selectedBranch = $("#branchfilter").val();
-	    if (selectedBranch == "all") {
-		clearFilters();
-	    } else {
-		$("table#claimst tbody tr").hide();
-		$("table#claimst tbody tr:contains(" + selectedBranch + ")").show();		    
-	    }
-	}
-	// Filter by date
-	function filterByDate() {
-	    var beginDate = Date_from_syspref($("#begindate").val()).getTime();
-	    var endDate   = Date_from_syspref($("#enddate").val()).getTime();
-	    
-	    // Checks if the beginning date is valid
-	    if (!parseInt(beginDate)) {
-		alert(_('The beginning date is missing or invalid.'));
-		return false;
-	    }
-
-	    // Checks if the ending date is valid
-	    if (!parseInt(endDate)) {
-		alert(_('The ending date is missing or invalid.'));
-		return false;
-	    }
-
-	    // Checks if beginning date is before ending date
-	    if (beginDate > endDate) {
-		// If not, we swap them
-		var tmpDate = endDate;
-		endDate = beginDate;
-		beginDate = tmpDate;
-	    }
-	   
-	    // We hide everything
-	    $("table#claimst tbody tr").hide();
-
-	    // For each date in the table
-	    $(".planneddate").each(function() {
-
-		// We make a JS Date Object, according to the locale
-		var pdate = Date_from_syspref($(this).text()).getTime();
-
-		// And checks if the date is between the beginning and ending dates
-		if (pdate > beginDate && 
-		    pdate < endDate) {
-			// If so, we can show the row
-			$(this).parent().show();
-		    }
-
-	    });
-	}
-
-	// Clears filters : shows everything
-	function clearFilters() {
-	    $("table#claimst tbody tr").show();
-	}
-
 	function popup(supplierid,serialid){
 		window.open('claims.pl?supplierid='+ supplierid +'&amp;serialid='+ serialid +'&amp;op=preview' ,'popup', 'width=600,height=400,toolbar=no,scrollbars=yes');
-	}
+}
 
 //]]>
+
 </script>
 </head>
 <body>
@@ -200,77 +187,53 @@
    <!-- TMPL_IF NAME="missingissues" -->	
     <h3>Missing Issues</h3>
     <form action="claims.pl" onsubmit="return false;">
-	<fieldset class="rows">
-	<legend>Filters :</legend>
-	
-	<ol>
-	<li>
-	    <label for="statusfilter">Status : </label>
-	    <select id="statusfilter" onchange="filterByStatus();">
-		<option value="all" selected="selected">(All)</option>
-		<option>Expected</option>
-		<option>Arrived</option>
-		<option>Late</option>
-		<option>Missing</option>
-		<option>Claimed</option>
-	    </select>
-	</li>
-	
-	<li>
-	    <label for="titlefilter">Title : </label>
-	    <input id="titlefilter" type="text" />
-	    <label for="branchfilter">Branch: </label>
-	    <select id="branchfilter" onchange="filterByBranch();">
-            <!-- TMPL_LOOP Name="branchloop" -->
-                <!-- TMPL_IF NAME="selected" -->
-                <option value="<!-- TMPL_VAR NAME="value" -->" selected="selected"><!-- TMPL_VAR NAME="branchname" --></option>
-                <!-- TMPL_ELSE -->
-                <option value="<!-- TMPL_VAR NAME="value" -->"><!-- TMPL_VAR NAME="branchname" --></option>
-                <!-- /TMPL_IF -->
-            <!-- /TMPL_LOOP -->
-        </select>
-	</li>
-	
-	<li>
-	    <label for="begindate">From</label>
-	    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="begindatebutton" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-	    <input type="text" name="begindate" id="begindate" value="<!-- TMPL_VAR name="begindate" -->" size="10" maxlength="10" />
-	    <script type="text/javascript">
-		 //<![CDATA[ 
-		Calendar.setup({
-		    inputField	: "begindate", 
-		    button		: "begindatebutton",
-		    ifFormat	: "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->"
-		});
-		//]]>
-	    </script>
+        <fieldset class="rows">
+        <legend>Filters :</legend>
+            <ol>
+                <li>
+                    <input type="text" name="title" class="filter search_init" value="Title Search" data-column_num="3" />
+                </li>
+                <li class="filter branchfilter"></li>
+                <li class="filter statusfilter"></li>
+                <li>
+                    <label for="begindate">From</label>
+                    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="begindatebutton" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                    <input type="text" name="begindate" id="begindate" value="<!-- TMPL_VAR name="begindate" -->" size="10" maxlength="10" disabled="disabled" />
+                    <a href="#" onclick="clearDate('begindate');return false;">X</a>
+                    <script type="text/javascript">
+                     //<![CDATA[ 
+                    Calendar.setup({
+                        inputField	: "begindate", 
+                        button		: "begindatebutton",
+                        ifFormat	: "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                        onClose: function() { $("#begindate").change(); this.hide();}
+                    });
+                    //]]>
+                    </script>
 
-	    <label for="enddate" style="float:none;">To</label>
-	    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="enddatebutton" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-	    <input type="text" name="enddate" id="enddate" value="<!-- TMPL_VAR name="enddate" -->" size="10" maxlength="10" />
-	    <script type="text/javascript">
-		 //<![CDATA[ 
-		 Calendar.setup({
-		    inputField      : "enddate", 
-		    button          : "enddatebutton",
-		    ifFormat        : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->"
-		});
-		//]]>
-	    </script> <span class="hint"><!-- TMPL_INCLUDE NAME="date-format.inc" --></span>
-	    <input type="button" value="OK" onclick="filterByDate();" />
-        </li>
-	
-	<li>
-	    <input type="reset" value="Clear Filters" onclick="clearFilters();" />
-	</li>
-	</ol>
-	</fieldset>
+                    <label for="enddate" style="float:none;">To</label>
+                    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="enddatebutton" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                    <input type="text" name="enddate" id="enddate" value="<!-- TMPL_VAR name="enddate" -->" size="10" maxlength="10" disabled="disabled" />
+                    <a href="#" onclick="clearDate('enddate');return false;">X</a>
+                    <script type="text/javascript">
+                     //<![CDATA[ 
+                     Calendar.setup({
+                        inputField      : "enddate", 
+                        button          : "enddatebutton",
+                        ifFormat        : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                        onClose: function() { $("#enddate").change(); this.hide();}
+                    });
+                    //]]>
+                    </script> <span class="hint"><!-- TMPL_INCLUDE NAME="date-format.inc" --></span>
+                </li>
+            </ol>
+        </fieldset>
     </form>
 
     <fieldset>
-	<form action="claims.pl" method="post" class="checkboxed" onsubmit="return checkForm()">
+    <form action="claims.pl" method="post" class="checkboxed" onsubmit="return checkForm()">
         <input type="hidden" name="order" value="<!--TMPL_VAR Name="order"-->" />
-         <table id="claimst">
+         <table id="claimst" class="display">
                 <thead><tr>
                     <!--TMPL_IF NAME="letter"-->
                     <th><input type="checkbox" id="CheckAll"></th>
@@ -283,7 +246,6 @@
                     <th>Since</th>
                     <th>Claims count</th>
                     <th>Claim Date</th>
-                <th>Begin Claim</th>
                 </tr></thead>
                 <tbody><!-- TMPL_LOOP name="missingissues" -->
                     <tr>
@@ -322,13 +284,11 @@
                         <td>
                         <!-- TMPL_VAR name="claimdate" -->
                         </td>
-                        <td>
-                            <a href="/cgi-bin/koha/serials/lateissues-excel.pl?supplierid=<!-- TMPL_VAR name="supplieri" -->&amp;serialid=<!-- TMPL_VAR name="serialid" -->&amp;op=claims">Export item data</a>
-                        </td>
                     </tr>
                 <!-- /TMPL_LOOP --></tbody>
             </table>
-	     <p><span class="exportSelected"></span></p>
+            <div class="spacer"></div>
+	     <p style="display:block;"><span class="exportSelected"></span></p>
 
 <!--TMPL_IF Name="letter" -->
         <fieldset class="action"> <label for="letter_code">Select notice:</label>
