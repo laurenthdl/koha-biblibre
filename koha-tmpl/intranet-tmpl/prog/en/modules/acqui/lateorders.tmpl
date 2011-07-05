@@ -2,27 +2,58 @@
 <title>Koha &rsaquo; Acquisitions &rsaquo; Late orders</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME="themelang" -->/css/datatables.css" />
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
-$(document).ready(function() {
-    $.tablesorter.addParser({
-        id: 'amount',
-        is: function(s) {
-            return false;
-        },
-        format:	function(s) {
-            return s.replace(/ /g,"").replace(/,/g,"");
-        },
-        type: 'numeric'
-    });
-    $("#lateorders").tablesorter({
-	    widgets : ['zebra'],
-	    headers: {
-            8: { sorter: false },
-        },
-	});
 
+<!-- TMPL_IF NAME='dateformatmetric' -->
+  jQuery.fn.dataTableExt.aTypes.unshift(
+    function ( sData )
+    {
+      console.log(sData);
+      if (sData.match(/(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20|21)\d\d/))
+      {
+        console.log("MATCH");
+        return 'uk_date';
+      }
+      return null;
+    }
+  );
+
+  jQuery.fn.dataTableExt.oSort['uk_date-asc']  = function(a,b) {
+    var re = /(\d{2}\/\d{2}\/\d{4})/;
+    a.match(re);
+    var ukDatea = RegExp.$1.split("/");
+    b.match(re);
+    var ukDateb = RegExp.$1.split("/");
+
+    var x = (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
+    var y = (ukDateb[2] + ukDateb[1] + ukDateb[0]) * 1;
+
+    return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+  };
+
+  jQuery.fn.dataTableExt.oSort['uk_date-desc'] = function(a,b) {
+    var re = /(\d{2}\/\d{2}\/\d{4})/;
+    a.match(re);
+    var ukDatea = RegExp.$1.split("/");
+    b.match(re);
+    var ukDateb = RegExp.$1.split("/");
+
+    var x = (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
+    var y = (ukDateb[2] + ukDateb[1] + ukDateb[0]) * 1;
+
+    return ((x < y) ? 1 : ((x > y) ?  -1 : 0));
+  };
+<!-- /TMPL_IF -->
+
+$(document).ready(function() {
+    $("#lateorders").dataTable({
+      "aoColumnDefs": [
+        { "aTargets": [8], "bSortable": false }
+      ]
+    });
     $("#checkAll").click(function() {
         $("#lateorders :checkbox").attr('checked', $("#checkAll").is(':checked'));
     });

@@ -153,6 +153,7 @@ $template->param(
     estimateddeliverydateto   => $estimateddeliverydateto,
     total                   => $total,
     intranetcolorstylesheet => C4::Context->preference("intranetcolorstylesheet"),
+    dateformatmetric => C4::Context->preference("dateformat") eq "metric" ? 1 : 0,
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
 output_html_with_http_headers $input, $cookie, $template->output;
