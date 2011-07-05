@@ -160,8 +160,10 @@ foreach ( sort keys %$locations ) {
 }
 
 my @ccodes;
+if ($ccodes){
 foreach ( sort { $ccodes->{$a} cmp $ccodes->{$b} } keys %$ccodes ) {
     push @ccodes, { code => $_, description => $ccodes->{$_} };
+}
 }
 
 # various
@@ -347,7 +349,7 @@ sub null_to_zzempty ($) {
 sub display_value {
     my ( $crit, $value ) = @_;
     my $display_value =
-        ( $crit =~ /ccode/ )         ? $ccodes->{$value}
+        ( $crit =~ /ccode/  && $ccodes )         ? $ccodes->{$value}
       : ( $crit =~ /location/ )      ? $locations->{$value}
       : ( $crit =~ /itemtype/ )      ? $itemtypes->{$value}->{description}
       : ( $crit =~ /branch/ )        ? GetBranchName($value)

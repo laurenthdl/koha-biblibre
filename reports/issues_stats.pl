@@ -155,10 +155,11 @@ foreach ( sort keys %$locations ) {
 }
 
 my @ccodes;
+if ($ccodes){
 foreach ( sort { $ccodes->{$a} cmp $ccodes->{$b} } keys %$ccodes ) {
     push @ccodes, { code => $_, description => $ccodes->{$_} };
 }
-
+}
 # various
 my @mime = ( C4::Context->preference("MIME") );
 

@@ -155,16 +155,19 @@ if ($do_it) {
 
     my $authvals = GetKohaAuthorisedValues("items.ccode");
     my @authvals;
+    if ($authvals){
     foreach ( sort { $authvals->{$a} cmp $authvals->{$b} || $a cmp $b } keys %$authvals ) {
         push @authvals, { code => $_, description => $authvals->{$_} };
+    }
     }
 
     my $locations = GetKohaAuthorisedValues("items.location");
     my @locations;
+    if ($locations){
     foreach ( sort keys %$locations ) {
         push @locations, { code => $_, description => "$_ - " . $locations->{$_} };
     }
-
+    }
     my @mime = ( map { +{ type => $_ } } ( split /[;:]/, C4::Context->preference("MIME") ) );
 
     $template->param(
