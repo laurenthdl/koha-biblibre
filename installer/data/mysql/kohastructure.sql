@@ -2626,6 +2626,7 @@ CREATE TABLE `aqorders` (
   `claims_count` int(11) default 0,
   `claimed_date` date default NULL,
   `subscriptionid` int(11) default NULL,
+  `branchcode` varchar(10) default NULL,
   PRIMARY KEY  (`ordernumber`),
   KEY `basketno` (`basketno`),
   KEY `biblionumber` (`biblionumber`),
