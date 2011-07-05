@@ -96,7 +96,7 @@ if ( $count == 1 ) {
 }
 
 # Sort alphabetically
-@suppliers = sort { $a->{'name'} cmp $b->{'name'} } @suppliers;
+@suppliers = sort { lc($a->{'name'}) cmp lc($b->{'name'}) } @suppliers;
 
 #build result page
 my @loop_suppliers;
