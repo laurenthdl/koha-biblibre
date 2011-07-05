@@ -52,10 +52,13 @@
         var claimst = $("#claimst").dataTable( {
             "oLanguage": {
                 "sSearch": "Search all columns:",
-                "aaSorting": [ [3, 'asc'] ], // sorting on title by default
-                "aoColumns": [null],
             },
-
+            "aaSorting": [ [3, 'asc'] ], // sorting on title by default
+            "aoColumnDefs": [
+                { "aTargets": [ 0 ], "bSortable": false }, // No sorting on first column
+                { "aTargets": [ '_all' ], "bSortable": true }
+            ],
+            "sPaginationType": "full_numbers",
         } );
 
         $('#begindate').change( function() {claimst.fnDraw(); } );
@@ -284,7 +287,8 @@
                     </tr>
                 <!-- /TMPL_LOOP --></tbody>
             </table>
-	     <p><span class="exportSelected"></span></p>
+            <div class="spacer"></div>
+	     <p style="display:block;"><span class="exportSelected"></span></p>
 
 <!--TMPL_IF Name="letter" -->
         <fieldset class="action"> <label for="letter_code">Select notice:</label>
