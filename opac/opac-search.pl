@@ -516,7 +516,8 @@ my @facets;
 while ( my ($index,$facet) = each %{$res->facets} ) {
     if ( @$facet > 1 ) {
         my @values;
-        my ($type, $code) = split /_/, $index;
+        $index =~ m/^([^_]*)_(.*)$/;
+        my ($type, $code) = ($1, $2);
 
         for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
             my $value = $facet->[$i++];
