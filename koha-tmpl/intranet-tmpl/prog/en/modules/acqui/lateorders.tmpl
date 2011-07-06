@@ -14,7 +14,6 @@
       console.log(sData);
       if (sData.match(/(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20|21)\d\d/))
       {
-        console.log("MATCH");
         return 'uk_date';
       }
       return null;
@@ -50,9 +49,13 @@
 
 $(document).ready(function() {
     $("#lateorders").dataTable({
+      "oLanguage": {
+        "sSearch": "Search all columns:"
+      },
       "aoColumnDefs": [
         { "aTargets": [8], "bSortable": false }
-      ]
+      ],
+      "sPaginationType": "full_numbers"
     });
     $("#checkAll").click(function() {
         $("#lateorders :checkbox").attr('checked', $("#checkAll").is(':checked'));
@@ -102,7 +105,7 @@ $(document).ready(function() {
 	  </select>
 	</p>
 	<!-- /TMPL_IF -->
-    <table id="lateorders">
+    <table id="lateorders" class="display">
         <thead>
             <tr>
                 <th>Order Date</th>
