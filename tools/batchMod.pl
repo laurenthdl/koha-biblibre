@@ -31,7 +31,6 @@ use C4::ClassSource;
 use C4::Dates;
 use C4::Debug;
 use YAML;
-use Switch;
 use MARC::File::XML;
 use List::MoreUtils qw /any/;
 
@@ -216,8 +215,8 @@ if ( $op eq "show" ) {
             push @contentlist, $content if $content;
         }
 
-        switch ($filecontent) {
-            case "barcode_file" {
+        given ($filecontent) {
+            when ( /barcode_file/ ) {
                 foreach my $barcode (@contentlist) {
 
                     my $itemnumber = GetItemnumberFromBarcode($barcode);
@@ -230,7 +229,7 @@ if ( $op eq "show" ) {
 
             }
 
-            case "itemid_file" {
+            when ( /itemid_file/ ) {
                 @itemnumbers = @contentlist;
             }
         }

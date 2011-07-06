@@ -21,7 +21,6 @@ use Modern::Perl;
 
 use CGI;
 use Encode qw(encode);
-use Switch;
 
 use C4::Auth;
 use C4::Biblio;
@@ -66,10 +65,10 @@ if ( $bib_list && $format ) {
 
             my $record = GetMarcBiblio($biblio);
 
-            switch ($format) {
-                case "iso2709" { $output .= $record->as_usmarc(); }
-                case "ris"     { $output .= marc2ris($record); }
-                case "bibtex"  { $output .= marc2bibtex( $record, $biblio ); }
+            given ($format) {
+                when ( /iso2709/ ) { $output .= $record->as_usmarc(); }
+                when ( /ris/     ) { $output .= marc2ris($record); }
+                when ( /bibtex/  ) { $output .= marc2bibtex( $record, $biblio ); }
             }
         }
     }

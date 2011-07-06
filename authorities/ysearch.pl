@@ -31,7 +31,6 @@ use Encode;
 use C4::Context;
 use C4::AuthoritiesMarc;
 use C4::Auth qw/check_cookie_auth/;
-use Switch;
 use C4::Search::Query;
 use C4::Search;
 

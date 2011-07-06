@@ -28,7 +28,6 @@ use C4::Output;
 use C4::Dates;
 use XML::Simple;
 use XML::Dumper;
-use Switch;
 use C4::Debug;
 use C4::Logger;
 use utf8;
@@ -303,8 +302,8 @@ sub get_criteria {
     foreach my $localcrit (@$crit) {
         my ( $value, $type )   = split( /\|/, $localcrit );
         my ( $table, $column ) = split( /\./, $value );
-        switch ($type) {
-            case 'textrange' {
+        given ($type) {
+            when ( /textrange/ ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'from'}        = "from_" . $value;
@@ -314,7 +313,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            case 'date' {
+            when ( /date/ ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'date'}        = 1;
@@ -322,7 +321,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            case 'daterange' {
+            when ( /daterange/ ) {
                 my %temp;
                 $temp{'name'}        = $value;
                 $temp{'from'}        = "from_" . $value;
@@ -332,7 +331,7 @@ sub get_criteria {
                 push @criteria_array, \%temp;
             }
 
-            else {
+            default {
                 my $query = "SELECT distinct($column) as availablevalues FROM $table";
                 my $sth   = $dbh->prepare($query);
                 $sth->execute();
