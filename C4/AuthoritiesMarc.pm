@@ -1372,6 +1372,7 @@ sub merge {
     my ($auth_tag_to_report_from) = $sth->fetchrow;
     $sth->execute($authtypecodeto);
     my ($auth_tag_to_report_to) = $sth->fetchrow;
+    my ( $bibliotag, $bibliosubf ) = GetMarcFromKohaField( "biblio.biblionumber", "" );
 
     my @record_to;
     @record_to = grep {$_->[0]!~/[0-9]/} $MARCto->field($auth_tag_to_report_to)->subfields() if $MARCto->field($auth_tag_to_report_to);
@@ -1406,8 +1407,14 @@ sub merge {
         my $z=0;
 	    $debug && warn scalar(@$res);
         foreach my $rawrecord( @$res ) {
-      	    my $marcrecord = MARC::File::USMARC::decode($rawrecord);
-	        SetUTF8Flag($marcrecord);
+      	    my $localmarc = MARC::File::USMARC::decode($rawrecord);
+            my $biblionumber;
+            if ( $bibliotag < 10 ) {
+                $biblionumber = $localmarc->field($bibliotag)->data;
+            } else {
+                $biblionumber = $localmarc->subfield( $bibliotag, $bibliosubf );
+            }
+            my $marcrecord=GetMarcBiblio($biblionumber);
             push @reccache, $marcrecord;
         }
     }
