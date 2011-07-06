@@ -1220,7 +1220,7 @@ sub SanitizeEntity {
                     $new_field = MARC::Field->new($field->tag(), $field->indicator(1), $field->indicator(2), @new_subfields);
                 };
                 if ($@) {
-                    $log->all("error : $@");
+		    warn "error : $@";
                 } else {
                     $field->replace_with($new_field);
                 }
