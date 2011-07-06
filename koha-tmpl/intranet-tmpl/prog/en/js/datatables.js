@@ -30,28 +30,28 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
     return asResultData;
 }
 
-$.fn.dataTableExt.afnFiltering.push(
-    function( oSettings, aData, iDataIndex ) {
+function dt_add_rangedate_filter(begindate_id, enddate_id, dateCol) {
+    $.fn.dataTableExt.afnFiltering.push(
+        function( oSettings, aData, iDataIndex ) {
 
-        var beginDate = Date_from_syspref($("#begindate").val()).getTime();
-        var endDate   = Date_from_syspref($("#enddate").val()).getTime();
+            var beginDate = Date_from_syspref($("#"+begindate_id).val()).getTime();
+            var endDate   = Date_from_syspref($("#"+enddate_id).val()).getTime();
 
-        var dateCol = 6;
+            var data = Date_from_syspref(aData[dateCol]).getTime();
 
-        var data = Date_from_syspref(aData[dateCol]).getTime();
-
-        if ( !parseInt(beginDate) && ! parseInt(endDate) ) {
-            return true;
+            if ( !parseInt(beginDate) && ! parseInt(endDate) ) {
+                return true;
+            }
+            else if ( beginDate <= data && !parseInt(endDate) ) {
+                return true;
+            }
+            else if ( data <= endDate && !parseInt(beginDate) ) {
+                return true;
+            }
+            else if ( beginDate <= data && data <= endDate) {
+                return true;
+            }
+            return false;
         }
-        else if ( beginDate <= data && !parseInt(endDate) ) {
-            return true;
-        }
-        else if ( data <= endDate && !parseInt(beginDate) ) {
-            return true;
-        }
-        else if ( beginDate <= data && data <= endDate) {
-            return true;
-        }
-        return false;
-    }
-);
+    );
+}
