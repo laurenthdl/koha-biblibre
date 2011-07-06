@@ -352,7 +352,7 @@ function popup(subscriptionid) {
             <tr><td><label>Received issues</label></td><td><!-- TMPL_VAR name="recievedlist" --></td></tr>
             <tr><td><label>Missing issues</label></td><td><!-- TMPL_VAR name="missinglist" --></td></tr>
             <tr><td><label>Nonpublic note</label></td><td><!-- TMPL_VAR name="internalnotes" --></td></tr>
-            <tr><td><label>Public note</label></td><td><!-- TMPL_VAR name="notes" --></td></tr>
+            <tr><td><label>Public note</label></td><td><!-- TMPL_VAR EXPR="nl2br(notes)" --></td></tr>
         </table>
     </div>
 
