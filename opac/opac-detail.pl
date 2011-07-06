@@ -17,11 +17,10 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
-use C4::Auth;
+use C4::Auth qw(:DEFAULT get_session);
 use C4::Branch;
 use C4::Koha;
 use C4::Serials;    #uses getsubscriptionfrom biblionumber
@@ -40,9 +39,6 @@ use C4::Members;
 use C4::VirtualShelves;
 use C4::XSLT;
 use List::MoreUtils qw/any none/;
-use 5.10.0;
-
-#use Switch;
 
 BEGIN {
     if ( C4::Context->preference('BakerTaylorEnabled') ) {
@@ -688,6 +684,14 @@ if ( my $search_for_title = C4::Context->preference('OPACSearchForTitleIn') ) {
     $dat->{title} ? $search_for_title =~ s/{TITLE}/$dat->{title}/g : $search_for_title =~ s/{TITLE}//g;
     $isbn         ? $search_for_title =~ s/{ISBN}/$isbn/g          : $search_for_title =~ s/{ISBN}//g;
     $template->param( 'OPACSearchForTitleIn' => $search_for_title );
+}
+
+my $session = get_session($query->cookie("CGISESSID"));
+if ($session) {
+    # read session variables
+    foreach (qw(currentsearchurl currentsearchisoneresult)) {
+        $template->param( $_ => $session->param( $_ ) );
+    }
 }
 
 output_html_with_http_headers $query, $cookie, $template->output;
