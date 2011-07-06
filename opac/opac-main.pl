@@ -87,4 +87,28 @@ if ( C4::Context->preference('GoogleIndicTransliteration') ) {
     $template->param( 'GoogleIndicTransliteration' => 1 );
 }
 
+# Fetch the paramater list as a hash in scalar context:
+#  * returns paramater list as tied hash ref
+#  * we can edit the values by changing the key
+#  * multivalued CGI paramaters are returned as a packaged string separated by "\0" (null)
+my $params = $input->Vars;
+
+# indexes are query qualifiers, like 'title', 'author', etc. They
+# can be single or multiple parameters separated by comma: kw,right-Truncation 
+my @indexes;
+@indexes = split("\0",$params->{'idx'}) if $params->{'idx'};
+
+# if a simple index (only one)  display the index used in the top search box
+if ($indexes[0] && !$indexes[1]) {
+    $template->param("ms_".$indexes[0] => 1);
+}
+# an operand can be a single term, a phrase, or a complete ccl query
+my @operands;
+@operands = split("\0",$params->{'q'}) if $params->{'q'};
+
+# if a simple search, display the value in the search box
+if ($operands[0] && !$operands[1]) {
+    $template->param(ms_value => $operands[0]);
+}
+
 output_html_with_http_headers $input, $cookie, $template->output;
