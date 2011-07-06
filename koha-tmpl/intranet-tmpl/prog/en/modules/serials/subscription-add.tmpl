@@ -74,10 +74,12 @@ function Check_page1() {
 }
 
 function Check_page2(){
-    if($("#acqui_date").val().length == 0){
-        alert(_("You must choose a first publication date"));
-        return false;
-    }
+    <!-- TMPL_UNLESS NAME='more_than_one_serial' -->
+      if($("#acqui_date").val().length == 0){
+          alert(_("You must choose a first publication date"));
+          return false;
+      }
+    <!-- /TMPL_UNLESS -->
     if($("#frequency").val().length == 0){
         alert(_("You must choose a frequency"));
         return false;
@@ -86,9 +88,8 @@ function Check_page2(){
         alert(_("You must choose a start date"));
         return false;
     }
-    if(($("#sublength").val().length == 0 && $("#enddate").val().length == 0)
-    || ($("#sublength").val().length != 0 && $("#enddate").val().length != 0)){
-        alert(_("You must choose a subscription length or an end date, but not them two."));
+    if(($("#sublength").val().length == 0 && $("#enddate").val().length == 0)){
+        alert(_("You must choose a subscription length or an end date."));
         return false;
     }
     if(advancedpatternlocked == 0){
@@ -137,14 +138,24 @@ function displaymoreoptions() {
         return false;
     }
 
-    if(globalnumpatterndata.label1 || globalnumpatterndata.label2 || globalnumpatterndata.label3) {
+    var X = 0, Y = 0, Z = 0;
+    var numberingmethod = unescape(globalnumpatterndata.numberingmethod);
+    if(numberingmethod.match(/{X}/)) X = 1;
+    if(numberingmethod.match(/{Y}/)) Y = 1;
+    if(numberingmethod.match(/{Z}/)) Z = 1;
+
+    if(X || Y || Z) {
         $("#moreoptionst").show();
     } else {
         $("#moreoptionst").hide();
     }
 
-    if(globalnumpatterndata.label1) {
-        $("#headerX").html(unescape(globalnumpatterndata.label1));
+    if(X) {
+        if(globalnumpatterndata.label1) {
+            $("#headerX").html(unescape(globalnumpatterndata.label1));
+        } else {
+            $("#headerX").html("X");
+        }
         $("#headerX").show();
         $("#beginsX").show();
         $("#innerX").show();
@@ -155,8 +166,12 @@ function displaymoreoptions() {
         $("#lastvaluetemp1").val('');
         $("#innerlooptemp1").val('');
     }
-    if(globalnumpatterndata.label2) {
-        $("#headerY").html(unescape(globalnumpatterndata.label2));
+    if(Y) {
+        if(globalnumpatterndata.label2) {
+            $("#headerY").html(unescape(globalnumpatterndata.label2));
+        } else {
+            $("#headerY").html("Y");
+        }
         $("#headerY").show();
         $("#beginsY").show();
         $("#innerY").show();
@@ -167,8 +182,12 @@ function displaymoreoptions() {
         $("#lastvaluetemp2").val('');
         $("#innerlooptemp2").val('');
     }
-    if(globalnumpatterndata.label3) {
-        $("#headerZ").html(unescape(globalnumpatterndata.label3));
+    if(Z) {
+        if(globalnumpatterndata.label3) {
+            $("#headerZ").html(unescape(globalnumpatterndata.label3));
+        } else {
+            $("#headerZ").html("Z");
+        }
         $("#headerZ").show();
         $("#beginsZ").show();
         $("#innerZ").show();
@@ -257,17 +276,26 @@ function restoreAdvancedPattern() {
 
 function testPredictionPattern() {
     var frequencyid = $("#frequency").val();
-    var firstacquidate = $("#acqui_date").val();
+    var acquidate;
     var error = 0;
     var error_msg = "";
     if(frequencyid == undefined || frequencyid == ""){
         error_msg += _("- Frequency is not defined\n");
         error ++;
     }
-    if(firstacquidate == undefined || firstacquidate == ""){
-        error_msg += _("- First publication date is not defined\n");
+    <!-- TMPL_IF NAME='more_than_one_serial' -->
+      acquidate = $("#nextacquidate").val();
+      if(acquidate == undefined || acquidate == ""){
+        error_msg += _("- Next issue publication date is not defined\n");
         error ++;
-    }
+      }
+    <!-- TMPL_ELSE -->
+      acquidate = $("#acqui_date").val();
+      if(acquidate == undefined || acquidate == ""){
+          error_msg += _("- First publication date is not defined\n");
+          error ++;
+      }
+    <!-- /TMPL_IF -->
 
     if(error){
         alert(_("Cannot test prediction pattern for the following reason(s):\n\n")
@@ -284,7 +312,10 @@ function testPredictionPattern() {
         url: "showpredictionpattern.pl",
         data: {
             'custompattern' : custompattern,
-            'firstacquidate': $("#acqui_date").val(),
+            <!-- TMPL_IF NAME='mod' -->
+              'subscriptionid': $("input[name='subscriptionid']").val(),
+            <!-- /TMPL_IF -->
+            'firstacquidate': acquidate,
             'enddate'       : $("#enddate").val(),
             'subtype'       : $("#subtype").val(),
             'sublength'     : $("#sublength").val(),
@@ -322,36 +353,53 @@ function testPredictionPattern() {
 }
 
 function saveAdvancedPattern() {
-    $.getJSON("create-numberpattern.pl",{
-            "patternname"   :$("#patternname").val(),
-            "numberingmethod":$("#numberingmethod").val(),
-            "label1"        :$("#label1").val(),
-            "label2"        :$("#label2").val(),
-            "label3"        :$("#label3").val(),
-            "add1"          :$("#add1").val(),
-            "add2"          :$("#add2").val(),
-            "add3"          :$("#add3").val(),
-            "every1"        :$("#every1").val(),
-            "every2"        :$("#every2").val(),
-            "every3"        :$("#every3").val(),
-            "setto1"        :$("#setto1").val(),
-            "setto2"        :$("#setto2").val(),
-            "setto3"        :$("#setto3").val(),
-            "whenmorethan1" :$("#whenmorethan1").val(),
-            "whenmorethan2" :$("#whenmorethan2").val(),
-            "whenmorethan3" :$("#whenmorethan3").val(),
-            "numbering1"    :$("#numbering1").val(),
-            "numbering2"    :$("#numbering2").val(),
-            "numbering3"    :$("#numbering3").val(),
-            ajax:'true'
-        },
-        function(data){
-            $("#numberpattern").append("<option value=\""+data.numberpatternid+"\">"+$("#patternname").val()+"</option>");
-            $("#numberpattern").val(data.numberpatternid);
-            numberpatternload();
+    // Check if patternname already exists, and modify pattern
+    // instead of creating it if so
+    var found = 0;
+    $("#numberpattern option").each(function(){
+        if($(this).text() == $("#patternname").val()){
+            found = 1;
+            return false;
         }
-    );
+    });
+    var cnfrm = 1;
+    if(found){
+        cnfrm = confirm(_("This pattern already exists. Do you want to modify it"));
+    }
 
+    if(cnfrm) {
+        $.getJSON("create-numberpattern.pl",{
+                "patternname"   :$("#patternname").val(),
+                "numberingmethod":$("#numberingmethod").val(),
+                "label1"        :$("#label1").val(),
+                "label2"        :$("#label2").val(),
+                "label3"        :$("#label3").val(),
+                "add1"          :$("#add1").val(),
+                "add2"          :$("#add2").val(),
+                "add3"          :$("#add3").val(),
+                "every1"        :$("#every1").val(),
+                "every2"        :$("#every2").val(),
+                "every3"        :$("#every3").val(),
+                "setto1"        :$("#setto1").val(),
+                "setto2"        :$("#setto2").val(),
+                "setto3"        :$("#setto3").val(),
+                "whenmorethan1" :$("#whenmorethan1").val(),
+                "whenmorethan2" :$("#whenmorethan2").val(),
+                "whenmorethan3" :$("#whenmorethan3").val(),
+                "numbering1"    :$("#numbering1").val(),
+                "numbering2"    :$("#numbering2").val(),
+                "numbering3"    :$("#numbering3").val(),
+                ajax:'true'
+            },
+            function(data){
+                if(found == 0){
+                    $("#numberpattern").append("<option value=\""+data.numberpatternid+"\">"+$("#patternname").val()+"</option>");
+                }
+                $("#numberpattern").val(data.numberpatternid);
+                numberpatternload();
+            }
+        );
+    }
 }
 
 function show_page_1() {
@@ -513,6 +561,18 @@ $(document).ready(function() {
                                         <div class="inputnote">To notify patrons of new serial issues, you must <a href="/cgi-bin/koha/tools/letter.pl">define a notice</a>.</div>
                                     <!-- /TMPL_IF -->
                                 </li>
+                                <li>
+                                    <label for="graceperiod">Grace period (days)</label>
+                                    <input type="text" name="graceperiod" id="graceperiod" value="<!-- TMPL_VAR name="graceperiod" -->" size="20" />
+                                </li>
+                                <li>
+                                    <label for="staffdisplaycount">Number of issues to display to staff</label>
+                                    <input type="text" name="staffdisplaycount" id="staffdisplaycount" value="<!-- TMPL_VAR name="staffdisplaycount" -->" size="20" />
+                                </li>
+                                <li>
+                                    <label for="opacdisplaycount">Number of issues to display to the public</label>
+                                    <input type="text" name="opacdisplaycount" id="opacdisplaycount" value="<!-- TMPL_VAR name="opacdisplaycount" -->" size="20" />
+                                </li>
                             </ol>
 
                             <div class="warning"><b>Note:</b>
@@ -536,26 +596,54 @@ $(document).ready(function() {
                                 <ol>
                                     <li>
                                         <label for="firstacquidate">First issue publication date: (*)</label>
-                                        <input type="text" name="firstacquidate" value="<!-- TMPL_VAR name="firstacquidate" -->" size="13" maxlength="10" id="acqui_date" readonly="readonly" />
-                                        <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button2" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-                                        <!-- both scripts for calendar must follow the input field --> 
-                                        <script type="text/javascript">
-                                            Calendar.setup({
-                                                inputField:"acqui_date",
-                                                ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                                button         :   "button2",
-                                                align          :   "Tl"
-                                            });
-                                        </script>
-                                        <script type="text/javascript">
-                                            Calendar.setup({
-                                                inputField     :   "acqui_date",
-                                                ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                                                button         :   "acqui_date",
-                                                align          :   "Tl"
-                                            });
-                                        </script>
+                                        <!-- TMPL_UNLESS NAME='more_than_one_serial' -->
+                                          <input type="text" name="firstacquidate" value="<!-- TMPL_VAR name="firstacquidate" -->" size="13" maxlength="10" id="acqui_date" readonly="readonly" />
+                                          <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="button2" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                                          <!-- both scripts for calendar must follow the input field --> 
+                                          <script type="text/javascript">
+                                              Calendar.setup({
+                                                  inputField:"acqui_date",
+                                                  ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                  button         :   "button2",
+                                                  align          :   "Tl"
+                                              });
+                                          </script>
+                                          <script type="text/javascript">
+                                              Calendar.setup({
+                                                  inputField     :   "acqui_date",
+                                                  ifFormat       :   "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                                                  button         :   "acqui_date",
+                                                  align          :   "Tl"
+                                              });
+                                          </script>
+                                        <!-- TMPL_ELSE -->
+                                          <!-- TMPL_VAR NAME='firstacquidate' -->
+                                          <input type="hidden" id="acqui_date" name="firstacquidate" value="<!-- TMPL_VAR NAME='firstacquidate' -->" />
+                                        <!-- /TMPL_UNLESS -->
                                     </li>
+                                    <!-- TMPL_IF NAME='more_than_one_serial' -->
+                                      <li>
+                                        <label for="nextacquidate">Next issue publication date:</label>
+                                        <input type="text" id="nextacquidate" name="nextacquidate" size="13" readonly="readonly" value="<!-- TMPL_VAR NAME='nextacquidate' -->" />
+                                        <img src="<!-- TMPL_VAR Name='themelang' -->/lib/calendar/cal.gif" id="nextacquidatebutton" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
+                                        <script type="text/javascript">
+                                          Calendar.setup({
+                                            inputField: "nextacquidate",
+                                            ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+                                            button: "nextacquidatebutton",
+                                            align: "Tl"
+                                          });
+                                        </script>
+                                        <script type="text/javascript">
+                                          Calendar.setup({
+                                            inputField: "nextacquidate",
+                                            ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+                                            button: "nextacquidate",
+                                            align: "Tl"
+                                          });
+                                        </script>
+                                      </li>
+                                    <!-- /TMPL_IF -->
                                     <li>
                                         <label for="frequency">Frequency: (*)</label>
                                         <select name="frequency" size="1" id="frequency">
@@ -633,9 +721,7 @@ $(document).ready(function() {
                                         <select name="numbering_pattern" size="1" id="numberpattern">
                                             <option value="">-- please choose --</option>
                                             <!--TMPL_LOOP Name="numberpatterns"-->
-                                                <option value="<!--TMPL_VAR Name="id"-->" <!--TMPL_IF name="selected"--> selected="selected" <!-- /TMPL_IF -->>
-                                                    <!--TMPL_VAR Name="label"-->
-                                                </option>
+                                                <option value="<!--TMPL_VAR Name="id"-->" <!--TMPL_IF name="selected"--> selected="selected" <!-- /TMPL_IF -->><!--TMPL_VAR Name="label"--></option>
                                             <!--/TMPL_LOOP-->
                                         </select>
                                     </li>
@@ -651,7 +737,13 @@ $(document).ready(function() {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>Begins with</td>
+                                                    <td>
+                                                      <!-- TMPL_IF NAME='more_than_one_serial' -->
+                                                        Last value
+                                                      <!-- TMPL_ELSE -->
+                                                        Begins with
+                                                      <!-- /TMPL_IF -->
+                                                    </td>
                                                     <td id="beginsX"><input type="text" id="lastvaluetemp1" name="lastvaluetemp1" value="<!-- TMPL_VAR NAME='lastvalue1' -->" /></td>
                                                     <td id="beginsY"><input type="text" id="lastvaluetemp2" name="lastvaluetemp2" value="<!-- TMPL_VAR NAME='lastvalue2' -->" /></td>
                                                     <td id="beginsZ"><input type="text" id="lastvaluetemp3" name="lastvaluetemp3" value="<!-- TMPL_VAR NAME='lastvalue3' -->" /></td>
@@ -713,12 +805,6 @@ $(document).ready(function() {
                                                     <td><input type="text" readonly="readonly" id="every3" name="every3" /></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Inner counter</td>
-                                                    <td><input type="text" readonly="readonly" id="innerloop1" name="innerloop1" /></td>
-                                                    <td><input type="text" readonly="readonly" id="innerloop2" name="innerloop2" /></td>
-                                                    <td><input type="text" readonly="readonly" id="innerloop3" name="innerloop3" /></td>
-                                                </tr>
-                                                <tr>
                                                     <td>Set back to</td>
                                                     <td><input type="text" readonly="readonly" id="setto1" name="setto1" /></td>
                                                     <td><input type="text" readonly="readonly" id="setto2" name="setto2" /></td>
@@ -729,6 +815,12 @@ $(document).ready(function() {
                                                     <td><input type="text" readonly="readonly" id="whenmorethan1" name="whenmorethan1" /></td>
                                                     <td><input type="text" readonly="readonly" id="whenmorethan2" name="whenmorethan2" /></td>
                                                     <td><input type="text" readonly="readonly" id="whenmorethan3" name="whenmorethan3" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Inner counter</td>
+                                                    <td><input type="text" readonly="readonly" id="innerloop1" name="innerloop1" /></td>
+                                                    <td><input type="text" readonly="readonly" id="innerloop2" name="innerloop2" /></td>
+                                                    <td><input type="text" readonly="readonly" id="innerloop3" name="innerloop3" /></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Numbering</td>

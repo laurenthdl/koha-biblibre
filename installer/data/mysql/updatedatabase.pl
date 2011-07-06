@@ -5999,23 +5999,18 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 
     (2, 'Volume, Number, Issue', 2, 'Volume Number Issue 1', 'Vol.{X}, Number {Y}, Issue {Z}',
-    'Volume', 'value2', 1, NULL, 99999, 1, NULL,
-    'Number', 'value3', 1, NULL, 99999, 1, NULL,
-    'Issue', NULL, 1, 1, 99999, 1, NULL),
+    'Volume', NULL, 1, 48, 99999, 1, NULL,
+    'Number', NULL, 1, 4, 12, 1, NULL,
+    'Issue', NULL, 1, 1, 4, 1, NULL),
 
     (3, 'Volume, Number', 3, 'Volume Number 1', 'Vol {X}, No {Y}',
-    'Volume', 'value2', 1, NULL, 99999, 1, NULL,
-    'Number', NULL, 1, 1, 99999, 1, NULL,
+    'Volume', NULL, 1, 12, 99999, 1, NULL,
+    'Number', NULL, 1, 1, 12, 1, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 
     (4, 'Seasonal', 4, 'Season Year ', '{X} {Y}',
     'Season', NULL, 1, 1, 4, 1, 'season',
-    'Year', 'year', NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-
-    (5, 'Year/Number', 4, 'Year Number 1', 'Year {X}/Number {Y}',
-    'Year', 'year', NULL, NULL, NULL, NULL, NULL,
-    'Number', NULL, 1, 1, 99999, 1, NULL,
+    'Year', NULL, 1, 4, 99999, 1, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
 
     $dbh->do("ALTER TABLE `subscription`

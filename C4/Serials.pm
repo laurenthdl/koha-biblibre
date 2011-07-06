@@ -32,6 +32,7 @@ use C4::Search;
 use C4::Letters;
 use C4::Log;    # logaction
 use C4::Debug;
+use C4::Serials::Frequency;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
@@ -46,16 +47,13 @@ BEGIN {
       &GetFullSubscriptionsFromBiblionumber   &GetFullSubscription
       &GetSubscriptionHistoryFromSubscriptionId &ModSubscriptionHistory
       &HasSubscriptionStrictlyExpired &HasSubscriptionExpired &GetExpirationDate &abouttoexpire
-      &GetSubscriptionFrequencies
-      &GetSubscriptionNumberpatterns
-      &GetSubscriptionFrequency
-      &GetSubscriptionNumberpattern
 
       &GetSeq &GetNextSeq &NewIssue           &ItemizeSerials    &GetSerials
       &GetLatestSerials   &ModSerialStatus    &GetNextDate       &GetSerials2
       &ReNewSubscription  &GetLateIssues      &GetLateOrMissingIssues
       &GetSerialInformation                   &AddItem2Serial
       &PrepareSerialsData &GetNextExpected    &ModNextExpected
+      &GetSubscriptionIrregularities
 
       &UpdateClaimdateIssues
       &GetSuppliersWithLateIssues             &getsupplierbyserialid
@@ -108,7 +106,7 @@ sub GetSuppliersWithLateIssues {
         LEFT JOIN       serial ON serial.subscriptionid=subscription.subscriptionid
         LEFT JOIN       aqbooksellers ON subscription.aqbooksellerid = aqbooksellers.id
         WHERE           subscription.subscriptionid = serial.subscriptionid
-        AND             (serial.STATUS = 3 OR serial.STATUS = 4 OR serial.STATUS = 7)
+        AND (serial.STATUS = 4 OR ((planneddate < now() AND serial.STATUS =1) OR serial.STATUS = 3 OR serial.STATUS = 7))
         ORDER BY name
     |;
     return $dbh->selectall_arrayref( $query, { Slice => {} } );
@@ -715,7 +713,7 @@ sub SearchSubscriptions {
         push @where_args, "$minold" if ($minold);
     }
     if ($maxold) {
-        push @where_strs, "TO_DAYS(NOW()) - TO_DAYS(subscription.enddate) <= ?" if ($maxold);
+        push @where_strs, "TO_DAYS(NOW()) - TO_DAYS(subscription.enddate) <= ? OR subscription.enddate IS NULL" if ($maxold);
         push @where_args, "$maxold" if ($maxold);
     }
 
@@ -731,112 +729,6 @@ sub SearchSubscriptions {
     $sth->finish;
 
     return @$results;
-}
-
-=head2 GetSubscriptionFrequencies
-
-=over 4
-
-@$results = GetSubscriptionFrequencies;
-this function get all subscription frequencies entered in table
-
-=back
-
-=cut
-
-sub GetSubscriptionFrequencies {
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_frequencies
-        ORDER by displayorder
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute;
-    my $results=$sth->fetchall_arrayref({});
-    return $results;
-}
-
-=head2 GetSubscriptionFrequency
-
-=over 4
-
-%$results = GetSubscriptionFrequency($frqid);
-this function gets the data of the subscription frequency which id is $frqid
-
-=back
-
-=cut
-
-sub GetSubscriptionFrequency {
-    my ($frqid)=@_;
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_frequencies
-        where id=?
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute($frqid);
-    my $results=$sth->fetchrow_hashref;
-    return $results;
-}
-
-=head2 GetSubscriptionNumberpattern
-
-=over 4
-
-%$result = GetSubscriptionNumberpattern($numpatternid);
-this function get the data of the subscription numberpatterns which id is $numpatternid
-
-=back
-
-=cut
-
-sub GetSubscriptionNumberpattern {
-    my $numpatternid=shift;
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_numberpatterns
-        where id=?
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute($numpatternid);
-    my $results=$sth->fetchrow_hashref;
-    return $results;
-}
-
-=head2 GetSubscriptionNumberpatterns
-
-=over 4
-
-@$results = GetSubscriptionNumberpatterns;
-this function get all subscription number patterns entered in table
-
-=back
-
-=cut
-
-sub GetSubscriptionNumberpatterns {
-    #return unless $title or $ISSN or $biblionumber;
-    my $dbh = C4::Context->dbh;
-    my $sth;
-    my $query = qq(
-        SELECT *
-        FROM   subscription_numberpatterns
-        ORDER by displayorder
-    );
-    $sth = $dbh->prepare($query);
-    $sth->execute;
-    my $results=$sth->fetchall_arrayref({});
-    return $results;
 }
 
 =head2 GetSerials
@@ -1155,6 +1047,50 @@ sub ModSubscriptionHistory {
     return $sth->rows;
 }
 
+# Update missinglist field, used by ModSerialStatus
+sub _update_missinglist {
+    my $subscriptionid = shift;
+
+    my $dbh = C4::Context->dbh;
+    my @missingserials = GetSerials2($subscriptionid, "4,5");
+    my $missinglist;
+    foreach (@missingserials) {
+        if($_->{'status'} == 4) {
+            $missinglist .= $_->{'serialseq'} . "; ";
+        } elsif($_->{'status'} == 5) {
+            $missinglist .= "not issued " . $_->{'serialseq'} . "; ";
+        }
+    }
+    $missinglist =~ s/; $//;
+    my $query = qq{
+        UPDATE subscriptionhistory
+        SET missinglist = ?
+        WHERE subscriptionid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($missinglist, $subscriptionid);
+}
+
+# Update recievedlist field, used by ModSerialStatus
+sub _update_receivedlist {
+    my $subscriptionid = shift;
+
+    my $dbh = C4::Context->dbh;
+    my @receivedserials = GetSerials2($subscriptionid, "2");
+    my $receivedlist;
+    foreach (@receivedserials) {
+        $receivedlist .= $_->{'serialseq'} . "; ";
+    }
+    $receivedlist =~ s/; $//;
+    my $query = qq{
+        UPDATE subscriptionhistory
+        SET recievedlist = ?
+        WHERE subscriptionid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($receivedlist, $subscriptionid);
+}
+
 =head2 ModSerialStatus
 
 ModSerialStatus($serialid,$serialseq, $planneddate,$publisheddate,$publisheddatetext,$status,$notes)
@@ -1196,28 +1132,14 @@ sub ModSerialStatus {
         $sth->execute($subscriptionid);
         my $val = $sth->fetchrow_hashref;
         unless ( $val->{manualhistory} ) {
-            $query = "SELECT missinglist,recievedlist FROM subscriptionhistory WHERE  subscriptionid=?";
-            $sth   = $dbh->prepare($query);
-            $sth->execute($subscriptionid);
-            my ( $missinglist, $recievedlist ) = $sth->fetchrow;
-            if ( $status == 2 ) {
-
-                $recievedlist .= "; $serialseq"
-                  unless ( index( "$recievedlist", "$serialseq" ) >= 0 );
+            if ( $status == 2 || ($oldstatus == 2 && $status != 2) ) {
+                  _update_receivedlist($subscriptionid);
             }
-
-            #         warn "missinglist : $missinglist serialseq :$serialseq, ".index("$missinglist","$serialseq");
-            $missinglist .= "; $serialseq"
-              if ( $status == 4
-                and not index( "$missinglist", "$serialseq" ) >= 0 );
-            $missinglist .= "; not issued $serialseq"
-              if ( $status == 5
-                and index( "$missinglist", "$serialseq" ) >= 0 );
-            $query = "UPDATE subscriptionhistory SET recievedlist=?, missinglist=? WHERE  subscriptionid=?";
-            $sth   = $dbh->prepare($query);
-            $recievedlist =~ s/^; //;
-            $missinglist  =~ s/^; //;
-            $sth->execute( $recievedlist, $missinglist, $subscriptionid );
+            if($status == 4 || $status == 5
+              || ($oldstatus == 4 && $status != 4)
+              || ($oldstatus == 5 && $status != 5)) {
+                _update_missinglist($subscriptionid);
+            }
         }
     }
 
@@ -1252,6 +1174,7 @@ sub ModSerialStatus {
             SendAlerts( 'issue', $val->{subscriptionid}, $val->{letter} );
         }
     }
+
     return;
 }
 
@@ -1317,6 +1240,37 @@ sub ModNextExpected($$) {
     $sth->execute( $date->output('iso'), $date->output('iso'), $subscriptionid, 1 );
     return 0;
 
+}
+
+=head2 GetSubscriptionIrregularities
+
+=over4
+
+=item @irreg = &GetSubscriptionIrregularities($subscriptionid);
+get the list of irregularities for a subscription
+
+=back
+
+=cut
+
+sub GetSubscriptionIrregularities {
+    my $subscriptionid = shift;
+
+    return undef unless $subscriptionid;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT irregularity
+        FROM subscription
+        WHERE subscriptionid = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($subscriptionid);
+
+    my ($result) = $sth->fetchrow_array;
+    my @irreg = split /;/, $result;
+
+    return @irreg;
 }
 
 =head2 ModSubscription
@@ -2659,6 +2613,10 @@ sub GetNextDate {
                     warn "year month day : $year $month $day $subscription->{subscriptionid} : $@";
                 }
                 else {
+                    # Sometimes, the first days of a year are in the last week
+                    # of previous year. In this case, set $year to be $year-1
+                    # in order to calculate next date properly.
+                    $year = $yr;
                     my $daycount = 7 / $freqdata->{'issuesperunit'};
                     while ($irregularities{$wkno*$freqdata->{'issuesperunit'}+$tmpsubscription->{'countissuesperunit'}*(($freqdata->{'issuesperunit'}-1)!=0)+ $freqdata->{"unitsperissue"} }) {
                             if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){

@@ -2,7 +2,7 @@
 
 use CGI;
 use C4::Context;
-use C4::Serials;
+use C4::Serials::Frequency;
 use C4::Auth qw/check_cookie_auth/;
 use URI::Escape;
 use strict;

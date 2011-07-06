@@ -29,7 +29,8 @@ use C4::Output;
 use C4::Context;
 use C4::Branch;    # GetBranches
 use C4::Serials;
-use C4::Serials::PredictiveModel;
+use C4::Serials::Frequency;
+use C4::Serials::Numberpattern;
 use C4::Letters;
 use Carp;
 
@@ -92,7 +93,7 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
     $subs->{'letter'} = '' unless ( $subs->{'letter'} );
     letter_loop( $subs->{'letter'}, $template );
     $nextexpected = GetNextExpected($subscriptionid);
-    $subs->{nextacquidate} = defined $nextexpected->{planneddate} and $op eq 'mod' ? $nextexpected->{planneddate}->output() : undef;
+    $subs->{nextacquidate} = (defined $nextexpected->{planneddate} and $op eq 'mod') ? $nextexpected->{planneddate}->output() : undef;
     unless ( $op eq 'modsubscription' ) {
         foreach my $length_unit qw(numberlength weeklength monthlength) {
             if ( $subs->{$length_unit} ) {
@@ -114,6 +115,11 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
             $op         => 1,
             sublength   => $sub_length,
         );
+
+        my ($serials_number) = GetSerials($subscriptionid);
+        if($serials_number > 1) {
+            $template->param(more_than_one_serial => 1);
+        }
     }
     if ( $op eq 'dup' ) {
         my $dont_copy_fields = C4::Context->preference('SubscriptionDuplicateDroppedInput');
@@ -181,9 +187,9 @@ if ( $op eq 'addsubscription' ) {
             $template->param( bibliotitle => $bib->{title} );
         }
     }
-    my $frequencies = GetSubscriptionFrequencies;
+    my @frequencies = GetSubscriptionFrequencies;
     my @frqloop;
-    foreach my $thisfrq (@$frequencies) {
+    foreach my $thisfrq (@frequencies) {
         my $selected = 1 if $thisfrq->{'id'} eq $subs->{'periodicity'};
         my %row =(id => $thisfrq->{'id'},
                     selected => $selected,
@@ -193,9 +199,9 @@ if ( $op eq 'addsubscription' ) {
     }
     $template->param(frequencies => \@frqloop);
 
-    my $numpatterns = GetSubscriptionNumberpatterns;
+    my @numpatterns = GetSubscriptionNumberpatterns;
     my @numberpatternloop;
-    foreach my $thisnumpattern (@$numpatterns) {
+    foreach my $thisnumpattern (@numpatterns) {
         my $selected = 1 if $thisnumpattern->{'id'} eq $subs->{'numberpattern'};
         my %row =(id => $thisnumpattern->{'id'},
                     selected => $selected,
@@ -290,10 +296,10 @@ sub redirect_add_subscription {
     my $opacdisplaycount  = $query->param('opacdisplaycount');
     my $location          = $query->param('location');
     my $startdate = format_date_in_iso( $query->param('startdate') );
-    my $enddate = $query->param('enddate');
+    my $enddate = format_date_in_iso( $query->param('enddate') );
     my $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));
     if(!defined $enddate || $enddate eq '') {
-        $enddate = _guess_enddate($firstacquidate, $periodicity, $numberlength, $weeklength, $monthlength);
+        $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
     }
 
     my $subscriptionid = NewSubscription(
@@ -327,7 +333,7 @@ sub redirect_mod_subscription {
       $query->param('nextacquidate')
       ? format_date_in_iso( $query->param('nextacquidate') )
       : format_date_in_iso( $query->param('startdate') );
-    my $enddate = $query->param('enddate');
+    my $enddate = format_date_in_iso( $query->param('enddate') );
     my $periodicity = $query->param('frequency');
     my $dow         = $query->param('dow');
 
@@ -356,7 +362,7 @@ sub redirect_mod_subscription {
 
     # Guess end date
     if(!defined $enddate || $enddate eq '') {
-        $enddate = _guess_enddate($firstacquidate, $periodicity, $numberlength, $weeklength, $monthlength);
+        $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
     }
 
     #  If it's  a mod, we need to check the current 'expected' issue, and mod it in the serials table if necessary.

@@ -17,7 +17,7 @@ function closemenu(){
     $("tr").removeClass("selected");
 }
 $(document).ready(function(){
-    $("#results > ul").tabs();
+    var tabs = $("#results > ul").tabs();
     <!-- TMPL_IF NAME="tab" -->
         tabs.tabs("select", <!-- TMPL_VAR NAME="tab" -->);
     <!-- /TMPL_IF -->
@@ -135,25 +135,7 @@ tr.selected { background-color : #FFFFCC; } tr.selected td { background-color : 
         </ul>
         <!-- TMPL_LOOP NAME="resultsloop" -->
         <div id="<!-- TMPL_VAR NAME="server_id" -->">
-            <!-- TMPL_IF NAME="PAGE_NUMBERS" -->
-                <div class="pages">
-                   <!-- TMPL_IF NAME="previous_page" -->
-                      <a class="nav" href="?<!-- TMPL_LOOP NAME="pager_params" --><!-- TMPL_VAR ESCAPE="URL" NAME="ind" -->=<!-- TMPL_VAR ESCAPE="URL" NAME="val" -->&amp;<!-- /TMPL_LOOP --><!-- TMPL_VAR NAME="server_id" -->_page=<!-- TMPL_VAR ESCAPE="URL" NAME="previous_page" -->">&lt;&lt; Previous</a>
-                   <!-- /TMPL_IF -->
-                   <!-- TMPL_LOOP NAME="PAGE_NUMBERS" -->
-                      <!-- TMPL_IF NAME="current" -->
-                         <span class="current">
-                            <!-- TMPL_VAR NAME="page" -->
-                         </span>
-                      <!-- TMPL_ELSE -->
-                         <a class="nav" href="?<!-- TMPL_LOOP NAME="pager_params" --><!-- TMPL_VAR ESCAPE="URL" NAME="ind" -->=<!-- TMPL_VAR ESCAPE="URL" NAME="val" -->&amp;<!-- /TMPL_LOOP --><!-- TMPL_VAR NAME="server_id" -->_page=<!-- TMPL_VAR NAME="page" -->"><!-- TMPL_VAR NAME="page" --></a>
-                      <!-- /TMPL_IF -->
-                   <!-- /TMPL_LOOP -->
-                   <!-- TMPL_IF NAME="next_page" -->
-                      <a class="nav" href="?<!-- TMPL_LOOP NAME="pager_params" --><!-- TMPL_VAR ESCAPE="URL" NAME="ind" -->=<!-- TMPL_VAR ESCAPE="URL" NAME="val" -->&amp;<!-- /TMPL_LOOP --><!-- TMPL_VAR NAME="server_id" -->_page=<!-- TMPL_VAR NAME="next_page" -->">Next &gt;&gt;</a>
-                   <!-- /TMPL_IF -->
-               </div>
-            <!-- /TMPL_IF -->
+            <!-- TMPL_INCLUDE NAME="page-numbers.inc" -->
             <!-- TMPL_IF NAME="serverresultsloop" -->
             <table id="resultst<!-- TMPL_VAR NAME="server_id" -->">
                 <thead><tr>
@@ -193,15 +175,16 @@ tr.selected { background-color : #FFFFCC; } tr.selected td { background-color : 
                     <!-- /TMPL_LOOP -->
                 </tbody>
             </table>
+            <!-- TMPL_ELSE -->
+              <!-- TMPL_IF NAME='error' -->
+                <p><strong>Error:</strong> <!-- TMPL_VAR NAME='error' --></p>
+              <!-- TMPL_ELSE -->
+                <p>Nothing found. <a href="/cgi-bin/koha/acqui/z3950_search.pl?basketno=<!-- TMPL_VAR NAME='basketno' -->&booksellerid=<!-- TMPL_VAR NAME='booksellerid' -->">Try another search</a>.</p>
+              <!-- /TMPL_IF -->
             <!-- /TMPL_IF -->
         </div>
         <!-- /TMPL_LOOP -->
     </div>
-    <!-- TMPL_ELSE -->
-        <!-- TMPL_LOOP name="errconn" -->
-            Connection failed to <!-- TMPL_VAR NAME="server" -->
-        <!-- /TMPL_LOOP -->
-	<p>Nothing found. <a href="/cgi-bin/koha/cataloguing/z3950_search.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->">Try another search</a>.</p>
     <!-- /TMPL_IF -->
 
 

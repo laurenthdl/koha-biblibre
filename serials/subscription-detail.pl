@@ -25,6 +25,8 @@ use C4::Budgets;
 use C4::Koha;
 use C4::Dates qw/format_date/;
 use C4::Serials;
+use C4::Serials::Frequency;
+use C4::Serials::Numberpattern;
 use C4::Output;
 use C4::Context;
 use Date::Calc qw/Today Day_of_Year Week_of_Year Add_Delta_Days/;
@@ -108,17 +110,14 @@ $subs->{abouttoexpire} = abouttoexpire( $subs->{subscriptionid} );
 
 $template->param($subs);
 $template->param( biblionumber_for_new_subscription => $subs->{bibnum} );
-my @irregular_issues = split /,/, $subs->{irregularity};
+my @irregular_issues = split /;/, $subs->{irregularity};
 
-if ( !$subs->{numberpattern} ) {
-    $subs->{numberpattern} = q{};
-}
 if ( !$subs->{dow} ) {
     $subs->{dow} = q{};
 }
-if ( !$subs->{periodicity} ) {
-    $subs->{periodicity} = '0';
-}
+my $frequency = GetSubscriptionFrequency($subs->{'periodicity'});
+my $numberpattern = GetSubscriptionNumberpattern($subs->{'numberpattern'});
+
 my $default_bib_view = get_default_view();
 
 my ( $order, $bookseller, $tmpl_infos );
@@ -161,9 +160,14 @@ $template->param(
           && $subs->{branchcode}
           && ( C4::Context->userenv->{branch} ne $subs->{branchcode} )
     ),
-    'periodicity' . $subs->{periodicity}     => 1,
-    'arrival' . $subs->{dow}                 => 1,
-    'numberpattern' . $subs->{numberpattern} => 1,
+    frequency                   => $frequency->{'description'},
+    numberpattern               => $numberpattern->{'label'},
+    has_X           => ($numberpattern->{'numberingmethod'} =~ /{X}/) ? 1 : 0,
+    has_Y           => ($numberpattern->{'numberingmethod'} =~ /{Y}/) ? 1 : 0,
+    has_Z           => ($numberpattern->{'numberingmethod'} =~ /{Z}/) ? 1 : 0,
+    whenmorethan1               => $numberpattern->{'whenmorethan1'},
+    whenmorethan2               => $numberpattern->{'whenmorethan2'},
+    whenmorethan3               => $numberpattern->{'whenmorethan3'},
     intranetstylesheet                       => C4::Context->preference('intranetstylesheet'),
     intranetcolorstylesheet                  => C4::Context->preference('intranetcolorstylesheet'),
     irregular_issues                         => scalar @irregular_issues,

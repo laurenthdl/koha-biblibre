@@ -1,0 +1,104 @@
+input.search_init {
+    color: #999999;
+}
+.sorting_asc {
+    background: url("../../img/sort_asc.png") no-repeat scroll right center transparent;
+}
+.sorting_desc {
+    background: url("../../img/sort_desc.png") no-repeat scroll right center transparent;
+}
+.sorting {
+    background: url("../../img/sort_both.png") no-repeat scroll right center transparent;
+}
+.sorting_asc_disabled {
+    background: url("../../img/sort_asc_disabled.png") no-repeat scroll right center transparent;
+}
+.sorting_desc_disabled {
+    background: url("../../img/sort_desc_disabled.png") no-repeat scroll right center transparent;
+}
+table.display {
+    width: 100%;
+}
+table.display thead th {
+    border-bottom: 1px solid black;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 3px 18px 3px 10px;
+}
+.dataTables_wrapper {
+    clear: both;
+    position: relative;
+}
+.dataTables_processing {
+    background-color: white;
+    border: 1px solid #DDDDDD;
+    color: #999999;
+    font-size: 14px;
+    height: 30px;
+    left: 50%;
+    margin-left: -125px;
+    margin-top: -15px;
+    padding: 14px 0 2px;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 250px;
+}
+.dataTables_info {
+    float: left;
+    width: 60%;
+}
+.dataTables_paginate {
+    float: right;
+    text-align: right;
+    width: 44px;
+}
+.paging_full_numbers {
+    height: 22px;
+    line-height: 22px;
+    width: 400px;
+}
+.paging_full_numbers span.paginate_button,
+     .paging_full_numbers span.paginate_active {
+    border: 1px solid #aaa;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    padding: 2px 5px;
+    margin: 0 3px;
+    cursor: pointer;
+    *cursor: hand;
+}
+
+.paging_full_numbers span.paginate_button {
+    background-color: #ddd;
+}
+
+.paging_full_numbers span.paginate_button:hover {
+    background-color: #ccc;
+}
+
+.paging_full_numbers span.paginate_active {
+    background-color: #99B3FF;
+}
+.paginate_disabled_previous, .paginate_enabled_previous, .paginate_disabled_next, .paginate_enabled_next {
+    float: left;
+    height: 19px;
+    margin-left: 3px;
+    width: 19px;
+}
+.paginate_disabled_previous {
+    background-image: url("../../img/back_disabled.jpg");
+}
+.paginate_enabled_previous {
+    background-image: url("../../img/back_enabled.jpg");
+}
+.paginate_disabled_next {
+    background-image: url("../../img/forward_disabled.jpg");
+}
+.paginate_enabled_next {
+    background-image: url("../../img/forward_enabled.jpg");
+}
+.spacer {
+    clear: both;
+    height: 20px;
+}
