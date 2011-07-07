@@ -196,7 +196,10 @@ sub splitToken {
 
         if ( $idx =~ /^date_/ ) {
             $operand =~ s/\\:/:/g;
-            my $date = C4::Search::Engine::Solr::NormalizeDate($operand) if not $operand =~ /\[.*TO.*\]/;
+            my $date = '"' . C4::Search::Engine::Solr::NormalizeDate($operand) . '"'
+                    if $operand
+                        and $operand ne '""' # FIX for rpn (harvestdate,alwaysMatches="")
+                        and not $operand =~ /\[.*TO.*\]/;
             $operand = $date if defined $date;
             $operand = "[" . C4::Search::Engine::Solr::NormalizeDate($1) . " TO " . C4::Search::Engine::Solr::NormalizeDate($2) . "]"
                 if $operand =~ /\[(.*)\sTO\s(.*)\]/;
@@ -219,7 +222,7 @@ sub splitToken {
                 # not yet implemented ! TODO
             }
             when ( 'alwaysMatches' ) {
-                $operand = "[* TO * ]";
+                $operand = "[* TO *]";
             }
         }
 
