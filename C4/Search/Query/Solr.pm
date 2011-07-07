@@ -141,7 +141,7 @@ sub BuildTokenString {
 sub normalSearch {
     my ($class, $query) = @_;
 
-    return "" if not defined $query;
+    return "*:*" if not defined $query;
 
     # Particular *:* query
     if ($query  eq '*:*'){

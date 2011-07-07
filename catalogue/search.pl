@@ -407,6 +407,7 @@ my @follower_params = map { {
     ind => 'filters',
     val => $_->{'ind'}.':"'.$_->{'val'}.'"'
 } } @tplfilters;
+$operands[0] = "*:*" if not defined $operands[0];
 push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
 push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
