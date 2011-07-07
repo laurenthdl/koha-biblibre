@@ -291,12 +291,15 @@ RECORD: while () {
         my $filters = { recordtype => $recordtype };
         for my $matchingpoint (@$match) {
             my ( $ind, $val ) = split /,/, $matchingpoint;
-            $filters->{$ind} = $val;
+            my ($tagfilter,$subfilter)=($1,$2) if $val=~m/([0-9]{3})(.)?/;
+            $tagfilter=sprintf("%03d",$tagfilter);
+            my $valuefilter= ($tagfilter<10?$record->field($tagfilter)->data():$record->subfield($tagfilter,$subfilter));
+            $filters->{$ind} = $valuefilter;
         }
 
         my $results = C4::Search::SimpleSearch( '*:*', $filters );
         my $totalhits = $results->{'pager'}->{'total_entries'};
-        $debug && warn "$query $recordtype : $totalhits";
+        $debug && warn "query :",Dump($filters)," $recordtype : $totalhits";
         if ( $results && $totalhits == 1 ) {
             $id = $results->{'items'}->{'values'}->{'recordid'};
             my $marcrecord = $authorities ? GetAuthority( $id ) : GetMarcBiblio( $id );
@@ -319,9 +322,9 @@ RECORD: while () {
                 }
             }
         } elsif ( $results && $totalhits > 1 ) {
-            $debug && warn "more than one match for $query";
+            $debug && warn "more than one match for query ",Dump($filters);
         } else {
-            $debug && warn "nomatch for $query";
+            $debug && warn "nomatch for query ",Dump($filters);
         }
     }
     if ($keepids) {
