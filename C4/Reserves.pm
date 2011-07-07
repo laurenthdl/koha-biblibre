@@ -796,6 +796,8 @@ sub GetReservesControlBranch {
     my $hbr           = C4::Context->preference('HomeOrHoldingBranch') || "homebranch";
     my $branchcode    = "*";
     if ( $controlbranch eq "ItemHomeLibrary" ) {
+    warn Data::Dumper::Dumper($item);
+    warn "branchcode = $item->{$hbr}";
         $branchcode = $item->{$hbr};
     } elsif ( $controlbranch eq "PatronLibrary" ) {
         $branchcode = $borrower->{'branchcode'};
@@ -1310,6 +1312,7 @@ $newstatus is the new status.
 =cut
 
 sub ModReserveStatus {
+warn 'ModReserveStatus';
     #first : check if we have a reservation for this item .
     my ($itemnumber, $newstatus) = @_;
     my $dbh          = C4::Context->dbh;
@@ -1343,6 +1346,7 @@ take care of the waiting status
 
 sub ModReserveAffect {
     my ( $itemnumber, $borrowernumber,$transferToDo, $reservenumber ) = @_;
+    warn 'ModReserveAffect';
     my $dbh = C4::Context->dbh;
     # we want to attach $itemnumber to $borrowernumber, find the biblionumber
     # attached to $itemnumber
@@ -1806,6 +1810,7 @@ C<biblioitemnumber>.
 
 sub _Findgroupreserve {
     my ( $bibitem, $biblio, $itemnumber ) = @_;
+warn "_Findgroupreserve $bibitem $biblio $itemnumber";
     my $dbh = C4::Context->dbh;
 
     # TODO: consolidate at least the SELECT portion of the first 2 queries to a common $select var.
@@ -1839,6 +1844,7 @@ sub _Findgroupreserve {
     if ( my $data = $sth->fetchrow_hashref ) {
         push( @results, $data );
     }
+    warn "FGR1";
     return @results if @results;
 
     # check for title-level targetted match
@@ -1871,6 +1877,7 @@ sub _Findgroupreserve {
     if ( my $data = $sth->fetchrow_hashref ) {
         push( @results, $data );
     }
+    warn "FGR2";
     return @results if @results;
 
     my $query = qq/
@@ -1884,7 +1891,7 @@ sub _Findgroupreserve {
                reserves.reservenotes AS reservenotes,
                reserves.priority AS priority,
                reserves.timestamp AS timestamp,
-               reserves.firstavailablebranch AS fistavailablebranch,
+               reserves.firstavailablebranch AS firstavailablebranch,
                reserveconstraints.biblioitemnumber AS biblioitemnumber,
                reserves.itemnumber                 AS itemnumber
         FROM reserves
@@ -1897,12 +1904,19 @@ sub _Findgroupreserve {
           AND (reserves.itemnumber IS NULL OR reserves.itemnumber = ?)
           AND reserves.reservedate <= CURRENT_DATE()
     /;
+
     $sth = $dbh->prepare($query);
     $sth->execute( $biblio, $bibitem, $itemnumber );
     @results = ();
+    my $itemdata = GetItem($itemnumber);
     while ( my $data = $sth->fetchrow_hashref ) {
+    warn Data::Dumper::Dumper($data);
+    warn $data->{'firstavailablebranch'} . " -> " .  $itemdata->{'holdingbranch'};
+        next if ($data->{'firstavailablebranch'} and ($data->{'firstavailablebranch'} ne $itemdata->{'holdingbranch'}));
         push( @results, $data );
     }
+    warn "FGR3";
+    warn Data::Dumper::Dumper(@results);
     return @results;
 }
 

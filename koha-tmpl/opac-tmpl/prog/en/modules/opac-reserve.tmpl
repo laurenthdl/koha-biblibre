@@ -47,12 +47,7 @@
         $(this).html(html);
     });
 
-    <!-- TMPL_IF NAME="onlynextat" -->
-    // Disabling pickup library
-   $(".branchselect").attr('disabled', 'disabled'); 
-   <!-- /TMPL_IF -->
-
-    // Make sure a specific item was selected where specified
+       // Make sure a specific item was selected where specified
     // before moving on to a new item.
     function changeSelection (newCopiesRowId, isSpecific) {
         if (copiesRowId && ((copiesRowId != newCopiesRowId) || (wasSpecific != isSpecific))) {
@@ -130,9 +125,6 @@
         biblioNum = suffixOf($(this).attr("id"), "_");
         newCopiesRowId = "#copiesrow_" + biblioNum;
 
-        // Enabling pick-up library
-        $('#branch_' + biblioNum).removeAttr('disabled');
-
         if (!changeSelection(newCopiesRowId, false)) {
             return false;
         }
@@ -207,6 +199,12 @@
 
         return true;
     });
+ <!-- TMPL_IF NAME="onlynextat" -->
+    // Disabling pickup library
+   $(".branchselect").attr('disabled', 'disabled'); 
+   $(".selectanyat").click();
+   <!-- /TMPL_IF -->
+
 
  });
 // ]]>
@@ -441,7 +439,6 @@
                     <!-- TMPL_IF NAME="OPACItemHolds" -->
                       <td class="place_on_type" style="display:none">
                         <table>
-                            <!-- TMPL_UNLESS NAME="onlynextat" -->
                           <tr>
                             <td>
                               <!-- TMPL_UNLESS NAME="holdable" -->
@@ -462,7 +459,6 @@
                               <label for="reqany_<!-- TMPL_VAR NAME="biblionumber" -->">Next available copy</label>
                             </td>
                           </tr>
-                          <!-- /TMPL_UNLESS -->
                           <!-- TMPL_IF NAME="onlynextat" -->
                           <tr>
                             <td>
@@ -533,6 +529,7 @@
                           <!-- /TMPL_LOOP -->
                         </select>
                     <!-- TMPL_ELSE -->
+                        <!-- <input type="hidden" name="branch" id="branch_<!-- TMPL_VAR NAME="biblionumber" -->" value="" /> -->
                         <input type="hidden" name="branch" id="branch_<!-- TMPL_VAR NAME="biblionumber" -->" value="<!--TMPL_VAR Name="branch"-->" /> <!-- TMPL_VAR NAME="branchname" -->
                     <!-- /TMPL_IF -->
                       </td>
