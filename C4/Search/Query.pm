@@ -181,10 +181,10 @@ sub splitToken {
     my $is_replaced = 0;
     # Foreach couple of index:operand
     while ( $token =~ m/[^ \(\\]*:[^ \)]*/g ) {
-        @values = split ':', $&;
+        @values = split ":", $&;
         $idx = (@values)[0];
         next if not $idx;
-        my $old_operand = (@values)[1];
+        my $old_operand = join ":", @values[1..scalar(@values)-1]; # After first colon, all is operand (FIX for date with format date_pubdate:"2001-01-01T00:00:00Z")
         my $old_idx = $idx;
         $operand = $old_operand;
 
@@ -195,14 +195,7 @@ sub splitToken {
         $idx = getIndexName $idx if $idx;
 
         if ( $idx =~ /^date_/ ) {
-            $operand =~ s/\\:/:/g;
-            my $date = '"' . C4::Search::Engine::Solr::NormalizeDate($operand) . '"'
-                    if $operand
-                        and $operand ne '""' # FIX for rpn (harvestdate,alwaysMatches="")
-                        and not $operand =~ /\[.*TO.*\]/;
-            $operand = $date if defined $date;
-            $operand = "[" . C4::Search::Engine::Solr::NormalizeDate($1) . " TO " . C4::Search::Engine::Solr::NormalizeDate($2) . "]"
-                if $operand =~ /\[(.*)\sTO\s(.*)\]/;
+            $operand = C4::Search::Engine::Solr::buildDateOperand( $operand );
         }
 
         given ( $attr ) {
