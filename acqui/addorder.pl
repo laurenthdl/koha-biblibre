@@ -169,48 +169,23 @@ unless($confirm_budget_exceeding) {
             }
         }
 
-        my @field_value = $input->param('field_value');
         my @field_value_loop;
-        foreach (@field_value) {
-            push @field_value_loop, {
-                value => $_,
-            };
-        }
-        my @itemid = $input->param('itemid');
+        push @field_value_loop, {value => $_} for $input->param('field_value');
+
         my @itemid_loop;
-        foreach (@itemid) {
-            push @itemid_loop, {
-                value => $_,
-            };
-        }
-        my @kohafield = $input->param('kohafield');
+        push @itemid_loop, {value => $_} for $input->param('itemid');
+
         my @kohafield_loop;
-        foreach (@kohafield) {
-            push @kohafield_loop, {
-                value => $_,
-            };
-        }
-        my @tag = $input->param('tag');
+        push @kohafield_loop, {value => $_} for $input->param('kohafield');
+
         my @tag_loop;
-        foreach (@tag) {
-            push @tag_loop, {
-                value => $_,
-            };
-        }
-        my @subfield = $input->param('subfield');
+        push @tag_loop, {value => $_} for $input->param('tag');
+
         my @subfield_loop;
-        foreach (@subfield) {
-            push @subfield_loop, {
-                value => $_,
-            };
-        }
-        my @mandatory = $input->param('mandatory');
+        push @subfield_loop, {value => $_} for $input->param('subfield');
+
         my @mandatory_loop;
-        foreach (@mandatory) {
-            push @mandatory_loop, {
-                value => $_,
-            };
-        }
+        push @mandatory_loop, {value => $_} for $input->param('mandatory');
 
         $template->param(
             not_enough_budget => 1,
