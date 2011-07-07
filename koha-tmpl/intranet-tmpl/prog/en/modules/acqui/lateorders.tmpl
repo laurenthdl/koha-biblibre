@@ -11,6 +11,8 @@
 <!-- TMPL_IF NAME='dateformatmetric' -->
   dt_add_type_uk_date();
 <!-- /TMPL_IF -->
+dt_overwrite_html_sorting_localeCompare();
+dt_overwrite_string_sorting_localeCompare();
 
 $(document).ready(function() {
     $("#lateorders").dataTable({

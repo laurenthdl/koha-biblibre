@@ -94,3 +94,47 @@ function dt_add_type_uk_date() {
     return ((x < y) ? 1 : ((x > y) ?  -1 : 0));
   };
 }
+
+function dt_overwrite_html_sorting_localeCompare() {
+    jQuery.fn.dataTableExt.oSort['html-asc']  = function(a,b) {
+        a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        if (typeof(a.localeCompare == "function")) {
+           return a.localeCompare(b);
+        } else {
+           return (a > b) ? 1 : ((a < b) ? -1 : 0);
+        }
+    };
+
+    jQuery.fn.dataTableExt.oSort['html-desc'] = function(a,b) {
+        a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        if(typeof(b.localeCompare == "function")) {
+            return b.localeCompare(a);
+        } else {
+            return (b > a) ? 1 : ((b < a) ? -1 : 0);
+        }
+    };
+}
+
+function dt_overwrite_string_sorting_localeCompare() {
+    jQuery.fn.dataTableExt.oSort['string-asc']  = function(a,b) {
+        a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        if (typeof(a.localeCompare == "function")) {
+           return a.localeCompare(b);
+        } else {
+           return (a > b) ? 1 : ((a < b) ? -1 : 0);
+        }
+    };
+
+    jQuery.fn.dataTableExt.oSort['string-desc'] = function(a,b) {
+        a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        if(typeof(b.localeCompare == "function")) {
+            return b.localeCompare(a);
+        } else {
+            return (b > a) ? 1 : ((b < a) ? -1 : 0);
+        }
+    };
+}
