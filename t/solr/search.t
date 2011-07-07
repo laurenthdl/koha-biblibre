@@ -3,7 +3,7 @@
 use utf8;
 use Modern::Perl;
 use Test::More;
-use C4::Search::Engine;
+use C4::Search::Engine::Solr;
 
 my $tests;
 plan tests => $tests;
@@ -379,7 +379,7 @@ $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = qq{($titleindex:"foo \\"bar")};
 is($got, $expected, qq{Test just one \" (buildQuery)});
 
-BEGIN { $tests += 5 } # Test for date index
+BEGIN { $tests += 9 } # Test for date index
 $q = qq{pubdate:2000};
 $got = C4::Search::Query->normalSearch($q);
 $expected = qq{$pubdateindex:"2000-01-01T00:00:00Z"};
@@ -395,11 +395,29 @@ is($got, $expected, qq{Date index format with 1 date (normalSearch)});
 #$expected = qq{$pubdateindex:[2000-01-01T00:00:00Z TO 2011-01-01T00:00:00Z]};
 #is($got, $expected, qq{Date index format with 1 date (normalSearch)});
 
+$q = qq{date_pubdate:"2001-01-01T00:00:00Z"};
+$got = C4::Search::Query->normalSearch($q);
+$expected = qq{$pubdateindex:"2001-01-01T00:00:00Z"};
+is($got, $expected, qq{Date index format iso with 1 date (normalSearch)});
 @$operands = (qq{2000});
+
+$q = qq{date_pubdate:2001-01-01T00:00:00Z};
+$got = C4::Search::Query->normalSearch($q);
+$expected = qq{$pubdateindex:"2001-01-01T00:00:00Z"};
+is($got, $expected, qq{Date index format iso (without quote) with 1 date (normalSearch)});
+@$operands = (qq{2000});
+
 @$indexes = ("pubdate");
 @$operators = ();
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = qq{$pubdateindex:"2000-01-01T00:00:00Z"};
+is($got, $expected, qq{Date index format with 1 date(buildQuery)});
+
+@$operands = (qq{maudits}, qq{2000});
+@$indexes = ("all_fields", "pubdate");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{maudits AND $pubdateindex:"2000-01-01T00:00:00Z"};
 is($got, $expected, qq{Date index format with 1 date(buildQuery)});
 
 @$operands = (qq{2000 2001 2002});
@@ -415,4 +433,11 @@ is($got, $expected, qq{Date index format with x dates (buildQuery)});
 $got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
 $expected = qq{$pubdateindex:[2000-01-01T00:00:00Z TO 2011-01-01T00:00:00Z]};
 is($got, $expected, qq{Date index format with x dates (buildQuery)});
+
+@$operands = (qq{"2000-01-01T00:00:00Z"});
+@$indexes = ("pubdate");
+@$operators = ();
+$got = C4::Search::Query->buildQuery($indexes, $operands, $operators);
+$expected = qq{$pubdateindex:"2000-01-01T00:00:00Z"};
+is($got, $expected, qq{Date index format iso (buildQuery)});
 

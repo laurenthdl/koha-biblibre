@@ -501,7 +501,6 @@ sub DeleteRecordIndex {
     $sc->remove("id:${recordtype}_${id}");
 }
 
-#duplicate code with C4::Date::output('iso') ?
 sub NormalizeDate {
     my $date = shift;
     given( $date ) {
@@ -512,6 +511,21 @@ sub NormalizeDate {
         when( /^(\d{4})$/                 ) { return "$1-01-01T00:00:00Z" }
     }
     return undef;
+}
+
+sub buildDateOperand {
+    my $operand = shift;
+    $operand =~ s/\\:/:/g;
+    $operand =~ s/^"(.*)"$/$1/; # Remove existing quote around date
+    my $date = '"' . NormalizeDate($operand) . '"'
+            if $operand
+                and $operand ne '""' # FIX for rpn (harvestdate,alwaysMatches="")
+                and not $operand =~ /\[.*TO.*\]/;
+    $operand = $date if defined $date;
+    $operand = "[" . NormalizeDate($1) . " TO " . NormalizeDate($2) . "]"
+            if $operand =~ /\[(.*)\sTO\s(.*)\]/;
+
+    return $operand;
 }
 
 # overide add method in Data::SearchEngine::Solr to not use optimize function!
