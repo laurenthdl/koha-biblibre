@@ -83,17 +83,30 @@ my $totspent_active     = 0;
 my $totordered_active   = 0;
 my $totavail_active     = 0;
 
-my $borrower = GetMember ( borrowernumber => $loggedinuser );
 my @budgets_loop = ();
 foreach my $budget ( @$budget_arr ) {
     unless($staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
         if ( !defined $budget->{budget_amount} || $budget->{budget_amount} == 0 ) {
             next;
-        } elsif ( $budget->{budget_permission} == 1 && $budget->{budget_owner_id} != $borrower->{borrowernumber} ) {
+        # Restricted to owner
+        } elsif ( $budget->{budget_permission} == 1
+          && $budget->{budget_owner_id} != $loggedinuser )
+        {
             next;
-        } elsif ( $budget->{budget_permission} == 2 && defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
-            next;
-        } elsif ( $budget->{budget_permission} == 3 ){
+        # Restricted to library + owner + users
+        } elsif ( $budget->{budget_permission} == 2
+          && defined $budget->{budget_branchcode}
+          && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode}
+          && $budget->{'budget_owner_id'} != $loggedinuser )
+        {
+            my $budgetusers = GetUsersFromBudget($budget->{'budget_id'});
+            if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}){
+                next;
+            }
+        # Restricted to owner + users
+        } elsif ( $budget->{budget_permission} == 3
+          && $budget->{'budget_owner_id'} != $loggedinuser )
+        {
             my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
             if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}){
                 next;
