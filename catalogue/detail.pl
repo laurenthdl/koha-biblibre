@@ -238,6 +238,7 @@ $template->param(
     detailview          => 1,
     subscriptions       => \@subs,
     subscriptionsnumber => $subscriptionsnumber,
+    dateformatmetric    => C4::Context->preference("dateformat") eq "metric" ? 1 : 0,
     subscriptiontitle   => $dat->{title},
     author_index_name   => C4::Search::Query::getIndexName('author'),
     authid_index_name   => C4::Search::Query::getIndexName('authid'),
