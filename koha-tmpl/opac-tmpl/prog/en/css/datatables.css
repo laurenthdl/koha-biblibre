@@ -2,20 +2,30 @@ input.search_init {
     color: #999999;
 }
 .sorting_asc {
-    background: url("../../images/datatables/sort_asc.png") no-repeat scroll right center transparent;
+    padding-right: 19px;
+    background: url("../../img/datatables/sort_asc.png") no-repeat scroll right center #EEEEEE;
 }
 .sorting_desc {
-    background: url("../../images/datatables/sort_desc.png") no-repeat scroll right center transparent;
+    padding-right: 19px;
+    background: url("../../img/datatables/sort_desc.png") no-repeat scroll right center #EEEEEE;
 }
 .sorting {
-    background: url("../../images/datatables/sort_both.png") no-repeat scroll right center transparent;
+    padding-right: 19px;
+    background: url("../../img/datatables/sort_both.png") no-repeat scroll right center #EEEEEE;
 }
 .sorting_asc_disabled {
-    background: url("../../images/datatables/sort_asc_disabled.png") no-repeat scroll right center transparent;
+    padding-right: 19px;
+    background: url("../../img/datatables/sort_asc_disabled.png") no-repeat scroll right center #EEEEEE;
 }
 .sorting_desc_disabled {
-    background: url("../../images/datatables/sort_desc_disabled.png") no-repeat scroll right center transparent;
+    padding-right: 19px;
+    background: url("../../img/datatables/sort_desc_disabled.png") no-repeat scroll right center #EEEEEE;
 }
+.sorting_disabled {
+    padding-right: 19px;
+    background-color: #EEEEEE;
+}
+
 table.display {
     width: 100%;
 }
@@ -39,7 +49,7 @@ table.display thead th {
     margin-left: -125px;
     margin-top: -15px;
     padding: 14px 0 2px;
-    position: absolute;
+    position: fixed;
     text-align: center;
     top: 50%;
     width: 250px;
@@ -87,16 +97,16 @@ table.display thead th {
     width: 19px;
 }
 .paginate_disabled_previous {
-    background-image: url("../../images/datatables/back_disabled.jpg");
+    background-image: url("../../img/datatables/back_disabled.jpg");
 }
 .paginate_enabled_previous {
-    background-image: url("../../images/datatables/back_enabled.jpg");
+    background-image: url("../../img/datatables/back_enabled.jpg");
 }
 .paginate_disabled_next {
-    background-image: url("../../images/datatables/forward_disabled.jpg");
+    background-image: url("../../img/datatables/forward_disabled.jpg");
 }
 .paginate_enabled_next {
-    background-image: url("../../images/datatables/forward_enabled.jpg");
+    background-image: url("../../img/datatables/forward_enabled.jpg");
 }
 .spacer {
     clear: both;
