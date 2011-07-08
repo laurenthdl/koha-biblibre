@@ -362,15 +362,25 @@ foreach my $budget (@budgets) {
         # check budget permission
         if ( $period->{budget_period_locked} == 1 ) {
             $budget_lock = 1;
+        # Restricted to owner
         } elsif ( $budget->{budget_permission} == 1 ) {
             $budget_lock = 1 if $borrower_id != $budget->{'budget_owner_id'};
+        # Restricted to library + owner + users
         } elsif ( $budget->{budget_permission} == 2 ) {
-            if( defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ) {
+            my $budgetusers = GetUsersFromBudget($budget->{'budget_id'});
+            if( defined $budget->{budget_branchcode}
+              && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode}
+              && $budget->{'budget_owner_id'} != $borrower_id
+              && defined $budgetusers && defined $budgetusers->{$borrower_id} )
+            {
                 $budget_lock = 1;
             }
+        # Restricted to owner + users
         } elsif ( $budget->{budget_permission} == 3 ) {
             my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
-            if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
+            if($budget->{'budget_owner_id'} != $borrower_id
+              && (!defined $budgetusers || !defined $budgetusers->{$borrower_id}) )
+            {
                 $budget_lock = 1;
             }
         }
