@@ -98,45 +98,48 @@ if ( $op and $op eq "send_alert" ) {
 
 my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch, C4::Dates->new($estimateddeliverydatefrom)->output("iso"), C4::Dates->new($estimateddeliverydateto)->output("iso") );
 my (@sloopy);                                             # supplier loop
-foreach ( keys %supplierlist ) {
+my $total;
+my @orders_loop = ();
+foreach ( sort keys %supplierlist ) {
+    my @lateorders = GetLateOrders($delay, $_, undef, C4::Dates->new($estimateddeliverydatefrom)->output('iso'), C4::Dates->new($estimateddeliverydateto)->output('iso'));
+    my @displayedorders = ();
+    foreach (@lateorders) {
+        $_->{'branch'} ||= $_->{'basket_branch'};
+
+        unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_claim_for_all'} ) {
+            # Check if order belong to a basket the user is owner or user,
+            # or if order branch is the current working branch.
+            # Otherwise, the user can't claim for this order.
+            my $basket = GetBasket($_->{'basketno'});
+            my @basketusers = GetBasketUsers($_->{'basketno'});
+            my $isabasketuser = 0;
+            foreach (@basketusers) {
+                if ($_ == $loggedinuser) {
+                    $isabasketuser = 1;
+                    last;
+                }
+            }
+            if($_->{'branch'} ne C4::Context->userenv->{'branch'}
+            && $basket->{'authorisedby'} != $loggedinuser
+            && $isabasketuser == 0) {
+                next;
+            }
+        }
+        $total += $_->{subtotal};
+        push @displayedorders, $_;
+    }
+    if(scalar(@displayedorders) == 0){
+        next;
+    }
     push @sloopy,
       (   ( $supplierid and $supplierid eq $_ )
         ? { id => $_, name => $supplierlist{$_}, selected => 1 }
         : { id => $_, name => $supplierlist{$_} }
       );
+    push @orders_loop, @displayedorders if($_ == $supplierid || !$supplierid);
 }
 $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
-
-my @lateorders = GetLateOrders( $delay, $supplierid, undef, C4::Dates->new($estimateddeliverydatefrom)->output("iso"), C4::Dates->new($estimateddeliverydateto)->output("iso") );
-
-my $total;
-my @orders_loop = ();
-foreach (@lateorders) {
-    $total += $_->{subtotal};
-    $_->{'branch'} ||= $_->{'basket_branch'};
-
-    unless( $staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_order_claim_for_all'} ) {
-        # Check if order belong to a basket the user is owner or user,
-        # or if order branch is the current working branch.
-        # Otherwise, the user can't claim for this order.
-        my $basket = GetBasket($_->{'basketno'});
-        my @basketusers = GetBasketUsers($_->{'basketno'});
-        my $isabasketuser = 0;
-        foreach (@basketusers) {
-            if ($_ == $loggedinuser) {
-                $isabasketuser = 1;
-                last;
-            }
-        }
-        if($_->{'branch'} ne C4::Context->userenv->{'branch'}
-        && $basket->{'authorisedby'} != $loggedinuser
-        && $isabasketuser == 0) {
-            next;
-        }
-    }
-    push @orders_loop, $_;
-}
 
 my @letters;
 my $letters = GetLetters("claimacquisition");
