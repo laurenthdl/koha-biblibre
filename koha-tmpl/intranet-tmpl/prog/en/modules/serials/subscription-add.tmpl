@@ -418,11 +418,18 @@ function show_page_2() {
 $(document).ready(function() {
     $("select#frequency").change(function(){
         patternneedtobetested = 1;
+        $("#enddate").val('');
         frequencyload();
     });
     $("select#numberpattern").change(function(){
         patternneedtobetested = 1;
         numberpatternload();
+    });
+    $("#subtype").change(function(){
+        $("#enddate").val('');
+    });
+    $("#sublength").change(function(){
+        $("#enddate").val('');
     });
     $("#lastvaluetemp1").keyup(function(){
         $("#lastvalue1").val($(this).val());
