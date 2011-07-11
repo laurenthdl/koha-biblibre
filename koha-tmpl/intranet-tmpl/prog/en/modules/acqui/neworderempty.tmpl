@@ -97,6 +97,42 @@ $(document).ready(function()
             $('#budget_id .b_inactive').show();
             }
         });
+
+        $("#budget_id").change(function() {
+            var budget = $("#budget_id option:selected");
+            var sort1_authcat = $(budget).attr('data-sort1-authcat');
+            var sort2_authcat = $(budget).attr('data-sort2-authcat');
+            $.ajax({
+                url: "/cgi-bin/koha/acqui/ajax-getauthvaluedropbox.pl",
+                data: {
+                    name: 'sort1',
+                    category: sort1_authcat
+                },
+                success: function(data){
+                    if(data === "0"){
+                        var textbox = '<input type="text" id="sort1" name="sort1" />';
+                        $("#sort1").replaceWith(textbox);
+                    }else{
+                        $("#sort1").replaceWith(data);
+                    }
+                }
+            });
+            $.ajax({
+                url: "/cgi-bin/koha/acqui/ajax-getauthvaluedropbox.pl",
+                data: {
+                    name: 'sort2',
+                    category: sort2_authcat
+                },
+                success: function(data){
+                    if(data === "0"){
+                        var textbox = '<input type="text" id="sort2" name="sort2" />';
+                        $("#sort2").replaceWith(textbox);
+                    }else{
+                        $("#sort2").replaceWith(data);
+                    }
+                }
+            });
+        });
     });
 //]]>
 </script>
@@ -377,10 +413,10 @@ $(document).ready(function()
                 <select id="budget_id" size="1" name="budget_id">
                 <!-- TMPL_LOOP NAME="budget_loop" -->
                     <!-- TMPL_IF NAME="b_sel" -->
-                        <option value="<!-- TMPL_VAR NAME='b_id' -->" selected="selected"><!-- TMPL_VAR NAME="b_txt" --></option>
+                        <option value="<!-- TMPL_VAR NAME='b_id' -->" selected="selected" data-sort1-authcat="<!-- TMPL_VAR NAME='b_sort1_authcat' -->" data-sort2-authcat="<!-- TMPL_VAR NAME='b_sort2_authcat' -->"><!-- TMPL_VAR NAME="b_txt" --></option>
                     <!-- TMPL_ELSE -->
-                        <!-- TMPL_IF NAME="b_active" --><option value="<!-- TMPL_VAR NAME='b_id' -->"><!-- TMPL_VAR NAME="b_txt" --></option>
-                        <!-- TMPL_ELSE --><option value="<!-- TMPL_VAR NAME='b_id' -->" class="b_inactive" style="display : none;"><!-- TMPL_VAR NAME="b_txt" --></option>    
+                        <!-- TMPL_IF NAME="b_active" --><option value="<!-- TMPL_VAR NAME='b_id' -->" data-sort1-authcat="<!-- TMPL_VAR NAME='b_sort1_authcat' -->" data-sort2-authcat="<!-- TMPL_VAR NAME='b_sort2_authcat' -->"><!-- TMPL_VAR NAME="b_txt" --></option>
+                        <!-- TMPL_ELSE --><option value="<!-- TMPL_VAR NAME='b_id' -->" class="b_inactive" style="display : none;" data-sort1-authcat="<!-- TMPL_VAR NAME='b_sort1_authcat' -->" data-sort2-authcat="<!-- TMPL_VAR NAME='b_sort2_authcat' -->"><!-- TMPL_VAR NAME="b_txt" --></option>    
                         <!-- /TMPL_IF -->
                     <!-- /TMPL_IF -->
                 <!-- /TMPL_LOOP -->
