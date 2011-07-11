@@ -49,30 +49,35 @@
 		<!-- TMPL_ELSE -->
         <option value="title">Title</option>
 		<!-- /TMPL_IF -->
-		<!-- TMPL_IF NAME="ms_au" -->
-        <option selected="selected" value="author">Author</option>
+		<!-- TMPL_IF NAME="ms_ts-aut" -->
+        <option selected="selected" value="ts-aut">Author</option>
 		<!-- TMPL_ELSE -->
-        <option value="author">Author</option>
+        <option value="ts-aut">Author</option>
 		<!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="ms_su" -->
         <option selected="selected" value="subject">Subject</option>
 		<!-- TMPL_ELSE -->
         <option value="subject">Subject</option>
 		<!-- /TMPL_IF -->
-		<!-- TMPL_IF NAME="ms_nb" -->
-		<option selected="selected" value="isbn">ISBN</option>
+<!-- 		<!-- TMPL_IF NAME="ms_nb" -->
+		<option selected="selected" value="nb">ISBN</option>
 		<!-- TMPL_ELSE -->
-		<option value="isbn">ISBN</option>
-		<!-- /TMPL_IF -->
+		<option value="nb">ISBN</option>
+		<!-- /TMPL_IF -->  -->
 		<!-- TMPL_IF NAME="ms_se" -->
         <option selected="selected" value="title-series">Series</option>
 		<!-- TMPL_ELSE -->
-        <option value="title-series">Series</option>
-		<!-- /TMPL_IF -->
-		<!-- TMPL_IF NAME="ms_callnum" -->
-        <option selected="selected" value="callnumber">Call Number</option>
+        <option value="se">Series</option>
+		<!-- /TMPL_IF -->  -->
+                <!-- TMPL_IF NAME="ms_isxn" -->
+        <option selected="selected" value="isxn">ISBN ISSN ISMN</option>
+                <!-- TMPL_ELSE -->
+        <option value="isxn">ISBN ISSN ISMN</option>
+                <!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="ms_cn" -->
+        <option selected="selected" value="cn">Call Number</option>
 		<!-- TMPL_ELSE -->
-        <option value="callnumber">Call Number</option>
+        <option value="cn">Call Number</option>
 		<!-- /TMPL_IF --></select>
         <!-- TMPL_IF NAME="tag" -->
                 <input type="text" id = "transl1" name="q" value="" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
