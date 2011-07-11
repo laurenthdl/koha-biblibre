@@ -100,7 +100,7 @@ my %supplierlist = GetBooksellersWithLateOrders( $delay, $branch, C4::Dates->new
 my (@sloopy);                                             # supplier loop
 my $total;
 my @orders_loop = ();
-foreach ( sort keys %supplierlist ) {
+foreach ( keys %supplierlist ) {
     my @lateorders = GetLateOrders($delay, $_, undef, C4::Dates->new($estimateddeliverydatefrom)->output('iso'), C4::Dates->new($estimateddeliverydateto)->output('iso'));
     my @displayedorders = ();
     foreach (@lateorders) {
@@ -138,6 +138,7 @@ foreach ( sort keys %supplierlist ) {
       );
     push @orders_loop, @displayedorders if($_ == $supplierid || !$supplierid);
 }
+@sloopy = sort { lc($a->{'name'}) cmp lc($b->{'name'}) } @sloopy;
 $template->param( SUPPLIER_LOOP => \@sloopy );
 $template->param( Supplier => $supplierlist{$supplierid} ) if ($supplierid);
 
