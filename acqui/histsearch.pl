@@ -68,6 +68,7 @@ my $budget         = $input->param('budget');
 my $invoicenumber  = $input->param('invoicenumber');
 my $branchcode     = $input->param('branchcode');
 my $orderstatus    = $input->param('orderstatus');
+my $groupname      = $input->param('groupname');
 my $to_placed_on   = C4::Dates->new( $input->param('to') );
 my $from_placed_on = C4::Dates->new( $input->param('from') );
 if ( not $input->param('from') ) {
@@ -89,7 +90,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 
 my $from_iso = C4::Dates->new( $input->param('from') )->output('iso') if $input->param('from');
 my $to_iso   = C4::Dates->new( $input->param('to') )->output('iso')   if $input->param('to');
-my ( $order_loop, $total_qty, $total_price, $total_qtyreceived ) = &GetHistory( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $orderstatus, $from_iso, $to_iso );
+my ( $order_loop, $total_qty, $total_price, $total_qtyreceived ) = &GetHistory( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $orderstatus, $groupname, $from_iso, $to_iso );
 
 my $budgetperiods = C4::Budgets::GetBudgetPeriods;
 my $bp_loop = $budgetperiods;
