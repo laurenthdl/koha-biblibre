@@ -6057,6 +6057,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
+<<<<<<< HEAD
 $DBversion = "3.06.00.035";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("ALTER TABLE serial
@@ -6198,6 +6199,15 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     print "Upgrade to $DBversion done (Add invoices table)\n";
     SetVersion($DBversion);
 }
+
+$DBversion = "3.06.00.038";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do(q{ALTER TABLE `reserves` ADD COLUMN `firstavailablebranch` VARCHAR(10) DEFAULT NULL;});
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OPACHoldNextInLibrary','','','Allows the borrower to place a hold on the first available item for a given library','YesNo')");
+    print "Upgrade to $DBversion done (Add System Preference OPACHoldNextInLibrary and database column reserves.firstavailablebranch)\n";
+    SetVersion ($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 

@@ -285,3 +285,4 @@ INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Moteur de recherche','Choice');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SubscriptionDuplicateDroppedInput','','','Liste des champs à ne pas dupliquer lors de la duplication d\'un abonnement (séparés par un point-virgule)','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('FinesDependsOnGracePeriod',0,'','Si Oui, les amendes commencent après le délais de grâce. Sinon, elles commencent juste après le retour','YesNo');
+INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OPACHoldNextInLibrary','','','Permet à un usage de placer une réservation sur le premier exemplaire disponible pour une bibliothèque donnée','YesNo')
