@@ -120,8 +120,6 @@
         // We set the pickup library (even if it is disabled) to the selected value,
         // so the user understand there will be no transfer
         $("#branch_" + biblioNum).val($("#" + $(this).attr("id") + " option:selected").val());
-        // Disabling location
-       $("#nextatbranch_" + biblioNum).attr('disabled', 'disabled'); 
     });
 
     // When 'first available' radion button is clicked
