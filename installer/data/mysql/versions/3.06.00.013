@@ -1,0 +1,5 @@
+#Upgrade to $DBversion done (Update System Preferences defaultSortField and OPACdefaultSortField and *SortOrder)
+UPDATE `systempreferences` SET options='acqdate|author|callnumber|ccode|dewey|location|pubdate|score|title' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField');
+UPDATE `systempreferences` SET options='asc|desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder');
+UPDATE `systempreferences` SET value='desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder');
+UPDATE `systempreferences` SET value='score' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField');
