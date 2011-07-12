@@ -100,6 +100,9 @@
         // Disabling pickup library
        $("#branch_" + biblioNum).attr('disabled', 'disabled'); 
 
+       // Enabling reserve location
+       $("#nextatbranch_" + biblioNum).removeAttr('disabled'); 
+
         // We set the pickup library (even if it is disabled) to the selected value,
         // so the user understand there will be no transfer
         $("#branch_" + biblioNum).val($("#nextatbranch_"  + biblioNum + " option:selected").val());
@@ -117,6 +120,8 @@
         // We set the pickup library (even if it is disabled) to the selected value,
         // so the user understand there will be no transfer
         $("#branch_" + biblioNum).val($("#" + $(this).attr("id") + " option:selected").val());
+        // Disabling location
+       $("#nextatbranch_" + biblioNum).attr('disabled', 'disabled'); 
     });
 
     // When 'first available' radion button is clicked
@@ -124,6 +129,10 @@
         // Make sure all other specific copy table rows are hidden
         biblioNum = suffixOf($(this).attr("id"), "_");
         newCopiesRowId = "#copiesrow_" + biblioNum;
+        // Disabling location
+       $("#nextatbranch_" + biblioNum).attr('disabled', 'disabled'); 
+
+
 
         if (!changeSelection(newCopiesRowId, false)) {
             return false;
@@ -184,7 +193,16 @@
                 }
             }
             else {
-                selections=biblioNum+separator+separator+branch+separator+availBranch;
+                // If the request is for any item in a specific location
+                if ($("#reqat_" + biblioNum + ":checked").size() > 0) {
+                    selections=biblioNum+separator+separator+branch+separator+availBranch;
+                } else {
+                    // If the request is for any item in any location,
+                    // we do not set branch and firstavailablebranch.
+                    // Branch will be set later, when we know which one it is
+                    selections=biblioNum+separator+separator+separator;
+                }
+
             }
             return true;
         });
@@ -193,7 +211,6 @@
             alert(MSG_NO_COPY_SELECTED);
             return false;
         }
-
         $("#selections").val(selections);
         $("#biblionumbers").val(biblionumbers);
 

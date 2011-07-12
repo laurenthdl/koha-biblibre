@@ -115,6 +115,7 @@ BEGIN {
       &ModReserveFill
       &ModReserveAffect
       &ModReserve
+      &ModReserveLibrary
       &ModReserveStatus
       &ModReserveCancelAll
       &ModReserveMinusPriority
@@ -189,6 +190,7 @@ sub AddReserve {
              ?,?,?,?,?,?,?)
     /;
     my $sth = $dbh->prepare($query);
+    $branch = undef if ($branch eq ''); # So it's null and constraint on the branches table does not fail
     $sth->execute( $borrowernumber, $biblionumber, $resdate, $branch, $const, $priority, $notes, $checkitem, $found, $waitingdate, $expdate, $firstavailablebranch );
 
     # Send e-mail to librarian if syspref is active
@@ -1229,6 +1231,20 @@ sub ModReserve {
     }
 }
 
+
+sub ModReserveLibrary {
+warn 'ModReserveLibrary';
+    my ($reservenumber, $branchcode, $firstavailablebranch) = @_;
+    my $dbh = C4::Context->dbh;
+
+    my $query = "UPDATE reserves SET branchcode=?, firstavailablebranch=? WHERE reservenumber=?";
+    warn "ModReserve $query $reservenumber $branchcode $firstavailablebranch";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($branchcode, $firstavailablebranch, $reservenumber);
+    $sth->finish;
+
+}
+
 =item ModReserveFill
 
   &ModReserveFill($reserve);
@@ -1361,7 +1377,7 @@ sub ModReserveAffect {
 
     # If we affect a reserve that has to be transfered, don't set to Waiting
     my $query;
-    if ($transferToDo) {
+    if ($transferToDo and not C4::Context->preference('OPACHoldNextInLibrary')) {
         $query = "
         UPDATE reserves
         SET    priority = 0,
@@ -1398,6 +1414,7 @@ sub ModReserveAffect {
         my $calendar = C4::Calendar->new( branchcode => $branch);
         my $holdexpdate  = $calendar->addDate($holdstartdate, $holdperiod);
         my $sqlexpdate = $holdexpdate->output('iso');
+
         $query = "
             UPDATE reserves
             SET     priority = 0,

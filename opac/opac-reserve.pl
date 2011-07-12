@@ -166,7 +166,10 @@ if ( $query->param('place_reserve') ) {
         $selectedItems = "$bib/$item/$branch/$availbranch";
     }
 
-    my @selectedItems = split /\//, $selectedItems;
+    my @selectedItems = split /\//, $selectedItems, 4;
+    # Note: we use the limit parameter to split in order to fill the array
+    #       with empty values (when branchcode and/or firstavailablebranch
+    #       are empty, for exemple) instead of having no value at all
 
     # Make sure there is a biblionum/itemnum/branch/availbranch triplet for each item.
     # The itemnum can be 'any', meaning next available.
