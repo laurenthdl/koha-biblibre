@@ -16,6 +16,8 @@
 	<div class="yui-b">
     <div class='neworder_filter'>
         <form action="/cgi-bin/koha/acqui/neworderbiblio.pl" method="get">
+            <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME='booksellerid' -->" />
+            <input type="hidden" name="basketno" value="<!-- TMPL_VAR NAME='basketno' -->" />
             Filter: <input type="text" name="q" value="" />
             in      <select name="idx">
                         <option value="kw">Library Catalog</option>
