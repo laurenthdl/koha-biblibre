@@ -253,6 +253,15 @@ $(document).ready(function()
                 <input type="text" size="20" name="series" id="series" value="<!-- TMPL_VAR NAME="seriestitle" -->" />
             <!-- /TMPL_IF -->
         </li>
+        <li>
+          <label for="branchcode">Branch: </label>
+          <select name="branchcode" id="branchcode">
+            <option value=""></option>
+            <!-- TMPL_LOOP name="branchloop" -->
+              <option value="<!-- TMPL_VAR name="value" -->" <!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->><!-- TMPL_VAR name="branchname" --></option>
+            <!-- /TMPL_LOOP -->
+          </select>
+        </li>
             <!-- TMPL_UNLESS name="biblionumber" -->
             <!-- TMPL_IF name="itemtypeloop" -->
             <li>
@@ -278,22 +287,6 @@ $(document).ready(function()
         <ol><li><span class="label">Suggested by <!-- TMPL_VAR NAME="surnamesuggestedby" --><!-- TMPL_IF name="firstnamesuggestedby" -->,<!-- /TMPL_IF --> <!-- TMPL_VAR NAME="firstnamesuggestedby" --> (from <a href="/cgi-bin/koha/suggestion/suggestion.pl?suggestionid=<!-- TMPL_VAR NAME="suggestionid" -->">suggestion #<!-- TMPL_VAR NAME="suggestionid" --></a>)</span></li></ol>
         </fieldset>
     <!-- /TMPL_IF -->
-
-    <!-- Acquisition details -->
-    <fieldset class="rows">
-        <legend>Acquisition details</legend>
-	<ol>
-	<li>
-	    <label for="branchcode">Branch: </label>
-	    <select name="branchcode" id="branchcode">
-            <option value=""></option>
-		<!-- TMPL_LOOP name="branchloop" -->
-		    <option value="<!-- TMPL_VAR name="value" -->" <!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->><!-- TMPL_VAR name="branchname" --></option>
-		<!-- /TMPL_LOOP -->
-	    </select>
-	</li>
-	</ol>
-    </fieldset>	
 
     <!-- From a suggestion, we have not items -->
     <!-- TMPL_UNLESS NAME="subscriptionid" -->
