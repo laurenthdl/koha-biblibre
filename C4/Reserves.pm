@@ -798,8 +798,6 @@ sub GetReservesControlBranch {
     my $hbr           = C4::Context->preference('HomeOrHoldingBranch') || "homebranch";
     my $branchcode    = "*";
     if ( $controlbranch eq "ItemHomeLibrary" ) {
-    warn Data::Dumper::Dumper($item);
-    warn "branchcode = $item->{$hbr}";
         $branchcode = $item->{$hbr};
     } elsif ( $controlbranch eq "PatronLibrary" ) {
         $branchcode = $borrower->{'branchcode'};
@@ -1233,7 +1231,6 @@ sub ModReserve {
 
 
 sub ModReserveLibrary {
-warn 'ModReserveLibrary';
     my ($reservenumber, $branchcode, $firstavailablebranch) = @_;
     my $dbh = C4::Context->dbh;
 
@@ -1328,7 +1325,6 @@ $newstatus is the new status.
 =cut
 
 sub ModReserveStatus {
-warn 'ModReserveStatus';
     #first : check if we have a reservation for this item .
     my ($itemnumber, $newstatus) = @_;
     my $dbh          = C4::Context->dbh;
@@ -1827,7 +1823,6 @@ C<biblioitemnumber>.
 
 sub _Findgroupreserve {
     my ( $bibitem, $biblio, $itemnumber ) = @_;
-warn "_Findgroupreserve $bibitem $biblio $itemnumber";
     my $dbh = C4::Context->dbh;
 
     # TODO: consolidate at least the SELECT portion of the first 2 queries to a common $select var.
@@ -1861,7 +1856,6 @@ warn "_Findgroupreserve $bibitem $biblio $itemnumber";
     if ( my $data = $sth->fetchrow_hashref ) {
         push( @results, $data );
     }
-    warn "FGR1";
     return @results if @results;
 
     # check for title-level targetted match
@@ -1894,7 +1888,6 @@ warn "_Findgroupreserve $bibitem $biblio $itemnumber";
     if ( my $data = $sth->fetchrow_hashref ) {
         push( @results, $data );
     }
-    warn "FGR2";
     return @results if @results;
 
     my $query = qq/
@@ -1932,8 +1925,6 @@ warn "_Findgroupreserve $bibitem $biblio $itemnumber";
         next if ($data->{'firstavailablebranch'} and ($data->{'firstavailablebranch'} ne $itemdata->{'holdingbranch'}));
         push( @results, $data );
     }
-    warn "FGR3";
-    warn Data::Dumper::Dumper(@results);
     return @results;
 }
 
