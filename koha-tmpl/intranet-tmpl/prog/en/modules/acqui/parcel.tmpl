@@ -237,10 +237,11 @@
     <!-- TMPL_LOOP NAME="loop_orders" -->
             <tr>
                 <td class="basketfilterclass">
+                  <!-- TMPL_VAR NAME='basketname' -->
                   <!-- TMPL_IF NAME="basket_lock" -->
-                    <!-- TMPL_VAR NAME="basketno" -->
+                    (<!-- TMPL_VAR NAME="basketno" -->)
                   <!-- TMPL_ELSE -->
-                    <a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a>
+                    (<a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a>)
                   <!-- /TMPL_IF -->
                 </td>
                 <td class="orderfilterclass">
@@ -358,7 +359,10 @@
 	    <!-- TMPL_LOOP NAME="loop_received" -->
             <tr>
                 <td><!-- TMPL_VAR NAME="parent_ordernumber" --></td>
-                <td><a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a></td>
+                <td>
+                  <!-- TMPL_VAR NAME='basketname' -->
+                  (<a href="/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->"><!-- TMPL_VAR NAME="basketno" --></a>)
+                </td>
                 <td><a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="supplierid" -->"><!-- TMPL_VAR NAME="ordernumber" --></a></td>
                 <td>
                     <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR name="biblionumber" -->"><!-- TMPL_VAR NAME="title" ESCAPE="html" --></a>
