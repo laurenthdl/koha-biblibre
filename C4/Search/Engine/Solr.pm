@@ -517,7 +517,12 @@ sub buildDateOperand {
                 and $operand ne '""' # FIX for rpn (harvestdate,alwaysMatches="")
                 and not $operand =~ /\[.*TO.*\]/;
     $operand = $date if defined $date;
-    $operand = "[" . NormalizeDate($1) . " TO " . NormalizeDate($2) . "]"
+
+    return "[" . NormalizeDate($1) . " TO *]"
+            if $operand =~ /\[(.*)\sTO\s\*\]/;
+    return "[* TO " . NormalizeDate($1) . "]"
+            if $operand =~ /\[\*\sTO\s(.*)\]/;
+    return "[" . NormalizeDate($1) . " TO " . NormalizeDate($2) . "]"
             if $operand =~ /\[(.*)\sTO\s(.*)\]/;
 
     return $operand;
