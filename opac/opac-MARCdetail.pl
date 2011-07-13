@@ -42,7 +42,7 @@ the items attached to the biblio
 use strict;
 use warnings;
 
-use C4::Auth;
+use C4::Auth qw(:DEFAULT get_session);
 use C4::Context;
 use C4::Output;
 use CGI;
@@ -262,5 +262,13 @@ $template->param(
     item_header_loop => \@header_value_loop,
     biblionumber     => $biblionumber,
 );
+
+my $session = get_session($query->cookie("CGISESSID"));
+if ($session) {
+    # read session variables
+    foreach (qw(currentsearchurl currentsearchisoneresult)) {
+        $template->param( $_ => $session->param( $_ ) );
+    }
+}
 
 output_html_with_http_headers $query, $cookie, $template->output;
