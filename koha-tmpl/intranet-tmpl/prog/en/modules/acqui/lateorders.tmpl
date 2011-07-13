@@ -2,27 +2,32 @@
 <title>Koha &rsaquo; Acquisitions &rsaquo; Late orders</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME="themelang" -->/css/datatables.css" />
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/js/datatables.js"></script>
 <script type="text/javascript">
 //<![CDATA[
-$(document).ready(function() {
-    $.tablesorter.addParser({
-        id: 'amount',
-        is: function(s) {
-            return false;
-        },
-        format:	function(s) {
-            return s.replace(/ /g,"").replace(/,/g,"");
-        },
-        type: 'numeric'
-    });
-    $("#lateorders").tablesorter({
-	    widgets : ['zebra'],
-	    headers: {
-            8: { sorter: false },
-        },
-	});
 
+<!-- TMPL_IF NAME='dateformatmetric' -->
+  dt_add_type_uk_date();
+<!-- /TMPL_IF -->
+dt_overwrite_html_sorting_localeCompare();
+dt_overwrite_string_sorting_localeCompare();
+dt_add_type_totalcost();
+dt_add_type_htmlbasketno();
+
+$(document).ready(function() {
+    $("#lateorders").dataTable({
+      "oLanguage": {
+        "sSearch": "Search all columns:"
+      },
+      "aoColumnDefs": [
+        { "aTargets": [4], "sType": "totalcost" },
+        { "aTargets": [5], "sType": "htmlbasketno" },
+        { "aTargets": [8], "bSortable": false }
+      ],
+      "sPaginationType": "full_numbers"
+    });
     $("#checkAll").click(function() {
         $("#lateorders :checkbox").attr('checked', $("#checkAll").is(':checked'));
     });
@@ -71,7 +76,7 @@ $(document).ready(function() {
 	  </select>
 	</p>
 	<!-- /TMPL_IF -->
-    <table id="lateorders">
+    <table id="lateorders" class="display">
         <thead>
             <tr>
                 <th>Order Date</th>
