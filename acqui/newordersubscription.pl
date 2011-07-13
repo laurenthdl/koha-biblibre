@@ -56,7 +56,7 @@ my ($bookseller) = GetBookSellerFromId($booksellerid);
 
 my @subscriptions;
 if ($searched) {
-    @subscriptions = SearchSubscriptions($title, $ISSN, $EAN, $publisher, $supplier, $branch);
+    @subscriptions = SearchSubscriptions($biblionumber, $title, $ISSN, $EAN, $publisher, $supplier, $branch);
 }
 
 foreach my $sub (@subscriptions) {

@@ -661,9 +661,9 @@ sub GetSubscriptions {
 
 =head2 SearchSubscriptions
 
-@results = SearchSubscriptions($title, $issn, $ean, $publisher, $supplier, $branch, $minold, $maxold);
+@results = SearchSubscriptions($biblionumber, $title, $issn, $ean, $publisher, $supplier, $branch, $minold, $maxold);
 
-this function gets all subscriptions which have title like $title, ISSN like $issn, EAN like $ean, publisher like $publisher, supplier like $supplier AND branchcode eq $branch.
+this function gets all subscriptions which have biblionumber eq $biblionumber, title like $title, ISSN like $issn, EAN like $ean, publisher like $publisher, supplier like $supplier AND branchcode eq $branch.
 $minold and $maxold are values in days. It allows to get active and inactive subscription apart.
 
 return:
@@ -672,7 +672,7 @@ a table of hashref. Each hash containt the subscription.
 =cut
 
 sub SearchSubscriptions {
-    my ($title, $issn, $ean, $publisher, $supplier, $branch, $minold, $maxold) = @_;
+    my ($biblionumber, $title, $issn, $ean, $publisher, $supplier, $branch, $minold, $maxold) = @_;
 
     my $query = qq{
         SELECT subscription.*, subscriptionhistory.*, biblio.*, biblioitems.issn
@@ -684,6 +684,10 @@ sub SearchSubscriptions {
     };
     my @where_strs;
     my @where_args;
+    if($biblionumber){
+        push @where_strs, "subscription.biblionumber = ?";
+        push @where_args, "$biblionumber";
+    }
     if($title){
         push @where_strs, "biblio.title LIKE ?";
         push @where_args, "%$title%";
