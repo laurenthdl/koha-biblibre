@@ -371,12 +371,12 @@ sub GetBudgetPermDropbox {
     my %labels;
     $labels{'0'} = 'None';
     $labels{'1'} = 'Owner';
-    $labels{'2'} = 'Library';
+    $labels{'2'} = 'Owner + Users + Library';
     $labels{'3'} = 'Owner + Users';
     my $radio = CGI::scrolling_list(
         -id      => 'budget_permission',
         -name    => 'budget_permission',
-        -values  => [ '0', '1', '2', '3' ],
+        -values  => [ '0', '1', '3', '2' ],
         -default => $perm,
         -labels  => \%labels,
         -size    => 1,
