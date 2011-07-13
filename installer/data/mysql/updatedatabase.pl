@@ -6180,6 +6180,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.040";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numFacetsDisplay','100','Specify the maximum number of facets to display for an index','','Integer');");
+    print "Upgrade to $DBversion done (Add System Preferences numFacetsDisplay)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.041";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("DROP TABLE IF EXISTS `invoices`");

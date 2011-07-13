@@ -82,29 +82,8 @@ if ( $op eq "do_search" && $query ) {
     my $filters = { recordtype => 'biblio' };
     $$filters{$itype_indexname} = $itemtypelimit if $itemtypelimit;
 
-    my $sort_by = join(' ', grep { defined } (
-        C4::Search::Query::getIndexName(C4::Context->preference('defaultSortField'))
-                                      , C4::Context->preference('defaultSortOrder') ) );
-    $query = C4::Search::Query->normalSearch($query);
-    my $res = SimpleSearch( $query, $filters, $page, $count, $sort_by);
-    my @results;
-    my $title_indexname = C4::Search::Query::getIndexName('title');
-    my $author_indexname = C4::Search::Query::getIndexName('author');
-    my $publisher_indexname = C4::Search::Query::getIndexName('publisher');
-    my $publicationyear_indexname = C4::Search::Query::getIndexName('pubdate');
-    my $issn_indexname = C4::Search::Query::getIndexName('issn');
-
-    for my $searchresult ( @{ $res->items } ) {
-        my $biblio = {
-            title => $$searchresult{values}{$title_indexname},
-            author => $$searchresult{values}{$author_indexname},
-            publisher => $$searchresult{values}{$publisher_indexname},
-            publicationyear => C4::Dates->new($$searchresult{values}{$publicationyear_indexname}, 'iso')->output(),
-            issn => $$searchresult{values}{$issn_indexname},
-            biblionumber => $$searchresult{values}{recordid},
-        };
-        push @results, $biblio;
-    }
+    my $res = SimpleSearch( $query, $filters, $page, $count);
+    my @results = map { GetBiblioData $_->{'values'}->{'recordid'} } @{ $res->items };
 
     my $pager = Data::Pagination->new(
         $res->{'pager'}->{'total_entries'},
