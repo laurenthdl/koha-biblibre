@@ -95,6 +95,8 @@ if ( $op eq "action" ) {
     my @subfields = $input->param('subfield');
     my @values    = $input->param('field_value');
     my @disabled  = $input->param('disable_input');
+    warn Data::Dumper::Dumper \@values;
+    exit 1;
     
     # build indicator hash.
     my @ind_tag   = $input->param('ind_tag');

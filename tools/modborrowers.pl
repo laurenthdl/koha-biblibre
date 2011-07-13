@@ -17,13 +17,15 @@
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+use Modern::Perl;
 use CGI;
 use C4::Auth;
 use C4::Branch;
+use C4::Koha;
 use C4::Members;
-use C4::Members::Attributes qw(GetBorrowerAttributes);
+use C4::Members::Attributes qw(GetBorrowerAttributes UpdateBorrowerAttribute DeleteBorrowerAttribute);
 use C4::Output;
-use Modern::Perl;
+use List::MoreUtils qw /any/;
 
 my $input = new CGI;
 my $op = $input->param('op') || 'show_form';
@@ -62,7 +64,6 @@ if ( $op eq 'show' ) {
     }
 
     my $max_nb_attr = 0;
-    my $attributes = C4::Members::Attributes::GetBorrowerAttributes(10);
     foreach my $cardnumber (@cardnumbers) {
         my $borrower = GetMember( cardnumber => $cardnumber );
         if ( $borrower ) {
@@ -86,7 +87,9 @@ if ( $op eq 'show' ) {
         }
     }
 
+    my @patron_attributes_option;
     for my $borrower ( @borrowers ) {
+        push @patron_attributes_option, { value => "$$_{code}", lib => $$_{code} } for @{ $$borrower{patron_attributes} };
         my $length = scalar( @{ $$borrower{patron_attributes} } );
         push @{ $$borrower{patron_attributes} }, {} for ( $length .. $max_nb_attr - 1);
     }
@@ -100,25 +103,34 @@ if ( $op eq 'show' ) {
     $template->param( notfoundcardnumbers => map { { cardnumber => $_ } } @notfoundcardnumbers )
         if @notfoundcardnumbers;
 
-    my @branches = GetBranchesLoop;
-    push my @branches_option, { value => $$_{branchcode}, lib => $$_{branchname} } for @branches;
+    my $branches = GetBranchesLoop;
+    my @branches_option;
+    push @branches_option, { value => $$_{branchcode}, lib => $$_{branchname} } for @$branches;
+    unshift @branches_option, { value => "", lib => "" };
     my $branchcategories = GetBranchCategories;
-    push my @branchcategories_option, { value => $$_{categorycode}, lib => $$_{categoryname} } for @branchcategories;
-    my @Bsort1 = GetAuthorisedValues("Bsort1");
-    push my @sort1_option, { value => $$_{authorised_valued}, lib => $$_{lib} } for @bSort1;
-    my @Bsort2 = GetAuthorisedValues("Bsort2");
-    push my @sort2_option, { value => $$_{authorised_valued}, lib => $$_{lib} } for @bsort2;
+    my @branchcategories_option;
+    push @branchcategories_option, { value => $$_{categorycode}, lib => $$_{categoryname} } for @$branchcategories;
+    unshift @branchcategories_option, { value => "", lib => "" };
+    my $bsort1 = GetAuthorisedValues("Bsort1");
+    my @sort1_option;
+    push @sort1_option, { value => $$_{authorised_value}, lib => $$_{lib} } for @$bsort1;
+    unshift @sort1_option, { value => "", lib => "" };
+    my $bsort2 = GetAuthorisedValues("Bsort2");
+    my @sort2_option;
+    push @sort2_option, { value => $$_{authorised_value}, lib => $$_{lib} } for @$bsort2;
+    unshift @sort2_option, { value => "", lib => "" };
+
     my @fields = (
         {
             name => "surname",
             lib  => "Surname",
-            type => "text"
+            type => "text",
         }
         ,
         {
             name => "firstname",
             lib  => "Firstname",
-            type => "text"
+            type => "text",
         }
         ,
         {
@@ -152,36 +164,82 @@ if ( $op eq 'show' ) {
         {
             name => "dateenrolled",
             lib  => "Date enrolled",
-            type => "text"
+            type => "date",
         }
         ,
         {
             name => "dateexpiry",
             lib  => "Date expiry",
-            type => "text"
+            type => "date",
         }
         ,
         {
             name => "debarred",
             lib  => "Debarred",
-            type => "text"
+            type => "date",
         }
         ,
         {
             name => "debarredcomment",
             lib  => "Debarred comment",
-            type => "text"
+            type => "text",
         }
         ,
         {
             name => "notes",
             lib  => "Notes",
-            type => "text"
+            type => "text",
         }
-        ,
     );
+
+    $template->param('patron_attributes', \@patron_attributes_option);
+
     $template->param( 'fields' => \@fields );
+    $template->param( DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar() );
     my $op = "show";
+}
+
+if ( $op eq 'action' ) {
+
+    my @disabled = $input->param('disable_input');
+    warn Data::Dumper::Dumper \@disabled;
+    my $infos;
+    for my $field ( qw/surname firstname branchcode categorycode sort1 sort2 dateenrolled dateexpiry debarred debarredcomment notes/ ) {
+        my $value = $input->param($field);
+        $$infos{$field} = $value if $value;
+        $$infos{$field} = "" if grep { /^$field$/ } @disabled;
+    }
+
+    my @attributes = $input->param('patron_attributes');
+    my @attr_values = $input->param('patron_attributes_value');
+
+    my @borrowernumbers = $input->param('borrowernumber');
+    for my $borrowernumber ( @borrowernumbers ) {
+        $$infos{borrowernumber} = $borrowernumber;
+        warn "Update borrower $borrowernumber with";
+        warn Data::Dumper::Dumper $infos;
+        ModMember(%$infos);
+
+        my $i=0;
+        for ( @attributes ) {
+            my $attribute;
+            $$attribute{code} = $_;
+            $$attribute{attribute} = $attr_values[$i];
+            my $valuename = "attr" . $i . "_value";
+            if ( grep { /^$valuename$/ } @disabled ) {
+                warn "Delete attribute for $borrowernumber";
+                warn Data::Dumper::Dumper $attribute;
+                DeleteBorrowerAttribute $borrowernumber, $attribute;
+            } else {
+                warn "Update attribute for $borrowernumber";
+                warn Data::Dumper::Dumper $attribute;
+                UpdateBorrowerAttribute $borrowernumber, $attribute;
+            }
+            $i++;
+        }
+
+
+    }
 }
 
 $template->param(
