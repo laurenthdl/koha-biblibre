@@ -319,18 +319,18 @@ $template->param('filters' => \@tplfilters );
 my $limit_yr = $cgi->param('limit-yr');
 if ( $limit_yr ) {
     my $op;
-    my $pubdate_indexname = C4::Search::Query::getIndexName('pubdate');    
+    my $pubdate_indexname = C4::Search::Query::getIndexName('pubdate');
     if ( $limit_yr =~ /\d{4}-\d{4}/ ) {
         my ( $yr1, $yr2 ) = split( /-/, $limit_yr );
-        $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $yr1 ) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate( $yr2 ) . '"]';
+        $op = "[$yr1 TO $yr2]";
     } elsif ( $limit_yr =~ /-\d{4}/ ) {
         $limit_yr =~ /-(\d{4})/;
-        $op = '[* TO "' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '"]';
+        $op = "[* TO $1]";
     } elsif ( $limit_yr =~ /\d{4}-/ ) {
         $limit_yr =~ /(\d{4})-/;
-        $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '" TO *]';
+        $op = "[$1 TO *]";
     } elsif ( $limit_yr =~ /\d{4}/ ) {
-        $op = '"' . C4::Search::Engine::Solr::NormalizeDate( $limit_yr ) . '"';
+        $op = $limit_yr;
     } else {
         #FIXME: Should return a error to the user, incorect date format specified
     }
