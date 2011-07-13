@@ -140,19 +140,7 @@ function dt_overwrite_string_sorting_localeCompare() {
 }
 
 function dt_add_type_totalcost() {
-  jQuery.fn.dataTableExt.aTypes.unshift(
-    function ( sData )
-    {
-      sData = sData.replace(/\s\s+/g, " ");
-      if (sData.match(/(\d+\.\d+)x(\d+) = (\d+\.\d+) <p.*>(.*)<\/p>/))
-      {
-        return 'totalcost';
-      }
-      return null;
-    }
-  );
-
-  jQuery.fn.dataTableExt.oSort['totalcost-asc']  = function(a,b) {
+  function totalcost_sort(a,b) {
     a = a.replace(/\s+/g, " ");
     b = b.replace(/\s+/g, " ");
     var re = /(\d+\.\d+)x(\d+) = (\d+\.\d+) <p.*>(.*)<\/p>/;
@@ -178,61 +166,29 @@ function dt_add_type_totalcost() {
     }
 
     return r;
+  }
+
+  jQuery.fn.dataTableExt.oSort['totalcost-asc'] = function(a,b) {
+    return totalcost_sort(a,b);
   };
 
   jQuery.fn.dataTableExt.oSort['totalcost-desc'] = function(a,b) {
-    a = a.replace(/\s+/g, " ");
-    b = b.replace(/\s+/g, " ");
-    var re = /(\d+\.\d+)x(\d+) = (\d+\.\d+) <p.*>(.*)<\/p>/;
-    a.match(re);
-    var a_ecost = RegExp.$1 * 1;
-    var a_qty = RegExp.$2 * 1;
-    var a_total = RegExp.$3 * 1;
-    var a_budget = RegExp.$4;
-    b.match(re);
-    var b_ecost = RegExp.$1 * 1;
-    var b_qty = RegExp.$2 * 1;
-    var b_total = RegExp.$3 * 1;
-    var b_budget = RegExp.$4;
-
-    var r = (b_total > a_total) ? 1 : ((b_total < a_total) ? -1 : 0);
-
-    if(r == 0){
-      if(typeof(b_budget.localeCompare == "function")){
-        r = b_budget.localeCompare(a_budget);
-      }else{
-        r = (b_budget > a_budget) ? 1 : ((b_budget < a_budget) ? -1 : 0);
-      }
-    }
-
-    return r;
+    return totalcost_sort(b,a);
   };
 }
 
 function dt_add_type_htmlbasketno() {
-  jQuery.fn.dataTableExt.aTypes.unshift(
-    function ( sData )
-    {
-      sData = sData.replace(/\s\s+/g, " ");
-      if (sData.match(/<.*basketno.*>\d+<\/.*>/))
-      {
-        return 'htmlbasketno';
-      }
-      return null;
-    }
-  );
+  function htmlbasketno_sort(a, b) {
+    a = a.replace(/\s+/g, " ");
+    b = b.replace(/\s+/g, " ");
 
-  jQuery.fn.dataTableExt.oSort['htmlbasketno-asc']  = function(a,b) {
-    a = a.replace(/\s\s+/g, " ").replace(/<.*?>/g, "");
-    b = b.replace(/\s\s+/g, " ").replace(/<.*?>/g, "");
-
-    var re = /(\d+) (.*)/;
+    var re = /<.*?basketno=.*?>(\d+)<.*?> (.*)/;
     a.match(re);
     var a_basketno = RegExp.$1 * 1;
-    var a_string = RegExp.$2;
+    var a_string = RegExp.$2.replace(/<.*?>/g, "");
     b.match(re);
     var b_basketno = RegExp.$1 * 1;
-    var b_string = RegExp.$2;
+    var b_string = RegExp.$2.replace(/<.*?>/g, "");
 
     var r = (a_basketno > b_basketno) ? 1 : ((a_basketno < b_basketno) ? -1 : 0);
 
@@ -247,28 +203,11 @@ function dt_add_type_htmlbasketno() {
     return r;
   }
 
-  jQuery.fn.dataTableExt.oSort['htmlbasketno-desc']  = function(a,b) {
-    a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
-    b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+  jQuery.fn.dataTableExt.oSort['htmlbasketno-asc'] = function(a,b) {
+      return htmlbasketno_sort(a,b);
+  };
 
-    var re = /(\d+) (.*)/;
-    a.match(re);
-    var a_basketno = RegExp.$1 * 1;
-    var a_string = RegExp.$2;
-    b.match(re);
-    var b_basketno = RegExp.$1 * 1;
-    var b_string = RegExp.$2;
-
-    var r = (b_basketno > a_basketno) ? 1 : ((b_basketno < a_basketno) ? -1 : 0);
-
-    if(r == 0) {
-      if(typeof(b_string.localeCompare == "function")){
-        r = b_string.localeCompare(a_string);
-      }else{
-        r = (b_string > a_string) ? 1 : ((b_string < a_string) ? -1 : 0);
-      }
-    }
-
-    return r;
-  }
+  jQuery.fn.dataTableExt.oSort['htmlbasketno-desc'] = function(a,b) {
+      return htmlbasketno_sort(b,a);
+  };
 }
