@@ -20,12 +20,24 @@ my $VERSIONS_DIRNAME = 'versions';
 my $VERSIONS_PATH = $script_dir . '/' . $VERSIONS_DIRNAME;
 
 if ( $version ) {
-    my @files = <$VERSIONS_PATH/$version(.pl)*>;
+    my @files = <$VERSIONS_PATH/$version*>;
     if ( scalar @files != 1 ) {
         warn "This version ($version) returned more than one file (or any) corresponding!";
         exit 2;
     }
-    print "$_\n" for @files;
+    my @file_infos = fileparse($files[0], qr/\.[^.]*/);
+    my $extension = $file_infos[2];
+    given ( $extension ) {
+        when ( /.sql/ ) {
+
+        }
+        when ( /.pl/ ) {
+
+        }
+        default {
+            warn "This extension ($extension) is not take into account (only .pl or .sql)";
+        }
+    }
 }
 
 if ( $list ) {
