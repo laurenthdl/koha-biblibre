@@ -59,6 +59,7 @@ C4::Reserves - Koha functions for dealing with reservation.
   - priority >0      : then the reserve is at 1st stage, and not yet affected to any item.
              =0      : then the reserve is being dealed
   - found : NULL       : means the patron requested the 1st available, and we haven't choosen the item
+                         (if firstavailable branch is not null, we'll check only for this branch)
             W(aiting)  : the reserve has an itemnumber affected, and is on the way
             F(inished) : the reserve has been completed, and is done
   - itemnumber : empty : the reserve is still unaffected to an item
@@ -114,6 +115,7 @@ BEGIN {
       &ModReserveFill
       &ModReserveAffect
       &ModReserve
+      &ModReserveLibrary
       &ModReserveStatus
       &ModReserveCancelAll
       &ModReserveMinusPriority
@@ -136,12 +138,12 @@ BEGIN {
 
 =item AddReserve
 
-    AddReserve($branch,$borrowernumber,$biblionumber,$constraint,$bibitems,$priority,$resdate,$expdate,$notes,$title,$checkitem,$found)
+    AddReserve($branch,$borrowernumber,$biblionumber,$constraint,$bibitems,$priority,$resdate,$expdate,$notes,$title,$checkitem,$found, $firstavailablebranch)
 
 =cut
 
 sub AddReserve {
-    my ( $branch, $borrowernumber, $biblionumber, $constraint, $bibitems, $priority, $resdate, $expdate, $notes, $title, $checkitem, $found ) = @_;
+    my ( $branch, $borrowernumber, $biblionumber, $constraint, $bibitems, $priority, $resdate, $expdate, $notes, $title, $checkitem, $found, $firstavailablebranch ) = @_;
     my $fee   = GetReserveFee( $borrowernumber, $biblionumber, $constraint, $bibitems );
     my $dbh   = C4::Context->dbh;
     my $const = lc substr( $constraint, 0, 1 );
@@ -182,13 +184,14 @@ sub AddReserve {
     my $query = qq/
         INSERT INTO reserves
             (borrowernumber,biblionumber,reservedate,branchcode,constrainttype,
-            priority,reservenotes,itemnumber,found,waitingdate,expirationdate)
+            priority,reservenotes,itemnumber,found,waitingdate,expirationdate, firstavailablebranch)
         VALUES
              (?,?,?,?,?,
-             ?,?,?,?,?,?)
+             ?,?,?,?,?,?,?)
     /;
     my $sth = $dbh->prepare($query);
-    $sth->execute( $borrowernumber, $biblionumber, $resdate, $branch, $const, $priority, $notes, $checkitem, $found, $waitingdate, $expdate );
+    $branch = undef if ($branch eq ''); # So it's null and constraint on the branches table does not fail
+    $sth->execute( $borrowernumber, $biblionumber, $resdate, $branch, $const, $priority, $notes, $checkitem, $found, $waitingdate, $expdate, $firstavailablebranch );
 
     # Send e-mail to librarian if syspref is active
     if ( C4::Context->preference("emailLibrarianWhenHoldIsPlaced") ) {
@@ -1166,6 +1169,19 @@ sub ModReserve {
     }
 }
 
+
+sub ModReserveLibrary {
+    my ($reservenumber, $branchcode, $firstavailablebranch) = @_;
+    my $dbh = C4::Context->dbh;
+
+    my $query = "UPDATE reserves SET branchcode=?, firstavailablebranch=? WHERE reservenumber=?";
+    warn "ModReserve $query $reservenumber $branchcode $firstavailablebranch";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($branchcode, $firstavailablebranch, $reservenumber);
+    $sth->finish;
+
+}
+
 =item ModReserveFill
 
   &ModReserveFill($reserve);
@@ -1275,6 +1291,7 @@ take care of the waiting status
 
 sub ModReserveAffect {
     my ( $itemnumber, $borrowernumber,$transferToDo, $reservenumber ) = @_;
+    warn 'ModReserveAffect';
     my $dbh = C4::Context->dbh;
     # we want to attach $itemnumber to $borrowernumber, find the biblionumber
     # attached to $itemnumber
@@ -1289,7 +1306,7 @@ sub ModReserveAffect {
 
     # If we affect a reserve that has to be transfered, don't set to Waiting
     my $query;
-    if ($transferToDo) {
+    if ($transferToDo and not C4::Context->preference('OPACHoldNextInLibrary')) {
         $query = "
         UPDATE reserves
         SET    priority = 0,
@@ -1326,6 +1343,7 @@ sub ModReserveAffect {
         my $calendar = C4::Calendar->new( branchcode => $branch);
         my $holdexpdate  = $calendar->addDate($holdstartdate, $holdperiod);
         my $sqlexpdate = $holdexpdate->output('iso');
+
         $query = "
             UPDATE reserves
             SET     priority = 0,
@@ -1753,6 +1771,7 @@ sub _Findgroupreserve {
                reserves.reservenotes AS reservenotes,
                reserves.priority AS priority,
                reserves.timestamp AS timestamp,
+               reserves.firstavailablebranch AS fistavailablebranch,
                biblioitems.biblioitemnumber AS biblioitemnumber,
                reserves.itemnumber          AS itemnumber
         FROM reserves
@@ -1784,6 +1803,7 @@ sub _Findgroupreserve {
                reserves.reservenotes AS reservenotes,
                reserves.priority AS priority,
                reserves.timestamp AS timestamp,
+               reserves.firstavailablebranch AS fistavailablebranch,
                biblioitems.biblioitemnumber AS biblioitemnumber,
                reserves.itemnumber          AS itemnumber
         FROM reserves
@@ -1814,6 +1834,7 @@ sub _Findgroupreserve {
                reserves.reservenotes AS reservenotes,
                reserves.priority AS priority,
                reserves.timestamp AS timestamp,
+               reserves.firstavailablebranch AS firstavailablebranch,
                reserveconstraints.biblioitemnumber AS biblioitemnumber,
                reserves.itemnumber                 AS itemnumber
         FROM reserves
@@ -1826,10 +1847,15 @@ sub _Findgroupreserve {
           AND (reserves.itemnumber IS NULL OR reserves.itemnumber = ?)
           AND reserves.reservedate <= CURRENT_DATE()
     /;
+
     $sth = $dbh->prepare($query);
     $sth->execute( $biblio, $bibitem, $itemnumber );
     @results = ();
+    my $itemdata = GetItem($itemnumber);
     while ( my $data = $sth->fetchrow_hashref ) {
+    warn Data::Dumper::Dumper($data);
+    warn $data->{'firstavailablebranch'} . " -> " .  $itemdata->{'holdingbranch'};
+        next if ($data->{'firstavailablebranch'} and ($data->{'firstavailablebranch'} ne $itemdata->{'holdingbranch'}));
         push( @results, $data );
     }
     return @results;
