@@ -248,15 +248,15 @@ foreach my $r ( @{$budgets} ) {
         } elsif ( $r->{budget_permission} == 2
           && defined $r->{budget_branchcode}
           && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode}
-          && $budget->{'budget_owner_id'} != $loggedinuser )
+          && $r->{'budget_owner_id'} != $loggedinuser )
         {
-            my $budgetusers = GetUsersFromBudget($budget->{'budget_id'});
+            my $budgetusers = GetUsersFromBudget($r->{'budget_id'});
             if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}){
                 next;
             }
         # Restricted to owner + users
         } elsif ( $r->{budget_permission} == 3
-          && $budget->{'budget_owner_id'} != $loggedinuser )
+          && $r->{'budget_owner_id'} != $loggedinuser )
         {
             my $budgetusers = GetUsersFromBudget( $r->{budget_id} );
             if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}){
