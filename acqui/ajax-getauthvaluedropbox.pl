@@ -52,6 +52,7 @@ my $name = $input->param('name');
 my $category = $input->param('category');
 my $default = $input->param('default');
 
+binmode STDOUT, ":utf8";
 print $input->header(-type => 'text/plain', -charset => 'UTF-8');
 print GetAuthvalueDropbox($name, $category, $default);
 
