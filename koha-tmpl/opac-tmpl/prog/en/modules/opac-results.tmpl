@@ -463,6 +463,9 @@ $(document).ready(function(){
                     </a>
                     <!-- TMPL_IF NAME="BakerTaylorEnabled" --><!-- TMPL_IF NAME="normalized_isbn" --><a href="https://<!-- TMPL_VAR name="BakerTaylorBookstoreURL" ESCAPE="HTML" --><!-- TMPL_VAR name="normalized_isbn" -->"><img alt="See Baker &amp; Taylor" src="<!-- TMPL_VAR name="BakerTaylorImageURL" ESCAPE="HTML" --><!-- TMPL_VAR name="normalized_isbn" -->" /></a><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF -->
 				</td>
+                  <!-- TMPL_IF NAME='ocoins' -->
+                    <span class="Z3988" title="<!-- TMPL_VAR NAME='ocoins' -->"></span>
+                  <!-- /TMPL_IF -->
                 </tr>
                 <!-- /TMPL_LOOP -->
                 </tbody>
