@@ -1912,6 +1912,8 @@ sub getItemsInfos {
         $biblio->{'OPACXSLTResultsRecord'} = XSLTParse4Display( $biblionumber, $marcrecord, C4::Context->preference("OPACXSLTResultsDisplay") );
     }
 
+    $biblio->{'ocoins'} = GetCOinSBiblio($biblionumber);
+
     return $biblio;
  
 }

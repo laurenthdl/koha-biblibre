@@ -381,6 +381,9 @@ function GetZ3950Terms(){
                                 <a class="reserve" id="reserve_<!-- TMPL_VAR NAME="biblionumber" -->" href="/cgi-bin/koha/reserve/request.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->">Holds</a>
                             <!-- /TMPL_IF -->
                         <!-- /TMPL_IF --><!-- end of no xslt block -->
+                        <!-- TMPL_IF NAME='ocoins' -->
+                          <span class="Z3988" title="<!-- TMPL_VAR NAME='ocoins' -->"></span>
+                        <!-- /TMPL_IF -->
                     </td>
 
                     <td>
