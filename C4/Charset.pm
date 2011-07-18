@@ -42,6 +42,7 @@ BEGIN {
       StripNonXmlChars
       nsb_clean
       nsb_rm_content
+      SanitizeEntity
     );
 }
 
@@ -1233,6 +1234,52 @@ sub nsb_rm_content {
 
 }
 
+=head2 SanitizeEntity
+
+=over 4
+
+SanitizeEntity($record);
+
+=back
+
+Removes HTML Entities from record
+
+=cut
+
+sub SanitizeEntity {
+    my $record = shift;
+
+    foreach my $field ($record->fields()) {
+        if ($field->is_control_field()) {
+            $field->update(entity_clean($field->data()));
+        } else {
+            my @subfields = $field->subfields();
+            my @new_subfields;
+            foreach my $subfield (@subfields) {
+                push @new_subfields, $subfield->[0] => entity_clean($subfield->[1]);
+            }
+            if (scalar(@new_subfields) > 0) {
+                my $new_field;
+                eval {
+                    $new_field = MARC::Field->new($field->tag(), $field->indicator(1), $field->indicator(2), @new_subfields);
+                };
+                if ($@) {
+                    $debug && warn "error : $@";
+                } else {
+                    $field->replace_with($new_field);
+                }
+
+            }
+        }
+    }
+    return $record;
+}
+
+sub entity_clean {
+    my $string=shift;
+    $string=~s/(&)(amp;)+/$1/g;
+    return $string;
+}
 
 1;
 
