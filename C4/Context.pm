@@ -352,6 +352,7 @@ sub new {
     $self->{"stopwords"}         = undef;    # stopwords list
     $self->{"marcfromkohafield"} = undef;    # the hash with relations between koha table fields and MARC field/subfield
     $self->{"userenv"}           = undef;    # User env
+    $self->{"sysprefs"}          = undef;    # User env
     $self->{"activeuser"}        = undef;    # current active user
     $self->{"shelves"}           = undef;
 
@@ -499,8 +500,8 @@ sub preference {
     my $var  = shift;    # The system preference to return
 
     $var=lc($var);
-    if ( exists $sysprefs{$var} ) {
-        return $sysprefs{$var};
+    if ( defined $context->{'sysprefs'} ) {
+        return $context->{'sysprefs'}->{$var};
     }
 
     my $dbh = C4::Context->dbh or return 0;
@@ -514,6 +515,7 @@ END_SQL
     $sysprefs_arrayref = $dbh->selectcol_arrayref( $sql, { Columns => [ 1, 2 ] } );
     return unless $sysprefs_arrayref;
     %sysprefs = @$sysprefs_arrayref;
+    $context->{'sysprefs'}=\%sysprefs;
     return $sysprefs{$var};
 }
 
