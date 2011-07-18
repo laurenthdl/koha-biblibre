@@ -90,7 +90,7 @@ my $warnings;
 my $messages;
 
 my $date   = C4::Dates->today('iso');
-my $action = $input->param('action');
+my $action = $input->param('action') ||'';
 
 if ( $action eq 'move' ) {
     my $where          = $input->param('where');
@@ -137,9 +137,9 @@ if ($cardnumber) {
     #   we check the reserves of the borrower, and if he can reserv a document
     # FIXME At this time we have a simple count of reservs, but, later, we could improve the infos "title" ...
 
-    my $number_reserves = GetReserveCount( $borrowerinfo->{'borrowernumber'} );
+    my $number_reserves = GetReserveCount( $borrowerinfo->{'borrowernumber'},"*","*" );
 
-    if ( not CanBookBeReserved( $borrowerinfo->{borrowernumber}, $input->param('biblionumber') ) ) {
+    if ( not CanBookBeReserved( $borrowerinfo->{borrowernumber}, $input->param('biblionumber')) ) {
         $warnings    = 1;
         $maxreserves = 1;
     }
@@ -223,7 +223,7 @@ foreach my $biblionumber (@biblionumbers) {
 
     my $dat = GetBiblioData($biblionumber);
 
-     my ($canBookBeReserve, $current_reserve_count, $max_reserve_allowed )= CanBookBeReserved( $borrowerinfo->{borrowernumber}, $biblionumber );
+     my ($canBookBeReserve, $current_reserve_count, $max_reserve_allowed )= CanBookBeReserved( $borrowerinfo->{borrowernumber}, $biblionumber);
     if ( not $canBookBeReserve ) {
         $warnings    = 1;
         $maxreserves = 1;
@@ -406,11 +406,11 @@ foreach my $biblionumber (@biblionumbers) {
                 }
             }
 
-            my $branchitemrule = GetIssuingRule( $borrowerinfo->{categorycode}, $item->{'itype'}, GetReservesControlBranch( $borrowerinfo, $item ) );
+            my $branchitemrule = GetIssuingRule( $borrowerinfo->{categorycode}, $item->{'itype'}, GetReservesControlBranch( $borrowerinfo, $item )  );
             my $policy_holdrestricted = $branchitemrule->{'reservesallowed'};
             # prevent item to be reserved if holdrestricted & branch not the librarian branch & syspref to override not set
             $item->{'holdrestricted'} = $branchitemrule->{'holdrestricted'} && (C4::Context->userenv->{branch} ne $item->{homebranch}) && !C4::Context->preference('AllowHoldPolicyOverride');
-            if ( IsAvailableForItemLevelRequest($itemnumber) and not $item->{cantreserve} and CanItemBeReserved( $borrowerinfo->{borrowernumber}, $itemnumber ) ) {
+            if ( IsAvailableForItemLevelRequest($itemnumber) and not $item->{cantreserve} and CanItemBeReserved( $borrowerinfo->{borrowernumber}, $itemnumber, GetReservesControlBranch( $borrowerinfo, $item ) ) ) {
                 if ( not $policy_holdrestricted and C4::Context->preference('AllowHoldPolicyOverride') ) {
                     $item->{override} = 1;
                     $num_override++;
