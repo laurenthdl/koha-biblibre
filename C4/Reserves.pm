@@ -22,6 +22,7 @@ package C4::Reserves;
 use strict;
 
 #use warnings; FIXME - Bug 2505
+use 5.010;
 use Date::Calc qw( Add_Delta_Days Time_to_Date Today);
 use C4::Context;
 use C4::Biblio;
@@ -494,12 +495,19 @@ $error = &CanBookBeReserved($borrowernumber, $biblionumber)
 sub CanBookBeReserved {
     my ( $borrowernumber, $biblionumber ) = @_;
 
-    my @items = GetItemsInfo($biblionumber);
-    my ($toomanyReserves, $current_reserve_count, $max_reserve_allowed) = TooManyReseserves( $borrowernumber, '*' );
-    
-    return 0, $current_reserve_count, $max_reserve_allowed if ($toomanyReserves);
-    
-    return 1;  
+    my @items = C4::Items::GetItemsInfo($biblionumber);
+    my ($currentreserves,$maxreservesallowed);
+    for my $item (@items){
+	my @list=CanItemBeReserved($borrowernumber,$item->{itemnumber});
+	if ($list[0]==1){
+	    return 1;
+	}
+	else {
+		$currentreserves=$list[1] if ($list[1]>$currentreserves);
+		$maxreservesallowed=$list[2] if ($list[2]<$maxreservesallowed and $maxreservesallowed>0);
+	}
+    }
+    return 0,$currentreserves,$maxreservesallowed;
 }
 
 =item CanItemBeReserved
@@ -513,50 +521,36 @@ this function return 1 if an item can be issued by this borrower.
 sub CanItemBeReserved {
     my ( $borrowernumber, $itemnumber ) = @_;
 
-    my $dbh             = C4::Context->dbh;
     
     my $branchfield;
-    my $branchcode;
-       
-	
+
     # we retrieve borrowers and items informations #
     my $item     = C4::Items::GetItem($itemnumber);
-    my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber); 
-    
-    
-    $branchcode = GetReservesControlBranch($borrower,$item);
-    
-    my $branchfield=C4::Context->preference("HomeOrHoldingBranch")||"homebranch";
-    
-    my $cat_borrower = $borrower->{'categorycode'};    
-    
-
-
-    my $itype = ( C4::Context->preference('item-level_itypes') )
-      ? $item->{'itype'}        # item-level
-      : $item->{'itemtype'};    # biblio-level
-
-
+    my $borrower = C4::Members::GetMember('borrowernumber'=>$borrowernumber);     
+    my $branchcode  = GetReservesControlBranch($borrower,$item);
+    my $itype = $item->{'itype'}     ;    # biblio-level 
     
     # We see if he have right or not to reserve this item(Y or N), we don't care about the number of reserves allowed
     # if he have no rule set, he have not right
-    my $issuingrule = GetIssuingRule($cat_borrower, $itype, $branchcode);
-  
-    my ($reserves_total_rule) = GetReserveIssueRuleCount($borrower, $issuingrule, $branchcode);
-   
-    
-    return 0 if( (defined $issuingrule->{reservesallowed} && not $issuingrule->{reservesallowed}) or $reserves_total_rule >= $issuingrule->{'reservesallowed'}   ); 
+    my $return=1;
+    my @test_branches=(((C4::Context->preference('ReservesControlBranch') eq 'PatronLibrary')?():$branchcode),'*');
+    for my $branch (@test_branches) {
+        for my $type ( $itype, '*' ) {
+            my $issuingrule = GetIssuingRule($borrower->{categorycode}, $type, $branch);
+            my $reservecount = GetReserveCount($borrowernumber,$type,$branch);
+            return 0, $reservecount,$issuingrule->{reservesallowed} if( defined $issuingrule->{reservesallowed} && not $issuingrule->{reservesallowed} ); 
+            # We retrieve the count of reserves allowed for this category code
 
-    return 0 if ($issuingrule->{holdrestricted} == 1 && ($branchcode ne $borrower->{branchcode})); 		
-    
-     if (!$issuingrule->{allowonshelfholds}){
-            	
-          return 0 if (!$item->{onloan} or not defined ($item->{onloan}));
-          return 0 if (GetReserveStatus($itemnumber) eq "W");
-     }
-     return 0 if TooManyReseserves( $borrowernumber, $branchcode );
-     
-	return 1;
+            return 0 , $reservecount,$issuingrule->{holdrestricted} if (($issuingrule->{holdrestricted}== 1 ) && ($branchcode ne $borrower->{branchcode}));
+
+            if( $reservecount >= $issuingrule->{reservesallowed} ){
+                $debug && warn " Issuingrule qui bloque : cat type branch max",@$issuingrule{qw(categorycode itemtype branchcode reservesallowed)};
+                return 0, $reservecount,$issuingrule->{reservesallowed};
+            }
+        }
+    }
+    return $return;
+    # we check if it's ok or not
 }
 
 =item GetMaxPickupDelay
@@ -573,64 +567,13 @@ sub GetMaxPickupDelay {
     my $dbh             = C4::Context->dbh;
     my $allowedreserves = 0;
 
-    my $itype = C4::Context->preference('item-level_itypes') ? "itype" : "itemtype";
 
     # we retrieve borrowers and items informations #
     my $item          = C4::Items::GetItem($itemnumber);
     my $borrower      = C4::Members::GetMember( 'borrowernumber' => $borrowernumber );
     my $controlbranch = GetReservesControlBranch( $borrower, $item );
 
-    # we retrieve user rights on this itemtype and branchcode
-    my $sth = $dbh->prepare(
-        "SELECT holdspickupdelay 
-                    FROM issuingrules 
-                    WHERE categorycode=? 
-                    AND itemtype=?
-                    AND branchcode=?
-                    AND holdspickupdelay IS NOT NULL"
-    );
-
-    my $itemtype     = $item->{$itype};
-    my $borrowertype = $borrower->{categorycode};
-    my $branchcode   = $controlbranch;
-
-    $sth->execute( $borrowertype, $itemtype, $branchcode );
-    my $pickupdelay = $sth->fetchrow_hashref;
-    return $pickupdelay->{holdspickupdelay}
-      if defined($pickupdelay) && $pickupdelay->{holdspickupdelay} ne 'NULL';
-
-    $sth->execute( $borrowertype, "*", $branchcode );
-    $pickupdelay = $sth->fetchrow_hashref;
-    return $pickupdelay->{holdspickupdelay}
-      if defined($pickupdelay) && $pickupdelay->{holdspickupdelay} ne 'NULL';
-
-    $sth->execute( "*", $itemtype, $branchcode );
-    $pickupdelay = $sth->fetchrow_hashref;
-    return $pickupdelay->{holdspickupdelay}
-      if defined($pickupdelay) && $pickupdelay->{holdspickupdelay} ne 'NULL';
-
-    $sth->execute( "*", "*", $branchcode );
-    $pickupdelay = $sth->fetchrow_hashref;
-    return $pickupdelay->{holdspickupdelay}
-      if defined($pickupdelay) && $pickupdelay->{holdspickupdelay} ne 'NULL';
-
-    $sth->execute( $borrowertype, $itemtype, "*" );
-    $pickupdelay = $sth->fetchrow_hashref;
-    return $pickupdelay->{holdspickupdelay}
-      if defined($pickupdelay) && $pickupdelay->{holdspickupdelay} ne 'NULL';
-
-    $sth->execute( $borrowertype, "*", "*" );
-    $pickupdelay = $sth->fetchrow_hashref;
-    return $pickupdelay->{holdspickupdelay}
-      if defined($pickupdelay) && $pickupdelay->{holdspickupdelay} ne 'NULL';
-
-    $sth->execute( "*", $itemtype, "*" );
-    $pickupdelay = $sth->fetchrow_hashref;
-    return $pickupdelay->{holdspickupdelay}
-      if defined($pickupdelay) && $pickupdelay->{holdspickupdelay} ne 'NULL';
-
-    $sth->execute( "*", "*", "*" );
-    $pickupdelay = $sth->fetchrow_hashref;
+    my $pickupdelay = C4::IssuingRules::GetIssuingRule($borrower->{categorycode},$item->{'itype'},$controlbranch);
     return $pickupdelay->{holdspickupdelay}
       if defined($pickupdelay) && $pickupdelay->{holdspickupdelay} ne 'NULL';
 
@@ -662,26 +605,44 @@ sub GetMaxPickupDate {
 
 =item GetReserveCount
 
-$number = &GetReserveCount($borrowernumber);
+$number = &GetReserveCount($borrowernumber, $itype, $branchcode);
 
 this function returns the number of reservation for a borrower given on input arg.
 
 =cut
 
 sub GetReserveCount {
-    my ($borrowernumber) = @_;
+    my ($borrowernumber,$itemtypecode,$branchcode) = @_;
 
     my $dbh = C4::Context->dbh;
 
     my $query = '
-        SELECT COUNT(*) AS counter
-        FROM reserves
+        SELECT items.itype,reserves.branchcode,reserves.biblionumber,reserves.itemnumber,reserves.borrowernumber
+        FROM reserves LEFT JOIN items USING (itemnumber)
           WHERE borrowernumber = ?
     ';
     my $sth = $dbh->prepare($query);
     $sth->execute($borrowernumber);
-    my $row = $sth->fetchrow_hashref;
-    return $row->{counter};
+    my $select = $sth->fetchall_arrayref({});
+    if ($select) {
+        @$select =grep {$_->{'branchcode'} eq $branchcode} @$select if ($branchcode ne "*");
+        if ($itemtypecode ne "*"){
+            my @itemselect =grep {$_->{'itype'} eq $itemtypecode } @$select;
+            my $biblioquery = qq{
+                SELECT reserves.branchcode,reserves.biblionumber,reserves.itemnumber,reserves.borrowernumber
+                FROM reserves JOIN biblioitems USING (biblionumber) JOIN items ON items.biblionumber=biblioitems.biblionumber
+                  WHERE borrowernumber = ? and items.itype = ? and reserves.branchcode LIKE ? and reserves.itemnumber IS NULL  GROUP BY biblioitems.biblionumber
+            };
+            my $bibliosth = $dbh->prepare($biblioquery);
+            $bibliosth->execute($borrowernumber, $itemtypecode,($branchcode eq "*"?"%":$branchcode));
+            my $biblioselect = $bibliosth->fetchall_arrayref({});
+            return scalar(@$biblioselect)+scalar(@itemselect);
+        }
+        return scalar(@$select);
+    }
+    else {
+        return 0;
+    }
 }
 
 =item GetReserveIssueRuleCount
