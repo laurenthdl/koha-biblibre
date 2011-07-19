@@ -141,7 +141,7 @@ $(document).ready(function() {
                 <!-- /TMPL_IF --></td>
             <td> <!-- TMPL_VAR name="branchcode" --></td>
             <td> <!-- TMPL_VAR name="callnumber" --></td>
-        <td> <!-- TMPL_VAR name="notes" -->        <!--TMPL_IF name="subscriptionexpired"--><br /><span class="problem"> Subscription Expired</span>
+        <td> <!-- TMPL_VAR EXPR="nl2br(notes)" -->        <!--TMPL_IF name="subscriptionexpired"--><br /><span class="problem"> Subscription Expired</span>
         <!--/TMPL_IF-->
         </td>
 			<td><a href="/cgi-bin/koha/serials/routinglists.pl?subscriptionid=<!-- TMPL_VAR NAME="subscriptionid" -->">Edit Routing List</a></td>
@@ -220,7 +220,7 @@ $(document).ready(function() {
                     <!-- TMPL_IF Name="status1" -->Expected<!-- /TMPL_IF --><!-- TMPL_IF Name="status2" -->Arrived<!-- /TMPL_IF --><!-- TMPL_IF Name="status3" -->Late<!-- /TMPL_IF --><!-- TMPL_IF Name="status4" -->Missing<!-- /TMPL_IF --><!-- TMPL_IF Name="status5" -->Not Available<!-- /TMPL_IF --><!-- TMPL_IF Name="status7" -->Claimed<!-- /TMPL_IF -->
                 </td>
                 <td>
-                    <!-- TMPL_VAR Name="notes" -->
+                    <!-- TMPL_VAR EXPR="nl2br(notes)" -->
                 </td>
                 <td>
                     <!-- TMPL_VAR Name="branchcode" -->

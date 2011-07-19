@@ -105,6 +105,7 @@ sub gettemplate {
         global_vars       => 1,
         case_sensitive    => 1,
         loop_context_vars => 1,                               # enable: __first__, __last__, __inner__, __odd__, __counter__
+        functions => { nl2br => sub { my $t = shift or return; $t =~ s/([\r\n])/<br \/>$1/g; return $t; } },
         path              => ["$htdocs/$theme/$lang/$path"]
     );
     my $themelang = ( $interface ne 'intranet' ? '/opac-tmpl' : '/intranet-tmpl' ) . "/$theme/$lang";
