@@ -5775,6 +5775,15 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.062";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        UPDATE `indexes` SET plugin='C4::Search::Plugins::Date' WHERE plugin='C4::Search::Plugins::PubDate'
+    });
+    print "Upgrade to $DBversion done (PubDate plugin name changed)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.013";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("UPDATE `systempreferences` SET options='acqdate|author|callnumber|ccode|dewey|location|pubdate|score|title' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
@@ -6177,6 +6186,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
                ('SNPREFIX', 'Z', 'Z')
     ");
     print "Upgrade to $DBversion done (Add authorised values SNPREFIX for stocknumbers prefixes)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.040";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numFacetsDisplay','100','Specify the maximum number of facets to display for an index','','Integer');");
+    print "Upgrade to $DBversion done (Add System Preferences numFacetsDisplay)\n";
     SetVersion($DBversion);
 }
 

@@ -49,6 +49,8 @@
 		return false;
 	    });	
 
+        dt_add_rangedate_filter("begindate", "enddate", 6);
+
         var claimst = $("#claimst").dataTable( {
             "oLanguage": {
                 "sSearch": "Search all columns:",

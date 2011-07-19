@@ -1,4 +1,4 @@
-package C4::Search::Plugins::PubDate;
+package C4::Search::Plugins::Date;
 
 # Copyright (C) 2010 BibLibre
 #
