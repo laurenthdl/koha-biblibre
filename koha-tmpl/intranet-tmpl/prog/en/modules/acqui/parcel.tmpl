@@ -183,6 +183,7 @@
             <th>Summary</th>
     	    <th>View Record</th>
             <th>Quantity</th>  
+            <th>RRP</th>
             <th>Unit cost</th>
             <th>Order cost</th>
             <th>&nbsp;</th>
@@ -192,6 +193,7 @@
             <tr><td colspan="4" class="total">TOTAL</td>
                 <td> <!-- TMPL_VAR NAME="totalPquantity" --> </td>
 				<td>&nbsp;</td>
+                <td>&nbsp;</td>
                 <td><!-- TMPL_VAR NAME="ordergrandtotal" --></td>
 				<td>&nbsp;</td>
             </tr>
@@ -213,6 +215,7 @@
                 </td>
                 <td><a href="/cgi-bin/koha/catalogue/showmarc.pl?id=<!-- TMPL_VAR NAME="biblionumber" -->" title="MARC" rel="gb_page_center[600,500]">MARC</a> | <a href="/cgi-bin/koha/catalogue/showmarc.pl?viewas=card&amp;id=<!-- TMPL_VAR NAME="biblionumber" -->" title="MARC" rel="gb_page_center[600,500]">Card</a></td>
                 <td><!-- TMPL_VAR NAME="quantity" --></td>
+                <td><!-- TMPL_VAR NAME="rrp" --></td>
                 <td><!-- TMPL_VAR NAME="ecost" --></td>
                 <td><!-- TMPL_VAR NAME="ordertotal" --></td>
 				<td>
