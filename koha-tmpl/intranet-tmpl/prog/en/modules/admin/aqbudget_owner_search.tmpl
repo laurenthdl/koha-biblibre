@@ -1,5 +1,5 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
-<title>Koha &rsaquo; Budget Owner Search</title>
+<title>Koha &rsaquo; Budget <!-- TMPL_VAR NAME='type' --> search</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
     <style type="text/css">
     #custom-doc { width:44.46em;*width:43.39em;min-width:578px; margin:auto; text-align:left; }
@@ -35,7 +35,7 @@ function returnOwner(ownerId, ownerName){
 	<div class="yui-g">
 
 
-  <h3>Search for Budget Owner</h3>
+  <h3>Search for budget <!-- TMPL_VAR NAME='type' --></h3>
 	<form action="/cgi-bin/koha/admin/aqbudget_borrower_search.pl" method="post">
 		<fieldset>
 		<input type="text" name="member" id="member" value="<!-- TMPL_VAR NAME="member" -->" class="focus" />
