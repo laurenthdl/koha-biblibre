@@ -1918,7 +1918,7 @@ sub _Findgroupreserve {
     $sth = $dbh->prepare($query);
     $sth->execute( $biblio, $bibitem, $itemnumber );
     @results = ();
-    my $itemdata = GetItem($itemnumber);
+    my $itemdata = C4::Items::GetItem($itemnumber);
     while ( my $data = $sth->fetchrow_hashref ) {
     warn Data::Dumper::Dumper($data);
     warn $data->{'firstavailablebranch'} . " -> " .  $itemdata->{'holdingbranch'};
