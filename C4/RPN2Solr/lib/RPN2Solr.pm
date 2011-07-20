@@ -105,16 +105,23 @@ sub fetch_handler {
     my $recordid = $$item{values}{recordid};
     my $recordtype = $$item{values}{recordtype};
 
-    # "1.2.840.10003.5.109.10" == XML
-    # "1.2.840.10003.5.10" == USmarc
-    my $format_output = $$args{REQ_FORM} eq "1.2.840.10003.5.109.10"
-        ? "xml"
-        : "usmarc";
+    my $format_output;
+    if($args->{'REQ_FORM'} eq Net::Z3950::OID::xml) {
+        $format_output = 'xml';
+    } else {
+        if (C4::Context->preference('marcflavour') eq 'UNIMARC'){
+            $$args{REP_FORM} = Net::Z3950::OID::unimarc;
+            $format_output = 'unimarc';
+        } else {
+            $$args{REP_FORM} = Net::Z3950::OID::usmarc;
+            $format_output = 'usmarc';
+        }
+    }
 
     my $record;
     given ( $format_output ) {
         # We must return an usmarc format
-        when ( 'usmarc' ) {
+        when ( ['usmarc', 'unimarc'] ) {
             if ( $recordtype && $recordtype eq 'biblio' ) {
                 $record = GetMarcBiblio( $recordid )->as_usmarc();
             }elsif ( $recordtype && $recordtype eq 'authority' ) {
@@ -132,16 +139,9 @@ sub fetch_handler {
         }
         default {}
     }
-    
-    $$args{RECORD} = $record if $record;
-    $$args{REP_FORM} = $$args{REQ_FORM};
 
-#    if (C4::Context->preference('marcflavour') eq 'UNIMARC'){
-#    $$args{REP_FORM} = Net::Z3950::OID::unimarc;
-#    }
-#    else {
-#    $$args{REP_FORM} = Net::Z3950::OID::usmarc;
-#    }
+    $$args{RECORD} = $record if $record;
+
     $$args{BASENAME} = $recordtype;
     $$args{LAST} = $number_of_hits == $$args{OFFSET};
 }
