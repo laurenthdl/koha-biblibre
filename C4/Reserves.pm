@@ -543,8 +543,12 @@ sub CanItemBeReserved {
 
             return 0 , $reservecount,$issuingrule->{holdrestricted} if (($issuingrule->{holdrestricted}== 1 ) && ($branchcode ne $borrower->{branchcode}));
 
+            $debug && warn " Issuingrule : cat type branch max",@$issuingrule{qw(categorycode itemtype branchcode reservesallowed)};
+            $debug && warn " cat type branch $type,". $borrower->{categorycode} .", $branch";
+            $debug and warn "reserve count for $borrower->{categorycode}, $type , $branch,$reservecount";
+
             if( $reservecount >= $issuingrule->{reservesallowed} ){
-                $debug && warn " Issuingrule qui bloque : cat type branch max",@$issuingrule{qw(categorycode itemtype branchcode reservesallowed)};
+                $debug && warn "Blocking Issuingrule : cat type branch max",@$issuingrule{qw(categorycode itemtype branchcode reservesallowed)};
                 return 0, $reservecount,$issuingrule->{reservesallowed};
             }
         }
