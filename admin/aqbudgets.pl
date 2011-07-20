@@ -112,17 +112,6 @@ $template->param(
 # retrieve branches
 my ( $budget, );
 
-my $branches = GetBranches(!$show_all);
-my @branchloop2;
-foreach my $thisbranch ( keys %$branches ) {
-    my %row = (
-        value      => $thisbranch,
-        branchname => $branches->{$thisbranch}->{'branchname'},
-    );
-    $row{selected} = 1 if $thisbranch eq $filter_budgetbranch;
-    push @branchloop2, \%row;
-}
-
 $template->param( auth_cats_loop => GetBudgetAuthCats( $$period{budget_period_id} ) );
 
 # Used to create form to add or  modify a record
@@ -281,6 +270,7 @@ if ( $op eq 'add_form' ) {
 
     #This Looks WEIRD to me : should budgets be filtered in such a way ppl who donot own it would not see the amount spent on the budget by others ?
 
+    my @branchcodes;
     foreach my $budget (@budgets) {
 
         #Level and sublevels total spent
@@ -324,6 +314,12 @@ if ( $op eq 'add_form' ) {
                 }
              }
         }    # ...SUPER_LIB END
+
+        if( $budget->{'budget_branchcode'}
+          && (grep { /^$budget->{'budget_branchcode'}$/ } @branchcodes) == 0)
+        {
+            push @branchcodes, $budget->{'budget_branchcode'};
+        }
 
         # if a budget search doesnt match, next
         if ($filter_budgetname) {
@@ -377,6 +373,19 @@ if ( $op eq 'add_form' ) {
                 budget_hierarchy => \@budget_hierarchy,
             }
         );
+    }
+
+    # Only branches which have an associated fund displayable are pushed
+    # in the branch filter dropdown list
+    my @branchloop2;
+    foreach (@branchcodes) {
+        my $branch = GetBranchDetail($_);
+        my %row = (
+            value       => $_,
+            branchname  => $branch->{'branchname'},
+        );
+        $row{'selected'} = 1 if $_ eq $filter_budgetbranch;
+        push @branchloop2, \%row;
     }
 
     my $budget_period_total = $num->format_price( $$period{budget_period_total} ) if $$period{budget_period_total};
