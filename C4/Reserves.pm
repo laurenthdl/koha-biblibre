@@ -1521,7 +1521,7 @@ sub IsAvailableForItemLevelRequest {
                                $item->{wthdrawn} or
                                $notforloan_per_itemtype;
 
-
+    #XERCODE
     if (CanHoldOnShelf($itemnumber)) {
         return $available_per_item;
     } else {
