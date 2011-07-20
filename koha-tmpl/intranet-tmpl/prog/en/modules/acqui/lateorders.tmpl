@@ -23,7 +23,7 @@ $(document).ready(function() {
       },
       "aoColumnDefs": [
         { "aTargets": [4], "sType": "totalcost" },
-        { "aTargets": [5], "sType": "htmlbasketno" },
+        { "aTargets": [5], "sType": "html" },
         { "aTargets": [8], "bSortable": false }
       ],
       "sPaginationType": "full_numbers"
@@ -125,7 +125,8 @@ $(document).ready(function() {
             </td>
             <td>
                 <p>
-                    <a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->" title="basket"><!-- TMPL_VAR name="basketno" --></a>
+                    <!-- TMPL_VAR NAME='basketname' -->
+                    (<a href="basket.pl?basketno=<!-- TMPL_VAR name="basketno" -->" title="basket"><!-- TMPL_VAR name="basketno" --></a>)
                 </p>
                 <p title="branch"><!-- TMPL_VAR name="branch" --></p>
             </td>

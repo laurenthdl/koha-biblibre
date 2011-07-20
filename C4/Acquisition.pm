@@ -1884,6 +1884,7 @@ sub GetParcel {
         SELECT  authorisedby,
                 creationdate,
                 aqbasket.basketno,
+                aqbasket.basketname,
                 closedate,surname,
                 firstname,
                 aqorders.biblionumber,
@@ -2417,6 +2418,7 @@ sub GetLateOrders {
     my @query_params = ();
     my $select       = "
     SELECT aqbasket.basketno,
+        aqbasket.basketname,
         aqorders.ordernumber,
         DATE(aqbasket.closedate)  AS orderdate,
         aqorders.rrp              AS unitpricesupplier,
