@@ -73,7 +73,7 @@ if ( $query ) {
 
     # BreedingSearch
     my ( $title, $isbn );
-    $query =~ /^(\d{10}|\d{12}.)$/ ? $isbn = $1 : $title = $1;
+    $query =~ /^(\d{10}|\d{12}.)$/ ? $isbn = $query : $title = $query;
     my ( $breeding_count, @breeding_loop ) = BreedingSearch( $title, $isbn );
 
     $template->param(
