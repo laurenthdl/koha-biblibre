@@ -1659,13 +1659,11 @@ sub IsAvailableForItemLevelRequest {
                                $notforloan_per_itemtype;
 
 	#XERCODE
-    #if (CanHoldOnShelf($itemnumber)) {
-    #    return $available_per_item;
-    #} else {
-    #    return ($available_per_item and ($item->{onloan} or GetReserveStatus($itemnumber) eq "W"));
-    #}
- 	
- 	return $available_per_item;   
+    if (CanHoldOnShelf($itemnumber)) {
+        return $available_per_item;
+    } else {
+        return ($available_per_item and ($item->{onloan} or GetReserveStatus($itemnumber) eq "W"));
+    }
 }
 
 =item AlterPriority
