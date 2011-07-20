@@ -252,6 +252,7 @@ if ( $op eq 'add_form' ) {
             $status = ModBudget($budget_hash);
         } else {
             $status = AddBudget($budget_hash);
+            $$budget_hash{'budget_id'} = $status;
         }
         $sql_error = "This fund name (or code) already exists" unless $status;
         if (defined $$budget_hash{'budgetusersid'}){
