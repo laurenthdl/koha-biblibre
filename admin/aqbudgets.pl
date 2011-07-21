@@ -317,7 +317,7 @@ if ( $op eq 'add_form' ) {
                 if( defined $budget->{budget_branchcode}
                   && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode}
                   && $budget->{'budget_owner_id'} != $borrower_id
-                  && defined $budgetusers && defined $budgetusers->{$borrower_id} )
+                  && (!defined $budgetusers || !defined $budgetusers->{$borrower_id}) )
                 {
                     next if(!$show_all);
                     $budget->{'budget_lock'} = 1;

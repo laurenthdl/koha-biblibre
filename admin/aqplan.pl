@@ -371,7 +371,7 @@ foreach my $budget (@budgets) {
             if( defined $budget->{budget_branchcode}
               && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode}
               && $budget->{'budget_owner_id'} != $borrower_id
-              && defined $budgetusers && defined $budgetusers->{$borrower_id} )
+              && (!defined $budgetusers || !defined $budgetusers->{$borrower_id}) )
             {
                 $budget_lock = 1;
             }
