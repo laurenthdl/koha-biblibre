@@ -533,9 +533,12 @@ sub CanItemBeReserved {
     # We see if he have right or not to reserve this item(Y or N), we don't care about the number of reserves allowed
     # if he have no rule set, he have not right
     my $return=1;
-    my @test_branches=(((C4::Context->preference('ReservesControlBranch') eq 'PatronLibrary')?():$branchcode),'*');
+    my @test_branches=((((C4::Context->preference('ReservesControlBranch') eq 'PatronLibrary') or ($branchcode eq '*'))
+                        ?()
+                        :$branchcode)
+                       ,'*');
     for my $branch (@test_branches) {
-        for my $type ( $itype, '*' ) {
+        for my $type ( (($itype eq '*')?():$itype), '*' ) {
             my $issuingrule = GetIssuingRule($borrower->{categorycode}, $type, $branch);
             my $reservecount = GetReserveCount($borrowernumber,$type,$branch);
             return 0, $reservecount,$issuingrule->{reservesallowed} if( defined $issuingrule->{reservesallowed} && not $issuingrule->{reservesallowed} ); 
