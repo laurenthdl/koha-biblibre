@@ -1,0 +1,45 @@
+MAILTO=sysop@biblibre.com
+
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+KOHA_CONF=/home/koha/etc/koha-conf.xml
+PERL5LIB=/home/koha/src
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+#50 12 * * * export KOHA_CONF=/home/koha/etc/koha-conf.xml; export PERL5LIB=/home/koha/src; perl /home/koha/src/misc/maintenance/UNIMARC_sync_date_created_with_marc_biblio.pl;
+10 01 * * * perl /home/koha/src/misc/cronjobs/overdue_notices.pl -t -html /home/koha/src/koha-tmpl/relances -n
+20 01 * * * perl /home/koha/src/misc/cronjobs/gather_print_notices.pl /home/koha/src/koha-tmpl/relances
+30 01 * * * perl /home/koha/src/misc/cronjobs/printoverdues.sh /home/koha/src/koha-tmpl/relances /home/koha/style.css
+#05 */1 * * * /usr/bin/perl /home/koha/src/misc/cronjobs/process_message_queue.pl
+05 8-20 * * * /usr/bin/perl /home/koha/src/misc/cronjobs/process_message_queue.pl
+
+# Indexation des exemplaires
+*/1 8-19 * * * /home/koha/bin/syncitems.sh
+0 23 * * * /home/koha/bin/sync_date.sh
+10 19 * * * cd $PERL5LIB/misc/cronjobs; perl toggle_new_status.pl
+
+*/2 22-23 * * * /home/koha/bin/traceps
+
+#Indexation intégrale des notices bibliographiques
+#00 21 * * * perl /home/koha/src/misc/migration_tools/rebuild_solr.pl -t biblio -o
+
+#Indexation intégrale 
+#00 21 * * * bash /home/koha/rebuild_solr_parts.sh
