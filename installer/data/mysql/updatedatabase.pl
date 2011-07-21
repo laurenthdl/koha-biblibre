@@ -5018,6 +5018,16 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.065";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('DontExportFields','','List of fields for non export in circulation.pl (separated by a space)','','');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference DontExportFields)\n";
+    SetVersion($DBversion);
+}
+
+
 $DBversion = "3.02.00.066";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
@@ -5042,8 +5052,9 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
         INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('LibraryType','Public','Set a type for the library','Academic|Public|Special','Choice');
     });
     print "Upgrade to $DBversion done (Adds New System preference LibraryType)\n";
-    SetVersion($DBversion);
+    SetVersion($DBversion)
 }
+
 
 $DBversion = "3.02.00.069";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {

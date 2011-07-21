@@ -26,20 +26,18 @@ $.tablesorter.addParser({
 
 		$("#issuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
 		dateFormat: 'uk',<!-- /TMPL_IF -->
-		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false}}
+		headers: { 1: { sorter: 'articles' },8:{sorter:false},9:{sorter:false},10:{sorter:false}}
 		});
 		$("#relissuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
 		dateFormat: 'uk',<!-- /TMPL_IF -->
-		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false}}
+		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false},9:{sorter:false},10:{sorter:false}}
 		});
 
-		//FIXME: Sorting does not work when there are previous checkouts only
-		// (It works fine when there are only checkouts of the day, or both previous and today checkouts)
 		$("#issuest").bind("sortEnd",function() {
-		    $("#previous").parents("tr").remove();  // 'previous checkouts' header chokes table sorter
+		    $("#previous").parents("tr").css('display', 'none');  // 'previous checkouts' header chokes table sorter
 		});
 		$("#relissuest").bind("sortEnd",function() {
-		    $("#relprevious").parents("tr").remove();  // 'previous checkouts' header chokes table sorter
+		    $("#relprevious").parents("tr").css('display', 'none');  // 'previous checkouts' header chokes table sorter
 		});
 
 		$("#holdst").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
@@ -54,6 +52,8 @@ var allcheckboxes = $(".checkboxed");
         $("#CheckNoitems"   ).click(function(){ $(".checkboxed").unCheckCheckboxes(":input[name*=items]"); return false; });
         $("#CheckAllreturns").click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=barcodes]"); $(".checkboxed").unCheckCheckboxes(":input[name*=items]"); return false; });
         $("#CheckNoreturns" ).click(function(){ $(".checkboxed").unCheckCheckboxes(":input[name*=barcodes]"); return false; });
+        $("#CheckAllexports").click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=biblionumbers]"); $(".checkboxed").unCheckCheckboxes(":input[name*=items]"); return false; });
+        $("#CheckNoexports").click(function(){ $(".checkboxed").unCheckCheckboxes(":input[name*=biblionumbers]"); return false; });
 
         $("#relrenew_all"      ).click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=items]"   ); $(".checkboxed").unCheckCheckboxes(":input[name*=barcodes]"); });
         $("#relCheckAllitems"  ).click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=items]"   ); $(".checkboxed").unCheckCheckboxes(":input[name*=barcodes]"); return false; });
@@ -109,7 +109,8 @@ var allcheckboxes = $(".checkboxed");
 
 function initExportButton() {
 	var exportmenu = [
-        { text: _("ISO2709"), onclick: {fn: function(){export_submit("iso2709")}} },
+        { text: _("ISO2709 with items"), onclick: {fn: function(){export_submit("iso2709_995")}} },
+        { text: _("ISO2709 without items"), onclick: {fn: function(){export_submit("iso2709")}} },
         { text: _("CSV"), onclick: {fn: function(){export_submit("csv")}} },
     ];
     new YAHOO.widget.Button({
@@ -162,9 +163,22 @@ function refocus(calendar) {
 };
 
 function export_submit(format) {
+    if ($("input:checkbox[name='biblionumbers'][checked]").length < 1){
+        alert("You must select a checkout to export");
+        return;
+    }
+    if (format == 'iso2709_995'){
+        format = 'iso2709';
+        $("#dont_export_item").val(0);
+    }else if (format == 'iso2709'){
+        $("#dont_export_item").val(1);
+    }
     document.issues.action="/cgi-bin/koha/tools/export.pl";
     document.getElementById("export_format").value = format;
     document.issues.submit();
+
+    /* Reset form action to its initial value */
+    document.issues.action="/cgi-bin/koha/reserve/renewscript.pl";
 };
 
 //]]>
@@ -694,13 +708,14 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
         <th scope="col">Due date</th>
         <th scope="col">Title</th>
         <th scope="col">Item Type</th>
-        <th scope="col" filter-type="ddl">Branch</th>
+        <th scope="col">Location</th>
+        <th scope="col">Branch</th>
         <th scope="col">Checked out on</th> 
         <th scope="col" filter="false">Charge</th>
         <th scope="col" filter="false">Material</th>
         <th scope="col" filter="false">Renew <p class="column-tool"><a href="#" id="CheckAllitems">select all</a> | <a href="#" id="CheckNoitems">none</a></p></th>
         <th scope="col" filter="false">Check in <p class="column-tool"><a href="#" id="CheckAllreturns">select all</a> | <a href="#" id="CheckNoreturns">none</a></p></th>
-        <th scope="col" filter="false">Export</th>
+        <th scope="col" filter="false">Export <p class="column-tool"><a href="#" id="CheckAllexports">select all</a> | <a href="#" id="CheckNoexports">none</a></p></th>
     </tr>
     </thead>
 <tfoot>
@@ -739,9 +754,11 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
                 <!-- /TMPL_IF -->
             </td>
             <td/>
+            <td/>
         </tr>
 		</tfoot>
-<!-- TMPL_IF NAME="todayissues" -->	<tbody>
+          <tbody>
+<!-- TMPL_IF NAME="todayissues" -->
 
     <!-- TMPL_LOOP NAME="todayissues" -->
     <!-- TMPL_IF NAME="__odd__" -->
@@ -752,6 +769,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
         <!-- TMPL_IF NAME="overdue" --><td class="od"><!-- TMPL_ELSE --><td><!-- /TMPL_IF --><!-- TMPL_VAR NAME="dd" --></td>
         <td><a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;type=intra"><strong><!-- TMPL_VAR NAME="title" escape="html" --></strong></a><!-- TMPL_IF NAME="author" -->, by <!-- TMPL_VAR NAME="author" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="itemnotes" -->- <span class="circ-hlt"><!-- TMPL_VAR name="itemnotes" --></span><!-- /TMPL_IF --> <a href="/cgi-bin/koha/catalogue/moredetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#item<!-- TMPL_VAR NAME="itemnumber" -->"><!-- TMPL_VAR NAME="barcode" --></a></td>
         <td><!-- TMPL_UNLESS NAME="noItemTypeImages" --> <!-- TMPL_IF NAME="itemtype_image" --><img src="<!-- TMPL_VAR NAME="itemtype_image" -->" alt="" /><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME="itemtype" --></td>
+    <td><!-- TMPL_VAR NAME="location" --> <!-- TMPL_IF NAME="location_description" -->(<!-- TMPL_VAR NAME="location_description" -->)<!-- /TMPL_IF --></td>    
 	<td><!-- TMPL_VAR NAME="branchdisplay" -->
         <!--TMPL_IF Name="itemcallnumber"-->(<!-- TMPL_VAR NAME="itemcallnumber" -->)<!--/TMPL_IF--></td>
         <td><!-- TMPL_VAR NAME="displaydate" --></td>
@@ -792,9 +810,12 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
 
     </tr>
     <!-- /TMPL_LOOP --> <!-- /loop todayissues -->
+    <!-- TMPL_ELSE -->
+    <!-- Required for table sorter to work -->
+    <tr style="display:none"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <!-- /if todayissues --><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="previssues" -->
-<tr><th class="{sorter: false}" colspan="10"><a name="previous" id="previous"></a>Previous checkouts</th></tr>
+<tr><th class="{sorter: false}" colspan="11"><a name="previous" id="previous"></a>Previous checkouts</th></tr>
     <!-- TMPL_LOOP NAME="previssues" -->
     <!-- TMPL_IF NAME="__odd__" -->
         <tr>
@@ -805,9 +826,8 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
         <!-- TMPL_VAR NAME="dd" -->
         </td>
         <td><a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;type=intra"><strong><!-- TMPL_VAR NAME="title" escape="html" --></strong></a><!-- TMPL_IF NAME="author" -->, by <!-- TMPL_VAR NAME="author" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="itemnotes" -->- <!-- TMPL_VAR name="itemnotes" --><!-- /TMPL_IF --> <a href="/cgi-bin/koha/catalogue/moredetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#item<!-- TMPL_VAR NAME="itemnumber" -->"><!-- TMPL_VAR NAME="barcode" --></a></td>
-        <td>
-            <!-- TMPL_VAR NAME="itemtype" -->
-        </td>
+        <td><!-- TMPL_VAR NAME="itemtype" --></td>
+        <td><!-- TMPL_VAR NAME="location" --> <!-- TMPL_IF NAME="location_description" -->(<!-- TMPL_VAR NAME="location_description" -->)<!-- /TMPL_IF --></td>
 	<td><!-- TMPL_VAR NAME="branchdisplay" -->
         <!--TMPL_IF NAME="itemcallnumber"-->(<!-- TMPL_VAR NAME="itemcallnumber" -->)<!--/TMPL_IF--></td>
         <td><!-- TMPL_VAR NAME="displaydate" --></td>
@@ -852,9 +872,11 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
     <fieldset class="action">
         <input type="submit" name="renew_checked" value="Renew or Return checked items" />
         <br/><br/>
+        Don't export fields : <input type="text" id="dont_export_fields" name="dont_export_fields" value="<!--TMPL_VAR NAME="dont_export_fields"-->" />
         <span id="exportmenuc">Export</span>
         <input type="hidden" name="op" value="export" />
         <input type="hidden" id="export_format" name="format" value="iso2709" />
+        <input type="hidden" id="dont_export_item" name="dont_export_item" value="0" />
     </fieldset>
     <!-- /TMPL_IF -->
 <!-- TMPL_ELSE -->
@@ -870,6 +892,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
         <th scope="col">Due date</th>
         <th scope="col">Title</th>
         <th scope="col">Item Type</th>
+        <th scope="col">Location</th>
         <th scope="col">Branch</th>
         <th scope="col">Checked out on</th> 
         <th scope="col">Charge</th>
@@ -889,6 +912,8 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
             <!-- TMPL_VAR NAME="dd" --></td>
         <td><a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;type=intra"><strong><!-- TMPL_VAR NAME="title" escape="html" --></strong></a><!-- TMPL_IF NAME="author" -->, by <!-- TMPL_VAR NAME="author" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="itemnotes" -->- <span class="circ-hlt"><!-- TMPL_VAR name="itemnotes" --></span><!-- /TMPL_IF --> <a href="/cgi-bin/koha/catalogue/moredetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#item<!-- TMPL_VAR NAME="itemnumber" -->"><!-- TMPL_VAR NAME="barcode" --></a></td>
         <td><!-- TMPL_UNLESS NAME="noItemTypeImages" --> <!-- TMPL_IF NAME="itemtype_image" --><img src="<!-- TMPL_VAR NAME="itemtype_image" -->" alt="" /><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME="itemtype" --></td>
+
+    <td><!-- TMPL_VAR NAME="location" --> <!-- TMPL_IF NAME="location_description" -->(<!-- TMPL_VAR NAME="location_description" -->)<!-- /TMPL_IF --></td>
 	<td><!-- TMPL_VAR NAME="branchdisplay" -->
         <!--TMPL_IF Name="itemcallnumber"-->(<!-- TMPL_VAR NAME="itemcallnumber" -->)<!--/TMPL_IF--></td>
         <td><!-- TMPL_VAR NAME="displaydate" --></td>
@@ -899,7 +924,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
     <!-- /TMPL_LOOP --> <!-- /loop todayissues -->
     <!-- /if todayissues --><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="relprevissues" -->
-<tr><th class="{sorter: false}" colspan="10"><a name="relprevious" id="relprevious"></a>Previous checkouts</th></tr>
+<tr><th class="{sorter: false}" colspan="11"><a name="relprevious" id="relprevious"></a>Previous checkouts</th></tr>
     <!-- TMPL_LOOP NAME="relprevissues" -->
     <!-- TMPL_IF NAME="__odd__" -->
         <tr>
@@ -913,6 +938,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
         <td>
             <!-- TMPL_VAR NAME="itemtype" -->
         </td>
+    <td><!-- TMPL_VAR NAME="location" --> <!-- TMPL_IF NAME="location_description" -->(<!-- TMPL_VAR NAME="location_description" -->)<!-- /TMPL_IF --></td>    
 	<td><!-- TMPL_VAR NAME="branchdisplay" -->
         <!--TMPL_IF NAME="itemcallnumber"-->(<!-- TMPL_VAR NAME="itemcallnumber" -->)<!--/TMPL_IF--></td>
         <td><!-- TMPL_VAR NAME="displaydate" --></td>
