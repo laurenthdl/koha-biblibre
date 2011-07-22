@@ -100,6 +100,7 @@ if ( $op eq "do_search" ) {
            authid  => $_->{values}->{recordid},
            authid_index_name => $authid_index_name,
            summary => BuildSummary( $authrecord, $_->{values}->{recordid}, $_->{'values'}->{$authtype_index_name}),
+           authtype => GetAuthTypeText($_->{'values'}->{$authtype_index_name}),
            used    => CountUsage($_->{values}->{recordid}),
         };
 
