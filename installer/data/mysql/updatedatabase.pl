@@ -6233,9 +6233,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 }
 
 
-
-
->>>>>>> MT4076, follow-up: Adds permissions on shelves and fix fast cataloging
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
