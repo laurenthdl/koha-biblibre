@@ -64,11 +64,11 @@ if ( $op eq 'show' ) {
     }
 
     my $max_nb_attr = 0;
-    foreach my $cardnumber (@cardnumbers) {
+    for my $cardnumber ( @cardnumbers ) {
         my $borrower = GetMember( cardnumber => $cardnumber );
         if ( $borrower ) {
             $$borrower{branchname} = GetBranchName( $$borrower{branchcode} );
-            foreach ( qw(dateenrolled dateexpiry debarred) ) {
+            for ( qw(dateenrolled dateexpiry debarred) ) {
                 my $userdate = $$borrower{$_};
                 unless ($userdate && $userdate ne "0000-00-00" and $userdate ne "9999-12-31") {
                     $borrower->{$_} = '';
@@ -107,10 +107,10 @@ if ( $op eq 'show' ) {
     my @branches_option;
     push @branches_option, { value => $$_{branchcode}, lib => $$_{branchname} } for @$branches;
     unshift @branches_option, { value => "", lib => "" };
-    my $branchcategories = GetBranchCategories;
-    my @branchcategories_option;
-    push @branchcategories_option, { value => $$_{categorycode}, lib => $$_{categoryname} } for @$branchcategories;
-    unshift @branchcategories_option, { value => "", lib => "" };
+    my $categories = GetBorrowercategoryList;
+    my @categories_option;
+    push @categories_option, { value => $$_{categorycode}, lib => $$_{description} } for @$categories;
+    unshift @categories_option, { value => "", lib => "" };
     my $bsort1 = GetAuthorisedValues("Bsort1");
     my @sort1_option;
     push @sort1_option, { value => $$_{authorised_value}, lib => $$_{lib} } for @$bsort1;
@@ -144,7 +144,7 @@ if ( $op eq 'show' ) {
             name => "categorycode",
             lib  => "Category",
             type => "select",
-            option => \@branchcategories_option,
+            option => \@categories_option,
         }
         ,
         {
@@ -196,13 +196,11 @@ if ( $op eq 'show' ) {
 
     $template->param( 'fields' => \@fields );
     $template->param( DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar() );
-    my $op = "show";
 }
 
 if ( $op eq 'action' ) {
 
     my @disabled = $input->param('disable_input');
-    warn Data::Dumper::Dumper \@disabled;
     my $infos;
     for my $field ( qw/surname firstname branchcode categorycode sort1 sort2 dateenrolled dateexpiry debarred debarredcomment notes/ ) {
         my $value = $input->param($field);
@@ -213,33 +211,76 @@ if ( $op eq 'action' ) {
     my @attributes = $input->param('patron_attributes');
     my @attr_values = $input->param('patron_attributes_value');
 
+    my @errors;
     my @borrowernumbers = $input->param('borrowernumber');
     for my $borrowernumber ( @borrowernumbers ) {
         $$infos{borrowernumber} = $borrowernumber;
-        warn "Update borrower $borrowernumber with";
-        warn Data::Dumper::Dumper $infos;
-        ModMember(%$infos);
+        my $success = ModMember(%$infos);
+        push @errors, { error => "can_not_update", borrowernumber => $$infos{borrowernumber} } if not $success;
 
         my $i=0;
         for ( @attributes ) {
             my $attribute;
             $$attribute{code} = $_;
             $$attribute{attribute} = $attr_values[$i];
+            next if not $$attribute{attribute};
             my $valuename = "attr" . $i . "_value";
             if ( grep { /^$valuename$/ } @disabled ) {
-                warn "Delete attribute for $borrowernumber";
-                warn Data::Dumper::Dumper $attribute;
-                DeleteBorrowerAttribute $borrowernumber, $attribute;
+                eval {
+                    DeleteBorrowerAttribute $borrowernumber, $attribute;
+                };
+                push @errors, { error => $@ } if $@;
             } else {
-                warn "Update attribute for $borrowernumber";
-                warn Data::Dumper::Dumper $attribute;
-                UpdateBorrowerAttribute $borrowernumber, $attribute;
+                eval {
+                    UpdateBorrowerAttribute $borrowernumber, $attribute;
+                };
+                push @errors, { error => $@ } if $@;
             }
             $i++;
         }
 
-
     }
+    $op = "show_results";
+
+    my @borrowers;
+    my $max_nb_attr = 0;
+    for my $borrowernumber ( @borrowernumbers ) {
+        my $borrower = GetMember( borrowernumber => $borrowernumber );
+        if ( $borrower ) {
+            $$borrower{branchname} = GetBranchName( $$borrower{branchcode} );
+            for ( qw(dateenrolled dateexpiry debarred) ) {
+                my $userdate = $$borrower{$_};
+                unless ($userdate && $userdate ne "0000-00-00" and $userdate ne "9999-12-31") {
+                    $borrower->{$_} = '';
+                    next;
+                }
+                $userdate = C4::Dates->new( $userdate, 'iso' )->output('syspref');
+                $borrower->{$_} = $userdate || '';
+            }
+            my $attr_loop = C4::Members::Attributes::GetBorrowerAttributes( $$borrower{borrowernumber} );
+            $$borrower{patron_attributes} = $attr_loop;
+            $max_nb_attr = scalar( @{ $$borrower{patron_attributes} } )
+                if scalar( $$borrower{patron_attributes} ) > $max_nb_attr;
+            push @borrowers, $borrower;
+        }
+    }
+    my @patron_attributes_option;
+    for my $borrower ( @borrowers ) {
+        push @patron_attributes_option, { value => "$$_{code}", lib => $$_{code} } for @{ $$borrower{patron_attributes} };
+        my $length = scalar( @{ $$borrower{patron_attributes} } );
+        push @{ $$borrower{patron_attributes} }, {} for ( $length .. $max_nb_attr - 1);
+    }
+
+    my @attributes_header = ();
+    for ( 1 .. scalar( $max_nb_attr ) ) {
+        push @attributes_header, { attribute => "Attributes $_" };
+    }
+
+    $template->param( borrowers => \@borrowers );
+    $template->param( attributes_header => \@attributes_header );
+
+    $template->param( borrowers => \@borrowers );
+    $template->param( errors => \@errors );
 }
 
 $template->param(
