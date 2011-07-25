@@ -40,6 +40,7 @@ my ( $input_marc_file, $number, $offset ) = ( '', 0, 0 );
 my ( $version, $delete, $skip_marc8_conversion, $char_encoding, $verbose, $commit, $fk_off, $format, $biblios, $authorities, $keepids, $match, $isbn_check, $logfile, $yamlfile );
 my ( $sourcetag, $sourcesubfield, $idmapfl );
 my ( $insert, $filters, $update, $all, $test_parameter );
+my ( $authtypes );
 
 $| = 1;
 
@@ -60,6 +61,7 @@ GetOptions(
     'k|keepids:s'   => \$keepids,
     'b|biblios'     => \$biblios,
     'a|authorities' => \$authorities,
+    'authtypes:s' => \$authtypes,
     'filter=s@'     => \$filters,
     'insert'        => \$insert,
     'update'        => \$update,
@@ -78,6 +80,7 @@ if ($all) {
     $insert = 1;
     $update = 1;
 }
+
 
 if ( $version || ( $input_marc_file eq '' ) ) {
     print <<EOF
@@ -108,6 +111,7 @@ Parameters:
   keepids store ids in 009 (usefull for authorities, where 001 contains the authid for Koha, that can contain a very valuable info for authorities coming from LOC or BNF. useless for biblios probably)
   b|biblios type of import : bibliographic records
   a|authorities type of import : authority records
+  authtypes file yamlfile with authoritiesTypes and distinguishable record field in order to store the correct authtype
   match  matchindex,fieldtomatch matchpoint to use to deduplicate
           fieldtomatch can be either 001 to 999 
                        or field and list of subfields as such 100abcde
@@ -130,6 +134,8 @@ EOF
 ;#'
       exit;
 }
+
+my $heading_fields=get_heading_fields();
 
 if ( defined $idmapfl ) {
     open( IDMAP, ">$idmapfl" ) or die "cannot open $idmapfl \n";
@@ -298,10 +304,10 @@ RECORD: while () {
         }
 
         my $results = C4::Search::SimpleSearch( '*:*', $filters );
-        my $totalhits = $results->{'pager'}->{'total_entries'};
+        my $totalhits = (defined $results?$results->{'pager'}->{'total_entries'}:0);
         $debug && warn "query :",Dump($filters)," $recordtype : $totalhits";
         if ( $results && $totalhits == 1 ) {
-            $id = $results->{'items'}->{'values'}->{'recordid'};
+            $id = ${$results->{'items'}}[0]->{'values'}->{'recordid'};
             my $marcrecord = $authorities ? GetAuthority( $id ) : GetMarcBiblio( $id );
             SetUTF8Flag($marcrecord);
             if ( $authorities && $marcFlavour ) {
@@ -358,7 +364,7 @@ RECORD: while () {
     }
     if ($authorities) {
         use C4::AuthoritiesMarc;
-        my $authtypecode = GuessAuthTypeCode($record);
+        my $authtypecode = GuessAuthTypeCode($record, $heading_fields);
         my $authid = ( $id ? $id : GuessAuthId($record) );
         if ( $authid && GetAuthority($authid) && $update ) {
             ## Authority has an id and is in database : Replace
@@ -521,6 +527,21 @@ sub report_item_errors {
 sub printlog {
     my $logelements = shift;
     print $loghandle join( ";", map { defined $_ ? $_ : "" } @$logelements{qw<id op status>} ), "\n";
+}
+
+sub get_heading_fields{
+    my $headingfields;
+    if ($authtypes){
+        $headingfields=YAML::LoadFile($authtypes);
+
+        $headingfields={C4::Context->preference('marcflavour')=>$headingfields};
+        $debug && warn YAML::Dump($headingfields);
+    }
+    unless ($headingfields){
+        $headingfields=$dbh->selectall_hashref("SELECT auth_tag_to_report, authtypecode from auth_types",'auth_tag_to_report',{Slice=>{}});
+        $headingfields={C4::Context->preference('marcflavour')=>$headingfields};
+    }
+    return $headingfields;
 }
 
 =head1 NAME
