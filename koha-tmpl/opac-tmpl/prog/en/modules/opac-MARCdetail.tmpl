@@ -1,5 +1,6 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" --><!-- TMPL_IF NAME="LibraryNameTitle" --><!-- TMPL_VAR NAME="LibraryNameTitle" --><!-- TMPL_ELSE -->Koha Online<!-- /TMPL_IF --> Catalog &rsaquo;  MARC Details for Record No. <!-- TMPL_VAR name="biblionumber" -->
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<!-- TMPL_INCLUDE NAME="results-navigation-js.inc" -->
 <!-- TMPL_IF NAME="OPACXSLTDetailsDisplay" --><script type="text/javascript">
     var GB_ROOT_DIR = "/opac-tmpl/prog/en/lib/greybox/";
 </script>
@@ -158,6 +159,7 @@
         <p>No copies available.</p>
     <!-- /TMPL_IF -->
     </div>
+    <!-- TMPL_INCLUDE NAME="results-navigation-html.inc" -->
     </div>
     </div>
 	<div class="yui-u">
@@ -204,6 +206,7 @@
         <option value="marc8">MARC (non-Unicode/MARC-8)</option>
         <option value="utf8">MARC (Unicode/UTF-8)</option>    </select><input type="hidden" name="op" value="export" /><input type="hidden" name="bib" value="<!-- TMPL_VAR NAME="biblionumber" -->" />
 <input type="submit" name="save" value="Go" /></form></div>
+        <!-- TMPL_INCLUDE NAME="new-search.inc" -->
 </div>
 </div>
 </div>

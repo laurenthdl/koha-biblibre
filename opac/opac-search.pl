@@ -57,7 +57,9 @@ BEGIN {
     }
 }
 
-my ( $template, $borrowernumber, $cookie );
+my $session = get_session($cgi->cookie("CGISESSID")); 
+
+my ($template,$borrowernumber,$cookie);
 
 # decide which template to use
 my $template_name;
@@ -355,6 +357,12 @@ if (!$res){
 
 $total = $res->{'pager'}->{'total_entries'},
 
+$session->param('currentsearchisoneresult', '0'); # init is only one result
+# href for back to results
+my $current_search_url = $ENV{'REQUEST_URI'};
+$current_search_url =~ s/;/&/g; # some URL use ; instead of &
+$session->param('currentsearchurl', $current_search_url);
+
 # Opac search history
 my $newsearchcookie;
 my $limit_desc;
@@ -375,7 +383,6 @@ if ( C4::Context->preference('EnableOpacSearchHistory') ) {
     if ( not defined $borrowernumber or $borrowernumber eq '' ) {
 
         # To a cookie (the user is not logged in)
-
         if ( not defined $page or $page == 1 ) {
             push @recentSearches,
               { "query_desc" => $query_desc || "unknown",
@@ -428,6 +435,7 @@ if ( $total == 1
     } else {
         print $cgi->redirect("/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber");
     }
+    $session->param('currentsearchisoneresult', '1');
     exit;
 }
 

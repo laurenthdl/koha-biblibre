@@ -43,7 +43,7 @@ the items attached to the biblio
 use strict;
 use warnings;
 
-use C4::Auth;
+use C4::Auth qw(:DEFAULT get_session);
 use C4::Context;
 use C4::Output;
 use CGI;
@@ -181,6 +181,14 @@ if ( C4::Context->preference("OPACAmazonEnabled") == 1 ) {
     }
     $template->param( SIMILAR_PRODUCTS => \@products );
     $template->param( AMAZONREVIEWS    => \@reviews );
+}
+
+my $session = get_session($query->cookie("CGISESSID"));
+if ($session) {
+    # read session variables
+    foreach (qw(currentsearchurl currentsearchisoneresult)) {
+        $template->param( $_ => $session->param( $_ ) );
+    }
 }
 
 output_html_with_http_headers $query, $cookie, $template->output;
