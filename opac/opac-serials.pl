@@ -35,6 +35,7 @@ use C4::Context;
 use C4::Output;
 
 use C4::Search;
+use Data::Pagination;
 
 my $input = new CGI;
 my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
@@ -47,46 +48,73 @@ my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
 
 my $letter = $input->param('letter');
 
-my $dbh = C4::Context->dbh;
-my $query = qq{
-    SELECT COUNT(*)
-    FROM subscription
-        LEFT JOIN biblio USING (biblionumber)
-    WHERE title LIKE ?
-};
-my $sth = $dbh->prepare($query);
+my $srt_title_indexname = 'srt_'.C4::Search::Query::getIndexName('title');
+my $isserial_indexname = C4::Search::Query::getIndexName('is-serial');
+my $sort_by = C4::Search::Query::getIndexName('title')." asc";
 
 my @letters = qw(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z);
 my @letters_loop = ();
 foreach (@letters) {
-    $sth->execute("$_%");
-    my ($count) = $sth->fetchrow_array;
-    push @letters_loop, {
+    my %row = (
         letter => $_,
-        count => $count,
-        active => ($_ eq $letter) ? 1 : 0,
-    };
+        active => ($letter && $_ eq $letter),
+        count => 1,
+    );
+
+    # NOTE: This can be uncommented to disable letters that
+    # have no results
+    #my $q = "( $srt_title_indexname:".uc($_)."*"
+    #    ." OR $srt_title_indexname:".lc($_)."* )"
+    #    ." AND $isserial_indexname:1";
+    #my $res = SimpleSearch($q, undef, 1, 1);
+    #$row->{'count'} = scalar @{ $res->{'items'} };
+
+    push @letters_loop, \%row;
 }
 
-my $query = qq{
-    SELECT biblio.*, biblioitems.issn, subscription.branchcode
-    FROM subscription
-        LEFT JOIN biblio USING (biblionumber)
-        LEFT JOIN biblioitems USING (biblionumber)
-    WHERE title LIKE ?
-};
-my $sth = $dbh->prepare($query);
-$sth->execute("$letter%");
-my $results = $sth->fetchall_arrayref({});
-my @results_loop;
-foreach (@$results) {
-    push @results_loop, C4::Search::getItemsInfos($_->{'biblionumber'}, 'opac', {}, {}, {}, {});
+if($letter) {
+    my $page = $input->param('page') || 1;
+    my $count = C4::Context->preference('OPACnumSearchResults') || 20;
+    my $q = "( $srt_title_indexname:".uc($letter)."*"
+        ." OR $srt_title_indexname:".lc($letter)."* )"
+        ." AND $isserial_indexname:1";
+    my $res = SimpleSearch($q, undef, $page, $count, $sort_by);
+
+    my @results_loop;
+    foreach (@{$res->{'items'}}) {
+        my $recordid = $_->{'values'}->{'recordid'};
+        my $record = C4::Search::getItemsInfos($recordid, 'opac', {}, {}, {}, {});
+        push @results_loop, $record;
+    }
+
+    $template->param(
+        results_loop => \@results_loop,
+    );
+
+    my $total = $res->{'pager'}->{'total_entries'};
+    my $pager = Data::Pagination->new(
+        $total,
+        $count,
+        20,
+        $page,
+    );
+    my @follower_params;
+    push @follower_params, {
+        ind => 'letter',
+        val => $letter,
+    };
+    $template->param(
+        previous_page   => $pager->{'prev_page'},
+        next_page       => $pager->{'next_page'},
+        PAGE_NUMBERS    => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
+        current_page    => $page,
+        follower_params => \@follower_params,
+    );
 }
 
 $template->param(
     letters_loop => \@letters_loop,
     letter => $letter,
-    results_loop => \@results_loop,
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;

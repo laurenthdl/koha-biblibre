@@ -14,7 +14,6 @@ $(document).ready(function() {
 </head>
 
 <body>
-<!-- TMPL_INCLUDE NAME="header.inc" -->
 <!-- TMPL_INCLUDE NAME="masthead.inc" -->
 
 <div id="doc3" class="yui-t7">
@@ -40,6 +39,7 @@ $(document).ready(function() {
       <br />
       <!-- TMPL_IF NAME='letter' -->
         <!-- TMPL_IF NAME='results_loop' -->
+          <!-- TMPL_INCLUDE NAME='page-numbers.inc' -->
           <!-- TMPL_IF NAME='OPACXSLTResultsDisplay' -->
             <table id="resultst" style="margin:auto; text-align:left">
               <thead></thead>
