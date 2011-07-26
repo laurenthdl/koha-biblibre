@@ -25,7 +25,7 @@ use C4::Koha;
 use C4::Members;
 use C4::Members::Attributes qw(GetBorrowerAttributes UpdateBorrowerAttribute DeleteBorrowerAttribute);
 use C4::Output;
-use List::MoreUtils qw /any/;
+use List::MoreUtils qw /any uniq/;
 
 my $input = new CGI;
 my $op = $input->param('op') || 'show_form';
@@ -87,11 +87,30 @@ if ( $op eq 'show' ) {
         }
     }
 
-    my @patron_attributes_option;
+    my @patron_attributes;
     for my $borrower ( @borrowers ) {
-        push @patron_attributes_option, { value => "$$_{code}", lib => $$_{code} } for @{ $$borrower{patron_attributes} };
+        push @patron_attributes, $$_{code} for @{ $$borrower{patron_attributes} };
         my $length = scalar( @{ $$borrower{patron_attributes} } );
         push @{ $$borrower{patron_attributes} }, {} for ( $length .. $max_nb_attr - 1);
+    }
+
+    @patron_attributes = uniq @patron_attributes;
+
+    my @patron_attributes_values;
+    my @patron_attributes_codes;
+    for ( @patron_attributes ) {
+        my $attr_type = C4::Members::AttributeTypes->fetch( $_ );
+        next if not $attr_type->authorised_value_category;
+        my $options = GetAuthorisedValues( $attr_type->authorised_value_category );
+        push @patron_attributes_values,
+            {
+                attribute_code => $_,
+                options => $options
+            };
+        push @patron_attributes_codes,
+            {
+                attribute_code => $_
+            };
     }
 
     my @attributes_header = ();
@@ -186,13 +205,14 @@ if ( $op eq 'show' ) {
         }
         ,
         {
-            name => "notes",
-            lib  => "Notes",
+            name => "borrowernotes",
+            lib  => "Borrower Notes",
             type => "text",
         }
     );
 
-    $template->param('patron_attributes', \@patron_attributes_option);
+    $template->param('patron_attributes_codes', \@patron_attributes_codes);
+    $template->param('patron_attributes_values', \@patron_attributes_values);
 
     $template->param( 'fields' => \@fields );
     $template->param( DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar() );
@@ -202,7 +222,7 @@ if ( $op eq 'action' ) {
 
     my @disabled = $input->param('disable_input');
     my $infos;
-    for my $field ( qw/surname firstname branchcode categorycode sort1 sort2 dateenrolled dateexpiry debarred debarredcomment notes/ ) {
+    for my $field ( qw/surname firstname branchcode categorycode sort1 sort2 dateenrolled dateexpiry debarred debarredcomment borrowernotes/ ) {
         my $value = $input->param($field);
         $$infos{$field} = $value if $value;
         $$infos{$field} = "" if grep { /^$field$/ } @disabled;
@@ -214,9 +234,11 @@ if ( $op eq 'action' ) {
     my @errors;
     my @borrowernumbers = $input->param('borrowernumber');
     for my $borrowernumber ( @borrowernumbers ) {
-        $$infos{borrowernumber} = $borrowernumber;
-        my $success = ModMember(%$infos);
-        push @errors, { error => "can_not_update", borrowernumber => $$infos{borrowernumber} } if not $success;
+        if ( defined $infos ) {
+            $$infos{borrowernumber} = $borrowernumber;
+            my $success = ModMember(%$infos);
+            push @errors, { error => "can_not_update", borrowernumber => $$infos{borrowernumber} } if not $success;
+        }
 
         my $i=0;
         for ( @attributes ) {
