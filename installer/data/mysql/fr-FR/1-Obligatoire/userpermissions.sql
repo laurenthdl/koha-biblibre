@@ -24,7 +24,7 @@ INSERT INTO permissions (module_bit, code, description) VALUES
    (13, 'batchmod', 'Modifier les exemplaires par lot'),
    (13, 'batchdel', 'Supprimer les exemplaires par lot'),
    (13, 'batchedit', 'Modifier les notices par lot'),
-   (13, 'edit_patron', 'Modification par lot des lecteurs'),
+   (13, 'edit_patrons', 'Modification par lot des lecteurs'),
    (16, 'execute_reports', 'Lancer les rapports SQL'),
    (16, 'create_reports', 'Créer les rapports SQL Reports'),
    (13, 'edit_news', 'Write news for the OPAC and staff interfaces'),
