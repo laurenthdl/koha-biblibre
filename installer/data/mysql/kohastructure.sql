@@ -230,6 +230,7 @@ CREATE TABLE `borrowers` (
   `gonenoaddress` tinyint(1) default NULL,
   `gonenoaddresscomment` VARCHAR(255) default NULL,
   `lost` tinyint(1) default NULL,
+  `lostcomment` VARCHAR(255) DEFAULT NULL,
   `debarred` date default NULL,
   `debarredcomment` VARCHAR(255) DEFAULT NULL,
   `contactname` mediumtext,
@@ -2592,15 +2593,6 @@ CREATE TABLE `indexes` (
   PRIMARY KEY (`id`),
   UNIQUE (`code`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-T NULL,
-
-
-
-
-
-
 
 
 --
