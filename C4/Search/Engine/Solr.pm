@@ -83,7 +83,7 @@ sub GetSortableIndexes {
 
 sub GetFacetedIndexes {
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare("SELECT `type`, `code` FROM indexes WHERE faceted = 1 AND ressource_type = ? ORDER BY code");
+    my $sth = $dbh->prepare("SELECT `type`, `code` FROM indexes WHERE faceted = 1 AND ressource_type = ?");
     $sth->execute(shift);
 
     my @indexes;

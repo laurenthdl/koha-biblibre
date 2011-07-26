@@ -408,7 +408,9 @@ for my $searchresult ( @{ $res->items } ) {
 
 # build facets
 my @facets;
-while ( my ($index,$facet) = each %{$res->facets} ) {
+my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
+for my $index ( @$facets_ordered ) {
+    my $facet = %{$res->facets}->{$index};
     if ( @$facet > 1 ) {
         my @values;
         $index =~ m/^([^_]*)_(.*)$/;
