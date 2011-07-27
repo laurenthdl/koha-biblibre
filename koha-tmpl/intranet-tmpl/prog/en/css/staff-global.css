@@ -1997,3 +1997,7 @@ ul.vendors_anchors {
 table#orders p.notes {
     color: orange;
 }
+
+.facets_arrows {
+    text-align: center;
+}

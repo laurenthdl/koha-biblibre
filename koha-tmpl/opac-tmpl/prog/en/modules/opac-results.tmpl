@@ -10,6 +10,9 @@
 
 
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.checkboxes.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/js/facets.js"></script>
+
 <!-- TMPL_IF NAME="OpacHighlightedWords" --><script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.highlight-3.js"></script>
 <!-- /TMPL_IF --><script type="text/javascript">
 //<![CDATA[
@@ -260,6 +263,10 @@ $(document).ready(function(){
     <!-- /TMPL_IF -->
     <!-- TMPL_IF NAME="GoogleJackets" -->KOHA.Google.GetCoverFromIsbn();<!-- /TMPL_IF -->
 
+    $("#tresults").tablesorter({
+        widgets : ['zebra'],
+    });
+
     $("#itypes_form").hide();
     $("#expand_sign").toggle(
         function(){
@@ -332,113 +339,59 @@ $(document).ready(function(){
 
 <!-- Search Results Table -->
 <!-- TMPL_IF NAME="total" -->
-<!-- TMPL_IF NAME="scan" -->
-    <h1>Scan Index:</h1>
-    <form action="/cgi-bin/koha/opac-search.pl" method="get">
-        <table>
-            <tr>
-                <td>
-                    Scan Index for: <input type="text" name="q" id="scan-index" size="35" value="" />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="scan-index">Indexed in:</label>
-                    <select name="idx" id="scan-index">
-                        <option value="">Any Word</option>
-                        <option value="kw,phr:">Any Phrase</option>
-                        <option value="ti:">Title</option>
-                        <option value="ti,phr:">Title Phrase</option>
-                        <option value="au,phr:">Author</option>
-                        <option value="su:">Subject</option>
-                        <option value="su,phr:">Subject Phrase</option>
-                        <option value="se:">Series</option>
-                        <option value="pb:">Publisher</option>
-                        <option value="nt:">Notes</option>
-                        <option value="se:">Series Title</option>
-                        <option value="sn:">ISBN</option>
-                        <option value="ss:">ISSN</option>
-                    </select>
-                    <input type="hidden" name="scan" value="1" />
-                </td>
-            </tr>
-        </table>
-    </form>
-
-    <form action="/cgi-bin/koha/opac-search.pl" method="get">
-        <table>
-            <tr>
-                <th>Term/Phrase</th>
-                <th>Count</th>
-            </tr>
-            <!-- TMPL_LOOP NAME="SEARCH_RESULTS" -->
-			<!-- TMPL_IF name="even" -->
-            <tr class="highlight">
-			<!-- TMPL_ELSE -->
-			<tr>
-			<!-- /TMPL_IF -->
-                <td>
-                    <a href="/cgi-bin/koha/opac-search.pl?q=<!-- TMPL_VAR NAME="scan_use" escape="url" --><!-- TMPL_VAR NAME="title"  ESCAPE="URL" -->"><!-- TMPL_IF NAME="title" --><!-- TMPL_VAR NAME="title" ESCAPE="html" --><!-- TMPL_ELSE -->No title<!-- /TMPL_IF --></a>
-                </td>
-                <td>
-                    <!-- TMPL_VAR NAME="author" -->
-                </td>
-            </tr>
-            <!-- /TMPL_LOOP -->
-        </table>
-    </form>
-<!-- TMPL_ELSE -->
-
     <div class="searchresults">
-	<form action="/cgi-bin/koha/opac-search.pl" method="get" name="bookbag_form" id="bookbag_form">
+        <form action="/cgi-bin/koha/opac-search.pl" method="get" name="bookbag_form" id="bookbag_form">
         <!-- TMPL_LOOP NAME="follower_params" -->
             <!-- TMPL_UNLESS EXPR="ind eq 'sort_by'" -->
                 <input type="hidden" name='<!-- TMPL_VAR ESCAPE="HTML" NAME="ind" -->' value='<!-- TMPL_VAR ESCAPE="HTML" NAME="val" -->' />
             <!-- /TMPL_UNLESS -->
         <!-- /TMPL_LOOP -->
         <!-- TABLE RESULTS START -->
-        <table>
-		<tr><td colspan="5" class="resultscontrol" style="border : 1px solid #e8e8e8;">
-		<div class="resort"> <select id="sort_by" name="sort_by"> <!--TMPL_INCLUDE NAME="resort_form.inc"--> </select> <input type="submit" class="submit clearfix" id="sortsubmit" value="Go" /></div>
-		<div class="cartlist">
-            <!-- checkall, clearall are now needed for placehold -->
-            <span class="checkall"></span>
-        	<span class="clearall"></span>
-            <a href="#" class="highlight_toggle" id="highlight_toggle_off">Unhighlight</a>
-            <a href="#" class="highlight_toggle" id="highlight_toggle_on">Highlight</a>
-            <!-- TMPL_IF EXPR="opacbookbag || virtualshelves" -->
-    	    	<span class="addto"></span>
-            <!-- /TMPL_IF -->
-		    <span id="placehold"><!-- input class="submit" type="submit" value="Place Hold"/ --></span>
-            <div id="holdDetails"></div>
+        <table id="tresults">
+            <thead>
+                <tr>
+                    <td colspan="5" class="resultscontrol" style="border : 1px solid #e8e8e8;">
+                        <div class="resort">
+                            <select id="sort_by" name="sort_by"> <!--TMPL_INCLUDE NAME="resort_form.inc"--> </select>
+                            <input type="submit" class="submit clearfix" id="sortsubmit" value="Go" />
+                        </div>
+                        <div class="cartlist">
+                            <!-- checkall, clearall are now needed for placehold -->
+                            <span class="checkall"></span>
+                            <span class="clearall"></span>
+                            <a href="#" class="highlight_toggle" id="highlight_toggle_off">Unhighlight</a>
+                            <a href="#" class="highlight_toggle" id="highlight_toggle_on">Highlight</a>
+                            <!-- TMPL_IF EXPR="opacbookbag || virtualshelves" -->
+                                <span class="addto"></span>
+                            <!-- /TMPL_IF -->
+                            <span id="placehold"><!-- input class="submit" type="submit" value="Place Hold"/ --></span>
+                            <div id="holdDetails"></div>
 
-			<!-- TMPL_IF NAME="TagsEnabled" -->
-            <!-- TMPL_IF NAME="TagsInputOnList" -->
-                <span id="tagsel_span"></span>
-              <!-- TMPL_IF NAME="loggedinusername" -->
-                <span id="tagsel_form" style="display:none">
-                  <label for="tagsel_new">New Tag:</label>
-                  <input name="tagsel_new" id="tagsel_new" maxlength="100" />
-                  <input id="tagsel_button" name="tagsel_button" class="input tagsel_button" title="tagsel_button" type="submit" value="Add" />
-                  <a href="#" id="tagsel_cancel">Cancel</a>
-                </span>
-                <span id="tagsel_status" class="tagsel_tatus" style="display:none;">
-                  Tag status here.
-                </span>
-              <!-- /TMPL_IF -->
-            <!-- /TMPL_IF -->
-            <!-- /TMPL_IF -->
-            <span class="details_link" style="display:none" ><a href="#" onclick="storeAllBibNums();">Go to details &gt;&gt;</a></span>
-        </div>
-
-        </td></tr>
+                            <!-- TMPL_IF NAME="TagsEnabled" -->
+                                <!-- TMPL_IF NAME="TagsInputOnList" -->
+                                    <span id="tagsel_span"></span>
+                                    <!-- TMPL_IF NAME="loggedinusername" -->
+                                        <span id="tagsel_form" style="display:none">
+                                            <label for="tagsel_new">New Tag:</label>
+                                            <input name="tagsel_new" id="tagsel_new" maxlength="100" />
+                                            <input id="tagsel_button" name="tagsel_button" class="input tagsel_button" title="tagsel_button" type="submit" value="Add" />
+                                            <a href="#" id="tagsel_cancel">Cancel</a>
+                                        </span>
+                                        <span id="tagsel_status" class="tagsel_tatus" style="display:none;">
+                                            Tag status here.
+                                        </span>
+                                    <!-- /TMPL_IF -->
+                                <!-- /TMPL_IF -->
+                            <!-- /TMPL_IF -->
+                            <span class="details_link" style="display:none" ><a href="#" onclick="storeAllBibNums();">Go to details &gt;&gt;</a></span>
+                        </div>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
             <!-- Actual Search Results -->
             <!-- TMPL_LOOP NAME="SEARCH_RESULTS" -->
-            <!-- TMPL_UNLESS name="__odd__" -->
-                <tr class="highlight">
-            <!-- TMPL_ELSE -->
-                <tr>
-            <!-- /TMPL_UNLESS -->
+            <tr>
 
                 <td class="select selectcol"><!--TMPL_IF NAME="opacbookbag" --><input type="checkbox" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" title="Click to add to cart" /> <label for="bib<!-- TMPL_VAR NAME="biblionumber" -->"></label><!-- TMPL_ELSE -->
 <!-- TMPL_IF NAME="virtualshelves" --><input type="checkbox" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" title="Click to add to cart" /> <label for="bib<!-- TMPL_VAR NAME="biblionumber" -->"></label><!-- TMPL_ELSE -->
@@ -476,7 +429,7 @@ $(document).ready(function(){
                                 <!-- /TMPL_IF -->
                                 <!-- /TMPL_IF -->
 								<!-- TMPL_IF NAME="title" --><!-- TMPL_VAR NAME="title" ESCAPE="html" --><!-- TMPL_ELSE -->No title<!-- /TMPL_IF --> <!-- TMPL_LOOP NAME="subtitle"  --><!--TMPL_VAR Name="subfield"--><!--/TMPL_LOOP--></a>
-                                <!-- TMPL_IF NAME="author" -->by <a href="/cgi-bin/koha/opac-search.pl?q=au:<!-- TMPL_VAR NAME="author" ESCAPE="URL" -->" title="Search for works by this author" class="author"><!-- TMPL_VAR NAME="author" --></a>
+                                <!-- TMPL_IF NAME="author" -->by <a href="/cgi-bin/koha/opac-search.pl?q=<!-- TMPL_VAR NAME="author_indexname" -->:<!-- TMPL_VAR NAME="author" ESCAPE="URL" -->" title="Search for works by this author" class="author"><!-- TMPL_VAR NAME="author" --></a>
                                 <!-- TMPL_ELSE -->&nbsp;
                                 <!-- /TMPL_IF -->
 				<span class="results_summary"><span class="label">Publication:</span>
@@ -508,7 +461,7 @@ $(document).ready(function(){
 
                     <!-- TMPL_IF name="OPACItemsResultsDisplay" -->
 					    <!-- TMPL_UNLESS NAME="singleBranchMode" --><!-- TMPL_VAR NAME="location" --><!-- /TMPL_UNLESS -->
-                        <!-- TMPL_IF NAME="itemcallnumber" -->[<a href="/cgi-bin/koha/opac-search.pl?q=callnum:<!-- TMPL_VAR NAME="itemcallnumber" ESCAPE="URL" -->"><!-- TMPL_VAR NAME="itemcallnumber" --></a>]<!-- /TMPL_IF -->
+                        <!-- TMPL_IF NAME="itemcallnumber" -->[<a href="/cgi-bin/koha/opac-search.pl?q=itemcallnumber:<!-- TMPL_VAR NAME="itemcallnumber" ESCAPE="URL" -->"><!-- TMPL_VAR NAME="itemcallnumber" --></a>]<!-- /TMPL_IF -->
                     <!-- /TMPL_IF -->
                     (<!-- TMPL_VAR NAME="count" -->),
 		    <!-- /TMPL_UNLESS -->
@@ -589,6 +542,7 @@ $(document).ready(function(){
 				</td>
                 </tr>
                 <!-- /TMPL_LOOP -->
+                </tbody>
             </table>
     </form>
     <form id="hold_form" name="hold_form" method="get" action="/cgi-bin/koha/opac-reserve.pl">

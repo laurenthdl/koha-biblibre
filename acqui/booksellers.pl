@@ -95,6 +95,9 @@ if ( $count == 1 ) {
     );
 }
 
+# Sort alphabetically
+@suppliers = sort { lc($a->{'name'}) cmp lc($b->{'name'}) } @suppliers;
+
 #build result page
 my @loop_suppliers;
 for ( my $i = 0 ; $i < $count ; $i++ ) {

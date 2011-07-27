@@ -167,12 +167,14 @@ if($input->param('field') and not defined $op){
                          );        
 
     }else{
-        my @fields     = $input->param('field');
-        my @subfields  = $input->param('subfield');
-        my @actions    = $input->param('action');
-        my @condvals   = $input->param('condval');
-        my @nocondvals = $input->param('nocondval');
-        my @repvals    = $input->param('repval');
+        my @fields       = $input->param('field');
+        my @subfields    = $input->param('subfield');
+        my @actions      = $input->param('action');
+        my @tofields     = $input->param('tofield');
+        my @tosubfields  = $input->param('tosubfield');
+        my @condvals     = $input->param('condval');
+        my @nocondvals   = $input->param('nocondval');
+        my @repvals      = $input->param('repval');
         foreach my $biblionumber ( @biblionumbers ){
             my $record = GetMarcBiblio($biblionumber);
             my $biblio = GetBiblio($biblionumber);
@@ -186,14 +188,16 @@ if($input->param('field') and not defined $op){
             my $report = 0;
             my @failed_actions;
             for(my $i = 0 ; $i < scalar(@fields) ; $i++ ){
-                my $field    = $fields[$i];
-                my $subfield = $subfields[$i];
-                my $action   = $actions[$i];
-                my $condval  = $condvals[$i];
-                my $nocond   = $nocondvals[$i];
-                my $repval   = $repvals[$i];
+                my $field      = $fields[$i];
+                my $subfield   = $subfields[$i];
+                my $action     = $actions[$i];
+                my $tofield    = $tofields[$i];
+                my $tosubfield = $tosubfields[$i];
+                my $condval    = $condvals[$i];
+                my $nocond     = $nocondvals[$i];
+                my $repval     = $repvals[$i];
 
-                my ($result,$record)   = BatchModField($record, $field, $subfield, $action, $condval, $nocond, $repval);
+                my ($result,$record)   = BatchModField($record, $field, $subfield, $action, $tofield, $tosubfield, $condval, $nocond, $repval);
                 push @failed_actions, {action=>"$field $subfield $action ".($nocond eq "true"?"all":$condval)." $repval"} if ($result<=0);
             }
             if (@failed_actions == scalar(@fields)){

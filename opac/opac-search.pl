@@ -123,11 +123,12 @@ unless ($mybranch){
 $template->param(
     branchloop       => $branchloop,
     searchdomainloop => GetBranchCategories( undef, 'searchdomain' ),
+    holdingbranch_indexname => C4::Search::Query::getIndexName('holdingbranch'),
 );
 
 # load the language limits (for search)
 $template->param( search_languages_loop => getAllLanguagesAuthorizedValues() );
-$template->param( lang_index => C4::Search::Query::getIndexName('lang') );
+$template->param( lang_indexname => C4::Search::Query::getIndexName('lang') );
 
 # load the sorting stuff
 my $sort_by = $cgi->param('sort_by') || join(' ', grep { defined } (
@@ -160,6 +161,7 @@ my @itypes = $cgi->param('itypes');
 my @indexes = $cgi->param('idx');
 my @operators = $cgi->param('op');
 my @operands = $cgi->param('q');
+$operands[0] = '[* TO *]' if not defined $operands[0];
 
 my $query_cgi = "q=" .       join("&q=", @operands);
 $query_cgi   .= "&itypes=" . join("&itypes=", @itypes)  if (@itypes);
@@ -175,27 +177,6 @@ if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
 }
 
 my $itype_indexname = C4::Search::Query::getIndexName($itype_or_ccode);
-# If @itypes exists, we delete idx, op and q in the corresponding arrays
-# => Advsearch of filter by itypes
-# Else we must push in @itypes values existing in @operands
-# => Facets, sort, pagination
-if ( @itypes ) {
-    for my $i (0..$#indexes){
-        if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
-            splice @indexes, $i, 1;
-            splice @operands, $i, 1;
-            splice @operators, $i - 1, 1;
-        }
-    }
-} else {
-    for my $i (0..$#indexes){
-        if ( $indexes[$i] =~ /$itype_or_ccode/ ) {
-            $operands[$i] =~ m/\(([^\)]*)\)/;
-            push @itypes, map { $_ } split ' OR ', $1 ;
-        }
-    }
-}
-
 # Build itemtypesloop
 # Set selected itypes
 if ( $itype_or_ccode ne 'ccode') {
@@ -203,7 +184,7 @@ if ( $itype_or_ccode ne 'ccode') {
         my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
             number      => $cnt++,
-            index       => $itype_indexname,
+            indexname   => $itype_indexname,
             code        => $thisitemtype,
             selected    => $selected,
             description => $itemtypes->{$thisitemtype}->{'description'},
@@ -218,7 +199,7 @@ if ( $itype_or_ccode ne 'ccode') {
         my $selected = grep {$_ eq $thisitemtype} @itypes;
         my %row = (
             number      => $cnt++,
-            index       => $itype_indexname,
+            indexname   => $itype_indexname,
             code        => $thisitemtype->{authorised_value},
             selected    => $selected,
             description => $thisitemtype->{'lib'},
@@ -286,34 +267,21 @@ for (my $i = $#indexes; $i >= 0; $i--) {
   splice @indexes,$i,1 if $i > $#operands;
 }
 
-# construct query as itype:(@itypes[0] OR @itypes[1]) - item type advanced search
-my $itype_val_str="";
-if ( scalar( @itypes ) != 0 and $cgi->param('itypes') ) {
-    $itype_val_str = join ' OR ', @itypes ;
-    $itype_val_str = "($itype_val_str)";
-    if ( not @indexes ) {
-        $operands[0] .= " AND " if $operands[0];
-        $operands[0] .= "$itype_or_ccode:$itype_val_str";
-    } else {
-        push @operators, "AND";
-        push @operands, $itype_val_str;
-        push @indexes, $itype_or_ccode;
-    }
-}
-
 my %filters;
 # This array is used to build facets GUI
 my @tplfilters;
-for my $filter ( grep {$_ ne ""} $cgi->param('filters') ) {
+for my $filter ( $cgi->param('filters') ) {
+    next if not $filter;
     my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
-    $filters{$k} = $v;
+    push @{$filters{$k}}, $v;
     $v =~ s/"//g;
     push @tplfilters, {
         'ind' => $k,
         'val' => $v,
     };
 }
-$filters{recordtype} = 'biblio';
+
+push @{$filters{recordtype}}, 'biblio';
 $template->param('filters' => \@tplfilters );
 
 
@@ -321,18 +289,18 @@ $template->param('filters' => \@tplfilters );
 my $limit_yr = $cgi->param('limit-yr');
 if ( $limit_yr ) {
     my $op;
-    my $pubdate_indexname = C4::Search::Query::getIndexName('pubdate');    
+    my $pubdate_indexname = C4::Search::Query::getIndexName('pubdate');
     if ( $limit_yr =~ /\d{4}-\d{4}/ ) {
         my ( $yr1, $yr2 ) = split( /-/, $limit_yr );
-        $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $yr1 ) . '" TO "' . C4::Search::Engine::Solr::NormalizeDate( $yr2 ) . '"]';
+        $op = "[$yr1 TO $yr2]";
     } elsif ( $limit_yr =~ /-\d{4}/ ) {
         $limit_yr =~ /-(\d{4})/;
-        $op = '[* TO "' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '"]';
+        $op = "[* TO $1]";
     } elsif ( $limit_yr =~ /\d{4}-/ ) {
         $limit_yr =~ /(\d{4})-/;
-        $op = '["' . C4::Search::Engine::Solr::NormalizeDate( $1 ) . '" TO *]';
+        $op = "[$1 TO *]";
     } elsif ( $limit_yr =~ /\d{4}/ ) {
-        $op = '"' . C4::Search::Engine::Solr::NormalizeDate( $limit_yr ) . '"';
+        $op = $limit_yr;
     } else {
         #FIXME: Should return a error to the user, incorect date format specified
     }
@@ -479,11 +447,12 @@ my $pager = Data::Pagination->new(
     $page,
 );
 
-# This array is used to build pagination, facets links and itypes, sort form
+# This array is used to build pagination, facets links, sort form
 my @follower_params = map { {
     ind => 'filters',
     val => $_->{'ind'}.':"'.$_->{'val'}.'"'
 } } @tplfilters;
+$operands[0] = "*:*" if not defined $operands[0];
 push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
 push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
@@ -531,7 +500,8 @@ my @facets;
 while ( my ($index,$facet) = each %{$res->facets} ) {
     if ( @$facet > 1 ) {
         my @values;
-        my ($type, $code) = split /_/, $index;
+        $index =~ m/^([^_]*)_(.*)$/;
+        my ($type, $code) = ($1, $2);
 
         for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
             my $value = $facet->[$i++];
@@ -555,15 +525,16 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
                 'lib'     => $lib,                
                 'value'   => $value,
                 'count'   => $count,
-                'active'  => $filters{$index} && $filters{$index} eq "\"$value\"",
+                'active'  => $filters{$index} && grep /"\Q$value\E"/, @{ $filters{$index} },
                 'filters' => \@tplfilters,
             };
         }
 
         push @facets, {
-            'index'  => $index,
-            'label'  => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
-            'values' => \@values,
+            'indexname'  => $index,
+            'label'      => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
+            'values'     => \@values,
+            'size'      => scalar(@values),
         };
     }
 }
@@ -580,6 +551,9 @@ $template->param(
     'count'          => $count,
     'countrss'       => $countRSS,
     'tag'            => $tag,
+    author_indexname => C4::Search::Query::getIndexName('author'),
+    availability_indexname => C4::Search::Query::getIndexName('availability'),
+
 );
 
 # VI. BUILD THE TEMPLATE

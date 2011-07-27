@@ -7,37 +7,69 @@
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
-     var CGIBIN = "/cgi-bin/koha/";
-     
-     function fieldChanged(){
-        var field = $('#fieldchoice').val();
+    $(document).ready(function() {
+        $("#fieldchoice,#tofieldchoice").change(function(){
+                fieldChanged(this);
+        });
+        $("#subfieldchoice,#tosubfieldchoice").change(function(){
+                subfieldChanged(this);
+        });
+    });
+
+    function check(form) {
+        if ( $("#uploadfile").val().length == 0 && $("#recordslist").val().length == 0 ) {
+            $(".warning").show();
+            return false;
+        }
+        return true;
+    }
+
+    var CGIBIN = "/cgi-bin/koha/";
+    function fieldChanged(caller){
+        var fieldid = $(caller).attr('id');
+        var subfieldid = $(caller).parent().next().find("select.subfield").attr('id');
+        var field = $('#'+fieldid).val();
         $.ajax({
-        	url: CGIBIN + 'tools/batchedit.pl?field=' + field,
-        	dataType: 'json',
+            url: CGIBIN + 'tools/batchedit.pl?field=' + field,
+            dataType: 'json',
             success: function(data){
-            	$("#subfieldchoice option").remove();
-            
-        	    var subfield = $('#subfieldchoice'); 
-                	$("<option>").attr("value", "@")
+                $("#"+subfieldid+" option").remove();
+                var subfield = $('#'+subfieldid);
+                $("<option>").attr("value", "@")
                                  .text( _('Whole field'))
-                                 .appendTo('#subfieldchoice');
+                                 .appendTo('#'+subfieldid);
                 for( var i=0; i < data.length ; i++){
-                	$("<option>").attr("value", data[i].subfield)
+                    $("<option>").attr("value", data[i].subfield)
                                  .text(data[i].subfield)
-                                 .appendTo('#subfieldchoice');
+                                 .appendTo('#'+subfieldid);
                 }
-                subfieldChanged();
+                $(subfield).change();
             }
         });
+        var action = $("#actionchoice").val();
+        if ( action == "dup_w" && fieldid != "tofieldchoice" ) {
+            var val = $(caller).find("option:selected").val();
+            $("#tofieldchoice option[value='" + val + "']").attr('disabled', '');
+            $("#tofieldchoice option[value='" + val + "']").attr('selected', 'selected');
+            $("#tofieldchoice option[value!='" + val + "']").attr('disabled', 'disabled');
+            $("#tofieldchoice").change();
+        }
      }
 
-     function subfieldChanged(){
-        var field    = $('#fieldchoice').val();
-        var subfield = $('#subfieldchoice').val();
+     function subfieldChanged(caller){
+        var fieldid = $(caller).attr('id');
+        var subfieldid = $(caller).parent().next().find("select.subfield").attr('id');
+        var field = $('#'+fieldid).val();
+        var subfield = $('#'+subfieldid).val();
         $.ajax({
         	url: CGIBIN + 'tools/batchedit.pl?field=' + field + '&subfield=' + subfield,
         	dataType: 'json',
             success: function(data){
+
+                var was_checked = '';
+                if ( $("#nocond").attr("checked") == true ) {
+                    was_checked = "checked='checked'";
+                };
 
         	    if( data.length > 0) {
         	    	$("#condvaltd").html('<select name="condvalchoice" id="condvalchoice" />');
@@ -57,27 +89,61 @@
                             .text(data[i].value)
                             .appendTo('#condvalchoice');
                     }
-        	    }else{
-                    $("#condvaltd").html('<input type="text" name="condvalchoice" id="condvalchoice" />');
-                    $("#repvaltd").html('<input type="text" name="repvalchoice"  id="repvalchoice" />');
-        	    }
-                $('<input type="checkbox" id="nocond" name="nocond" value="nocond" onClick="$(\'#condvalchoice\').attr(\'disabled\', ! $(\'#condvalchoice\').attr(\'disabled\') ) ">All</input>').appendTo("#condvaltd");
+                }else{
+                    var cond_was_disabled = '';
+                    if ( $("#condvalchoice").attr("disabled") == true) {
+                        cond_was_disabled = "disabled='disabled'";
+                    }
+                    var rep_was_disabled = '';
+                    if ( $("#repvaltd").attr("disabled") == true) {
+                        rep_was_disabled = "disabled='disabled'";
+                    }
+                    $("#condvaltd").html('<input type="text" name="condvalchoice" id="condvalchoice" '+cond_was_disabled+' />');
+                    $("#repvaltd").html('<input type="text" name="repvalchoice"  id="repvalchoice" '+rep_was_disabled+'/>');
+                }
+                $('<input type="checkbox" id="nocond" name="nocond" value="nocond" '+was_checked+' onClick="$(\'#condvalchoice\').attr(\'disabled\', ! $(\'#condvalchoice\').attr(\'disabled\') ) ">All</input>').appendTo("#condvaltd");
             }
         });
-        
+
+     }
+
+     function actionChanged(){
+        var action = $("#actionchoice").val();
+        if ( action == "dup" || action == "dup_w" ) {
+            $("#tofieldchoice").attr('disabled', '');
+            $("#tosubfieldchoice").attr('disabled', '');
+            $("#repvalchoice").attr('disabled', 'disabled');
+        } else {
+            $("#tofieldchoice").attr('disabled', 'disabled');
+            $("#tosubfieldchoice").attr('disabled', 'disabled');
+            $("#repvalchoice").attr('disabled', '');
+        }
+
+        if ( action == "dup_w" ) {
+            var val = $("#fieldchoice option:selected").val();
+            $("#tofieldchoice option[value='" + val + "']").attr('selected', 'selected');
+            $("#tofieldchoice option[value!='" + val + "']").attr('disabled', 'disabled');
+            $("#tofieldchoice").change();
+        } else {
+            $("#tofieldchoice option").attr('disabled', '');
+        }
      }
 
      function addRule(){
         var actionlabel = {
                 mod: _('Modify'),
                 del: _('Delete'),
-                add: _('Create')
+                add: _('Create'),
+                dup: _('Duplicate'),
+                dup_w: _('Duplicate')
                 };
         var repvallabel  = $('#repvalchoice :selected').text()  || $("#repvalchoice").val();
-        
+
         var field    = $('#fieldchoice').val();
         var subfield = $('#subfieldchoice').val();
         var action   = $('#actionchoice').val();
+        var tofield    = $('#tofieldchoice').val();
+        var tosubfield = $('#tosubfieldchoice').val();
         var nocond   = $('#nocond').attr('checked')||(! $('#condvalchoice').val().length);
 
         if( ! nocond ) {
@@ -93,10 +159,11 @@
                 + '<td><input type="hidden" name="subfield" value="' + subfield + '" />' + subfield            + '</td>'
                 + '<td><input type="hidden" name="action" value="'   + action + '" />'   + actionlabel[action] + '</td>'
                 + '<td><input type="hidden" name="condval" value="'  + condval + '" />'  
-                    + condvallabel        
+                    + condvallabel
                     + '<input type="hidden" name="nocondval" value="' + nocond + '" />'
                 + '</td>'
-                
+                + '<td><input type="hidden" name="tofield" value="'    + tofield + '" />'    + tofield               + '</td>'
+                + '<td><input type="hidden" name="tosubfield" value="' + tosubfield + '" />' + tosubfield            + '</td>'
                 + '<td><input type="hidden" name="repval" value="'   + repval + '" />'   + repvallabel         + '</td>'
                 + '<td><input type="button" value="Delete" onclick="deleteRule(this)" /></td>'
             + '</tr>';
@@ -170,43 +237,59 @@
             
 <!-- TMPL_IF NAME="moddone" -->
     <div class="dialog alert">All operations processed</div>
+    <a href="/cgi-bin/koha/tools/batchedit.pl">Create another batch record modification</a>
 <!-- TMPL_ELSE -->
 
 <fieldset>
 <h2>Modification rules:</h2>
-<input type="submit" value="Submit" />
+<div class="warning" style="display:none;">
+    You must select a file or specify records numbers
+</div>
+<input type="submit" value="Submit" onclick="return check(this.form);"/>
 <input type="hidden" name="op" value="do" />
 <input type="hidden" name="bib_list" value="<!-- TMPL_VAR NAME="bib_list" -->" />
 <table id="rulestable">
     <thead>
         <tr>
-            <th>Field</th><th>Subfield</th><th>Action</th><th>Condition Value</th><th>Value</th><th>&nbsp;</th>
+            <th>Field</th><th>Subfield</th><th>Action</th><th>Condition Value</th><th>To field</th><th>To subfield</th><th>Value</th><th>&nbsp;</th>
         </tr>
     </thead>
         <tr>
             <td>
-                <select name="fieldchoice" id="fieldchoice" onchange="fieldChanged();">
+                <select name="fieldchoice" id="fieldchoice" class='field'>
 <!-- TMPL_LOOP NAME="marcfields" -->
                     <option value="<!-- TMPL_VAR NAME="tag" -->"><!-- TMPL_VAR NAME="tag" --></option>
 <!-- /TMPL_LOOP -->
                 </select>
             </td>
             <td>
-                <select name="subfieldchoice" id="subfieldchoice" onchange="subfieldChanged();">
+                <select name="subfieldchoice" id="subfieldchoice" class='subfield'>
                 
                 </select>
             </td>
             <td>
-                <select name="actionchoice" id="actionchoice">
+                <select name="actionchoice" id="actionchoice" onchange="actionChanged();">
                     <option value="mod">Modify subfield</option>
                     <option value="add">Create subfield</option>
                     <option value="addfield">Create field and subfield</option>
                     <option value="del">Delete subfield</option>
+                    <option value="dup">Duplicate subfield</option>
+                    <option value="dup_w">Duplicate subfield within field</option>
                 </select>
             </td>
             <td id="condvaltd">
-                <input type="text" name="condvalchoice" id="condvalchoice" />
-                <input type="checkbox" id="nocond" name="nocond" value="nocond" onClick="$('#condvalchoice').attr('disabled', ! $('#condvalchoice').attr('disabled') ) ">All</input> 
+                <input type="text" name="condvalchoice" id="condvalchoice" disabled="disabled" />
+                <input type="checkbox" id="nocond" name="nocond" value="nocond" onClick="$('#condvalchoice').attr('disabled', ! $('#condvalchoice').attr('disabled') ) " checked="checked" >All</input> 
+            </td>
+            <td>
+                <select name="fieldchoice" id="tofieldchoice" class='field' disabled='disabled'>
+                    <!-- TMPL_LOOP NAME="marcfields" -->
+                        <option value="<!-- TMPL_VAR NAME="tag" -->"><!-- TMPL_VAR NAME="tag" --></option>
+                    <!-- /TMPL_LOOP -->
+                </select>
+            </td>
+            <td>
+                <select name="subfieldchoice" id="tosubfieldchoice" class='subfield' disabled='disabled'></select>
             </td>
             <td id="repvaltd">
                 <input type="text" name="repvalchoice" id="repvalchoice" />
@@ -219,7 +302,7 @@
     
 <!-- /TMPL_LOOP -->
 </table>
-<input type="submit" value="Submit" />
+<input type="submit" value="Submit" onclick="return check(this.form);"/>
 </fieldset>
 </form>
 <!-- /TMPL_IF -->
