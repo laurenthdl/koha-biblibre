@@ -305,7 +305,7 @@ canned reports and writing custom SQL reports.</p>
             <td>
                 <select name="<!-- TMPL_VAR NAME="name" -->_value">
                 <!-- TMPL_LOOP NAME="values" -->
-                <option value="<!-- TMPL_VAR NAME="availablevalues"-->"><!-- TMPL_IF name="default" -->Default<!-- TMPL_ELSE --><!-- TMPL_VAR NAME="availablevalues" ESCAPE="HTML"--><!-- /TMPL_IF --></option>
+                <option value="<!-- TMPL_VAR NAME="availablevalues"-->"><!-- TMPL_IF name="default" -->Default<!-- TMPL_ELSE --><!-- TMPL_VAR NAME="display_value" ESCAPE="HTML"--><!-- /TMPL_IF --></option>
                 <!-- /TMPL_LOOP -->
                 </select>
             </td>
