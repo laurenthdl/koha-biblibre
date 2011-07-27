@@ -74,7 +74,11 @@ $(document).ready(function() {
             </table>
           <!-- /TMPL_IF -->
         <!-- TMPL_ELSE -->
-          <p>There is no subscription whose title begins with '<!-- TMPL_VAR NAME='letter' -->'.</p>
+          <!-- TMPL_IF NAME='error_while_searching' -->
+            <p>An error has occured. Please contact the site administrator.</p>
+          <!-- TMPL_ELSE -->
+            <p>There is no subscription whose title begins with '<!-- TMPL_VAR NAME='letter' -->'.</p>
+          <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
       <!-- TMPL_ELSE -->
         <p>Please click on a letter to show subscriptions whose title begins with this letter.</p>
