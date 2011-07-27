@@ -57,14 +57,14 @@ $table_areas{'2'} = [ 'items', 'biblioitems', 'biblio' ];                     # 
 $table_areas{'3'} = ['borrowers'];                                            # patrons
 $table_areas{'4'} = [ 'aqorders', 'biblio', 'items' ];                        # acquisitions
 $table_areas{'5'} = [ 'borrowers', 'accountlines' ];                          # accounts
-$table_areas{'6'} = [ 'biblio', 'biblioitems', 'serial', 'serialitems', 'subscription', 'subscriptionhistory', 'subscriptionroutinglist', 'aqbooksellers' ]; # serial
+$table_areas{'6'} = [ 'biblio', 'biblioitems', 'serial', 'serialitems', 'subscription', 'subscriptionhistory', 'subscriptionroutinglists', 'aqbooksellers' ]; # serial
 our %keys;
 $keys{'1'} = [ 'statistics.borrowernumber=borrowers.borrowernumber',  'items.itemnumber = statistics.itemnumber', 'biblioitems.biblioitemnumber = items.biblioitemnumber' ];
 $keys{'2'} = [ 'items.biblioitemnumber=biblioitems.biblioitemnumber', 'biblioitems.biblionumber=biblio.biblionumber' ];
 $keys{'3'} = [];
 $keys{'4'} = [ 'aqorders.biblionumber=biblio.biblionumber',           'biblio.biblionumber=items.biblionumber' ];
 $keys{'5'} = ['borrowers.borrowernumber=accountlines.borrowernumber'];
-$keys{'6'} = [ 'biblio.biblionumber=biblioitems.biblionumber', 'biblioitems.biblionumber=serial.biblionumber', 'serial.serialid=serialitems.serialid', 'serial.subscriptionid=subscription.subscriptionid', 'serial.subscriptionid=subscriptionhistory.subscriptionid', 'serial.subscriptionid=subscriptionroutinglist.subscriptionid', 'subscription.aqbooksellerid=aqbooksellers.id'];
+$keys{'6'} = [ 'biblio.biblionumber=biblioitems.biblionumber', 'biblioitems.biblionumber=serial.biblionumber', 'serial.serialid=serialitems.serialid', 'serial.subscriptionid=subscription.subscriptionid', 'serial.subscriptionid=subscriptionhistory.subscriptionid', 'serial.subscriptionid=subscriptionroutinglists.subscriptionid', 'subscription.aqbooksellerid=aqbooksellers.id'];
 
 # have to do someting here to know if its dropdown, free text, date etc
 
