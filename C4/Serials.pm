@@ -67,6 +67,8 @@ BEGIN {
       &check_routing &updateClaim &removeMissingIssue
       &CountIssues &HasItems
 
+      &GetSubscriptionsByFirstLetters
+
       subscriptionCurrentlyOnOrder
     );
 }
@@ -2745,6 +2747,31 @@ sub subscriptionCurrentlyOnOrder {
     my $sth = $dbh->prepare( $query );
     $sth->execute($subscriptionid);
     return $sth->fetchrow_array;
+}
+
+=head2
+
+$res = GetSubscriptionsByFirstLetters($letters, $page, $count, $sort_by);
+
+Search the subscriptions whose name (without stopwords) begins with the letters given in parameters, and returns a Data::SearchEngine::Solr::Results object for the $count results after the ($page-1)*$count first results.
+$sort_by is composed of an index name, followed by a space, and an order ("asc" or "desc").
+
+=cut
+
+sub GetSubscriptionsByFirstLetters {
+    my ($letters, $page, $count, $sort_by) = @_;
+
+    $page ||= 1;
+    $count ||= C4::Context->preference('OPACnumSearchResults') || 20;
+    $sort_by ||= "score desc";
+    my $srt_title_indexname = 'srt_'.C4::Search::Query::getIndexName('title');
+    my $isserial_indexname = C4::Search::Query::getIndexName('is-serial');
+
+    my $q = "( $srt_title_indexname:".ucfirst($letters)."*"
+        ." OR $srt_title_indexname:".lcfirst($letters)."* )"
+        ." AND $isserial_indexname:1";
+
+    return SimpleSearch($q, undef, $page, $count, $sort_by);
 }
 
 =head2 _numeration

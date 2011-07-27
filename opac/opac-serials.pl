@@ -35,6 +35,7 @@ use C4::Context;
 use C4::Output;
 
 use C4::Search;
+use C4::Serials;
 use Data::Pagination;
 
 my $input = new CGI;
@@ -48,9 +49,6 @@ my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
 
 my $letter = $input->param('letter');
 
-my $srt_title_indexname = 'srt_'.C4::Search::Query::getIndexName('title');
-my $isserial_indexname = C4::Search::Query::getIndexName('is-serial');
-my $sort_by = C4::Search::Query::getIndexName('title')." asc";
 
 my @letters = qw(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z);
 my @letters_loop = ();
@@ -63,11 +61,8 @@ foreach (@letters) {
 
     # NOTE: This can be uncommented to disable letters that
     # have no results
-    #my $q = "( $srt_title_indexname:".uc($_)."*"
-    #    ." OR $srt_title_indexname:".lc($_)."* )"
-    #    ." AND $isserial_indexname:1";
-    #my $res = SimpleSearch($q, undef, 1, 1);
-    #$row->{'count'} = scalar @{ $res->{'items'} };
+    #my $res = GetSubscriptionsByFirstLetters($_, 1, 1);
+    #$row->{'count'} = scalar @{ $res->{'items'} } if(ref($res));
 
     push @letters_loop, \%row;
 }
@@ -75,10 +70,8 @@ foreach (@letters) {
 if($letter) {
     my $page = $input->param('page') || 1;
     my $count = C4::Context->preference('OPACnumSearchResults') || 20;
-    my $q = "( $srt_title_indexname:".uc($letter)."*"
-        ." OR $srt_title_indexname:".lc($letter)."* )"
-        ." AND $isserial_indexname:1";
-    my $res = SimpleSearch($q, undef, $page, $count, $sort_by);
+    my $sort_by = C4::Search::Query::getIndexName('title')." asc";
+    my $res = GetSubscriptionsByFirstLetters($letter, $page, $count, $sort_by);
 
     if (ref($res)) {
         my @results_loop;
