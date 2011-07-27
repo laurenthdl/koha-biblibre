@@ -1665,7 +1665,9 @@ sub getItemsInfos {
     my ($biblionumber, $interface, $itemtypes, $subfieldstosearch, $itemtag, $branches) = @_;
 
     my $marcrecord = C4::Biblio::GetMarcBiblio($biblionumber);
-    
+
+    return if not $marcrecord;
+
     %$subfieldstosearch or $subfieldstosearch = getSubfieldsToSearch;
 
     $itemtag = getItemTag if not $itemtag;
