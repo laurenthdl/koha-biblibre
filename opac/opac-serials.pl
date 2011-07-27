@@ -80,36 +80,42 @@ if($letter) {
         ." AND $isserial_indexname:1";
     my $res = SimpleSearch($q, undef, $page, $count, $sort_by);
 
-    my @results_loop;
-    foreach (@{$res->{'items'}}) {
-        my $recordid = $_->{'values'}->{'recordid'};
-        my $record = C4::Search::getItemsInfos($recordid, 'opac', {}, {}, {}, {});
-        push @results_loop, $record;
+    if (ref($res)) {
+        my @results_loop;
+        foreach (@{$res->{'items'}}) {
+            my $recordid = $_->{'values'}->{'recordid'};
+            my $record = C4::Search::getItemsInfos($recordid, 'opac', {}, {}, {}, {});
+            push @results_loop, $record;
+        }
+
+        $template->param(
+            results_loop => \@results_loop,
+        );
+
+        my $total = $res->{'pager'}->{'total_entries'};
+        my $pager = Data::Pagination->new(
+            $total,
+            $count,
+            20,
+            $page,
+        );
+        my @follower_params;
+        push @follower_params, {
+            ind => 'letter',
+            val => $letter,
+        };
+        $template->param(
+            previous_page   => $pager->{'prev_page'},
+            next_page       => $pager->{'next_page'},
+            PAGE_NUMBERS    => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
+            current_page    => $page,
+            follower_params => \@follower_params,
+        );
+    } else {
+        $template->param(
+            error_while_searching => 1,
+        );
     }
-
-    $template->param(
-        results_loop => \@results_loop,
-    );
-
-    my $total = $res->{'pager'}->{'total_entries'};
-    my $pager = Data::Pagination->new(
-        $total,
-        $count,
-        20,
-        $page,
-    );
-    my @follower_params;
-    push @follower_params, {
-        ind => 'letter',
-        val => $letter,
-    };
-    $template->param(
-        previous_page   => $pager->{'prev_page'},
-        next_page       => $pager->{'next_page'},
-        PAGE_NUMBERS    => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
-        current_page    => $page,
-        follower_params => \@follower_params,
-    );
 }
 
 $template->param(

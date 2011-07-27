@@ -5348,6 +5348,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
         ('printed-music','Musique imprimée','txt',0,'biblio',0,0,'','',''),
         ('electronic-ressource','Ressource électronique','txt',0,'biblio',0,0,'','',''),
         ('country-heading','Pays d\'édition','str',0,'biblio',0,0,'','',''),
+        ('is-serial','Est un périodique','int',0,'biblio',0,0,'','',''),
         ('auth-corporate-name','corporate-name','ste',0,'authority',0,1,'C4::Search::Plugins::Author','',''),
         ('auth-corporate-name-heading','corporate-name-heading','ste',0,'authority',0,1,'C4::Search::Plugins::Author','',''),
         ('auth-corporate-name-parallel','corporate-name-parallel','ste',0,'authority',0,0,'','',''),
