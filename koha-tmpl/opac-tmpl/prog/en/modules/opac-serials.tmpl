@@ -1,0 +1,85 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+Koha Online Catalog &rsaquo; Serials
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+$(document).ready(function() {
+    $("#resultst").tablesorter({
+      widgets: ['zebra'],
+    });
+});
+//]]>
+</script>
+</head>
+
+<body>
+<!-- TMPL_INCLUDE NAME="masthead.inc" -->
+
+<div id="doc3" class="yui-t7">
+
+<div id="bd">
+  <div id="yui-main">
+    <div class="yui-b" style="text-align:center">
+      <h1>Serials</h1>
+
+      <div id="letters">
+        <!-- TMPL_LOOP NAME="letters_loop" -->
+          <!-- TMPL_IF NAME='active' -->
+            <strong><!-- TMPL_VAR NAME='letter' --></strong>&nbsp;
+          <!-- TMPL_ELSE -->
+            <!-- TMPL_IF NAME='count' -->
+              <a href="/cgi-bin/koha/opac-serials.pl?letter=<!-- TMPL_VAR NAME='letter' -->"><!-- TMPL_VAR NAME='letter' --></a>&nbsp;
+            <!-- TMPL_ELSE -->
+              <span style="color:grey"><!-- TMPL_VAR NAME='letter' --></span>&nbsp;
+            <!-- /TMPL_IF -->
+          <!-- /TMPL_IF -->
+        <!-- /TMPL_LOOP -->
+      </div>
+      <br />
+      <!-- TMPL_IF NAME='letter' -->
+        <!-- TMPL_IF NAME='results_loop' -->
+          <!-- TMPL_INCLUDE NAME='page-numbers.inc' -->
+          <!-- TMPL_IF NAME='OPACXSLTResultsDisplay' -->
+            <table id="resultst" style="margin:auto; text-align:left">
+              <thead></thead>
+              <tbody>
+                <!-- TMPL_LOOP NAME='results_loop' -->
+                  <tr>
+                    <td><!-- TMPL_VAR NAME='OPACXSLTResultsRecord' --></td>
+                  </tr>
+                <!-- /TMPL_LOOP -->
+              </tbody>
+            </table>
+          <!-- TMPL_ELSE -->
+            <table id="resultst" style="margin:auto">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>ISSN</th>
+                  <th>Notes</th>
+                  <th>Library</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- TMPL_LOOP NAME='results_loop' -->
+                  <tr>
+                    <td><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->"><!-- TMPL_VAR NAME='title' --></a></td>
+                    <td><!-- TMPL_VAR NAME='issn' --></td>
+                    <td><!-- TMPL_VAR NAME='notes' --></td>
+                    <td><!-- TMPL_VAR NAME='branchcode' --></td>
+                  </tr>
+                <!-- /TMPL_LOOP -->
+              </tbody>
+            </table>
+          <!-- /TMPL_IF -->
+        <!-- TMPL_ELSE -->
+          <p>There is no subscription whose title begins with '<!-- TMPL_VAR NAME='letter' -->'.</p>
+        <!-- /TMPL_IF -->
+      <!-- TMPL_ELSE -->
+        <p>Please click on a letter to show subscriptions whose title begins with this letter.</p>
+      <!-- /TMPL_IF -->
+    </div>
+  </div>
+</div>
+<!-- TMPL_INCLUDE NAME="opac-bottom.inc" -->
