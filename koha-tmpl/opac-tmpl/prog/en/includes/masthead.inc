@@ -137,6 +137,7 @@
   <!-- TMPL_ELSIF NAME="OPACViewOthersSuggestions" --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-suggestions.pl">Purchase Suggestions</a>
   <!-- /TMPL_IF -->
 <!-- /TMPL_IF -->
+<span class="pipe"> | </span><a href="/cgi-bin/koha/opac-serials.pl">Serials</a>
 </div>
  </div>
 </div>
