@@ -1665,7 +1665,9 @@ sub getItemsInfos {
     my ($biblionumber, $interface, $itemtypes, $subfieldstosearch, $itemtag, $branches) = @_;
 
     my $marcrecord = C4::Biblio::GetMarcBiblio($biblionumber);
-    
+
+    return if not $marcrecord;
+
     %$subfieldstosearch or $subfieldstosearch = getSubfieldsToSearch;
 
     $itemtag = getItemTag if not $itemtag;
@@ -1911,6 +1913,8 @@ sub getItemsInfos {
     if ( C4::Context->preference("OPACXSLTResultsDisplay") ) {
         $biblio->{'OPACXSLTResultsRecord'} = XSLTParse4Display( $biblionumber, $marcrecord, C4::Context->preference("OPACXSLTResultsDisplay") );
     }
+
+    $biblio->{'ocoins'} = GetCOinSBiblio($biblionumber);
 
     return $biblio;
  

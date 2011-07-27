@@ -239,13 +239,27 @@ foreach my $r ( @{$budgets} ) {
     unless($staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
         if ( !defined $r->{budget_amount} || $r->{budget_amount} == 0 ) {
             next;
-        } elsif ( $r->{budget_permission} == 1 && $r->{budget_owner_id} != $borrower->{borrowernumber} ) {
+        # Restricted to owner
+        } elsif ( $r->{budget_permission} == 1
+          && $r->{budget_owner_id} != $loggedinuser )
+        {
             next;
-        } elsif ( $r->{budget_permission} == 2 && defined $r->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode} ) {
-            next;
-        } elsif ( $r->{budget_permission} == 3 ) {
+        # Restricted to library + owner + users
+        } elsif ( $r->{budget_permission} == 2
+          && defined $r->{budget_branchcode}
+          && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode}
+          && $r->{'budget_owner_id'} != $loggedinuser )
+        {
+            my $budgetusers = GetUsersFromBudget($r->{'budget_id'});
+            if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}){
+                next;
+            }
+        # Restricted to owner + users
+        } elsif ( $r->{budget_permission} == 3
+          && $r->{'budget_owner_id'} != $loggedinuser )
+        {
             my $budgetusers = GetUsersFromBudget( $r->{budget_id} );
-            if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}) {
+            if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}){
                 next;
             }
         }
@@ -255,6 +269,8 @@ foreach my $r ( @{$budgets} ) {
       { b_id  => $r->{budget_id},
         b_txt => $r->{budget_name},
         b_active => $r->{budget_period_active},
+        b_sort1_authcat => $r->{'sort1_authcat'},
+        b_sort2_authcat => $r->{'sort2_authcat'},
         b_sel => ( $r->{budget_id} == $budget_id ) ? 1 : 0,
       };
 }
