@@ -86,20 +86,32 @@
     <!-- TMPL_IF NAME="OpacAddMastheadLibraryPulldown" -->
         <select name="filters" id="masthead_branchsearch" class="left" style="max-width:10em;width:10em;">
             <!-- TMPL_IF NAME="branchsearchexistsincookie" -->
-                <option value="" <!-- TMPL_IF EXPR="branchsearch eq ''" -->selected="selected"<!-- /TMPL_IF -->>All Libraries</option>
+              <!-- TMPL_IF EXPR="branchsearch eq ''" -->
+                <option value="" selected="selected">All Libraries</option>
+              <!-- TMPL_ELSE -->
+                <option value="">All Libraries</option>
+              <!-- /TMPL_IF -->
             <!-- TMPL_ELSE -->
                 <option value="">All Libraries</option>
             <!-- /TMPL_IF -->
             <!-- TMPL_LOOP NAME="BranchesLoop" -->
-                <option 
-                <!-- TMPL_IF NAME="branchsearchexistsincookie" -->
-                    <!-- TMPL_IF EXPR="branchsearch eq value" -->selected="selected"<!-- /TMPL_IF -->
+              <!-- TMPL_IF NAME="branchsearchexistsincookie" -->
+                <!-- TMPL_IF EXPR="branchsearch eq value" -->
+                  <option selected="selected" value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
                 <!-- TMPL_ELSE -->
-                    <!-- TMPL_IF name="mylibraryfirst" -->
-                        <!-- TMPL_IF NAME="selected" -->selected="selected"<!-- /TMPL_IF -->
-                    <!-- /TMPL_IF -->
+                  <option value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
                 <!-- /TMPL_IF -->
-                value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+              <!-- TMPL_ELSE -->
+                <!-- TMPL_IF NAME='mylibraryfirst' -->
+                  <!-- TMPL_IF NAME='selected' -->
+                    <option selected="selected" value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+                  <!-- TMPL_ELSE -->
+                    <option value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+                  <!-- /TMPL_IF -->
+                <!-- TMPL_ELSE -->
+                  <option value="<!-- TMPL_VAR NAME='holdingbranch_index' -->:<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+                <!-- /TMPL_IF -->
+              <!-- /TMPL_IF -->
             <!-- /TMPL_LOOP -->
         </select>
    <!-- TMPL_ELSE -->
