@@ -32,7 +32,7 @@ BEGIN {
     # set the version for version checking
     $VERSION   = 3.01;
     @ISA       = qw(Exporter);
-    @EXPORT_OK = qw(GetBorrowerAttributes CheckUniqueness SetBorrowerAttributes
+    @EXPORT_OK = qw(GetBorrowerAttributes CheckUniqueness SetBorrowerAttributes DeleteBorrowerAttribute UpdateBorrowerAttribute
       extended_attributes_code_value_arrayref extended_attributes_merge
       SearchIdMatchingAttribute);
     %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -211,6 +211,34 @@ sub SetBorrowerAttributes {
         $attr->{password} = undef unless exists $attr->{password};
         $sth->execute( $borrowernumber, $attr->{code}, $attr->{value}, $attr->{password} );
     }
+}
+
+sub DeleteBorrowerAttribute {
+    my ( $borrowernumber, $attribute ) = @_;
+
+    my $dbh    = C4::Context->dbh;
+    my $sth = $dbh->prepare("DELETE FROM borrower_attributes 
+        WHERE borrowernumber = ?
+        AND code = ?");
+    $sth->execute( $borrowernumber, $$attribute{code} );
+}
+
+sub UpdateBorrowerAttribute {
+    my ( $borrowernumber, $attribute ) = @_;
+
+    my $dbh    = C4::Context->dbh;
+    my $query = "UPDATE borrower_attributes SET attribute = ?";
+    my @params = ( $$attribute{attribute} );
+    if ( defined $$attribute{password} ) {
+        $query .= ", password = ?";
+        push @params, $$attribute{password};
+    }
+    $query .= " WHERE code = ? AND borrowernumber = ?";
+    push @params, $$attribute{code};
+    push @params, $borrowernumber;
+    my $sth = $dbh->prepare( $query );
+
+    $sth->execute( @params );
 }
 
 =head2 extended_attributes_code_value_arrayref 
