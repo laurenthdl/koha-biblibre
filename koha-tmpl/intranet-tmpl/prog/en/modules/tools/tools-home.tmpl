@@ -45,6 +45,11 @@
     <dd>Delete old borrowers and anonymize circulation history (deletes borrower reading history)</dd>
     <!-- /TMPL_IF -->
 
+    <!-- TMPL_IF NAME="CAN_user_tools_edit_patrons" -->
+    <dt><a href="/cgi-bin/koha/tools/modborrowers.pl">Patrons (Modification)</a></dt>
+    <dd>Modify patrons</dd>
+    <!-- /TMPL_IF -->
+
     <!-- TMPL_IF NAME="CAN_user_tools_moderate_tags" -->
     <dt><a href="/cgi-bin/koha/tags/review.pl">Tags</a></dt>
 	<dd>Moderate patron tags</dd>
