@@ -309,9 +309,11 @@ my %filters;
 my @tplfilters;
 for my $filter ( $cgi->param('filters') ) {
     next if not $filter;
-    my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
+    #my ($k, $v) = split /[^\\]\K:/, $filter; #FIXME If ':' exists in value
+    my ($k, @v) = $filter =~ /(?: \\. | [^:] )+/xg;
+    my $v = join ':', @v;
     push @{$filters{$k}}, $v;
-    $v =~ s/"//g;
+    $v =~ s/^"(.*)"$/$1/;
     push @tplfilters, {
         'ind' => $k,
         'val' => $v,
