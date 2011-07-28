@@ -238,16 +238,21 @@ sub generate_subfield_form {
 }
 
 sub removeFieldsForPrefill {
-    #FIXME: this is not generic enough
+    #FIXME: this is not generic enough. Me could define fields to remove in a syspref.
     my $item = shift;
-    my $field = $item->field('995');
-    $field->delete_subfield(code => 'f');
-    $field->delete_subfield(code => 'k');
-    $field->delete_subfield(code => 'u');
-    $field->delete_subfield(code => 'v');
-    $field->delete_subfield(code => 'x');
-    $field->delete_subfield(code => 'z');
-
+    # Getting item tag
+    my ($tag, $subtag) = GetMarcFromKohaField("items.barcode", '');
+    if ($tag) {
+        my $field = $item->field($tag);
+        if ($field) {
+            $field->delete_subfield(code => 'f');
+            $field->delete_subfield(code => 'k');
+            $field->delete_subfield(code => 'u');
+            $field->delete_subfield(code => 'v');
+            $field->delete_subfield(code => 'x');
+            $field->delete_subfield(code => 'z');
+        }
+    }
     return $item;
 
 }
