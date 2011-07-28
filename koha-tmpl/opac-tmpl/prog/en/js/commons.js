@@ -1,3 +1,7 @@
+// Extends jQuery API
+// http://www.wskidmore.com/downloads/jquery-uniqueArray.min.js
+jQuery.extend({uniqueArray:function(e){if($.isArray(e)){var c={};var a,b;for(b=0,a=e.length;b<a;b++){var d=e[b].toString();if(c[d]){e.splice(b,1);a--;b--}else{c[d]=true}}}return(e)}});
+
 function paramOfUrl( url, param ) {
     param = param.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
     var regexS = "[\\?&]"+param+"=([^&#]*)";
@@ -15,7 +19,7 @@ function getContextBiblioNumbers() {
 }
 
 function setContextBiblioNumbers(bibnums) {
-    $.session("context_bibnums", $.unique(bibnums));
+    $.session("context_bibnums", $.uniqueArray(bibnums));
 }
 
 function getContextPreviousBiblioNumbers() {
@@ -23,7 +27,7 @@ function getContextPreviousBiblioNumbers() {
 }
 
 function setContextPreviousBiblioNumbers(bibnums) {
-    $.session("context_prevbibnums", $.unique(bibnums));
+    $.session("context_prevbibnums", $.uniqueArray(bibnums));
 }
 
 function getContextAllBiblioNumbers() {
