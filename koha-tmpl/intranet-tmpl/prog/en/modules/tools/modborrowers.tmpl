@@ -5,6 +5,7 @@
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
+        var patron_attributes_lib = new Array();
         var patron_attributes_values = new Array();
         $(document).ready(function() {
             $("#borrowerst").tablesorter();
@@ -23,12 +24,16 @@
             });
 
             var values = new Array();
+            var lib = new Array();
             <!-- TMPL_LOOP NAME="patron_attributes_values" -->
                 values = new Array();
+                lib = new Array();
                 <!-- TMPL_LOOP NAME="options" -->
                     values.push("<!-- TMPL_VAR NAME="lib" -->");
+                    lib.push("<!-- TMPL_VAR NAME="authorised_value" -->");
                 <!-- /TMPL_LOOP -->
-                patron_attributes_values["<!-- TMPL_VAR NAME="attribute_code" -->"] = values;
+                patron_attributes_lib["<!-- TMPL_VAR NAME="attribute_code" -->"] = values;
+                patron_attributes_values["<!-- TMPL_VAR NAME="attribute_code" -->"] = lib;
             <!-- /TMPL_LOOP -->
 
             $('select[name="patron_attributes"]').change(function() {
@@ -44,7 +49,7 @@
             var select = $(select_attr).parent().parent().find('select[name="patron_attributes_value"]');
             var options = '<option value = ""></option>';
             for ( var i = 0 ; i < patron_attributes_values[attr_code].length ; i++ ) {
-                options += '<option value="'+patron_attributes_values[attr_code][i]+'">'+patron_attributes_values[attr_code][i]+'</option>';
+                options += '<option value="'+patron_attributes_values[attr_code][i]+'">'+patron_attributes_lib[attr_code][i]+'</option>';
             }
             select.html(options);
         }
