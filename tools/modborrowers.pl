@@ -282,7 +282,7 @@ if ( $op eq 'action' ) {
             my $attr_loop = C4::Members::Attributes::GetBorrowerAttributes( $$borrower{borrowernumber} );
             $$borrower{patron_attributes} = $attr_loop;
             $max_nb_attr = scalar( @{ $$borrower{patron_attributes} } )
-                if scalar( $$borrower{patron_attributes} ) > $max_nb_attr;
+                if scalar( @{ $$borrower{patron_attributes} } ) > $max_nb_attr;
             push @borrowers, $borrower;
         }
     }
