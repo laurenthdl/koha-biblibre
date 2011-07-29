@@ -140,7 +140,7 @@
                 <!-- /TMPL_IF -->
             </li>
             <!-- /TMPL_IF -->
-            <li><span class="label">Withdrawn?:</span><!-- TMPL_IF NAME="wthdrawn" -->Yes<!-- TMPL_ELSE -->No<!-- /TMPL_IF -->
+         <span style="display:none">   <li><span class="label">Withdrawn?:</span><!-- TMPL_IF NAME="wthdrawn" -->Yes<!-- TMPL_ELSE -->No<!-- /TMPL_IF -->
                 <!-- TMPL_IF NAME="CAN_user_circulate" -->
                     <form action="updateitem.pl" method="post">
                     <input type="hidden" name="biblionumber" value="<!-- TMPL_VAR Name="biblionumber" -->" />
@@ -157,7 +157,7 @@
             <!-- /TMPL_IF -->
                     </form>
                 <!-- /TMPL_IF -->
-            </li>
+            </li></span>
             </ol></div>
             <div class="listgroup"><h4>History</h4>
             <ol class="bibliodetails">
