@@ -29,6 +29,10 @@
   <!-- TMPL_IF NAME="virtualshelves" --> 
   <!-- TMPL_IF NAME="listsview" --><li class="active"><!-- TMPL_ELSE --><li><!-- /TMPL_IF --><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">my lists</a></li>
   <!-- /TMPL_IF -->
+  <!-- TMPL_IF NAME="useDischarge" --> 
+  <!-- TMPL_IF NAME="dischargeview" --><li class="active"><!-- TMPL_ELSE --><li><!-- /TMPL_IF --><a href="/cgi-bin/koha/opac-discharge.pl">Discharge</a></li>
+  <!-- /TMPL_IF -->
+
 
 </ul>
 </div>

@@ -391,6 +391,7 @@ sub get_template_and_user {
             NoZebra                                                                    => C4::Context->preference('NoZebra'),
             IntranetXSLTDetailsDisplay                                                 => C4::Context->preference("IntranetXSLTDetailsDisplay"),
             IntranetXSLTResultsDisplay                                                 => C4::Context->preference("IntranetXSLTResultsDisplay"),
+            useDischarge                                                               => C4::Context->preference("useDischarge"),
         );
     } else {
         warn "template type should be OPAC, here it is=[" . $in->{'type'} . "]" unless ( $in->{'type'} eq 'opac' );
@@ -481,6 +482,7 @@ sub get_template_and_user {
             SyndeticsAwards                => C4::Context->preference("SyndeticsAwards"),
             SyndeticsSeries                => C4::Context->preference("SyndeticsSeries"),
             SyndeticsCoverImageSize        => C4::Context->preference("SyndeticsCoverImageSize"),
+            useDischarge                   => C4::Context->preference("useDischarge"),
         );
 
         if ( C4::Context->preference('EnableOpacSearchHistory') ) {

@@ -303,3 +303,6 @@ INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SubscriptionDuplicateDroppedInput','','','List of fields which must not be rewritten when a subscription is duplicated (Separated by semicolon)','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('FinesDependsOnGracePeriod',0,'','If Yes, fines begin after grace delay. If No, fines begin just after return','YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numFacetsDisplay','100','Specify the maximum number of facets to display for an index','','Integer');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('useDischarge','','Allows librarians to discharge borrowers and borrowers to request a discharge','','YesNo');
+INSERT INTO  systempreferences  (variable,value,explanation,options,type) VALUES('dischargePath','','Sets the upload path for the generated discharges','','');
+INSERT INTO  systempreferences  (variable,value,explanation,options,type) VALUES('dischargeWebPath','','Set the upload path starting from document root for the generated discharges','','');

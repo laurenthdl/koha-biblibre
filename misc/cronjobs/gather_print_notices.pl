@@ -39,7 +39,7 @@ use Getopt::Long;
 
 sub usage {
     print STDERR <<USAGE;
-Usage: $0 [ -s STYLESHEET ] OUTPUT_DIRECTORY
+Usage: $0 [ -s STYLESHEET ] [ -b borrowernumber ] [ -f filename] OUTPUT_DIRECTORY
   Will print all waiting print notices to
   OUTPUT_DIRECTORY/notices-CURRENT_DATE.html .
   If the filename of a CSS stylesheet is specified with -s, the contents of that
@@ -48,10 +48,12 @@ USAGE
     exit $_[0];
 }
 
-my ( $stylesheet, $help );
+my ( $stylesheet, $help, $borrowernumber, $filename );
 
 GetOptions(
-    's:s'    => \$stylesheet,
+    's:s' => \$stylesheet,
+    'b:i' => \$borrowernumber,
+    'f:s' => \$filename,
     'h|help' => \$help,
 ) || usage(1);
 
@@ -63,16 +65,16 @@ if ( !$output_directory || !-d $output_directory ) {
     print STDERR "Error: You must specify a valid directory to dump the print notices in.\n";
     usage(1);
 }
-
+my $params = ($borrowernumber) ? { 'borrowernumber' => $borrowernumber } : {};
 my $today    = C4::Dates->new();
-my @messages = @{ GetPrintMessages() };
+my @messages = @{ GetPrintMessages($params) };
 exit unless (@messages);
 foreach my $message (@messages) {
     $message->{'content'} =~ s#\n#<br/>#g;
 #    print STDOUT $message->{'content'};
 }
-
-my $file=File::Spec->catdir( $output_directory, "holdnotices-" . $today->output('iso') . ".html");
+my $fn = $filename || "holdnotices";
+my $file=File::Spec->catdir( $output_directory, $fn . "-" . $today->output('iso') . ".html");
 open OUTPUT, '>', $file or die "Can't open file $file : $!";
 
 my $template = C4::Output::gettemplate( 'batch/print-notices.tmpl', 'intranet', new CGI );

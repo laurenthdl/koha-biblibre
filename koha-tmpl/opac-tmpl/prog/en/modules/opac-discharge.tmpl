@@ -1,0 +1,79 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<!-- TMPL_IF NAME="LibraryNameTitle" --><!-- TMPL_VAR NAME="LibraryNameTitle" --><!-- TMPL_ELSE -->Koha Online<!-- /TMPL_IF --> Catalog
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
+<script type="text/JavaScript" language="JavaScript">
+//<![CDATA[
+         $(document).ready(function() {
+		// We show table ordered by descending dates by default
+		// (so that the more recent query is shown first)
+		$.tablesorter.defaults.sortList = [[0,1]];
+                $(".historyt").tablesorter({
+						widgets : ['zebra'],<!-- TMPL_IF EXPR="dateformat eq 'metric'" -->
+                        dateFormat: 'uk'<!-- /TMPL_IF -->
+                });
+            });
+//]]>
+
+</script>
+</head>
+<body id="opac-search-history">
+<!-- TMPL_IF NAME="OpacNav" -->
+<div id="doc3" class="yui-t1">
+<!-- TMPL_ELSIF NAME="loggedinusername" -->
+<div id="doc3" class="yui-t1">
+<!-- TMPL_ELSE -->
+<div id="doc3" class="yui-t7">
+<!-- /TMPL_IF -->
+   <div id="bd">
+<!--TMPL_INCLUDE NAME="masthead.inc" -->
+
+	<div id="yui-main">
+<div class="yui-b"><div class="yui-g">
+        <div id="discharge" class="container">
+	<h1>Discharge</h1>
+<!-- TMPL_IF NAME="generated" -->
+<!-- TMPL_IF NAME="success" -->
+    <p>Your discharge request has been sent. Your discharge will be available on this page within a few days.</p>
+    <!-- TMPL_ELSE -->
+    <p>Your discharge request could not be sent. Please retry later or contact an administrator.</p>
+    <!-- /TMPL_IF -->
+<!-- TMPL_ELSE -->
+<h2>Qu'est-ce qu'un quitus ?</h2>
+<p>Ce document certifie que vous avez rendu tous les documents empruntés. Il est parfois demandé lors de transfert de dossier d'une scolarité à une autre.
+Le quitus est envoyé par nos soins à la scolarité de votre faculté. Vous le trouverez également disponible sur votre compte lecteur.</p>
+<p><strong>Attention</strong>: Cette demande n'est valable que si vous êtes en règle avec la bibliothèque.
+Une fois la demande effectuée, vous ne pourrez plus emprunter de documents dans les bibliothèques.</p>
+
+<a href="/cgi-bin/koha/opac-discharge.pl?generate=1">Ask for a discharge</a>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="dischargeloop" -->
+    <br /><br /><h3>Generated discharges</h3>
+    <ul>
+    <!-- TMPL_LOOP NAME="dischargeloop" -->
+        <li><a href="<!-- TMPL_VAR NAME="url" -->"><!-- TMPL_VAR NAME="filename" --></a></li>
+    <!-- /TMPL_LOOP -->
+    </ul>
+<!-- /TMPL_IF -->
+
+     </div>
+     </div>
+     </div>
+     </div>
+
+<!-- TMPL_IF NAME="OpacNav" -->
+<div class="yui-b"><div class="container">
+<!--TMPL_INCLUDE NAME="navigation.inc" -->
+<!--TMPL_INCLUDE NAME="usermenu.inc" -->
+</div></div>
+<!-- TMPL_ELSIF NAME="loggedinusername" -->
+<div class="yui-b"><div class="container">
+<!--TMPL_INCLUDE NAME="navigation.inc" -->
+<!--TMPL_INCLUDE NAME="usermenu.inc" -->
+</div></div>
+<!-- TMPL_ELSE -->
+<!-- /TMPL_IF -->
+
+
+</div>
+<!-- TMPL_INCLUDE NAME="opac-bottom.inc" -->
