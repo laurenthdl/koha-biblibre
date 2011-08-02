@@ -98,9 +98,9 @@ my @activesubs;
 my @inactivesubs;
 if ($searched) {
     # Getting active subscriptions (enddate must not exceed 2 years from today in the past)
-    @activesubs = SearchSubscriptions($title, $ISSN, $EAN, $publisher, $supplier, $branch, undef, 730);
+    @activesubs = SearchSubscriptions($biblionumber, $title, $ISSN, $EAN, $publisher, $supplier, $branch, undef, 730);
     # Getting inactive subscriptions (enddate is more than 2 years in the past)
-    @inactivesubs = SearchSubscriptions($title, $ISSN, $EAN, $publisher, $supplier, $branch, 730, undef);
+    @inactivesubs = SearchSubscriptions($biblionumber, $title, $ISSN, $EAN, $publisher, $supplier, $branch, 730, undef);
 }
 
 my @asubs_loop = ();
