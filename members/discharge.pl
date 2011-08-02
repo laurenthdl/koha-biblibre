@@ -66,11 +66,6 @@ if ( $input->param('borrowernumber') ) {
     my @reserves = GetReservesFromBorrowernumber($borrowernumber); 
     my $hasreserves = scalar(@reserves);
 
-    # Getting already generated discharges
-    my @list = GetDischarges($borrowernumber);
-    my @loop = map {{ url => $dischargeWebPath . "/" . $borrowernumber . "/" . $_, filename => $_ }} @list;
-    $template->param("dischargeloop" => \@loop) if (@list);
-
     # Generating discharge if needed
     if ($input->param('generatedischarge')) {
         # If borrower has pending reserves, we cancel them
@@ -114,6 +109,12 @@ if ( $input->param('borrowernumber') ) {
         qx{../misc/cronjobs/printoverdues.sh $dischargePath/$borrowernumber};
 
     }
+
+    # Getting already generated discharges
+    my @list = GetDischarges($borrowernumber);
+    my @loop = map {{ url => $dischargeWebPath . "/" . $borrowernumber . "/" . $_, filename => $_ }} @list;
+    $template->param("dischargeloop" => \@loop) if (@list);
+
 
     $template->param(
         borrowernumber    => $borrowernumber,
