@@ -6224,6 +6224,17 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.045";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('useDischarge','','Allows librarians to discharge borrowers and borrowers to request a discharge','','YesNo');");
+    $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('dischargePath','','Sets the upload path for the generated discharges','','');");
+    $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('dischargeWebPath','','Sets the upload path starting from documentroot for the generated discharges','','');");
+    $dbh->do("INSERT INTO `letter` (module, code, name, title, content) VALUES('members', 'DISCHARGE', 'Discharge', 'Discharge for <<borrowers.firstname>> <<borrowers.surname>>', '<h1>Discharge</h1>\r\n\r\nThe library <<borrowers.branchcode>> certifies that the following borrower :\r\n\r\n    <<borrowers.firstname>> <<borrowers.surname>>\r\n   Cardnumber : <<borrowers.cardnumber>>\r\n\r\nreturned all his documents.\r\n\r\n<<today>>');");
+    print "Upgrade to $DBversion done (Add System Preferences useDischarge, dischargePath, dischargeWebpath and discharge notice)\n";
+    SetVersion($DBversion);
+}
+
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

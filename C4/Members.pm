@@ -2107,7 +2107,7 @@ sub GetBorrowersNamesAndLatestIssue {
 
 =over 4
 
-my $success = DebarMember( $borrowernumber, $todate );
+my $success = DebarMember( $borrowernumber, $todate, $comment);
 
 marks a Member as debarred, and therefore unable to checkout any more
 items.
@@ -2122,13 +2122,15 @@ true on success, false on failure
 sub DebarMember {
     my $borrowernumber = shift;
     my $todate         = shift;
+    my $comment        = shift;
 
     return unless defined $borrowernumber;
     return unless $borrowernumber =~ /^\d+$/;
 
     return ModMember(
         borrowernumber => $borrowernumber,
-        debarred       => $todate
+        debarred       => $todate,
+        debarredcomment   => $comment
     );
 
 }
