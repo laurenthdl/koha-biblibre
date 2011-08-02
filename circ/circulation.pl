@@ -481,10 +481,6 @@ if ($borrowernumber) {
 }
 
 # make the issued books table.
-my $todaysissues = '';
-my $previssues   = '';
-my @todaysissues;
-my @previousissues;
 my @relissues;
 my @relprevissues;
 my $displayrelissues;
@@ -496,7 +492,6 @@ my $totalprice = 0;
 
 sub build_issue_data {
     my $issueslist = shift;
-    my $relatives = shift;
     my $shelflocations = GetKohaAuthorisedValues( 'items.location', '', 'opac' );
 
   # split in 2 arrays for today & previous
@@ -549,9 +544,9 @@ sub build_issue_data {
         # ADDED BY JF: NEW ITEMTYPE COUNT DISPLAY
         $issued_itemtypes_count->{ $it->{'itemtype'} }++;
 	if ( $todaysdate eq $it->{'checkoutdate'} or $todaysdate eq $it->{'lastreneweddate'} ) {
-	    (!$relatives) ? push @todaysissues, $it : push @relissues, $it;
+	    push @relissues, $it;
 	} else {
-	    (!$relatives) ? push @previousissues, $it : push @relprevissues, $it;
+	    push @relprevissues, $it;
 	}
 
     }
@@ -562,28 +557,15 @@ if ($borrower) {
 
     # Getting borrower relatives
     my @relborrowernumbers = GetMemberRelatives($borrower->{'borrowernumber'});
-    #push @borrowernumbers, $borrower->{'borrowernumber'};
 
     # get each issue of the borrower & separate them in todayissues & previous issues
-    my ($issueslist) = GetPendingIssues($borrower->{'borrowernumber'});
     my ($relissueslist) = GetPendingIssues(@relborrowernumbers);
 
-    build_issue_data($issueslist, 0);
-    build_issue_data($relissueslist, 1);
-  
-    $displayrelissues = scalar($relissueslist);
+    build_issue_data($relissueslist);
 
-    if ( C4::Context->preference("todaysIssuesDefaultSortOrder") eq 'asc' ) {
-        @todaysissues = sort { $a->{'timestamp'} cmp $b->{'timestamp'} } @todaysissues;
-    } else {
-        @todaysissues = sort { $b->{'timestamp'} cmp $a->{'timestamp'} } @todaysissues;
-    }
-    if ( C4::Context->preference("previousIssuesDefaultSortOrder") eq 'asc' ) {
-        @previousissues = sort { $a->{'date_due'} cmp $b->{'date_due'} } @previousissues;
-    } else {
-        @previousissues = sort { $b->{'date_due'} cmp $a->{'date_due'} } @previousissues;
-    }
+    $displayrelissues = scalar($relissueslist);
 }
+
 my @reserveswaiting;
 foreach my $itemnumber ( keys %return_failed ) {
     next unless $return_failed{$itemnumber}->{'reservesdata'};
@@ -798,8 +780,6 @@ $template->param(
     CGIselectborrower           => $CGIselectborrower,
     totalprice                  => sprintf( '%.2f', $totalprice ),
     totaldue                    => sprintf( '%.2f', $total ),
-    todayissues                 => \@todaysissues,
-    previssues                  => \@previousissues,
     relissues			=> \@relissues,
     relprevissues		=> \@relprevissues,
     displayrelissues		=> $displayrelissues,
