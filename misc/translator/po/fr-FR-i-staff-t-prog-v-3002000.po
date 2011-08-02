@@ -10215,7 +10215,7 @@ msgstr "Modification de notices par lots"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/tools/batchedit.tmpl:127
 msgid "Batch records modification"
-msgstr "Modification d'exemplaires par lots"
+msgstr "Modification de notices par lots"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/includes/label-status.inc:6
 msgid "Batch:"
@@ -11267,10 +11267,8 @@ msgstr "Annuler réservation"
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/circ/waitingreserves.tmpl:113
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/circ/waitingreserves.tmpl:165
-#, fuzzy
 msgid "Cancel hold and return to : <!-- TMPL_VAR NAME=\"branchname\" -->"
-msgstr ""
-"Annuler réservation et retourner à <!-- TMPL_VAR NAME=\"homebranch\" -->"
+msgstr "Annuler réservation et retourner à <!-- TMPL_VAR NAME=\"homebranch\" -->"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/circ/branchoverdues.tmpl:172
 msgid "Cancel notification"
@@ -39212,7 +39210,7 @@ msgstr "Les règles de prêt interdisent à cet adhérent d'emprunter ce documen
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/circ/circulation.tmpl:247
 #, c-format
 msgid "This patron can't check out this item. Debarred until : %s"
-msgstr "Cet adhérent ne peut pas emprunter. Bloqué jusqu'au : %s"
+msgstr "Cet adhérent ne peut pas emprunter. Documents en retard : %s"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/members/moremember.tmpl:209
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/members/messaging.tmpl:49
