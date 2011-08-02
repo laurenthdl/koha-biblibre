@@ -49,13 +49,12 @@ $| = 1;
 my $dbh = C4::Context->dbh;
 
 if ($help) {
-    print qq(
-        Option :
-            \t-h        show this help
-            \t-noisbn   don't remove '-' in biblioitems.isbn
-            \t-noxml    don't remove '-' in biblioitems.marcxml in field 010a
-            \n\n 
-    );
+    print "\n"
+        ."\tOption :\n"
+            ."\t\t-h        show this help\n"
+            ."\t\t-noisbn   don't remove '-' in biblioitems.isbn\n"
+            ."\t\t-noxml    don't remove '-' in biblioitems.marcxml in field 010a\n"
+            ."\n\n";
     exit;
 }
 
@@ -63,7 +62,7 @@ my $cpt_isbn = 0;
 if ( not $no_isbn ) {
 
     my $query_isbn = "
-        SELECT biblioitemnumber,isbn FROM biblioitems WHERE isbn IS NOT NULL ORDER BY biblioitemnumber
+        SELECT biblioitemnumber,isbn FROM biblioitems WHERE isbn IS NOT NULL AND (isbn LIKE '%-%' OR isbn LIKE '% %') ORDER BY biblioitemnumber
     ";
 
     my $update_isbn = "
@@ -75,12 +74,12 @@ if ( not $no_isbn ) {
 
     while ( my $data = $sth->fetchrow_arrayref ) {
         my $biblioitemnumber = $data->[0];
-        print "\rremoving '-' on isbn for biblioitemnumber $biblioitemnumber";
+        print "removing '-' and ' ' on isbn for biblioitemnumber $biblioitemnumber\n";
 
-        # suppression des tirets de l'isbn
+        # suppression des tirets et des espaces de l'isbn
         my $isbn = $data->[1];
         if ($isbn) {
-            $isbn =~ s/-//g;
+            $isbn =~ s/[- ]//g;
 
             #update
             my $sth = $dbh->prepare($update_isbn);
@@ -88,7 +87,7 @@ if ( not $no_isbn ) {
         }
         $cpt_isbn++;
     }
-    print "$cpt_isbn updated";
+    print "$cpt_isbn isbns updated\n";
 }
 
 if ( not $no_marcxml ) {
@@ -104,10 +103,10 @@ if ( not $no_marcxml ) {
     my $sth = $dbh->prepare($query_marcxml);
     $sth->execute;
 
+    $cpt_isbn = 0;
     while ( my $data = $sth->fetchrow_arrayref ) {
 
         my $biblioitemnumber = $data->[0];
-        print "\rremoving '-' on marcxml for biblioitemnumber $biblioitemnumber";
 
         # suppression des tirets de l'isbn dans la notice
         my $marcxml = $data->[1];
@@ -118,11 +117,13 @@ if ( not $no_marcxml ) {
             my $flag   = 0;
             foreach my $field (@field) {
                 my $subfield = $field->subfield('a');
-                if ($subfield) {
+                if ($subfield && $subfield =~ /[- ]/) {
+                    print "removing '-' and ' ' on marcxml for biblioitemnumber $biblioitemnumber\n";
                     my $isbn = $subfield;
-                    $isbn =~ s/-//g;
+                    $isbn =~ s/[- ]//g;
                     $field->update( 'a' => $isbn );
                     $flag = 1;
+                    $cpt_isbn ++;
                 }
             }
             if ($flag) {
@@ -137,4 +138,5 @@ if ( not $no_marcxml ) {
             print "\n /!\\ pb getting $biblioitemnumber : $@";
         }
     }
+    print "$cpt_isbn marcxml updated\n";
 }

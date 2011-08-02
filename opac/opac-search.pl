@@ -270,9 +270,10 @@ my %filters;
 my @tplfilters;
 for my $filter ( $cgi->param('filters') ) {
     next if not $filter;
-    my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
+    my ($k, @v) = $filter =~ /(?: \\. | [^:] )+/xg;
+    my $v = join ':', @v;
     push @{$filters{$k}}, $v;
-    $v =~ s/"//g;
+    $v =~ s/^"(.*)"$/$1/; # Remove quotes around
     push @tplfilters, {
         'ind' => $k,
         'val' => $v,
@@ -489,7 +490,9 @@ for my $searchresult ( @{ $res->items } ) {
 
 # build facets
 my @facets;
-while ( my ($index,$facet) = each %{$res->facets} ) {
+my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
+for my $index ( @$facets_ordered ) {
+    my $facet = %{$res->facets}->{$index};
     if ( @$facet > 1 ) {
         my @values;
         $index =~ m/^([^_]*)_(.*)$/;
