@@ -8,11 +8,10 @@ use CGI;
 use JSON;
 
 use C4::Auth;
-use C4::Circulation;
+use C4::Circulation qw/CanBookBeRenewed/;
 use C4::Context;
-use C4::Koha;
-use C4::Output;
-use C4::Reserves;
+use C4::Reserves qw/CheckReserves/;
+use C4::Utils::DataTables;
 
 my $input = new CGI;
 
@@ -33,7 +32,8 @@ for(my $i=0; $i<$dtparam{'iColumns'}; $i++) {
 my $dbh = C4::Context->dbh;
 
 # Build the query
-my $select = "SELECT issues.itemnumber, issues.date_due, issues.branchcode,".
+my $select = "SELECT SQL_CALC_FOUND_ROWS ".
+    "issues.itemnumber, issues.date_due, issues.branchcode,".
     "issues.renewals, issues.issuedate, items.barcode, items.location, items.materials,".
     "items.itemnotes, items.itemcallnumber, items.itype, itemtypes.imageurl,".
     "itemtypes.description AS itemtype_description, branches.branchname,".
@@ -53,10 +53,10 @@ $from .= " LEFT JOIN issuingrules ON borrowers.categorycode = issuingrules.categ
 $from .= " LEFT JOIN branches ON issues.branchcode = branches.branchcode ";
 $from .= " LEFT JOIN authorised_values ON authorised_values.category = 'LOC' AND authorised_values.authorised_value = items.location ";
 my $where = " WHERE issues.borrowernumber = ? ";
-my ($filters, $filter_params) = build_filters(\%dtparam);
+my ($filters, $filter_params) = dt_build_having(\%dtparam);
 
 my $having .= " HAVING " . join(" AND ", @$filters) if (@$filters);
-my $order_by = build_orderby(\%dtparam);
+my $order_by = dt_build_orderby(\%dtparam);
 my $limit .= " LIMIT ?,? ";
 
 my $query = $select.$from.$where.$having.$order_by.$limit;
@@ -66,15 +66,15 @@ my $sth = $dbh->prepare($query);
 $sth->execute(@bind_params);
 my $results = $sth->fetchall_arrayref({});
 
+$sth = $dbh->prepare("SELECT FOUND_ROWS()");
+$sth->execute;
+my ($iTotalDisplayRecords) = $sth->fetchrow_array;
+
 # This is mandatory for DataTables to show the total number of results
 my $select_total_count = "SELECT COUNT(*) ";
 $sth = $dbh->prepare($select_total_count.$from.$where);
 $sth->execute($borrowernumber);
 my ($iTotalRecords) = $sth->fetchrow_array;
-$sth = $dbh->prepare($select.$from.$where.$having);
-$sth->execute($borrowernumber, @$filter_params);
-my $res = $sth->fetchall_arrayref;
-my $iTotalDisplayRecords = scalar @$res;
 
 my @aaData = ();
 foreach(@$results) {
@@ -117,60 +117,3 @@ $template->param(
 
 print $input->header('application/json');
 print $template->output();
-
-sub build_orderby {
-    my $param = shift;
-
-    my $i = 0;
-    my @orderbys;
-    while(exists $param->{'iSortCol_'.$i}){
-        my $iSortCol = $param->{'iSortCol_'.$i};
-        my $sSortDir = $param->{'sSortDir_'.$i};
-        my $mDataProp = $param->{'mDataProp_'.$iSortCol};
-
-        push @orderbys, "$mDataProp $sSortDir";
-        $i++;
-    }
-
-    my $orderby = " ORDER BY " . join(',', @orderbys) . " " if @orderbys;
-    return $orderby;
-}
-
-sub build_filters {
-    my $param = shift;
-
-    my @filters;
-    my @params;
-
-    # Global filter
-    if($param->{'sSearch'}) {
-        my $sSearch = $param->{'sSearch'};
-        my $i = 0;
-        my @gFilters;
-        my @gParams;
-        while($i < $param->{'iColumns'}) {
-            if($param->{'bSearchable_'.$i} eq 'true') {
-                my $mDataProp = $param->{'mDataProp_'.$i};
-                push @gFilters, " $mDataProp LIKE ? ";
-                push @gParams, "%$sSearch%";
-            }
-            $i++;
-        }
-        push @filters, " (" . join(" OR ", @gFilters) . ") ";
-        push @params, @gParams;
-    }
-
-    # Individual filters
-    my $i = 0;
-    while($i < $param->{'iColumns'}) {
-        my $sSearch = $param->{'sSearch_'.$i};
-        if($sSearch) {
-            my $mDataProp = $param->{'mDataProp_'.$i};
-            push @filters, " $mDataProp LIKE ? ";
-            push @params, "%$sSearch%";
-        }
-        $i ++;
-    }
-
-    return (\@filters, \@params);
-}
