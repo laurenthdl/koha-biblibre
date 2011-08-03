@@ -1034,6 +1034,7 @@ sub GetPendingIssues {
     my (@borrowernumbers) = @_;
 
     # Borrowers part of the query
+    return unless (@borrowernumbers>0);
     my $bquery = '';
     for (my $i = 0; $i < @borrowernumbers; $i++) {
         $bquery .= " borrowernumber = ?";
