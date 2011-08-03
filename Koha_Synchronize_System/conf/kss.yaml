@@ -1,0 +1,96 @@
+# kss configuration parameters
+
+datatest:
+        db_client: koha_devkss_client
+        db_server: koha_devkss_server
+        db_merge: koha_devkss_merge
+        mysql_cmd: /usr/bin/mysql
+        mysqlbinlog_cmd: /usr/bin/mysqlbinlog
+        mysqldump_cmd: /usr/bin/mysqldump
+        hostname: localhost
+        user: koha
+        passwd: koha
+
+databases_infos:
+        db_client: koha_devkss_client
+        db_server: koha_kss
+        hostname: localhost
+        user: root 
+        passwd: 'root'
+        kss_infos_table: kss_infos
+        kss_logs_table: kss_logs
+        kss_errors_table: kss_errors
+        kss_sql_errors_table: kss_sql_errors
+        kss_statistics_table: kss_statistics
+        kss_status_table: kss_status
+        kss_md5_table: kss_md5
+        max_borrowers_fieldname: max_old_borrowernumber
+        max_reserves_fieldname: max_old_reservenumber
+        matching_table_prefix: kss_tmp_matching_
+        matching_table_ids: kss_tmp_ids
+
+which_cmd:
+        mysql: /usr/bin/mysql
+        mysqlbinlog: /usr/bin/mysqlbinlog
+        mysqldump: /usr/bin/mysqldump
+        ls: /bin/ls
+        cp: /bin/cp
+        rm: /bin/rm
+        mv: /bin/mv
+        scp: /usr/bin/scp
+        ssh: /usr/bin/ssh
+        ssh-copy-id: /usr/bin/ssh-copy-id
+        service: sudo /usr/bin/service
+        hostname: /bin/hostname
+        mkdir: /bin/mkdir
+        chown: /bin/chown
+        useradd: /usr/sbin/useradd
+        ssh-keygen: /usr/bin/ssh-keygen
+        file: /usr/bin/file
+        perl: /usr/bin/perl
+        tar: /bin/tar
+        rebuild_zebra: /home/jonathan/workspace/versions/koha_master/misc/migration_tools/rebuild_zebra.pl
+        gzip_cmd: /bin/gzip
+
+
+path:
+        kss_root: Koha_Synchronize_System
+        generate_triggers: tools/generate_triggers.pl
+        generate_procedures: tools/generate_procedures.pl
+        client_scripts_ids: scripts/client/ids/
+
+abspath:
+        kss_server_home: /home/users/kss/
+        server_outbox: /home/users/kss/outbox/
+        server_dump_filepath: /home/users/kss/outbox/last.sql
+        server_inbox: /home/users/kss/inbox/
+        backup_server_db: /home/users/kss/backup/db/
+        backup_server_diff: /home/users/kss/backup/diff/
+        server_kss_pl_script: /home/users/koha/versions/kss/Koha_Synchronize_System/tools/kss.pl
+        dump_ids: /home/users/kss/tmp/ids/
+        diff_logbin_dir: /home/users/kss/tmp/logbin/
+        diff_logtxt_full_dir: /home/users/kss/tmp/logtxt_full/
+        diff_logtxt_dir: /home/users/kss/tmp/logtxt/
+        kss_client_home: /home/kss/
+        client_inbox: /home/kss/inbox/
+        client_outbox: /home/kss/outbox/
+        client_dump_filepath: /home/kss/inbox/last.sql
+        client_backup: /home/kss/backup/
+        client_logbin: /var/log/mysql
+        logfile_stderr: /home/jonathan/workspace/sites/koha_master/var/log/kss.log
+
+backup_delay:
+        client: 30
+        server_db: 30
+        server_diff: 30
+cron:
+        serverhost: flaubert.biblibre.com
+        executiontime: 2200
+        master: 1
+        alertmail: claire.hernandez@biblibre.com
+        smtpserver: mail.biblibre.com
+        jobtime_server_digest: "0 21 * * *"
+        jobtime_client_push: "0 21 * * *"
+        jobtime_client_pull: "0 23 * * *"
+        koha_conf: /home/users/koha/sites/dev_kss_server/etc/koha-conf.xml
+

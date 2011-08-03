@@ -230,6 +230,7 @@ CREATE TABLE `borrowers` (
   `gonenoaddress` tinyint(1) default NULL,
   `gonenoaddresscomment` VARCHAR(255) default NULL,
   `lost` tinyint(1) default NULL,
+  `lostcomment` VARCHAR(255) default NULL,
   `debarred` date default NULL,
   `debarredcomment` VARCHAR(255) DEFAULT NULL,
   `contactname` mediumtext,
@@ -1381,6 +1382,7 @@ CREATE TABLE `opac_news` (
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `expirationdate` date default NULL,
   `number` int(11) default NULL,
+  `servername` text default NULL,
   PRIMARY KEY  (`idnew`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

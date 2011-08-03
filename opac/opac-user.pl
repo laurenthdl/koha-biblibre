@@ -87,6 +87,7 @@ if ( $borr->{'amountoutstanding'} < 0 ) {
 }
 
 $borr->{'amountoutstanding'} = sprintf "%.02f", $borr->{'amountoutstanding'};
+$borr->{debarred} = C4::Dates->new($borr->{debarred},'iso')->output;
 
 my @bordat;
 $bordat[0] = $borr;
@@ -120,7 +121,7 @@ if ($issues) {
         foreach my $ac (@$accts) {
             if ( $ac->{'itemnumber'} == $issue->{'itemnumber'} ) {
                 $charges += $ac->{'amountoutstanding'}
-                  if $ac->{'accounttype'} eq 'F';
+                  if $ac->{'accounttype'} =~/F/;
                 $charges += $ac->{'amountoutstanding'}
                   if $ac->{'accounttype'} eq 'L';
             }

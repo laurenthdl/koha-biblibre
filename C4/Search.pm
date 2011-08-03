@@ -1048,7 +1048,10 @@ sub buildQuery {
 
             # COMBINE OPERANDS, INDEXES AND OPERATORS
             if ( $operands[$i] ) {
+                # remove starting blanks
                 $operands[$i] =~ s/^\s+//;
+                # remove multiple blanks that breaks the resulting query
+                $operands[$i] =~ s/\s+/ /g;
                 next unless $operands[$i];
 
                 # A flag to determine whether or not to add the index to the query
@@ -1276,7 +1279,9 @@ sub buildQuery {
     # This is flawed , means we can't search anything with : in it
     # if user wants to do ccl or cql, start the query with that
     $query =~ s/:/=/g;
+    $limit .= " and (" . $ENV{'OPAC_SEARCH_LIMIT'} .")" if($ENV{'OPAC_SEARCH_LIMIT'} and $ENV{'OPAC_SEARCH_LIMIT'} ne "");
     $limit =~ s/:/=/g;
+
     for ( $query, $query_desc, $limit, $limit_desc ) {
         s/  / /g;    # remove extra spaces
         s/^ //g;     # remove any beginning spaces

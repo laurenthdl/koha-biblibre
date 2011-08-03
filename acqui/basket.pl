@@ -28,12 +28,12 @@ use C4::Output;
 use CGI;
 use C4::Acquisition;
 use C4::Budgets;
-
 use C4::Bookseller;
 use C4::Dates qw/format_date/;
 use C4::Debug;
-
+use C4::Biblio;
 use C4::Members qw/GetMember/;    #needed for permissions checking for changing basketgroup of a basket
+use C4::Items;
 
 =head1 NAME
 
@@ -238,11 +238,13 @@ if ( $op eq 'delete_confirm' ) {
     my $count   = scalar @results;
 
     my $gist = $bookseller->{gstrate} || C4::Context->preference("gist") || 0;
+    $gist = 0 if $gist == 0.0000;
     my $discount = $bookseller->{'discount'} / 100;
     my $total_rrp;         # RRP Total, its value will be assigned to $total_rrp_gsti or $total_rrp_gste depending of $bookseller->{'listincgst'}
     my $total_rrp_gsti;    # RRP Total, GST included
     my $total_rrp_gste;    # RRP Total, GST excluded
     my $gist_rrp;
+    my $total_rrp_est;
 
     my $qty_total;
     my @books_loop;
@@ -259,11 +261,18 @@ if ( $op eq 'delete_confirm' ) {
 
         $total_rrp += $qty * $results[$i]->{'rrp'};
         my $line_total = $qty * $results[$i]->{'ecost'};
+        $total_rrp_est += $qty * $results[$i]->{'ecost'};
 
         # FIXME: what about the "actual cost" field?
         $qty_total += $qty;
         my %line = %{ $results[$i] };
         ( $i % 2 ) and $line{toggle} = 1;
+
+        my $biblionumber = $results[$i]->{'biblionumber'};
+        my $countbiblio = CountBiblioInOrders($biblionumber);
+        my $ordernumber = $results[$i]->{'ordernumber'};
+        # if the biblio is not in other orders and if there is no items elsewhere we can show the link "Delete order and Biblio" see bug 5680
+        $line{can_del_bib} = 1 if $countbiblio <= 1 && GetItemsCount($biblionumber) == scalar GetItemnumbersFromOrder( $ordernumber );
 
         $line{order_received} = ( $qty == $results[$i]->{'quantityreceived'} );
         $line{basketno}       = $basketno;
@@ -288,21 +297,29 @@ if ( $op eq 'delete_confirm' ) {
         push @books_loop, \%line;
     }
 
-    if ( $bookseller->{'listincgst'} ) {    # if prices already includes GST
-        $total_rrp_gsti = $total_rrp;                           # we know $total_rrp_gsti
-        $total_rrp_gste = $total_rrp_gsti / ( $gist + 1 );      # and can reverse compute other values
-        $gist_rrp       = $total_rrp_gsti - $total_rrp_gste;    #
-    } else {                                                    # if prices does not include GST
-        $total_rrp_gste = $total_rrp;                           # then we use the common way to compute other values
-        $gist_rrp       = $total_rrp_gste * $gist;              #
-        $total_rrp_gsti = $total_rrp_gste + $gist_rrp;          #
-    }
-
-    # These vars are estimated totals and GST, taking in account the booksellet discount
-    my $total_est_gsti = $total_rrp_gsti - ( $total_rrp_gsti * $discount );
-    my $gist_est       = $gist_rrp -       ( $gist_rrp * $discount );
-    my $total_est_gste = $total_rrp_gste - ( $total_rrp_gste * $discount );
-
+    my $total_est_gste;
+    my $total_est_gsti;
+    my $gist_est;
+    if ($gist){                                                    # if we have GST
+       if ( $bookseller->{'listincgst'} ) {                        # if prices already includes GST
+           $total_rrp_gsti = $total_rrp;                           # we know $total_rrp_gsti
+           $total_rrp_gste = $total_rrp_gsti / ( $gist + 1 );      # and can reverse compute other values
+           $gist_rrp       = $total_rrp_gsti - $total_rrp_gste;    #
+           $total_est_gste = $total_rrp_gste - ( $total_rrp_gste * $discount );
+           $total_est_gsti = $total_rrp_est;
+        } else {                                                    # if prices does not include GST
+           $total_rrp_gste = $total_rrp;                           # then we use the common way to compute other values
+           $gist_rrp       = $total_rrp_gste * $gist;              #
+           $total_rrp_gsti = $total_rrp_gste + $gist_rrp;          #
+           $total_est_gste = $total_rrp_est;
+           $total_est_gsti = $total_rrp_gsti - ( $total_rrp_gsti * $discount );
+       }
+       $gist_est = $gist_rrp - ( $gist_rrp * $discount );
+    } else {
+    $total_rrp_gsti = $total_rrp;
+    $total_est_gsti = $total_rrp_est;
+} 
+    
     my $contract = &GetContract( $basket->{contractnumber} );
     my @orders   = GetOrders($basketno);
     $template->param(

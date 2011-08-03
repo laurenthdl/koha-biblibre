@@ -462,7 +462,7 @@ END_SQL
                 push @borrower_parameters, $mindays;
             } else {
                 $borrower_sql .= ' HAVING TO_DAYS(NOW())-TO_DAYS(longest_issue) BETWEEN ? and ? ';
-                push @borrower_parameters, $mindays, $maxdays;
+                push @borrower_parameters, $mindays, $maxdays-1;
             }
 
             # $sth gets borrower info iff at least one overdue item has triggered the overdue action.
@@ -537,7 +537,11 @@ END_SQL
                         }
                     }
                 );
-                $letter->{'content-type'}="text/".($htmlfilename?"html":"plain");
+                $letter->{'content-type'}="text/".($htmlfilename?"html":"plain")."; charset=UTF8";
+
+                # Adds the ability to display the current date
+                my $today = C4::Dates->new()->output();
+                $letter->{'content'} =~ s/<<today>>/$today/g;
 
                 if ($exceededPrintNoticesMaxLines) {
                     $letter->{'content'} .= "List too long for form; please check your account online for a complete list of your overdue items.";

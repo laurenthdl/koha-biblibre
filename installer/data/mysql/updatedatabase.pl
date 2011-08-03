@@ -5018,6 +5018,16 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.065";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('DontExportFields','','List of fields for non export in circulation.pl (separated by a space)','','');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference DontExportFields)\n";
+    SetVersion($DBversion);
+}
+
+
 $DBversion = "3.02.00.066";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
@@ -5030,9 +5040,36 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 $DBversion = "3.02.00.067";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('DontExportFields','','List of fields for non export in circulation.pl (separated by a space)','','');
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('CsvProfileForExport','0','Set a profile name for CSV export','','');
     });
-    print "Upgrade to $DBversion done (Adds New System preference DontExportFields)\n";
+    print "Upgrade to $DBversion done (Adds New System preference CsvProfileForExport)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.068";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('LibraryType','Public','Set a type for the library','Academic|Public|Special','Choice');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference LibraryType)\n";
+    SetVersion($DBversion)
+}
+
+
+$DBversion = "3.02.00.069";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    INSERT INTO `permissions` (`module_bit`, `code`, `description`) VALUES ('13', 'kss', 'Allows to use the Koha Synchronize System');
+
+    });
+    print "Upgrade to $DBversion done (Adds New Permission KSS)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.070";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `opac_news` ADD `servername` text default NULL;");
+    print "Upgrade to $DBversion done (add servername field on opac_news)\n";
     SetVersion($DBversion);
 }
 

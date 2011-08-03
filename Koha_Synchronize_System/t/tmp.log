@@ -1,0 +1,29 @@
+
+INFOS: hostname:localhost - user:test - pass:test - db:koha_devkss_server at 01-base.t line 26.
+ERROR 1045 (28000): Access denied for user 'test'@'localhost' (using password: YES)
+ls: ne peut accéder /home/koha/versions/devcg55/Koha_Synchronize_Systemdata/client/ids: Aucun fichier ou dossier de ce type
+
+#   Failed test 'borrower 86 modified by testborrower02update'
+#   at 01-base.t line 105.
+#          got: '0'
+#     expected: '1'
+file:/home/koha/versions/devcg55/Koha_Synchronize_System/t/unitdiff/borrower-01-insert.sql at 01-base.t line 70.
+ERROR 1146 (42S02) at line 1: Table 'koha_devkss_server.kss_tmp_matching_borrowers' doesn't exist
+DBD::mysql::db do failed: Table 'koha_devkss_server.kss_tmp_matching_borrowers' doesn't exist at /home/claire/dev/versions/devcg55/Koha_Synchronize_System/tools/kss.pm line 286, <FILE> chunk 1.
+
+#   Failed test 'new borrower John Carmack'
+#   at 01-base.t line 119.
+#          got: '0'
+#     expected: '1'
+# Looks like you failed 2 tests of 2.
+01-base.t .. 
+Dubious, test returned 2 (wstat 512, 0x200)
+Failed 2/2 subtests 
+
+Test Summary Report
+-------------------
+01-base.t (Wstat: 512 Tests: 2 Failed: 2)
+  Failed tests:  1-2
+  Non-zero exit status: 2
+Files=1, Tests=2, 83 wallclock secs ( 0.02 usr  0.00 sys +  2.12 cusr  0.24 csys =  2.38 CPU)
+Result: FAIL
