@@ -3958,11 +3958,11 @@ msgstr "Document perdu"
 
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:515
 msgid "Item type"
-msgstr "Type de document"
+msgstr "Type de prêt"
 
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:327
 msgid "Item type :"
-msgstr "Type de document&nbsp;:"
+msgstr "Type de prêt:"
 
 #. %1$s: TMPL_VAR name=wbrname
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-user.tmpl:373
@@ -5438,8 +5438,16 @@ msgstr "Lien&nbsp;:"
 msgid "Relevance"
 msgstr "Pertinence"
 
-#: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-basket.tmpl:141
-#: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-basket.tmpl:316
+#: /home/users/koha/versions/unilimmigration/koha-tmpl/opac-tmpl/prog/en/includes/resort_form.inc:1
+msgid "Relevance Asc"
+msgstr "Pertinence croissante"
+
+#: /home/users/koha/versions/unilimmigration/koha-tmpl/opac-tmpl/prog/en/includes/resort_form.inc:2
+msgid "Relevance Desc"
+msgstr "Pertinence décroissante"
+
+#: /home/users/koha/versions/unilimmigration/koha-tmpl/opac-tmpl/prog/en/modules/opac-basket.tmpl:141
+#: /home/users/koha/versions/unilimmigration/koha-tmpl/opac-tmpl/prog/en/modules/opac-basket.tmpl:316
 msgid "Remove"
 msgstr "Supprimer"
 
@@ -6528,7 +6536,7 @@ msgstr "Titre (Z-A)"
 
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-detail.tmpl:445
 msgid "Title Notes"
-msgstr "Plus d'infos"
+msgstr "Résumé"
 
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-results-grouped.tmpl:126
 #: /home/koha/versions/biblibre/koha-tmpl/opac-tmpl/prog/en/modules/opac-results.tmpl:273
