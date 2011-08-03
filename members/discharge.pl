@@ -62,10 +62,6 @@ if ( $input->param('borrowernumber') ) {
     my $issues = GetPendingIssues($borrowernumber);
     my $hasissues = scalar(@$issues);
 
-    # Getting reserves
-    my @reserves = GetReservesFromBorrowernumber($borrowernumber); 
-    my $hasreserves = scalar(@reserves);
-
     # Generating discharge if needed
     if ($input->param('generatedischarge')) {
         # If borrower has pending reserves, we cancel them
@@ -109,6 +105,10 @@ if ( $input->param('borrowernumber') ) {
         qx{../misc/cronjobs/printoverdues.sh $dischargePath/$borrowernumber};
 
     }
+
+    # Getting reserves
+    my @reserves = GetReservesFromBorrowernumber($borrowernumber); 
+    my $hasreserves = scalar(@reserves);
 
     # Getting already generated discharges
     my @list = GetDischarges($borrowernumber);
