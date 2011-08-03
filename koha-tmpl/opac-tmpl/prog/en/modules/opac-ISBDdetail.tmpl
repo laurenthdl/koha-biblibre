@@ -1,5 +1,6 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" --><!-- TMPL_IF NAME="LibraryNameTitle" --><!-- TMPL_VAR NAME="LibraryNameTitle" --><!-- TMPL_ELSE -->Koha Online<!-- /TMPL_IF --> Catalog &rsaquo; ISBD View
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<!-- TMPL_INCLUDE NAME="results-navigation-js.inc" -->
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
 	$(document).ready(function() {
@@ -41,6 +42,7 @@
     <div id="isbdcontents"><!-- TMPL_VAR name="ISBD" --></div>
 	
 	</div>
+<!-- TMPL_INCLUDE NAME="results-navigation-html.inc" -->
 	</div>
 	</div>
 	<div class="yui-u">
@@ -88,6 +90,7 @@
  	    <option value="ris">RIS</option>    
 		</select><input type="hidden" name="op" value="export" /><input type="hidden" name="bib" value="<!-- TMPL_VAR NAME="biblionumber" -->" />
 <input type="submit" name="save" value="Go" /></form></div>
+    <!-- TMPL_INCLUDE NAME="new-search.inc" -->
 </div>
 </div>
 </div>
