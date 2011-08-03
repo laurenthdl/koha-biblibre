@@ -251,6 +251,12 @@ if ( ( defined $newdata{'userid'} ) && ( $newdata{'userid'} eq '' ) ) {
 $debug and warn join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry);
 my $extended_patron_attributes = ();
 if ( $op eq 'save' || $op eq 'insert' ) {
+    # If cardnumber is not defined generate cardnumber
+    # Syspref BorrowerMandatorySubfield must not contains 'cardnumber'
+    unless($newdata{cardnumber}) {
+        my $cardnumber = GetNextCardnumber($newdata{branchcode});
+        $newdata{cardnumber} = $cardnumber;
+    }
     if ( checkcardnumber( $newdata{cardnumber}, $newdata{borrowernumber} ) ) {
         push @errors, 'ERROR_cardnumber';
     }
