@@ -751,7 +751,12 @@
     <!-- /TMPL_IF--> 
     Card number: </label>
     <input type="text" id="cardnumber" name="cardnumber" size="20" value="<!-- TMPL_IF NAME="opduplicate" --><!--TMPL_ELSE--><!-- TMPL_VAR NAME="cardnumber" --><!-- /TMPL_IF -->" />
-	  <!-- TMPL_IF NAME="mandatorycardnumber" --><span class="required">Required</span><!-- /TMPL_IF --></li>
+	  <!-- TMPL_IF NAME="mandatorycardnumber" -->
+      <span class="required">Required</span>
+    <!-- TMPL_ELSE -->
+      <span style="color:grey">Empty this field to auto generate cardnumber</span>
+    <!-- /TMPL_IF -->
+    </li>
     <li>
       <!-- TMPL_IF NAME="mandatorybranchcode" -->
         <label for="branchcode" class="required">
