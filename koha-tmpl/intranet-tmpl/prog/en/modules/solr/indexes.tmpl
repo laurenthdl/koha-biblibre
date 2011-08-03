@@ -1,13 +1,17 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Administration &rsaquo; Solr config</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
-<script type="text/javascript" src="/intranet-tmpl/prog/en/lib/jquery/plugins/ui.sortable.js"></script>
+<script type="text/javascript" src="/intranet-tmpl/prog/en/lib/jquery/plugins/tablednd.js"></script>
 <script type="text/javascript" language="javascript">
     $(document).ready(function() {
         $('.delete').click(function() {
             $(this).parents('tr').remove();
         });
-        $('#indexes tbody').sortable();
+
+        $("#indexes").tableDnD( {
+            onDragClass: "dragClass",
+        } );
+
         $('.add').click(function() {
             var code            = $('#code').val();
             var label           = $('#label').val();
@@ -120,7 +124,7 @@
                         <input type="hidden" name="ressource_type" value="<!-- TMPL_VAR NAME="ressource_type" -->" />
                         <table id="indexes" class="zebra">
                             <thead>
-                                <tr>
+                                <tr class="nodrag nodrop">
                                     <th></th>
                                     <th>Code</th>
                                     <th>Label</th>
@@ -186,7 +190,7 @@
                                 <!-- /TMPL_LOOP -->
                             </tbody>
                             <tfoot>
-                                <tr>
+                                <tr class="nodrag nodrop">
                                     <td></td>
                                     <td><input id="code" type="text" maxlength="25" /></td>
                                     <td><input id="label" type="text" maxlength="25" /></td>

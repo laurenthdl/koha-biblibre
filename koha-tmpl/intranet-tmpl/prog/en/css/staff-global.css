@@ -2001,3 +2001,8 @@ table#orders p.notes {
 .facets_arrows {
     text-align: center;
 }
+
+tr.dragClass td {
+    background-color: grey;
+    color: yellow;
+}

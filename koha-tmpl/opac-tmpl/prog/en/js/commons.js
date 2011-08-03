@@ -1,3 +1,16 @@
+// Extends jQuery API
+// http://www.wskidmore.com/downloads/jquery-uniqueArray.min.js
+jQuery.extend({uniqueArray:function(e){if($.isArray(e)){var c={};var a,b;for(b=0,a=e.length;b<a;b++){var d=e[b].toString();if(c[d]){e.splice(b,1);a--;b--}else{c[d]=true}}}return(e)}});
+
+function removeByValue(arr, val) {
+    for(var i=0; i<arr.length; i++) {
+        if(arr[i] == val) {
+            arr.splice(i, 1);
+            break;
+        }
+    }
+}
+
 function paramOfUrl( url, param ) {
     param = param.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
     var regexS = "[\\?&]"+param+"=([^&#]*)";
@@ -10,31 +23,23 @@ function paramOfUrl( url, param ) {
     }
 }
 
+function addBibToContext( bibnum ) {
+    var bibnums = getContextBiblioNumbers();
+    bibnums.push(bibnum);
+    $.session( "context_bibnums", bibnums );
+}
+
+function delBibToContext( bibnum ) {
+    var bibnums = getContextBiblioNumbers();
+    removeByValue( bibnums, bibnum );
+    $.session( "context_bibnums", $.uniqueArray( bibnums ) );
+}
 function getContextBiblioNumbers() {
     return $.session("context_bibnums") || new Array();
 }
 
-function setContextBiblioNumbers(bibnums) {
-    $.session("context_bibnums", $.unique(bibnums));
-}
-
-function getContextPreviousBiblioNumbers() {
-    return $.session("context_prevbibnums") || new Array();
-}
-
-function setContextPreviousBiblioNumbers(bibnums) {
-    $.session("context_prevbibnums", $.unique(bibnums));
-}
-
-function getContextAllBiblioNumbers() {
-    var all = getContextPreviousBiblioNumbers();
-    all.push.apply( all, getContextBiblioNumbers() );
-    return all || new Array();
-}
-
 function resetSearchContext() {
     $.session("context_bibnums", []);
-    $.session("context_prevbibnums", []);
 }
 
 $(document).ready(function(){
