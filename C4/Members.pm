@@ -23,7 +23,7 @@ use strict;
 use C4::Context;
 use C4::Dates qw(format_date_in_iso);
 use Digest::MD5 qw(md5_base64);
-use Date::Calc qw/Today Add_Delta_YM check_date Date_to_Days/;
+use Date::Calc qw/Today Add_Delta_YM check_date Date_to_Days This_Year/;
 use C4::Log;    # logaction
 use C4::Branch;
 use C4::Overdues;
@@ -91,6 +91,8 @@ BEGIN {
       &GetMessagesCount
       &SetMemberInfosInTemplate
       &getFullBorrowerAddress
+
+      &GetNextCardnumber
     );
 
     #Modify data
@@ -1750,6 +1752,74 @@ sub getFullBorrowerAddress {
     if(($roadttype_hashref->{ $borrower->{'streettype'} }) ne ""){$address1=$address1.$roadttype_hashref->{ $borrower->{'streettype'} }.' ';}
     $address1=$address1.$borrower->{'address'};
     return $address1;
+}
+
+=head2 GetNextCardnumber
+
+    my $cardnumber = GetNextCardnumber($branchcode);
+
+Generate a cardnumber in the form AAAABXXXX where:
+
+- AAAA is the current year
+
+- B is the branchcode
+
+- XXXX is an autoincrement number
+
+=back
+
+=cut
+
+# This feature is only for 'Institut Telecom', that's why
+# there are some hard-coded values in this sub
+sub GetNextCardnumber {
+    my $branchcode = shift;
+
+    if($branchcode) {
+        my $year = This_Year;
+        my $dbh = C4::Context->dbh;
+        my $query;
+        my $max;
+        if($branchcode == 1) {  # 'Evry'
+            $query = qq{
+                SELECT MAX( SUBSTRING( cardnumber, -4 ) )
+                FROM borrowers
+                WHERE cardnumber LIKE ?
+                LIMIT 1
+            };
+            $max = 9999;
+        } else {
+            $query = qq{
+                SELECT MAX( SUBSTRING( cardnumber, -3 ) )
+                FROM borrowers
+                WHERE cardnumber LIKE ?
+                LIMIT 1
+            };
+            $max = 999;
+        }
+        warn $query;
+        my $sth = $dbh->prepare($query);
+        $sth->execute($year.$branchcode."%");
+        my ($last) = $sth->fetchrow_array;
+        warn "LAST = $last";
+        my $newcardnumber = $year.$branchcode;
+        if($last) {
+            my $new = $last + 1;
+            $new = 1 if $new > $max;
+            if($branchcode == 1) {
+                $newcardnumber .= sprintf("%04d", $new);
+            } else {
+                $newcardnumber .= sprintf("%03d", $new);
+            }
+        } else {
+            if($branchcode == 1) {
+                $newcardnumber .= "0001";
+            } else {
+                $newcardnumber .= "001";
+            }
+        }
+        return $newcardnumber;
+    }
 }
 
 =head2 ExtendMemberSubscriptionTo (OUEST-PROVENCE)
