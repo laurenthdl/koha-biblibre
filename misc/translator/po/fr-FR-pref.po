@@ -2847,18 +2847,6 @@ msgid "searching.pref#numSearchResults# results per page in the staff client."
 msgstr "notices bibliographiques par page de résultat."
 
 # Serials
-msgid "serials.pref#RenewSerialAddsSuggestion# Add"
-msgstr "Ajouter"
-
-# Serials
-msgid "serials.pref#RenewSerialAddsSuggestion# Don't add"
-msgstr "Ne pas ajouter"
-
-# Serials
-msgid "serials.pref#RenewSerialAddsSuggestion# a suggestion for a biblio when its attached serial is renewed."
-msgstr "une suggestion pour une notice biblio quand son périodique attaché est renouvelé."
-
-# Serials
 msgid "serials.pref#RoutingListAddReserves# Don't place"
 msgstr "Ne placer"
 
