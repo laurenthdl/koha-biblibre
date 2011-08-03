@@ -26,6 +26,7 @@ use C4::Context;
 use C4::Output;
 use C4::Log;
 use C4::Debug;
+use C4::Branch;
 use C4::Members;
 use C4::Discharges;
 use Mail::Sendmail;
@@ -54,17 +55,17 @@ $template->param("dischargeloop" => \@loop) if (@list);
 my $generate = $cgi->param('generate');
 # Sending an email to the librarian if user requested a discharge
 if ($generate) {
-    my $admin_email_address = C4::Context->preference('KohaAdminEmailAddress');
-    my $sender_email_address = GetFirstValidEmailAddress($loggedinuser);
-    $sender_email_address = $admin_email_address unless ($sender_email_address);
     my $title = "Discharge request";
     my $member = GetMember('borrowernumber' => $loggedinuser);
     my $membername = $member->{'firstname'} . " " . $member->{'surname'} . " (" . $member->{'cardnumber'} . ")";
     my $content = "Discharge request from $membername";
+    my $branch = GetBranchDetail($member->{'branchcode'});
+    my $sender_email_address = GetFirstValidEmailAddress($loggedinuser);
+    $sender_email_address = $branch->{'branchemail'} unless ($sender_email_address);
 
     # Note : perhaps we should use C4::Messages here?
     my %mail    = (
-          To             => $admin_email_address,
+          To             => $branch->{'branchemail'},
           From           => $sender_email_address,
           Subject        => "Discharge request",
           Message        => $content,
@@ -75,7 +76,7 @@ if ($generate) {
     $template->param("success" => $result);
     $template->param("generated" => 1);
 
- 
+
 }
 
 
