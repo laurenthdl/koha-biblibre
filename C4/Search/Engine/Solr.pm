@@ -375,6 +375,16 @@ sub SimpleSearch {
     return $result if (ref($result) eq "Data::SearchEngine::Solr::Results");
 }
 
+=head2 AddRecordToIndexRecordQueue
+
+=cut
+sub AddRecordToIndexRecordQueue {
+    my ( $recordtype, $recordids ) = @_;
+    # Verify IndexRecordQueue.pl is start
+    # Append recordtype recordids in /tmp/records.txt (ex.)
+    # Else call IndexRecord directly
+}
+
 =head2 IndexRecord
 
 Index all records with id in recordsids and recordtype=$recordtype ('biblio' or 'authority').
@@ -383,6 +393,7 @@ Index all records with id in recordsids and recordtype=$recordtype ('biblio' or 
 sub IndexRecord {
     my $recordtype = shift;
     my $recordids  = shift;
+    warn "IndexRecord for $recordtype";warn Data::Dumper::Dumper $recordids;
     my $debug = C4::Context->preference("DebugLevel");
 
     my $indexes = GetIndexes( $recordtype );
