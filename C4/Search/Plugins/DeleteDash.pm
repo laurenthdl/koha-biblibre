@@ -28,16 +28,17 @@ our $VERSION = 3.0.1;
 
 sub ComputeValue {
     my $record = shift;
-    my $mappings = shift;
+    my $mapping = shift;
     my @values = ();
-    for my $field ( keys (%$mappings) ) {
-        for my $subfield ( @{$$mappings{$field}} ) {
-            my $f = $record->field($field);
-            next if not $f;
-            my $sf = $f->subfield($subfield);
-            next if not $sf;
-            $sf =~ s/-//g;
-            push @values, $sf
+    for my $tag ( keys (%$mapping) ) {
+        for my $code ( @{$$mapping{$tag}} ) {
+            for my $f ( $record->field($tag) ) {
+                for my $sf ($f->subfield($code)){
+                    push @values, $sf;
+                    $sf =~ s/-//g;
+                    push @values, $sf;
+                }
+            }
         }
     }
     return @values;
