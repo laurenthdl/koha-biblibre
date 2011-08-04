@@ -10,6 +10,7 @@ use JSON;
 use C4::Auth;
 use C4::Circulation qw/CanBookBeRenewed/;
 use C4::Context;
+use C4::Koha qw/getitemtypeimagelocation/;
 use C4::Reserves qw/CheckReserves/;
 use C4::Utils::DataTables;
 
@@ -82,6 +83,7 @@ foreach(@$results) {
     $row{'date_due'} = C4::Dates->new($row{'date_due'}, 'iso')->output();
     $row{'issuedate'} = C4::Dates->new($row{'issuedate'}, 'iso')->output();
     $row{'charge'} = sprintf("%.2f", $row{'charge'});
+    $row{'imageurl'} = getitemtypeimagelocation('intranet', $row{'imageurl'});
 
     my ($can_renew, $can_renew_error) = CanBookBeRenewed($borrowernumber, $row{'itemnumber'});
     if(defined $can_renew_error->{'message'}) {
