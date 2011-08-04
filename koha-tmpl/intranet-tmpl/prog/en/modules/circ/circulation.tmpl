@@ -6,25 +6,18 @@
 <!-- /TMPL_IF --></title>
 <link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME='themelang' -->/css/datatables.css" />
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.checkboxes.min.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/picnet.table.filter.min.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/datatables.js"></script>
 <script type="text/javascript">
 //<![CDATA[
 function Dopop(link) {
     var newin=window.open(link,'popup','width=600,height=400,resizable=1,toolbar=0,scrollbars=1,top');
 }
-$.tablesorter.addParser({
-    id: 'articles',
-    is: function(s) {return false;  },
-    format: function(s) { return s.toLowerCase().replace(/^(the|an|a) /,''); },
-    type: 'text'
-});
 <!-- TMPL_UNLESS NAME="borrowernumber" --><!-- TMPL_UNLESS NAME="CGIselectborrower" -->window.onload=function(){ $('#findborrower').focus(); };<!-- /TMPL_UNLESS --><!-- /TMPL_UNLESS -->
-	 $(document).ready(function() {
- 		$('#patronlists > ul').tabs();
-		$.tablesorter.defaults.widgets = ['zebra'];
+$(document).ready(function() {
+    $('#patronlists > ul').tabs();
 
     var dt_issues = $("#issuest").dataTable({
         'bAutoWidth': false,
@@ -81,16 +74,38 @@ $.tablesorter.addParser({
         }
     } );
 
-		$("#relissuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
-		dateFormat: 'uk',<!-- /TMPL_IF -->
-		headers: { 1: { sorter: 'articles' },5: { sorter: false },6:{sorter:false},7:{sorter:false},8:{sorter:false},9:{sorter:false},10:{sorter:false}}
-		});
+    <!-- TMPL_IF EXPR='dateformat eq "metric"' -->
+        dt_add_type_uk_date();
+    <!-- /TMPL_IF -->
 
-		$("#holdst").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
-		dateFormat: 'uk',<!-- /TMPL_IF -->
-			sortList: [[0,0]],
-			headers: { 1: { sorter: 'articles' }}
-		});
+    $("#relissuest").dataTable({
+        'bAutoWidth': false,
+        'aoColumns': [
+            null,
+            null,
+            null,
+            null,
+            null,
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": false }
+        ],
+        'sPaginationType': 'full_numbers'
+    });
+
+    $("#holdst").dataTable({
+        'bAutoWidth': false,
+        'aoColumns': [
+            null,
+            null,
+            null,
+            null,
+            null,
+            { 'bSortable': false }
+        ],
+        'sPaginationType': 'full_numbers'
+    });
 
 var allcheckboxes = $(".checkboxed");
 	$("#renew_all"      ).click(function(){ $(".checkboxed").checkCheckboxes(":input[name*=items]"   ); $(".checkboxed").unCheckCheckboxes("issuest:input[name*=barcodes]"); });
