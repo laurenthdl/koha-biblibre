@@ -93,7 +93,7 @@ my $marcnotesarray = GetMarcNotes( $record, $marcflavour );
 my $marcauthorsarray = GetMarcAuthors( $record, $marcflavour );
 my $marcsubjctsarray = GetMarcSubjects( $record, $marcflavour );
 my $marcseriesarray = GetMarcSeries( $record, $marcflavour );
-my $marcurlsarray = GetMarcUrls( $record, $marcflavour );
+my $marcurlsarray = GetMarcUrls( $record, $marcflavour, $fw );
 my $subtitle = GetRecordValue( 'subtitle', $record, $fw );
 
 # Get Branches, Itemtypes and Locations

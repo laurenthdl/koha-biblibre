@@ -287,7 +287,7 @@ my $marcnotesarray   = GetMarcNotes( $record, $marcflavour );
 my $marcauthorsarray = GetMarcAuthors( $record, $marcflavour );
 my $marcsubjctsarray = GetMarcSubjects( $record, $marcflavour );
 my $marcseriesarray  = GetMarcSeries( $record, $marcflavour );
-my $marcurlsarray    = GetMarcUrls( $record, $marcflavour );
+my $marcurlsarray    = GetMarcUrls( $record, $marcflavour, $dat->{'frameworkcode'});
 my $subtitle         = GetRecordValue( 'subtitle', $record, GetFrameworkCode($biblionumber) );
 
 #search rebound parameter

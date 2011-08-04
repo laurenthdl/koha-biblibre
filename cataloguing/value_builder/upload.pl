@@ -1,19 +1,23 @@
 #!/usr/bin/perl
 
-
 use strict;
 use warnings;
 
 use C4::Auth;
-use CGI;
+use CGI qw/-utf8/;
 use C4::Context;
+use C4::Debug;
 
 use C4::AuthoritiesMarc;
 use C4::Output;
 use File::Basename;
+use Text::Undiacritic qw/undiacritic/;
+use Encode;
+
+#use open qw(:std :utf8);
+
 
 my $upload_path = C4::Context->preference('uploadPath');
-warn $upload_path;
 
 =head1
 
@@ -106,6 +110,10 @@ sub plugin {
 	
 	    # Dealing with filenames:
 
+	    # Normalizing filename:
+	    $uploaded_file = normalize_string($uploaded_file);
+	    $uploaded_file = undiacritic($uploaded_file);
+
 	    # Checking for an existing filename in destination directory
 	    if (-f "$upload_path/$uploaded_file") {
 
@@ -156,4 +164,25 @@ sub findname {
 
     return "$file-$count$ext";
 }
+
+=head2 normalize_string
+        Given 
+            a string
+        Returns a utf8 NFC normalized string
+        
+        Sample code :
+=cut
+
+sub normalize_string{
+        my ($string)=@_;
+    $debug and warn " string in normalize before normalize :",$string;
+    $string=decode_utf8($string,1);
+    $debug and warn " string in normalize :",$string;
+    $string=~s/\<|\>|\^|\;|\?|,|\-|\(|\)|\[|\]|\{|\}|\$|\%|\!|\*|\:|\\|\/|\&|\"|\'|\s/_/g;
+    $string=~s/\s+$//g;
+    $string=~s/^\s+//g;
+    return $string; 
+}
+
+
 1;
