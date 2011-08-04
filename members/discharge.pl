@@ -62,18 +62,23 @@ if ( $input->param('borrowernumber') ) {
     my $issues = GetPendingIssues($borrowernumber);
     my $hasissues = scalar(@$issues);
 
+    # Getting reserves
+    my @reserves = GetReservesFromBorrowernumber($borrowernumber); 
+    my $hasreserves = scalar(@reserves);
+
     # Generating discharge if needed
     if ($input->param('generatedischarge')) {
         # If borrower has pending reserves, we cancel them
         foreach (@reserves) {
             CancelReserve($_->{'reservenumber'});
-        } 
+        }
+        $hasreserves = 0;
 
         # Debarring member
         # Getting librarian's name
         my $librarian = GetMember('borrowernumber' => $loggedinuser);
         my $librarianname = $librarian->{'firstname'} . " " . $librarian->{'surname'};
-        
+
         # Getting today's date
         my $date = C4::Dates->new()->output();
         # (this is quite ugly, but this is how borrowers seems to be permanently debarred)
@@ -105,10 +110,6 @@ if ( $input->param('borrowernumber') ) {
         qx{../misc/cronjobs/printoverdues.sh $dischargePath/$borrowernumber};
 
     }
-
-    # Getting reserves
-    my @reserves = GetReservesFromBorrowernumber($borrowernumber); 
-    my $hasreserves = scalar(@reserves);
 
     # Getting already generated discharges
     my @list = GetDischarges($borrowernumber);
