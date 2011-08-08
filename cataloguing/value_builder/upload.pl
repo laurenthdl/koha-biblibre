@@ -89,8 +89,9 @@ sub plugin {
     # If there's already a file uploaded for this field,
     # We handle is deletion
     if ($delete) {
-	warn "deletion of $upload_path/$result";
-	my $success = unlink("$upload_path/$result");
+        my ($filename) = fileparse($result);
+	warn "deletion of $upload_path/$filename";
+	my $success = unlink("$upload_path/$filename");
 	if ($success) {
 	    $template->param(success => $success);
 	} else {
@@ -141,6 +142,9 @@ sub plugin {
 	$template->param(success       => $success)        if ($success);
 	$template->param(error         => $error)          if ($error);
 	$template->param(uploaded_file => $uploaded_file);
+    my $uploadWebPath = C4::Context->preference('uploadWebPath');
+    $uploadWebPath =~ s/\/+$//;
+    $template->param(fileurl    => "$uploadWebPath/$uploaded_file");
     }
 
     output_html_with_http_headers $input, $cookie, $template->output;
