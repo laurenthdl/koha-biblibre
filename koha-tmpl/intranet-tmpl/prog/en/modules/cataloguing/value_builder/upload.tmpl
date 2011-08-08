@@ -12,18 +12,16 @@
 <!-- TMPL_IF NAME="success" -->
 
     <script type="text/javascript">
-        function report() {
-            var doc   = opener.document; 
-            var field = doc.getElementById("<!-- TMPL_VAR NAME="index" -->");
-            field.value =  "<!-- TMPL_VAR NAME="uploaded_file" -->";
-            window.close();
-            return false;
-        }
+        //<![CDATA[
+        var doc = opener.document;
+        var field = doc.getElementById("<!-- TMPL_VAR NAME='index' -->");
+        field.value = "<!-- TMPL_VAR NAME='fileurl' -->";
+        //]]>
     </script>
 
 
     The file <!-- TMPL_VAR NAME="uploaded_file" --> has been successfully added.
-    <p><input type="button" value="close" onclick="javascript:report();" /></p>
+    <p><input type="button" value="close" onclick="javascript:window.close();" /></p>
 
 <!-- TMPL_ELSE -->
 
