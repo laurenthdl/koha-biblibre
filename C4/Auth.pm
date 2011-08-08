@@ -1089,7 +1089,7 @@ sub check_api_auth {
     unless ( $query->param('userid') ) {
         $sessionID = $query->cookie("CGISESSID");
     }
-    if ( $sessionID && not $cas ) {
+    if ( $sessionID && not ($cas && $query->param('PT')) ) {
         my $session = get_session($sessionID);
         C4::Context->_new_userenv($sessionID);
         if ($session) {
