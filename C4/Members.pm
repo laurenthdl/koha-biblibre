@@ -1770,28 +1770,53 @@ Generate a cardnumber in the form AAAABXXXX where:
 
 =cut
 
+# This feature is only for 'Institut Telecom', that's why
+# there are some hard-coded values in this sub
 sub GetNextCardnumber {
     my $branchcode = shift;
 
     if($branchcode) {
         my $year = This_Year;
         my $dbh = C4::Context->dbh;
-        my $query = qq{
-            SELECT MAX( SUBSTRING( cardnumber, -4 ) )
-            FROM borrowers
-            WHERE cardnumber LIKE ?
-            LIMIT 1
-        };
+        my $query;
+        my $max;
+        if($branchcode == 1) {  # 'Evry'
+            $query = qq{
+                SELECT MAX( SUBSTRING( cardnumber, -4 ) )
+                FROM borrowers
+                WHERE cardnumber LIKE ?
+                LIMIT 1
+            };
+            $max = 9999;
+        } else {
+            $query = qq{
+                SELECT MAX( SUBSTRING( cardnumber, -3 ) )
+                FROM borrowers
+                WHERE cardnumber LIKE ?
+                LIMIT 1
+            };
+            $max = 999;
+        }
+        warn $query;
         my $sth = $dbh->prepare($query);
         $sth->execute($year.$branchcode."%");
-        my ($max) = $sth->fetchrow_array;
+        my ($last) = $sth->fetchrow_array;
+        warn "LAST = $last";
         my $newcardnumber = $year.$branchcode;
-        if($max) {
-            $max = 0 if $max == 9999;
-            $max ++;
-            $newcardnumber .= sprintf("%04d", $max);
+        if($last) {
+            my $new = $last + 1;
+            $new = 1 if $new > $max;
+            if($branchcode == 1) {
+                $newcardnumber .= sprintf("%04d", $new);
+            } else {
+                $newcardnumber .= sprintf("%03d", $new);
+            }
         } else {
-            $newcardnumber .= "0001";
+            if($branchcode == 1) {
+                $newcardnumber .= "0001";
+            } else {
+                $newcardnumber .= "001";
+            }
         }
         return $newcardnumber;
     }
