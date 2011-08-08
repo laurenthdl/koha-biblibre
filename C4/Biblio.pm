@@ -1598,11 +1598,11 @@ sub GetMarcUrls {
                 $marcurl->{'toc'} = 1 if ( defined($s3) && $s3 =~ /^[Tt]able/ );
             } else {
                 $marcurl->{'linktext'} = $field->subfield('2') || C4::Context->preference('URLLinkText') || $url;
-		if ($tagslib->{ $urltag }->{ $urlsubtag }->{value_builder} eq "upload.pl") {
-		    $marcurl->{'MARCURL'} = C4::Context->preference('uploadWebPath') . "/" . $url;
-		} else {
-		    $marcurl->{'MARCURL'} = $url;
-		}
+                if (not $url =~ /http:/ ) {
+                    $marcurl->{'MARCURL'} = C4::Context->preference('uploadWebPath') . "/" . $url;
+                } else {
+                    $marcurl->{'MARCURL'} = $url;
+                }
             }
             push @marcurls, $marcurl;
         }
