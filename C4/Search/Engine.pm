@@ -84,4 +84,18 @@ sub index {
     }
 }
 
+sub add_to_index_queue {
+
+    my $self = shift(@_);
+
+    if ($self->searchengine eq "Solr") {
+        return C4::Search::Engine::Solr::AddRecordToIndexRecordQueue(@_);
+    } elsif ($self->searchengine eq "Zebra") {
+        warn "Unsupported yet";
+    } else {
+        warn "System preference 'SearchEngine' not equal 'Solr' or 'Zebra'.";
+        warn "We can not indexing";
+    }
+}
+
 1;

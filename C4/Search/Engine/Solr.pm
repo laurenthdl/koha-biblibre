@@ -377,12 +377,30 @@ sub SimpleSearch {
 
 =head2 AddRecordToIndexRecordQueue
 
+Push recordids list in IndexRecordQueue if it launch
+else call IndexRecord
+
 =cut
 sub AddRecordToIndexRecordQueue {
-    my ( $recordtype, $recordids ) = @_;
-    # Verify IndexRecordQueue.pl is start
-    # Append recordtype recordids in /tmp/records.txt (ex.)
+    my ( $recordtype, $recordids, $force_reindex ) = @_;
+
+    # FIXME : Where set this value ???
+    my $scriptpath = "/home/jonathan/workspace/versions/koha_master/services/IndexRecordQueue.pl";
+
+    my $status = qx#$scriptpath status#;
+
+    # Verify IndexRecordQueue.pl is started
     # Else call IndexRecord directly
+    if ( $status =~ /No pidfile found/ or $status =~ /Running: *no/ ) {
+        return IndexRecord $recordtype, $recordids;
+    }
+
+    # Append recordtype recordids in file
+    my $recordids_str = ref($recordids) eq 'ARRAY'
+                    ? join " ", @$recordids
+                    : $recordids;
+    system(qq/$scriptpath -a "$recordtype $recordids_str"/) == 0 or die "Could not indexing these biblionumbers : $recordids_str";
+
 }
 
 =head2 IndexRecord
@@ -393,7 +411,6 @@ Index all records with id in recordsids and recordtype=$recordtype ('biblio' or 
 sub IndexRecord {
     my $recordtype = shift;
     my $recordids  = shift;
-    warn "IndexRecord for $recordtype";warn Data::Dumper::Dumper $recordids;
     my $debug = C4::Context->preference("DebugLevel");
 
     my $indexes = GetIndexes( $recordtype );
@@ -424,7 +441,7 @@ sub IndexRecord {
 
         $solrrecord->set_value( 'recordtype', $recordtype );
         $solrrecord->set_value( 'recordid'  , $id );
-        warn $id;
+        warn "$recordtype $id";
 
         for my $index ( @$indexes ) {
             eval {
