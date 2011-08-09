@@ -241,9 +241,19 @@ my $relissuecount  = scalar(@$relissue) if ($relissue);
 my $roaddetails = &GetRoadTypeDetails( $data->{'streettype'} );
 my $today       = POSIX::strftime( "%Y-%m-%d", localtime );       # iso format
 my @borrowers_with_issues;
+my $overdues_exist = 0;
 my $totalprice     = GetTotalReplacementPriceOfPendingIssues($borrowernumber);
 my $totalissues= GetTotalIssuesByBorrower($borrowernumber);
 my $totalissueslastyear = GetTotalIssuesLastYearByBorrower($borrowernumber);
+
+# Only fetch pending issues data if this is a print
+# On "normal" display, data is fetched with an ajax script
+my $issue;
+my @issuedata;
+if($print) {
+    $issue = GetPendingIssues($borrowernumber);
+    @issuedata = build_issue_data($issue, $issuecount);
+}
 
 my @relissuedata = build_issue_data($relissue, $relissuecount);
 
@@ -294,6 +304,7 @@ for ( my $i = 0 ; $i < $issuecount ; $i++ ) {
 
     # end lost, damaged
     if ( $datedue lt $today ) {
+        $overdues_exist = 1;
         $row{'red'} = 1;
     }
     if ( $issuedate eq $today ) {
@@ -560,10 +571,12 @@ $template->param(
     totaldue                  => sprintf( "%.2f", $total ),
     totaldue_raw              => $total,
     relissueloop              => @relissuedata,
+    issueloop                 => @issuedata,
     issuecount                => $issuecount,
     totalissues               => $totalissues,
     totalissueslastyear       => $totalissueslastyear,
     relissuecount             => $relissuecount,
+    overdues_exist            => $overdues_exist,
     error                     => $error,
     $error                    => 1,
     StaffMember               => ( $category_type eq 'S' ),
