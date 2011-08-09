@@ -1,47 +1,129 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Patrons &rsaquo; <!-- TMPL_IF NAME="unknowuser" -->Patron does not exist<!-- TMPL_ELSE -->Patron Details for <!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" --> (<!-- TMPL_VAR NAME="cardnumber" -->)<!-- /TMPL_IF --></title>
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME='themelang' -->/css/datatables.css" />
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.checkboxes.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/datatables.js"></script>
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
 function Dopop(link) {
     var newin=window.open(link,'popup','width=600,height=400,resizable=1,toolbar=0,scrollbars=1,top');
 }
-$.tablesorter.addParser({
-    id: 'articles', 
-    is: function(s) {return false;  }, 
-    format: function(s) { return s.toLowerCase().replace(/^(the|an|a) /,''); }, 
-    type: 'text' 
-});
 $(document).ready(function() {
-	$('#finesholdsissues > ul').tabs();
-	$('#patron-details > ul').tabs();
-	$.tablesorter.defaults.widgets = ['zebra'];
-	$("#issuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
-		dateFormat: 'uk',<!-- /TMPL_IF -->
-		headers: { 1: { sorter: 'articles' }}
-	}); 
-	$("#relissuest").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
-		dateFormat: 'uk',<!-- /TMPL_IF -->
-		headers: { 1: { sorter: 'articles' }}
-	}); 
+  $('#finesholdsissues > ul').tabs();
+  $('#patron-details > ul').tabs();
 
-	$("#holdst").tablesorter({<!-- TMPL_IF NAME="dateformat_metric" -->
-		dateFormat: 'uk',<!-- /TMPL_IF -->
-		sortList: [[0,0]],
-		headers: { 1: { sorter: 'articles' },6: { sorter: false }}
-	}); 
+  $(".replace_me").each( function() {
+      replace_html( this );
+  } );
+  var dt_issues = $("#issuest").dataTable({
+    'bAutoWidth': false,
+    'bProcessing': true,
+    'bServerSide': true,
+    'sAjaxSource': '/cgi-bin/koha/members/tables/issues.pl',
+    'fnServerData': function(sSource, aoData, fnCallback) {
+        aoData.push({
+          'name':'borrowernumber',
+          'value':'<!-- TMPL_VAR NAME="borrowernumber" -->'
+        },{
+          'name' : 'ccode',
+          'value': $("#collection_filter").val()
+        },{
+          'name' : 'itype',
+          'value': $("#itemtype_filter").val()
+        },{
+          'name' : 'dateduefrom',
+          'value': $("#dateduefrom").val()
+        },{
+          'name' : 'datedueto',
+          'value': $("#datedueto").val()
+        },{
+          'name' : 'issuedatefrom',
+          'value': $("#issuedatefrom").val()
+        },{
+          'name' : 'issuedateto',
+          'value': $("#issuedateto").val()
+        },{
+          'name' : 'title_filteron',
+          'value': 'biblio.title biblio.author biblioitems.publishercode biblioitems.publicationyear'
+        },{
+          'name' : 'collection_filteron',
+          'value': 'items.ccode'
+        });
+        $.ajax({
+            "dataType": 'json',
+            "type": "POST",
+            "url": sSource,
+            "data": aoData,
+            "success": fnCallback
+        });
+    },
+    'aoColumns': [
+        { "mDataProp": "date_due" },
+        { "mDataProp": "title" },
+        { "mDataProp": "collection" },
+        { "mDataProp": "stocknumber" },
+        { "mDataProp": "barcode" },
+        { "mDataProp": "itemtype_description" },
+        { "mDataProp": "issuedate" },
+        { "mDataProp": "itemcallnumber" },
+        { "mDataProp": "charge" },
+        { "mDataProp": "replacementprice" },
+        { "mDataProp": "renewals", "bSortable": false, "bSearchable": false },
+        { "mDataProp": "checkin", "bSortable": false, "bSearchable": false }
+    ],
+    'sPaginationType': 'full_numbers'
+  });
+
+  dt_issues.fnAddFilters("filter", 750);
+
+  $("#collection_filter,#itemtype_filter").change(function(){
+    dt_issues.fnDraw();
+  });
+  $("#dateduefrom,#datedueto,#issuedatefrom,#issuedateto").change(function(){
+    dt_issues.fnDraw();
+  });
+
+  <!-- TMPL_IF NAME='dateformat_metric' -->
+    dt_add_type_uk_date();
+  <!-- /TMPL_IF -->
+
+  $("#relissuest").dataTable({
+    'bAutoWidth': false,
+    'sPaginationType': 'full_numbers'
+  });
+
+  $("#holdst").dataTable({
+    'bAutoWidth': false,
+    'bPaginate': false,
+    'bFilter': false,
+    'bInfo': false,
+    'aoColumns': [
+      null,
+      null,
+      null,
+      null,
+      null,
+      { "bSortable": false }
+    ],
+  });
 
     <!-- TMPL_LOOP NAME="attributes_loop" -->
         <!-- TMPL_IF NAME="class" -->
-            $("#aai_<!-- TMPL_VAR NAME='class' -->").tablesorter({
-                headers: {}
+            $("#aai_<!-- TMPL_VAR NAME='class' -->").dataTable({
+                'bAutoWidth': false,
+                'bPaginate': false,
+                'bFilter': false,
+                'bInfo': false
             });
         <!-- TMPL_ELSE -->
-            $("#aai").tablesorter({
-                headers: {}
+            $("#aai").dataTable({
+                'bAutoWidth': false,
+                'bPaginate': false,
+                'bFilter': false,
+                'bInfo': false
             });
         <!-- /TMPL_IF -->
     <!-- /TMPL_LOOP -->
@@ -92,28 +174,16 @@ $(document).ready(function() {
 		}
 	});
  });
-function uncheck_sibling(me){
-nodename=me.getAttribute("name");
-if (nodename =="barcodes[]"){
-    var Node=me.parentNode.previousSibling;
-    while (Node.nodeName!="TD"){Node=Node.previousSibling}
-    var Nodes=Node.childNodes;
-    for (var i=0;i<Nodes.length;i++){
-      if (Nodes[i].nodeName=="INPUT" && Nodes[i].getAttribute("type")=="checkbox"){
-        Nodes[i].checked=false;
-      }     
-   }   
 
-}else {
-    var Node=me.parentNode.nextSibling;
-    while (Node.nodeName!="TD"){Node=Node.nextSibling}
-    var Nodes=Node.childNodes;
-    for (var i=0;i<Nodes.length;i++){
-      if (Nodes[i].nodeName=="INPUT" && Nodes[i].getAttribute("type")=="checkbox"){
-        Nodes[i].checked=false;
-      }     
-   }   
-}
+function uncheck_sibling(me){
+    nodename = $(me).attr("name");
+    if (nodename == "barcodes[]"){
+        var node = $(me).parents('td').prev('td').find('input[type="checkbox"]');
+        $(node).attr("checked", false);
+    }else {
+        var node = $(me).parents('td').next('td').find('input[type="checkbox"]');
+        $(node).attr("checked", false);
+    }
 }
 
 //]]>
@@ -138,7 +208,6 @@ $(document).ready(function() {
             $("#loadingtab").hide();
         }
         });
-    $.tablesorter.defaults.widgets = ['zebra'];
 
 
 // functions for allsuggestionforthisborrower interactions
@@ -607,144 +676,110 @@ $(document).ready(function() {
     <input type="hidden" name="borrowernumber" value="<!-- TMPL_VAR NAME="borrowernumber" -->" />
 	<input type="hidden" name="branch" value="<!-- TMPL_VAR NAME="branch" -->" />
 <div id="checkedout">
-    <!-- TMPL_IF NAME="issueloop" -->
-    <table id="issuest">
+<!-- TMPL_IF NAME="issuecount" -->
+  <table id="issuest" class="display">
     <thead>
-	<tr>
-            <th scope="col">Due date</th>
-            <th scope="col">Title</th>
-            <th scope="col">Collection</th>
-            <th scope="col">Stock number</th>
-            <th scope="col">Barcode</th>
-            <th scope="col">Item Type</th>
-            <th scope="col">Checked out on</th> 
-            <th scope="col">Call no</th>
-            <th scope="col">Charge</th>
-            <th scope="col">Price</th>
-            <th scope="col">Renew <p class="column-tool"><a href="#" id="CheckAllitems">select all</a> | <a href="#" id="CheckNoitems">none</a></p></th>
-            <th scope="col">Check in <p class="column-tool"><a href="#" id="CheckAllreturns">select all</a> | <a href="#" id="CheckNoreturns">none</a></p></th>
-        </tr>
+      <tr>
+        <th scope="col">Due date</th>
+        <th scope="col">Title</th>
+        <th scope="col">Collection</th>
+        <th scope="col">Stock number</th>
+        <th scope="col">Barcode</th>
+        <th scope="col">Item Type</th>
+        <th scope="col">Checked out on</th> 
+        <th scope="col">Call no</th>
+        <th scope="col">Charge</th>
+        <th scope="col">Price</th>
+        <th scope="col">Renew <p class="column-tool"><a href="#" id="CheckAllitems">select all</a> | <a href="#" id="CheckNoitems">none</a></p></th>
+        <th scope="col">Check in <p class="column-tool"><a href="#" id="CheckAllreturns">select all</a> | <a href="#" id="CheckNoreturns">none</a></p></th>
+      </tr>
     </thead>
-    	<tfoot>
-		<tr>
-            <td colspan="8" style="text-align: right; font-weight:bold;">Totals:</td>
-			<td><!-- TMPL_VAR NAME="totaldue" --></td>
-            <td><!-- TMPL_VAR NAME="totalprice" --></td>
-            <td colspan="2">      
-                <p>
-                    Renewal due date: <input type="text" size="8" id="newduedate" name="newduedate" value="<!-- TMPL_VAR Name="newduedate" -->" />
-                    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="newduedate_button" alt="Show Calendar" />
-                    <script type="text/javascript">
-                        //<![CDATA[
-                        Calendar.setup({
-                            inputField : "newduedate",
-                            ifFormat : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
-                            button : "newduedate_button"
-                        });
-                        //]]>
-                    </script>
-				<span style="display:block;color:#666;font-weight:normal;font-size:90%;"><!-- TMPL_INCLUDE NAME="date-format.inc" --></span>
-                </p>
-                <p>
-                    <label for="exemptfine">Forgive fines on return: </label><input type="checkbox" name="exemptfine" value="1" />
-                </p>
-                <!-- TMPL_IF NAME="CAN_user_circulate_override_renewals" -->
-                <!-- TMPL_IF NAME="AllowRenewalLimitOverride" -->
-                <p>
-                    <label for="override_limit">Override Renewal Limit:</label>
-                    <input type="checkbox" name="override_limit" id="override_limit" value="1" />
-                </p>
-                <!-- /TMPL_IF -->
-                <!-- /TMPL_IF -->
-                </td>
-        </tr>
-		</tfoot>
-       <tbody>
-       <!-- TMPL_LOOP name="issueloop" -->
-
-          <!-- TMPL_IF name="overdue" -->
-          <tr class="problem">
-          <!-- TMPL_ELSE -->
-          <tr>
+    <tfoot>
+      <tr>
+        <td><span class="replace_me" data-id="datedue" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"/></td>
+        <td>
+          <input type="text" class="filter" data-column_num="1" placeholder="Search title, author, ..." />
+        </td>
+        <td>
+          <select id="collection_filter" style="max-width:7em">
+            <option value="">All</option>
+            <!-- TMPL_LOOP NAME='collections_loop' -->
+              <option value="<!-- TMPL_VAR NAME='authorised_value' -->"><!-- TMPL_VAR NAME='lib' --></option>
+            <!-- /TMPL_LOOP -->
+          </select>
+        </td>
+        <td>
+          <input type="text" class="filter" data-column_num="3" placeholder="Search stocknumber" size="12"/>
+        </td>
+        <td>
+          <input type="text" class="filter" data-column_num="4" placeholder="Search barcode" size="12"/>
+        </td>
+        <td>
+          <select id="itemtype_filter" style="max-width:7em">
+            <option value="">All</option>
+            <!-- TMPL_LOOP NAME='itemtypes_loop' -->
+              <option value="<!-- TMPL_VAR NAME='itemtype' -->"><!-- TMPL_VAR NAME='description' --></option>
+            <!-- /TMPL_LOOP -->
+          </select>
+        </td>
+        <td><span class="replace_me" data-id="issuedate" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"/></td>
+        <td>
+          <input type="text" class="filter" data-column_num="7" placeholder="Search callnumber" size="12" />
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="8" style="text-align: right; font-weight:bold;">Totals:</td>
+        <td><!-- TMPL_VAR NAME="totaldue" --></td>
+        <td><!-- TMPL_VAR NAME="totalprice" --></td>
+        <td colspan="2">
+          <p>Renewal due date:
+            <input type="text" size="8" id="newduedate" name="newduedate" value="<!-- TMPL_VAR Name="newduedate" -->" />
+            <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="newduedate_button" alt="Show Calendar" />
+            <script type="text/javascript">
+              //<![CDATA[
+              Calendar.setup({
+                  inputField : "newduedate",
+                  ifFormat : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                  button : "newduedate_button"
+              });
+              //]]>
+            </script>
+            <span style="display:block;color:#666;font-weight:normal;font-size:90%;">
+              <!-- TMPL_INCLUDE NAME="date-format.inc" -->
+            </span>
+          </p>
+          <p>
+            <label for="exemptfine">Forgive fines on return: </label>
+            <input type="checkbox" name="exemptfine" value="1" />
+          </p>
+          <!-- TMPL_IF NAME="CAN_user_circulate_override_renewals" -->
+            <!-- TMPL_IF NAME="AllowRenewalLimitOverride" -->
+              <p>
+                <label for="override_limit">Override Renewal Limit:</label>
+                <input type="checkbox" name="override_limit" id="override_limit" value="1" />
+              </p>
+            <!-- /TMPL_IF -->
           <!-- /TMPL_IF -->
-		  <td<!-- TMPL_IF NAME="red" --> class="od"<!-- /TMPL_IF -->><!-- TMPL_VAR NAME="date_due" -->
-                <!-- TMPL_IF NAME="itemlost" -->
-                                        <span class="lost"><!-- TMPL_VAR NAME="itemlost" --></span>
-                    <!-- /TMPL_IF -->
-                <!-- TMPL_IF NAME="damaged" -->
-                                        <span class="dmg"><!-- TMPL_VAR NAME="itemdamaged" --></span>
-                <!-- /TMPL_IF -->
-</td>
-            <td><a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->"><strong><!-- TMPL_VAR NAME="title" escape="html" --></strong></a><!-- TMPL_IF NAME="author" -->, by <!-- TMPL_VAR name="author" --><!-- /TMPL_IF --> <!-- TMPL_IF name="publishercode" -->; <!-- TMPL_VAR name="publishercode" --> <!-- /TMPL_IF --> <!-- TMPL_IF name="publicationyear" -->, <!-- TMPL_VAR name="publicationyear" --><!-- /TMPL_IF --></td>
-            <td><!-- TMPL_VAR NAME="collection" --></td>
-            <td><!-- TMPL_VAR NAME="stocknumber" --></td>
-            <td><a href="/cgi-bin/koha/catalogue/moredetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#item<!-- TMPL_VAR NAME="itemnumber" -->"><!-- TMPL_VAR NAME="barcode" --></a></td>
-<td><!-- TMPL_UNLESS NAME="noItemTypeImages" --> <!-- TMPL_IF NAME="itemtype_image" --><img src="<!-- TMPL_VAR NAME="itemtype_image" -->" alt="" /><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME="itemtype_description" --></td>
-            <td><!-- TMPL_VAR NAME="issuedate" --></td>
-	        <td><!-- TMPL_VAR NAME="itemcallnumber" --></td>
-            <td><!-- TMPL_VAR NAME="charge" --></td>
-            <td><!-- TMPL_VAR NAME="replacementprice" --></td>
-      <!-- TMPL_IF NAME="renew_failed" -->
-            <td class="problem">Renewal Failed</td>
-      <!-- TMPL_ELSE -->
-            <td style="text-align : center"><span style="padding: 0 1em;">
-            <!-- TMPL_IF Name="norenew_reason_too_many" --><span class="problem"><!-- /TMPL_IF -->
-            <!-- TMPL_VAR NAME="renewals" -->/<!-- TMPL_VAR NAME="renewalsallowed" -->
-            <!-- TMPL_IF Name="norenew_reason_too_many" --></span><!-- /TMPL_IF -->
-                </span>
-            <!-- TMPL_IF name="norenew" -->
-                <!-- TMPL_IF NAME="can_confirm" --><span class="renewals-allowed" style="display: none">
-                    <!-- TMPL_IF NAME="od" -->
-                        <input type="checkbox" name="items[]" value="<!-- TMPL_VAR NAME="itemnumber" -->" checked="checked" />
-                    <!-- TMPL_ELSE -->
-                        <input type="checkbox" name="items[]" value="<!-- TMPL_VAR NAME="itemnumber" -->" />
-                    <!-- /TMPL_IF -->
-                    </span>
-                    <br/>
-                    <span class="renewals-disabled problem">
-                <!-- /TMPL_IF -->
-                <!-- TMPL_IF NAME="norenew_reason_on_reserve" -->
-                        On Hold
-                <!-- /TMPL_IF -->
-				    <!-- TMPL_IF NAME="norenew_reason_overdue" -->
-				        Overdue
-				    <!-- /TMPL_IF -->
-				    <!-- TMPL_IF NAME="norenew_reason_too_many" -->
-				        Not Renewable
-				    <!-- /TMPL_IF -->
-                <!-- TMPL_IF NAME="can_confirm" -->
-                    </span>
-                <!-- /TMPL_IF -->
-            <!-- TMPL_ELSE -->
-            <!-- TMPL_IF NAME="red" -->
-            <input type="checkbox" name="items[]" value="<!-- TMPL_VAR NAME="itemnumber" -->" checked="checked" onclick="uncheck_sibling(this);" />
-            <!-- TMPL_ELSE -->
-            <input type="checkbox" name="items[]" value="<!-- TMPL_VAR NAME="itemnumber" -->" onclick="uncheck_sibling(this);" />
-            <!-- /TMPL_IF -->
-            <!-- /TMPL_IF -->
-            </td>
-      <!-- /TMPL_IF -->
-      <!-- TMPL_IF NAME="return_failed" -->
-            <td class="problem">Checkin Failed</td>
-      <!-- TMPL_ELSE -->
-            <td style="text-align:center;"><input type="checkbox" name="barcodes[]"  value="<!-- TMPL_VAR NAME="barcode" -->" onclick="uncheck_sibling(this);" />
-                <!-- TMPL_IF Name="reserved" --><br/><a href="javascript:void(0);" onclick="window.open('/cgi-bin/koha/reserve/request.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->')">On Hold</a><!-- /TMPL_IF -->
-            </td>
-      <!-- /TMPL_IF -->
-        </tr>
-  <!-- /tmpl_loop -->
-        </tbody>
-        </table>
-     <fieldset class="action">
-        <input type="submit" name="renew_checked" value="Renew or Return checked items" />
-        <input type="submit" id="renew_all" name="renew_all" value="Renew all" />
-        </fieldset>
-<!-- TMPL_ELSE --><p>Patron has nothing checked out.</p>
+        </td>
+      </tr>
+    </tfoot>
+    <tbody></tbody>
+  </table>
+  <fieldset class="action">
+    <input type="submit" name="renew_checked" value="Renew or Return checked items" />
+    <input type="submit" id="renew_all" name="renew_all" value="Renew all" />
+  </fieldset>
+<!-- TMPL_ELSE -->
+  <p>Patron has nothing checked out.</p>
 <!-- /TMPL_IF -->
 
 <!-- TMPL_IF NAME="relissuecount" -->
 	<h2>Relatives issues</h2>
- <table id="relissuest">
+ <table id="relissuest" class="display">
     <thead>
 	<tr>
             <th scope="col">Due date</th>

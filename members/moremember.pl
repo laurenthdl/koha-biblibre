@@ -235,28 +235,33 @@ $template->param( lib2 => $lib2 ) if ($lib2);
 # current issues
 #
 my @borrowernumbers = GetMemberRelatives($borrowernumber);
-my $issue       = GetPendingIssues($borrowernumber);
 my $relissue    = GetPendingIssues(@borrowernumbers) if (@borrowernumbers);
-my $issuecount  = scalar(@$issue);
+my $issuecount  = GetNumberOfPendingIssues($borrowernumber);
 my $relissuecount  = scalar(@$relissue) if ($relissue);
 my $roaddetails = &GetRoadTypeDetails( $data->{'streettype'} );
 my $today       = POSIX::strftime( "%Y-%m-%d", localtime );       # iso format
-my @issuedata;
 my @borrowers_with_issues;
 my $overdues_exist = 0;
-my $totalprice     = 0;
+my $totalprice     = GetTotalReplacementPriceOfPendingIssues($borrowernumber);
 my $totalissues= GetTotalIssuesByBorrower($borrowernumber);
 my $totalissueslastyear = GetTotalIssuesLastYearByBorrower($borrowernumber);
 
-my @issuedata = build_issue_data($issue, $issuecount);
+# Only fetch pending issues data if this is a print
+# On "normal" display, data is fetched with an ajax script
+my $issue;
+my @issuedata;
+if($print) {
+    $issue = GetPendingIssues($borrowernumber);
+    @issuedata = build_issue_data($issue, $issuecount);
+}
+
 my @relissuedata = build_issue_data($relissue, $relissuecount);
-#warn Data::Dumper::Dumper(@issuedata);
 
 sub build_issue_data {
     my $issue = shift;
     my $issuecount = shift;
 
-    my $localissue;
+    my $localissue = [];
 
 for ( my $i = 0 ; $i < $issuecount ; $i++ ) {
 
@@ -271,7 +276,6 @@ for ( my $i = 0 ; $i < $issuecount ; $i++ ) {
     $issue->[$i]{'issuedate'} = C4::Dates->new( $issue->[$i]{'issuedate'}, 'iso' )->output('syspref');
     my $biblionumber = $issue->[$i]{'biblionumber'};
     my %row          = %{ $issue->[$i] };
-    $totalprice += $issue->[$i]{'replacementprice'};
     $row{'replacementprice'} = $issue->[$i]{'replacementprice'};
 
     # item lost, damaged loops
@@ -349,7 +353,7 @@ for ( my $i = 0 ; $i < $issuecount ; $i++ ) {
     }
     push( @$localissue, \%row );
 }
-    return $localissue;
+    return @$localissue;
 
 }
 
@@ -553,6 +557,16 @@ if ( C4::Context->preference('EnhancedMessagingPreferences') ) {
     $template->param( SMSnumber               => defined $data->{'smsalertnumber'} ? $data->{'smsalertnumber'} : $data->{'mobile'} );
 }
 
+# Build itemtypes and collection loops for filters
+my $itemtypes = GetItemTypes;
+my @itemtypes_loop;
+foreach(sort keys %$itemtypes){
+    my $row = $itemtypes->{$_};
+    push @itemtypes_loop, $row;
+}
+
+my $collections_loop = GetAuthorisedValues('CCODE');
+
 $template->param(
     detailview                => 1,
     AllowRenewalLimitOverride => C4::Context->preference("AllowRenewalLimitOverride"),
@@ -566,8 +580,8 @@ $template->param(
     totalprice                => sprintf( "%.2f", $totalprice ),
     totaldue                  => sprintf( "%.2f", $total ),
     totaldue_raw              => $total,
-    issueloop                 => @issuedata,
-    relissueloop              => @relissuedata,
+    relissueloop              => \@relissuedata,
+    issueloop                 => \@issuedata,
     issuecount                => $issuecount,
     totalissues               => $totalissues,
     totalissueslastyear       => $totalissueslastyear,
@@ -578,6 +592,8 @@ $template->param(
     StaffMember               => ( $category_type eq 'S' ),
     is_child                  => ( $category_type eq 'C' ),
     librarytype               => C4::Context->preference("LibraryType"),
+    collections_loop          => $collections_loop,
+    itemtypes_loop            => \@itemtypes_loop,
 
     #   reserveloop     => \@reservedata,
     dateformat => C4::Context->preference("dateformat"),

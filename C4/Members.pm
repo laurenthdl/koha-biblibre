@@ -54,6 +54,8 @@ BEGIN {
       &GetMemberIssuesAndFines
       &GetPendingIssues
       &GetAllIssues
+      &GetNumberOfPendingIssues
+      &GetTotalReplacementPriceOfPendingIssues
 
       &get_institutions
       &getzipnamecity
@@ -1138,6 +1140,61 @@ sub GetAllIssues {
     }
 
     return \@result;
+}
+
+=head2 GetNumberOfIssus
+
+    my $total = GetNumberOfPendingIssues($borrowernumber);
+
+returns the total number of pending issues for this borrower
+
+=cut
+
+sub GetNumberOfPendingIssues {
+    my $borrowernumber = shift;
+
+    return unless $borrowernumber;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT COUNT(*)
+        FROM issues
+        WHERE borrowernumber = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($borrowernumber);
+
+    my ($count) = $sth->fetchrow_array;
+
+    return $count;
+}
+
+=head2 GetTotalReplacementPriceOfPendingIssues
+
+    my $totalreplacementprice = GetTotalReplacementPriceOfPendingIssues($borrowernumber);
+
+returns the total replacement price of this borrower's pending issues.
+
+=cut
+
+sub GetTotalReplacementPriceOfPendingIssues {
+    my $borrowernumber = shift;
+
+    return unless $borrowernumber;
+
+    my $dbh = C4::Context->dbh;
+    my $query = qq{
+        SELECT SUM( replacementprice )
+        FROM issues
+            LEFT JOIN items ON items.itemnumber = issues.itemnumber
+        WHERE borrowernumber = ?
+    };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($borrowernumber);
+
+    my ($total) = $sth->fetchrow_array;
+
+    return $total;
 }
 
 =head2 GetMemberAccountRecords
