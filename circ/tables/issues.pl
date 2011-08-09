@@ -82,6 +82,7 @@ foreach(@$results) {
     my %row = %{$_};
     $row{'date_due'} = C4::Dates->new($row{'date_due'}, 'iso')->output();
     $row{'issuedate'} = C4::Dates->new($row{'issuedate'}, 'iso')->output();
+    $row{'charge'} ||= 0;
     $row{'charge'} = sprintf("%.2f", $row{'charge'});
     $row{'imageurl'} = getitemtypeimagelocation('intranet', $row{'imageurl'});
 
