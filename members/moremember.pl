@@ -235,22 +235,17 @@ $template->param( lib2 => $lib2 ) if ($lib2);
 # current issues
 #
 my @borrowernumbers = GetMemberRelatives($borrowernumber);
-my $issue       = GetPendingIssues($borrowernumber);
 my $relissue    = GetPendingIssues(@borrowernumbers) if (@borrowernumbers);
-my $issuecount  = scalar(@$issue);
+my $issuecount  = GetNumberOfPendingIssues($borrowernumber);
 my $relissuecount  = scalar(@$relissue) if ($relissue);
 my $roaddetails = &GetRoadTypeDetails( $data->{'streettype'} );
 my $today       = POSIX::strftime( "%Y-%m-%d", localtime );       # iso format
-my @issuedata;
 my @borrowers_with_issues;
-my $overdues_exist = 0;
-my $totalprice     = 0;
+my $totalprice     = GetTotalReplacementPriceOfPendingIssues($borrowernumber);
 my $totalissues= GetTotalIssuesByBorrower($borrowernumber);
 my $totalissueslastyear = GetTotalIssuesLastYearByBorrower($borrowernumber);
 
-my @issuedata = build_issue_data($issue, $issuecount);
 my @relissuedata = build_issue_data($relissue, $relissuecount);
-#warn Data::Dumper::Dumper(@issuedata);
 
 sub build_issue_data {
     my $issue = shift;
@@ -271,7 +266,6 @@ for ( my $i = 0 ; $i < $issuecount ; $i++ ) {
     $issue->[$i]{'issuedate'} = C4::Dates->new( $issue->[$i]{'issuedate'}, 'iso' )->output('syspref');
     my $biblionumber = $issue->[$i]{'biblionumber'};
     my %row          = %{ $issue->[$i] };
-    $totalprice += $issue->[$i]{'replacementprice'};
     $row{'replacementprice'} = $issue->[$i]{'replacementprice'};
 
     # item lost, damaged loops
@@ -300,7 +294,6 @@ for ( my $i = 0 ; $i < $issuecount ; $i++ ) {
 
     # end lost, damaged
     if ( $datedue lt $today ) {
-        $overdues_exist = 1;
         $row{'red'} = 1;
     }
     if ( $issuedate eq $today ) {
@@ -566,13 +559,11 @@ $template->param(
     totalprice                => sprintf( "%.2f", $totalprice ),
     totaldue                  => sprintf( "%.2f", $total ),
     totaldue_raw              => $total,
-    issueloop                 => @issuedata,
     relissueloop              => @relissuedata,
     issuecount                => $issuecount,
     totalissues               => $totalissues,
     totalissueslastyear       => $totalissueslastyear,
     relissuecount             => $relissuecount,
-    overdues_exist            => $overdues_exist,
     error                     => $error,
     $error                    => 1,
     StaffMember               => ( $category_type eq 'S' ),

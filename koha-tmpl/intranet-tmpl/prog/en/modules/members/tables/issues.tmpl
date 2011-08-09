@@ -1,0 +1,47 @@
+{
+    "sEcho": "<!-- TMPL_VAR NAME='sEcho' -->",
+    "iTotalRecords": "<!-- TMPL_VAR NAME='iTotalRecords' -->",
+    "iTotalDisplayRecords": "<!-- TMPL_VAR NAME='iTotalDisplayRecords' -->",
+    "aaData": [
+        <!-- TMPL_LOOP NAME='aaData' -->
+            {
+                "date_due":
+                    "<!-- TMPL_VAR NAME='date_due' -->",
+
+                "title":
+                    "<a href=\"/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->\"><strong><!-- TMPL_VAR NAME='title' ESCAPE='html'--></strong></a><!-- TMPL_IF NAME='author' -->, by <!-- TMPL_VAR NAME='author' --><!-- /TMPL_IF --><!-- TMPL_IF NAME='publishercode' --> ; <!-- TMPL_VAR NAME='publishercode' --><!-- /TMPL_IF --><!-- TMPL_IF NAME='publicationyear' -->, <!-- TMPL_VAR NAME='publicationyear' --><!-- /TMPL_IF -->",
+
+                "collection":
+                    "<!-- TMPL_VAR NAME='collection' -->",
+
+                "stocknumber":
+                    "<!-- TMPL_VAR NAME='stocknumber' -->",
+
+                "barcode":
+                    "<a href=\"/cgi-bin/koha/catalogue/moredetail.pl?biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->&amp;itemnumber=<!-- TMPL_VAR NAME='itemnumber' -->#item<!-- TMPL_VAR NAME='itemnumber' -->\"><!-- TMPL_VAR NAME='barcode' --></a>",
+
+                "itemtype_description":
+                    "<!-- TMPL_UNLESS NAME='noItemTypeImages' --><!-- TMPL_IF NAME='imageurl' --><img src=\"<!-- TMPL_VAR NAME='imageurl' -->\" /><!-- /TMPl_IF --><!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME='itemtype_description' -->",
+
+                "issuedate":
+                    "<!-- TMPL_VAR NAME='issuedate' -->",
+
+                "itemcallnumber":
+                    "<!-- TMPL_VAR NAME='itemcallnumber' -->",
+
+                "charge":
+                    "<!-- TMPL_VAR NAME='charge' -->",
+
+                "replacementprice":
+                    "<!-- TMPL_VAR NAME='replacementprice' -->",
+
+                "renewals":
+                    "<div style=\"text-align:center\"><span style=\"padding: 0 1em\"><!-- TMPL_IF NAME='renew_error_too_many' --><span class=\"problem\"><!-- /TMPL_IF --><!-- TMPL_VAR NAME='renewals' -->/<!-- TMPL_VAR NAME='renewalsallowed' --><!-- TMPL_IF NAME='renew_error_too_many' --></span><!-- /TMPL_IF --></span><!-- TMPL_UNLESS NAME='can_renew' --><span class\"renewals-allowed\" style=\"display: none\"><!-- /TMPL_UNLESS --><input type=\"checkbox\" id=\"renew_<!-- TMPL_VAR NAME='itemnumber' -->\" name=\"items[]\" value=\"<!-- TMPL_VAR NAME='itemnumber' -->\" onclick=\"uncheck_sibling(this);\" /><!-- TMPL_UNLESS NAME='can_renew' --></span><!-- /TMPL_UNLESS --> <!-- TMPL_IF NAME='renew_error' --><br /><span class=\"renewals-disabled problem\"><!-- TMPL_IF NAME='renew_error_on_reserve' --> On Hold <!-- /TMPL_IF --><!-- TMPL_IF NAME='renew_error_overdue' --> Overdue <!-- /TMPL_IF --><!-- TMPL_IF NAME='renew_error_too_many' --> Not Renewable <!-- /TMPL_IF --></span><!-- /TMPL_IF --></div>",
+
+                "checkin":
+                    "<div style=\"text-align:center\"><!-- TMPL_IF NAME='return_failed' -->Checkin Failed<!-- TMPL_ELSE --><input type=\"checkbox\" id=\"return_<!-- TMPL_VAR NAME='itemnumber' -->\" name=\"barcodes[]\" value=\"<!-- TMPL_VAR NAME='barcode' -->\" onclick=\"uncheck_sibling(this);\" /> <!-- TMPL_IF NAME='reserved' --><br /><a href=\"javascript:void(0);\" onclick=\"window.open('/cgi-bin/koha/reserve/request.pl?biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->')\">On Hold</a><!-- /TMPL_IF --><!-- /TMPL_IF --></div>",
+
+            }<!-- TMPL_UNLESS NAME='__last__' -->,<!-- /TMPL_UNLESS -->
+        <!-- /TMPL_LOOP -->
+    ]
+}
