@@ -3,10 +3,12 @@
     Catalog &rsaquo; Advanced Search
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <script type="text/JavaScript" language="JavaScript">
-	$(document).ready(function() {
-    advSearchPrepare();
-    $(".advsearch").change(); //force update if back button is pushed
-	});
+    $(document).ready(function() {
+        advSearchPrepare();
+        $(".advsearch").change(); //force update if back button is pushed
+        $('select[name="idx"]').attr('disabled', false);
+        $('select[name="op"]').attr('disabled', false);
+    });
 
   function advSearchPrepare () {
 
@@ -22,6 +24,27 @@
     <!-- /TMPL_LOOP -->
     $(".advsearch").change( function () {getAuthorisedValuesList($(this))});
   }
+
+  function check_form() {
+    $('select[name="idx"]').each( function() {
+        var input_elt = $(this).find('~ input'); // Input element
+        var op_elt = $(this).parent().next('div').find('select[name="op"]'); // Select op element
+        if ( !$(this).find('option:selected').attr('avlist') && $(input_elt).val().length < 1 ) {
+            $(input_elt).attr('disabled', true);
+            $(this).attr('disabled', true);
+            if ( op_elt.length > 0 ) {
+                $(op_elt).attr('disabled', true);
+            }
+        }
+    } );
+    if ( $('select[name="idx"]:enabled').length < 1 ) {
+        var first_select = $('select[name="idx"]')[0];
+        $(first_select).attr('disabled', false);
+        $(first_select).find('~ input').attr('disabled', false);
+    }
+    return true;
+  }
+
 </script>
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/catalogue.js"></script>
 </head>
@@ -163,7 +186,7 @@
     <!-- SEARCH BUTTONS -->
     <div class="yui-g">
         <div class="container" style="text-align: center;">
-            <input class="submit" type="submit" accesskey="s" name="do" title="Search" value="Search" />
+            <input class="submit" type="submit" accesskey="s" name="do" title="Search" onclick="return check_form();" value="Search" />
             <!-- TMPL_IF NAME="expanded_options" -->
                 <a href="/cgi-bin/koha/opac-search.pl?expanded_options=0">[Fewer Options]</a>
             <!-- TMPL_ELSE -->
