@@ -53,7 +53,7 @@ if($op && $op eq 'savenew') {
     my $numberpattern;
     foreach(qw/ label description numberingmethod displayorder
       label1 label2 label3 add1 add2 add3 every1 every2 every3
-      setto1 setto3 setto3 whenmorethan1 whenmorethan2 whenmorethan3
+      setto1 setto2 setto3 whenmorethan1 whenmorethan2 whenmorethan3
       numbering1 numbering2 numbering3 /) {
         $numberpattern->{$_} = $input->param($_) || undef;
     }
@@ -80,7 +80,7 @@ if($op && $op eq 'savenew') {
     if($mod_ok) {
         foreach(qw/ id label description numberingmethod displayorder
           label1 label2 label3 add1 add2 add3 every1 every2 every3
-          setto1 setto3 setto3 whenmorethan1 whenmorethan2 whenmorethan3
+          setto1 setto2 setto3 whenmorethan1 whenmorethan2 whenmorethan3
           numbering1 numbering2 numbering3 /) {
             $numberpattern->{$_} = $input->param($_) || undef;
         }
