@@ -27,19 +27,64 @@ use C4::Branch;    # GetBranches
 use C4::Record;
 use C4::Csv;
 
+use Getopt::Long;
+
 
 my $query       = new CGI;
-my $op          = $query->param("op") || '';
-my $filename    = $query->param("filename") || 'koha.mrc';
+
+my $commandline = 0;
+my $op;
+my $filename;
 my $dbh         = C4::Context->dbh;
 my $marcflavour = C4::Context->preference("marcflavour");
-my $format      = $query->param("format") || 'iso2709';
+my $format;
+my $output_format;
+my $dont_export_items;
+my $start_accession;
+my $help;
+my $oldstdout;
 
+# Checks if the script is called from commandline
+if ( scalar @ARGV > 0 ) {
+
+    # Getting parameters
+    $op = 'export';
+    $format = 'iso2709';
+    GetOptions( 'format=s' => \$output_format, 'date=s' => \$start_accession, 'dont_export_items' => \$dont_export_items, 'filename=s' => \$filename, 'help|?' => \$help );
+    $commandline = 1;
+
+
+    if ($help) {
+        print "\nexport.pl [--format=format] [--date=date] [--dont_export_items] --filename=outputfile\n\n";
+        print " * format is either 'xml' or 'marc' (default)\n";
+        print " * date should be entered as the 'dateformat' syspref is set (dd/mm/yyyy for metric, yyyy-mm-dd for iso, mm/dd/yyyy for us)\n";
+        print " * records exported are the ones that have been modified since 'date'\n";
+        exit;
+    }
+
+    # Default parameters values :
+    $output_format     ||= 'marc';
+    $start_accession   ||= '';
+    $dont_export_items ||= 0;
+    $filename          ||= "koha.mrc";
+
+    # Let's redirect stdout
+    open $oldstdout, ">&STDOUT";
+    close STDOUT;
+    open STDOUT, ">$filename";
+
+} else {
+
+    $op          = $query->param("op") || '';
+    $filename    = $query->param("filename") || 'koha.mrc';
+    $format      = $query->param("format") || 'iso2709';
+
+}
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
     {   template_name   => "tools/export.tmpl",
         query           => $query,
         type            => "intranet",
-        authnotrequired => 0,
+        authnotrequired => $commandline,
         flagsrequired   => { tools => 'export_catalog' },
         debug           => 1,
     }
@@ -60,17 +105,21 @@ if ( $op eq "export" ) {
             -type       => 'application/octet-stream',
             -charset    => 'utf-8',
             -attachment => $filename
-        );
+        ) unless ($commandline);
 
         my $StartingBiblionumber = $query->param("StartingBiblionumber");
         my $EndingBiblionumber   = $query->param("EndingBiblionumber");
-        my $output_format        = $query->param("output_format") || 'marc';
+           $output_format        = $query->param("output_format") || 'marc' unless ($commandline);
         my $itemtype             = $query->param("itemtype");
         my $start_callnumber     = $query->param("start_callnumber");
         my $end_callnumber       = $query->param("end_callnumber");
-        my $start_accession      = ( $query->param("start_accession") ) ? C4::Dates->new( $query->param("start_accession") ) : '';
+        if ($commandline) {
+           $start_accession      = ($start_accession) ? C4::Dates->new($start_accession) : '';
+        } else {
+           $start_accession      = ( $query->param("start_accession") ) ? C4::Dates->new( $query->param("start_accession") ) : '';
+        }
         my $end_accession        = ( $query->param("end_accession") ) ? C4::Dates->new( $query->param("end_accession") ) : '';
-        my $dont_export_items    = $query->param("dont_export_item"); # recommendation 995
+           $dont_export_items    = $query->param("dont_export_item") unless ($commandline); # recommendation 995
         my $strip_nonlocal_items = $query->param("strip_nonlocal_items");
         my $dont_export_fields   = $query->param("dont_export_fields");
         my @biblionumbers        = $query->param("biblionumbers");
@@ -148,8 +197,10 @@ if ( $op eq "export" ) {
                 for my $itemfield ( $record->field($homebranchfield) ) {
 
                     # if stripping nonlocal items, use loggedinuser's branch if they didn't select one
-                    $branch = C4::Context->userenv->{'branch'} unless $branch;
-                    $record->delete_field($itemfield) if ( $dont_export_items || ( $itemfield->subfield($homebranchsubfield) ne $branch ) );
+                    if ($strip_nonlocal_items) {
+                        $branch = C4::Context->userenv->{'branch'} unless $branch;
+                    }
+                    $record->delete_field($itemfield) if ( $dont_export_items || ($branch ne '' && $itemfield->subfield($homebranchsubfield) ne $branch ) );
                 }
             }
 
@@ -185,7 +236,7 @@ if ( $op eq "export" ) {
             -type                        => 'application/octet-stream',
             -'Content-Transfer-Encoding' => 'binary',
             -attachment                  => "export.csv"
-        );
+        ) unless ($commandline);
         print $output;
         exit;
     }
@@ -223,3 +274,12 @@ else {
 
     output_html_with_http_headers $query, $cookie, $template->output;
 }
+
+
+if ($commandline) {
+    # Let's re-redirect stdout
+    close STDOUT;
+    open STDOUT, ">&", $oldstdout;
+}
+
+
