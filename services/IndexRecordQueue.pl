@@ -88,14 +88,14 @@ $filepath    = $opts{"-f"}  if defined $opts{"-f"};
 $max_records = get_opt( $opts{"-mr"} ) || $DEFAULT_MAX_RECORDS;
 $max_delta   = get_opt( $opts{"-ms"} ) || $DEFAULT_MAX_DELTA;
 
-# If we want add records, we don't want to daemonize
+# If we want to add records, we don't want to daemonize
 if ( $opts{"-a"} ) {
     add( $opts{"-a"}, $filepath );
 } else {
     daemonize();
 }
 
-# If we want status or add records, we want not require C4::Search
+# If we want to return status or to add records, we do not want to require C4::Search
 if ( not $opts{"-a"} and not grep /status/, @ARGV ) {
     require C4::Search;
     C4::Search->import(qw/IndexRecord/);
@@ -106,7 +106,7 @@ process_previous_records( $filepath );
 
 my %records;
 
-# No wait because we want check on delay
+# Nowait because we want to check on delay
 my $file = File::Tail->new( name => $filepath, max_interval => $MAX_INTERVAL, nowait => 1 );
 
 # Main loop
@@ -116,13 +116,13 @@ my $timer;
 my $mr;
 my $ms;
 while ( $continue and defined( my $line = $file->read ) ) {
-    # If we get a line, we build the corresponding record and add to the records array.
+    # If we get a line, we build the corresponding record and add it to the records array.
     if ( $line ) {
         chomp $line;
         my $record = build_record( $line );
         append( \%records, $record );
 
-        # Initialize timer if not exists (ie. Is the first record for this recordtype)
+        # Initialize timer if it doesn't exist (ie. It is the first record for this recordtype)
         $$timer{ $$record{ recordtype } } = new Time::Progress
             if not defined $$timer{ $$record{ recordtype } };
 
@@ -140,13 +140,13 @@ while ( $continue and defined( my $line = $file->read ) ) {
 
     }
 
-    # If already exists records
+    # If a record already exists
     while ( my ( $recordtype, $recordids ) = each %records ) {
-        next if scalar( @$recordids ) == 0; # In fact, there is no records
+        next if scalar( @$recordids ) == 0; # In fact, there is no record
 
-        # If one condition is true
+        # If one of these following conditions is true :
         # - We have max records for this recordtype
-        # - These records are waiting for enough
+        # - These records are waiting for enough time
         if ( scalar( @$recordids ) >= $$mr { $recordtype }
                 or int( $$timer{ $recordtype }->elapsed ) >= $$ms{ $recordtype } ) {
             # Lock file
@@ -161,12 +161,12 @@ while ( $continue and defined( my $line = $file->read ) ) {
             # Unlock
             unlock( $fh );
             close $fh;
-            # Réinitialize timer
+            # Reinitialize timer
             $$timer{ $recordtype } = undef;
         }
     }
 
-    # We sleep. File::Tail no sleep with nowait = 1
+    # Sleep. File::Tail no sleep with nowait = 1
     sleep $MAX_INTERVAL;
 }
 
@@ -199,7 +199,7 @@ sub append {
 }
 
 =head2 process_previous_records
-
+Process previous records, already existing before launching the daemon
 =cut
 sub process_previous_records {
     my ( $filepath ) = @_;
@@ -226,14 +226,14 @@ sub process_previous_records {
 }
 
 =head2 index_records
-Create a new thread for indexation if not already exists.
-If exists, we sleep for 10''
+Create a new thread for indexation if it doesn't already exist.
+If a thread exists, we sleep for 10''
 =cut
 sub index_records {
     my ( $recordtype, $recordids ) = @_;
     say "Indexing !";
 
-    # Wait if precedent thread already running
+    # Wait if precedent thread is already running
     while ( defined $thread and $thread->is_running() ) {
         say "Precedent thread is already running, I'm going to sleep for 10''";
         sleep 10;
@@ -270,9 +270,9 @@ sub unlock {
     flock($fh, LOCK_UN) or die "Cannot unlock $filepath - $!\n";
 }
 
-=head2 buld_record
-Building a record from a line
-input must be "biblio 1 2 3" and we return a hash : 
+=head2 build_record
+Build a record from a line.
+input must be "biblio 1 2 3" and we return a hash :
 { recordtype => "biblio", recordids => [1, 2, 3] }
 =cut
 sub build_record {
@@ -288,7 +288,7 @@ sub build_record {
 }
 
 =head2 add
-Add a line into a file after have put a lock.
+Add a line into a file after locking it.
 =cut
 sub add {
     my ( $line, $filepath ) = @_;
@@ -342,7 +342,7 @@ Options:
 
 -a  : Add new line in file.
 
--f  : Set a filepath for manage records.
+-f  : Set a filepath for managing records.
 
 -mr : Max records in queue.
 
@@ -354,7 +354,7 @@ Options:
 
 =item B<-h>
 
-Print a brief help message and exits.
+Print a brief help message and exit.
 
 =item B<-a>
 
@@ -362,13 +362,13 @@ Add new line in file (ex. "biblio 1 2 3" for pushing in queue an indexation of b
 
 =item B<-f>
 
-Set a filepath for manage records (default is /tmp/records.txt. /tmp is not a good idea)
+Set a filepath for managing records (default is /tmp/records.txt. /tmp is not a good idea)
 
 =item B<-mr>
 
 Max records in queue. You can specify a specific max records before indexation.
-              -mr 5  Index each type when we have 5 differents records for a recordtype
-              -mr "authority:4;biblio:5" Index authorities when there is 4 authority id. The same with 5 biblios id
+              -mr 5  Index each type when there are 5 differents records for a recordtype
+              -mr "authority:4;biblio:5" Index authorities when there are 4 authority id. The same with 5 biblios id
 
 =item B<-ms>
 
