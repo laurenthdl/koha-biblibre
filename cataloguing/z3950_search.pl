@@ -219,6 +219,9 @@ if ( $op ne "do_search" ) {
                         $marcdata = $rec->raw();
 
                         my ( $charset_result, $charset_errors );
+                        # FIXME, I don't think this is the good place for doing this,
+                        # but don't know where to place it.
+                        $marcdata =~ s/([^\x80-\xff])[\x88\x89]/$1/g;
                         ( $marcrecord, $charset_result, $charset_errors ) = MarcToUTF8Record( $marcdata, C4::Context->preference('marcflavour'), $encoding[$k] );
 ####WARNING records coming from Z3950 clients are in various character sets MARC8,UTF8,UNIMARC etc
 ## In HEAD i change everything to UTF-8
