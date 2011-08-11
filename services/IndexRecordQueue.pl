@@ -63,6 +63,7 @@ $App::Daemon::logfile = "/tmp/IndexRecordQueue.log";
 $App::Daemon::pidfile = "/tmp/IndexRecordQueue.pid";
 
 my $logger = Log::LogLite->new( $App::Daemon::logfile, 7 );
+$logger and $logger->template("<date> <message>\n");
 
 $| = 1;
 
@@ -76,6 +77,10 @@ my $max_delta;
 
 if ( grep /-h/, @ARGV ) {pod2usage(1);} # Display full usage
 
+if ( grep /start/, @ARGV ) {$logger and $logger->write("START");}
+
+if ( grep /stop/, @ARGV ) {$logger and $logger->write("STOP");}
+
 # Get options
 my %opts = ();
 for my $opt (qw(-a -f -mr -ms)) {
@@ -87,6 +92,8 @@ $filepath    = $opts{"-f"}  if defined $opts{"-f"};
 
 $max_records = get_opt( $opts{"-mr"} ) || $DEFAULT_MAX_RECORDS;
 $max_delta   = get_opt( $opts{"-ms"} ) || $DEFAULT_MAX_DELTA;
+
+if ( grep /start/, @ARGV ) {$logger and $logger->write("SET OPTS: \nfilepath=$filepath\nmax_records=$max_records\nmax_delta=$max_delta");}
 
 # If we want to add records, we don't want to daemonize
 if ( $opts{"-a"} ) {
@@ -149,6 +156,7 @@ while ( $continue and defined( my $line = $file->read ) ) {
         # - These records are waiting for enough time
         if ( scalar( @$recordids ) >= $$mr { $recordtype }
                 or int( $$timer{ $recordtype }->elapsed ) >= $$ms{ $recordtype } ) {
+            $logger and $logger->write("We have " . scalar( @$recordids ) . " records for $recordtype and " . int( $$timer{ $recordtype }->elapsed ) . "seconds since first add");
             # Lock file
             open my $fh, "+<", $filepath or die "Can't open $filepath: $!";
             lock_file( $fh );
@@ -163,25 +171,13 @@ while ( $continue and defined( my $line = $file->read ) ) {
             close $fh;
             # Reinitialize timer
             $$timer{ $recordtype } = undef;
+        } else {
+            $logger and $logger->write("Nothing todo")
         }
     }
 
     # Sleep. File::Tail no sleep with nowait = 1
     sleep $MAX_INTERVAL;
-}
-
-=head2 remove_indexed_records
-Rewrite file without indexed records.
-=cut
-sub remove_indexed_records {
-    my ( $recordtype, $recordids, $fh ) = @_;
-    tie my @lines, 'Tie::File', $fh;
-    for my $line ( @lines ) {
-        $line =~ s/^$recordtype.*\K $_// for @$recordids;
-        $line =~ s/^$recordtype$//;
-    }
-    @lines = grep {!/^$/} @lines;
-    untie @lines;
 }
 
 =head2 append
@@ -205,6 +201,7 @@ sub process_previous_records {
     my ( $filepath ) = @_;
     # We open a $fh for reading
     # and a $fh_lock for locking
+    $logger and $logger->write("Processing previous records");
     open my $fh, "<", $filepath or die "Can't open $filepath: $!";
     open my $fh_lock, ">>", $filepath or die "Can't open $filepath: $!";
     lock_file( $fh_lock );
@@ -220,6 +217,7 @@ sub process_previous_records {
     close $fh;
     close $fh_lock;
     # Index previous records
+    $logger and $logger->write(Data::Dumper::Dumper \%previous_records);
     while ( my ( $recordtype, $recordids ) = each %previous_records ) {
         index_records( $recordtype, $recordids );
     }
@@ -231,11 +229,12 @@ If a thread exists, we sleep for 10''
 =cut
 sub index_records {
     my ( $recordtype, $recordids ) = @_;
-    say "Indexing !";
+    $logger and $logger->write("Indexing");
+    $logger and $logger->write("$recordtype " . join(',', @$recordids));
 
     # Wait if precedent thread is already running
     while ( defined $thread and $thread->is_running() ) {
-        say "Precedent thread is already running, I'm going to sleep for 10''";
+        $logger and $logger->write("Precedent thread is already running, I'm going to sleep for 10''");
         sleep 10;
     }
 
@@ -249,6 +248,22 @@ Launching indexation to call C4::Search::IndexRecord;
 sub launch_indexation {
     my ( $recordtype, $recordids ) = @_;
     C4::Search::IndexRecord( $recordtype, $recordids );
+}
+
+=head2 remove_indexed_records
+Rewrite file without indexed records.
+=cut
+sub remove_indexed_records {
+    my ( $recordtype, $recordids, $fh ) = @_;
+
+    $logger and $logger->write("Removing records ($recordtype " . join(',', @$recordids) . ") from file");
+    tie my @lines, 'Tie::File', $fh;
+    for my $line ( @lines ) {
+        $line =~ s/^$recordtype.*\K $_// for @$recordids;
+        $line =~ s/^$recordtype$//;
+    }
+    @lines = grep {!/^$/} @lines;
+    untie @lines;
 }
 
 =head2 lock_file
@@ -294,6 +309,7 @@ sub add {
     my ( $line, $filepath ) = @_;
     open my $fh, ">>", $filepath or die "Can' open $filepath: $!";
     lock_file( $fh );
+    $logger and $logger->write("ADD #$line# to file");
     print $fh "$line\n";
     unlock( $fh );
     close $fh;
