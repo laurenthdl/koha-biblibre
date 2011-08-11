@@ -261,7 +261,7 @@ sub build_issue_data {
     my $issue = shift;
     my $issuecount = shift;
 
-    my $localissue;
+    my $localissue = [];
 
 for ( my $i = 0 ; $i < $issuecount ; $i++ ) {
 
@@ -353,7 +353,7 @@ for ( my $i = 0 ; $i < $issuecount ; $i++ ) {
     }
     push( @$localissue, \%row );
 }
-    return $localissue;
+    return @$localissue;
 
 }
 
@@ -570,8 +570,8 @@ $template->param(
     totalprice                => sprintf( "%.2f", $totalprice ),
     totaldue                  => sprintf( "%.2f", $total ),
     totaldue_raw              => $total,
-    relissueloop              => @relissuedata,
-    issueloop                 => @issuedata,
+    relissueloop              => \@relissuedata,
+    issueloop                 => \@issuedata,
     issuecount                => $issuecount,
     totalissues               => $totalissues,
     totalissueslastyear       => $totalissueslastyear,
