@@ -482,9 +482,10 @@ elsif ( $phase eq 'Run this report' ) {
         # split on ??. Each odd (2,4,6,...) entry should be a parameter to fill
         my @split = split /<<|>>/, $sql;
         my @tmpl_parameters;
+        my $globalquoted="";
         for ( my $i = 0 ; $i < $#split / 2 ; $i++ ) {
             my $quoted = C4::Context->dbh->quote( $sql_params[$i] );
-
+            $globalquoted.="&sql_params=".$quoted;
             # if there are special regexp chars, we must \ them
             $split[ $i * 2 + 1 ] =~ s/(\||\?|\.|\*|\(|\)|\%)/\\$1/g;
             $sql =~ s/<<$split[$i*2+1]>>/$quoted/;
@@ -503,9 +504,10 @@ elsif ( $phase eq 'Run this report' ) {
             }
 warn "nb rangs : ".$total;
         }
-
+        $globalquoted=~s/'//g;
         my $totpages = int( $total / $limit ) + ( ( $total % $limit ) > 0 ? 1 : 0 );
         my $url = "/cgi-bin/koha/reports/guided_reports.pl?reports=$report&phase=Run%20this%20report";
+        $url .= "$globalquoted" if $globalquoted ne "";
         $template->param(
             'results'         => \@rows,
             'sql'             => $sql,

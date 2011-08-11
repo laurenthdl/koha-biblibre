@@ -64,7 +64,6 @@ if ( $op eq 'do_search' ) {
 
     my @searchtypes = ('authority_search', 'main_heading', 'all_headings');
 
-    my $index;
     my $indexes;
     my $value;
     my $operands;
@@ -72,7 +71,7 @@ if ( $op eq 'do_search' ) {
     my $authoritysep = C4::Context->preference('authoritysep');
     # Construct arrays with 3 values
     for my $searchtype (@searchtypes) {
-        $index = GetIndexBySearchtype($searchtype);
+        my $idx = GetIndexBySearchtype($searchtype);
         my $value = $query->param($searchtype);
         # if there is a value
         if ( $value ){
@@ -80,13 +79,13 @@ if ( $op eq 'do_search' ) {
             my @values = split (' ', $value); # Get all words
             $_ =~ s/"/\\"/g for @values;
             push @$operands, "\"$_\"" for @values; # Each word is an operand
-            push @$indexes, $index for @values; # For each word, push index corresponding
+            push @$indexes, $idx for @values; # For each word, push idx corresponding
             push @$operators, 'AND' for @values; # idem for operator
         # Else, if we have not operand and it's the 'all_headings' fields
         } elsif ( not $operands and $searchtype eq 'all_headings' ) {
             # We search all authorities
             push @$operands, "[* TO *]";
-            push @$indexes, $index;
+            push @$indexes, $idx;
             push @$operators, 'AND';
         }
         $template->param($searchtype => $query->param($searchtype));
@@ -111,7 +110,6 @@ if ( $op eq 'do_search' ) {
      
         my $summary_index = C4::Search::Query::getIndexName('auth-summary');
         for my $searchtype (@searchtypes) {
-            $index = GetIndexBySearchtype($searchtype);
             my $value = $query->param($searchtype);
             if ( $value ){
                 $value =~ s/^\s*(.*)\s*$/$1/; # Delete spaces (begin and after string)
@@ -132,7 +130,7 @@ if ( $op eq 'do_search' ) {
         {
             authid  => $_->{'values'}->{'recordid'},
             summary => BuildSummary( $record, $_->{'values'}->{'recordid'}, $_->{'values'}->{$authtype_indexname} ),
-            used    => $_->{values}->{C4::Search::Query::getIndexName('usedinxbiblios')},
+            used    => CountUsage($_->{values}->{recordid}),
         }
     } @{ $results->{items} };
 

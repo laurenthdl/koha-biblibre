@@ -106,7 +106,7 @@ if ( $op eq "do_search" ) {
            authid   => $_->{values}->{recordid},
            authid_index_name => $authid_index_name,
            summary  => BuildSummary( $authrecord, $_->{values}->{recordid} ),
-           used     => $_->{values}->{C4::Search::Query::getIndexName('usedinxbiblios')},
+           used     => CountUsage($_->{values}->{recordid}),
            authtype => $authtype,
         };
 

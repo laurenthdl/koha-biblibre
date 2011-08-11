@@ -44,7 +44,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 );
 
 my $type       = $input->param('type');
-my $branchcode = $input->param('branchcode') || ( C4::Branch::onlymine() ? ( C4::Branch::mybranch() || '*' ) : '*' );
+my $branchcode = $input->param('branchcode') || ( C4::Branch::onlymine() ? ( C4::Branch::mybranch() || 'Default' ) : 'Default' );
 my $op         = $input->param('op');
 my $confirm    = $input->param('confirm');
 
@@ -116,26 +116,6 @@ elsif ( $op eq 'add' ) {
     }
 }
 
-# Get the issuing rules list...
-my @issuingrules = GetIssuingRulesByBranchCode($branchcode);
-
-# ...and refine its data, row by row.
-for my $rule (@issuingrules) {
-    $rule->{'humanitemtype'} ||= $rule->{'itemtype'};
-    $rule->{'default_humanitemtype'} = $rule->{'humanitemtype'} eq '*';
-    $rule->{'humancategorycode'} ||= $rule->{'categorycode'};
-    $rule->{'default_humancategorycode'} = $rule->{'humancategorycode'} eq '*';
-
-    # This block is to show herited values in grey.
-    # We juste compare keys from our raw rule, with keys from the computed rule.
-    my $computedrule = GetIssuingRule( $rule->{'categorycode'}, $rule->{'itemtype'}, $rule->{'branchcode'} );
-    for ( keys %$rule ) {
-        if ( not defined $rule->{$_} ) {
-            $rule->{$_} = $computedrule->{$_};
-            $rule->{"herited_$_"} = 1;
-        }
-    }
-}
 
 # Get the issuing rules list...
 my @issuingrules = GetIssuingRulesByBranchCode($branchcode);
@@ -143,9 +123,11 @@ my @issuingrules = GetIssuingRulesByBranchCode($branchcode);
 # ...and refine its data, row by row.
 for my $rule (@issuingrules) {
     $rule->{'humanitemtype'} ||= $rule->{'itemtype'};
-    $rule->{'default_humanitemtype'} = $rule->{'humanitemtype'} eq '*';
+    $rule->{'default_humanitemtype'} = $rule->{'humanitemtype'} eq 'Default';
+    $rule->{'global_humanitemtype'} = $rule->{'humanitemtype'} eq '*';
     $rule->{'humancategorycode'} ||= $rule->{'categorycode'};
-    $rule->{'default_humancategorycode'} = $rule->{'humancategorycode'} eq '*';
+    $rule->{'default_humancategorycode'} = $rule->{'humancategorycode'} eq 'Default';
+    $rule->{'global_humancategorycode'} = $rule->{'humancategorycode'} eq '*';
 
     # This block is to show herited values in grey.
     # We juste compare keys from our raw rule, with keys from the computed rule.
@@ -166,6 +148,8 @@ $template->param(
     rules         => \@issuingrules,
     branchloop    => \@branchloop,
     humanbranch   => ( $branchcode ne '*' ? $branches->{$branchcode}->{branchname} : '' ),
+    defaultbranch   =>  $branchcode eq 'Default',
+    globalbranch   =>  $branchcode eq '*',
     branchcode    => $branchcode,
     definedbranch => scalar(@issuingrules) > 0,
 );

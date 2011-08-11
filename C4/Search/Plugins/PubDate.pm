@@ -30,16 +30,18 @@ sub ComputeValue {
     my $record = shift;
     my $date_str = $record->subfield('210','d');
     my @dates = ();
-    while ( $date_str =~ m/\d{4}-\d{4}/g ) {
-        my @d = split('-', $&);
-        for ( my $i = $d[0] ; $i <= $d[1] ; $i++ ) {
-            push @dates, C4::Search::Engine::Solr::NormalizeDate($i);
+    if (defined $date_str) {
+        while ( $date_str =~ m/\d{4}-\d{4}/g ) {
+            my @d = split('-', $&);
+            for ( my $i = $d[0] ; $i <= $d[1] ; $i++ ) {
+                push @dates, C4::Search::Engine::Solr::NormalizeDate($i);
+            }
         }
-    }
-    return @dates if @dates;
+        return @dates if @dates;
 
-    while ( $date_str =~ m/\d{4}/g ) {
-        push @dates, C4::Search::Engine::Solr::NormalizeDate($&);
+        while ( $date_str =~ m/\d{4}/g ) {
+            push @dates, C4::Search::Engine::Solr::NormalizeDate($&);
+        }
     }
 
     return @dates;

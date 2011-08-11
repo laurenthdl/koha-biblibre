@@ -230,6 +230,7 @@ CREATE TABLE `borrowers` (
   `gonenoaddress` tinyint(1) default NULL,
   `gonenoaddresscomment` VARCHAR(255) default NULL,
   `lost` tinyint(1) default NULL,
+  `lostcomment` VARCHAR(255) DEFAULT NULL,
   `debarred` date default NULL,
   `debarredcomment` VARCHAR(255) DEFAULT NULL,
   `contactname` mediumtext,
@@ -1004,6 +1005,7 @@ CREATE TABLE `items` (
   `copynumber` varchar(32) default NULL,
   `stocknumber` varchar(32) default NULL,
   `statisticvalue` varchar(80) DEFAULT NULL,
+  `new` INT(1) DEFAULT NULL,
   PRIMARY KEY  (`itemnumber`),
   UNIQUE KEY `itembarcodeidx` (`barcode`),
   KEY `itembinoidx` (`biblioitemnumber`),
@@ -2592,15 +2594,6 @@ CREATE TABLE `indexes` (
   PRIMARY KEY (`id`),
   UNIQUE (`code`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-T NULL,
-
-
-
-
-
-
 
 
 --

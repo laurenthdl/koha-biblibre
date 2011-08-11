@@ -17,6 +17,7 @@
 	$(document).ready(function() {
 		$("input[name=q]:eq(0)").focus();
     advSearchPrepare();
+    $(".advsearch").change(); //force update if back button is pushed
 	});
 
   function advSearchPrepare () {

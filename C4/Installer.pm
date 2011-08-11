@@ -576,8 +576,8 @@ sub load_sql {
     }
 
     #   errors thrown while loading installer data should be logged
-    warn "C4::Installer::load_sql returned the following errors while attempting to load $filename:\n";
-    warn $error;
+    warn "C4::Installer::load_sql returned the following errors while attempting to load $filename:\n" if ($error);
+    warn $error if ($error);
     return $error;
 }
 

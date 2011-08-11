@@ -5343,6 +5343,38 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.072";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+INSERT INTO issuingrules (
+branchcode,categorycode,itemtype,restrictedtype,rentaldiscount,
+reservecharge, fine, finedays, chargeperiod, accountsent, chargename, maxissueqty, issuelength,
+allowonshelfholds, holdrestricted, holdspickupdelay, renewalsallowed, renewalperiod
+)
+SELECT  IF(branchcode='*','Default',branchcode),
+        IF(categorycode='*','Default',categorycode),
+        IF(itemtype='*','Default',itemtype), 
+        restrictedtype,rentaldiscount,
+        reservecharge, fine, finedays, chargeperiod,
+        accountsent, chargename, maxissueqty, issuelength,
+        allowonshelfholds, holdrestricted, holdspickupdelay, 
+        renewalsallowed, renewalperiod
+    FROM issuingrules where branchcode='*' or itemtype='*' or categorycode='*';
+    });
+    print "Upgrade to $DBversion done (Ajout des règles de prêt pour les prêts par défauts)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.073";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    my $installer = C4::Installer->new();
+    my $full_path = $installer->get_file_path_from_name("atomicupdate/maduvil_indexes.sql");
+    my $error     = $installer->load_sql($full_path);
+    warn $error if $error;
+    print "Upgrade to $DBversion done (Adds maduvil indexes in index for solr)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
