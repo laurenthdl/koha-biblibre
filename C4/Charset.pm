@@ -41,6 +41,7 @@ BEGIN {
       SetMarcUnicodeFlag
       StripNonXmlChars
       nsb_clean
+      nsb_replace_by_valid_utf8
     );
 }
 
@@ -1199,6 +1200,27 @@ sub nsb_clean {
     $string = $_ ;
 
     return($string) ;
+}
+
+=head2 nsb_replace_by_valid_utf8
+
+=over 4
+
+$string = nsb_replace_by_valid_utf8($string);
+
+=back
+
+Replaces \x88 and \x89 characters by their valid utf8 value
+(\xc2\x88 and \xc2\x89 respectively).
+
+=cut
+
+sub nsb_replace_by_valid_utf8 {
+    my $string = shift;
+
+    $string =~ s/([^\x{80}-\x{ff}])([\x{88}\x{89}])/$1\x{c2}$2/g;
+
+    return $string;
 }
 
 
