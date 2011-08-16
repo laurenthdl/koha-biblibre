@@ -24,23 +24,12 @@
   }
 
   function check_form() {
-    // Get the last input which contains a value
-    var last_input = $('input[name="q"][value!=""]:last');
-    if ( last_input.length < 1 ) return true;
     $('select[name="idx"]').each( function() {
-        var select_val = $(this).val(); // Select value
         var input_elt = $(this).find("~ input"); // Input element
-        var input_val = $(input_elt).val(); // Input value
-
-        // If there was no value into the input element
-        // And 'select' was set to 'kw' (Keyword)
-        if ( input_val.length < 1 && ( select_val == 'kw' || select_val == 'all_fields' ) ) {
-            // We set the input value at [* TO *]
-            $(input_elt).val('[* TO *]');
+        if ( !$(this).find('option:selected').attr('avlist') && $(input_elt).val().length < 1 ) {
+            $(input_elt).attr('disabled', true);
+            $(this).attr('disabled', true);
         }
-        // If it's the last input, we can't check the following values
-        // return false doesn't quit the check_form function
-        if ( last_input.get(0) === input_elt.get(0) ) return false;
     } );
     return true;
   }
