@@ -150,22 +150,23 @@
 </div>
 <p />
 <div id="select-libs" class="container">
-        <label for="branchloop">Individual Libraries:</label>
-        <select name="filters" id="branchloop" onchange='if(this.value != ""){document.getElementById("categoryloop").disabled=true;} else {document.getElementById("categoryloop").disabled=false;}'>
-            <option value="">All Libraries</option>
-            <!-- TMPL_LOOP NAME="branchloop" -->
-            <option value='<!-- TMPL_VAR NAME="holdingbranch_indexname" -->:"<!-- TMPL_VAR NAME="branchcode" -->"' <!--TMPL_IF NAME="selected"-->selected="selected"<!--/TMPL_IF--> >
-                <!-- TMPL_VAR NAME="branchname" -->
-            </option>
-        <!-- /TMPL_LOOP -->
-        </select>
-        <!-- TMPL_IF NAME="searchdomainloop" -->
-    <p>OR</p> <!-- should addjs to grey out group pulldown if a library is selected. -->
-        <label for="categoryloop">Groups of Libraries</label><select name="multibranchlimit" id="categoryloop">
-        <option value=""> -- none -- </option>
-        <!-- TMPL_LOOP NAME="searchdomainloop" -->
-        <option value="<!-- TMPL_VAR NAME="categorycode" -->"><!-- TMPL_VAR NAME="categoryname" --></option>
-        <!-- /TMPL_LOOP -->
+    <label for="branchloop">Individual Libraries:</label>
+    <select name="filters" id="branchloop" onchange='if(this.value != ""){$("#categoryloop").attr("disabled", true)} else {$("#categoryloop").attr("disabled", false)}'>
+        <option value="">All Libraries</option>
+        <!-- TMPL_LOOP NAME="branchloop" -->
+        <option value='<!-- TMPL_VAR NAME="holdingbranch_indexname" -->:"<!-- TMPL_VAR NAME="branchcode" -->"' <!--TMPL_IF NAME="selected"-->selected="selected"<!--/TMPL_IF--> >
+            <!-- TMPL_VAR NAME="branchname" -->
+        </option>
+    <!-- /TMPL_LOOP -->
+    </select>
+    <!-- TMPL_IF NAME="searchdomainloop" -->
+        <p>OR</p> <!-- should addjs to grey out group pulldown if a library is selected. -->
+        <label for="categoryloop">Groups of Libraries</label>
+        <select name="multibranchlimit" id="categoryloop">
+            <option value=""> -- none -- </option>
+            <!-- TMPL_LOOP NAME="searchdomainloop" -->
+                <option value="<!-- TMPL_VAR NAME="categorycode" -->"><!-- TMPL_VAR NAME="categoryname" --></option>
+            <!-- /TMPL_LOOP -->
         </select>
     <!-- /TMPL_IF -->
 </div>

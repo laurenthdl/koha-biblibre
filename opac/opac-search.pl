@@ -283,6 +283,12 @@ for my $filter ( $cgi->param('filters') ) {
 push @{$filters{recordtype}}, 'biblio';
 $template->param('filters' => \@tplfilters );
 
+# Limit groups of Libraries
+if( $cgi->param('multibranchlimit') ) {
+    my $indexname = C4::Search::Query::getIndexName('homebranch');
+    my @branches = @{ GetBranchesInCategory( $cgi->param('multibranchlimit') ) };
+    push @{$filters{$indexname}}, '(' . join( " OR ", @branches ) . ')';
+}
 
 # append year limits if they exist
 my $limit_yr = $cgi->param('limit-yr');

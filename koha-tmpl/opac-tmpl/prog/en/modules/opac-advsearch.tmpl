@@ -131,7 +131,7 @@
                 <div id="location" class="container">
                     <fieldset>
                         <legend>Location and availability: </legend>
-                        <select name="filters" id="branchloop">
+                        <select name="filters" id="branchloop" onchange='if(this.value != ""){$("#categoryloop").attr("disabled", true)} else {$("#categoryloop").attr("disabled", false)}'>
                             <option value="">All libraries</option>
                             <!-- TMPL_LOOP NAME="branchloop" -->
                                 <option value='<!-- TMPL_VAR NAME="holdingbranch_indexname" -->:"<!-- TMPL_VAR NAME="branchcode" -->"' <!--TMPL_IF NAME="selected"-->selected="selected"<!--/TMPL_IF--> >
@@ -139,6 +139,16 @@
                                 </option>
                             <!-- /TMPL_LOOP -->
                         </select>
+                        <!-- TMPL_IF NAME="searchdomainloop" -->
+                            <p>OR</p> <!-- should addjs to grey out group pulldown if a library is selected. -->
+                            <label for="categoryloop">Groups of Libraries</label>
+                            <select name="multibranchlimit" id="categoryloop">
+                                <option value=""> -- none -- </option>
+                                <!-- TMPL_LOOP NAME="searchdomainloop" -->
+                                    <option value="<!-- TMPL_VAR NAME="categorycode" -->"><!-- TMPL_VAR NAME="categoryname" --></option>
+                                <!-- /TMPL_LOOP -->
+                            </select>
+                        <!-- /TMPL_IF -->
                         <div style="margin-top:.4em"><label for="available-items"><input type="checkbox" id="available-items" name="filters" value="<!-- TMPL_VAR NAME="availability_indexname" -->:1" /> Only items currently available for loan or reference</label></div>
                     </fieldset>
                 </div>
