@@ -38,7 +38,7 @@
   function check_form() {
     $('select[name="idx"]').each( function() {
         var input_elt = $(this).find('~ input'); // Input element
-        var op_elt = $(this).prev('select[name="op"]'); // Select op element
+        var op_elt = $(this).parent().next('div').find('select[name="op"]'); // Select op element
         if ( !$(this).find('option:selected').attr('avlist') && $(input_elt).val().length < 1 ) {
             $(input_elt).attr('disabled', true);
             $(this).attr('disabled', true);
