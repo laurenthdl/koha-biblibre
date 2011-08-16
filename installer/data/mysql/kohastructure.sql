@@ -1380,6 +1380,7 @@ CREATE TABLE `opac_news` (
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `expirationdate` date default NULL,
   `number` int(11) default NULL,
+  `servername` text default NULL,
   PRIMARY KEY  (`idnew`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2552,6 +2553,7 @@ CREATE TABLE `aqorders` (
   `sort1_authcat` varchar(10) default NULL,
   `sort2_authcat` varchar(10) default NULL,
   `uncertainprice` tinyint(1),
+  `parent_ordernumber` int(11) default NULL,
   PRIMARY KEY  (`ordernumber`),
   KEY `basketno` (`basketno`),
   KEY `biblionumber` (`biblionumber`),
