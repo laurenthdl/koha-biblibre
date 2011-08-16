@@ -14,11 +14,13 @@
 		line.removeChild(ButtonPlus);
 	}
 
-	$(document).ready(function() {
-		$("input[name=q]:eq(0)").focus();
-    advSearchPrepare();
-    $(".advsearch").change(); //force update if back button is pushed
-	});
+    $(document).ready(function() {
+        $("input[name=q]:eq(0)").focus();
+        advSearchPrepare();
+        $(".advsearch").change(); //force update if back button is pushed
+        $('select[name="idx"]').attr('disabled', false);
+        $('select[name="op"]').attr('disabled', false);
+    });
 
   function advSearchPrepare () {
 
@@ -35,10 +37,14 @@
 
   function check_form() {
     $('select[name="idx"]').each( function() {
-        var input_elt = $(this).find("~ input"); // Input element
+        var input_elt = $(this).find('~ input'); // Input element
+        var op_elt = $(this).prev('select[name="op"]'); // Select op element
         if ( !$(this).find('option:selected').attr('avlist') && $(input_elt).val().length < 1 ) {
             $(input_elt).attr('disabled', true);
             $(this).attr('disabled', true);
+            if ( op_elt.length > 0 ) {
+                $(op_elt).attr('disabled', true);
+            }
         }
     } );
     return true;
