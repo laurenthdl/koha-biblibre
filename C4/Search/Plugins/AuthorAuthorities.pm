@@ -29,7 +29,7 @@ our $VERSION = 3.0.1;
 
 # We want to concatenate values returned by ComputeValue with others mappings
 sub ConcatMappings {
-    0;
+    1;
 }
 
 =head2 fonction
