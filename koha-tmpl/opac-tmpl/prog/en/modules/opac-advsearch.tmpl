@@ -13,7 +13,7 @@
 
   function set_values() {
     var ids = $.session("advsearch_checkboxes") || new Array();
-    $("input:checkbox[name='filters']").each( function() {
+    $("input:checkbox[name='itypes']").each( function() {
         $(this).attr('checked', false);
         if ( ids.indexOf($(this).attr('id')) > -1 ) {
             $(this).attr('checked', true);
@@ -37,7 +37,7 @@
   function saveValues(){
     var ids = [];
     var avlist = [];
-    $("input:checkbox[name='filters'][checked]").each( function() {
+    $("input:checkbox[name='itypes'][checked]").each( function() {
         ids.push($(this).attr('id'));
     } );
     $("select[name='q']").each( function() {
