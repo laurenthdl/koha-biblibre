@@ -28019,17 +28019,20 @@ msgstr "Non, ne pas supprimer !"
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/circ/circulation.tmpl:301
 msgid "No, Don't Check Out (N)"
-msgstr "Non, ne pas prêter (N)"
+#msgstr "Non, ne pas prêter (N)"
+msgstr "Non (Alt Maj N)"
 
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/acqui/basket.tmpl:330
 msgid "No, Don't Close (N)"
-msgstr "Non, ne pas fermer (N)"
+#msgstr "Non, ne pas fermer (N)"
+msgstr "Non, ne pas fermer (Alt Maj N)"
 
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/serials/subscription-detail.tmpl:72
 msgid "No, Don't Delete (N)"
-msgstr "Non, ne pas supprimer (N)"
+#msgstr "Non, ne pas supprimer (N)"
+msgstr "Non, ne pas supprimer (Alt Maj N)"
 
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/admin/cities.tmpl:108
@@ -43008,12 +43011,14 @@ msgstr ""
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/circ/circulation.tmpl:294
 msgid "Yes, Check Out (Y)"
-msgstr "Oui, prêter (Y)"
+#msgstr "Oui, prêter (Y)"
+msgstr "Oui (Alt Maj Y)"
 
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/acqui/basket.tmpl:329
 msgid "Yes, Close (Y)"
-msgstr "Oui, Fermer (Y)"
+#msgstr "Oui, Fermer (Y)"
+msgstr "Oui, Fermer (Alt Maj Y)"
 
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/tools/letter.tmpl:279
@@ -43030,7 +43035,8 @@ msgstr "Oui, supprimer"
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/serials/subscription-detail.tmpl:68
 msgid "Yes, Delete (Y)"
-msgstr "Oui, supprimer (Y)"
+#msgstr "Oui, supprimer (Y)"
+msgstr "Oui, supprimer (Alt Maj Y)"
 
 #. INPUT type=submit
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/admin/biblio_framework.tmpl:102
@@ -54877,7 +54883,7 @@ msgstr "tfklsv"
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/reserve/request.tmpl:231
 #, c-format
 msgid "than <a1>%s %s</a>'s home library (%s / %s )"
-msgstr "que le site de rattachement de<a1>%s %s</a> (%s / %s)"
+msgstr "du site de rattachement de<a1>%s %s</a> (%s / %s)"
 
 #. %1$s: TMPL_VAR name=CRDFIL
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/tools/picture-upload.tmpl:59
