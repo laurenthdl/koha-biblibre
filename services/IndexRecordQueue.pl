@@ -83,7 +83,7 @@ if ( grep /stop/, @ARGV ) {$logger and $logger->write("STOP");}
 
 # Get options
 my %opts = ();
-for my $opt (qw(-a -f -mr -ms)) {
+for my $opt (qw(-a -f -mr -ms)) { # TODO -l for log ; -p for pid
     my $v = App::Daemon::find_option( $opt, 1 );
     $opts{ $opt } = $v if defined $v;
 }
@@ -259,6 +259,7 @@ sub remove_indexed_records {
     $logger and $logger->write("Removing records ($recordtype " . join(',', @$recordids) . ") from file");
     tie my @lines, 'Tie::File', $fh;
     for my $line ( @lines ) {
+        # FIXME
         $line =~ s/^$recordtype.*\K $_// for @$recordids;
         $line =~ s/^$recordtype$//;
     }
