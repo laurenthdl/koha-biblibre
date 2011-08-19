@@ -47,6 +47,11 @@
             }
         }
     } );
+    if ( $('select[name="idx"][disabled="true"]').length < 1 ) {
+        var first_select = $('select[name="idx"]')[0];
+        $(first_select).attr('disabled', false);
+        $(first_select).find('~ input').attr('disabled', false);
+    }
     return true;
   }
 
