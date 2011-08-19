@@ -150,12 +150,12 @@ UPCOMINGITEM: foreach my $upcoming (@$upcoming_dues) {
         # This item is due today. Send an 'item due' message.
         $borrower_preferences = C4::Members::Messaging::GetMessagingPreferences(
             {   borrowernumber => $upcoming->{'borrowernumber'},
-                message_name   => 'item due'
+                message_name   => 'Item DUE'
             }
         );
-
-        # warn( Data::Dumper->Dump( [ $borrower_preferences ], [ 'borrower_preferences' ] ) );
-        next DUEITEM unless $borrower_preferences;
+        if ( C4::Context->preference('EnhancedMessagingPreferences') ) {
+			next UPCOMINGITEM if defined $borrower_preferences->{'wants_digest'};
+		}
 
         if ( $borrower_preferences->{'wants_digest'} ) {
 

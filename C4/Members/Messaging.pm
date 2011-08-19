@@ -64,10 +64,21 @@ sub GetMessagingPreferences {
     return unless exists $params->{borrowernumber} xor exists $params->{categorycode};    # yes, xor
 
     my $sql = <<'END_SQL';
-SELECT borrower_message_preferences.*,
-       borrower_message_transport_preferences.message_transport_type,
-       message_attributes.*,
-       message_transports.*
+SELECT borrower_message_preferences.borrower_message_preference_id,
+       borrower_message_preferences.borrowernumber,
+       borrower_message_preferences.categorycode,
+       borrower_message_preferences.message_attribute_id AS borrower_message_preferencesmessage_attribute_id,
+       borrower_message_preferences.days_in_advance,
+       borrower_message_preferences.wants_digest,
+       borrower_message_transport_preferences.message_transport_type as borrower_message_transport_preferencesmessage_transport_type,
+       message_attributes.message_attribute_id AS message_attribute_id,
+       message_attributes.message_name,
+       message_attributes.takes_days,
+       message_transports.message_attribute_id AS message_transportsmessage_attribute_id,
+       message_transports.message_transport_type AS message_transport_type,
+       message_transports.is_digest,
+       message_transports.letter_module,
+       message_transports.letter_code
   FROM borrower_message_preferences
   LEFT JOIN borrower_message_transport_preferences
     ON borrower_message_transport_preferences.borrower_message_preference_id = borrower_message_preferences.borrower_message_preference_id
@@ -93,13 +104,14 @@ END_SQL
     my $return;
     my %transports;    # helps build a list of unique message_transport_types
   ROW: while ( my $row = $sth->fetchrow_hashref() ) {
+        #warn Data::Dumper::Dumper $row;
         next ROW unless $row->{'message_attribute_id'};
 
         # warn( Data::Dumper->Dump( [ $row ], [ 'row' ] ) );
         $return->{'days_in_advance'} = $row->{'days_in_advance'} if defined $row->{'days_in_advance'};
         $return->{'wants_digest'}    = $row->{'wants_digest'}    if defined $row->{'wants_digest'};
         $return->{'letter_code'}     = $row->{'letter_code'};
-        $transports{ $row->{'message_transport_type'} } = 1;
+        $transports{ $row->{'message_transport_type'} } = 1 if $row->{'message_transport_type'};
     }
     @{ $return->{'transports'} } = keys %transports;
     return $return;
