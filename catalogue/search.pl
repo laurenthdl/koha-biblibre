@@ -387,6 +387,7 @@ push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
 push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
 push @follower_params, { ind => 'sort_by', val => $sort_by };
+push @follower_params, { ind => 'multibranchlimit', val => $cgi->param('multibranchlimit') } if $cgi->param('multibranchlimit');
 
 # Pager template params
 $template->param(
