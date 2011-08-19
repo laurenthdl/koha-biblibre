@@ -676,7 +676,7 @@ sub reindex_last_biblios_server {
 	my $timestamp = $sth->fetchrow_array;
     if ( $timestamp ) {
         $log->info("Réindexation des biblios modifiées après $timestamp");
-        system( qq{$perl_cmd $rebuild_cmd -b -x -nosanitize --where "timestamp >= '$timestamp'"} ) == 0 or die "Can't rebuild_zebra ($?)";
+        system( qq{sudo -u koha $perl_cmd $rebuild_cmd -b -x -nosanitize --where "timestamp >= '$timestamp'"} ) == 0 or die "Can't rebuild_zebra ($?)";
     } else {
         $log->info("Aucune biblio à réindexer car pas de modification depuis $timestamp");
     }
