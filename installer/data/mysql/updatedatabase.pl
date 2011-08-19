@@ -4985,7 +4985,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 $DBversion = "3.02.00.061";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
-    	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
+        ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
     });
     print "Upgrade to $DBversion done (Adds New System preference BlockRenewWhenOverdue)\n";
     SetVersion($DBversion);
@@ -4994,9 +4994,27 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 $DBversion = "3.02.00.062";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
-    INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');
+        INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');
     });
     print "Upgrade to $DBversion done (Adds New System preference numSearchRSSResults)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "XXX";
+if( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('CsvProfileForExport','0','Set a profile name for CSV export','','');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference CsvProfileForExport)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "XXX";
+if( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('LibraryType','Public','Set a type for the library','Academic|Public|Special','Choice');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference LibraryType)\n";
     SetVersion($DBversion);
 }
 
