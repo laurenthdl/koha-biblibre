@@ -354,8 +354,8 @@ sub SimpleSearch {
                             ? join ' AND ', @{ $filters->{$_} }
                             : $filters->{$_};
             utf8::decode($filter_str);
+            my $quotes_existed = ( $filter_str =~ m/^".*"$/ );
             $filter_str =~ s/^"(.*)"$/$1/; #remove quote around value if exist
-            my $quotes_existed = defined $1 ? 1 : 0;
             $filter_str =~ s/[^\\]\K"/\\"/g;
             $filter_str = qq{"$filter_str"} # Add quote around value if not exist
                 if not $filter_str =~ /^".*"$/
