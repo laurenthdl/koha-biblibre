@@ -1,147 +1,135 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
     <title>Koha &rsaquo; Serials &rsaquo; Claims</title>
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME='themelang' -->/css/datatables.css" />
     <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.uitablefilter.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/js/datatables.js"></script>
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
-	 $(document).ready(function() {
-		<!-- TMPL_UNLESS NAME="preview" -->$("#claimst").tablesorter({<!-- TMPL_IF EXPR="dateformat eq 'metric'" -->
-			dateFormat: 'uk',<!-- /TMPL_IF -->
-			headers: { 0: { sorter: false },1:{sorter:false}}
-		});<!-- /TMPL_UNLESS -->
-	    $('#supplierid').change(function() {
-    	    $('#claims').submit();
-	    });
+    $(document).ready(function() {
+        $('#supplierid').change(function() {
+            $('#claims').submit();
+        });
 
-	    // Case-insensitive version of jquery's contains function
-	    jQuery.extend(
-		jQuery.expr[':'], { 
-		    icontains : "jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase())>=0" 
-		}
-	    );
+        // Case-insensitive version of jquery's contains function
+        jQuery.extend(
+            jQuery.expr[':'], {
+                icontains : "jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase())>=0" 
+            }
+        );
 
-
-	    // Checkboxes : Select All / None
-	    $("span.checkall").html("<input type=\"checkbox\" name=\"CheckAll\"> "+_("Check All")+"</input>");
-	    $("span.exportSelected").html("<a id=\"ExportSelected\" href=\"/cgi-bin/koha/serials/claims.pl\"> "+_("Export selected items data") +"<\/a>");
+        // Checkboxes : Select All / None
+        $("span.checkall").html("<input type=\"checkbox\" name=\"CheckAll\"> "+_("Check All")+"</input>");
+        $("span.exportSelected").html("<a id=\"ExportSelected\" href=\"/cgi-bin/koha/serials/claims.pl\"> "+_("Export selected items data") +"<\/a>");
 
         $("#CheckAll").click(function() {
             $("#claimst tr:visible :checkbox").attr('checked', $("#CheckAll").is(':checked'));
         });
 
-	    // Generates a dynamic link for exporting the selection's data as CSV
-	    $("#ExportSelected").click(function() {
-		// We use input:checked because it's faster, but if there must new checkboxes  
-		// used for other purpose on this page, please use [name=serialid]:checked instead
-		var selected = $("input:checked");
+        // Generates a dynamic link for exporting the selection's data as CSV
+        $("#ExportSelected").click(function() {
+            // We use input:checked because it's faster, but if there must new checkboxes
+            // used for other purpose on this page, please use [name=serialid]:checked instead
+            var selected = $("input:checked");
 
-		if (selected.length == 0) {
-			alert(_('Please select at least one item to export.'));
-			return false;
-		}
-		
-		// Building the url from currently checked boxes
-		var url = '/cgi-bin/koha/serials/lateissues-excel.pl?supplierid=&amp;op=claims';
-		for (var i = 0; i < selected.length; i++) {
-		    url += '&amp;serialid=' + selected[i].value;
-		}
-		// And redirecting to the CSV page
-		location.href = url;
-		return false;
-	    });	
+            if (selected.length == 0) {
+                alert(_('Please select at least one item to export.'));
+                return false;
+            }
 
-        $("#titlefilter").keyup(function() {
-            $.uiTableFilter($("#claimst"), $("#titlefilter").val())
-	    });
+            // Building the url from currently checked boxes
+            var url = '/cgi-bin/koha/serials/lateissues-excel.pl?supplierid=&amp;op=claims';
+            for (var i = 0; i < selected.length; i++) {
+                url += '&amp;serialid=' + selected[i].value;
+            }
+            // And redirecting to the CSV page
+            location.href = url;
+            return false;
+        });
 
-        $("#branchfilter").keyup(function() {
-            $.uiTableFilter($("#claimst"), $("#branchfilter").val())
-	    });
-	 });
+        $("span.replace_me").each(function(){
+            replace_html(this);
+        });
 
-	// Checks if the form can be sent (at least one checkbox must be checked)
-	function checkForm() {
-	    if ($("input:checked").length == 0) {
-		alert(_('Please select at least one item.'));
-		return false;
-	    }
-	}
+        var claimst = $("#claimst").dataTable($.extend(true, {}, dataTablesDefaults, {
+            "bAutoWidth": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "sAjaxSource": "/cgi-bin/koha/serials/tables/claims.pl",
+            'fnServerData': function(sSource, aoData, fnCallback) {
+              aoData.push(
+                {
+                  'name': 'planneddate_from',
+                  'value': $("#planneddatefrom").val()
+                },
+                {
+                  'name': 'planneddate_to',
+                  'value': $("#planneddateto").val()
+                },
+                {
+                    'name': 'claimdatefrom',
+                    'value': $("#claimdatefrom").val()
+                },
+                {
+                    'name': 'claimdateto',
+                    'value': $("#claimdateto").val()
+                }
+              );
+              $.ajax({
+                'dataType': 'json',
+                'type': 'POST',
+                'url': sSource,
+                'data': aoData,
+                'success': fnCallback
+              });
+            },
+            "oLanguage": {
+                "sSearch": _("Search all columns:"),
+            },
+            "aaSorting": [ [3, 'asc'] ], // sorting on title by default
+            "aoColumnDefs": [
+                { "aTargets": [ 0 ], "mDataProp": "checkbox", "bSortable":false, "bSearchable":false  }, // No sorting on first column
+                { "aTargets": [ 1 ], "mDataProp": "suppliername" },
+                { "aTargets": [ 2 ], "mDataProp": "branchname" },
+                { "aTargets": [ 3 ], "mDataProp": "title" },
+                { "aTargets": [ 4 ], "mDataProp": "serialseq" },
+                { "aTargets": [ 5 ], "mDataProp": "status", "bSortable":false, "bSearchable":false },
+                { "aTargets": [ 6 ], "mDataProp": "planneddate" },
+                { "aTargets": [ 7 ], "mDataProp": "claims_count" },
+                { "aTargets": [ 8 ], "mDataProp": "claimdate" },
+                { "aTargets": [ '_all' ], "bSortable": true }
+            ],
+            "sPaginationType": "full_numbers",
+        }) );
 
-	// Filter by status
-	function filterByStatus() {
-	    selectedStatus = $("#statusfilter").val();
-	    if (selectedStatus == "all") {
-		clearFilters();
-	    } else {
-		$("table#claimst tbody tr").hide();
-		$("table#claimst tbody tr:contains(" + selectedStatus + ")").show();		    
-	    }
-	}
+        claimst.fnAddFilters("filter", 750);
 
-	// Filter by branch
-	function filterByBranch() {
-	    selectedBranch = $("#branchfilter").val();
-	    if (selectedBranch == "all") {
-		clearFilters();
-	    } else {
-		$("table#claimst tbody tr").hide();
-		$("table#claimst tbody tr:contains(" + selectedBranch + ")").show();		    
-	    }
-	}
-	// Filter by date
-	function filterByDate() {
-	    var beginDate = Date_from_syspref($("#begindate").val()).getTime();
-	    var endDate   = Date_from_syspref($("#enddate").val()).getTime();
-	    
-	    // Checks if the beginning date is valid
-	    if (!parseInt(beginDate)) {
-		alert(_('The beginning date is missing or invalid.'));
-		return false;
-	    }
 
-	    // Checks if the ending date is valid
-	    if (!parseInt(endDate)) {
-		alert(_('The ending date is missing or invalid.'));
-		return false;
-	    }
+        $("#status_filter").change(function() {
+            claimst.fnFilter($(this).val(), 5);
+        });
 
-	    // Checks if beginning date is before ending date
-	    if (beginDate > endDate) {
-		// If not, we swap them
-		var tmpDate = endDate;
-		endDate = beginDate;
-		beginDate = tmpDate;
-	    }
-	   
-	    // We hide everything
-	    $("table#claimst tbody tr").hide();
 
-	    // For each date in the table
-	    $(".planneddate").each(function() {
+        $('#planneddatefrom').change( function() {claimst.fnDraw(); } );
+        $('#planneddateto').change( function() { claimst.fnDraw(); } );
+        $('#claimdatefrom').change( function() {claimst.fnDraw(); } );
+        $('#claimdateto').change( function() {claimst.fnDraw(); } );
 
-		// We make a JS Date Object, according to the locale
-		var pdate = Date_from_syspref($(this).text()).getTime();
+    });
 
-		// And checks if the date is between the beginning and ending dates
-		if (pdate > beginDate && 
-		    pdate < endDate) {
-			// If so, we can show the row
-			$(this).parent().show();
-		    }
+    function clearDate(nodeid) {
+        $("#"+nodeid).val("");
+        $("#"+nodeid).change();
+    }
 
-	    });
-	}
-
-	// Clears filters : shows everything
-	function clearFilters() {
-	    $("table#claimst tbody tr").show();
-	}
-
-	function popup(supplierid,serialid){
-		window.open('claims.pl?supplierid='+ supplierid +'&amp;serialid='+ serialid +'&amp;op=preview' ,'popup', 'width=600,height=400,toolbar=no,scrollbars=yes');
-	}
+    // Checks if the form can be sent (at least one checkbox must be checked)
+    function checkForm() {
+        if ($("input:checked").length == 0) {
+        alert(_('Please select at least one item.'));
+        return false;
+        }
+    }
 
 //]]>
 </script>
@@ -163,113 +151,25 @@
 	<div class="yui-b">
 
     <h1>Claims</h1>
-
-<!-- TMPL_IF NAME="letter" --><!-- TMPL_UNLESS NAME="missingissues" --><!-- TMPL_IF NAME="supplierid" --> <div class="dialog alert">No missing issues found.</div><!-- TMPL_ELSE --><div class="dialog message">Please choose a vendor.</div><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- /TMPL_IF -->
-	
-	     <!-- TMPL_IF NAME="SHOWCONFIRMATION" -->
+    <!-- TMPL_IF NAME="error_claim" -->
+        <div class='error'><!-- TMPL_VAR NAME="error_claim" --></div>
+    <!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="info_claim" -->
+        <div class='info'><!-- TMPL_VAR NAME="info_claim" --></div>
+    <!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="SHOWCONFIRMATION" -->
      <div class="dialog alert">Your notification has been sent.</div>
      <!-- /TMPL_IF -->
 <!-- TMPL_UNLESS NAME="letter" --><div class="dialog alert">No claims notice defined. <a href="/cgi-bin/koha/tools/letter.pl">Please define one</a>.</div><!-- /TMPL_UNLESS -->
-    <form id="claims" name="claims" action="claims.pl" method="post">
-    <fieldset>
-	    <label for="supplierid">Supplier: </label>
-	    <select id="supplierid" name="supplierid">
-	        <!-- TMPL_LOOP name="suploop"-->
-	            <!-- TMPL_IF name="selected" -->
-	            <option value="<!-- TMPL_VAR name="id" -->" selected="selected" >
-	            <!-- TMPL_ELSE -->
-	            <option value="<!-- TMPL_VAR name="id" -->">
-	            <!-- /TMPL_IF -->
-	                <!-- TMPL_VAR name="name" -->
-	                (<!-- TMPL_VAR name="count" -->)
-	            </option>
-	        <!-- /TMPL_LOOP -->
-	    </select>
-        <input type="submit" value="OK" />
-        <!-- TMPL_IF name="phone" -->Phone: <!-- TMPL_VAR name="phone" --><!-- /TMPL_IF -->
-        <!-- TMPL_IF name="booksellerfax" -->Fax: <!-- TMPL_VAR name="booksellerfax" --><!-- /TMPL_IF -->
-        <!-- TMPL_IF name="bookselleremail" --></p><p><a href="mailto:<!-- TMPL_VAR name="bookselleremail" -->"><!-- TMPL_VAR name="bookselleremail" --></a><!-- /TMPL_IF -->
-    </fieldset>
-</form>
 
-   <!-- TMPL_IF NAME="missingissues" -->	
     <h3>Missing Issues</h3>
-    <form action="claims.pl" onsubmit="return false;">
-	<fieldset class="rows">
-	<legend>Filters :</legend>
-	
-	<ol>
-	<li>
-	    <label for="statusfilter">Status : </label>
-	    <select id="statusfilter" onchange="filterByStatus();">
-		<option value="all" selected="selected">(All)</option>
-		<option>Expected</option>
-		<option>Arrived</option>
-		<option>Late</option>
-		<option>Missing</option>
-		<option>Claimed</option>
-	    </select>
-	</li>
-	
-	<li>
-	    <label for="titlefilter">Title : </label>
-	    <input id="titlefilter" type="text" />
-	    <label for="branchfilter">Branch: </label>
-	    <select id="branchfilter" onchange="filterByBranch();">
-            <!-- TMPL_LOOP Name="branchloop" -->
-                <!-- TMPL_IF NAME="selected" -->
-                <option value="<!-- TMPL_VAR NAME="value" -->" selected="selected"><!-- TMPL_VAR NAME="branchname" --></option>
-                <!-- TMPL_ELSE -->
-                <option value="<!-- TMPL_VAR NAME="value" -->"><!-- TMPL_VAR NAME="branchname" --></option>
-                <!-- /TMPL_IF -->
-            <!-- /TMPL_LOOP -->
-        </select>
-	</li>
-	
-	<li>
-	    <label for="begindate">From</label>
-	    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="begindatebutton" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-	    <input type="text" name="begindate" id="begindate" value="<!-- TMPL_VAR name="begindate" -->" size="10" maxlength="10" />
-	    <script type="text/javascript">
-		 //<![CDATA[ 
-		Calendar.setup({
-		    inputField	: "begindate", 
-		    button		: "begindatebutton",
-		    ifFormat	: "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->"
-		});
-		//]]>
-	    </script>
 
-	    <label for="enddate" style="float:none;">To</label>
-	    <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="enddatebutton" style="cursor: pointer;" alt="Show Calendar" title="Show Calendar" />
-	    <input type="text" name="enddate" id="enddate" value="<!-- TMPL_VAR name="enddate" -->" size="10" maxlength="10" />
-	    <script type="text/javascript">
-		 //<![CDATA[ 
-		 Calendar.setup({
-		    inputField      : "enddate", 
-		    button          : "enddatebutton",
-		    ifFormat        : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->"
-		});
-		//]]>
-	    </script> <span class="hint"><!-- TMPL_INCLUDE NAME="date-format.inc" --></span>
-	    <input type="button" value="OK" onclick="filterByDate();" />
-        </li>
-	
-	<li>
-	    <input type="reset" value="Clear Filters" onclick="clearFilters();" />
-	</li>
-	</ol>
-	</fieldset>
-    </form>
-
-    <fieldset>
-	<form action="claims.pl" method="post" class="checkboxed" onsubmit="return checkForm()">
+    <form action="claims.pl" method="post" class="checkboxed" onsubmit="return checkForm()">
+      <fieldset>
         <input type="hidden" name="order" value="<!--TMPL_VAR Name="order"-->" />
          <table id="claimst">
                 <thead><tr>
-                    <!--TMPL_IF NAME="letter"-->
                     <th><input type="checkbox" id="CheckAll"></th>
-                    <!--/TMPL_IF-->
                     <th>Vendor</th>
                     <th>Branch</th>
                     <th>Title</th>
@@ -279,43 +179,29 @@
                     <th>Claim Date</th>
                 <th>Begin Claim</th>
                 </tr></thead>
-                <tbody><!-- TMPL_LOOP name="missingissues" -->
-                    <tr>
-                        <!--TMPL_IF NAME="letter" -->
-                            <td>
-                    <input type="checkbox" name="serialid" value="<!-- TMPL_VAR NAME="serialid"-->" />
-                            </td>
-                        <!--/TMPL_IF-->
-                        <td>
-                        <!-- TMPL_VAR name="name" -->
-                        </td>
-                        <td>
-                        <!-- TMPL_VAR name="branchcode" -->
-                        </td>
-                        <td>
-                        <a href="/cgi-bin/koha/serials/subscription-detail.pl?subscriptionid=<!-- TMPL_VAR NAME="subscriptionid" -->"><!-- TMPL_VAR name="title" escape="html" --></a>
-                        </td>
-                        <td>
-                        <!-- TMPL_VAR name="serialseq" -->
-                        </td>
-                        <td>
-                            <!-- TMPL_IF Name="status1" -->Expected<!-- /TMPL_IF -->
-                            <!-- TMPL_IF Name="status2" -->Arrived<!-- /TMPL_IF -->
-                            <!-- TMPL_IF Name="status3" -->Late<!-- /TMPL_IF -->
-                            <!-- TMPL_IF Name="status4" -->Missing<!-- /TMPL_IF -->
-                            <!-- TMPL_IF Name="status7" -->Claimed<!-- /TMPL_IF -->
-                        </td>
-                        <td class="planneddate">
-                        <!-- TMPL_VAR name="planneddate" -->
-                        </td>
-                        <td>
-                        <!-- TMPL_VAR name="claimdate" -->
-                        </td>
-                        <td>
-                            <a href="/cgi-bin/koha/serials/lateissues-excel.pl?supplierid=<!-- TMPL_VAR name="supplieri" -->&amp;serialid=<!-- TMPL_VAR name="serialid" -->&amp;op=claims">Export item data</a>
-                        </td>
-                    </tr>
-                <!-- /TMPL_LOOP --></tbody>
+                <tbody></tbody>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th><input type="text" class="filter" id="suppliername_filter" data-column_num="1" placeholder="Search vendor" /></th>
+                    <th><input type="text" class="filter" id="branchname_filter"  data-column_num="2" placeholder="Search branch" /></th>
+                    <th><input type="text" class="filter" id="title_filter"  data-column_num="3" placeholder="Search title" /></th>
+                    <th><input type="text" class="filter" id="serialseq_filter"  data-column_num="4" placeholder="Search issue number" /></th>
+                    <th>
+                      <select id="status_filter" data-column_num="5">
+                        <option value="">All</option>
+                        <option value="1">Expected</option>
+                        <option value="2">Arrived</option>
+                        <option value="3">Late</option>
+                        <option value="4">Missing</option>
+                        <option value="7">Claimed</option>
+                      </select>
+                    </th>
+                    <th>
+                      <span class="replace_me" data-id="planneddate" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"></span>
+                    </th>
+                    <th><input type="text" class="filter" id="claimscount_filter" data-column_num="7" placeholder="Search claims count" /></th>
+                    <th><span class="replace_me" data-type="range_dates" data-id="claimdate" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"></span></th>
             </table>
 	     <p><span class="exportSelected"></span></p>
 
@@ -328,17 +214,14 @@
 			</select>
 	    <input type="hidden" name="op" value="send_alert" /><input type="submit" name="submit" class="button" value="Send notification" /></fieldset>
             <!--/TMPL_IF-->
+          </fieldset>
         </form>
-    </fieldset>
-<!-- /TMPL_IF -->
-
 <!-- TMPL_ELSE -->
 
 <div id="doc" class="yui-t7">
    <div id="bd">
 	
-<!-- TMPL_IF Name="supplierloop"-->
-        <!-- TMPL_LOOP Name="supplierloop"-->
+<!-- TMPL_IF Name="supplierid"-->
         <!-- TMPL_IF NAME="name" -->
         <p><b><!-- TMPL_VAR NAME="name" --></b><br />
         <!-- /TMPL_IF -->
@@ -363,7 +246,6 @@
         <p>To whom it may concern</p>
         <!-- /TMPL_IF -->
         <p>The following items have not been received from you and are now considered missing:</p>
-        <!-- /TMPL_LOOP -->
 <!-- /TMPL_IF -->
         <!-- TMPL_IF NAME="missingissues" -->
         <h3>Missing Issues</h3>
@@ -380,7 +262,7 @@
                     <!-- TMPL_VAR name="name" -->
                     </td>
                     <td>
-                    <!-- TMPL_VAR name="Title" escape="html" -->
+                    <!-- TMPL_VAR name="title" escape="html" -->
                     </td>
                     <td>
                     <!-- TMPL_VAR name="serialseq" -->
