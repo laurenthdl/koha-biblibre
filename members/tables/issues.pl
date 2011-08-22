@@ -15,18 +15,28 @@ use C4::Reserves qw/CheckReserves/;
 use C4::Utils::DataTables;
 
 my $input = new CGI;
+my $vars = $input->Vars;
 
 my $borrowernumber = $input->param('borrowernumber');
+my $ccode = $input->param('ccode');
+my $itype = $input->param('itype');
+my $dateduefrom = $input->param('dateduefrom');
+my $datedueto = $input->param('datedueto');
+my $issuedatefrom = $input->param('issuedatefrom');
+my $issuedateto = $input->param('issuedateto');
 
 # Fetch DataTables parameters
 my %dtparam;
 foreach(qw/ iDisplayStart iDisplayLength iColumns sSearch bRegex iSortingCols sEcho /) {
-    $dtparam{$_} = $input->param($_);
+    $dtparam{$_} = $vars->{$_};
+}
+foreach(grep /(?:_sorton|_filteron)$/, keys %$vars) {
+    $dtparam{$_} = $vars->{$_};
 }
 for(my $i=0; $i<$dtparam{'iColumns'}; $i++) {
     foreach(qw/ bSearchable sSearch bRegex bSortable iSortCol mDataProp sSortDir /) {
         my $key = $_ . '_' . $i;
-        $dtparam{$key} = $input->param($key) if defined $input->param($key);
+        $dtparam{$key} = $vars->{$key} if defined $vars->{$key};
     }
 }
 
@@ -39,7 +49,7 @@ my $select = "SELECT SQL_CALC_FOUND_ROWS ".
     "itemtypes.description AS itemtype_description, itemtypes.itemtype,".
     "biblio.biblionumber, biblio.title, biblio.author, biblioitems.publishercode,".
     "biblioitems.publicationyear, authorised_values.lib AS collection,".
-    "items.stocknumber, items.replacementprice,".
+    "items.stocknumber, items.ccode, items.replacementprice,".
     "( (itemtypes.rentalcharge * (100 - issuingrules.rentaldiscount) ) / 100 ) AS charge";
 my $from = " FROM issues ";
 $from .= " LEFT JOIN items USING(itemnumber) ";
@@ -52,15 +62,45 @@ $from .=
 $from .= " LEFT JOIN borrowers ON borrowers.borrowernumber = issues.borrowernumber ";
 $from .= " LEFT JOIN issuingrules ON borrowers.categorycode = issuingrules.categorycode AND borrowers.branchcode = issuingrules.branchcode AND items.itype = issuingrules.itemtype ";
 $from .= " LEFT JOIN authorised_values ON authorised_values.category = 'CCODE' AND authorised_values.authorised_value = items.ccode ";
+my @where_params;
 my $where = " WHERE issues.borrowernumber = ? ";
+push @where_params, $borrowernumber;
+my $where_filters;
+my @where_filters_params;
+if($ccode) {
+    $where_filters .= " AND items.ccode = ? ";
+    push @where_filters_params, $ccode;
+}
+if($itype) {
+    $where_filters .= (C4::Context->preference('item-level_itypes'))
+        ? " AND items.itype = ? "
+        : " AND biblioitems.itemtype = ? ";
+    push @where_filters_params, $itype;
+}
+if($dateduefrom) {
+    $where_filters .= " AND issues.date_due >= ? ";
+    push @where_filters_params, C4::Dates->new($dateduefrom)->output('iso');
+}
+if($datedueto) {
+    $where_filters .= " AND issues.date_due <= ? ";
+    push @where_filters_params, C4::Dates->new($datedueto)->output('iso');
+}
+if($issuedatefrom) {
+    $where_filters .= " AND issues.issuedate >= ? ";
+    push @where_filters_params, C4::Dates->new($issuedatefrom)->output('iso');
+}
+if($issuedateto) {
+    $where_filters .= " AND issues.issuedate <= ? ";
+    push @where_filters_params, C4::Dates->new($issuedateto)->output('iso');
+}
 my ($filters, $filter_params) = dt_build_having(\%dtparam);
-my $having = " HAVING " . join(" AND ", @$filters) if (@$filters);
+my $having = @$filters ? " HAVING " . join(" AND ", @$filters) : "";
 my $order_by = dt_build_orderby(\%dtparam);
 my $limit .= " LIMIT ?,? ";
 
-my $query = $select.$from.$where.$having.$order_by.$limit;
+my $query = $select.$from.$where.$where_filters.$having.$order_by.$limit;
 my @bind_params;
-push @bind_params, $borrowernumber, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
+push @bind_params, @where_params, @where_filters_params, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
 my $sth = $dbh->prepare($query);
 $sth->execute(@bind_params);
 my $results = $sth->fetchall_arrayref({});
@@ -72,7 +112,7 @@ my ($iTotalDisplayRecords) = $sth->fetchrow_array;
 # This is mandatory for DataTables to show the total number of results
 my $select_total_count = "SELECT COUNT(*) ";
 $sth = $dbh->prepare($select_total_count.$from.$where);
-$sth->execute($borrowernumber);
+$sth->execute(@where_params);
 my ($iTotalRecords) = $sth->fetchrow_array;
 
 my @aaData = ();

@@ -97,8 +97,14 @@ sub dt_build_orderby {
         my $iSortCol = $param->{'iSortCol_'.$i};
         my $sSortDir = $param->{'sSortDir_'.$i};
         my $mDataProp = $param->{'mDataProp_'.$iSortCol};
-
-        push @orderbys, "$mDataProp $sSortDir";
+        my @sort_fields = $param->{$mDataProp.'_sorton'}
+            ? split(' ', $param->{$mDataProp.'_sorton'})
+            : ();
+        if(@sort_fields > 0) {
+            push @orderbys, "$_ $sSortDir" foreach (@sort_fields);
+        } else {
+            push @orderbys, "$mDataProp $sSortDir";
+        }
         $i++;
     }
 
@@ -143,8 +149,18 @@ sub dt_build_having {
         while($i < $param->{'iColumns'}) {
             if($param->{'bSearchable_'.$i} eq 'true') {
                 my $mDataProp = $param->{'mDataProp_'.$i};
-                push @gFilters, " $mDataProp LIKE ? ";
-                push @gParams, "%$sSearch%";
+                my @filter_fields = $param->{$mDataProp.'_filteron'}
+                    ? split(' ', $param->{$mDataProp.'_filteron'})
+                    : ();
+                if(@filter_fields > 0) {
+                    foreach my $field (@filter_fields) {
+                        push @gFilters, " $field LIKE ? ";
+                        push @gParams, "%$sSearch%";
+                    }
+                } else {
+                    push @gFilters, " $mDataProp LIKE ? ";
+                    push @gParams, "%$sSearch%";
+                }
             }
             $i++;
         }
@@ -158,10 +174,22 @@ sub dt_build_having {
         my $sSearch = $param->{'sSearch_'.$i};
         if($sSearch) {
             my $mDataProp = $param->{'mDataProp_'.$i};
-            push @filters, " $mDataProp LIKE ? ";
-            push @params, "%$sSearch%";
+            my @filter_fields = $param->{$mDataProp.'_filteron'}
+                ? split(' ', $param->{$mDataProp.'_filteron'})
+                : ();
+            if(@filter_fields > 0) {
+                my @localfilters;
+                foreach my $field (@filter_fields) {
+                    push @localfilters, " $field LIKE ? ";
+                    push @params, "%$sSearch%";
+                }
+                push @filters, " ( ". join(" OR ", @localfilters) ." ) ";
+            } else {
+                push @filters, " $mDataProp LIKE ? ";
+                push @params, "%$sSearch%";
+            }
         }
-        $i ++;
+        $i++;
     }
 
     return (\@filters, \@params);

@@ -24,6 +24,30 @@ $(document).ready(function() {
         aoData.push({
           'name':'borrowernumber',
           'value':'<!-- TMPL_VAR NAME="borrowernumber" -->'
+        },{
+          'name' : 'ccode',
+          'value': $("#collection_filter").val()
+        },{
+          'name' : 'itype',
+          'value': $("#itemtype_filter").val()
+        },{
+          'name' : 'dateduefrom',
+          'value': $("#dateduefrom").val()
+        },{
+          'name' : 'datedueto',
+          'value': $("#datedueto").val()
+        },{
+          'name' : 'issuedatefrom',
+          'value': $("#issuedatefrom").val()
+        },{
+          'name' : 'issuedateto',
+          'value': $("#issuedateto").val()
+        },{
+          'name' : 'title_filteron',
+          'value': 'biblio.title biblio.author biblioitems.publishercode biblioitems.publicationyear'
+        },{
+          'name' : 'collection_filteron',
+          'value': 'items.ccode'
         });
         $.ajax({
             "dataType": 'json',
@@ -48,6 +72,25 @@ $(document).ready(function() {
         { "mDataProp": "checkin", "bSortable": false, "bSearchable": false }
     ],
     'sPaginationType': 'full_numbers'
+  });
+
+  dt_issues.fnSetFilteringDelay(750);
+
+  var filterTimerId = null;
+  var filterTimerDelay = 750;
+  $("input.filter").keyup(function() {
+    var $this = this;
+    window.clearTimeout(filterTimerId);
+    filterTimerId = window.setTimeout(function() {
+      dt_issues.fnFilter($($this).val(), $($this).attr('data-column_num'));
+    }, filterTimerDelay);
+  });
+
+  $("#collection_filter,#itemtype_filter").change(function(){
+    dt_issues.fnDraw();
+  });
+  $("#dateduefrom,#datedueto,#issuedatefrom,#issuedateto").change(function(){
+    dt_issues.fnDraw();
   });
 
   <!-- TMPL_IF NAME='dateformat_metric' -->
@@ -671,6 +714,96 @@ $(document).ready(function() {
       </tr>
     </thead>
     <tfoot>
+      <tr>
+        <td>
+          From
+          <span style="white-space:nowrap">
+            <input type="text" id="dateduefrom" readonly="readonly" placeholder="Pick date" size="7" />
+            <a style="cursor:pointer" onclick="$('#dateduefrom').val('').change();" />&times;</a>
+          </span>
+          To
+          <span style="white-space:nowrap">
+            <input type="text" id="datedueto" readonly="readonly" placeholder="Pick date" size="7" />
+            <a style="cursor:pointer" onclick="$('#datedueto').val('').change();" />&times;</a>
+          </span>
+          <script type="text/javascript">
+          //<![CDATA[
+            Calendar.setup({
+              inputField: "dateduefrom",
+              ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+              button: "dateduefrom",
+              onClose: function(){ $("#dateduefrom").change(); this.hide();}
+            });
+            Calendar.setup({
+              inputField: "datedueto",
+              ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+              button: "datedueto",
+              onClose: function(){ $("#datedueto").change(); this.hide();}
+            });
+          //]]>
+          </script>
+        </td>
+        <td>
+          <input type="text" class="filter" data-column_num="1" placeholder="Search title, author, ..." />
+        </td>
+        <td>
+          <select id="collection_filter" style="max-width:7em">
+            <option value="">All</option>
+            <!-- TMPL_LOOP NAME='collections_loop' -->
+              <option value="<!-- TMPL_VAR NAME='authorised_value' -->"><!-- TMPL_VAR NAME='lib' --></option>
+            <!-- /TMPL_LOOP -->
+          </select>
+        </td>
+        <td>
+          <input type="text" class="filter" data-column_num="3" placeholder="Search stocknumber" size="12"/>
+        </td>
+        <td>
+          <input type="text" class="filter" data-column_num="4" placeholder="Search barcode" size="12"/>
+        </td>
+        <td>
+          <select id="itemtype_filter" style="max-width:7em">
+            <option value="">All</option>
+            <!-- TMPL_LOOP NAME='itemtypes_loop' -->
+              <option value="<!-- TMPL_VAR NAME='itemtype' -->"><!-- TMPL_VAR NAME='description' --></option>
+            <!-- /TMPL_LOOP -->
+          </select>
+        </td>
+        <td>
+          From
+          <span style="white-space:nowrap">
+            <input type="text" id="issuedatefrom" readonly="readonly" placeholder="Pick date" size="7" />
+            <a style="cursor:pointer" onclick="$('#issuedatefrom').val('').change();" />&times;</a>
+          </span>
+          To
+          <span style="white-space:nowrap">
+            <input type="text" id="issuedateto" readonly="readonly" placeholder="Pick date" size="7" />
+            <a style="cursor:pointer" onclick="$('#issuedateto').val('').change();" />&times;</a>
+          </span>
+          <script type="text/javascript">
+          //<![CDATA[
+            Calendar.setup({
+              inputField: "issuedatefrom",
+              ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+              button: "issuedatefrom",
+              onClose: function(){ $("#issuedatefrom").change(); this.hide();}
+            });
+            Calendar.setup({
+              inputField: "issuedateto",
+              ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
+              button: "issuedateto",
+              onClose: function(){ $("#issuedateto").change(); this.hide();}
+            });
+          //]]>
+          </script>
+        </td>
+        <td>
+          <input type="text" class="filter" data-column_num="7" placeholder="Search callnumber" size="12" />
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
       <tr>
         <td colspan="8" style="text-align: right; font-weight:bold;">Totals:</td>
         <td><!-- TMPL_VAR NAME="totaldue" --></td>
