@@ -557,6 +557,16 @@ if ( C4::Context->preference('EnhancedMessagingPreferences') ) {
     $template->param( SMSnumber               => defined $data->{'smsalertnumber'} ? $data->{'smsalertnumber'} : $data->{'mobile'} );
 }
 
+# Build itemtypes and collection loops for filters
+my $itemtypes = GetItemTypes;
+my @itemtypes_loop;
+foreach(sort keys %$itemtypes){
+    my $row = $itemtypes->{$_};
+    push @itemtypes_loop, $row;
+}
+
+my $collections_loop = GetAuthorisedValues('CCODE');
+
 $template->param(
     detailview                => 1,
     AllowRenewalLimitOverride => C4::Context->preference("AllowRenewalLimitOverride"),
@@ -582,6 +592,8 @@ $template->param(
     StaffMember               => ( $category_type eq 'S' ),
     is_child                  => ( $category_type eq 'C' ),
     librarytype               => C4::Context->preference("LibraryType"),
+    collections_loop          => $collections_loop,
+    itemtypes_loop            => \@itemtypes_loop,
 
     #   reserveloop     => \@reservedata,
     dateformat => C4::Context->preference("dateformat"),
