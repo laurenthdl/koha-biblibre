@@ -60,7 +60,7 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay )
                 oTimerId = window.setTimeout(function() {
                     $.fn.dataTableExt.iApiIndex = i;
                     _that.fnFilter( anControl.val() );
-                }, 5000);
+                }, iDelay);
             }
         });
 
