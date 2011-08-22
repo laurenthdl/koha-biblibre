@@ -214,5 +214,14 @@
     You did not specify any search criteria.
     <!-- /TMPL_IF -->
 </p>
+<p>
+Vous pouvez rechercher ce document dans : 
+<li><a href="http://catalogue.bm-limoges.fr/">Le catalogue de la Bfm de Limoges</a></li>
+<li><a href="http://www.sudoc.abes.fr">Le catalogue Sudoc</a></li>
+</p>
+<p>
+<div id="qpchatwidget" ></div>
+<script id="qp.bootstrap" type="text/javascript" src="http://www.questionpoint.org/crs/js/qwidget/qp.bootstrap.js?langcode=2&instid=13282&skin=gray&size=standard" [^] charset="utf-8">//<noscript>Veuillez activer le javascript pour utiliser le Chat avec les bibliothécaires en ligne></noscript></script>
+</p>
 </div>
 <!-- /TMPL_IF --></p><!-- /TMPL_IF --></div>
