@@ -204,6 +204,12 @@ if ( $op eq "export" ) {
                 }
             }
 
+            # Remove not borrowed items
+            my ($onloanfield, $onloadsubfield) = GetMarcFromKohaField('items.onloan', '');
+            for my $itemfield ( $record->field($onloanfield) ) {
+                $record->delete_field($itemfield) unless ($itemfield->subfield($onloadsubfield));
+            }
+
             if ($dont_export_fields) {
                 my @fields = split " ", $dont_export_fields;
                 foreach (@fields) {
