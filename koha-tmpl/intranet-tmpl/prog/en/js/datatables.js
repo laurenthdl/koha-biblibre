@@ -30,6 +30,65 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
     return asResultData;
 }
 
+var blacklist_keys = new Array(0, 16, 17, 18, 37, 38, 39, 40);
+jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay ) {
+    /*
+     * Inputs:      object:oSettings - dataTables settings object - automatically given
+     *              integer:iDelay - delay in milliseconds
+     * Usage:       $('#example').dataTable().fnSetFilteringDelay(250);
+     * Author:      Zygimantas Berziunas (www.zygimantas.com) and Allan Jardine
+     * License:     GPL v2 or BSD 3 point style
+     * Contact:     zygimantas.berziunas /AT\ hotmail.com
+     */
+    var
+        _that = this,
+        iDelay = (typeof iDelay == 'undefined') ? 250 : iDelay;
+
+    this.each( function ( i ) {
+        $.fn.dataTableExt.iApiIndex = i;
+        var
+            $this = this,
+            oTimerId = null,
+            sPreviousSearch = null,
+            anControl = $( 'input', _that.fnSettings().aanFeatures.f );
+
+        anControl.unbind( 'keyup.DT' ).bind( 'keyup.DT', function(event) {
+            var $$this = $this;
+            if (blacklist_keys.indexOf(event.keyCode) != -1) {
+                return this;
+            }else if ( event.keyCode == '13' ) {
+                $.fn.dataTableExt.iApiIndex = i;
+                _that.fnFilter( $(this).val() );
+            } else {
+                if (sPreviousSearch === null || sPreviousSearch != anControl.val()) {
+                    window.clearTimeout(oTimerId);
+                    sPreviousSearch = anControl.val();
+                    oTimerId = window.setTimeout(function() {
+                        $.fn.dataTableExt.iApiIndex = i;
+                        _that.fnFilter( anControl.val() );
+                    }, iDelay);
+                }
+            }
+        });
+
+        return this;
+    } );
+    return this;
+}
+
+jQuery.fn.dataTableExt.oApi.fnAddFilteringDelay = function ( oSettings, iDelay ) {
+    var table = this;
+    this.fnSetFilteringDelay(iDelay);
+    var filterTimerId = null;
+    $("input.filter").keyup(function(event) {
+      var $this = this;
+      window.clearTimeout(filterTimerId);
+      filterTimerId = window.setTimeout(function() {
+        table.fnFilter($($this).val(), $($this).attr('data-column_num'));
+      }, iDelay);
+    });
+}
+
 function dt_add_rangedate_filter(begindate_id, enddate_id, dateCol) {
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {
@@ -137,4 +196,38 @@ function dt_overwrite_string_sorting_localeCompare() {
             return (b > a) ? 1 : ((b < a) ? -1 : 0);
         }
     };
+}
+
+
+function replace_html( original_node, type ) {
+    switch ( $(original_node).attr('data-type') ) {
+        case "interval_dates":
+            var id = $(original_node).attr("data-id");
+            var format = $(original_node).attr("data-format");
+            replace_html_date( original_node, id, format );
+            break;
+        default:
+            console.log("default");
+    }
+}
+
+function replace_html_date( original_node, id, format ) {
+    var node = $("<td>From<span style=\"white-space:nowrap\"><input type=\"text\" id=\"" + id + "from\" readonly=\"readonly\" placeholder=\"Pick date\" size=\"7\" /><a style=\"cursor:pointer\" onclick=\"$('#" + id + "from').val('').change();\" >&times;</a></span>To<span style=\"white-space:nowrap\"><input type=\"text\" id=\"" + id + "to\" readonly=\"readonly\" placeholder=\"Pick date\" size=\"7\" /><a style=\"cursor:pointer\" onclick=\"$('#" + id + "to').val('').change();\" >&times;</a></span></td>");
+    $(original_node).replaceWith(node);
+    var script = document.createElement( 'script' );
+    script.type = 'text/javascript';
+    var script_content = "Calendar.setup({";
+    script_content += "    inputField: \"" + id + "from\",";
+    script_content += "    ifFormat: \"" + format + "\",";
+    script_content += "    button: \"" + id + "from\",";
+    script_content += "    onClose: function(){ $(\"#" + id + "from\").change(); this.hide();}";
+    script_content += "  });";
+    script_content += "  Calendar.setup({";
+    script_content += "    inputField: \"" + id + "to\",";
+    script_content += "    ifFormat: \"" + format + "\",";
+    script_content += "    button: \"" + id + "to\",";
+    script_content += "    onClose: function(){ $(\"#" + id + "to\").change(); this.hide();}";
+    script_content += "  });";
+    script.text = script_content;
+    $(original_node).append( script );
 }

@@ -26,7 +26,7 @@ BEGIN {
     $VERSION    = 3.04,
 
     @ISA        = qw(Exporter);
-    @EXPORT     = qw(dt_build_orderby dt_build_having);
+    @EXPORT     = qw(dt_build_orderby dt_build_having get_dt_params dt_construct_query);
 }
 
 =head1 NAME
@@ -97,8 +97,14 @@ sub dt_build_orderby {
         my $iSortCol = $param->{'iSortCol_'.$i};
         my $sSortDir = $param->{'sSortDir_'.$i};
         my $mDataProp = $param->{'mDataProp_'.$iSortCol};
-
-        push @orderbys, "$mDataProp $sSortDir";
+        my @sort_fields = $param->{$mDataProp.'_sorton'}
+            ? split(' ', $param->{$mDataProp.'_sorton'})
+            : ();
+        if(@sort_fields > 0) {
+            push @orderbys, "$_ $sSortDir" foreach (@sort_fields);
+        } else {
+            push @orderbys, "$mDataProp $sSortDir";
+        }
         $i++;
     }
 
@@ -143,8 +149,18 @@ sub dt_build_having {
         while($i < $param->{'iColumns'}) {
             if($param->{'bSearchable_'.$i} eq 'true') {
                 my $mDataProp = $param->{'mDataProp_'.$i};
-                push @gFilters, " $mDataProp LIKE ? ";
-                push @gParams, "%$sSearch%";
+                my @filter_fields = $param->{$mDataProp.'_filteron'}
+                    ? split(' ', $param->{$mDataProp.'_filteron'})
+                    : ();
+                if(@filter_fields > 0) {
+                    foreach my $field (@filter_fields) {
+                        push @gFilters, " $field LIKE ? ";
+                        push @gParams, "%$sSearch%";
+                    }
+                } else {
+                    push @gFilters, " $mDataProp LIKE ? ";
+                    push @gParams, "%$sSearch%";
+                }
             }
             $i++;
         }
@@ -158,13 +174,82 @@ sub dt_build_having {
         my $sSearch = $param->{'sSearch_'.$i};
         if($sSearch) {
             my $mDataProp = $param->{'mDataProp_'.$i};
-            push @filters, " $mDataProp LIKE ? ";
-            push @params, "%$sSearch%";
+            my @filter_fields = $param->{$mDataProp.'_filteron'}
+                ? split(' ', $param->{$mDataProp.'_filteron'})
+                : ();
+            if(@filter_fields > 0) {
+                my @localfilters;
+                foreach my $field (@filter_fields) {
+                    push @localfilters, " $field LIKE ? ";
+                    push @params, "%$sSearch%";
+                }
+                push @filters, " ( ". join(" OR ", @localfilters) ." ) ";
+            } else {
+                push @filters, " $mDataProp LIKE ? ";
+                push @params, "%$sSearch%";
+            }
         }
-        $i ++;
+        $i++;
     }
 
     return (\@filters, \@params);
+}
+
+sub get_dt_params {
+    my $input = shift;
+    my %dtparam;
+    my $vars = $input->Vars;
+
+    foreach(qw/ iDisplayStart iDisplayLength iColumns sSearch bRegex iSortingCols sEcho /) {
+        $dtparam{$_} = $input->param($_);
+    }
+    foreach(grep /(?:_sorton|_filteron)$/, keys %$vars) {
+        $dtparam{$_} = $vars->{$_};
+    }
+    for(my $i=0; $i<$dtparam{'iColumns'}; $i++) {
+        foreach(qw/ bSearchable sSearch bRegex bSortable iSortCol mDataProp sSortDir /) {
+            my $key = $_ . '_' . $i;
+            $dtparam{$key} = $input->param($key) if defined $input->param($key);
+        }
+    }
+    return %dtparam;
+}
+
+sub dt_construct_query_simple {
+    my ( $field, $value ) = @_;
+    my $query;
+    my @params;
+    if( $field ) {
+        $query .= " AND location_description = ? ";
+        push @params, $value;
+    }
+    return ( $query, \@params );
+}
+sub dt_construct_query_dates {
+    my ( $dateto, $datefrom, $field ) = @_;
+    my $query;
+    my @params;
+    if ( $datefrom ) {
+        $query .= " AND $field >= ? ";
+        push @params, C4::Dates->new($datefrom)->output('iso');
+    }
+    if ( $dateto ) {
+        $query = " AND $field <= ? ";
+        push @params, C4::Dates->new($dateto)->output('iso');
+    }
+    return ( $query, \@params );
+}
+
+sub dt_construct_query {
+    my ( $type, $others ) = @_;
+    given ( $type ) {
+        when ( /simple/ ) {
+            return dt_construct_query_simple( $others );
+        }
+        when ( /interval_dates/ ) {
+            return dt_construct_query_dates( $others );
+        }
+    }
 }
 
 1;

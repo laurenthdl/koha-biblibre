@@ -745,6 +745,20 @@ $duedatespec = "" if not( $stickyduedate or scalar $confirm_required );
 
 my @categories = C4::Category->all;
 
+# Build itemtypes loops for filters
+my $itemtypes = GetItemTypes;
+my @itemtypes_loop;
+foreach(sort keys %$itemtypes){
+    my $row = $itemtypes->{$_};
+    push @itemtypes_loop, $row;
+}
+my $locations = GetKohaAuthorisedValues("items.location");
+my @locations_loop;
+foreach ( sort keys %$locations ) {
+    push @locations_loop, { code => $_, description => "$_ - " . $locations->{$_} };
+}
+
+
 $template->param(
     issued_itemtypes_count_loop => \@issued_itemtypes_count_loop,
     lib_messages_loop           => $lib_messages_loop,
@@ -790,6 +804,10 @@ $template->param(
     circview                    => 1,
     soundon                     => C4::Context->preference("SoundOn"),
     categoryloop				=> \@categories,
+    itemtypes_loop              => \@itemtypes_loop,
+    locations_loop              => \@locations_loop,
+    branches_loop               => GetBranchesLoop(),
+
 );
 
 $template->param( newexpiry => format_date($newexpiry) ) if ( defined $newexpiry );
