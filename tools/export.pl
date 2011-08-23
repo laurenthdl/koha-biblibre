@@ -40,6 +40,7 @@ my $marcflavour = C4::Context->preference("marcflavour");
 my $format;
 my $output_format;
 my $dont_export_items;
+my $deleted_barcodes;
 my $start_accession;
 my $help;
 my $oldstdout;
@@ -50,15 +51,16 @@ if ( scalar @ARGV > 0 ) {
     # Getting parameters
     $op = 'export';
     $format = 'iso2709';
-    GetOptions( 'format=s' => \$output_format, 'date=s' => \$start_accession, 'dont_export_items' => \$dont_export_items, 'filename=s' => \$filename, 'help|?' => \$help );
+    GetOptions( 'format=s' => \$output_format, 'date=s' => \$start_accession, 'dont_export_items' => \$dont_export_items, 'deleted_barcodes' => \$deleted_barcodes, 'filename=s' => \$filename, 'help|?' => \$help );
     $commandline = 1;
 
 
     if ($help) {
-        print "\nexport.pl [--format=format] [--date=date] [--dont_export_items] --filename=outputfile\n\n";
+        print "\nexport.pl [--format=format] [--date=date] [--dont_export_items] [--deleted_barcodes] --filename=outputfile\n\n";
         print " * format is either 'xml' or 'marc' (default)\n";
         print " * date should be entered as the 'dateformat' syspref is set (dd/mm/yyyy for metric, yyyy-mm-dd for iso, mm/dd/yyyy for us)\n";
         print " * records exported are the ones that have been modified since 'date'\n";
+        print " * if --deleted_barcodes is used, a list of barcodes of items deleted since 'date' is produced (or from all deleted items if no date is specified)\n";
         exit;
     }
 
@@ -66,6 +68,7 @@ if ( scalar @ARGV > 0 ) {
     $output_format     ||= 'marc';
     $start_accession   ||= '';
     $dont_export_items ||= 0;
+    $deleted_barcodes  ||= 0;
     $filename          ||= "koha.mrc";
 
     # Let's redirect stdout
@@ -123,6 +126,11 @@ if ( $op eq "export" ) {
         my $strip_nonlocal_items = $query->param("strip_nonlocal_items");
         my $dont_export_fields   = $query->param("dont_export_fields");
         my @biblionumbers        = $query->param("biblionumbers");
+        my $biblioitemstable     = ($commandline and $deleted_barcodes) ? 'deletedbiblioitems' : 'biblioitems';
+        my $itemstable           = ($commandline and $deleted_barcodes) ? 'deleteditems' : 'items';
+
+        my ( $barcodefield, $barcodesubfield) = GetMarcFromKohaField( 'items.barcode', '' );
+
         my @sql_params;
 
         if (not @biblionumbers) {
@@ -134,18 +142,18 @@ if ( $op eq "export" ) {
               || $end_accession
               || ( $itemtype && C4::Context->preference('item-level_itypes') );
             my $q = $items_filter
-              ? "SELECT DISTINCT biblioitems.biblionumber
-                 FROM biblioitems JOIN items
+              ? "SELECT DISTINCT $biblioitemstable.biblionumber
+                 FROM $biblioitemstable JOIN $itemstable
                  USING (biblionumber) WHERE 1"
-              : "SELECT biblioitems.biblionumber FROM biblioitems WHERE biblionumber >0 ";
+              : "SELECT $biblioitemstable.biblionumber FROM $biblioitemstable WHERE biblionumber >0 ";
 
             if ($StartingBiblionumber) {
-                $q .= " AND biblioitems.biblionumber >= ? ";
+                $q .= " AND $biblioitemstable.biblionumber >= ? ";
                 push @sql_params, $StartingBiblionumber;
             }
 
             if ($EndingBiblionumber) {
-                $q .= " AND biblioitems.biblionumber <= ? ";
+                $q .= " AND $biblioitemstable.biblionumber <= ? ";
                 push @sql_params, $EndingBiblionumber;
             }
 
@@ -174,7 +182,7 @@ if ( $op eq "export" ) {
             }
 
             if ($itemtype) {
-                $q .= ( C4::Context->preference('item-level_itypes') ) ? " AND items.itype = ? " : " AND biblioitems.itemtype = ?";
+                $q .= ( C4::Context->preference('item-level_itypes') ) ? " AND $itemstable.itype = ? " : " AND $biblioitemstable.itemtype = ?";
                 push @sql_params, $itemtype;
             }
             warn "$q, @sql_params";
@@ -220,9 +228,17 @@ if ( $op eq "export" ) {
                     }
                 }
             }
-            if ( $output_format eq "xml" ) {
+            if ( $deleted_barcodes ) {
+                foreach ($record->field($barcodefield)) {
+                   foreach ($_->subfield($barcodesubfield)) {
+                        print $_ . "\n";
+                   }
+                }
+            } 
+            elsif ( $output_format eq "xml" ) {
                 print $record->as_xml_record($marcflavour);
-            } else {
+            } 
+            else {
                 print $record->as_usmarc();
             }
         }
