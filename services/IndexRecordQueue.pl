@@ -59,12 +59,6 @@ use Tie::File;
 use Time::Progress;
 use threads;
 
-$App::Daemon::logfile = "/tmp/IndexRecordQueue.log";
-$App::Daemon::pidfile = "/tmp/IndexRecordQueue.pid";
-
-my $logger = Log::LogLite->new( $App::Daemon::logfile, 7 );
-$logger and $logger->template("<date> <message>\n");
-
 $| = 1;
 
 # Defaults values
@@ -72,6 +66,8 @@ our $DEFAULT_MAX_RECORDS = 5;
 our $DEFAULT_MAX_DELTA   = 30;
 our $MAX_INTERVAL        = 1;
 my $filepath = '/tmp/records.txt';
+my $logpath  = '/tmp/IndexRecordQueue.log';
+my $pidpath  = '/tmp/IndexRecordQueue.pid';
 my $max_records;
 my $max_delta;
 
@@ -83,15 +79,22 @@ if ( grep /stop/, @ARGV ) {$logger and $logger->write("STOP");}
 
 # Get options
 my %opts = ();
-for my $opt (qw(-a -f -mr -ms)) { # TODO -l for log ; -p for pid
+for my $opt (qw(-a -f -l -p -mr -ms)) {
     my $v = App::Daemon::find_option( $opt, 1 );
     $opts{ $opt } = $v if defined $v;
 }
 
-$filepath    = $opts{"-f"}  if defined $opts{"-f"};
-
+$filepath    = $opts{"-f"} if defined $opts{"-f"};
+$logpath     = $opts{"-l"} if defined $opts{"-l"};
+$pidpath     = $opts{"-p"} if defined $opts{"-p"};
 $max_records = get_opt( $opts{"-mr"} ) || $DEFAULT_MAX_RECORDS;
 $max_delta   = get_opt( $opts{"-ms"} ) || $DEFAULT_MAX_DELTA;
+
+$App::Daemon::logfile = $logpath;
+$App::Daemon::pidfile = $pidpath;
+
+my $logger = Log::LogLite->new( $logpath, 7 );
+$logger and $logger->template("<date> <message>\n");
 
 if ( grep /start/, @ARGV ) {$logger and $logger->write("SET OPTS: \nfilepath=$filepath\nmax_records=$max_records\nmax_delta=$max_delta");}
 

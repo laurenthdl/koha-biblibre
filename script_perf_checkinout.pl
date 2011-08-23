@@ -43,6 +43,7 @@ use C4::Auth;
 use C4::Circulation;
 use C4::Members;
 
+$| = 1;
 
 my $logger = Log::LogLite->new( "script_perf_checkinout.log", 7 );
 $logger and $logger->template("<date> <message>\n");
@@ -78,41 +79,57 @@ $b->concurrency($concurrency);
 
 my $dbh = C4::Context->dbh;
 
-my $MAX_ISSUES = 1;
-my $MAX_RETURNS = 1;
-my $query = "SELECT borrowernumber FROM borrowers WHERE dateexpiry > NOW() AND debarred IS NULL ORDER BY RAND() LIMIT 1;";
+my $MAX_BORROWERS = 20;
+my $MAX_ISSUES    = 2;
+my $MAX_RETURNS   = 2;
+my $SQL_LIMIT     = 100;
+
+my $query = "SELECT borrowernumber FROM borrowers WHERE dateexpiry > NOW() AND debarred IS NULL LIMIT $SQL_LIMIT;";
 my $sth = $dbh->prepare($query);
 $sth->execute();
 
-my $borrowernumbers = $sth->fetchall_arrayref( {} );
-my @borrowers = map { GetMemberDetails $$_{borrowernumber}, 0 } @$borrowernumbers;
-
-$query = "SELECT barcode FROM items WHERE onloan IS NULL ORDER BY RAND() LIMIT $MAX_ISSUES;";
+my @borrowernumbers = map { shift @$_ } @{ $sth->fetchall_arrayref };
+@borrowernumbers = get_random_elements( \@borrowernumbers, $MAX_BORROWERS );
+my @borrowers = map { GetMemberDetails $_, 0 } @borrowernumbers;
+$query = "SELECT barcode FROM items WHERE onloan IS NULL LIMIT $SQL_LIMIT;";
 $sth = $dbh->prepare($query);
 $sth->execute();
-
+my @barcodes = map { shift @$_ } @{ $sth->fetchall_arrayref };
+my @barcodes4issues = get_random_elements( \@barcodes, $MAX_ISSUES );
 my @checkout_pages;
 my @checkout_runs;
-while (my $barcode = $sth->fetchrow ) {
+
+for my $barcode ( @barcodes4issues ) {
     my $borrower = _rand( \@borrowers );
 
-    $logger and $logger->write( "Checkout barcode $barcode for borrower " . $$borrower{borrowernumber} );
     my $run = HTTPD::Bench::ApacheBench::Run->new(
         {
             urls => [ $baseurl . "/circ/circulation.pl" ],
             cookies => [$cookie],
+            user_message => "du blalbal",
         }
     );
+    # postdata method is very stupid ? Without "foo" and "bar", data are truncated (or prefixed with \r) !?
     my @postdata = ( "foo=foo&borrowernumber=" . $$borrower{borrowernumber} . "&barcode=$barcode&issueconfirmed=1bar=bar" );
     $run->postdata( \@postdata );
 
+    $$run{user_message} = "Checkout barcode $barcode for borrower " . $$borrower{borrowernumber};
+
     $b->add_run( $run );
 
-    # send HTTP request sequences to server and time responses
-    my $ro = $b->execute;
-
 }
-$query = "SELECT it.barcode, b.cardnumber, b.borrowernumber FROM issues iss, borrowers b, items it WHERE iss.borrowernumber=b.borrowernumber AND iss.itemnumber=it.itemnumber ORDER BY RAND() LIMIT $MAX_RETURNS;";
+
+# send HTTP request sequences to server and time responses
+my $ro = $b->execute;
+$logger and $logger->write( report_regress ( $ro, $b ) );
+
+$query = <<EOQ;
+SELECT it.barcode, b.cardnumber, b.borrowernumber
+FROM issues iss, borrowers b, items it
+WHERE iss.borrowernumber=b.borrowernumber
+    AND iss.itemnumber=it.itemnumber
+LIMIT $SQL_LIMIT;
+EOQ
 $sth = $dbh->prepare($query);
 $sth->execute();
 my @checkin_pages;
@@ -124,23 +141,45 @@ while ( my ( $barcode, $cardnumber, $borrowernumber ) = $sth->fetchrow ) {
         {
             urls => [ $baseurl . "/reserve/renewscript.pl" ],
             cookies => [$cookie],
-        }
+    }
     );
+    # postdata method is very stupid ? Without "foo" and "bar", data are truncated (or prefixed with \r) !?
     my @postdata = ( "foo=foo&borrowernumber=$borrowernumber&cardnumber=$cardnumber&barcodes[]=$barcode&destination=circ&bar=bar" );
     $run->postdata( \@postdata );
 
     $b->add_run( $run );
 
-    # send HTTP request sequences to server and time responses
-    my $ro = $b->execute;
-
 }
 
+# send HTTP request sequences to server and time responses
+my $ro = $b->execute;
+$logger and $logger->write( report_regress ( $ro, $b ) );
 
 sub _rand {
   my ( $arr ) = @_;
-  my $rand = rand ( scalar @$arr - 1 );
+  my $rand = int( rand ( scalar @$arr - 1 ) );
   return @$arr[$rand];
 }
 
+sub get_random_elements {
+    my $arr = shift;
+    my $nb_elt = shift || 1;
+    $nb_elt = $nb_elt > scalar(@$arr) ? scalar($arr) : $nb_elt;
+    my @r = sort { int(rand $arr) - int($arr / 2) } @$arr;
+    return @r[0 .. $nb_elt-1] if $nb_elt <= scalar(@$arr);
+    return @r;
+}
 
+sub report_regress {
+    my ( $regress, $bench ) = @_;
+    my $s = "\n";
+    for my $runnumber ( grep { /run/ } keys %{$regress->{regression}} ) {
+        $runnumber =~ s/run(\d+)/$1/;
+        my $run = $$regress{regression}{"run$runnumber"}[0];
+        $s .= ">>> $$bench{runs}[$runnumber]->{user_message}";
+        $s .= "\tresponse times (in ms) for run $runnumber : $$run{total_response_time}";
+        $s .= $$run{good}[0] == 0 ? "[KO]" : "[OK]";
+        $s .= "\n";
+    }
+    return $s;
+}
