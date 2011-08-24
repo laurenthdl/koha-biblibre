@@ -228,6 +228,7 @@ if ( $op ne "do_search" ) {
                             $marcdata = $rec->raw();
 
                             my ( $charset_result, $charset_errors );
+                            $marcdata = nsb_replace_by_valid_utf8($marcdata);
                             ( $marcrecord, $charset_result, $charset_errors ) = MarcToUTF8Record( $marcdata, C4::Context->preference('marcflavour'), $encoding[$k] );
 ####WARNING records coming from Z3950 clients are in various character sets MARC8,UTF8,UNIMARC etc
 ## In HEAD i change everything to UTF-8
