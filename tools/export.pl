@@ -42,6 +42,7 @@ my $output_format;
 my $dont_export_items;
 my $deleted_barcodes;
 my $start_accession;
+my $timestamp;
 my $help;
 my $oldstdout;
 
@@ -70,6 +71,12 @@ if ( scalar @ARGV > 0 ) {
     $dont_export_items ||= 0;
     $deleted_barcodes  ||= 0;
     $filename          ||= "koha.mrc";
+
+    # If we want deleted barcodes, we use timestamp instead of start_accession
+    if ($deleted_barcodes) {
+	$timestamp = $start_accession;
+	undef $start_accession;
+    }
 
     # Let's redirect stdout
     open $oldstdout, ">&STDOUT";
@@ -118,6 +125,7 @@ if ( $op eq "export" ) {
         my $end_callnumber       = $query->param("end_callnumber");
         if ($commandline) {
            $start_accession      = ($start_accession) ? C4::Dates->new($start_accession) : '';
+           $timestamp            = ($timestamp)       ? C4::Dates->new($timestamp)       : '';
         } else {
            $start_accession      = ( $query->param("start_accession") ) ? C4::Dates->new( $query->param("start_accession") ) : '';
         }
@@ -139,6 +147,7 @@ if ( $op eq "export" ) {
               || $start_callnumber
               || $end_callnumber
               || $start_accession
+	      || $timestamp
               || $end_accession
               || ( $itemtype && C4::Context->preference('item-level_itypes') );
             my $q = $items_filter
@@ -176,6 +185,11 @@ if ( $op eq "export" ) {
                 push @sql_params, $start_accession->output('iso');
             }
 
+	    if ($timestamp) {
+                $q .= " AND $itemstable.timestamp >= ? ";
+                push @sql_params, $timestamp->output('iso');
+            }
+
             if ($end_accession) {
                 $q .= " AND dateaccessioned <= ? ";
                 push @sql_params, $end_accession->output('iso');
@@ -193,12 +207,24 @@ if ( $op eq "export" ) {
         }
 
         for my $biblionumber (@biblionumbers) {
+
+	  if ( $deleted_barcodes ) {
+		my $q = "SELECT DISTINCT barcode from deleteditems where deleteditems.biblionumber = ?";
+		my $sth = $dbh->prepare($q);
+		$sth->execute($biblionumber);
+		while (my $row = $sth->fetchrow_array) {
+		    print $row . "\n";
+		}
+		next;
+            }
+
             my $record = eval { GetMarcBiblio($biblionumber); };
 
             # FIXME: decide how to handle records GetMarcBiblio can't parse or retrieve
             if ($@) {
                 next;
             }
+
             next if not defined $record;
             if ( $dont_export_items || $strip_nonlocal_items || $limit_ind_branch ) {
                 my ( $homebranchfield, $homebranchsubfield ) = GetMarcFromKohaField( 'items.homebranch', '' );
@@ -234,14 +260,7 @@ if ( $op eq "export" ) {
                     }
                 }
             }
-            if ( $deleted_barcodes ) {
-                foreach ($record->field($barcodefield)) {
-                   foreach ($_->subfield($barcodesubfield)) {
-                        print $_ . "\n";
-                   }
-                }
-            } 
-            elsif ( $output_format eq "xml" ) {
+            if ( $output_format eq "xml" ) {
                 print $record->as_xml_record($marcflavour);
             } 
             else {
