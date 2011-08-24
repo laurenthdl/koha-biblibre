@@ -50,6 +50,7 @@ my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user( {
 my $subscriptionid = $input->param('subscriptionid');
 my $frequencyid = $input->param('frequency');
 my $firstacquidate = $input->param('firstacquidate');
+my $nextacquidate = $input->param('nextacquidate');
 my $enddate = $input->param('enddate');
 my $subtype = $input->param('subtype');
 my $sublength = $input->param('sublength');
@@ -87,12 +88,6 @@ my %val = (
     innerloop3      => $input->param('innerloop3') // '',
 );
 
-my %subscription = (
-    irregularity    => '',
-    periodicity     => $frequencyid,
-    countissuesperunit  => 0,
-);
-
 if(!defined $firstacquidate || $firstacquidate eq ''){
     my ($year, $month, $day) = Today();
     $firstacquidate = C4::Dates->new("$year-$month-$day", "iso");
@@ -105,12 +100,19 @@ my $enddate_iso;
 if($enddate){
     $enddate_iso = C4::Dates->new($enddate)->output("iso");
 }
-my $date = C4::Dates->new($firstacquidate->output());
+$nextacquidate = C4::Dates->new($nextacquidate || $firstacquidate->output());
+my $date = C4::Dates->new($nextacquidate->output());
+
+my %subscription = (
+    irregularity    => '',
+    periodicity     => $frequencyid,
+    countissuesperunit  => 1,
+    firstacquidate  => $firstacquidate_iso,
+);
 
 my $issuenumber;
 if(defined $subscriptionid) {
-    ($issuenumber) = GetSerials($subscriptionid);
-    $issuenumber = 1 if($issuenumber == 0);
+    ($issuenumber) = GetFictiveIssueNumber(\%subscription, $date);
 } else {
     $issuenumber = 1;
 }
@@ -140,7 +142,7 @@ while( $i < 1000 ) {
     my %line;
 
     if(defined $date){
-        $date = GetNextDate($date->output("iso"), \%subscription, 1);
+        $date = GetNextDate($date, \%subscription);
     }
     if(defined $date){
         $line{'publicationdate'} = $date->output();

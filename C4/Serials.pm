@@ -53,7 +53,7 @@ BEGIN {
       &ReNewSubscription  &GetLateIssues      &GetLateOrMissingIssues
       &GetSerialInformation                   &AddItem2Serial
       &PrepareSerialsData &GetNextExpected    &ModNextExpected
-      &GetSubscriptionIrregularities
+      &GetSubscriptionIrregularities &GetFictiveIssueNumber
 
       &UpdateClaimdateIssues
       &GetSuppliersWithLateIssues             &getsupplierbyserialid
@@ -988,7 +988,7 @@ sub GetExpirationDate {
 
             #calculate the date of the last issue.
             for ( my $i = 1 ; $i <= $length ; $i++ ) {
-                $enddate = GetNextDate( $enddate->output("iso"), $subscription );
+                $enddate = GetNextDate( $enddate, $subscription );
             }
         } elsif ( $subscription->{monthlength} ) {
             if ( $$subscription{startdate} ) {
@@ -1117,6 +1117,7 @@ sub ModSerialStatus {
     my $sth   = $dbh->prepare($query);
     $sth->execute($serialid);
     my ( $subscriptionid, $oldstatus, $periodicity ) = $sth->fetchrow;
+    my $frequency = GetSubscriptionFrequency($periodicity);
 
     # change status & update subscriptionhistory
     my $val;
@@ -1124,7 +1125,7 @@ sub ModSerialStatus {
         DelIssue( { 'serialid' => $serialid, 'subscriptionid' => $subscriptionid, 'serialseq' => $serialseq } );
     } else {
 
-        if ( ( $periodicity % 16 ) == 0 ) {
+        unless ($frequency->{'unit'}) {
             if ( not $planneddate or $planneddate eq '0000-00-00' ) { $planneddate = C4::Dates->new()->output('iso') };
             if ( not $publisheddate or $publisheddate eq '0000-00-00' ) { $publisheddate = C4::Dates->new()->output('iso') };
         }
@@ -1165,7 +1166,7 @@ sub ModSerialStatus {
         my ( $newserialseq, $newlastvalue1, $newlastvalue2, $newlastvalue3, $newinnerloop1, $newinnerloop2, $newinnerloop3 ) = GetNextSeq($val);
 
         # next date (calculated from actual date & frequency parameters)
-        my $nextpublisheddate = GetNextDate( $publisheddate, $val );
+        my $nextpublisheddate = GetNextDate(C4::Dates->new($publisheddate, 'iso'), $val, 1);
         my $nextpubdate = ($nextpublisheddate) ? $nextpublisheddate->output("iso") : undef;
         NewIssue( $newserialseq, $subscriptionid, $val->{'biblionumber'}, 1, $nextpubdate, $nextpubdate );
         $query = "UPDATE subscription SET lastvalue1=?, lastvalue2=?, lastvalue3=?, innerloop1=?, innerloop2=?, innerloop3=?
@@ -2532,179 +2533,205 @@ sub abouttoexpire {
     return 0;
 }
 
-sub in_array {    # used in next sub down
-    my ( $val, @elements ) = @_;
-    foreach my $elem (@elements) {
-        if ( $val == $elem ) {
-            return 1;
+sub GetFictiveIssueNumber {
+    my ($subscription, $planneddate) = @_;
+
+    my $frequency = GetSubscriptionFrequency($subscription->{'periodicity'});
+    my $unit = lc $frequency->{'unit'};
+    my $issueno = 0;
+
+    if($unit) {
+        my ($year, $month, $day) = split /-/, $planneddate->output('iso');
+        my ($fa_year, $fa_month, $fa_day) = split /-/, $subscription->{'firstacquidate'};
+        my $wkno;
+        my $delta;
+
+        if($unit eq 'day') {
+            $delta = Delta_Days($fa_year, $fa_month, $fa_day, $year, $month, $day);
+        } elsif($unit eq 'week') {
+            ($wkno, $year) = Week_of_Year($year, $month, $day);
+            my ($fa_wkno, $fa_yr) = Week_of_Year($fa_year, $fa_month, $fa_day);
+            $delta = ($fa_yr == $year) ? ($wkno - $fa_wkno) : ( ($year-$fa_yr-1)*52 + (52-$fa_wkno+$wkno) );
+        } elsif($unit eq 'month') {
+            $delta = ($fa_year == $year)
+                   ? ($month - $fa_month)
+                   : ( ($year-$fa_year-1)*12 + (12-$fa_month+$month) );
+        } elsif($unit eq 'year') {
+            $delta = $year - $fa_year;
+        }
+        if($frequency->{'unitsperissue'} == 1) {
+            $issueno = $delta * $frequency->{'issuesperunit'} + $subscription->{'countissuesperunit'};
+        } else {
+            # Assuming issuesperunit == 1
+            $issueno = int( ($delta + $frequency->{'unitsperissue'}) / $frequency->{'unitsperissue'} );
         }
     }
-    return 0;
+    return $issueno;
 }
 
 =head2 GetNextDate
 
 $resultdate = GetNextDate($planneddate,$subscription)
 
-this function it takes the planneddate and will return the next issue's date and will skip dates if there
-exists an irregularity
-- eg if periodicity is monthly and $planneddate is 2007-02-10 but if March and April is to be 
+this function it takes the planneddate and will return the next issue's date
+and will skip dates if there exists an irregularity.
+$planneddate has to be a C4::Dates object
+$subscription is a hashref containing at least 'periodicity', 'firstacquidate', 'irregularity', and 'countissuesperunit'
+$updatecount is a boolean value which, when set to true, update the 'countissuesperunit' in database
+- eg if periodicity is monthly and $planneddate is 2007-02-10 but if March and April is to be
 skipped then the returned date will be 2007-05-10
 
 return :
-$resultdate - then next date in the sequence
+$resultdate - then next date in the sequence (C4::Dates object)
 
-Return 0 if periodicity==0
+Return $planneddate if subscription is irregular
 
 =cut
 
 sub GetNextDate {
-    my ( $planneddate, $subscription, $countdates ) = @_;
-    $countdates = $countdates || 1 ;
-    my $tmpsubscription = $subscription;
-    my @irreg = split /;/, $tmpsubscription->{'irregularity'} ;
-    my $freqdata = GetSubscriptionFrequency($tmpsubscription->{'periodicity'});
-    my @dates;
+    my ( $planneddate, $subscription, $updatecount ) = @_;
+
+    my $freqdata = GetSubscriptionFrequency($subscription->{'periodicity'});
+
     if ($freqdata->{'unit'}) {
-    #date supposed to be in ISO.
-        my ( $year, $month, $day ) = split /-/, $planneddate;
-        $month = 1 unless ($month);
-        $day = 1 unless ($day);
-        my @resultdate;
+        my ( $year, $month, $day ) = split /-/, $planneddate->output('iso');
+
         # Process an irregularity Hash
-        # Suppose that irregularities are stored in a string with this structure 
+        # Suppose that irregularities are stored in a string with this structure
         # irreg1;irreg2;irreg3
-        # Or irreg1,issue1;irreg2,issue2;
-        # Both can take value 0
+        # where irregX is the number of issue which will not be received
+        # (the first issue takes the number 1, the 2nd the number 2 and so on)
+        my @irreg = split /;/, $subscription->{'irregularity'} ;
         my %irregularities;
         foreach my $irregularity (@irreg) {
-            if ($irregularity =~ /,/){
-                my ($irregunit, $irregissue) = split /,/, $irregularity;
-                $irregularities{$irregunit*$freqdata->{'issuesperunit'}+$irregissue} = 1;
+            $irregularities{$irregularity} = 1;
+        }
+
+        # Get the 'fictive' next issue number
+        # It is used to check if next issue is an irregular issue.
+        my $issueno = GetFictiveIssueNumber($subscription, $planneddate) + 1;
+
+        # Then get the next date
+        my $unit = lc $freqdata->{'unit'};
+        if ($unit eq 'day') {
+            while ($irregularities{$issueno}) {
+                if ($subscription->{'countissuesperunit'} + 1 > $freqdata->{'issuesperunit'}){
+                    ($year,$month,$day) = Add_Delta_Days($year,$month, $day , $freqdata->{'unitsperissue'} );
+                    $subscription->{'countissuesperunit'} = 1;
+                } else {
+                    $subscription->{'countissuesperunit'}++;
+                }
+                $issueno++;
             }
-            else {
-                $irregularities{$irregularity} = 1;
+            if ($subscription->{'countissuesperunit'} + 1 > $freqdata->{'issuesperunit'}){
+                ($year,$month,$day) = Add_Delta_Days($year,$month, $day , $freqdata->{"unitsperissue"} );
+                $subscription->{'countissuesperunit'} = 1;
+            } else {
+                $subscription->{'countissuesperunit'}++;
             }
         }
-        for (my $i=0; $i<$countdates; $i++){
-        # GetVeryNext Date
-            if ( $freqdata->{unit}=~/day/i) {
-                my $dayofweek = eval{Day_of_Week( $year,$month, $day )};
-                if ($@){
-                    warn "year month day : $year $month $day $subscription->{subscriptionid} : $@";
+        elsif ($unit eq 'week') {
+            my ($wkno, $yr) = Week_of_Year($year, $month, $day);
+            while ($irregularities{$issueno}) {
+                if ($subscription->{'countissuesperunit'} + 1 > $freqdata->{'issuesperunit'}){
+                    $subscription->{'countissuesperunit'} = 1;
+                    warn "Set count to 1";
+                    $wkno += $freqdata->{"unitsperissue"};
+                    if($wkno > 52){
+                        $wkno = $wkno % 52;
+                        $yr++;
+                    }
+                    my $dow = Day_of_Week($year, $month, $day);
+                    ($year,$month,$day) = Monday_of_Week($wkno, $yr);
+                    if($freqdata->{'issuesperunit'} == 1) {
+                        ($year, $month, $day) = Add_Delta_Days($year, $month, $day, $dow - 1);
+                    }
                 } else {
-                    while ($irregularities{$dayofweek * $freqdata->{'issuesperunit'} + $tmpsubscription->{'countissuesperunit'} * ( ( $freqdata->{'issuesperunit'}-1 ) !=0 ) + $freqdata->{"unitsperissue"} } ) {
-                            if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
-                                $tmpsubscription->{'countissuesperunit'}=0;
-                                ($year,$month,$day) = Add_Delta_Days($year,$month, $day , $freqdata->{"unitsperissue"} );
-                                $dayofweek++;
-                            } else {
-                                $tmpsubscription->{'countissuesperunit'} += $freqdata->{"unitsperissue"};
-                            }
-                    }
-                    if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
-                        $tmpsubscription->{'countissuesperunit'}=0;
-                        ($year,$month,$day) = Add_Delta_Days($year,$month, $day , $freqdata->{"unitsperissue"} );
-                        $dayofweek++;
-                    } else {
-                        $tmpsubscription->{'countissuesperunit'} += $freqdata->{"unitsperissue"};
-                    }
+                    $subscription->{'countissuesperunit'}++;
                 }
+                $issueno++;
             }
-            if ( $freqdata->{'unit'}=~/week/i) {
-                my ($wkno,$yr) = eval {Week_of_Year( $year,$month, $day )};
-                if ($@){
-                    warn "year month day : $year $month $day $subscription->{subscriptionid} : $@";
+            if ($subscription->{'countissuesperunit'} + 1 > $freqdata->{'issuesperunit'}){
+                $subscription->{'countissuesperunit'} = 1;
+                $wkno += $freqdata->{"unitsperissue"};
+                if($wkno > 52){
+                    $wkno = $wkno % 52 ;
+                    $yr++;
                 }
-                else {
-                    # Sometimes, the first days of a year are in the last week
-                    # of previous year. In this case, set $year to be $year-1
-                    # in order to calculate next date properly.
-                    $year = $yr;
-                    my $daycount = 7 / $freqdata->{'issuesperunit'};
-                    while ($irregularities{$wkno*$freqdata->{'issuesperunit'}+$tmpsubscription->{'countissuesperunit'}*(($freqdata->{'issuesperunit'}-1)!=0)+ $freqdata->{"unitsperissue"} }) {
-                            if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
-                                $tmpsubscription->{'countissuesperunit'}=0;
-                                if($wkno + $freqdata->{"unitsperissue"} > 52){
-                                    $wkno=($wkno+$freqdata->{"unitsperissue"}) % 52;
-                                    $year++;
-                                }
-                                else {
-                                    $wkno+=$freqdata->{"unitsperissue"};
-                                }
-                                ($year,$month,$day) = Monday_of_Week($wkno, $year);
-                            } else {
-                                $tmpsubscription->{'countissuesperunit'} += $freqdata->{"unitsperissue"};
-                                ($year,$month,$day) = Add_Delta_Days($year,$month, $day , $daycount );
-                            }
-                    }
-                    if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
-                        $tmpsubscription->{'countissuesperunit'}=0;
-                        if($wkno + $freqdata->{"unitsperissue"} > 52){
-                            $wkno=($wkno+$freqdata->{"unitsperissue"}) % 52 ;
-                            $year++;
-                        }
-                        else {
-                            $wkno+=$freqdata->{"unitsperissue"};
-                        }
-                        ($year,$month,$day) = Monday_of_Week($wkno, $year);
-                    } else {
-                        $tmpsubscription->{'countissuesperunit'} += $freqdata->{"unitsperissue"};
-                        ($year,$month,$day) = Add_Delta_Days($year,$month, $day , $daycount );
-                    }
+                my $dow = Day_of_Week($year, $month, $day);
+                ($year,$month,$day) = Monday_of_Week($wkno, $yr);
+                if($freqdata->{'issuesperunit'} == 1) {
+                    ($year, $month, $day) = Add_Delta_Days($year, $month, $day, $dow - 1);
                 }
+            } else {
+                $subscription->{'countissuesperunit'}++;
             }
-            if ( $freqdata->{'unit'}=~/month/i) {
-                my $daycount = 30 / $freqdata->{'issuesperunit'};
-                while ($irregularities{$month*$freqdata->{'issuesperunit'}+$tmpsubscription->{'countissuesperunit'}*(($freqdata->{'issuesperunit'}-1)!=0)+ $freqdata->{"unitsperissue"} }) {
-                        if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
-                            $tmpsubscription->{'countissuesperunit'}=0;
-                            ($year,$month,$day) = Add_Delta_YMD($year,$month,$day, 0,$freqdata->{"unitsperissue"},0);
-                        } else {
-                            $tmpsubscription->{'countissuesperunit'} += 1;
-                            ($year,$month,$day) = Add_Delta_Days($year,$month, $day , $daycount );
-                        }
-                }
-                if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
-                    $tmpsubscription->{'countissuesperunit'}=0;
+        }
+        elsif ($unit eq 'month') {
+            while ($irregularities{$issueno}) {
+                if ($subscription->{'countissuesperunit'} + 1 > $freqdata->{'issuesperunit'}){
+                    $subscription->{'countissuesperunit'} = 1;
                     ($year,$month,$day) = Add_Delta_YMD($year,$month,$day, 0,$freqdata->{"unitsperissue"},0);
+                    unless($freqdata->{'issuesperunit'} == 1) {
+                        $day = 1;   # Jumping to the first day of month, because we don't know what day is expected
+                    }
                 } else {
-                    $tmpsubscription->{'countissuesperunit'} += $freqdata->{"unitsperissue"};
-                    ($year,$month,$day) = Add_Delta_Days($year,$month, $day , $daycount );
+                    $subscription->{'countissuesperunit'}++;
                 }
+                $issueno++;
             }
-            if ( $freqdata->{'unit'}=~/year/i) {
-                my $monthcount = 12 / $freqdata->{'issuesperunit'};
-                while ($irregularities{$year*$freqdata->{'issuesperunit'}+$tmpsubscription->{'countissuesperunit'}*(($freqdata->{'issuesperunit'}-1)!=0)+ $freqdata->{"unitsperissue"} }) {
-                        if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
-                            $tmpsubscription->{'countissuesperunit'}=0;
-                            ($year,$month,$day) = Add_Delta_YMD($year,$month,$day, $freqdata->{"unitsperissue"},0,0);
-                        } else {
-                            $tmpsubscription->{'countissuesperunit'} += 1;
-                            ($year,$month,$day) = Add_Delta_YMD($year,$month, $day , 0, $monthcount,0 );
-                        }
+            if ($subscription->{'countissuesperunit'} + 1 > $freqdata->{'issuesperunit'}){
+                $subscription->{'countissuesperunit'} = 1;
+                ($year,$month,$day) = Add_Delta_YMD($year,$month,$day, 0,$freqdata->{"unitsperissue"},0);
+                unless($freqdata->{'issuesperunit'} == 1) {
+                    $day = 1;   # Jumping to the first day of month, because we don't know what day is expected
                 }
-                if ($tmpsubscription->{'countissuesperunit'}+$freqdata->{"unitsperissue"}>=$freqdata->{'issuesperunit'}){
-                    $tmpsubscription->{'countissuesperunit'}=0;
-                    ($year,$month,$day) = Add_Delta_YMD($year,$month,$day, $freqdata->{"unitsperissue"}-1,$monthcount,0);
+            } else {
+                $subscription->{'countissuesperunit'}++;
+            }
+        }
+        elsif ($unit eq 'year') {
+            while ($irregularities{$issueno}) {
+                if ($subscription->{'countissuesperunit'} + 1 > $freqdata->{'issuesperunit'}){
+                    $subscription->{'countissuesperunit'} = 1;
+                    ($year,$month,$day) = Add_Delta_YMD($year,$month,$day, $freqdata->{"unitsperissue"},0,0);
+                    unless($freqdata->{'issuesperunit'} == 1) {
+                        # Jumping to the first day of year, because we don't know what day is expected
+                        $month = 1;
+                        $day = 1;
+                    }
                 } else {
-                    $tmpsubscription->{'countissuesperunit'} += 1;
-                    ($year,$month,$day) = Add_Delta_YMD($year,$month, $day , 0, $monthcount,0 );
+                    $subscription->{'countissuesperunit'}++;
                 }
+                $issueno++;
             }
-            my $resultdate=C4::Dates->new(sprintf("%04d-%02d-%02d",$year,$month,$day),"iso");
-            push @dates,$resultdate;
+            if ($subscription->{'countissuesperunit'} + 1 > $freqdata->{'issuesperunit'}){
+                $subscription->{'countissuesperunit'} = 1;
+                ($year,$month,$day) = Add_Delta_YMD($year,$month,$day, $freqdata->{"unitsperissue"},0,0);
+                unless($freqdata->{'issuesperunit'} == 1) {
+                    # Jumping to the first day of year, because we don't know what day is expected
+                    $month = 1;
+                    $day = 1;
+                }
+            } else {
+                $subscription->{'countissuesperunit'}++;
+            }
         }
-        if ($tmpsubscription->{countissuesperunit} != $subscription->{countissuesperunit}){
-            my $dbh=C4::Context->dbh;
-            $dbh->do("UPDATE subscription set countissuesperunit=".$tmpsubscription->{countissuesperunit}." where subscriptionid=".$tmpsubscription->{subscriptionid})
+        if ($updatecount){
+            my $dbh = C4::Context->dbh;
+            my $query = qq{
+                UPDATE subscription
+                SET countissuesperunit = ?
+                WHERE subscriptionid = ?
+            };
+            my $sth = $dbh->prepare($query);
+            $sth->execute($subscription->{'countissuesperunit'}, $subscription->{'subscriptionid'});
         }
-    #     warn "dateNEXTSEQ : ".$resultdate;
-        return $dates[0] if ($countdates==1);
-        return @dates if ($countdates>1);
+        my $resultdate = sprintf("%04d-%02d-%02d", $year, $month, $day);
+        return C4::Dates->new($resultdate, 'iso');
     }
     else {
-        return undef;
+        return $planneddate;
     }
 }
 

@@ -69,7 +69,7 @@ while ( my $issue = $sth->fetchrow_hashref ) {
     my $planneddate  = $issue->{planneddate};
 
     if ( $subscription && $planneddate && $planneddate ne "0000-00-00" ) {
-        my $nextpublisheddate = GetNextDate( $planneddate, $subscription );
+        my $nextpublisheddate = GetNextDate( C4::Dates->new($planneddate, 'iso'), $subscription );
         my $today = format_date_in_iso( C4::Dates->new()->output() );
 
         if ( $nextpublisheddate && $today ) {

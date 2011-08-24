@@ -1716,6 +1716,7 @@ CREATE TABLE `subscription` (
   `innerloop3` int(11) default 0,
   `issuesatonce` tinyint(3) NOT NULL default 1,
   `firstacquidate` date default NULL,
+  `countissuesperunit` smallint NOT NULL default 1,
   `manualhistory` tinyint(1) NOT NULL default 0,
   `irregularity` text,
   `letter` varchar(20) default NULL,
