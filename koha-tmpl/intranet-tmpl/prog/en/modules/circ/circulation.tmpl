@@ -19,7 +19,7 @@ function Dopop(link) {
 $(document).ready(function() {
     $('#patronlists > ul').tabs();
 
-    $("td.replace_me").each( function() {
+    $(".replace_me").each( function() {
         replace_html( this );
     } );
 
@@ -785,7 +785,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
       </tbody>
       <tfoot>
         <tr>
-          <td class="replace_me" data-id="datedue" data-type="interval_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"></td>
+          <td><span class="replace_me" data-id="datedue" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"/></td>
           <td><input type="text" class="filter" placeholder="Search title" style="width:99%" data-column_num="1" /></td>
           <td>
             <select id="itemtype_filter" style="max-width:7em">
@@ -811,7 +811,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
               <!-- /TMPL_LOOP -->
             </select>
           </td>
-          <td class="replace_me" data-id="issuedate" data-type="interval_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"></td>
+          <td><span class="replace_me" data-id="issuedate" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->" /></td>
           <!-- <script type="text/javascript">$("#test_1").html(include_html_tfoot('dates', 'issuedate'));</script></td> -->
           <td></td>
           <td></td>

@@ -1,8 +1,6 @@
 #!/usr/bin/perl
-#
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use JSON;
@@ -27,7 +25,7 @@ my $location = $input->param('location');
 my $branchcode = $input->param('branchcode');
 
 # Fetch DataTables parameters
-my %dtparam = get_dt_params( $input );
+my %dtparam = dt_get_params( $input );
 
 my $dbh = C4::Context->dbh;
 
@@ -65,22 +63,21 @@ if($itype) {
     push @where_filters_params, $itype;
 }
 
-my ( $datedue_q   , $datedue_f    ) = dt_construct_query( 'interval_dates', $dateduefrom, , $datedueto, 'issues.date_due' );
-my ( $issuedate_q , $issuedate_f  ) = dt_construct_query( 'interval_dates', $issuedatefrom, , $issuedateto, 'issues.issuedate' );
-my ( $location_q  , $location_f   ) = dt_construct_query( 'simple', $location, 'location_description' );
-my ( $branchcode_q, $branchcode_f ) = dt_construct_query( 'simple', $branchcode, 'issues.branchcode' );
+my ( $datedue_q   , $datedue_f    ) = dt_build_query( 'range_dates', $dateduefrom, , $datedueto, 'issues.date_due' );
+my ( $issuedate_q , $issuedate_f  ) = dt_build_query( 'range_dates', $issuedatefrom, , $issuedateto, 'issues.issuedate' );
+my ( $location_q  , $location_f   ) = dt_build_query( 'simple', $location, 'location_description' );
+my ( $branchcode_q, $branchcode_f ) = dt_build_query( 'simple', $branchcode, 'issues.branchcode' );
 
-$where_filters .= ( $datedue_q    ? $datedue_q : '' ) 
+$where_filters .= ( $datedue_q    ? $datedue_q : '' )
                 . ( $issuedate_q  ? $issuedate_q : '' )
                 . ( $location_q   ? $location_q : '' )
-                . ( $branchcode_q ? $branchcode_q : '');
+                . ( $branchcode_q ? $branchcode_q : '' );
 
-push @where_filters_params, 
-          ( scalar( @$datedue_f )    > 0 ? $datedue_f : () )
-        , ( scalar( @$issuedate_f )  > 0 ? $issuedate_f : () )
-        , ( scalar( @$location_f )   > 0 ? $location_f : () )
-        , ( scalar( @$branchcode_f ) > 0 ? $branchcode_f : () );
-
+push @where_filters_params,
+          scalar( @$datedue_f )    > 0 ? @$datedue_f : ()
+        , scalar( @$issuedate_f )  > 0 ? @$issuedate_f : ()
+        , scalar( @$location_f )   > 0 ? @$location_f : ()
+        , scalar( @$branchcode_f ) > 0 ? @$branchcode_f : ();
 
 my ($filters, $filter_params) = dt_build_having(\%dtparam);
 
@@ -93,8 +90,6 @@ my @bind_params;
 
 push @bind_params, @where_params, @where_filters_params, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
 my $sth = $dbh->prepare($query);
-warn $query;
-warn Data::Dumper::Dumper \@bind_params;
 $sth->execute(@bind_params);
 my $results = $sth->fetchall_arrayref({});
 

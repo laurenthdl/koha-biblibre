@@ -201,18 +201,18 @@ function dt_overwrite_string_sorting_localeCompare() {
 
 function replace_html( original_node, type ) {
     switch ( $(original_node).attr('data-type') ) {
-        case "interval_dates":
+        case "range_dates":
             var id = $(original_node).attr("data-id");
             var format = $(original_node).attr("data-format");
             replace_html_date( original_node, id, format );
             break;
         default:
-            console.log("default");
+            alert("_(This node can't be replaced)");
     }
 }
 
 function replace_html_date( original_node, id, format ) {
-    var node = $("<td>From<span style=\"white-space:nowrap\"><input type=\"text\" id=\"" + id + "from\" readonly=\"readonly\" placeholder=\"Pick date\" size=\"7\" /><a style=\"cursor:pointer\" onclick=\"$('#" + id + "from').val('').change();\" >&times;</a></span>To<span style=\"white-space:nowrap\"><input type=\"text\" id=\"" + id + "to\" readonly=\"readonly\" placeholder=\"Pick date\" size=\"7\" /><a style=\"cursor:pointer\" onclick=\"$('#" + id + "to').val('').change();\" >&times;</a></span></td>");
+    var node = $('<span style="white-space:nowrap">' + _("From") + '<input type="text" id="' + id + 'from" readonly="readonly" placeholder=\'' + _("Pick date") + '\' size="7" /><a title="Delete this filter" style="cursor:pointer" onclick=\'$("#' + id + 'from").val("").change();\' >&times;</a></span><br/><span style="white-space:nowrap">' + _("To") + '<input type="text" id="' + id + 'to" readonly="readonly" placeholder=\'' + _("Pick date") + '\' size="7" /><a title="Delete this filter" style="cursor:pointer" onclick=\'$("#' + id + 'to").val("").change();\' >&times;</a></span>');
     $(original_node).replaceWith(node);
     var script = document.createElement( 'script' );
     script.type = 'text/javascript';

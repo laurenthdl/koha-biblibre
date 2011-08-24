@@ -26,7 +26,7 @@ BEGIN {
     $VERSION    = 3.04,
 
     @ISA        = qw(Exporter);
-    @EXPORT     = qw(dt_build_orderby dt_build_having get_dt_params dt_construct_query);
+    @EXPORT     = qw(dt_build_orderby dt_build_having dt_get_params dt_build_query);
 }
 
 =head1 NAME
@@ -195,7 +195,18 @@ sub dt_build_having {
     return (\@filters, \@params);
 }
 
-sub get_dt_params {
+=item dt_get_params
+
+    my %dtparam = = dt_get_params( $input )
+
+    This function takes a reference to a new CGI object.
+
+    It prepares a hash containing Datatable parameters.
+
+=back
+
+=cut
+sub dt_get_params {
     my $input = shift;
     my %dtparam;
     my $vars = $input->Vars;
@@ -215,18 +226,45 @@ sub get_dt_params {
     return %dtparam;
 }
 
-sub dt_construct_query_simple {
-    my ( $field, $value ) = @_;
+=item dt_build_query_simple
+
+    my ( $query, $params )= dt_build_query_simple( $value, $field )
+
+    This function takes a value and a field (table.field).
+
+    It returns (undef, []) if not $value.
+    Else, returns a SQL where string and an arrayref containing parameters
+    for the execute method of the statement.
+
+=back
+
+=cut
+sub dt_build_query_simple {
+    my ( $value, $field ) = @_;
     my $query;
     my @params;
-    if( $field ) {
-        $query .= " AND location_description = ? ";
+    if( $value ) {
+        $query .= " AND $field = ? ";
         push @params, $value;
     }
     return ( $query, \@params );
 }
-sub dt_construct_query_dates {
-    my ( $dateto, $datefrom, $field ) = @_;
+
+=item dt_build_query_dates
+
+    my ( $query, $params )= dt_build_query_dates( $datefrom, $dateto, $field)
+
+    This function takes a datefrom, dateto and a field (table.field).
+
+    It returns (undef, []) if not $value.
+    Else, returns a SQL where string and an arrayref containing parameters
+    for the execute method of the statement.
+
+=back
+
+=cut
+sub dt_build_query_dates {
+    my ( $datefrom, $dateto, $field ) = @_;
     my $query;
     my @params;
     if ( $datefrom ) {
@@ -234,20 +272,33 @@ sub dt_construct_query_dates {
         push @params, C4::Dates->new($datefrom)->output('iso');
     }
     if ( $dateto ) {
-        $query = " AND $field <= ? ";
+        $query .= " AND $field <= ? ";
         push @params, C4::Dates->new($dateto)->output('iso');
     }
     return ( $query, \@params );
 }
 
-sub dt_construct_query {
-    my ( $type, $others ) = @_;
+=item dt_build_query
+
+    my ( $query, $filter ) = dt_build_query( $type, @params )
+
+    This function takes a value and a list of parameters.
+
+    It calls dt_build_query_dates or dt_build_query_simple fonction of $type.
+
+    $type can be 'simple' or 'rage_dates'.
+
+=back
+
+=cut
+sub dt_build_query {
+    my ( $type, @params ) = @_;
     given ( $type ) {
         when ( /simple/ ) {
-            return dt_construct_query_simple( $others );
+            return dt_build_query_simple( @params );
         }
-        when ( /interval_dates/ ) {
-            return dt_construct_query_dates( $others );
+        when ( /range_dates/ ) {
+            return dt_build_query_dates( @params );
         }
     }
 }
