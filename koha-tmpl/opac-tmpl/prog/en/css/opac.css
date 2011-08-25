@@ -1410,8 +1410,12 @@ div.message {
 
 .selectcol {
 	vertical-align: top;
-	width: 10px;
+/*	width: 10px; modif brisees */
+/* debut ajout brisees */
+	width: 40px; 
+/* fin ajout brisees */
 }
+
 .itypecol {
 	vertical-align: top;
 	width: 10px;
@@ -1419,6 +1423,30 @@ div.message {
 #container {
 	color : #000;
 }
+
+/* debut ajout brisees */
+div#opacnav {
+     background-color:#F3F3F3;
+    font-size : 85%;
+}
+
+div#opacnav a {
+    text-decoration : none ;
+    }
+
+div#opacnav span.logo {
+    background-color : #FFFFFF ;
+    text-decoration : none ;
+    }
+div#opacnav span.credit {
+    margin-left : 250px ;
+    text-align : right ;
+}
+
+div#opacnav span.credit img {
+    vertical-align : bottom ;
+    }
+/* fin ajout brisees */
 
 div#changelanguage{
 	background-color: #fff;

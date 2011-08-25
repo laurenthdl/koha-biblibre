@@ -276,7 +276,7 @@ $(document).ready(function(){
         <table id="tresults">
             <thead>
                 <tr>
-                    <td colspan="4" class="resultscontrol" style="border : 1px solid #e8e8e8;">
+                    <td colspan="3" class="resultscontrol" style="border : 1px solid #e8e8e8;">
                         <div class="resort">
                             <select id="sort_by" name="sort_by"> <!--TMPL_INCLUDE NAME="resort_form.inc"--> </select>
                             <input type="submit" class="submit clearfix" id="sortsubmit" value="Go" />
@@ -318,10 +318,10 @@ $(document).ready(function(){
             <!-- TMPL_LOOP NAME="SEARCH_RESULTS" -->
             <tr>
 
-                <td class="select selectcol"><!--TMPL_IF NAME="opacbookbag" --><input type="checkbox" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" title="Click to add to cart" /> <label for="bib<!-- TMPL_VAR NAME="biblionumber" -->"></label><!-- TMPL_ELSE -->
-<!-- TMPL_IF NAME="virtualshelves" --><input type="checkbox" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" title="Click to add to cart" /> <label for="bib<!-- TMPL_VAR NAME="biblionumber" -->"></label><!-- TMPL_ELSE -->
-<!-- TMPL_IF NAME="RequestOnOpac" --><!-- TMPL_UNLESS NAME="norequests" --><!-- TMPL_IF NAME="opacuserlogin" --><input type="checkbox" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" title="Click to add to cart" /> <label for="bib<!-- TMPL_VAR NAME="biblionumber" -->"></label><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF --></td>
-                <td class="select selectcol"><!-- TMPL_VAR EXPR="__counter__+((current_page-1)*count)" -->.</td>
+                <td class="select selectcol"><!--TMPL_IF NAME="opacbookbag" --><!-- debut modif brisees no reponse --><!-- TMPL_VAR EXPR="__counter__+((current_page-1)*count)" -->.<!-- fin modif brisees no reponse --><input type="checkbox" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" title="Click to add to cart" /> <label for="bib<!-- TMPL_VAR NAME="biblionumber" -->"></label><!-- TMPL_ELSE -->
+<!-- TMPL_IF NAME="virtualshelves" --><!-- debut modif brisees no reponse --><!-- TMPL_VAR EXPR="__counter__+((current_page-1)*count)" -->.<!-- fin modif brisees no reponse --><input type="checkbox" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" title="Click to add to cart" /> <label for="bib<!-- TMPL_VAR NAME="biblionumber" -->"></label><!-- TMPL_ELSE -->
+<!-- TMPL_IF NAME="RequestOnOpac" --><!-- TMPL_UNLESS NAME="norequests" --><!-- debut modif brisees no reponse --><!-- TMPL_VAR EXPR="__counter__+((current_page-1)*count)" -->.<!-- fin modif brisees no reponse --><!-- TMPL_IF NAME="opacuserlogin" --><input type="checkbox" id="bib<!-- TMPL_VAR NAME="biblionumber" -->" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" title="Click to add to cart" /> <label for="bib<!-- TMPL_VAR NAME="biblionumber" -->"></label><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF --></td>
+                <!-- debut modif brisees no reponse <td class="select selectcol"><!-- TMPL_VAR EXPR="__counter__+((current_page-1)*count)" -->.</td> fin modif brisees no reponse -->
 <!-- debut modif brisees position vignette couv -->
 <td>
                                         <a class="p1" href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->">
