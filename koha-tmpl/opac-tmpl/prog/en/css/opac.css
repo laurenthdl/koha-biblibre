@@ -171,12 +171,18 @@ h1#library {
 
 
 h1#libraryname {
-	background:transparent url(../../images/koha-logo.gif) no-repeat scroll 0%;
+/*	background:transparent url(../../images/koha-logo.gif) no-repeat scroll 0%; modif brisees*/
 	border: 0;
 	float : left !important;
-	margin:0;
-	padding:0;
+/*	margin:0; modif brisees */
+	padding:0; 
 	width:120px;
+/* ajout brisees */
+	background:transparent url(../../images/logo_brise_es.png) no-repeat scroll 0%; 
+	margin-top:13px;
+	margin-left:13px;
+	height:90px;
+/* fin ajout brisees */
 }
 
 h1#libraryname a {
@@ -184,11 +190,15 @@ h1#libraryname a {
 	cursor:pointer;
 	display:block;
 	height:0px !important;
-	margin:0;
+/*	margin:0; modif brisees */
 	overflow:hidden;
-	padding:40px 0 0;
+/*	padding:40px 0 0; modif brisees */
 	text-decoration:none;
-	width:120px;
+/*	width:120px; modif brisees */
+/* ajout brisees */
+	margin:20px 0 0;
+	padding:55px 0 0;
+	width:103px;
 }
 
 h1,h2,h3,h4,h5,h6 {
