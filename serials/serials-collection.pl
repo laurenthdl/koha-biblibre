@@ -77,7 +77,7 @@ if ( $op eq 'gennext' && @subscriptionid ) {
         my ( $newserialseq, $newlastvalue1, $newlastvalue2, $newlastvalue3, $newinnerloop1, $newinnerloop2, $newinnerloop3 ) = GetNextSeq($subscription);
 
         ## We generate the next publication date
-        my $nextpublisheddate = GetNextDate( $expected->{planneddate}->output('iso'), $subscription );
+        my $nextpublisheddate = GetNextDate($expected->{planneddate}, $subscription, 1);
         ## Creating the new issue
         NewIssue( $newserialseq, $subscriptionid, $subscription->{'biblionumber'}, 1, $nextpublisheddate, $nextpublisheddate );
 

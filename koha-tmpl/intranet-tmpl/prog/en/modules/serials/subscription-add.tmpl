@@ -283,17 +283,16 @@ function testPredictionPattern() {
         error_msg += _("- Frequency is not defined\n");
         error ++;
     }
+    acquidate = $("#acqui_date").val();
+    if(acquidate == undefined || acquidate == ""){
+        error_msg += _("- First publication date is not defined\n");
+        error ++;
+    }
     <!-- TMPL_IF NAME='more_than_one_serial' -->
-      acquidate = $("#nextacquidate").val();
-      if(acquidate == undefined || acquidate == ""){
+      var nextacquidate = $("#nextacquidate").val();
+      if(nextacquidate == undefined || nextacquidate == ""){
         error_msg += _("- Next issue publication date is not defined\n");
         error ++;
-      }
-    <!-- TMPL_ELSE -->
-      acquidate = $("#acqui_date").val();
-      if(acquidate == undefined || acquidate == ""){
-          error_msg += _("- First publication date is not defined\n");
-          error ++;
       }
     <!-- /TMPL_IF -->
 
@@ -314,6 +313,9 @@ function testPredictionPattern() {
             'custompattern' : custompattern,
             <!-- TMPL_IF NAME='mod' -->
               'subscriptionid': $("input[name='subscriptionid']").val(),
+            <!-- /TMPL_IF -->
+            <!-- TMPL_IF NAME='more_than_one_serial' -->
+              'nextacquidate': nextacquidate,
             <!-- /TMPL_IF -->
             'firstacquidate': acquidate,
             'enddate'       : $("#enddate").val(),
