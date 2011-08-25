@@ -83,7 +83,7 @@ sub GetSortableIndexes {
 
 sub GetFacetedIndexes {
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare("SELECT `type`, `code` FROM indexes WHERE faceted = 1 AND ressource_type = ? ORDER BY code");
+    my $sth = $dbh->prepare("SELECT `type`, `code` FROM indexes WHERE faceted = 1 AND ressource_type = ?");
     $sth->execute(shift);
 
     my @indexes;
@@ -354,7 +354,13 @@ sub SimpleSearch {
                             ? join ' AND ', @{ $filters->{$_} }
                             : $filters->{$_};
             utf8::decode($filter_str);
-            "$_:$filter_str";
+            my $quotes_existed = ( $filter_str =~ m/^".*"$/ );
+            $filter_str =~ s/^"(.*)"$/$1/; #remove quote around value if exist
+            $filter_str =~ s/[^\\]\K"/\\"/g;
+            $filter_str = qq{"$filter_str"} # Add quote around value if not exist
+                if not $filter_str =~ /^".*"$/
+                    and $quotes_existed;
+            qq{$_:$filter_str};
         } keys %$filters
     ];
 

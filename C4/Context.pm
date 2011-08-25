@@ -921,7 +921,8 @@ sub _new_stopwords {
     my $stopwordlist;
     my $sth = $dbh->prepare("select word from stopwords");
     $sth->execute;
-    while ( my $stopword = $sth->fetchrow_array ) {
+    while ( defined (my $stopword = $sth->fetchrow_array) ) {
+        next if $stopword eq '';
         $stopwordlist->{$stopword} = uc($stopword);
     }
     $stopwordlist->{A} = "A" unless $stopwordlist;
