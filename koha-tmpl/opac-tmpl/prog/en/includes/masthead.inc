@@ -1,6 +1,9 @@
 <div id="header-wrapper"><div id="members">
   <!-- TMPL_IF NAME="opacuserlogin" -->
 	<ul>
+<!-- debut ajout brisees -->
+<li><span id="spe">Bienvenue sur le catalogue BRISE-ES des bibliothèques d'enseignement supérieur de Saint Etienne</span></li>
+<!-- fin ajout brisees -->
 <!-- TMPL_UNLESS NAME="loggedinusername" -->
                <li><a href="/cgi-bin/koha/opac-user.pl">Log in to Your Account</a></li><!-- /TMPL_UNLESS -->
             <!-- TMPL_IF NAME="loggedinusername" -->

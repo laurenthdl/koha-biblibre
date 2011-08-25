@@ -177,7 +177,7 @@ h1#libraryname {
 /*	margin:0; modif brisees */
 	padding:0; 
 	width:120px;
-/* ajout brisees */
+/* debut ajout brisees */
 	background:transparent url(../../images/logo_brise_es.png) no-repeat scroll 0%; 
 	margin-top:13px;
 	margin-left:13px;
@@ -199,6 +199,7 @@ h1#libraryname a {
 	margin:20px 0 0;
 	padding:55px 0 0;
 	width:103px;
+/* fin ajout brisees */
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -710,7 +711,10 @@ body#advsearch #listsmenulink {
 }
 
 #members {
-	background-color: #fff;
+/*	background-color: #fff; modif brisees */
+/* debut ajout brisees */
+	background-color: #F3F3F3;
+/* fin ajout brisees */
 	font-size : 85%;
 	margin-left : -10px;
 	margin-right : -10px;
@@ -740,6 +744,14 @@ body#advsearch #listsmenulink {
 	margin : 0;
 	padding : 0 .5em;
 }
+
+/* debut ajout brisees */
+#members li #spe {
+    margin-right : 250px ;
+    border-right : 0px ;
+    font-size : 110% ;
+    }
+/* fin ajout brisees */
 
 #members ul {
 	margin : 0;
