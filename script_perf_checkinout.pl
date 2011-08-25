@@ -79,9 +79,9 @@ $b->concurrency($concurrency);
 
 my $dbh = C4::Context->dbh;
 
-my $MAX_BORROWERS = 20;
-my $MAX_ISSUES    = 2;
-my $MAX_RETURNS   = 2;
+my $MAX_BORROWERS = 10;
+my $MAX_ISSUES    = 20;
+my $MAX_RETURNS   = 20;
 my $SQL_LIMIT     = 100;
 
 my $query = "SELECT borrowernumber FROM borrowers WHERE dateexpiry > NOW() AND debarred IS NULL LIMIT $SQL_LIMIT;";
@@ -106,7 +106,6 @@ for my $barcode ( @barcodes4issues ) {
         {
             urls => [ $baseurl . "/circ/circulation.pl" ],
             cookies => [$cookie],
-            user_message => "du blalbal",
         }
     );
     # postdata method is very stupid ? Without "foo" and "bar", data are truncated (or prefixed with \r) !?
@@ -123,6 +122,10 @@ for my $barcode ( @barcodes4issues ) {
 my $ro = $b->execute;
 $logger and $logger->write( report_regress ( $ro, $b ) );
 
+
+$b = HTTPD::Bench::ApacheBench->new;
+$b->concurrency($concurrency);
+
 $query = <<EOQ;
 SELECT it.barcode, b.cardnumber, b.borrowernumber
 FROM issues iss, borrowers b, items it
@@ -132,11 +135,14 @@ LIMIT $SQL_LIMIT;
 EOQ
 $sth = $dbh->prepare($query);
 $sth->execute();
+my @values = $sth->fetchall_arrayref;
+my @values4returns = get_random_elements( $values[0], $MAX_RETURNS );
+
 my @checkin_pages;
 my @checkin_runs;
-while ( my ( $barcode, $cardnumber, $borrowernumber ) = $sth->fetchrow ) {
+for my $v ( @values4returns ) {
+    my ( $barcode, $cardnumber, $borrowernumber ) = @$v;
 
-    $logger and $logger->write( "Checkin barcode $barcode for borrower $borrowernumber (cardnumber=$cardnumber)" );
     my $run = HTTPD::Bench::ApacheBench::Run->new(
         {
             urls => [ $baseurl . "/reserve/renewscript.pl" ],
@@ -147,12 +153,14 @@ while ( my ( $barcode, $cardnumber, $borrowernumber ) = $sth->fetchrow ) {
     my @postdata = ( "foo=foo&borrowernumber=$borrowernumber&cardnumber=$cardnumber&barcodes[]=$barcode&destination=circ&bar=bar" );
     $run->postdata( \@postdata );
 
+    $$run{user_message} = "Checkin barcode $barcode for borrower $borrowernumber (cardnumber=$cardnumber)";
+
     $b->add_run( $run );
 
 }
 
 # send HTTP request sequences to server and time responses
-my $ro = $b->execute;
+$ro = $b->execute;
 $logger and $logger->write( report_regress ( $ro, $b ) );
 
 sub _rand {

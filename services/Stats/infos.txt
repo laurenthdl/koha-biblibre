@@ -1,0 +1,4 @@
+n * x ; y ; z => nombre de fois qu'on a lancé le script, avec x borrowers, y issues et z returns
+
+17:17:11_25-08-2011 => Config de base 1 * 10 ; 20 : 20
+17:33:36_25-08-2011 => Config de base 2 * 10 ; 20 ; 20

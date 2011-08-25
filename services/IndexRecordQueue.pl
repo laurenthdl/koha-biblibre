@@ -71,12 +71,6 @@ my $pidpath  = '/tmp/IndexRecordQueue.pid';
 my $max_records;
 my $max_delta;
 
-if ( grep /-h/, @ARGV ) {pod2usage(1);} # Display full usage
-
-if ( grep /start/, @ARGV ) {$logger and $logger->write("START");}
-
-if ( grep /stop/, @ARGV ) {$logger and $logger->write("STOP");}
-
 # Get options
 my %opts = ();
 for my $opt (qw(-a -f -l -p -mr -ms)) {
@@ -96,7 +90,14 @@ $App::Daemon::pidfile = $pidpath;
 my $logger = Log::LogLite->new( $logpath, 7 );
 $logger and $logger->template("<date> <message>\n");
 
-if ( grep /start/, @ARGV ) {$logger and $logger->write("SET OPTS: \nfilepath=$filepath\nmax_records=$max_records\nmax_delta=$max_delta");}
+if ( grep /-h/, @ARGV ) {pod2usage(1);} # Display full usage
+
+if ( grep /start/, @ARGV ) {
+    $logger and $logger->write("START");
+    $logger and $logger->write("SET OPTS: \nfilepath=$filepath\nmax_records=$max_records\nmax_delta=$max_delta");
+}
+
+if ( grep /stop/, @ARGV ) {$logger and $logger->write("STOP");}
 
 # If we want to add records, we don't want to daemonize
 if ( $opts{"-a"} ) {
