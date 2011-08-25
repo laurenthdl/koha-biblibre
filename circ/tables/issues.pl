@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 #
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use CGI;
 use JSON;
@@ -15,20 +14,19 @@ use C4::Reserves qw/CheckReserves/;
 use C4::Utils::DataTables;
 
 my $input = new CGI;
+my $vars = $input->Vars;
 
 my $borrowernumber = $input->param('borrowernumber');
+my $itype = $input->param('itype');
+my $dateduefrom = $input->param('dateduefrom');
+my $datedueto = $input->param('datedueto');
+my $issuedatefrom = $input->param('issuedatefrom');
+my $issuedateto = $input->param('issuedateto');
+my $location = $input->param('location');
+my $branchcode = $input->param('branchcode');
 
 # Fetch DataTables parameters
-my %dtparam;
-foreach(qw/ iDisplayStart iDisplayLength iColumns sSearch bRegex iSortingCols sEcho /) {
-    $dtparam{$_} = $input->param($_);
-}
-for(my $i=0; $i<$dtparam{'iColumns'}; $i++) {
-    foreach(qw/ bSearchable sSearch bRegex bSortable iSortCol mDataProp sSortDir /) {
-        my $key = $_ . '_' . $i;
-        $dtparam{$key} = $input->param($key) if defined $input->param($key);
-    }
-}
+my %dtparam = dt_get_params( $input );
 
 my $dbh = C4::Context->dbh;
 
@@ -40,7 +38,8 @@ my $select = "SELECT SQL_CALC_FOUND_ROWS ".
     "itemtypes.description AS itemtype_description, branches.branchname,".
     "biblio.biblionumber, biblio.title AS title, biblio.author, itemtypes.itemtype,".
     "authorised_values.lib AS location_description,".
-    "( (itemtypes.rentalcharge * (100 - issuingrules.rentaldiscount) ) / 100 ) AS charge";
+    "( (itemtypes.rentalcharge * (100 - issuingrules.rentaldiscount) ) / 100 ) AS charge,".
+    "IF (issues.date_due < DATE(NOW()), 1, NULL ) AS overdue ";
 my $from = " FROM issues ";
 $from .= " LEFT JOIN items USING(itemnumber) ";
 $from .= " LEFT JOIN biblio USING(biblionumber) ";
@@ -53,16 +52,45 @@ $from .= " LEFT JOIN borrowers ON borrowers.borrowernumber = issues.borrowernumb
 $from .= " LEFT JOIN issuingrules ON borrowers.categorycode = issuingrules.categorycode AND borrowers.branchcode = issuingrules.branchcode AND items.itype = issuingrules.itemtype ";
 $from .= " LEFT JOIN branches ON issues.branchcode = branches.branchcode ";
 $from .= " LEFT JOIN authorised_values ON authorised_values.category = 'LOC' AND authorised_values.authorised_value = items.location ";
+
+my @where_params;
 my $where = " WHERE issues.borrowernumber = ? ";
+push @where_params, $borrowernumber;
+my $where_filters;
+my @where_filters_params;
+if($itype) {
+    $where_filters .= (C4::Context->preference('item-level_itypes'))
+        ? " AND items.itype = ? "
+        : " AND biblioitems.itemtype = ? ";
+    push @where_filters_params, $itype;
+}
+
+my ( $datedue_q   , $datedue_f    ) = dt_build_query( 'range_dates', $dateduefrom, , $datedueto, 'issues.date_due' );
+my ( $issuedate_q , $issuedate_f  ) = dt_build_query( 'range_dates', $issuedatefrom, , $issuedateto, 'issues.issuedate' );
+my ( $location_q  , $location_f   ) = dt_build_query( 'simple', $location, 'location_description' );
+my ( $branchcode_q, $branchcode_f ) = dt_build_query( 'simple', $branchcode, 'issues.branchcode' );
+
+$where_filters .= ( $datedue_q    ? $datedue_q : '' )
+                . ( $issuedate_q  ? $issuedate_q : '' )
+                . ( $location_q   ? $location_q : '' )
+                . ( $branchcode_q ? $branchcode_q : '' );
+
+push @where_filters_params,
+          scalar( @$datedue_f )    > 0 ? @$datedue_f : ()
+        , scalar( @$issuedate_f )  > 0 ? @$issuedate_f : ()
+        , scalar( @$location_f )   > 0 ? @$location_f : ()
+        , scalar( @$branchcode_f ) > 0 ? @$branchcode_f : ();
+
+
 my ($filters, $filter_params) = dt_build_having(\%dtparam);
 
 my $having .= " HAVING " . join(" AND ", @$filters) if (@$filters);
 my $order_by = dt_build_orderby(\%dtparam);
 my $limit .= " LIMIT ?,? ";
 
-my $query = $select.$from.$where.$having.$order_by.$limit;
+my $query = $select . $from . $where . ( $where_filters || '' ) . ( $having || '' ) . $order_by . $limit;
 my @bind_params;
-push @bind_params, $borrowernumber, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
+push @bind_params, @where_params, @where_filters_params, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
 my $sth = $dbh->prepare($query);
 $sth->execute(@bind_params);
 my $results = $sth->fetchall_arrayref({});
@@ -78,9 +106,9 @@ $sth->execute($borrowernumber);
 my ($iTotalRecords) = $sth->fetchrow_array;
 
 my @aaData = ();
+my $todaysdate = C4::Dates->today('iso');
 foreach(@$results) {
     my %row = %{$_};
-    $row{'date_due'} = C4::Dates->new($row{'date_due'}, 'iso')->output();
     $row{'issuedate'} = C4::Dates->new($row{'issuedate'}, 'iso')->output();
     $row{'charge'} ||= 0;
     $row{'charge'} = sprintf("%.2f", $row{'charge'});
