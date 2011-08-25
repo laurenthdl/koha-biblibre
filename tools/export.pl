@@ -73,6 +73,7 @@ if ( $op eq "export" ) {
         my $dont_export_items    = $query->param("dont_export_item"); # recommendation 995
         my $strip_nonlocal_items = $query->param("strip_nonlocal_items");
         my $dont_export_fields   = $query->param("dont_export_fields");
+        my $export_only_borrowed = $query->param("export_only_borrowed");
         my @biblionumbers        = $query->param("biblionumbers");
         my @sql_params;
 
@@ -152,11 +153,12 @@ if ( $op eq "export" ) {
                     $record->delete_field($itemfield) if ( $dont_export_items || ( $itemfield->subfield($homebranchsubfield) ne $branch ) );
                 }
             }
-
-            # Remove not borrowed items
-            my ($onloanfield, $onloadsubfield) = GetMarcFromKohaField('items.onloan', '');
-            for my $itemfield ( $record->field($onloanfield) ) {
-                $record->delete_field($itemfield) unless ($itemfield->subfield($onloadsubfield));
+            if($export_only_borrowed) {
+                # Remove not borrowed items
+                my ($onloanfield, $onloadsubfield) = GetMarcFromKohaField('items.onloan', '');
+                for my $itemfield ( $record->field($onloanfield) ) {
+                    $record->delete_field($itemfield) unless ($itemfield->subfield($onloadsubfield));
+                }
             }
 
             if ($dont_export_fields) {
