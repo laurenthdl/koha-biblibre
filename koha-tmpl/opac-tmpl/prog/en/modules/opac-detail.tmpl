@@ -187,7 +187,13 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
     <!-- COinS / OpenURL -->
     <span class="Z3988" title="<!-- TMPL_VAR NAME="ocoins" -->"></span>
     <!-- /TMPL_IF -->
-
+<!-- debut ajout brisees -->
+        <!-- TMPL_IF NAME="can_opac_view_MARC" -->
+            <span class="view-brisees">
+               <a id="MARCview" rel="gb_page_center[600,500]" title="MARC" href="/cgi-bin/koha/opac-showmarc.pl?id=<!-- TMPL_VAR NAME="biblionumber" -->">MARC View</a>
+            </span>
+        <!-- /TMPL_IF -->
+<!-- fin ajout brisees -->
     <!-- TMPL_IF NAME="OPACXSLTDetailsDisplay" -->
         <!-- TMPL_VAR NAME="XSLTBloc" -->
     <!-- TMPL_ELSE -->
@@ -199,9 +205,9 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 	</span> 
 
 	<!-- TMPL_IF NAME="can_opac_view_MARC" -->
-	    <span class="view">
+	<span class="view">
 		<a id="MARCview" href="/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->">MARC View</a>
-	    </span>
+	</span>
 	<!-- /TMPL_IF -->
 
 	<!-- TMPL_IF NAME="can_opac_view_ISBD" -->

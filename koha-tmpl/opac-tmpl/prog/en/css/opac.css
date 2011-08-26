@@ -29,6 +29,17 @@ caption {
 	font-weight : bold;
 }
 
+/* debut ajout brisees */
+.view-brisees a#MARCview {
+    background-color: #FFF;
+    background-image : none ;
+    color: #C0C0C0;
+    border-left : 0px solid #FFF;
+    font-size : 80%;
+    padding-left : 500px;
+}
+/* fin ajout brisees */
+
 fieldset {
 	background-color: #FFF;
 	border : 2px solid #EEEEEE;
@@ -204,7 +215,10 @@ h1#libraryname a {
 
 h1,h2,h3,h4,h5,h6 {
 	font-weight : bold;
-	margin : .5em 0;
+/*	margin : .5em 0; modif brisees */
+/* debut modif brisees */
+	margin : .3em 0;
+/* fin modif brisees */
 }
 
 h2 {
@@ -871,7 +885,10 @@ body#advsearch #listsmenulink {
 }
 
 #breadcrumbs {
-	padding : .7em;
+/*	padding : .7em; modif brisees */
+/* debut modif brisees */
+        padding : .3em;
+/* fin modif brisees */
 }
 
 p {
