@@ -418,9 +418,12 @@ a .term {
 #action a#furthersearches {
 	background : transparent url(../../images/menu-arrow.gif) no-repeat right center;
 	border : 1px solid #F3F3F3;
-	margin-left : 5px;
+/*	margin-left : 5px; modif brisees */
 	padding : 2px 26px 2px 10px;
 	text-decoration : none;
+/* debut ajout brisees */
+	margin-left : 25px;
+/* fin ajout brisees */
 }
 
 #action a#furthersearches:hover {
@@ -439,9 +442,9 @@ a .term {
 	background-image:url(../../images/addtoshelf.gif);
 }
 
-#action a.addtocart, #toolbar a.addtocart {
+/* #action a.addtocart, #toolbar a.addtocart {
 	background-image:url(../../images/cart2.gif);
-}
+} modif brisees */
 
 /* toolbar buttons */
 
@@ -1305,8 +1308,8 @@ padding-left : .4em;
 }
 
 .actions a.addtocart {
-	background : url("../../images/cart-small.gif") center left no-repeat;
-	padding-left : 13px;
+/*	background : url("../../images/cart-small.gif") center left no-repeat; modif brisees */
+/*	padding-left : 13px; modif brisees */
 	display : none;
 }
 
