@@ -1276,8 +1276,11 @@ padding-left : .4em;
 .results_summary {
 	display: block;
 	font-size : 85%;
-	color: #707070;
+/*	color: #707070; modif brisees */
 	padding : 0 0 .5em 0;
+/* debut ajout brisees */
+	color: #000;
+/* fin ajout brisees */
 }
 
 .searchresults .tagstatus {
@@ -1290,7 +1293,10 @@ padding-left : .4em;
 }
 
 .results_summary .label {
-	color: #202020;
+/*	color: #202020; modif brisees */
+/* debut ajout brisees */
+        color: #A0A0A0;
+/* fin ajout brisees */
 }
 
 .results_summary a {
