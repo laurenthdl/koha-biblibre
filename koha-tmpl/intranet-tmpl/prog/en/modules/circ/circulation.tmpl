@@ -244,6 +244,8 @@ function export_submit(format) {
     }
     document.issues.action="/cgi-bin/koha/tools/export.pl";
     document.getElementById("export_format").value = format;
+    var input = '<input type="hidden" name="export_only_borrowed" value="1" />';
+    $("form[name='issues']").append(input);
     document.issues.submit();
 
     /* Reset form action to its initial value */
