@@ -442,7 +442,7 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 <li<!-- TMPL_IF EXPR="defaulttab eq 'holdings'"  --> class="ui-tabs-selected"<!-- /TMPL_IF -->><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#holdings">Holdings
     ( <!-- TMPL_VAR NAME="count" --> )</a>
    </li>
- <li> <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#descriptions">Title Notes</a></li>
+<!-- debut modif brisees <li> <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#descriptions">Title Notes</a></li> fin modif brisees -->
 <!-- TMPL_IF NAME="SYNDETICS_TOC" -->
  <li> <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#toc">TOC</a></li>
 <!-- /TMPL_IF -->
@@ -599,7 +599,7 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 </div>
 
 
-<div id="descriptions">
+<!-- debut modif brisees --><div id="descriptions" style="display:none;"><!-- debut modif brisees -->
 <div class="content_set">
 <!-- TMPL_IF NAME="OPACAmazonEnabled" -->
 <!-- TMPL_IF NAME="OPACAmazonReviews" -->
