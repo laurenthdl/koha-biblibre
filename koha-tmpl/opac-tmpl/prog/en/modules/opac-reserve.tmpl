@@ -18,7 +18,19 @@
     var copiesRowId = null;
     var wasSpecific = false;
     var lastCopiesRowId = null;
+    
 	$(".checkitem").parent().click(function(e){
+
+            <!-- TMPL_IF NAME="onlynextat" -->
+                
+                var itemnum = suffixOf($(this).attr("id"), "_");
+                var biblioNum = suffixOf($(this).find('input').attr("id"), "_");
+                console.log("bla " + biblioNum);
+                console.log($("#checkitemhomebranch_"  + itemnum + " span").attr("name"));
+                $("#branch_" + biblioNum).val($("#checkitemhomebranch_"  + itemnum + " span").attr("name"));
+            <!-- /TMPL_IF -->
+
+
 		if(e.target.tagName.toLowerCase() == 'td'){
            $(this).find("input.checkitem").each( function() {
                $(this).attr('checked', !$(this).attr('checked'));
@@ -75,9 +87,6 @@
         // Make sure all other specific copy table rows are hidden
         biblioNum = suffixOf($(this).attr("id"), "_");
         newCopiesRowId = "#copiesrow_" + biblioNum;
-
-        // Enabling pick-up library
-        $('#branch_' + biblioNum).removeAttr('disabled');
 
         if (!changeSelection(newCopiesRowId, true)) {
             return false;
@@ -578,14 +587,15 @@
 
                           <!-- TMPL_LOOP name="itemLoop" -->
                             <tr class="<!-- TMPL_VAR NAME="backgroundcolor" -->">
-                              <td>
+                              <td id="checkitemtd_<!-- TMPL_VAR NAME="itemnumber" -->">
                                 <!-- TMPL_IF NAME="available" -->
 				  <!-- TMPL_UNLESS NAME="ReservedForThisBorrower" -->
                                       <!-- TMPL_IF Name="canholdmultiple"-->
-	                                  <input type="checkbox" class="checkitem checkitem_<!-- TMPL_VAR NAME="biblionumber" -->" name="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
+	                                  <input type="checkbox" class="checkitem checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"  id="checkitem_<!-- TMPL_VAR NAME="itemnumber" -->" name="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
         	                                 value="<!-- TMPL_VAR NAME="itemnumber" -->" />
                                       <!--TMPL_ELSE-->
-	                                  <input type="radio" class="checkitem checkitem_<!-- TMPL_VAR NAME="biblionumber" -->" name="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
+	                                  <input type="radio" class="checkitem checkitem_<!-- TMPL_VAR NAME="biblionumber" -->" id="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
+ name="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
         	                                 value="<!-- TMPL_VAR NAME="itemnumber" -->" />
                                       <!-- /TMPL_IF -->
 				  <!-- /TMPL_UNLESS -->
@@ -602,7 +612,7 @@
                               <!-- /TMPL_IF -->
                               <td><!-- TMPL_VAR NAME="barcode" --></td>
                               <!-- TMPL_UNLESS NAME="singleBranchMode" -->
-                                <td><!-- TMPL_VAR NAME="homeBranchName" --></td>
+                                <td id="checkitemhomebranch_<!-- TMPL_VAR NAME="itemnumber" -->"><span name="<!-- TMPL_VAR NAME="homeBranchcode" -->"><!-- TMPL_VAR NAME="homeBranchName" --></span></td>
                                 <td><!-- TMPL_VAR NAME="holdingBranchName" --></td>
                               <!-- /TMPL_UNLESS -->
                               <td><!-- TMPL_VAR NAME="callNumber" --></td>

@@ -362,6 +362,7 @@ foreach my $biblioNum (@biblionumbers) {
         $itemLoopIter->{itemnumber}     = $itemNum;
         $itemLoopIter->{barcode}        = $itemInfo->{barcode};
         $itemLoopIter->{homeBranchName} = $branches->{ $itemInfo->{homebranch} }{branchname};
+        $itemLoopIter->{homeBranchcode} = $itemInfo->{homebranch} ;
         $itemLoopIter->{callNumber}     = $itemInfo->{itemcallnumber};
         $itemLoopIter->{enumchron}      = $itemInfo->{enumchron};
         $itemLoopIter->{copynumber}     = $itemInfo->{copynumber};
