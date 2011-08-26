@@ -1721,6 +1721,7 @@ CREATE TABLE `subscription` (
   `countissuesperunit` smallint NOT NULL default 1,
   `manualhistory` tinyint(1) NOT NULL default 0,
   `irregularity` text,
+  `skip_serialseq` tinyint(1) NOT NULL default 0,
   `letter` varchar(20) default NULL,
   `numberpattern` tinyint(3) default 0,
   `distributedto` text,

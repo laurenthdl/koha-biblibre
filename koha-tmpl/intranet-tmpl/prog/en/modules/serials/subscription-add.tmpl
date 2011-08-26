@@ -531,6 +531,27 @@ $(document).ready(function() {
                                         <p><input type="radio" id="serialsadditems-no" name="serialsadditems" value="0" checked="checked" /><label for="serialsadditems-no">do not create an item record when receiving this serial</label></p>
                                     <!-- /TMPL_IF -->
                                 </li>
+                                <li class="radio">
+                                  <p>When there is an irregular issue:</p>
+                                  <!-- TMPL_IF NAME='skip_serialseq' -->
+                                    <p>
+                                      <input type="radio" id="skip_serialseq_yes" name="skip_serialseq" value="1" checked="checked" />
+                                      <label for="skip_serialseq_yes">Skip issue number</label>
+                                    </p>
+                                    <p>
+                                      <input type="radio" id="skip_serialseq_no" name="skip_serialseq" value="0" />
+                                      <label for="skip_serialseq_no">Keep issue number</label>
+                                    </p>
+                                  <!-- TMPL_ELSE -->
+                                    <p>
+                                      <input type="radio" id="skip_serialseq_yes" name="skip_serialseq" value="1" />
+                                      <label for="skip_serialseq_yes">Skip issue number</label>
+                                    </p>
+                                    <p>
+                                      <input type="radio" id="skip_serialseq_no" name="skip_serialseq" value="0" checked="checked" />
+                                      <label for="skip_serialseq_no">Keep issue number</label>
+                                    </p>
+                                  <!-- /TMPL_IF -->
                                 <li>
                                     <label for="callnumber">Call Number</label>
                                     <input type="text" name="callnumber" id="callnumber" value="<!-- TMPL_VAR name="callnumber" -->" size="20" />
