@@ -142,7 +142,7 @@ while( $i < 1000 ) {
     my %line;
 
     if(defined $date){
-        $date = GetNextDate($date, \%subscription);
+        $date = GetNextDate(\%subscription, $date);
     }
     if(defined $date){
         $line{'publicationdate'} = $date->output();

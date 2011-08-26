@@ -295,6 +295,7 @@ sub redirect_add_subscription {
     my $staffdisplaycount = $query->param('staffdisplaycount');
     my $opacdisplaycount  = $query->param('opacdisplaycount');
     my $location          = $query->param('location');
+    my $skip_serialseq    = $query->param('skip_serialseq');
     my $startdate = format_date_in_iso( $query->param('startdate') );
     my $enddate = format_date_in_iso( $query->param('enddate') );
     my $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));
@@ -309,7 +310,8 @@ sub redirect_add_subscription {
         $lastvalue3, $innerloop3, $status, $notes, $letter, $firstacquidate,
         join(";",@irregularity), $numberpattern, $callnumber, $hemisphere,
         ($manualhistory ? $manualhistory : 0), $internalnotes, $serialsadditems,
-        $staffdisplaycount, $opacdisplaycount, $graceperiod, $location, $enddate
+        $staffdisplaycount, $opacdisplaycount, $graceperiod, $location, $enddate,
+        $skip_serialseq
     );
 
     print $query->redirect("/cgi-bin/koha/serials/subscription-detail.pl?subscriptionid=$subscriptionid");
@@ -359,6 +361,7 @@ sub redirect_mod_subscription {
     my $opacdisplaycount  = $query->param('opacdisplaycount');
     my $graceperiod       = $query->param('graceperiod') || 0;
     my $location          = $query->param('location');
+    my $skip_serialseq    = $query->param('skip_serialseq');
 
     # Guess end date
     if(!defined $enddate || $enddate eq '') {
@@ -377,7 +380,8 @@ sub redirect_mod_subscription {
         $innerloop1, $lastvalue2, $innerloop2, $lastvalue3, $innerloop3,
         $status, $biblionumber, $callnumber, $notes, $letter, $hemisphere,
         $manualhistory, $internalnotes, $serialsadditems, $staffdisplaycount,
-        $opacdisplaycount, $graceperiod, $location, $enddate, $subscriptionid
+        $opacdisplaycount, $graceperiod, $location, $enddate, $subscriptionid,
+        $skip_serialseq
     );
     print $query->redirect("/cgi-bin/koha/serials/subscription-detail.pl?subscriptionid=$subscriptionid");
     return;
