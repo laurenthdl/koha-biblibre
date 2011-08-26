@@ -1896,7 +1896,10 @@ a#MARCview, a#MARCviewPop, a#ISBDview, a#Normalview, a#Fullhistory, a#Briefhisto
 }
 #shelfbrowser td, #shelfbrowser th {
 	vertical-align : bottom;
-	width : 20%;
+/*	width : 20%; modif brisees */
+/* debut ajout brisees */
+	width : 13%; 
+/* fin ajout brisees */
 }
 #shelfbrowser td.top {
 	vertical-align : top;

@@ -600,7 +600,7 @@ if ( C4::Context->preference("OPACShelfBrowser") ) {
         WHERE
             ((cn_sort = ? AND itemnumber >= ?) OR cn_sort > ?) AND
             homebranch = ? AND location = ?
-        ORDER BY cn_sort, itemnumber LIMIT 3
+        ORDER BY cn_sort, itemnumber LIMIT 4 ## modif brisees
         " );
         $sth_shelfbrowse_next->execute( $starting_cn_sort, $starting_itemnumber, $starting_cn_sort, $starting_homebranch->{code}, $starting_location->{code} );
     } else {
@@ -610,7 +610,7 @@ if ( C4::Context->preference("OPACShelfBrowser") ) {
         WHERE
             ((cn_sort = ? AND itemnumber >= ?) OR cn_sort > ?) AND
             homebranch = ?
-        ORDER BY cn_sort, itemnumber LIMIT 3
+        ORDER BY cn_sort, itemnumber LIMIT 4 ## modif brisees
         " );
         $sth_shelfbrowse_next->execute( $starting_cn_sort, $starting_itemnumber, $starting_cn_sort, $starting_homebranch->{code} );
     }
