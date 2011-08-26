@@ -83,4 +83,16 @@
         <script type="text/javascript" src="http://www.google.com/jsapi"></script>
         <script type="text/javascript" language="javascript" src="<!-- TMPL_VAR NAME="themelang" -->/js/googleindictransliteration.js"></script>
 <!-- /TMPL_IF -->
+<link rel="stylesheet" type="text/css" href="/opac-tmpl/prog/en/js/shadowbox/shadowbox.css">
+<script type="text/javascript" src="/opac-tmpl/prog/en/js/shadowbox/shadowbox.js"></script>
+<script type="text/javascript">
+Shadowbox.init({
+    displayNav: true,
+    displayCounter: false,
+    overlayOpacity: 0.3,
+    enableKeys : false ,
+    fadeDuration : 0.30,
+    resizeDuration : 0.25
+});
+</script>
 
