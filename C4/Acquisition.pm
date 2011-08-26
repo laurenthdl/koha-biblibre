@@ -2156,7 +2156,7 @@ sub GetInvoice {
                aqorders.invoiceclosedate,
                aqbooksellers.name
         FROM invoices
-            LEFT JOIN aqorders invoices.invoicenumber = aqorders.booksellerinvoicenumber
+            LEFT JOIN aqorders ON invoices.invoicenumber = aqorders.booksellerinvoicenumber
             LEFT JOIN aqbasket ON aqorders.basketno = aqbasket.basketno
             LEFT JOIN aqbooksellers ON aqbasket.booksellerid = aqbooksellers.id
         WHERE aqorders.booksellerinvoicenumber = ?
