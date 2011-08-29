@@ -103,8 +103,9 @@ if ( $input->param('format') eq "json" ) {
     my $supplier = $input->param('supplierid') || '';
     my $basketno = $input->param('basketno')   || '';
     my $orderno  = $input->param('orderno')    || '';
+    my $basketgroupname = $input->param('basketgroupname') || '';
 
-    my $orders = SearchOrder( $orderno, $search, $supplier, $basketno );
+    my $orders = SearchOrder( $orderno, $search, $supplier, $basketno, $basketgroupname );
     foreach my $order (@$orders) {
         if ( $order->{quantityreceived} < $order->{quantity} ) {
             my $data = {};

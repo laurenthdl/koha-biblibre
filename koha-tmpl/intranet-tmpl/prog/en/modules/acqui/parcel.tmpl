@@ -63,10 +63,15 @@
     function filter() {
 
     var summaryStatus = jQuery.trim($("#summaryfilter").val());
-	var basketStatus  = $("#basketfilter").val();
-	var orderStatus   = $("#orderfilter").val();
+    var basketStatus  = $("#basketfilter").val();
+    var orderStatus   = $("#orderfilter").val();
+    var basketgroupnameStatus = $("#basketgroupnamefilter").val();
 
-	if (summaryStatus == '' && basketStatus == '' && orderStatus == '') { clearFilters(); return false; }
+    if (summaryStatus == '' && basketStatus == ''
+    && orderStatus == '' && basketgroupnameStatus == '') {
+        clearFilters();
+        return false;
+    }
 
 	var filtered = "table#pendingt tbody.filterclass tr";
 
@@ -107,7 +112,7 @@
 			}catch(e){alert(e);}
 		}
 	}
-	var transaction = YAHOO.util.Connect.asyncRequest('GET', '/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&search='+summaryStatus+'&basketno='+basketStatus+'&orderno='+orderStatus+'&format=json', callback, null);
+	var transaction = YAHOO.util.Connect.asyncRequest('GET', '/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&search='+summaryStatus+'&basketno='+basketStatus+'&orderno='+orderStatus+'&basketgroupname='+basketgroupnameStatus+'&format=json', callback, null);
 
 	return false;
     }
@@ -367,6 +372,10 @@
 		    <label for="orderfilter">Order :</label>
 		    <input type="text" name="orderfilter" id="orderfilter" />
 		</li>
+    <li>
+        <label for="basketgroupnamefilter">Basket group name :</label>
+        <input type="text" name="basketgroupnamefilter" id="basketgroupnamefilter" />
+    </li>
 	    </ol>
 		<fieldset class="action">
 		    <input type="submit" value="Filter" />
