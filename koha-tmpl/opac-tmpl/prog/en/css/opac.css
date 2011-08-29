@@ -40,6 +40,45 @@ caption {
 }
 /* fin ajout brisees */
 
+/* debut ajout brisees */
+fieldset.form_rech {
+    border: 1px solid white;
+    padding-top : 10px ;
+    width : 540px ;
+    display : inline ;
+    float : left ;
+    margin-top : 0px ;
+    background-color : #B8D0E6 ;
+    }
+
+fieldset.form_rech_adv {
+        border: 0px solid #B8D0E6;
+        padding-top : 10px ;
+        width : 500px ;
+        display : inline ;
+        float : left ;
+        margin-top : 0px ;
+        background-color : #B8D0E6 ;
+        }
+
+select.form_rech {
+    max-width : 10em ;
+    width : 10em ;
+    margin-left : 10px ;
+    margin-top : 2px ;
+    font-size : 9pt ;
+    background-color : #CEE1F3 ;
+    float : left ;
+    }
+
+input.form_rech {
+    width : 100% ;
+    font-size : 120% ;
+    float : left ;
+    }
+
+/* fin ajout brisees */
+
 fieldset {
 	background-color: #FFF;
 	border : 2px solid #EEEEEE;
@@ -681,10 +720,12 @@ body#advsearch #breadcrumbs {
 	padding : 0;	
 }
 
+/* debut modif brisees 
 body#advsearch #cartmenulink,
 body#advsearch #listsmenulink {
 	float : right;
 }
+fin modif brisees */
 
 #advsearch #branchloop,
 #advsearch #sort_by {
@@ -777,17 +818,22 @@ body#advsearch #listsmenulink {
 }
 
 #opac-main-search {
-	background-image : url( ../../images/menu-background.gif);
+/*	background-image : url( ../../images/menu-background.gif);
 	background-repeat : repeat-x;
-	background-color : #739ACF;
+	background-color : #739ACF; modif brisees */
 	background-position : -10px top;
 	border-top : 1px solid #335599;
 	border-bottom : 1px solid #335599;
 	margin-left : -10px;
 	margin-right : -10px;
-	padding : .7em 0 .4em .5em;
+/*	padding : .7em 0 .4em .5em; modif brisees */
 	font-size : 108%;
 	line-height : 116%;
+/* debut modif brisees */
+	background-color : #B8D0E6;
+	padding : .1em 0 .4em .5em;
+/* fin modif brisees */
+
 }
 
 #opac-main-search form {
@@ -1393,9 +1439,12 @@ div.message {
 }
 
 #moresearches a:link, #moresearches a:visited {
-	color : #e5ebff;
+/*	color : #e5ebff; modif brisees */
 	font-weight : normal;
 	text-decoration : none;
+/* debut modif brisees */
+	color : #EEGGFF; 
+/* fin modif brisees */
 }
 
 #news th {
@@ -1591,12 +1640,18 @@ div#menu li.active a:hover {
 }
 
 #searchsubmit {
-	cursor : default;
+/*	cursor : default;
 	font-size : 87%;
 	font-weight :  normal;
-	margin-top : 0;
+	margin-top : 0; modif brisees */
 	margin-left :  .2em;
 	padding: 2px 2px 1px 2px;
+/* debut modif brisees */
+        cursor : pointer;
+        font-size : 11pt;
+        font-weight :  normal;
+        margin-top : 2px;
+/* fin modif brisees */
 }
 
 #export,#further,.detailtagcell {
@@ -1659,11 +1714,11 @@ span.starMT {
 }
 
 #cartmenulink, #listsmenulink {
-	display : block;
+/*	display : block; modif brisees */
 	position : relative;
-	background : #aaa;
+/*	background : #aaa;
 	padding : 5px;
-	float : left;
+	float : left; modif brisees */
 	color : #333;
 	text-decoration : none;
 	cursor : pointer;
@@ -1671,9 +1726,9 @@ span.starMT {
 
  #cartmenulink *, #listsmenulink * {
 	font-style : normal;
-	background-image : url(../../images/button-background.png);
-	background-repeat : no-repeat;
-	display : block;
+/*	background-image : url(../../images/button-background.png);
+	background-repeat : no-repeat; 
+	display : block; modif brisees */
 	position : relative;
 }
 
@@ -1689,8 +1744,8 @@ span.starMT {
 
  #cartmenulink span, #listsmenulink span {
 	background-position : bottom left;
-	left : -5px;
-	padding : 0 0 5px 10px;
+/*	left : -5px;
+	padding : 0 0 5px 10px; modif brisees */
 	margin-bottom : -5px;
 }
 /* For IE7 */
@@ -1726,27 +1781,32 @@ span.starMT {
 	padding-top : 5px;
 }
 #listsmenulink {
-	background : #9FBFFF;
+/*	background : #9FBFFF; modif brisees */
 }
 
 #cartmenulink {
-	background : #98CB58;
+/*	background : #98CB58; modif brisees */
 	color : #336600;
 	font-size : 105%;
 }
-
+/* debut modif brisees
 #cartmenulink[class], #listsmenulink[class] {
 	background-image : url(../../images/button-background-gradient.png);
 	background-position : left top;
 }
+fin modif brisees */
 
+/* debut modif brisees 
 #listsmenulink:hover {
 	background-color : #b8d0e6;
 }
+fin modif brisees */
 
+/* debut modif brisees  
 #cartmenulink:hover {
 	background-color : #BFDE96;
 }
+fin modif brisees */
 
 #cartmenulink img {
 	background-image : none;
@@ -1769,34 +1829,48 @@ span.starMT {
 
 #cartmenulink span#basketcount span {
 	background-image : none;
-	background-color : #E6FCB7;
+/*	background-color : #E6FCB7; modif brisees */
 	color : #000;
 	display : inline;
 	float : none;
 	font-size : 80%;
 	font-weight : normal;
-	margin : 0 0 0 .9em;
+/*	margin : 0 0 0 .9em; modif brisees */
 	padding : 0 .3em 0 .3em;
 	position : relative;
 	left : auto;
 	right : auto;
 	top : auto;
+/* debut modif brisees */
+	background-color : #b8d0e6;
+	margin : 0 0 0 2px;
+/* fin modif brisees */
 }
 
-a#listsmenulink, a#listsmenulink:hover {
+/* a#listsmenulink, a#listsmenulink:hover { modif brisees */
+/* debut modif brisees */
+a#listsmenulink, a#listsmenulink:hover, a#listsmenulink:active, a#listsmenulink:visited {
+/* fin modif brisees */
 	color : #006699;
 	font-size : 105%;
-	font-weight : bold;
+/*	font-weight : bold;
 	line-height : 185%;
-	margin-left : 1.5em;
+	margin-left : 1.5em; modif brisees */
 }
 
-a#cartmenulink, a#cartmenulink:hover {
-	color : #336600;
+/* a#cartmenulink, a#cartmenulink:hover { modif brisees */
+/* debut modif brisees */
+a#cartmenulink, a#cartmenulink:hover, a#cartmenulink:active, a#cartmenulink:visited {
+/* fin modif brisees */
+/*	color : #336600;
 	font-size : 105%;
 	font-weight : bold;
 	line-height : 185%;
-	margin-left : 1.5em;
+	margin-left : 1.5em; modif brisees */
+/* debut modif brisees */
+        color : #006699;
+        font-size : 105%;
+/* fin modif brisees */
 }
 * html a#cartmenulink {
 	padding-top: 0;

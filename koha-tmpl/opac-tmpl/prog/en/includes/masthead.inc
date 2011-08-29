@@ -34,14 +34,32 @@
 
 <div id="fluid">
 <div id="fluid-offset">
-<!-- TMPL_UNLESS NAME="advsearch" --><form name="searchform" method="get" action="/cgi-bin/koha/opac-search.pl" id="searchform">
-    <label for="masthead_search" class="left"> Search 
+<!-- debut ajout brisees -->
+<!-- TMPL_IF NAME="advsearch" --><fieldset class="form_rech_adv"> </fieldset><!-- /TMPL_IF -->
+<!-- fin ajout brisees -->
+<!-- TMPL_UNLESS NAME="advsearch" --><!-- debut modif brisees --><fieldset class="form_rech"><form name="searchform" method="get" action="/cgi-bin/koha/opac-search.pl" id="searchform">
+    <label for="masthead_search" class="left"> <!-- Search --><!-- fin modif brisees --> 
 	<!-- TMPL_UNLESS NAME="OpacAddMastheadLibraryPulldown" -->
             <!-- TMPL_IF name="mylibraryfirst" --> (in <!-- TMPL_VAR name="mylibraryfirst" --> only)<!-- /TMPL_IF -->
 	<!-- /TMPL_UNLESS -->
     </label>
+<!-- debut modif brisees -->
+        <!-- TMPL_IF NAME="tag" -->
+                <input type="text" id = "transl1" name="q" value="" class="form_rech" /><div id="translControl"></div>
+        <!-- TMPL_ELSE -->
+            <!-- TMPL_IF NAME="query" -->
+                    <input type="text" id = "transl1" name="q" size="150" value="<!-- TMPL_VAR ESCAPE="HTML" NAME="query" -->" class="form_rech" /><div id="translControl"></div>
+            <!-- TMPL_ELSE -->
+                <input type="text" id = "transl1" name="q" size="150" class="form_rech" /><div id="translControl"></div>
+            <!-- /TMPL_IF -->
+        <!-- /TMPL_IF -->
+<br /><br />
+<!-- fin modif brisees -->
 
-	<select name="idx" id="masthead_search" class="left" style="max-width:10em;width:10em;">
+<!-- debut modif brisees	<select name="idx" id="masthead_search" class="left" style="max-width:10em;width:10em;"> fin modif brisees -->
+<!-- debut modif brisees -->
+	<select name="idx" id="masthead_search" class="form_rech">
+<!-- fin modif brisees -->
 	<!-- TMPL_IF NAME="ms_kw" -->
         <option selected="selected" value="">Library Catalog</option>
 		<!-- TMPL_ELSE -->
@@ -82,6 +100,7 @@
 		<!-- TMPL_ELSE -->
         <option value="cn">Call Number</option>
 		<!-- /TMPL_IF --></select>
+<!-- debut modif brisees 
         <!-- TMPL_IF NAME="tag" -->
                 <input type="text" id = "transl1" name="q" value="" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
         <!-- TMPL_ELSE -->
@@ -91,8 +110,12 @@
                 <input type="text" id = "transl1" name="q" class="left" style="width: 35%; font-size: 111%;"/><div id="translControl"></div>
             <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
+fin modif brisees -->
     <!-- TMPL_IF NAME="OpacAddMastheadLibraryPulldown" -->
-        <select name="filters" id="masthead_branchsearch" class="left" style="max-width:10em;width:10em;">
+<!-- debut modif brisees        <select name="filters" id="masthead_branchsearch" class="left" style="max-width:10em;width:10em;"> fin modif brisees -->
+<!-- debut modif brisees -->
+        <select name="filters" id="masthead_branchsearch" class="form_rech">
+<!-- fin modif brisees -->
             <!-- TMPL_IF NAME="branchsearchexistsincookie" -->
               <!-- TMPL_IF EXPR="branchsearch eq ''" -->
                 <option value="" selected="selected">All Libraries</option>
@@ -133,22 +156,42 @@
       <input name="limit" value="<!-- TMPL_VAR name="opac_search_limit" -->" type="hidden" />
    <!-- /TMPL_IF -->
 
-
-    <input type="submit" value="Go" id="searchsubmit" class="left" />
+<!-- debut modif brisees
+    <input type="submit" value="go" id="searchsubmit" class="left" />
 <!-- TMPL_IF NAME="opacbookbag" --><span id="cmspan"></span><!-- /TMPL_IF -->
 
 <!--TMPL_IF NAME="virtualshelves" --><a href="/cgi-bin/koha/opac-shelves.pl" id="listsmenulink" class=""><i></i><span><i></i><span></span>Lists </span></a><!-- /TMPL_IF -->
+fin modif brisees -->
+    <input type="submit" value="Search" id="searchsubmit" class="right" />
     </form>
+    </fieldset>
 <!-- TMPL_ELSE -->
+<!-- debut modif brisees
 <div style="width:80%;*margin-bottom:-30px;">
 <!--TMPL_IF NAME="virtualshelves" --><a href="/cgi-bin/koha/opac-shelves.pl" id="listsmenulink" class=""><i></i><span><i></i><span></span>Lists </span></a><!-- /TMPL_IF --><!-- TMPL_IF NAME="opacbookbag" --><span id="cmspan"></span><!-- /TMPL_IF -->
 </div>
+testes
+fin modif brisees -->
 <!-- /TMPL_UNLESS -->
 
-<div id="moresearches">
-<a href="/cgi-bin/koha/opac-search.pl">Advanced Search</a>
+
+<!-- debut modif brisees <div id="moresearches">
+
+<a href="/cgi-bin/koha/opac-search.pl">Advanced Search</a> fin modif brisses -->
+<!-- debut modif brisees -->
+<div id="moresearches" style="width:570px;" >
+<!-- TMPL_IF NAME="advsearch" --><a href="/cgi-bin/koha/opac-main.pl">Simple Search</a>
+<!-- TMPL_ELSE --><a href="/cgi-bin/koha/opac-search.pl">Advanced Search</a><!-- /TMPL_IF -->
+<!-- fin  modif brisees -->
 <!-- TMPL_IF NAME="OpacBrowser"     --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-browser.pl">Browse by Hierarchy</a><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="OpacAuthorities" --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-authorities-home.pl">Browse by author or subject</a><!-- /TMPL_IF -->
+<!-- debut modif brisees -->
+<span style="float:right;">
+<!-- TMPL_IF NAME="opacbookbag" --><span id="cmspan"></span><!-- /TMPL_IF -->
+
+<!--TMPL_IF NAME="virtualshelves" --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-shelves.pl" id="listsmenulink" class=""><i></i><span><i></i><span></span>Lists </span></a><!-- /TMPL_IF -->
+</span>
+<!-- fin modif brisees -->
 <!-- TMPL_IF NAME="TagsEnabled"     --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-tags.pl">Tag Cloud</a><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="OpacCloud"       --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-tags_subject.pl">Subject Cloud</a><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="OpacTopissue"    --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-topissues.pl">Most Popular</a><!-- /TMPL_IF -->
