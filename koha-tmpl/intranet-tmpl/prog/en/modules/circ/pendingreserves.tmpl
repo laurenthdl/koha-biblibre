@@ -1,6 +1,9 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Circulation &rsaquo; Pending Holds</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME="themelang" -->/css/datatables.css" />
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/js/datatables.js"></script>
 <!-- Additions to enable Calendar system -->
 <link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar-system.css" />
 <!-- End of additions --><!-- Additions to enable Calendar system -->
@@ -8,24 +11,12 @@
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar-en.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar-setup.js"></script>
 <!-- End of additions -->
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/picnet.table.filter.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
-$.tablesorter.addParser({
-    id: 'articles', 
-    is: function(s) {return false;  }, 
-    format: function(s) { return s.toLowerCase().replace(/^(the|an|a) /,''); }, 
-    type: 'text' 
-});
 	 $(document).ready(function() {
+		$('#holdst').dataTable({"bFilter": false});
 	 	$("th a").hide();
-		$.tablesorter.defaults.widgets = ['zebra'];
-		$("#holdst").tablesorter({<!-- TMPL_IF EXPR="dateformat eq 'metric'" -->
-		dateFormat: 'uk',<!-- /TMPL_IF -->
-			sortList: [[3,0]],
-			headers: { 0:{sorter:false},1:{sorter:false},3: { sorter: 'articles' },6:{sorter:false}}
-		});
 		// Initialise Plugin
             var options1 = {
                 additionalFilterTriggers: [$('#quickfind')],
@@ -139,6 +130,8 @@ $.tablesorter.addParser({
         <!-- /TMPL_LOOP -->
     </tbody>
     </table>
+    <div class="spacer"></div>
+  <p style="display:block;"><span class="exportSelected"></span></p>
     <!-- TMPL_ELSE -->
         <b>No items found.</b>
     <!-- /TMPL_IF -->
