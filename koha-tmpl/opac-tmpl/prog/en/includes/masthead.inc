@@ -10,6 +10,7 @@
                 <li><span class="members">Welcome, <a href="/cgi-bin/koha/opac-user.pl"><span class="loggedinusername"><!-- TMPL_LOOP NAME="USER_INFO" --><!-- TMPL_VAR NAME="title" --> <!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" --><!-- /TMPL_LOOP --></span></a></span></li>
 
             <!-- /TMPL_IF -->
+<!-- debut modif brisees
             <!-- TMPL_IF NAME="ShowOpacRecentSearchLink" -->
                 <script type="text/javascript">
                     function ConfirmHistoryDeletion() {
@@ -18,6 +19,7 @@
                 </script>
                 <li><a href="/cgi-bin/koha/opac-search-history.pl" title="View your search history">Search history</a> [<a class="logout" href="/cgi-bin/koha/opac-search-history.pl?action=delete" title="Delete your search history" onclick="return ConfirmHistoryDeletion();">x</a>]</li>
             <!-- /TMPL_IF -->
+fin de modif brisees -->
 			<!-- TMPL_IF NAME="loggedinusername" --><li><a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1">Log Out</a></li><!-- /TMPL_IF -->
    	</ul>	
   <!-- /TMPL_IF -->
@@ -185,6 +187,16 @@ fin modif brisees -->
 <!-- fin  modif brisees -->
 <!-- TMPL_IF NAME="OpacBrowser"     --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-browser.pl">Browse by Hierarchy</a><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="OpacAuthorities" --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-authorities-home.pl">Browse by author or subject</a><!-- /TMPL_IF -->
+<!-- debut modif brisees -->
+            <!-- TMPL_IF NAME="ShowOpacRecentSearchLink" -->
+                <script type="text/javascript">
+                    function ConfirmHistoryDeletion() {
+                        return confirm(_('Are you sure you want to delete your search history?'));
+                    }
+                </script>
+                <span class="pipe"> | </span><a href="/cgi-bin/koha/opac-search-history.pl" title="View your search history">Search history</a> [<a class="logout" href="/cgi-bin/koha/opac-search-history.pl?action=delete" title="Delete your search history" onclick="return ConfirmHistoryDeletion();">x</a>]
+            <!-- /TMPL_IF -->
+<!-- fin modif brisees -->
 <!-- debut modif brisees -->
 <span style="float:right;">
 <!-- TMPL_IF NAME="opacbookbag" --><span id="cmspan"></span><!-- /TMPL_IF -->
