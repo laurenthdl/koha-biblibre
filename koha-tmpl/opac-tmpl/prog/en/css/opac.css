@@ -2058,12 +2058,23 @@ span.no-image {
 	background-color : #FFF;
 	border: 1px solid #979797;
 	color : #AAA;
-	display:block;
+/*	display:block; modif brisees */
 	font-size : 86%;
 	font-weight : bold;
 	text-align : center;
 	width : 75px;
+/* debut modif brisees */
+	display:none;
+/* fin modif brisees */
 }
+
+/* debut ajout brisees */
+span.no-couv {
+    display:block;
+    width : 75px;
+}
+/* fin ajout brisees */
+
 #bookcover span.no-image {
 	margin-right : 10px;
 	margin-bottom : 10px;
