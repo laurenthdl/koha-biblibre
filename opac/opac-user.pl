@@ -154,6 +154,10 @@ if ($issues) {
             $issue->{'imageurl'} = getitemtypeimagelocation( 'opac', $itemtypes->{$itemtype}->{'imageurl'} );
             $issue->{'description'} = $itemtypes->{$itemtype}->{'description'};
         }
+        my ( $charge, $itemtypebis ) = GetIssuingCharges( $issue->{'itemnumber'}, $borrowernumber );
+        my $itemtypeinfo = getitemtypeinfo($itemtypebis);
+		$issue->{'itemtype_description'} = $itemtypeinfo->{description};
+		$issue->{'itemtype_image'}       = $itemtypeinfo->{imageurl};
         $issue->{date_due} = format_date( $issue->{date_due} );
         push @issuedat, $issue;
         $count++;
