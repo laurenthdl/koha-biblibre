@@ -31,7 +31,7 @@
          </backend>
        </retrieval>
      </retrievalinfo>
-     <xi:include href="/home/users/koha/sites/limogesvendange/etc/zebradb/explain-biblios.xml"
+     <xi:include href="/home/koha/src/etc/z3950/explain-biblios.xml"
                 xmlns:xi="http://www.w3.org/2001/XInclude">
        <xi:fallback>
          <explain xmlns="http://explain.z3950.org/dtd/2.0/">
@@ -62,7 +62,7 @@
          </backend>
        </retrieval>
      </retrievalinfo>
-     <xi:include href="/home/users/koha/sites/devstetienne/etc/zebradb/explain-biblios.xml"
+     <xi:include href="/home/koha/src/etc/z3950/explain-biblios.xml"
                 xmlns:xi="http://www.w3.org/2001/XInclude">
        <xi:fallback>
          <explain xmlns="http://explain.z3950.org/dtd/2.0/">
