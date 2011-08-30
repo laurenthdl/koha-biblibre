@@ -69,12 +69,9 @@ use C4::Search::Query;
 my $input = new CGI;
 my $params = $input->Vars;
 
-my $page             = $params->{'page'} || 1;
-my $q                = $params->{'q'}    || '*:*';
-my $results_per_page = $params->{'num'}  || 20;
+my $query            = $params->{'q'}    || '*:*';
 my $booksellerid     = $params->{'booksellerid'};
 my $basketno         = $params->{'basketno'};
-my $sub              = $params->{'sub'};
 my $bookseller       = GetBookSellerFromId( $booksellerid );
 
 my ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
@@ -85,41 +82,11 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user( {
     flagsrequired   => { acquisition => 'order_manage' },
 } );
 
-my $count = C4::Context->preference('OPACnumSearchResults') || 20;
-# construct the param array
-
-my @indexes = $params->{'idx'};
-my @operators = ();
-my @operands = $params->{'q'};
-my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
-warn Data::Dumper::Dumper \@indexes;
-warn $q;
-my $res = SimpleSearch( $q, { recordtype => 'biblio' }, $page, $count );
-
-
-my @results = map { GetBiblioData $_->{'values'}->{'recordid'} } @{ $res->items };
-
-my $pager = Data::Pagination->new(
-    $res->{'pager'}->{'total_entries'},
-    $count,
-    20,
-    $page,
-);
-
 $template->param(
     basketno      => $basketno,
     booksellerid  => $bookseller->{'id'},
     name          => $bookseller->{'name'},
-    resultsloop   => \@results,
-    total         => $res->{'pager'}->{'total_entries'},
-    query         => $q,
-    previous_page => $pager->{'prev_page'},
-    next_page     => $pager->{'next_page'},
-    PAGE_NUMBERS  => [ map { { page => $_, current => $_ == $page } } @{ $pager->{'numbers_of_set'} } ],
-    current_page  => $page,
-    pager_params  => [ { ind => 'q'           , val => $q                  },
-                       { ind => 'basketno'    , val => $basketno           },
-                       { ind => 'booksellerid', val => $bookseller->{'id'} }, ]
+    query         => $query,
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;
