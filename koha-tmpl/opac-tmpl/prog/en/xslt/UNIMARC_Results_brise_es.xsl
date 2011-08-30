@@ -47,13 +47,13 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
 <xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Livre imprimé'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/book_b.gif" alt="book" title="book"/>&#xA0;</xsl:when>
 <xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Livre numérique'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/binary_b.gif" alt="electronic ressource" title="electronic ressource"/>&#xA0;</xsl:when>
 <xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Revue imprimée'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/periodical_b.gif" alt="periodical" title="periodical"/>&#xA0;</xsl:when>
-<xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Thèse, mémoire, rapport'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/thesis_b.gif" alt="thesis" title="thesis"/>&#xA0;</xsl:when>
+<xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Thèse, mémoire, rapport'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/thesis_b.gif" alt="thesis, report" title="thesis, report"/>&#xA0;</xsl:when>
 <xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Carte'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/map_b.gif" alt="map" title="map"/>&#xA0;</xsl:when>
 <xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Partition'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/score_b.gif" alt="score" title="score"/>&#xA0;</xsl:when>
 <xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Article'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/article_b.gif" alt="article" title="article"/>&#xA0;</xsl:when>
-<xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='DVD'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/audiovisual_b.gif" alt="audiovisuel" title="audiovisuel"/>&#xA0;</xsl:when>
-<xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Video'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/audiovisual_b.gif" alt="audiovisuel" title="audiovisuel"/>&#xA0;</xsl:when>
-<xsl:otherwise><img src="/opac-tmpl/prog/itemtypeimg/sudoc/unknown_b.gif" alt="autre" title="autre"/>&#xA0;</xsl:otherwise>
+<xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Images, son, multisupport'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/sound_b.gif" alt="Images, son, multisupport" title="Images, son, multisupport"/>&#xA0;</xsl:when>
+<xsl:when test="marc:datafield[@tag=099]/marc:subfield[@code='t']='Support informatique'"><img src="/opac-tmpl/prog/itemtypeimg/sudoc/binary_b.gif" alt="electronic ressource" title="electronic ressource"/>&#xA0;</xsl:when>
+<xsl:otherwise><img src="/opac-tmpl/prog/itemtypeimg/sudoc/unknown_b.gif" alt="other" title="other"/>&#xA0;</xsl:otherwise>
 </xsl:choose>
 </xsl:if>
 </span>
