@@ -204,7 +204,7 @@ $.tablesorter.addParser({
         <!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="OPACFinesTab" -->
         <th>Fines</th>
-<!-- /TMPL_IF -->
+<!-- /TMPL_IF --><th>Item Type</th>
         </tr></thead>
         <tbody>
 		<!-- FIXME: the styling for highlight overrides the overdue red background,
@@ -250,7 +250,8 @@ $.tablesorter.addParser({
                 <!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="OPACFinesTab" -->
                 <td><!-- TMPL_IF NAME="charges" -->Yes<!-- TMPL_ELSE -->No<!-- /TMPL_IF --></td>
-<!-- /TMPL_IF -->
+<!-- /TMPL_IF --><td><!-- TMPL_UNLESS NAME="noItemTypeImages" --> <!-- TMPL_IF NAME="itemtype_image" --><img src="<!-- TMPL_VAR NAME="itemtype_image" -->" alt="" /><!-- /TMPL_IF --><!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME="itemtype_description" --></td>
+
             </tr>
         <!-- /TMPL_LOOP --></tbody>
         </table>
