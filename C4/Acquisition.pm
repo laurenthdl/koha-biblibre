@@ -1400,7 +1400,7 @@ sub SearchOrder {
 
     my $dbh   = C4::Context->dbh;
     my @args  = ();
-    my $query = "SELECT *
+    my $query = "SELECT aqorders.*, biblio.*, biblioitems.*, aqbasket.*
             FROM aqorders
             LEFT JOIN biblio ON aqorders.biblionumber=biblio.biblionumber
             LEFT JOIN biblioitems ON biblioitems.biblionumber=biblio.biblionumber
