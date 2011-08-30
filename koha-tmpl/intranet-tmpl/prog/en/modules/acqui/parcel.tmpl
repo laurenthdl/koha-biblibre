@@ -4,10 +4,14 @@
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <!-- TMPL_INCLUDE NAME="greybox.inc" -->
 <script type="text/javascript" src="<!-- TMPL_VAR NAME="yuipath" -->/json/json-min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/lib/jquery/plugins/jquery.json.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/lib/jquery/plugins/jquery.session.js"></script>
 <script type="text/JavaScript">
 //<![CDATA[
 
     var rowsToCollapse = 5;
+    var sticky_filters = <!-- TMPL_VAR NAME='sticky_filters' -->;
+
 
     $(document).ready(function(){
 
@@ -15,6 +19,19 @@
 	rowCountReceived = $("#receivedt tbody.filterclass tr").length;
 	if (rowCountPending  > rowsToCollapse) { pendingCollapse(); }
 	if (rowCountReceived > rowsToCollapse) { receivedCollapse(); }
+
+        if(sticky_filters) {
+            $("#summaryfilter").val($.session("parcel_summary"));
+            $("#basketfilter").val($.session("parcel_basket"));
+            $("#orderfilter").val($.session("parcel_order"));
+            $("#basketgroupnamefilter").val($.session("parcel_basketgroupname"));
+            filter();
+        } else {
+            $.session("parcel_summary", []);
+            $.session("parcel_basket", []);
+            $.session("parcel_order", []);
+            $.session("parcel_basketgroupname", []);
+        }
     });
 
      // Case-insensitive version of jquery's contains function
@@ -66,6 +83,11 @@
     var basketStatus  = $("#basketfilter").val();
     var orderStatus   = $("#orderfilter").val();
     var basketgroupnameStatus = $("#basketgroupnamefilter").val();
+
+    $.session('parcel_summary', summaryStatus);
+    $.session('parcel_basket', basketStatus);
+    $.session('parcel_order', orderStatus);
+    $.session('parcel_basketgroupname', basketgroupnameStatus);
 
     if (summaryStatus == '' && basketStatus == ''
     && orderStatus == '' && basketgroupnameStatus == '') {
@@ -123,6 +145,11 @@
         $("#pendingt tbody.filterclass tr").show();
         //$("#pendingt tbody.filterclass tr.orderfound").remove();
 	pendingExpand();
+
+        $.session("parcel_summary", []);
+        $.session("parcel_basket", []);
+        $.session("parcel_order", []);
+        $.session("parcel_basketgroupname", []);
     }
 
 //]]>

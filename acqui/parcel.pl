@@ -334,6 +334,7 @@ $template->param(
     totalPqtyrcvd         => $totalPqtyrcvd,
     totalPecost           => sprintf( "%.2f", $totalPecost ),
     resultsperpage        => $resultsperpage,
+    sticky_filters        => $input->param('sticky_filters') || 0,
 );
 output_html_with_http_headers $input, $cookie, $template->output;
 
