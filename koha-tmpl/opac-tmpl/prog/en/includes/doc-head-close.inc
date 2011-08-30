@@ -23,7 +23,7 @@
 <script type="text/javascript" language="javascript" src="<!-- TMPL_VAR NAME="themelang" -->/js/script.js"></script>
 <!-- TMPL_IF NAME="OPACAmazonCoverImages" -->
 <script type="text/javascript" language="javascript">//<![CDATA[
-		var NO_AMAZON_IMAGE = _("No cover image available");
+		var NO_AMAZON_IMAGE = _(""); // modif brisees
 	//]]>
 </script>
 <script type="text/javascript" language="javascript" src="<!-- TMPL_VAR NAME="themelang" -->/js/amazonimages.js"></script>

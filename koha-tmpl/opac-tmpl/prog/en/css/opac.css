@@ -253,8 +253,8 @@ h1#libraryname a {
 }
 
 h1,h2,h3,h4,h5,h6 {
-	font-weight : bold;
-/*	margin : .5em 0; modif brisees */
+/*	font-weight : bold;
+	margin : .5em 0; modif brisees */
 /* debut modif brisees */
 	margin : .3em 0;
 /* fin modif brisees */
@@ -965,6 +965,12 @@ em {
 	float : left;
 	margin : 0;
 	padding : 0;
+/* debut ajout brisees */
+    width : 160px ;
+    height : 270px ;
+    text-align : center ;
+/* fin ajout brisees */
+
 }
 
 #bookcover img {
@@ -1337,14 +1343,100 @@ padding-left : .4em;
 /* End hide from IE-mac */
 
 .results_summary {
-	display: block;
+	display: block; 
 	font-size : 85%;
-/*	color: #707070; modif brisees */
+	color: #707070; modif brisees */
 	padding : 0 0 .5em 0;
 /* debut ajout brisees */
 	color: #000;
+	display: inline;
+	font-size : 90%;
 /* fin ajout brisees */
 }
+
+/* debut ajout brisees */
+.results_titre {
+    display: block;
+    margin-bottom : 0.3em ;
+}
+
+.results_summary_coll {
+    display : block ;
+    font-size : 90%;
+    color: #006600;
+    padding : .7em 0 0 35px ;
+}
+
+.results_summary_dispo {
+    display: block;
+    font-size : 85%;
+    color: #000;
+    padding : .7em 0 0 35px;
+}
+
+.results_summary .label {
+    color: #A0A0A0;
+    display : inline-block ;
+    width : 60% ;
+    text-align : right ;
+    color : #A0A0A0 ;
+}
+
+.results_icon {
+    float : left ;
+    }
+
+.detail_titre {
+    letter-spacing : 0.02em ;
+    }
+
+.detail_resp {
+    display : block ;
+    font-size : 90% ;
+    }
+
+.result_detail .label {
+    display : inline-block ;
+    width : 120px ;
+    float : left ; /* aligne mieux l'auteur ??? */
+    text-align : left ;
+    color : #A0A0A0 ;
+}
+
+.result_detail {
+    display: block ;
+    font-size : 90%;
+/*  color: #707070; */
+    color: #000;
+    padding : 0 0 .5em 0;
+}
+
+.result_detail .valeur {
+    display : inline-block ;
+    width : 65% ;
+}
+
+.results_summary a {
+    font-weight: normal;
+}
+.notice {
+    display : inline-block ;
+    width : 70% ;
+}
+
+.notice .valeur {
+    font-weight : normal ;
+    font-size : 107% ;
+    }
+
+.notice .valeur a {
+    font-weight : normal ;
+    font-size : 107% ;
+    text-decoration : none ;
+    }
+
+
+/* fin ajout brisees */
 
 .searchresults .tagstatus {
 	display: block;
@@ -1359,6 +1451,9 @@ padding-left : .4em;
 /*	color: #202020; modif brisees */
 /* debut ajout brisees */
         color: #A0A0A0;
+    display : inline-block ;
+    width : 60% ;
+    text-align : right ;
 /* fin ajout brisees */
 }
 
@@ -2062,7 +2157,7 @@ span.no-image {
 	font-size : 86%;
 	font-weight : bold;
 	text-align : center;
-	width : 75px;
+/*	width : 75px; modif brisees */
 /* debut modif brisees */
 	display:none;
 /* fin modif brisees */
