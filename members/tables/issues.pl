@@ -26,19 +26,7 @@ my $issuedatefrom = $input->param('issuedatefrom');
 my $issuedateto = $input->param('issuedateto');
 
 # Fetch DataTables parameters
-my %dtparam;
-foreach(qw/ iDisplayStart iDisplayLength iColumns sSearch bRegex iSortingCols sEcho /) {
-    $dtparam{$_} = $vars->{$_};
-}
-foreach(grep /(?:_sorton|_filteron)$/, keys %$vars) {
-    $dtparam{$_} = $vars->{$_};
-}
-for(my $i=0; $i<$dtparam{'iColumns'}; $i++) {
-    foreach(qw/ bSearchable sSearch bRegex bSortable iSortCol mDataProp sSortDir /) {
-        my $key = $_ . '_' . $i;
-        $dtparam{$key} = $vars->{$key} if defined $vars->{$key};
-    }
-}
+my %dtparam = dt_get_params( $input );
 
 my $dbh = C4::Context->dbh;
 
@@ -77,28 +65,23 @@ if($itype) {
         : " AND biblioitems.itemtype = ? ";
     push @where_filters_params, $itype;
 }
-if($dateduefrom) {
-    $where_filters .= " AND issues.date_due >= ? ";
-    push @where_filters_params, C4::Dates->new($dateduefrom)->output('iso');
-}
-if($datedueto) {
-    $where_filters .= " AND issues.date_due <= ? ";
-    push @where_filters_params, C4::Dates->new($datedueto)->output('iso');
-}
-if($issuedatefrom) {
-    $where_filters .= " AND issues.issuedate >= ? ";
-    push @where_filters_params, C4::Dates->new($issuedatefrom)->output('iso');
-}
-if($issuedateto) {
-    $where_filters .= " AND issues.issuedate <= ? ";
-    push @where_filters_params, C4::Dates->new($issuedateto)->output('iso');
-}
+
+my ( $datedue_q   , $datedue_f    ) = dt_build_query( 'range_dates', $dateduefrom, , $datedueto, 'issues.date_due' );
+my ( $issuedate_q , $issuedate_f  ) = dt_build_query( 'range_dates', $issuedatefrom, , $issuedateto, 'issues.issuedate' );
+
+$where_filters .= ( $datedue_q    ? $datedue_q : '' )
+                 . ( $issuedate_q  ? $issuedate_q : '' );
+
+push @where_filters_params,
+          scalar( @$datedue_f )    > 0 ? @$datedue_f : ()
+        , scalar( @$issuedate_f )  > 0 ? @$issuedate_f : ();
+
 my ($filters, $filter_params) = dt_build_having(\%dtparam);
 my $having = @$filters ? " HAVING " . join(" AND ", @$filters) : "";
 my $order_by = dt_build_orderby(\%dtparam);
 my $limit .= " LIMIT ?,? ";
 
-my $query = $select.$from.$where.$where_filters.$having.$order_by.$limit;
+my $query = $select . $from . $where . ( $where_filters || '' ) . ( $having || '' ) . $order_by . $limit;
 my @bind_params;
 push @bind_params, @where_params, @where_filters_params, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
 my $sth = $dbh->prepare($query);

@@ -15,6 +15,9 @@ $(document).ready(function() {
   $('#finesholdsissues > ul').tabs();
   $('#patron-details > ul').tabs();
 
+  $(".replace_me").each( function() {
+      replace_html( this );
+  } );
   var dt_issues = $("#issuest").dataTable({
     'bAutoWidth': false,
     'bProcessing': true,
@@ -74,17 +77,7 @@ $(document).ready(function() {
     'sPaginationType': 'full_numbers'
   });
 
-  dt_issues.fnSetFilteringDelay(750);
-
-  var filterTimerId = null;
-  var filterTimerDelay = 750;
-  $("input.filter").keyup(function() {
-    var $this = this;
-    window.clearTimeout(filterTimerId);
-    filterTimerId = window.setTimeout(function() {
-      dt_issues.fnFilter($($this).val(), $($this).attr('data-column_num'));
-    }, filterTimerDelay);
-  });
+  dt_issues.fnAddFilteringDelay(750);
 
   $("#collection_filter,#itemtype_filter").change(function(){
     dt_issues.fnDraw();
@@ -715,34 +708,7 @@ $(document).ready(function() {
     </thead>
     <tfoot>
       <tr>
-        <td>
-          From
-          <span style="white-space:nowrap">
-            <input type="text" id="dateduefrom" readonly="readonly" placeholder="Pick date" size="7" />
-            <a style="cursor:pointer" onclick="$('#dateduefrom').val('').change();" />&times;</a>
-          </span>
-          To
-          <span style="white-space:nowrap">
-            <input type="text" id="datedueto" readonly="readonly" placeholder="Pick date" size="7" />
-            <a style="cursor:pointer" onclick="$('#datedueto').val('').change();" />&times;</a>
-          </span>
-          <script type="text/javascript">
-          //<![CDATA[
-            Calendar.setup({
-              inputField: "dateduefrom",
-              ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
-              button: "dateduefrom",
-              onClose: function(){ $("#dateduefrom").change(); this.hide();}
-            });
-            Calendar.setup({
-              inputField: "datedueto",
-              ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
-              button: "datedueto",
-              onClose: function(){ $("#datedueto").change(); this.hide();}
-            });
-          //]]>
-          </script>
-        </td>
+        <td><span class="replace_me" data-id="datedue" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"/></td>
         <td>
           <input type="text" class="filter" data-column_num="1" placeholder="Search title, author, ..." />
         </td>
@@ -768,34 +734,7 @@ $(document).ready(function() {
             <!-- /TMPL_LOOP -->
           </select>
         </td>
-        <td>
-          From
-          <span style="white-space:nowrap">
-            <input type="text" id="issuedatefrom" readonly="readonly" placeholder="Pick date" size="7" />
-            <a style="cursor:pointer" onclick="$('#issuedatefrom').val('').change();" />&times;</a>
-          </span>
-          To
-          <span style="white-space:nowrap">
-            <input type="text" id="issuedateto" readonly="readonly" placeholder="Pick date" size="7" />
-            <a style="cursor:pointer" onclick="$('#issuedateto').val('').change();" />&times;</a>
-          </span>
-          <script type="text/javascript">
-          //<![CDATA[
-            Calendar.setup({
-              inputField: "issuedatefrom",
-              ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
-              button: "issuedatefrom",
-              onClose: function(){ $("#issuedatefrom").change(); this.hide();}
-            });
-            Calendar.setup({
-              inputField: "issuedateto",
-              ifFormat: "<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->",
-              button: "issuedateto",
-              onClose: function(){ $("#issuedateto").change(); this.hide();}
-            });
-          //]]>
-          </script>
-        </td>
+        <td><span class="replace_me" data-id="issuedate" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"/></td>
         <td>
           <input type="text" class="filter" data-column_num="7" placeholder="Search callnumber" size="12" />
         </td>
