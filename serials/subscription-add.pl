@@ -117,7 +117,7 @@ if ( $op eq 'mod' || $op eq 'dup' || $op eq 'modsubscription' ) {
         );
 
         my ($serials_number) = GetSerials($subscriptionid);
-        if($serials_number > 1) {
+        if($serials_number > 1 && $op eq "mod") {
             $template->param(more_than_one_serial => 1);
         }
     }
