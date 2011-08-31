@@ -153,6 +153,12 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 <script type="text/javascript" src="/opac-tmpl/prog/en/lib/greybox/AJS_fx.js"></script>
 <script type="text/javascript" src="/opac-tmpl/prog/en/lib/greybox/gb_scripts.js"></script>
 <link href="/opac-tmpl/prog/en/lib/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
+<!-- debut modif brisees -->
+<script type="text/javascript" src="http://books.google.com/books/previewlib.js"></script>
+<script type="text/javascript">
+GBS_setLanguage('fr');
+</script>
+<!-- fin modif brisees -->
 <!-- /TMPL_IF -->
 
 </head>
@@ -180,6 +186,14 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 
     <!-- TMPL_IF NAME="GoogleJackets" --><div style="block" title="<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->" class="<!-- TMPL_VAR NAME="normalized_isbn" -->" id="gbs-thumbnail-preview"></div><!-- /TMPL_IF -->
     <!-- TMPL_IF NAME="BakerTaylorEnabled" --><!-- TMPL_IF NAME="normalized_isbn" --><!-- TMPL_IF NAME="OPACURLOpenInNewWindow" --><a href="https://<!-- TMPL_VAR NAME="BakerTaylorBookstoreURL" ESCAPE="HTML" --><!-- TMPL_VAR NAME="normalized_isbn" -->" target="_blank"><img alt="See Baker &amp; Taylor" src="<!-- TMPL_VAR NAME="BakerTaylorImageURL" ESCAPE="HTML" --><!-- TMPL_VAR NAME="normalized_isbn" -->" /></a><!-- TMPL_ELSE --><a href="https://<!-- TMPL_VAR NAME="BakerTaylorBookstoreURL" ESCAPE="HTML" --><!-- TMPL_VAR NAME="normalized_isbn" -->"><img alt="See Baker &amp; Taylor" src="<!-- TMPL_VAR NAME="BakerTaylorImageURL" ESCAPE="HTML" --><!-- TMPL_VAR NAME="normalized_isbn" -->" /></a><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
+<!-- debut ajout brisees -->
+<!-- TMPL_IF NAME="normalized_isbn" -->
+<span id="feuilletage_gb">
+<script type="text/javascript">
+GBS_insertPreviewButtonPopup('<!-- TMPL_VAR NAME="normalized_isbn" -->');
+</script>
+</span>
+<!-- fin ajout brisees -->
     </div>
 
     <abbr class="unapi-id" title="koha:biblionumber:<!-- TMPL_VAR NAME="biblionumber" -->"><!-- unAPI --></abbr>
