@@ -244,8 +244,6 @@ function export_submit(format) {
     }
     document.issues.action="/cgi-bin/koha/tools/export.pl";
     document.getElementById("export_format").value = format;
-    var input = '<input type="hidden" name="export_only_borrowed" value="1" />';
-    $("form[name='issues']").append(input);
     document.issues.submit();
 
     /* Reset form action to its initial value */
@@ -762,6 +760,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
     <input type="hidden" name="cardnumber" value="<!-- TMPL_VAR NAME="cardnumber" -->" />
     <input type="hidden" name="borrowernumber" value="<!-- TMPL_VAR NAME="borrowernumber" -->" />
     <input type="hidden" name="branch" value="<!-- TMPL_VAR NAME="branch" -->" />
+    <input type="hidden" name="export_only_borrowed" value="1" />
 
     <table id="issuest" >
       <thead>
