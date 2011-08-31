@@ -1097,6 +1097,49 @@ Then we should add some new parameter : bibliotargettag, authtargettag
 
 =cut
 
+
+# Test if a subfield exist in a subfield list
+sub _test_subfcode_presence{
+    my ($subfields,$subfcode)=@_;
+    return grep{$_->[0] eq $subfcode} @$subfields;
+}
+
+sub _test_string{
+    my ($string,@fields)=@_;
+    my $return=0;
+    for my $field (@fields) {
+        if (grep {$_->[1] =~/$string/i} $field->subfields){
+            $return=1;
+            last; 
+        }
+    }
+    return $return;
+}
+
+sub _process_subfcode_4_merge{
+    my ($tagfield,$bibliosubfields,$authorityrecord, $authoritysubfields)=@_;
+    return unless (uc(C4::Context->preference('marcflavour')) eq 'UNIMARC');
+    if ($tagfield eq "606"){
+        my $authtypecode = GuessAuthTypeCode($authorityrecord); 
+        my $authtag=GetAuthType($authtypecode);
+        my $chronological_auth=_test_string('chronologique',$authorityrecord->field('3..'));
+        my $subfz_absent= not _test_subfcode_presence($authoritysubfields,'z');
+        if (_test_subfcode_presence($bibliosubfields,"a")){
+        if ($authtag == '215'){
+           return "y";
+        }
+        elsif ($chronological_auth and $subfz_absent) {
+           return "z";
+        }
+        else {
+         return "x";
+            }
+        }   
+        return;
+    }
+    return;
+}
+
 sub merge {
     my ( $mergefrom, $MARCfrom, $mergeto, $MARCto ) = @_;
     my ( $counteditedbiblio, $countunmodifiedbiblio, $counterrors ) = ( 0, 0, 0 );
@@ -1211,33 +1254,50 @@ sub merge {
                         $index++;
                     }
                 }
+        #Get the next $9 subfield
+        my $nextindex_9 = 0;
+        for my $subf (
+            @localsubfields[ $index_9_auth + 1 .. $#localsubfields ] ) {
+            last if ( $subf->[0] =~ /[12456789]/ );
+            $nextindex_9++;
+        }
 
-                my $nextindex_9 =0;
-                for my $subf (@localsubfields[$index_9_auth + 1 .. $#localsubfields]){
-                    last if ($subf->[0] =~ /[12456789]/); 
-                    $nextindex_9++;
-                };
-                #Change the first tag if required
-                # That is : change the first tag ($a) to what it is in the biblio record
-                # Since some composed authorities will place the $a into $x or $y
-                my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
-                $debug && warn @tags;
-                if (defined $tags[0]->[0] and $tags[0]->[0] ne "a"){
-                    for my $record (@record_to){
-                       if ($record->[0] eq "a"){
-                     $record->[0] =$tags[0]->[0];
-                     last;
-                       }
-                    }
-                }
-                #$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
-                # Replace in local subfields the subfields related to recordfrom with data from record_to
-                splice(@localsubfields,$index_9_auth,$nextindex_9 + 1,([9,$mergeto],@record_to));
-                #$debug && warn "after splice ".Data::Dumper::Dumper(@localsubfields);
-                #very nice api for MARC::Record
-                # It seems that some elements localsubfields can be undefined so skip them
-                @newsubfields=map{(defined $_?@$_:())}@localsubfields;
-                #filter to subfields which are not in the subfield
+      #Change the first tag if required
+      # That is : change the first tag ($a) to what it is in the biblio record
+      # Since some composed authorities will place the $a into $x or $y
+
+        my @previous_subfields = @localsubfields[ 0 .. $index_9_auth ];
+        if (my $changesubfcode = _process_subfcode_4_merge(
+                $tag, \@previous_subfields, $MARCto, \@record_to
+            )
+            ) {
+            $record_to[0]->[0] = $changesubfcode;
+        }
+
+#my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
+#$debug && warn @tags;
+#		if (defined $tags[0]->[0] and $tags[0]->[0] ne "a"){
+#		    for my $record (@record_to){
+#		       if ($record->[0] eq "a"){
+#			 $record->[0] =$tags[0]->[0];
+#			 last;
+#		       }
+#		    }
+#		}
+#$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
+# Replace in local subfields the subfields related to recordfrom with data from record_to
+        splice(
+            @localsubfields, $index_9_auth,
+            $nextindex_9 + 1,
+            ( [ 9, $mergeto ], @record_to )
+        );
+
+    #$debug && warn "after splice ".Data::Dumper::Dumper(@localsubfields);
+    #very nice api for MARC::Record
+    # It seems that some elements localsubfields can be undefined so skip them
+        @newsubfields = map { ( defined $_ ? @$_ : () ) } @localsubfields;
+
+        #filter to subfields which are not in the subfield
                 my $field_to=MARC::Field->new(($tag_to?$tag_to:$tag),$field->indicator(1),$field->indicator(2),@newsubfields);
                 $marcrecord->delete_field($field);
                 $marcrecord->insert_fields_ordered($field_to);            
