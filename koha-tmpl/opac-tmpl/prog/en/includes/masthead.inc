@@ -185,6 +185,9 @@ fin modif brisees -->
 <!-- TMPL_IF NAME="advsearch" --><a href="/cgi-bin/koha/opac-main.pl">Simple Search</a>
 <!-- TMPL_ELSE --><a href="/cgi-bin/koha/opac-search.pl">Advanced Search</a><!-- /TMPL_IF -->
 <!-- fin  modif brisees -->
+<!-- debut modif brisees -->
+<span class="pipe"> | </span><a href="/cgi-bin/koha/opac-doc-num.pl">Doc Num</a>
+<!-- fin  modif brisees -->
 <!-- TMPL_IF NAME="OpacBrowser"     --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-browser.pl">Browse by Hierarchy</a><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="OpacAuthorities" --><span class="pipe"> | </span><a href="/cgi-bin/koha/opac-authorities-home.pl">Browse by author or subject</a><!-- /TMPL_IF -->
 <!-- debut modif brisees -->
