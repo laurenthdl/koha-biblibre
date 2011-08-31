@@ -1448,9 +1448,22 @@ sub merge {
 			    last;
 			}
 			$index_9_auth++;
-		};
+		}
 		#$debug && warn "$index_9_auth $#localsubfields $found";
 		next if ($index_9_auth >= $#localsubfields and !$found);
+                # Removes the data if before the $9
+	        my $index=0;
+                for my $subf (@localsubfields[0 .. $index_9_auth]) {
+                    if (any {$subf->[0] eq $_->[0] and $subf->[1] eq $_->[1]} @record_from )
+                    {    
+                        $debug && warn "found $subf->[0] ".$subf->[1];
+                        splice @localsubfields,$index,1;
+                        $index_9_auth--;
+                    }    
+                    else {
+                        $index++;
+                    }    
+                }    
 		#Get the next $9 subfield
 		my $nextindex_9 =0;
 		for my $subf (@localsubfields[$index_9_auth + 1 .. $#localsubfields]){
