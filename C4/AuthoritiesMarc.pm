@@ -1159,8 +1159,8 @@ sub merge {
     #warn scalar(@reccache)." biblios to update";
     # Get All candidate Tags for the change
     # (This will reduce the search scope in marc records).
-    $sth = $dbh->prepare("select distinct tagfield from marc_subfield_structure where authtypecode=?");
-    $sth->execute($authtypecodefrom);
+    $sth = $dbh->prepare("select distinct tagfield from marc_subfield_structure where authtypecode<>''");
+    $sth->execute();
     my @tags_using_authtype;
     while ( my ($tagfield) = $sth->fetchrow ) {
         push @tags_using_authtype, $tagfield;
