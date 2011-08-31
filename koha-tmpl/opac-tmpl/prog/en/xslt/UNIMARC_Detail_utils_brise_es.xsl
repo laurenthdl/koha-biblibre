@@ -59,6 +59,15 @@
     </xsl:if>
 </xsl:template>
 
+<xsl:template name="tag_099"><!-- ccode / type de doc -->
+  <xsl:if test="marc:datafield[@tag=099]">
+      <span class="result_detail">
+        <span class="label">Type doc: </span><span class="valeur">
+          <xsl:value-of select="marc:datafield[@tag=099]/marc:subfield[@code='t']"/>
+      </span></span>
+    </xsl:if>
+</xsl:template>
+
 <xsl:template name="tag_205"><!-- édition -->
     <xsl:if test="marc:datafield[@tag=205]/marc:subfield[@code='a' or @code='b']">
     <span class="result_detail">
@@ -266,9 +275,9 @@
 <xsl:template name="tag_463"><!-- titre revue pour les articles -->
     <xsl:if test="marc:datafield[@tag=463]">
       <span class="result_detail">
-        <span class="label">In: </span><span class="valeur">
+        <span class="label">Article in: </span><span class="valeur">
         <xsl:for-each select="marc:datafield[@tag=463]">
-          <a><xsl:attribute name="href">/cgi-bin/koha/opac-search.pl?q=<xsl:value-of select="marc:subfield[@code='t']"/></xsl:attribute><xsl:value-of select="marc:subfield[@code='t']"/></a>&#xA0;
+          <a><xsl:attribute name="href">/cgi-bin/koha/opac-search.pl?q=<xsl:value-of select="marc:subfield[@code='t']"/>&amp;filters=str_ccode%3A"REVUE"</xsl:attribute><xsl:value-of select="marc:subfield[@code='t']"/></a>&#xA0;
           <xsl:value-of select="marc:subfield[@code='v']"/>
         </xsl:for-each>
         </span>

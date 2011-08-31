@@ -50,7 +50,7 @@
             <xsl:value-of select="marc:subfield[@code='e']"/>
           </xsl:if>
 
-<!-- ne retourne pas la valeur de 200$b ???
+<!-- 
           <xsl:if test="marc:subfield[@code='b']">
             <xsl:text> [</xsl:text>
             <xsl:value-of select="marc:subfield[@code='b']"/>
@@ -90,6 +90,8 @@
 <xsl:call-template name="tag_856" /><!-- url -->
 <xsl:call-template name="tag_205" /><!-- édition -->
 <xsl:call-template name="tag_210" /><!-- éditeur -->
+
+<xsl:call-template name="tag_099" /><!-- ccode / type de doc -->
 
 <xsl:if test="marc:datafield[@tag=463]">
 <xsl:call-template name="tag_463" /><!-- lien titre revue si article -->
