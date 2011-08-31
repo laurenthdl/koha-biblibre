@@ -91,22 +91,11 @@
             "sPaginationType": "full_numbers",
         } );
 
-        claimst.fnSetFilteringDelay(750);
+        claimst.fnAddFilteringDelay(750);
 
         $('#begindate').change( function() {claimst.fnDraw(); } );
 
         $('#enddate').change( function() { claimst.fnDraw(); } );
-
-        var filterTimerId = null;
-        var filterTimer = 750;
-
-        $("input.filter").keyup( function () {
-            window.clearTimeout(filterTimerId);
-            var $this = this;
-            filterTimerId = window.setTimeout(function() {
-                claimst.fnFilter($($this).val(), $($this).attr('data-column_num'));
-            }, filterTimer);
-        } );
 
         $("#status_filter").change(function() {
             claimst.fnFilter($(this).val(), 5);
