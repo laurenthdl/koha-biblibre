@@ -41,7 +41,6 @@ my $format;
 my $output_format;
 my $dont_export_items;
 my $deleted_barcodes;
-my $start_accession;
 my $timestamp;
 my $help;
 my $oldstdout;
@@ -52,7 +51,7 @@ if ( scalar @ARGV > 0 ) {
     # Getting parameters
     $op = 'export';
     $format = 'iso2709';
-    GetOptions( 'format=s' => \$output_format, 'date=s' => \$start_accession, 'dont_export_items' => \$dont_export_items, 'deleted_barcodes' => \$deleted_barcodes, 'filename=s' => \$filename, 'help|?' => \$help );
+    GetOptions( 'format=s' => \$output_format, 'date=s' => \$timestamp, 'dont_export_items' => \$dont_export_items, 'deleted_barcodes' => \$deleted_barcodes, 'filename=s' => \$filename, 'help|?' => \$help );
     $commandline = 1;
 
 
@@ -67,16 +66,10 @@ if ( scalar @ARGV > 0 ) {
 
     # Default parameters values :
     $output_format     ||= 'marc';
-    $start_accession   ||= '';
+    $timestamp         ||= '';
     $dont_export_items ||= 0;
     $deleted_barcodes  ||= 0;
     $filename          ||= "koha.mrc";
-
-    # If we want deleted barcodes, we use timestamp instead of start_accession
-    if ($deleted_barcodes) {
-	$timestamp = $start_accession;
-	undef $start_accession;
-    }
 
     # Let's redirect stdout
     open $oldstdout, ">&STDOUT";
@@ -124,11 +117,9 @@ if ( $op eq "export" ) {
         my $start_callnumber     = $query->param("start_callnumber");
         my $end_callnumber       = $query->param("end_callnumber");
         if ($commandline) {
-           $start_accession      = ($start_accession) ? C4::Dates->new($start_accession) : '';
            $timestamp            = ($timestamp)       ? C4::Dates->new($timestamp)       : '';
-        } else {
-           $start_accession      = ( $query->param("start_accession") ) ? C4::Dates->new( $query->param("start_accession") ) : '';
         }
+        my $start_accession      = ( $query->param("start_accession") ) ? C4::Dates->new( $query->param("start_accession") ) : '';
         my $end_accession        = ( $query->param("end_accession") ) ? C4::Dates->new( $query->param("end_accession") ) : '';
            $dont_export_items    = $query->param("dont_export_item") unless ($commandline); # recommendation 995
         my $strip_nonlocal_items = $query->param("strip_nonlocal_items");
