@@ -28,7 +28,7 @@ use C4::Search;
 use C4::AuthoritiesMarc::MARC21;
 use C4::AuthoritiesMarc::UNIMARC;
 use C4::Charset;
-use List::MoreUtils qw/none first_index/;
+use List::MoreUtils qw/any none first_index/;
 use C4::Debug;
 
 use vars qw($VERSION @ISA @EXPORT);
