@@ -484,7 +484,7 @@ $(document).ready(function(){
     <!-- /TMPL_IF -->
 
 	<!-- TMPL_IF name="suggestion" -->
-<!-- TMPL_IF NAME="AnonSuggestions" --><div class="suggestion">Not finding what you're looking for?<br />  Make a <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">purchase suggestion</a></div><!-- TMPL_ELSE --><!-- TMPL_IF NAME="loggedinusername" --><div class="suggestion">Not finding what you're looking for?<br />  Make a <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">purchase suggestion</a></div><!-- /TMPL_IF --><!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="AnonSuggestions" --><div class="suggestion">Not finding what you're looking for?<br />  Make a <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">purchase suggestion</a><!-- debut modif brisees --> or <!-- TMPL_INCLUDE NAME="more_search.inc" --><!-- fin modif brisees --></div><!-- TMPL_ELSE --><!-- TMPL_IF NAME="loggedinusername" --><div class="suggestion">Not finding what you're looking for?<br />  Make a <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">purchase suggestion</a><!-- debut modif brisees --> or <!-- TMPL_INCLUDE NAME="more_search.inc" --><!-- TMPL_ELSE --><div class="suggestion">Not finding what you're looking for?<br /><!-- TMPL_INCLUDE NAME="more_search.inc" --></div><!-- /TMPL_IF --><!-- fin modif brisees --></div><!-- /TMPL_IF --><!-- /TMPL_IF -->
 <!-- /TMPL_IF -->
 </div>
 </div>

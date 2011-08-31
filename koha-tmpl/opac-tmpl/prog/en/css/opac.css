@@ -888,11 +888,20 @@ fin modif brisees */
 }
 
 .suggestion {
-	background-color : #EEEEEB;
+/*	background-color : #EEEEEB;
 	border : 1px solid #DDDED3;
 	margin : 10px auto;
 	padding : 4px;
-	width : 35%;
+	width : 35%; mosid brisees */
+/* debut modif brisees */
+	background-color : #F3F3F3;
+	border-bottom : 1px solid #DDDDDD;
+	border-top : 1px solid #DDDDDD;
+	margin : 15px 0px ;
+	padding : 5px 20px ;
+	width : 33%;
+/* fin modif brisees */
+
 }
 
 #facets ul {
@@ -1435,6 +1444,20 @@ padding-left : .4em;
     text-decoration : none ;
     }
 
+select.more_search_list {
+    background-color : #EEEEEB ;
+    font-weight : bold ;
+    font-size : 12px ;
+    color : #006699 ;
+    border : 1px solid #DDDED3 ;
+}
+
+option.more_search_list:hover {
+        background-color : #cee1f3 ;
+        font-weight : bold ;
+        font-size : 12px ;
+        color : #006699 ;
+}
 
 /* fin ajout brisees */
 

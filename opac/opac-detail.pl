@@ -319,6 +319,18 @@ foreach my $author (@$marcauthorsarray) {
     );
 }
 
+# debut modif brisees
+#concat author 7XX for variable {AUTHOR} meanwhile 200$f of $dat->{author}
+my $authors ;
+foreach my $author (@$marcauthorsarray) {
+    foreach my $subfield ( @{ $author->{'MARCAUTHOR_SUBFIELDS_LOOP'} } ) {
+        if ( $subfield->{'code'} eq "a" || $subfield->{'code'} eq "b" ) {
+        $authors .= $subfield->{'value'}."+";
+        }
+    }
+}
+# fin modif brisees
+
 #search rebound on subject
 foreach my $subject (@$marcsubjctsarray) {
     foreach my $subfield ( @{ $subject->{'MARCSUBJECT_SUBFIELDS_LOOP'} } ) {
@@ -682,7 +694,10 @@ if ( C4::Context->preference('TagsEnabled') and $tag_quantity = C4::Context->pre
 
 #Search for title in links
 if ( my $search_for_title = C4::Context->preference('OPACSearchForTitleIn') ) {
-    $dat->{author} ? $search_for_title =~ s/{AUTHOR}/$dat->{author}/g : $search_for_title =~ s/{AUTHOR}//g;
+#    $dat->{author} ? $search_for_title =~ s/{AUTHOR}/$dat->{author}/g : $search_for_title =~ s/{AUTHOR}//g; modif brisees
+# debut modif brisees
+    $authors ? $search_for_title =~ s/{AUTHOR}/$authors/g : $search_for_title =~ s/{AUTHOR}//g;
+# fin modif brisees
     $dat->{title} =~ s/\/+$//;    # remove trailing slash
     $dat->{title} =~ s/\s+$//;    # remove trailing space
     $dat->{title} ? $search_for_title =~ s/{TITLE}/$dat->{title}/g : $search_for_title =~ s/{TITLE}//g;
