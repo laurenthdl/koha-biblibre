@@ -141,6 +141,11 @@
 
     // Clear already applied filters
     function clearFilters() {
+        $("#summaryfilter").val('');
+        $("#basketfilter").val('');
+        $("#orderfilter").val('');
+        $("#basketgroupnamefilter").val('');
+
 	$("#nothingfoundrow").remove();
         $("#pendingt tbody.filterclass tr").show();
         //$("#pendingt tbody.filterclass tr.orderfound").remove();
