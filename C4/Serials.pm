@@ -1026,7 +1026,7 @@ sub GetExpirationDate {
 
             #calculate the date of the last issue.
             for ( my $i = 1 ; $i <= $length ; $i++ ) {
-                $enddate = GetNextDate( $enddate, $subscription );
+                $enddate = GetNextDate( $subscription, $enddate );
             }
         } elsif ( $subscription->{monthlength} ) {
             if ( $$subscription{startdate} ) {
