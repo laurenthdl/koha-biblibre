@@ -303,18 +303,14 @@ if ($CGIsort2) {
 
 if ( C4::Context->preference('AcqCreateItem') eq 'ordering' && !$ordernumber ) {
 
-    # prepare empty item form
-    my $cell = PrepareItemrecordDisplay( '', '', '', 'ACQ' );
+    # Check if ACQ framework exists
+    my $marc = GetMarcStructure( 1, 'ACQ' );
 
-    unless ($cell) {
-        $cell = PrepareItemrecordDisplay( '', '', '', '' );
+    unless ($marc) {
         $template->param( 'NoACQframework' => 1 );
     }
-    my @itemloop;
-    push @itemloop, $cell;
 
     $template->param(
-        items => \@itemloop,
         AcqCreateItemOrdering => 1,
     );
 }

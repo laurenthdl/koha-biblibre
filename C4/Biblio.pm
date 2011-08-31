@@ -2439,7 +2439,7 @@ sub PrepareItemrecordDisplay {
                                 $authorised_lib{$branchcode} = $branchname;
                             }
                         }
-                        $defaultvalue = C4::Context->userenv->{branch};
+                        $defaultvalue = C4::Context->userenv->{branch} if C4::Context->userenv;
 
                         #----- itemtypes
                     } elsif ( $tagslib->{$tag}->{$subfield}->{authorised_value} eq "itemtypes" ) {
@@ -2476,11 +2476,11 @@ sub PrepareItemrecordDisplay {
                         my $plugin = C4::Context->intranetdir . "/cataloguing/value_builder/" . $tagslib->{$tag}->{$subfield}->{'value_builder'};
                         if (do $plugin) {
                             my $temp;
+                            my $index_subfield = int(rand(1000000));
+                            $subfield_data{id} = "tag_".$tag."_subfield_".$subfield."_".$index_subfield;
                             my $extended_param = plugin_parameters( $dbh, $temp, $tagslib, $subfield_data{id}, undef );
                             my ( $function_name, $javascript ) = plugin_javascript( $dbh, $temp, $tagslib, $subfield_data{id}, undef );
                             $subfield_data{random}     = int(rand(1000000));    # why do we need 2 different randoms?
-                            my $index_subfield = int(rand(1000000));
-                            $subfield_data{id} = "tag_".$tag."_subfield_".$subfield."_".$index_subfield;
                             $subfield_data{marc_value} = qq[<input tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255"
                                 onfocus="Focus$function_name($subfield_data{random}, '$subfield_data{id}');"
                                  onblur=" Blur$function_name($subfield_data{random}, '$subfield_data{id}');" />
