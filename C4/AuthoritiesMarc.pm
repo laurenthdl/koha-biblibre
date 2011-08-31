@@ -26,7 +26,8 @@ use C4::Biblio;
 use C4::AuthoritiesMarc::MARC21;
 use C4::AuthoritiesMarc::UNIMARC;
 use C4::Charset;
-use List::MoreUtils qw/any none first_index/;
+use Storable;
+use List::MoreUtils qw/any none/;
 use C4::Debug;
 use C4::Search::Query;
 require C4::Search;
@@ -511,9 +512,9 @@ sub ModAuthority {
         }
 
         my $filename = $cgidir . "/tmp/modified_authorities/$authid.authid";
-        open AUTH, "> $filename";
-        print AUTH $authid;
-        close AUTH;
+        unless (-e $filename){
+	    store $oldrecord, "$filename";
+	}
     }
     C4::Search::IndexRecord("authority", [ $authid ] );
     return $authid;
