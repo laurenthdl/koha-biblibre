@@ -14,11 +14,13 @@
 		line.removeChild(ButtonPlus);
 	}
 
-	$(document).ready(function() {
-		$("input[name=q]:eq(0)").focus();
-    advSearchPrepare();
-    $(".advsearch").change(); //force update if back button is pushed
-	});
+    $(document).ready(function() {
+        $("input[name=q]:eq(0)").focus();
+        advSearchPrepare();
+        $(".advsearch").change(); //force update if back button is pushed
+        $('select[name="idx"]').attr('disabled', false);
+        $('select[name="op"]').attr('disabled', false);
+    });
 
   function advSearchPrepare () {
 
@@ -32,6 +34,27 @@
     <!-- /TMPL_LOOP -->
     $(".advsearch").change( function () {getAuthorisedValuesList($(this))});
   }
+
+  function check_form() {
+    $('select[name="idx"]').each( function() {
+        var input_elt = $(this).find('~ input'); // Input element
+        var op_elt = $(this).parent().next('div').find('select[name="op"]'); // Select op element
+        if ( !$(this).find('option:selected').attr('avlist') && $(input_elt).val().length < 1 ) {
+            $(input_elt).attr('disabled', true);
+            $(this).attr('disabled', true);
+            if ( op_elt.length > 0 ) {
+                $(op_elt).attr('disabled', true);
+            }
+        }
+    } );
+    if ( $('select[name="idx"]:enabled').length < 1 ) {
+        var first_select = $('select[name="idx"]')[0];
+        $(first_select).attr('disabled', false);
+        $(first_select).find('~ input').attr('disabled', false);
+    }
+    return true;
+  }
+
 </script>
 <script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/catalogue.js"></script>
 </head>
@@ -131,16 +154,7 @@
 <!-- /BASIC LIMITS -->
 </div>
 
-
-<!-- Not used / developped currently
-<!-- TMPL_IF NAME="UNIMARC" -->
-    <!-- TMPL_INCLUDE NAME="subtypes_unimarc.inc" -->
-<!-- TMPL_ELSE -->
-    <!-- TMPL_INCLUDE NAME="subtypes_usmarc.inc" -->
-<!-- /TMPL_IF -->
-
 <!-- /TYPE LIMITS -->
--->
 
 <div id="availability" class="container">
 <!-- AVAILABILITY LIMITS -->
@@ -150,22 +164,23 @@
 </div>
 <p />
 <div id="select-libs" class="container">
-        <label for="branchloop">Individual Libraries:</label>
-        <select name="filters" id="branchloop" onchange='if(this.value != ""){document.getElementById("categoryloop").disabled=true;} else {document.getElementById("categoryloop").disabled=false;}'>
-            <option value="">All Libraries</option>
-            <!-- TMPL_LOOP NAME="branchloop" -->
-            <option value='<!-- TMPL_VAR NAME="holdingbranch_indexname" -->:"<!-- TMPL_VAR NAME="branchcode" -->"' <!--TMPL_IF NAME="selected"-->selected="selected"<!--/TMPL_IF--> >
-                <!-- TMPL_VAR NAME="branchname" -->
-            </option>
-        <!-- /TMPL_LOOP -->
-        </select>
-        <!-- TMPL_IF NAME="searchdomainloop" -->
-    <p>OR</p> <!-- should addjs to grey out group pulldown if a library is selected. -->
-        <label for="categoryloop">Groups of Libraries</label><select name="multibranchlimit" id="categoryloop">
-        <option value=""> -- none -- </option>
-        <!-- TMPL_LOOP NAME="searchdomainloop" -->
-        <option value="<!-- TMPL_VAR NAME="categorycode" -->"><!-- TMPL_VAR NAME="categoryname" --></option>
-        <!-- /TMPL_LOOP -->
+    <label for="branchloop">Individual Libraries:</label>
+    <select name="filters" id="branchloop" onchange='if(this.value != ""){$("#categoryloop").attr("disabled", true)} else {$("#categoryloop").attr("disabled", false)}'>
+        <option value="">All Libraries</option>
+        <!-- TMPL_LOOP NAME="branchloop" -->
+        <option value='<!-- TMPL_VAR NAME="holdingbranch_indexname" -->:"<!-- TMPL_VAR NAME="branchcode" -->"' <!--TMPL_IF NAME="selected"-->selected="selected"<!--/TMPL_IF--> >
+            <!-- TMPL_VAR NAME="branchname" -->
+        </option>
+    <!-- /TMPL_LOOP -->
+    </select>
+    <!-- TMPL_IF NAME="searchdomainloop" -->
+        <p>OR</p> <!-- should addjs to grey out group pulldown if a library is selected. -->
+        <label for="categoryloop">Groups of Libraries</label>
+        <select name="multibranchlimit" id="categoryloop">
+            <option value=""> -- none -- </option>
+            <!-- TMPL_LOOP NAME="searchdomainloop" -->
+                <option value="<!-- TMPL_VAR NAME="categorycode" -->"><!-- TMPL_VAR NAME="categoryname" --></option>
+            <!-- /TMPL_LOOP -->
         </select>
     <!-- /TMPL_IF -->
 </div>
@@ -190,7 +205,7 @@
 
 
 <!-- SEARCH BUTTONS -->
-            <p><input class="submit" type="submit" accesskey="s" value="Search" />
+            <p><input class="submit" type="submit" accesskey="s" onclick="return check_form();" value="Search" />
             <!-- TMPL_IF NAME="expanded_options" -->
             <a href="/cgi-bin/koha/catalogue/search.pl?expanded_options=0">[Fewer Options]</a>
             <!-- TMPL_ELSE -->

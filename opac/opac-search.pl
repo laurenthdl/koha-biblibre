@@ -283,6 +283,12 @@ for my $filter ( $cgi->param('filters') ) {
 push @{$filters{recordtype}}, 'biblio';
 $template->param('filters' => \@tplfilters );
 
+# Limit groups of Libraries
+if( $cgi->param('multibranchlimit') ) {
+    my $indexname = C4::Search::Query::getIndexName('homebranch');
+    my @branches = @{ GetBranchesInCategory( $cgi->param('multibranchlimit') ) };
+    push @{$filters{$indexname}}, '(' . join( " OR ", @branches ) . ')';
+}
 
 # append year limits if they exist
 my $limit_yr = $cgi->param('limit-yr');
@@ -451,6 +457,7 @@ push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
 push @follower_params, { ind => 'sort_by', val => $sort_by };
 push @follower_params, { ind => 'tag', val => $tag } if $tag;
+push @follower_params, { ind => 'multibranchlimit', val => $cgi->param('multibranchlimit') } if $cgi->param('multibranchlimit');
 
 # Pager template params
 $template->param(
