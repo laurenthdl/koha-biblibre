@@ -26,7 +26,7 @@ BEGIN {
     $VERSION    = 3.04,
 
     @ISA        = qw(Exporter);
-    @EXPORT     = qw(dt_build_orderby dt_build_having);
+    @EXPORT     = qw(dt_build_orderby dt_build_having dt_get_params dt_build_query);
 }
 
 =head1 NAME
@@ -97,8 +97,14 @@ sub dt_build_orderby {
         my $iSortCol = $param->{'iSortCol_'.$i};
         my $sSortDir = $param->{'sSortDir_'.$i};
         my $mDataProp = $param->{'mDataProp_'.$iSortCol};
-
-        push @orderbys, "$mDataProp $sSortDir";
+        my @sort_fields = $param->{$mDataProp.'_sorton'}
+            ? split(' ', $param->{$mDataProp.'_sorton'})
+            : ();
+        if(@sort_fields > 0) {
+            push @orderbys, "$_ $sSortDir" foreach (@sort_fields);
+        } else {
+            push @orderbys, "$mDataProp $sSortDir";
+        }
         $i++;
     }
 
@@ -143,8 +149,18 @@ sub dt_build_having {
         while($i < $param->{'iColumns'}) {
             if($param->{'bSearchable_'.$i} eq 'true') {
                 my $mDataProp = $param->{'mDataProp_'.$i};
-                push @gFilters, " $mDataProp LIKE ? ";
-                push @gParams, "%$sSearch%";
+                my @filter_fields = $param->{$mDataProp.'_filteron'}
+                    ? split(' ', $param->{$mDataProp.'_filteron'})
+                    : ();
+                if(@filter_fields > 0) {
+                    foreach my $field (@filter_fields) {
+                        push @gFilters, " $field LIKE ? ";
+                        push @gParams, "%$sSearch%";
+                    }
+                } else {
+                    push @gFilters, " $mDataProp LIKE ? ";
+                    push @gParams, "%$sSearch%";
+                }
             }
             $i++;
         }
@@ -158,13 +174,133 @@ sub dt_build_having {
         my $sSearch = $param->{'sSearch_'.$i};
         if($sSearch) {
             my $mDataProp = $param->{'mDataProp_'.$i};
-            push @filters, " $mDataProp LIKE ? ";
-            push @params, "%$sSearch%";
+            my @filter_fields = $param->{$mDataProp.'_filteron'}
+                ? split(' ', $param->{$mDataProp.'_filteron'})
+                : ();
+            if(@filter_fields > 0) {
+                my @localfilters;
+                foreach my $field (@filter_fields) {
+                    push @localfilters, " $field LIKE ? ";
+                    push @params, "%$sSearch%";
+                }
+                push @filters, " ( ". join(" OR ", @localfilters) ." ) ";
+            } else {
+                push @filters, " $mDataProp LIKE ? ";
+                push @params, "%$sSearch%";
+            }
         }
-        $i ++;
+        $i++;
     }
 
     return (\@filters, \@params);
+}
+
+=item dt_get_params
+
+    my %dtparam = = dt_get_params( $input )
+
+    This function takes a reference to a new CGI object.
+
+    It prepares a hash containing Datatable parameters.
+
+=back
+
+=cut
+sub dt_get_params {
+    my $input = shift;
+    my %dtparam;
+    my $vars = $input->Vars;
+
+    foreach(qw/ iDisplayStart iDisplayLength iColumns sSearch bRegex iSortingCols sEcho /) {
+        $dtparam{$_} = $input->param($_);
+    }
+    foreach(grep /(?:_sorton|_filteron)$/, keys %$vars) {
+        $dtparam{$_} = $vars->{$_};
+    }
+    for(my $i=0; $i<$dtparam{'iColumns'}; $i++) {
+        foreach(qw/ bSearchable sSearch bRegex bSortable iSortCol mDataProp sSortDir /) {
+            my $key = $_ . '_' . $i;
+            $dtparam{$key} = $input->param($key) if defined $input->param($key);
+        }
+    }
+    return %dtparam;
+}
+
+=item dt_build_query_simple
+
+    my ( $query, $params )= dt_build_query_simple( $value, $field )
+
+    This function takes a value and a field (table.field).
+
+    It returns (undef, []) if not $value.
+    Else, returns a SQL where string and an arrayref containing parameters
+    for the execute method of the statement.
+
+=back
+
+=cut
+sub dt_build_query_simple {
+    my ( $value, $field ) = @_;
+    my $query;
+    my @params;
+    if( $value ) {
+        $query .= " AND $field = ? ";
+        push @params, $value;
+    }
+    return ( $query, \@params );
+}
+
+=item dt_build_query_dates
+
+    my ( $query, $params )= dt_build_query_dates( $datefrom, $dateto, $field)
+
+    This function takes a datefrom, dateto and a field (table.field).
+
+    It returns (undef, []) if not $value.
+    Else, returns a SQL where string and an arrayref containing parameters
+    for the execute method of the statement.
+
+=back
+
+=cut
+sub dt_build_query_dates {
+    my ( $datefrom, $dateto, $field ) = @_;
+    my $query;
+    my @params;
+    if ( $datefrom ) {
+        $query .= " AND $field >= ? ";
+        push @params, C4::Dates->new($datefrom)->output('iso');
+    }
+    if ( $dateto ) {
+        $query .= " AND $field <= ? ";
+        push @params, C4::Dates->new($dateto)->output('iso');
+    }
+    return ( $query, \@params );
+}
+
+=item dt_build_query
+
+    my ( $query, $filter ) = dt_build_query( $type, @params )
+
+    This function takes a value and a list of parameters.
+
+    It calls dt_build_query_dates or dt_build_query_simple fonction of $type.
+
+    $type can be 'simple' or 'rage_dates'.
+
+=back
+
+=cut
+sub dt_build_query {
+    my ( $type, @params ) = @_;
+    given ( $type ) {
+        when ( /simple/ ) {
+            return dt_build_query_simple( @params );
+        }
+        when ( /range_dates/ ) {
+            return dt_build_query_dates( @params );
+        }
+    }
 }
 
 1;

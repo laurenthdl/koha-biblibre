@@ -21,18 +21,7 @@ my $planneddate_to = $input->param('planneddate_to');
 my $planneddate_from = $input->param('planneddate_from');
 
 # Fetch DataTables parameters
-my %dtparam;
-foreach(qw/ iDisplayStart iDisplayLength iColumns sSearch bRegex iSortingCols sEcho /) {
-    $dtparam{$_} = $input->param($_);
-}
-for(my $i=0; $i<$dtparam{'iColumns'}; $i++) {
-    foreach(qw/ bSearchable sSearch bRegex bSortable iSortCol mDataProp sSortDir /) {
-        my $key = $_ . '_' . $i;
-        $dtparam{$key} = $input->param($key) if defined $input->param($key);
-    }
-}
-
-warn Data::Dumper::Dumper \%dtparam;
+my %dtparam = dt_get_params( $input );
 
 my $dbh = C4::Context->dbh;
 
@@ -54,20 +43,17 @@ my $where = <<EOQ;
     WHERE (serial.STATUS = 4 OR ((planneddate < now() AND serial.STATUS =1) OR serial.STATUS = 3 OR serial.STATUS = 7))
 EOQ
 my @bind_params;
-if($planneddate_to){
-    $where .= " AND planneddate <= ? ";
-    push @bind_params, C4::Dates->new($planneddate_to)->output('iso');
-}
-if($planneddate_from){
-    $where .= " AND planneddate >= ? ";
-    push @bind_params, C4::Dates->new($planneddate_from)->output('iso');
-}
+my ( $planneddate_q , $planneddate_f  ) = dt_build_query( 'range_dates', $planneddate_from, $planneddate_to, 'planneddate' );
+
+$where .= ( $planneddate_q    ? $planneddate_q : '' );
+push @bind_params, scalar( @$planneddate_f )    > 0 ? @$planneddate_f : ();
+
 my ($filters, $filter_params) = dt_build_having(\%dtparam);
 my $having = @$filters ? " HAVING ". join(" AND ", @$filters) : '';
 my $order_by = dt_build_orderby(\%dtparam);
 my $limit .= " LIMIT ?,? ";
 
-my $query = $select.$from.$where.$having.$order_by.$limit;
+my $query = $select . $from . $where . ( $having || '' ) . $order_by . $limit;
 push @bind_params, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
 my $sth = $dbh->prepare($query);
 $sth->execute(@bind_params);
@@ -83,17 +69,10 @@ $sth = $dbh->prepare($select_total_count.$from.$where);
 $sth->execute();
 my ($iTotalRecords) = $sth->fetchrow_array;
 
-warn Data::Dumper::Dumper $results;
 my @aaData = ();
 foreach(@$results) {
     my %row = %{$_};
     $row{'planneddate'} = C4::Dates->new($row{'planneddate'}, 'iso')->output();
-    #given ($row{'status'}) {
-    #    when (/1/){
-    #        $row{'status'} = "";
-    #    }
-    #}
-
     push @aaData, \%row;
 }
 
@@ -112,8 +91,5 @@ $template->param(
     aaData => \@aaData,
 );
 
-my $logger = Log::LogLite->new("/tmp/logJSON", 7);
-$logger and $logger->template("<date> <message>\n");
-$logger->write($template->output);
 print $input->header('application/json');
 print $template->output();
