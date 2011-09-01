@@ -290,7 +290,11 @@ $(document).ready(function()
           <select name="branchcode" id="branchcode">
             <option value=""></option>
             <!-- TMPL_LOOP name="branchloop" -->
-              <option value="<!-- TMPL_VAR name="value" -->" <!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->><!-- TMPL_VAR name="branchname" --></option>
+              <!-- TMPL_IF NAME='selected' -->
+                <option value="<!-- TMPL_VAR name="value" -->" selected="selected"><!-- TMPL_VAR name="branchname" --></option>
+              <!-- TMPL_ELSE -->
+                <option value="<!-- TMPL_VAR name="value" -->"><!-- TMPL_VAR name="branchname" --></option>
+              <!-- /TMPL_IF -->
             <!-- /TMPL_LOOP -->
           </select>
         </li>
