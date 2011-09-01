@@ -5278,6 +5278,32 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.041";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do("DROP TABLE IF EXISTS `invoices`");
+    $dbh->do("
+        CREATE TABLE `invoices` (
+            `invoicenumber` varchar(255) UNIQUE NOT NULL,
+            `shipmentcost` decimal(8,2) DEFAULT NULL,
+            `shipment_budget_id` int(11) DEFAULT NULL,
+            CONSTRAINT `invoices_shipment_budget_id` FOREIGN KEY (`shipment_budget_id`) REFERENCES `aqbudgets` (`budget_id`) ON DELETE SET NULL ON UPDATE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    ");
+    $dbh->do("
+        ALTER TABLE `aqorders`
+        MODIFY `booksellerinvoicenumber` varchar(255) DEFAULT NULL
+    ");
+    print "Upgrade to $DBversion done (Add invoices table)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.049";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SearchOPACHides','','Construct the opac query with this string at the end.','','Free');");
+    print "Upgrade to $DBversion done (Add System Preferences SearchOPACHides)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

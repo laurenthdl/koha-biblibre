@@ -347,8 +347,15 @@ if ($tag) {
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 $query_desc = $q if not $tag;
 
+my $countRSS         = C4::Context->preference('numSearchRSSResults') || 50;
+my $end_query = C4::Context->preference('SearchOPACHides');
+my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
+my $q_mod = $end_query
+        ? C4::Search::Query->normalSearch( $q . " " . $end_query )
+        : $q;
+
 # perform the search
-$res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
+$res = SimpleSearch( $q_mod, \%filters, $page, $count, $sort_by);
 C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q:";
 
 if (!$res){
