@@ -15,7 +15,7 @@ var dataTablesDefaults = {
         "sEmptyTable"       : _("No data available in table"),
         "sInfo"             : _("Showing _START_ to _END_ of _TOTAL_ entries"),
         "sInfoEmpty"        : _("No entries to show"),
-        "sInfoFiltered"     : _("(filtered from _MAX_ total entries"),
+        "sInfoFiltered"     : _("(filtered from _MAX_ total entries)"),
         "sLengthMenu"       : _("Show _MENU_ entries"),
         "sLoadingRecords"   : _("Loading..."),
         "sProcessing"       : _("Processing..."),
@@ -109,21 +109,20 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay )
 }
 
 // Add a filtering delay on general search and on all input (with a class 'filter')
-jQuery.fn.dataTableExt.oApi.fnAddFilteringDelay = function ( oSettings, iDelay ) {
+jQuery.fn.dataTableExt.oApi.fnAddFilters = function ( oSettings, sClass, iDelay ) {
     var table = this;
     this.fnSetFilteringDelay(iDelay);
     var filterTimerId = null;
-    $("input.filter").keyup(function(event) {
-      var $this = this;
+    $("input."+sClass).keyup(function(event) {
       if (blacklist_keys.indexOf(event.keyCode) != -1) {
         return this;
       }else if ( event.keyCode == '13' ) {
-        $.fn.dataTableExt.iApiIndex = i;
-        _that.fnFilter( $(this).val() );
+        table.fnFilter( $(this).val(), $(this).attr('data-column_num') );
       } else {
         window.clearTimeout(filterTimerId);
+        var input = this;
         filterTimerId = window.setTimeout(function() {
-          table.fnFilter($($this).val(), $($this).attr('data-column_num'));
+          table.fnFilter($(input).val(), $(input).attr('data-column_num'));
         }, iDelay);
       }
     });
