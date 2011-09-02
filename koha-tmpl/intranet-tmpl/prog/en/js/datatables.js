@@ -1,3 +1,30 @@
+// These default options are for translation but can be used
+// for any other datatables settings
+// To use it, write:
+//  $("#table_id").dataTable($.extend(true, {}, dataTableDefaults, {
+//      // other settings
+//  } ) );
+var dataTablesDefaults = {
+    "oLanguage": {
+        "oPaginate": {
+            "sFirst"    : _("First"),
+            "sLast"     : _("Last"),
+            "sNext"     : _("Next"),
+            "sPrevious" : _("Previous")
+        },
+        "sEmptyTable"       : _("No data available in table"),
+        "sInfo"             : _("Showing _START_ to _END_ of _TOTAL_ entries"),
+        "sInfoEmpty"        : _("No entries to show"),
+        "sInfoFiltered"     : _("(filtered from _MAX_ total entries"),
+        "sLengthMenu"       : _("Show _MENU_ entries"),
+        "sLoadingRecords"   : _("Loading..."),
+        "sProcessing"       : _("Processing..."),
+        "sSearch"           : _("Search:"),
+        "sZeroRecords"      : _("No matching records found")
+    }
+};
+
+
 // Return an array of string containing the values of a particular column
 $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
     // check that we have a column id
