@@ -105,7 +105,8 @@ $(document).ready(function(){
 
 <!-- TMPL_IF NAME="opacbookbag" -->
 	<!-- TMPL_IF NAME="virtualshelves" -->
-	var param1 = "<label for=\"addto\">"+_("Add to: ")+"<\/label><select name=\"addto\" id=\"addto\"><option value=\"\"><\/option>";
+// modif brisees	var param1 = "<label for=\"addto\">"+_("Add to: ")+"<\/label><select name=\"addto\" id=\"addto\"><option value=\"\"><\/option>"; 
+var param1 = "<input type=\"submit\" class=\"submit\" value=\""+_("Save on")+"\" /> <label for=\"addto\">"+_("")+"<\/label><select name=\"addto\" id=\"addto\">"; // modif brisees
 	<!-- TMPL_IF name="opacbookbag" -->	param1 += "<option value=\"addtocart\">"+_("Cart")+"<\/option>";
 	<!-- /TMPL_IF --><!-- TMPL_IF NAME="virtualshelves" --><!-- TMPL_IF NAME="loggedinusername" --><!-- TMPL_IF NAME="addbarshelves" -->
 	param1 += "<optgroup label=\""+_("Your Lists:")+"\">";<!-- TMPL_LOOP NAME="addbarshelvesloop" -->
@@ -115,7 +116,8 @@ $(document).ready(function(){
 	param1 +="<\/optgroup><option value=\"newlist\">[ "+_("New List")+" ]<\/option>"
 	<!-- /TMPL_IF -->
 	<!-- /TMPL_IF -->
-	param1 += "<\/select> <input type=\"submit\" class=\"submit\" value=\""+_("Save")+"\" />";
+// modif brisees	param1 += "<\/select> <input type=\"submit\" class=\"submit\" value=\""+_("Save")+"\" />";  
+	param1 += "<\/select>"; // modif brisees
 	<!-- TMPL_ELSE -->
 		var param1 = "<a id=\"addto\" class=\"addtocart\" href=\"#\">Add to Cart<\/a>";
 	<!-- /TMPL_IF -->
@@ -136,14 +138,14 @@ $(document).ready(function(){
     $('#sort_by').change(function() {
         $('#bookbag_form').submit();
     });
-	$("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_("Clear All")+"<\/a>");
-	$("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_("Select All")+"<\/a>");
+	$("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_("Clear All on page")+"<\/a>");
+	$("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_("Select All on page")+"<\/a>");
 <!-- TMPL_IF NAME="opacbookbag" -->$("span.addto").html(param1);<!-- TMPL_ELSE --><!-- TMPL_IF NAME="virtualshelves" --><!-- TMPL_IF NAME="loggedinusername" -->$("span.addto").html(param1);<!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
 
 	<!-- TMPL_IF NAME="virtualshelves" -->
-	$("#addto").change(function(){
-		cartList();
-	});
+// debut modif brisees	$("#addto").change(function(){
+//		cartList();
+//	}); fin modif brisees 
 	$(".addto").find("input:submit").click(function(){
 		cartList();
 		return false;

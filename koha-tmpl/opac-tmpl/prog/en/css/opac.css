@@ -1065,12 +1065,18 @@ a.hidemytags {
 	color : #333;
 	font-size : 87%;
 	padding : 2px 0;
-	margin : 0 0 0 0;
+/*	margin : 0 0 0 0; modif brisees */
+/* debut modif brisees */
+        margin : 0 0 0 0.7em;
+/* fin modif brisees */
 }
 
 #CheckAll, #CheckNone {
 	font-weight : normal;
 	margin : 0 .5em;
+/* debut modif brisees */
+	text-decoration : none;
+/* fin modif brisees */
 }
 
 .resultscontrol label {
