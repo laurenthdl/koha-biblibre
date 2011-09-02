@@ -27,6 +27,7 @@ $(document).ready(function() {
         'bAutoWidth': false,
         'bProcessing': true,
         'bServerSide': true,
+        'aLengthMenu': [[10, 25, 50, 100, 250, 500, 1000, -1], [10, 25, 50, 100, 250, 500, 1000, _("All")]],
         'sAjaxSource': '/cgi-bin/koha/circ/tables/issues.pl',
         'fnServerData': function(sSource, aoData, fnCallback) {
             aoData.push({

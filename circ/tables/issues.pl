@@ -86,11 +86,16 @@ my ($filters, $filter_params) = dt_build_having(\%dtparam);
 
 my $having .= " HAVING " . join(" AND ", @$filters) if (@$filters);
 my $order_by = dt_build_orderby(\%dtparam);
-my $limit .= " LIMIT ?,? ";
+
+my $limit .= $dtparam{'iDisplayLength'} ne '-1' ? ' LIMIT ?,? ' : '';
 
 my $query = $select . $from . $where . ( $where_filters || '' ) . ( $having || '' ) . $order_by . $limit;
 my @bind_params;
-push @bind_params, @where_params, @where_filters_params, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
+push @bind_params,
+    @where_params,
+    @where_filters_params,
+    @$filter_params,
+    $dtparam{'iDisplayLength'} ne '-1' ? ($dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'}) : ();
 my $sth = $dbh->prepare($query);
 $sth->execute(@bind_params);
 my $results = $sth->fetchall_arrayref({});
