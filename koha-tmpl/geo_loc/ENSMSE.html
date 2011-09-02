@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<title>MINES 42</title>
+<style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0px; padding: 0px }
+  #map { height: 100% }
+  h4 { font-family: verdana; font-size : 12px; font-weight: bold; }
+  p { font-family: verdana; font-size : 11px; font-weight: normal; }
+  span.st { font-family: verdana; font-size : 11px; font-weight: normal; }
+</style>	
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript">
+	window.onload = function() {
+		// coord bib
+		var myLatlng_1 = new google.maps.LatLng(45.422705,4.408777);
+		var myLatlng_2 = new google.maps.LatLng(45.427572,4.404637);
+		var myLatlng   = new google.maps.LatLng(45.425448,4.40644);
+	
+		// Carte centrée sur bib
+		var myMapOptions = {
+			zoom: 16,
+			center: myLatlng,
+			mapTypeId: google.maps.MapTypeId.HYBRID
+		};
+		
+		// Création de la carte
+		var myMap = new google.maps.Map(
+			document.getElementById('map'),
+			myMapOptions
+			);
+		
+		// Création du logo
+		var myMarkerImage = new google.maps.MarkerImage('../opac-tmpl/prog/images/logo_mines42.png');
+		
+		// Création du marker
+		var myMarker_1 = new google.maps.Marker({
+			// Coordonnées
+			position: myLatlng_1, 
+			map: myMap,
+			// info bulle sur le logo
+			icon: myMarkerImage,
+			title: "Bibliothèque de l'écoles des mines Saint Etienne"
+		});
+		var myMarker_2 = new google.maps.Marker({
+			// Coordonnées
+			position: myLatlng_2, 
+			map: myMap,
+			// info bulle sur le logo
+			icon: myMarkerImage,
+			title: "Bibliothèque de l'écoles des mines Saint Etienne"
+		});
+		
+		// texte de la fenêtre
+		var myWindowOptions_1 = {
+			content:
+			'<h4>SCIDEM<br /><span class="st">Service Commun de l\'Information et de la Documentation de l\'Ecole des Mines</span></h4>'+
+			'<p>158, cours Fauriel<br />F-42023 SAINT-ÉTIENNE cedex 2<br />Tél. : +33 (0)4 77 42 01 23<br />'+
+			'<a href="http://www.emse.fr/scidem/" title="SCIDEM" target="bib">le site web de la Bibliothèque</a> (horaires ... )</p>'+
+			'<p><a href="http://maps.google.fr/maps/ms?ie=UTF8&hl=fr&msa=0&msid=206165736844474917031.0004a1444a797f33430c7&ll=45.431829,4.398651&spn=0.048969,0.077162&t=h&z=14" title="BRISE-ES" target="brise-es">Situez les bibliothèques du réseau BRISE-ES</a><br />(outils google maps : itinéraires, plan ...)</p>'
+		};
+
+		var myWindowOptions_2 = {
+			content:
+			'<h4>Ecole des Mines<br /><span class="st">Espace Fauriel</span></h4>'+
+			'<p>29, rue Ponchardier<br />'+
+			'<a href="http://www.emse.fr/scidem/" title="SCIDEM" target="bib">le site web de la Bibliothèque</a> (horaires ... )</p>'+
+			'<p><a href="http://maps.google.fr/maps/ms?ie=UTF8&hl=fr&msa=0&msid=206165736844474917031.0004a1444a797f33430c7&ll=45.431829,4.398651&spn=0.048969,0.077162&t=h&z=14" title="BRISE-ES" target="brise-es">Situez les bibliothèques du réseau BRISE-ES</a><br />(outils google maps : itinéraires, plan ...)</p>'
+		};
+
+		
+		// Création de la fenêtre
+		var myInfoWindow_1 = new google.maps.InfoWindow(myWindowOptions_1);
+		var myInfoWindow_2 = new google.maps.InfoWindow(myWindowOptions_2);
+		
+		// Affichage de la fenêtre au survol de la carte
+		google.maps.event.addListener(myMap, 'mouseover', function() {
+			myInfoWindow_1.open(myMap,myMarker_1); myInfoWindow_2.open(myMap,myMarker_2);
+		});
+
+		// suppression affichage de la fenêtre si souris endehords  de la carte
+		google.maps.event.addListener(myMap, 'mouseout', function() {
+			myInfoWindow_1.close(myMap,myMarker_1); myInfoWindow_2.close(myMap,myMarker_2);
+		});
+	}
+	</script>
+</head>
+
+<body>
+	<div id="map">
+	</div>
+</body>
+</html>
