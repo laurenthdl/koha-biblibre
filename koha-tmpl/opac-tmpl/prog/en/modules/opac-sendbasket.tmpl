@@ -1,11 +1,15 @@
 <SUBJECT>
-Your Cart
+Bibliographic references from Brise-es
 <END_SUBJECT>
 
 <HEADER>
 Hi,
 
-<!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" --> sent you a cart from our online catalog.
+A cart from Brise-ES online catalog.
+
+<!-- TMPL_IF NAME="comment" -->
+<!-- TMPL_VAR NAME="comment" -->
+<!-- /TMPL_IF -->
 
 Please note that the attached file is a MARC biblographic records file
 which can be imported into a Personal Bibliographic Software like EndNote,
@@ -14,9 +18,6 @@ Reference Manager or ProCite.
 
 <MESSAGE>
 ---------------------------------------------
-<!-- TMPL_IF NAME="comment" -->
-<!-- TMPL_VAR NAME="comment" -->
-<!-- /TMPL_IF -->
 <!-- TMPL_LOOP NAME="BIBLIO_RESULTS" --><!-- TMPL_VAR NAME="title" --><!-- TMPL_IF name="subtitle" --> <!-- TMPL_VAR NAME="subtitle" --><!-- /TMPL_IF --><!-- TMPL_IF "HASAUTHORS" -->
 Author(s): <!-- TMPL_IF NAME="author" --><!-- TMPL_VAR NAME="author" --><!-- /TMPL_IF --><!-- TMPL_IF name="MARCAUTHORS" --><!-- TMPL_IF NAME="author" -->; <!-- /TMPL_IF --><!-- TMPL_LOOP NAME="MARCAUTHORS" --><!-- TMPL_LOOP NAME="MARCAUTHOR_SUBFIELDS_LOOP" --><!-- TMPL_VAR NAME="separator" --><!-- TMPL_VAR NAME="value" --><!-- /TMPL_LOOP --><!-- TMPL_UNLESS NAME="__last__" -->; <!-- TMPL_ELSE --><!-- /TMPL_UNLESS --><!-- /TMPL_LOOP --><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- TMPL_IF name="ISBN" -->
 ISBN: <!-- TMPL_VAR NAME="ISBN" --><!-- /TMPL_IF -->

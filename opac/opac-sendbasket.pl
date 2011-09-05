@@ -30,6 +30,7 @@ use C4::Auth;
 use C4::Output;
 use C4::Biblio;
 use C4::Members;
+use MARC::File::XML;
 
 my $query = new CGI;
 
@@ -37,7 +38,7 @@ my ( $template, $borrowernumber, $cookie ) = get_template_and_user(
     {   template_name   => "opac-sendbasketform.tmpl",
         query           => $query,
         type            => "opac",
-        authnotrequired => 0,
+        authnotrequired => 1, # modif brisees
         flagsrequired   => { borrow => 1 },
     }
 );
@@ -67,7 +68,7 @@ if ($email_add) {
 
     my @bibs = split( /\//, $bib_list );
     my @results;
-    my $iso2709;
+    my $iso2709; 
     my $marcflavour = C4::Context->preference('marcflavour');
     foreach my $biblionumber (@bibs) {
         $template2->param( biblionumber => $biblionumber );
@@ -92,21 +93,21 @@ if ($email_add) {
         $dat->{'biblionumber'} = $biblionumber;
         $dat->{ITEM_RESULTS}   = \@items;
 
-        $iso2709 .= $record->as_usmarc();
+        $iso2709 .= $record->as_usmarc(); 
 
         push( @results, $dat );
     }
 
     my $resultsarray = \@results;
 
-    my $user = GetMember( borrowernumber => $borrowernumber );
+#    my $user = GetMember( borrowernumber => $borrowernumber );  modif brisees
 
     $template2->param(
         BIBLIO_RESULTS => $resultsarray,
         email_sender   => $email_sender,
         comment        => $comment,
-        firstname      => $user->{firstname},
-        surname        => $user->{surname},
+#        firstname      => $user->{firstname},  modif brisees
+#        surname        => $user->{surname},  modif brisees
     );
 
     # Getting template result
@@ -143,7 +144,7 @@ if ($email_add) {
     #     # Writing mail
     #     $mail{body} =
     $mail{'content-type'} = "multipart/mixed; boundary=\"$boundary\"";
-    my $isofile = encode_base64( encode( "UTF-8", $iso2709 ) );
+    my $isofile = encode_base64( encode( "UTF-8", $iso2709 ) ); 
     $boundary = '--' . $boundary;
     $mail{body} = <<END_OF_BODY;
 $boundary
@@ -153,7 +154,7 @@ Content-Transfer-Encoding: quoted-printable
 $email_header
 $body
 $boundary
-Content-Type: application/octet-stream; name="basket.iso2709"
+Content-Type: application/octet-stream; name="basket.iso2709" 
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="basket.iso2709"
 
