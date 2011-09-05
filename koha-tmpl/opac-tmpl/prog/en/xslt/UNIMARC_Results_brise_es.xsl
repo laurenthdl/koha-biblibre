@@ -131,42 +131,15 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
   <xsl:call-template name="tag_930" />
 
   <xsl:call-template name="tag_940" />
+
+  <xsl:call-template name="tag_856" />
+
 </span>
 
   <span class="results_summary_dispo">
     
     <xsl:choose>
-      <xsl:when test="marc:datafield[@tag=856]">
-        <xsl:for-each select="marc:datafield[@tag=856]">
-          <!-- <xsl:choose> -->
-            <!-- <xsl:when test="@ind2=0"> a quoi correspond ce 0 ??? indic2 est blanc non def !! -->
-              <a>
-                <xsl:attribute name="href">
-                  <xsl:value-of select="marc:subfield[@code='u']"/>
-                </xsl:attribute>
-                <xsl:attribute name="target">_blank</xsl:attribute>
-                <xsl:choose>
-                  <xsl:when test="marc:subfield[@code='y' or @code='3' or @code='z']"> <!-- code=3 ??? -->
-                    <xsl:call-template name="subfieldSelect">                        
-                      <xsl:with-param name="codes">y3z</xsl:with-param>                    
-                    </xsl:call-template>
-                  </xsl:when>
-                  <xsl:when test="not(marc:subfield[@code='y']) and not(marc:subfield[@code='3']) and not(marc:subfield[@code='z'])"><!-- code=3 ??? -->
-                    Click here to access online
-                  </xsl:when>
-                </xsl:choose>
-              </a>
-              <xsl:choose>
-                <xsl:when test="position()=last()"></xsl:when>
-                <xsl:otherwise> | </xsl:otherwise>
-              </xsl:choose>
-           <!--  </xsl:when> -->
-          <!-- </xsl:choose> -->
-        </xsl:for-each>
-      </xsl:when>
-<!--      <xsl:when test="count(key('item-by-status', 'available'))=0 and count(key('item-by-status', 'reference'))=0">
-        Pas de copie disponible
-      </xsl:when> -->
+      <xsl:when test="count(key('item-by-status', 'available'))=0 and count(key('item-by-status', 'reference'))=0">&#160;</xsl:when> 
       <xsl:when test="count(key('item-by-status', 'available'))>0">
         <span class="available">
           <b><xsl:text>For loan: </xsl:text></b>
