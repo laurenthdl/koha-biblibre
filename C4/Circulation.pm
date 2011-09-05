@@ -330,7 +330,7 @@ sub transferbook {
 
     #actually do the transfer....
     if ($dotransfer) {
-        ModItemTransfer( $itemnumber, $fbr, $tbr ) unless (C4::Context->preference('OPACHoldNextInLibrary'));
+        ModItemTransfer( $itemnumber, $fbr, $tbr );
 
         # don't need to update MARC anymore, we do it in batch now
         $messages->{'WasTransfered'} = 1;
