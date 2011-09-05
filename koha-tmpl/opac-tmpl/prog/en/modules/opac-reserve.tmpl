@@ -205,9 +205,9 @@
                     selections=biblioNum+separator+separator+branch+separator+availBranch;
                 } else {
                     // If the request is for any item in any location,
-                    // we do not set branch and firstavailablebranch.
+                    // we do not set firstavailablebranch.
                     // Branch will be set later, when we know which one it is
-                    selections=biblioNum+separator+separator+separator;
+                    selections=biblioNum+separator+separator+branch+separator;
                 }
 
             }
