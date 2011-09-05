@@ -462,6 +462,8 @@
                         <table>
                           <tr>
                             <td>
+
+                            <!-- TMPL_UNLESS NAME="onlynextat" -->
                               <!-- TMPL_UNLESS NAME="holdable" -->
                                 <input type="radio" name="reqtype_<!-- TMPL_VAR NAME="biblionumber" -->"
                                        id="reqany_<!-- TMPL_VAR NAME="biblionumber" -->"
@@ -478,6 +480,7 @@
                                 />
                               <!-- /TMPL_UNLESS -->
                               <label for="reqany_<!-- TMPL_VAR NAME="biblionumber" -->">Next available copy</label>
+                              <!-- /TMPL_UNLESS -->
                             </td>
                           </tr>
                           <!-- TMPL_IF NAME="onlynextat" -->
