@@ -1491,8 +1491,6 @@ msgstr ""
 # Cataloging > Display
 # Cataloging > Display
 # Cataloging > Display
-msgid "cataloguing.pref#OpacSuppression# Don't hide"
-msgstr ""
 
 # Cataloging > Display
 # Cataloging > Display
@@ -1508,8 +1506,6 @@ msgstr ""
 # Cataloging > Display
 # Cataloging > Display
 # Cataloging > Display
-msgid "cataloguing.pref#OpacSuppression# Hide"
-msgstr ""
 
 # Cataloging > Display
 # Cataloging > Display
@@ -1525,8 +1521,6 @@ msgstr ""
 # Cataloging > Display
 # Cataloging > Display
 # Cataloging > Display
-msgid "cataloguing.pref#OpacSuppression# items marked as suppressed from OPAC search results. Note that you must have the <code>Suppress</code> index set up in Zebra and at least one suppressed item, or your searches will be broken."
-msgstr ""
 
 # Cataloging > Spine Labels
 # Cataloging > Spine Labels
