@@ -54,8 +54,14 @@ sub MockAuthority1Author {
                                          b => "Romain");
     $record->add_fields('400', " ", " ", a => "Gaa",
                                          b => "Rom");
+    $record->add_fields('410', " ", " ", a => "Gaa410",
+                                         b => "Rom410",
+                                         42 => "42410");
     $record->add_fields('700', " ", " ", a => "Ajar",
                                          b => "Emilie");
+    $record->add_fields('710', " ", " ", a => "Ajar710",
+                                         b => "Emilie710",
+                                         43 => "43710");
     return $record;
 }
 
@@ -67,7 +73,6 @@ sub MockAuthority1Author {
 sub MockMappingAuthor {
   {
      200 => ['f','g'],
-     225 => ['g'],
      '7..' => ['*']
   }
 }
