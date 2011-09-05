@@ -205,9 +205,9 @@
                     selections=biblioNum+separator+separator+branch+separator+availBranch;
                 } else {
                     // If the request is for any item in any location,
-                    // we do not set branch and firstavailablebranch.
+                    // we do not set firstavailablebranch.
                     // Branch will be set later, when we know which one it is
-                    selections=biblioNum+separator+separator+separator;
+                    selections=biblioNum+separator+separator+branch+separator;
                 }
 
             }
@@ -326,9 +326,7 @@
 		  <th>Hold Starts on Date</th>
 		  <!-- /TMPL_IF -->
 		  <th>Hold Not Needed After</th>
-                  <!-- TMPL_IF NAME="OPACItemHolds" -->
-                    <th id="place_on_hdr" style="display:none">Place On</th>
-                  <!-- /TMPL_IF -->
+                  <th id="place_on_hdr" style="display:none">Place On</th>
                   <!-- TMPL_UNLESS NAME="singleBranchMode" -->
                     <th>Pickup Location</th>
                   <!-- /TMPL_UNLESS -->
@@ -460,11 +458,12 @@
 		<a href="#" style="font-size:85%;text-decoration:none;" onclick="document.getElementById('expiration_date_<!-- TMPL_VAR NAME="biblionumber" -->').value='';return false;">Clear Date</a></p>
 	</td>
 
-                    <!-- TMPL_IF NAME="OPACItemHolds" -->
                       <td class="place_on_type" style="display:none">
                         <table>
                           <tr>
                             <td>
+
+                            <!-- TMPL_UNLESS NAME="onlynextat" -->
                               <!-- TMPL_UNLESS NAME="holdable" -->
                                 <input type="radio" name="reqtype_<!-- TMPL_VAR NAME="biblionumber" -->"
                                        id="reqany_<!-- TMPL_VAR NAME="biblionumber" -->"
@@ -481,6 +480,7 @@
                                 />
                               <!-- /TMPL_UNLESS -->
                               <label for="reqany_<!-- TMPL_VAR NAME="biblionumber" -->">Next available copy</label>
+                              <!-- /TMPL_UNLESS -->
                             </td>
                           </tr>
                           <!-- TMPL_IF NAME="onlynextat" -->
@@ -515,7 +515,8 @@
 
                             </td>
                           </tr>
-                        <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF -->
+                    <!-- TMPL_IF NAME="OPACItemHolds" -->
                           <tr>
                             <td>
                               <!-- TMPL_UNLESS NAME="holdable" -->
@@ -535,9 +536,9 @@
                               <label for="reqspecific_<!-- TMPL_VAR NAME="biblionumber"-->">A specific copy</label>
                             </td>
                           </tr>
+                        <!-- /TMPL_IF -->
                         </table>
                       </td>
-                    <!-- /TMPL_IF -->
 
                     <!-- TMPL_UNLESS NAME="singleBranchMode" -->
                       <td>
