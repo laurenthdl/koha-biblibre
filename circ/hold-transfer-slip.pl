@@ -22,6 +22,7 @@ use strict;
 #use warnings; FIXME - Bug 2505
 use C4::Context;
 use C4::Output;
+use C4::Items qw/GetItem/;
 use CGI;
 use C4::Auth;
 use C4::Reserves;
@@ -36,6 +37,7 @@ BEGIN {
 
 my $input          = new CGI;
 my $biblionumber   = $input->param('biblionumber');
+my $itemnumber     = $input->param('itemnumber');
 my $borrowernumber = $input->param('borrowernumber');
 my $transfer       = $input->param('transfer');
 
@@ -53,6 +55,9 @@ my $reserveinfo = GetReserveInfo( $borrowernumber, $biblionumber );
 my $pulldate = C4::Dates->new();
 $reserveinfo->{'pulldate'}         = $pulldate->output();
 $reserveinfo->{'branchname'}       = GetBranchName( $reserveinfo->{'branchcode'} );
+if ((defined $itemnumber) and (my $item =GetItem($itemnumber))){
+    $reserveinfo->{'barcode'}          ||= $item->{'barcode'};
+}
 $reserveinfo->{'transferrequired'} = $transfer;
 
 $template->param( reservedata => [$reserveinfo], );
