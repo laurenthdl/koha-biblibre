@@ -1,0 +1,25 @@
+{
+  "sEcho": "<!-- TMPL_VAR NAME='sEcho' -->",
+  "iTotalRecords": "<!-- TMPL_VAR NAME='iTotalRecords' -->",
+  "iTotalDisplayRecords": "<!-- TMPL_VAR NAME='iTotalDisplayRecords' -->",
+  "aaData": [
+    <!-- TMPL_LOOP NAME='aaData' -->
+      {
+        "summary":
+            '<p><span class="title"><!-- TMPL_VAR NAME="title" escape="html" --></span><!-- TMPL_IF name="author" -->  by <span class="author"><!-- TMPL_VAR NAME="author" ESCAPE="html" --></span>,<!-- /TMPL_IF --></p><p><!-- TMPL_IF name="isbn" --> <!-- TMPL_VAR name="isbn" ESCAPE="html" --><!-- /TMPL_IF --><!-- TMPL_IF name="pages" --> - <!-- TMPL_VAR name="pages" ESCAPE="html" --><!-- /TMPL_IF --><!-- TMPL_IF name="notes" --> : <!-- TMPL_VAR name="notes" ESCAPE="html" --><!-- /TMPL_IF --><!-- TMPL_IF name="size" --> ; <!-- TMPL_VAR name="size" ESCAPE="html" --><!-- /TMPL_IF --></p>',
+        
+        "publisher":
+            '<!-- TMPL_VAR name="publishercode" ESCAPE="html" --><!-- TMPL_IF name="place" --> ; <!-- TMPL_VAR name="place" ESCAPE="html" --><!-- /TMPL_IF -->',
+        
+        "copyright":
+            '<!-- TMPL_VAR NAME="copyrightdate" ESCAPE="html" -->',
+
+        "view_marc":
+            '<a href="/cgi-bin/koha/catalogue/showmarc.pl?id=<!-- TMPL_VAR NAME="biblionumber" -->" title="MARC" rel="gb_page_center[600,500]">View MARC</a>',
+
+        "order":
+            '<a href="/cgi-bin/koha/acqui/neworderempty.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->" title="Order this one">Order</a>'
+      }<!-- TMPL_UNLESS NAME='__last__' -->,<!-- /TMPL_UNLESS -->
+    <!-- /TMPL_LOOP -->
+  ]
+}
