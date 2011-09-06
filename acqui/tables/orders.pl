@@ -6,35 +6,10 @@ use C4::Search::Query;
 use C4::Output;
 use C4::Auth;
 use C4::Biblio;
+use C4::Utils::DataTables;
+use C4::Utils::DataTables::Solr;
 
 my $input = new CGI;
-
-my $query = $input->param('query') || "*:*";
-my $count = $input->param('iDisplayLength');
-my $page = int($input->param('iDisplayStart') / $count) + 1;
-
-my @filters = $input->param('filters');
-my @filters_values = $input->param('filters_values');
-
-my $search_filters = { recordtype => "biblio" };
-for (my $i = 0; $i < scalar(@filters); $i++) {
-    my $idx = C4::Search::Query::getIndexName($filters[$i]);
-    $search_filters->{$idx} = $filters_values[$i];
-}
-
-# Sorting on only one column
-my $sort;
-my $sortingCol = $input->param('iSortCol_0');
-if(defined $sortingCol) {
-    my $colName = $input->param("mDataProp_$sortingCol");
-    if($colName) {
-        my $sortIdx = $input->param($colName."_sorton") || $colName;
-        my $sortIdxName = C4::Search::Query::getIndexName($sortIdx);
-        if($sortIdxName) {
-            $sort = $sortIdxName . " " . $input->param('sSortDir_0');
-        }
-    }
-}
 
 my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user({
     template_name   => "acqui/tables/orders.tmpl",
@@ -43,6 +18,20 @@ my ($template, $loggedinuser, $cookie, $flags) = get_template_and_user({
     authnotrequired => 0,
     flagsrequired   => { acquisition => 'order_manage' },
 });
+
+my $query = $input->param('query');
+my $count = $input->param('iDisplayLength');
+my $page = int($input->param('iDisplayStart') / $count) + 1;
+
+my @filters = $input->param('filters');
+my @filters_values = $input->param('filters_values');
+
+my $search_filters = dt_build_filters(\@filters, \@filters_values);
+$search_filters->{'recordtype'} = "biblio";
+
+my %dtparam = dt_get_params($input);
+my $sort = dt_build_sort(\%dtparam);
+
 
 $query = C4::Search::Query->normalSearch($query);
 my $res = SimpleSearch($query, $search_filters, $page, $count, $sort);
