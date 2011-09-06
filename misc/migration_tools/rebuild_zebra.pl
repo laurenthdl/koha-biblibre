@@ -453,7 +453,7 @@ sub get_raw_marc_record {
                            # trying to process a record update
             }
         } else {
-            eval { $marc = GetMarcBiblio($record_number,"include_deleted_table"); };
+            eval { $marc = GetMarcBiblio($record_number,undef, "include_deleted_table"); };
             if ($@) {
 
                 # here we do warn since catching an exception

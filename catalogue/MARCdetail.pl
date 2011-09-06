@@ -69,7 +69,7 @@ my $subscriptionid = $query->param('subscriptionid');
 
 my $tagslib = &GetMarcStructure( 1, $frameworkcode );
 
-my $record = GetMarcBiblio($biblionumber);
+my $record = GetMarcBiblio($biblionumber, 1);
 my $biblio = GetBiblioData($biblionumber);
 
 
