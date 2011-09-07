@@ -120,6 +120,11 @@ my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
     }
 );
 
+if(!$basketno) {
+    my $order = GetOrder($ordernumber);
+    $basketno = $order->{'basketno'};
+}
+
 my $basket   = GetBasket($basketno);
 my $contract = &GetContract( $basket->{contractnumber} );
 
