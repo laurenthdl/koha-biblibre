@@ -770,8 +770,6 @@ sub BuildSummary {
     $thesaurus{'6'} = "Sujets";
 
     #thesaurus a remplir
-    my @fields = $record->fields();
-    my $reported_tag;
 
     # if the library has a summary defined, use it. Otherwise, build a standard one
     # FIXME - it appears that the summary field in the authority frameworks
@@ -780,35 +778,39 @@ sub BuildSummary {
     #         feature will be enabled only for UNIMARC for backwards
     #         compatibility.
     if ( $summary and C4::Context->preference('marcflavour') eq 'UNIMARC' ) {
-        my @fields = $record->fields();
-
-        #             $reported_tag = '$9'.$result[$counter];
-        my @stringssummary;
-        foreach my $field (@fields) {
-            my $tag          = $field->tag();
-            my $tagvalue     = $field->as_string();
-            my $localsummary = $summary;
-            $localsummary =~ s/\[(.?.?.?.?)$tag\*(.*?)\]/$1$tagvalue$2\[$1$tag$2\]/g;
-            if ( $tag < 10 ) {
-                if ( $tag eq '001' ) {
-                    $reported_tag .= '$3' . $field->data();
+        my @matches = ($summary =~ m/\[(.*?)(\d{3})([\*a-z0-9])(.*?)\]/g);
+        my (@textbefore, @tag, @subtag, @textafter);
+        for(my $i = 0; $i < scalar @matches; $i++){
+            push @textbefore, $matches[$i] if($i%4 == 0);
+            push @tag,        $matches[$i] if($i%4 == 1);
+            push @subtag,     $matches[$i] if($i%4 == 2);
+            push @textafter,  $matches[$i] if($i%4 == 3);
+        }
+        for(my $i = scalar @tag; $i >= 0; $i--){
+            my $textbefore = $textbefore[$i];
+            my $tag = $tag[$i];
+            my $subtag = $subtag[$i];
+            my $textafter = $textafter[$i];
+            my $value;
+            my $field = $record->field($tag);
+            next unless $field;
+            if($subtag eq '*') {
+                if($tag < 10) {
+                    $value = $textbefore . $field->data() . $textafter;
+                } else {
+                    $value = '';
                 }
             } else {
-                my @subf = $field->subfields;
-                for my $i ( 0 .. $#subf ) {
-                    my $subfieldcode  = $subf[$i][0];
-                    my $subfieldvalue = $subf[$i][1];
-                    my $tagsubf       = $tag . $subfieldcode;
-                    $localsummary =~ s/\[(.?.?.?.?)$tagsubf(.*?)\]/$1$subfieldvalue$2\[$1$tagsubf$2\]/g;
+                my $subfield = $field->subfield($subtag);
+                if(defined $subfield) {
+                    $value = $textbefore . $subfield . $textafter;
+                } else {
+                    $value = '';
                 }
             }
-            push @stringssummary, $localsummary if ( $localsummary ne $summary );
+            $summary =~ s/\[\Q$textbefore$tag$subtag$textafter\E\]/$value/;
         }
-        my $resultstring;
-        $resultstring = join( " -- ", @stringssummary );
-        $resultstring =~ s/\[(.*?)\]//g;
-        $resultstring =~ s/\n/<br>/g;
-        $summary = $resultstring;
+        $summary =~ s/\\n/<br \/>/g;
     } else {
         my $heading;
         my $altheading;
