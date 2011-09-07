@@ -4,7 +4,7 @@
 //  $("#table_id").dataTable($.extend(true, {}, dataTableDefaults, {
 //      // other settings
 //  } ) );
-var dataTablesDefaults = {
+var dataTableDefaults = {
     "oLanguage": {
         "oPaginate": {
             "sFirst"    : _("First"),
@@ -15,7 +15,7 @@ var dataTablesDefaults = {
         "sEmptyTable"       : _("No data available in table"),
         "sInfo"             : _("Showing _START_ to _END_ of _TOTAL_ entries"),
         "sInfoEmpty"        : _("No entries to show"),
-        "sInfoFiltered"     : _("(filtered from _MAX_ total entries)"),
+        "sInfoFiltered"     : _("(filtered from _MAX_ total entries"),
         "sLengthMenu"       : _("Show _MENU_ entries"),
         "sLoadingRecords"   : _("Loading..."),
         "sProcessing"       : _("Processing..."),
@@ -109,20 +109,21 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay )
 }
 
 // Add a filtering delay on general search and on all input (with a class 'filter')
-jQuery.fn.dataTableExt.oApi.fnAddFilters = function ( oSettings, sClass, iDelay ) {
+jQuery.fn.dataTableExt.oApi.fnAddFilteringDelay = function ( oSettings, iDelay ) {
     var table = this;
     this.fnSetFilteringDelay(iDelay);
     var filterTimerId = null;
-    $("input."+sClass).keyup(function(event) {
+    $("input.filter").keyup(function(event) {
+      var $this = this;
       if (blacklist_keys.indexOf(event.keyCode) != -1) {
         return this;
       }else if ( event.keyCode == '13' ) {
-        table.fnFilter( $(this).val(), $(this).attr('data-column_num') );
+        $.fn.dataTableExt.iApiIndex = i;
+        _that.fnFilter( $(this).val() );
       } else {
         window.clearTimeout(filterTimerId);
-        var input = this;
         filterTimerId = window.setTimeout(function() {
-          table.fnFilter($(input).val(), $(input).attr('data-column_num'));
+          table.fnFilter($($this).val(), $($this).attr('data-column_num'));
         }, iDelay);
       }
     });
@@ -241,79 +242,6 @@ function dt_overwrite_string_sorting_localeCompare() {
             return (b > a) ? 1 : ((b < a) ? -1 : 0);
         }
     };
-}
-
-function dt_add_type_totalcost() {
-  function totalcost_sort(a,b) {
-    a = a.replace(/\s+/g, " ");
-    b = b.replace(/\s+/g, " ");
-    var re = /(\d+\.\d+)x(\d+) = (\d+\.\d+) <p.*>(.*)<\/p>/;
-    a.match(re);
-    var a_ecost = RegExp.$1 * 1;
-    var a_qty = RegExp.$2 * 1;
-    var a_total = RegExp.$3 * 1;
-    var a_budget = RegExp.$4;
-    b.match(re);
-    var b_ecost = RegExp.$1 * 1;
-    var b_qty = RegExp.$2 * 1;
-    var b_total = RegExp.$3 * 1;
-    var b_budget = RegExp.$4;
-
-    var r = (a_total > b_total) ? 1 : ((a_total < b_total) ? -1 : 0);
-
-    if(r == 0){
-      if(typeof(a_budget.localeCompare == "function")){
-        r = a_budget.localeCompare(b_budget);
-      }else{
-        r = (a_budget > b_budget) ? 1 : ((a_budget < b_budget) ? -1 : 0);
-      }
-    }
-
-    return r;
-  }
-
-  jQuery.fn.dataTableExt.oSort['totalcost-asc'] = function(a,b) {
-    return totalcost_sort(a,b);
-  };
-
-  jQuery.fn.dataTableExt.oSort['totalcost-desc'] = function(a,b) {
-    return totalcost_sort(b,a);
-  };
-}
-
-function dt_add_type_htmlbasketno() {
-  function htmlbasketno_sort(a, b) {
-    a = a.replace(/\s+/g, " ");
-    b = b.replace(/\s+/g, " ");
-
-    var re = /<.*?basketno=.*?>(\d+)<.*?> (.*)/;
-    a.match(re);
-    var a_basketno = RegExp.$1 * 1;
-    var a_string = RegExp.$2.replace(/<.*?>/g, "");
-    b.match(re);
-    var b_basketno = RegExp.$1 * 1;
-    var b_string = RegExp.$2.replace(/<.*?>/g, "");
-
-    var r = (a_basketno > b_basketno) ? 1 : ((a_basketno < b_basketno) ? -1 : 0);
-
-    if(r == 0) {
-      if(typeof(a_string.localeCompare == "function")){
-        r = a_string.localeCompare(b_string);
-      }else{
-        r = (a_string > b_string) ? 1 : ((a_string < b_string) ? -1 : 0);
-      }
-    }
-
-    return r;
-  }
-
-  jQuery.fn.dataTableExt.oSort['htmlbasketno-asc'] = function(a,b) {
-      return htmlbasketno_sort(a,b);
-  };
-
-  jQuery.fn.dataTableExt.oSort['htmlbasketno-desc'] = function(a,b) {
-      return htmlbasketno_sort(b,a);
-  };
 }
 
 // Replace a node with a html and js contain.
