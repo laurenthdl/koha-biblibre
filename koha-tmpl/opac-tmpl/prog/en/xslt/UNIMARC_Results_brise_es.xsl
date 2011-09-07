@@ -59,13 +59,20 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
 </span>
       	<span class="results_titre">
     <xsl:for-each select="marc:datafield[@tag=200]">
+    <xsl:for-each select="marc:subfield[@code='a']">
 <a><xsl:attribute name="href">/cgi-bin/koha/opac-detail.pl?biblionumber=<xsl:value-of select="$biblionumber"/>
            </xsl:attribute>
-        <xsl:variable name="title" select="marc:subfield[@code='a']"/>
+        <xsl:variable name="title" select="."/>
         <xsl:variable name="ntitle"
              select="translate($title, '&#x0098;&#x009C;&#xC29C;&#xC29B;&#xC298;&#xC288;&#xC289;','')"/>
         <xsl:value-of select="$ntitle" />
-      </a>
+          <xsl:choose>
+            <xsl:when test="position()!=last()">
+              <xsl:text> ; </xsl:text>
+            </xsl:when>
+          </xsl:choose>
+    </xsl:for-each>
+   </a>
      <!-- sous titre -->
       <xsl:if test="marc:subfield[@code='e']">
         <xsl:text> : </xsl:text>
