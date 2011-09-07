@@ -138,8 +138,8 @@ var param1 = "<input type=\"submit\" class=\"submit\" value=\""+_("Save on")+"\"
     $('#sort_by').change(function() {
         $('#bookbag_form').submit();
     });
-	$("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_("Clear All on page")+"<\/a>");
-	$("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_("Select All on page")+"<\/a>");
+	$("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_("Unselect")+"<\/a>");
+	$("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_("Select")+"<\/a>");
 <!-- TMPL_IF NAME="opacbookbag" -->$("span.addto").html(param1);<!-- TMPL_ELSE --><!-- TMPL_IF NAME="virtualshelves" --><!-- TMPL_IF NAME="loggedinusername" -->$("span.addto").html(param1);<!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
 
 	<!-- TMPL_IF NAME="virtualshelves" -->
@@ -288,8 +288,9 @@ var param1 = "<input type=\"submit\" class=\"submit\" value=\""+_("Save on")+"\"
                         </div>
                         <div class="cartlist">
                             <!-- checkall, clearall are now needed for placehold -->
-                            <span class="checkall"></span>
-                            <span class="clearall"></span>
+<!-- debut modif brisees -->
+                            <span class="checkall"></span>|<span class="clearall"></span><span>all on page for</span>
+<!-- fin modif brisees -->
                             <a href="#" class="highlight_toggle" id="highlight_toggle_off">Unhighlight</a>
                             <a href="#" class="highlight_toggle" id="highlight_toggle_on">Highlight</a>
                             <!-- TMPL_IF EXPR="opacbookbag || virtualshelves" -->

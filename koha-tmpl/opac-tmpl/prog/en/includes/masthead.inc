@@ -1,13 +1,11 @@
 <div id="header-wrapper"><div id="members">
   <!-- TMPL_IF NAME="opacuserlogin" -->
-	<ul>
-<!-- debut ajout brisees -->
-<li><span id="spe">Bienvenue sur le catalogue BRISE-ES des bibliothèques d'enseignement supérieur de Saint Etienne</span></li>
-<!-- fin ajout brisees -->
+<!-- debut modif brisees -->
+<span id="title">Bienvenue sur le catalogue BRISE-ES des bibliothèques d'enseignement supérieur de Saint Etienne</span>
 <!-- TMPL_UNLESS NAME="loggedinusername" -->
-               <li><a href="/cgi-bin/koha/opac-user.pl">Log in to Your Account</a></li><!-- /TMPL_UNLESS -->
-            <!-- TMPL_IF NAME="loggedinusername" -->
-                <li><span class="members">Welcome, <a href="/cgi-bin/koha/opac-user.pl"><span class="loggedinusername"><!-- TMPL_LOOP NAME="USER_INFO" --><!-- TMPL_VAR NAME="title" --> <!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" --><!-- /TMPL_LOOP --></span></a></span></li>
+               <span class="members"><a href="/cgi-bin/koha/opac-user.pl">Log in to Your Account</a></span><!-- /TMPL_UNLESS -->
+             <!-- TMPL_IF NAME="loggedinusername" --><span class="members"><a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1">Log Out</a></span>
+                <span class="members">Welcome, <a href="/cgi-bin/koha/opac-user.pl"><span class="loggedinusername"><!-- TMPL_LOOP NAME="USER_INFO" --><!-- TMPL_VAR NAME="title" --> <!-- TMPL_VAR NAME="firstname" --> <!-- TMPL_VAR NAME="surname" --><!-- /TMPL_LOOP --></span></a></span>
 
             <!-- /TMPL_IF -->
 <!-- debut modif brisees
@@ -19,9 +17,9 @@
                 </script>
                 <li><a href="/cgi-bin/koha/opac-search-history.pl" title="View your search history">Search history</a> [<a class="logout" href="/cgi-bin/koha/opac-search-history.pl?action=delete" title="Delete your search history" onclick="return ConfirmHistoryDeletion();">x</a>]</li>
             <!-- /TMPL_IF -->
+			<!-- TMPL_IF NAME="loggedinusername" --><span class="members"><a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1">Log Out</a></span><!-- /TMPL_IF -->
 fin de modif brisees -->
-			<!-- TMPL_IF NAME="loggedinusername" --><li><a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1">Log Out</a></li><!-- /TMPL_IF -->
-   	</ul>	
+<!-- fin modif brisees -->
   <!-- /TMPL_IF -->
 </div>
   <!-- TMPL_IF NAME="opacheader" -->

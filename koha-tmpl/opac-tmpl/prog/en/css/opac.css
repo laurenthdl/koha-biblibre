@@ -2,7 +2,7 @@
 @import url("../../en/lib/yui/skin.css");
 
 a {
-	font-weight : bold;
+/*	font-weight : bold; modif brisees */
 	text-decoration : none;
 }
 
@@ -36,8 +36,8 @@ caption {
     background-image : none ;
     color: #C0C0C0;
     border-left : 0px solid #FFF;
-    font-size : 80%;
-    padding-left : 500px;
+    font-size : 70%;
+    padding-left : 65%;
 }
 /* fin ajout brisees */
 
@@ -332,7 +332,7 @@ td caption {
 
 th {
 	background-color:#EEE;
-	font-weight : bold;
+/*	font-weight : bold; modif brisees */
 	padding : 2px 23px;
 	text-align : center;
 }
@@ -385,6 +385,9 @@ tr.transfered td {
 	background-position:right center;
 	background-repeat:no-repeat;
 	cursor:pointer;
+/* debut modif brisees */
+	color : #A0A0A0;
+/* fin modif brisees */
 }
 .headerSortUp {
 	background-image:url("../../images/asc.gif");
@@ -773,6 +776,7 @@ fin modif brisees */
 /*	background-color: #fff; modif brisees */
 /* debut ajout brisees */
 	background-color: #F3F3F3;
+	height : 15px ;
 /* fin ajout brisees */
 	font-size : 85%;
 	margin-left : -10px;
@@ -792,11 +796,11 @@ fin modif brisees */
 	text-decoration : none;
 }
 
-#members li:last-child {
+#members li:last-child { /*obsolete modif brisees */
 	border-right : 0;
-}
+} 
 
-#members li {
+#members li { /*obsolete modif brisees */
 	border-right : 1px solid black;
 	display : inline;
 	list-style : none;
@@ -805,14 +809,20 @@ fin modif brisees */
 }
 
 /* debut ajout brisees */
-#members li #spe {
-    margin-right : 250px ;
+#members  #title {
+    float : left ;
+    margin-left : 20px ;
     border-right : 0px ;
     font-size : 110% ;
     }
+
+#members .members {
+        margin-right:10px;
+        float:right;
+}
 /* fin ajout brisees */
 
-#members ul {
+#members ul { /*obsolete modif brisees */
 	margin : 0;
 	padding : 0;
 	text-align : right;
@@ -943,7 +953,7 @@ fin modif brisees */
 #breadcrumbs {
 /*	padding : .7em; modif brisees */
 /* debut modif brisees */
-        padding : .3em;
+        padding : .15em;
 /* fin modif brisees */
 }
 
@@ -984,7 +994,7 @@ em {
 }
 
 #bookcover img {
-	margin : 0 1em 1em 0;	
+	margin : 1.8em 1em 1em 0; /* modif brisees */	
 }
 
 fieldset.brief {
@@ -1376,6 +1386,10 @@ padding-left : .4em;
     margin-bottom : 0.3em ;
 }
 
+.results_titre a {
+    font-weight: bold;
+}
+
 .results_summary_coll {
     display : block ;
     font-size : 90%;
@@ -1601,10 +1615,14 @@ div.message {
 #opac-main-search #listsmenu .bd {
 	background-color : #f3f3f3;
 	border : 1px solid #739acf;
-	background-image : url("../../images/listmenu-container-bg.gif");
+/*	background-image : url("../../images/listmenu-container-bg.gif"); modif brisees 
 	background-position : top right;
-	background-repeat : repeat-y;
+	background-repeat : repeat-y; modif brisees */
 	padding : .3em 1em 0 0;
+/* debut modif brisees */
+	background-color : #F2F6FE;
+/* fin modif brisees */
+
 }
 
 #opac-main-search #listsmenu .yuimenuitemlabel.selected {
@@ -1635,6 +1653,8 @@ div.message {
 div#opacnav {
      background-color:#F3F3F3;
     font-size : 85%;
+    padding : 2px 3px;
+    margin : 3px 0 0 0 ;
 }
 
 div#opacnav a {
