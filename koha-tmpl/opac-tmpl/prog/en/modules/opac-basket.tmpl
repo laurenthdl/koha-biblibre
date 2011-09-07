@@ -295,9 +295,7 @@ function tagAdded() {
             <td><!-- TMPL_IF NAME="ITEM_RESULTS" --><!-- TMPL_LOOP NAME="ITEM_RESULTS" -->
                 <p>
                     <!-- TMPL_VAR NAME="branchname" --><!-- TMPL_IF NAME="location" -->, <!-- TMPL_VAR NAME="location" --><!-- /TMPL_IF -->
-                    <!-- TMPL_IF name="itemcallnumber" -->
-                        (<!-- TMPL_VAR NAME="itemcallnumber" -->)
-                    <!-- /TMPL_IF -->
+                  ( <!-- TMPL_IF NAME="copynumber" --><!-- TMPL_VAR                        NAME="copynumber" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="price" --> <!-- TMPL_VAR              NAME="price" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="statisticvalue" --> <!-- TMPL_VAR          NAME="statisticvalue" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="stack" --> <!-- TMPL_VAR          NAME="stack" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR          NAME="itemcallnumber" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="materials" --> <!-- TMPL_VAR      NAME="materials" --><!-- /TMPL_IF -->)
                 </p>
                 <!-- /TMPL_LOOP --><!-- TMPL_ELSE -->This record has no items.<!-- /TMPL_IF --></td>
         </tr>
@@ -367,9 +365,7 @@ function tagAdded() {
                 <td><!-- TMPL_IF NAME="ITEM_RESULTS" --><!-- TMPL_LOOP NAME="ITEM_RESULTS" -->
                     <p>
                         <!-- TMPL_VAR NAME="branchname" --><!-- TMPL_IF NAME="location_description" -->, <!-- TMPL_VAR NAME="location_description" --><!-- /TMPL_IF -->
-                        <!-- TMPL_IF name="itemcallnumber" -->
-                            (<!-- TMPL_VAR NAME="itemcallnumber" -->)
-                        <!-- /TMPL_IF -->
+                    <br/>    (<!-- TMPL_IF NAME="copynumber" --><!-- TMPL_VAR                        NAME="copynumber" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="price" --> <!-- TMPL_VAR              NAME="price" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="statisticvalue" --> <!-- TMPL_VAR          NAME="statisticvalue" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="stack" --> <!-- TMPL_VAR          NAME="stack" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR          NAME="itemcallnumber" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="materials" --> <!-- TMPL_VAR      NAME="materials" --><!-- /TMPL_IF -->)
                     </p>
                     <!-- /TMPL_LOOP --><!-- TMPL_ELSE -->This record has no items.<!-- /TMPL_IF --></td>
             </tr>
