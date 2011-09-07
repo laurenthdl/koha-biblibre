@@ -1,0 +1,103 @@
+
+30/08/2011 12:07:50  Authentication successful
+30/08/2011 12:07:50  Auth:
+<?xml version='1.0' standalone='yes'?>
+<response>
+  <status>ok</status>
+</response>
+
+30/08/2011 12:07:55  Authentication successful
+30/08/2011 12:07:55  Auth:
+<?xml version='1.0' standalone='yes'?>
+<response>
+  <status>ok</status>
+</response>
+
+30/08/2011 12:08:52 
+>>> Checkout barcode 38700001832261 for borrower 613	response times (in ms) for run 12 : 7882[OK]
+>>> Checkout barcode 38700005722534 for borrower 427	response times (in ms) for run 6 : 1374[OK]
+>>> Checkout barcode 38700004092863 for borrower 800	response times (in ms) for run 17 : 1562[OK]
+>>> Checkout barcode 38700004309887 for borrower 316	response times (in ms) for run 0 : 1249[OK]
+>>> Checkout barcode 38700003918654 for borrower 364	response times (in ms) for run 13 : 1477[OK]
+>>> Checkout barcode 38700004489887 for borrower 364	response times (in ms) for run 8 : 5347[OK]
+>>> Checkout barcode 38700004290624 for borrower 209	response times (in ms) for run 16 : 3503[OK]
+>>> Checkout barcode 58700001026786 for borrower 613	response times (in ms) for run 10 : 5912[OK]
+>>> Checkout barcode 38700005722518 for borrower 427	response times (in ms) for run 15 : 1409[OK]
+>>> Checkout barcode 38700003919801 for borrower 305	response times (in ms) for run 7 : 1238[OK]
+>>> Checkout barcode 38700002573088 for borrower 372	response times (in ms) for run 18 : 1251[OK]
+>>> Checkout barcode 38700004137429 for borrower 52	response times (in ms) for run 5 : 4133[OK]
+>>> Checkout barcode 38700004049905 for borrower 570	response times (in ms) for run 2 : 5932[OK]
+>>> Checkout barcode 38700005541017 for borrower 364	response times (in ms) for run 19 : 5569[OK]
+>>> Checkout barcode 38700006466149 for borrower 57	response times (in ms) for run 3 : 1265[OK]
+>>> Checkout barcode 48700001006625 for borrower 194	response times (in ms) for run 14 : 1303[OK]
+>>> Checkout barcode 38700002569870 for borrower 102	response times (in ms) for run 9 : 1283[OK]
+>>> Checkout barcode 38700004077468 for borrower 102	response times (in ms) for run 11 : 1283[OK]
+>>> Checkout barcode 38700005725081 for borrower 744	response times (in ms) for run 4 : 1459[OK]
+>>> Checkout barcode 38700005844122 for borrower 338	response times (in ms) for run 1 : 1230[OK]
+
+30/08/2011 12:09:10 
+>>> Checkout barcode 38700003017317 for borrower 428	response times (in ms) for run 12 : 4816[OK]
+>>> Checkout barcode 38700005956405 for borrower 524	response times (in ms) for run 6 : 1230[OK]
+>>> Checkout barcode 38700002573088 for borrower 88	response times (in ms) for run 17 : 2393[OK]
+>>> Checkout barcode 38700003919900 for borrower 604	response times (in ms) for run 0 : 1380[OK]
+>>> Checkout barcode 38700007492730 for borrower 88	response times (in ms) for run 13 : 2346[OK]
+>>> Checkout barcode 38700004094315 for borrower 209	response times (in ms) for run 8 : 3923[OK]
+>>> Checkout barcode 38700006042973 for borrower 70	response times (in ms) for run 16 : 1299[OK]
+>>> Checkout barcode 38700005135083 for borrower 378	response times (in ms) for run 10 : 8393[OK]
+>>> Checkout barcode 58700001293998 for borrower 613	response times (in ms) for run 15 : 4012[OK]
+>>> Checkout barcode 38700003919850 for borrower 552	response times (in ms) for run 7 : 1306[OK]
+>>> Checkout barcode 38700005092862 for borrower 52	response times (in ms) for run 18 : 7437[OK]
+>>> Checkout barcode 38700004049905 for borrower 800	response times (in ms) for run 5 : 8968[OK]
+>>> Checkout barcode 38700004452513 for borrower 209	response times (in ms) for run 2 : 5099[OK]
+>>> Checkout barcode 38700001263236 for borrower 226	response times (in ms) for run 19 : 1287[OK]
+>>> Checkout barcode 38700001287474 for borrower 409	response times (in ms) for run 3 : 6868[OK]
+>>> Checkout barcode 38700003285005 for borrower 704	response times (in ms) for run 14 : 5174[OK]
+>>> Checkout barcode 38700001636449 for borrower 578	response times (in ms) for run 9 : 8892[OK]
+>>> Checkout barcode 58700001397401 for borrower 87	response times (in ms) for run 11 : 1247[OK]
+>>> Checkout barcode 48700001006625 for borrower 383	response times (in ms) for run 4 : 1472[OK]
+>>> Checkout barcode 38700001863712 for borrower 378	response times (in ms) for run 1 : 1238[OK]
+
+30/08/2011 12:11:02 
+>>> Checkin barcode 38700004072147 for borrower 4520 (cardnumber=28700001002989)	response times (in ms) for run 12 : 4271[OK]
+>>> Checkin barcode 38700007512784 for borrower 1330 (cardnumber=28700011289504)	response times (in ms) for run 6 : 10150[OK]
+>>> Checkin barcode 38700003984292 for borrower 423 (cardnumber=28700000586811)	response times (in ms) for run 17 : 4262[OK]
+>>> Checkin barcode 38700004264702 for borrower 1665 (cardnumber=28700010887654)	response times (in ms) for run 0 : 4602[OK]
+>>> Checkin barcode 38700005099354 for borrower 54171 (cardnumber=28700011524876)	response times (in ms) for run 13 : 16450[OK]
+>>> Checkin barcode 38700001242545 for borrower 196 (cardnumber=28700010998121)	response times (in ms) for run 8 : 8602[OK]
+>>> Checkin barcode 38700002604842 for borrower 8943 (cardnumber=28700011133876)	response times (in ms) for run 16 : 10810[OK]
+>>> Checkin barcode 38700007154553 for borrower 7664 (cardnumber=28700011129676)	response times (in ms) for run 10 : 5300[OK]
+>>> Checkin barcode 38700006062377 for borrower 59313 (cardnumber=28700011588632)	response times (in ms) for run 15 : 8055[OK]
+>>> Checkin barcode 38700004140746 for borrower 2895 (cardnumber=28700010898339)	response times (in ms) for run 7 : 5410[OK]
+>>> Checkin barcode 38700002569987 for borrower 457 (cardnumber=287000010056823)	response times (in ms) for run 18 : 5366[OK]
+>>> Checkin barcode 38700001636548 for borrower 185 (cardnumber=28700010885922)	response times (in ms) for run 5 : 4710[OK]
+>>> Checkin barcode 38700001242594 for borrower 1617 (cardnumber=287000010011971)	response times (in ms) for run 2 : 5615[OK]
+>>> Checkin barcode 38700006804455 for borrower 2861 (cardnumber=287000010054248)	response times (in ms) for run 19 : 8051[OK]
+>>> Checkin barcode 38700008801509 for borrower 417 (cardnumber=28700013041861)	response times (in ms) for run 3 : 3411[OK]
+>>> Checkin barcode 38700004163425 for borrower 578 (cardnumber=28700011459826)	response times (in ms) for run 14 : 2135[OK]
+>>> Checkin barcode 38700003379717 for borrower 409 (cardnumber=287000010064054)	response times (in ms) for run 9 : 7718[OK]
+>>> Checkin barcode 38700001246959 for borrower 8534 (cardnumber=287000010058717)	response times (in ms) for run 11 : 6167[OK]
+>>> Checkin barcode 38700003778561 for borrower 3758 (cardnumber=28700011392878)	response times (in ms) for run 4 : 3854[OK]
+>>> Checkin barcode 38700004452513 for borrower 209 (cardnumber=287000010053992)	response times (in ms) for run 1 : 6002[OK]
+
+30/08/2011 12:11:35 
+>>> Checkin barcode 38700007732283 for borrower 5705 (cardnumber=28700011515825)	response times (in ms) for run 12 : 6947[OK]
+>>> Checkin barcode 38700004052776 for borrower 260 (cardnumber=28700011064444)	response times (in ms) for run 6 : 9249[OK]
+>>> Checkin barcode 38700004273513 for borrower 5015 (cardnumber=28700000606312)	response times (in ms) for run 17 : 11769[OK]
+>>> Checkin barcode 38700001832261 for borrower 613 (cardnumber=28700011101279)	response times (in ms) for run 0 : 3415[OK]
+>>> Checkin barcode 38700004140746 for borrower 2895 (cardnumber=28700010898339)	response times (in ms) for run 13 : 4794[OK]
+>>> Checkin barcode 38700003984672 for borrower 771 (cardnumber=28700000067515)	response times (in ms) for run 8 : 5961[OK]
+>>> Checkin barcode 58700001330865 for borrower 1057 (cardnumber=287000010053326)	response times (in ms) for run 16 : 10064[OK]
+>>> Checkin barcode 38700002569987 for borrower 457 (cardnumber=287000010056823)	response times (in ms) for run 10 : 10647[OK]
+>>> Checkin barcode 38700001242545 for borrower 196 (cardnumber=28700010998121)	response times (in ms) for run 15 : 3306[OK]
+>>> Checkin barcode 38700001690982 for borrower 3784 (cardnumber=28700010773060)	response times (in ms) for run 7 : 5755[OK]
+>>> Checkin barcode 38700002531391 for borrower 394 (cardnumber=287000010056766)	response times (in ms) for run 18 : 3508[OK]
+>>> Checkin barcode 58700001293998 for borrower 613 (cardnumber=28700011101279)	response times (in ms) for run 5 : 9926[OK]
+>>> Checkin barcode 38700003694537 for borrower 541 (cardnumber=287000010010334)	response times (in ms) for run 2 : 5516[OK]
+>>> Checkin barcode 38700001246959 for borrower 8534 (cardnumber=287000010058717)	response times (in ms) for run 19 : 3072[OK]
+>>> Checkin barcode 38700004163425 for borrower 578 (cardnumber=28700011459826)	response times (in ms) for run 3 : 4941[OK]
+>>> Checkin barcode 38700003669067 for borrower 6475 (cardnumber=28700010684945)	response times (in ms) for run 14 : 8597[OK]
+>>> Checkin barcode 58700001355581 for borrower 5820 (cardnumber=287000010054935)	response times (in ms) for run 9 : 12003[OK]
+>>> Checkin barcode 38700005981882 for borrower 5868 (cardnumber=287000010053512)	response times (in ms) for run 11 : 10353[OK]
+>>> Checkin barcode 38700008408172 for borrower 59313 (cardnumber=28700011588632)	response times (in ms) for run 4 : 7806[OK]
+>>> Checkin barcode 38700005160552 for borrower 12725 (cardnumber=28700011313494)	response times (in ms) for run 1 : 7414[OK]
+

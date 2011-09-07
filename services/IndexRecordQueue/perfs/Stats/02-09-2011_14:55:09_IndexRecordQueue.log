@@ -1,0 +1,137 @@
+
+02/09/2011 14:55:14 START
+02/09/2011 14:55:14 SET OPTS: 
+filepath=/tmp/records1.txt
+max_records=20
+max_delta=20
+02/09/2011 14:55:15 Processing previous records
+02/09/2011 14:55:15 $VAR1 = {};
+
+2011/09/02 14:55:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:37 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:38 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:44 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:55:46 READ biblio 202
+2011/09/02 14:55:46 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:55:47 READ biblio 202
+2011/09/02 14:55:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:55:48 READ biblio 212
+02/09/2011 14:55:49 READ biblio 212
+02/09/2011 14:55:50 READ biblio 204
+2011/09/02 14:55:52 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:53 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:55:53 READ biblio 204
+02/09/2011 14:55:54 READ biblio 218
+2011/09/02 14:55:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:55:55 READ biblio 218
+2011/09/02 14:55:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:55:57 READ biblio 46
+2011/09/02 14:55:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:55:58 READ biblio 46
+02/09/2011 14:55:59 READ biblio 219416
+2011/09/02 14:55:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:55:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:00 READ biblio 219416
+02/09/2011 14:56:01 READ biblio 219416
+2011/09/02 14:56:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:02 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:03 READ biblio 1360
+2011/09/02 14:56:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:04 READ biblio 1360
+2011/09/02 14:56:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:05 READ biblio 354
+02/09/2011 14:56:06 READ biblio 354
+02/09/2011 14:56:06 We have 8 records for biblio and 20seconds since first add
+02/09/2011 14:56:06 Removing records (biblio 202,212,204,218,46,219416,1360,354) from file
+02/09/2011 14:56:06 Indexing
+02/09/2011 14:56:06 biblio 202,212,204,218,46,219416,1360,354
+2011/09/02 14:56:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:07 READ biblio 217735
+2011/09/02 14:56:07 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:08 READ biblio 217735
+2011/09/02 14:56:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:10 READ biblio 217735
+2011/09/02 14:56:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:11 READ biblio 217735
+2011/09/02 14:56:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:12 READ biblio 217735
+02/09/2011 14:56:13 READ biblio 346765
+2011/09/02 14:56:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:14 READ biblio 346765
+02/09/2011 14:56:15 READ biblio 346765
+2011/09/02 14:56:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:16 READ biblio 320569
+02/09/2011 14:56:17 READ biblio 320569
+2011/09/02 14:56:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:18 READ biblio 320569
+2011/09/02 14:56:19 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:19 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:20 READ biblio 627
+02/09/2011 14:56:21 READ biblio 627
+2011/09/02 14:56:21 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:22 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:22 READ biblio 267
+02/09/2011 14:56:23 READ biblio 267
+2011/09/02 14:56:23 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:24 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:24 READ biblio 338874
+02/09/2011 14:56:25 READ biblio 338874
+2011/09/02 14:56:25 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:26 READ biblio 338874
+2011/09/02 14:56:26 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:27 READ biblio 1127
+02/09/2011 14:56:27 We have 7 records for biblio and 20seconds since first add
+02/09/2011 14:56:27 Removing records (biblio 217735,346765,320569,627,267,338874,1127) from file
+02/09/2011 14:56:27 Indexing
+02/09/2011 14:56:27 biblio 217735,346765,320569,627,267,338874,1127
+2011/09/02 14:56:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:28 READ biblio 1127
+2011/09/02 14:56:28 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:29 READ biblio 228
+2011/09/02 14:56:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:30 READ biblio 228
+2011/09/02 14:56:30 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/02 14:56:31 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:32 READ biblio 228
+2011/09/02 14:56:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:33 READ biblio 228
+2011/09/02 14:56:33 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:34 READ biblio 582
+2011/09/02 14:56:34 /tmp/IndexRecordQueue.pid not writable by user www-data
+02/09/2011 14:56:35 READ biblio 582
+02/09/2011 14:56:36 READ biblio 84293
+02/09/2011 14:56:37 READ biblio 84293
+02/09/2011 14:56:38 READ biblio 1239
+02/09/2011 14:56:39 READ biblio 1239
+02/09/2011 14:56:40 READ biblio 791
+02/09/2011 14:56:41 READ biblio 791
+02/09/2011 14:56:42 READ biblio 495
+02/09/2011 14:56:43 READ biblio 495
+02/09/2011 14:56:44 READ biblio 479
+02/09/2011 14:56:45 READ biblio 479
+02/09/2011 14:56:47 READ biblio 143
+02/09/2011 14:56:48 READ biblio 143
+02/09/2011 14:56:48 We have 9 records for biblio and 20seconds since first add
+02/09/2011 14:56:48 Removing records (biblio 1127,228,582,84293,1239,791,495,479,143) from file
+02/09/2011 14:56:48 Indexing
+02/09/2011 14:56:48 biblio 1127,228,582,84293,1239,791,495,479,143
+02/09/2011 14:56:49 READ biblio 73
+02/09/2011 14:56:50 READ biblio 73
+02/09/2011 14:56:52 READ biblio 73
+02/09/2011 14:56:53 READ biblio 73
+02/09/2011 14:57:09 We have 1 records for biblio and 20seconds since first add
+02/09/2011 14:57:09 Removing records (biblio 73) from file
+02/09/2011 14:57:09 Indexing
+02/09/2011 14:57:09 biblio 73

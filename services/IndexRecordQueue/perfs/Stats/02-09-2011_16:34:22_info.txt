@@ -1,0 +1,5 @@
+my $MAX_BORROWERS = 10;
+my $MAX_ISSUES    = 50;
+my $MAX_RETURNS   = 50;
+my $SQL_LIMIT     = 500;
+

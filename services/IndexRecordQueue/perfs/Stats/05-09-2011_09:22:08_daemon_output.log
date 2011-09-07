@@ -1,0 +1,764 @@
+Daemon.pm-100: Running in foreground
+Daemon.pm-100: Running in foreground
+Daemon.pm-156: Process ID is 29549
+Daemon.pm-156: Process ID is 29549
+Daemon.pm-158: Written to /tmp/IndexRecordQueue.pid
+Daemon.pm-158: Written to /tmp/IndexRecordQueue.pid
+"my" variable $sth masks earlier declaration in same scope at /home/koha/src//C4/Accounts.pm line 220.
+"my" variable $sth masks earlier declaration in same scope at /home/koha/src//C4/Accounts.pm line 220.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 1274 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1274 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1274, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1274, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 501 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 501 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 501, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 501, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 776 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 776 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 776, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 776, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1018 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1018 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1018, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1018, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 409 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 409 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 409, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 409, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 449 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 449 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 449, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 449, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1116 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1116 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1116, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1116, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1119 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1119 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1119, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1119, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1308 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1308 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1308, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1308, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 1574 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1574 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1574, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1574, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 941 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 941 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 941, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 941, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 896 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 896 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 896, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 896, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1440 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1440 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1440, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1440, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1605 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1605 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1605, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1605, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 226 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 226 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 226, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 226, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 458 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 458 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 458, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 458, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1398 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1398 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1398, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1398, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1425 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1425 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1425, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1425, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1076 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1076 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1076, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1076, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 409 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 409 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 409, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 409, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1265 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1265 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1265, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1265, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 130 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 130 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 130, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 130, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 130 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 130 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 130, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 130, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1592 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1592 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1592, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1592, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 456 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 456 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 456, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 456, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1305 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1305 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1305, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1305, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 680 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 680 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 680, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 680, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 773 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 773 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 773, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 773, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 215 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 215 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 215, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 215, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1412 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1412 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1412, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1412, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 1394 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1394 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1394, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1394, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 89 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 89 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 89, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 89, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1263 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1263 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1263, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1263, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 797 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 797 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 797, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 797, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1633 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1633 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1633, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1633, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 652 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 652 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 652, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 652, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 396 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 396 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 396, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 396, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 14 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 14 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 14, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 14, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1568 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1568 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1568, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1568, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 136 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 136 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 136, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 136, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1376 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1376 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1376, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1376, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1655 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1655 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1655, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1655, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1614 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1614 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1614, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1614, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 711 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 711 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 711, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 711, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1542 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1542 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1542, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1542, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 1542 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1542 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1542, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1542, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1432 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1432 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1432, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1432, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1311 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1311 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1311, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1311, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 501 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 501 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 501, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 501, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1388 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1388 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1388, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1388, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1223 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1223 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1223, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1223, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 363 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 363 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 363, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 363, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 581 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 581 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 581, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 581, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1555 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1555 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1555, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1555, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 36 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 36 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 36, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 36, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 90 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 90 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 90, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 90, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1139 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1139 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1139, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1139, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 846 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 846 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 846, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 846, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1320 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1320 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1320, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1320, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 288 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 288 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 288, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 288, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 485 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 485 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 485, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 485, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 1616 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1616 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1616, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1616, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 143813 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 143813 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 143813, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 143813, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 387810 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 387810 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 387810, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 387810, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 222509 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 222509 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 222509, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 222509, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 268206 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 268206 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 268206, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 268206, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 359575 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 359575 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 359575, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 359575, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 357527 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 357527 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 357527, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 357527, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 283650 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 283650 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 283650, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 283650, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 344511 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 344511 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 344511, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 344511, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 143 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 143 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 143, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 143, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 321247 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 321247 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 321247, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 321247, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1213 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1213 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1213, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1213, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 832 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 832 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 832, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 832, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 910 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 910 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 910, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 910, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 214956 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 214956 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 214956, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 214956, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 294090 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 294090 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 294090, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 294090, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 40037 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 40037 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 40037, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 40037, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 48011 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 48011 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 48011, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 48011, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 126667 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 126667 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 126667, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 126667, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 383379 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 383379 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 383379, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 383379, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 346784 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 346784 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 346784, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 346784, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 74814 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 74814 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 74814, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 74814, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 61246 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 61246 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 61246, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 61246, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 110312 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 110312 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 110312, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 110312, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 202 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 202 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 202, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 202, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 260810 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 260810 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 260810, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 260810, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 490 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 490 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 490, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 490, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 81802 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 81802 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 81802, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 81802, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 372879 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 372879 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 372879, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 372879, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 67050 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 67050 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 67050, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 67050, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 178696 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 178696 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 178696, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 178696, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 973 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 973 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 973, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 973, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 202 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 202 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 202, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 202, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 260810 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 260810 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 260810, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 260810, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 490 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 490 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 490, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 490, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 81802 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 81802 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 81802, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 81802, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 90221 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 90221 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 90221, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 90221, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 269 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 269 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 269, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 269, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 324532 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 324532 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 324532, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 324532, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 179366 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 179366 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 179366, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 179366, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 313445 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 313445 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 313445, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 313445, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 680 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 680 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 680, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 680, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 383494 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 383494 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 383494, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 383494, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1100 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1100 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1100, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1100, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 326591 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 326591 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 326591, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 326591, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 385812 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 385812 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 385812, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 385812, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 342852 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 342852 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 342852, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 342852, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 639 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 639 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 639, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 639, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 1608 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1608 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1608, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1608, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 326847 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 326847 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 326847, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 326847, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 314 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 314 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 314, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 314, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1574 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1574 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1574, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1574, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 356650 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 356650 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 356650, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 356650, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 309841 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 309841 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 309841, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 309841, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 333009 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 333009 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 333009, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 333009, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 293377 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 293377 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 293377, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 293377, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 293377 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 293377 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 293377, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 293377, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 316294 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 316294 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 316294, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 316294, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 157 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 157 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 157, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 157, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 367969 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 367969 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 367969, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 367969, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 295 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 295 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 295, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 295, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 367764 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 367764 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 367764, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 367764, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 359858 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 359858 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 359858, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 359858, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1608 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1608 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1608, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1608, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 326847 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 326847 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 326847, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 326847, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 326847 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 326847 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 326847, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 326847, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 314 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 314 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 314, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 314, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 310848 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 310848 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 310848, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 310848, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1311 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1311 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1311, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1311, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 371671 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 371671 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 371671, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 371671, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 159177 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 159177 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 159177, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 159177, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 368712 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 368712 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 368712, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 368712, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 121 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 121 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 121, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 121, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 327308 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 327308 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 327308, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 327308, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 327308 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 327308 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 327308, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 327308, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 317822 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 317822 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 317822, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 317822, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 142865 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 142865 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 142865, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 142865, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1386 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1386 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1386, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1386, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 269151 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 269151 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 269151, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 269151, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 254591 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 254591 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 254591, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 254591, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 277750 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 277750 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 277750, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 277750, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 1158 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1158 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1158, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1158, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1489 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1489 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1489, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1489, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 339452 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 339452 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 339452, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 339452, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 341187 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 341187 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 341187, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 341187, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 255656 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 255656 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 255656, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 255656, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 26 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 26 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 26, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 26, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 378682 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 378682 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 378682, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 378682, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 332619 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 332619 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 332619, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 332619, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 332619 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 332619 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 332619, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 332619, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 364161 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 364161 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 364161, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 364161, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 240626 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 240626 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 240626, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 240626, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 328199 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 328199 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 328199, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 328199, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 41788 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 41788 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 41788, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 41788, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 376851 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 376851 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 376851, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 376851, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 12 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 12 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 12, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 12, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1080 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1080 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1080, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1080, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 361811 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 361811 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 361811, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 361811, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 361811 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 361811 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 361811, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 361811, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 830 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 830 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 830, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 830, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 270 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 270 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 270, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 270, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 339811 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 339811 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 339811, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 339811, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 596 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 596 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 596, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 596, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 343225 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 343225 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 343225, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 343225, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 207726 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 207726 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 207726, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 207726, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1158 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1158 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1158, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1158, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 1489 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 1489 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 1489, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 1489, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 339452 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 339452 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 339452, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 339452, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 358500 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 358500 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 358500, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 358500, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 325556 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 325556 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 325556, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 325556, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 368263 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 368263 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 368263, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 368263, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 212117 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 212117 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 212117, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 212117, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+Use of uninitialized value $child_pid in waitpid at ./IndexRecordQueue.pl line 246.
+biblio 212117 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 212117 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 212117, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 212117, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 425 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 425 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 425, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 425, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 990 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 990 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 990, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 990, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+biblio 360875 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+biblio 360875 at /home/koha/src//C4/Search/Engine/Solr.pm line 449.
+Error during indexation : recordid 360875, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.
+Error during indexation : recordid 360875, index spe_coteconstruite ( Can't use string ("0") as a subroutine ref while "strict refs" in use at /home/koha/src//C4/Search/Engine/Solr.pm line 461. ) at /home/koha/src//C4/Search/Engine/Solr.pm line 517.

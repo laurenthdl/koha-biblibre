@@ -1,0 +1,1044 @@
+
+2011/09/05 09:22:44 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:22:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:22:48 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:22:49 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:22:52 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:22:53 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:22:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:22:55 READ biblio 1274
+2011/09/05 09:22:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:22:56 READ biblio 1274
+05/09/2011 09:22:57 READ biblio 501
+05/09/2011 09:22:58 READ biblio 501
+2011/09/05 09:22:58 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:22:59 READ biblio 776
+2011/09/05 09:22:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:00 READ biblio 776
+2011/09/05 09:23:00 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:02 READ biblio 1018
+2011/09/05 09:23:02 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:03 READ biblio 1018
+2011/09/05 09:23:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:04 READ biblio 409
+05/09/2011 09:23:05 READ biblio 409
+2011/09/05 09:23:05 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:05 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:07 READ biblio 449
+2011/09/05 09:23:07 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:07 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:08 READ biblio 449
+05/09/2011 09:23:09 READ biblio 1116
+05/09/2011 09:23:10 READ biblio 1116
+05/09/2011 09:23:11 READ biblio 1119
+05/09/2011 09:23:12 READ biblio 1119
+2011/09/05 09:23:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:14 READ biblio 1308
+05/09/2011 09:23:15 READ biblio 1308
+05/09/2011 09:23:15 We have 9 records for biblio and 20seconds since first add
+05/09/2011 09:23:15 Removing records (biblio 1274,501,776,1018,409,449,1116,1119,1308) from file
+05/09/2011 09:23:15 Indexing
+05/09/2011 09:23:15 biblio 1274,501,776,1018,409,449,1116,1119,1308
+2011/09/05 09:23:16 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:18 READ biblio 1574
+2011/09/05 09:23:18 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:19 READ biblio 1574
+2011/09/05 09:23:19 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:20 READ biblio 1574
+05/09/2011 09:23:22 READ biblio 1574
+05/09/2011 09:23:23 READ biblio 941
+05/09/2011 09:23:24 READ biblio 941
+2011/09/05 09:23:25 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:25 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:28 READ biblio 896
+05/09/2011 09:23:29 READ biblio 896
+2011/09/05 09:23:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:32 READ biblio 1440
+05/09/2011 09:23:33 READ biblio 1440
+05/09/2011 09:23:34 READ biblio 1605
+05/09/2011 09:23:35 READ biblio 1605
+2011/09/05 09:23:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:37 READ biblio 226
+2011/09/05 09:23:37 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:37 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:38 READ biblio 226
+05/09/2011 09:23:38 We have 6 records for biblio and 20seconds since first add
+05/09/2011 09:23:38 Removing records (biblio 1574,941,896,1440,1605,226) from file
+05/09/2011 09:23:38 Indexing
+05/09/2011 09:23:38 biblio 1574,941,896,1440,1605,226
+2011/09/05 09:23:39 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:40 READ biblio 458
+05/09/2011 09:23:41 READ biblio 458
+05/09/2011 09:23:43 READ biblio 1398
+05/09/2011 09:23:44 READ biblio 1398
+2011/09/05 09:23:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:48 READ biblio 1425
+2011/09/05 09:23:48 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:49 READ biblio 1425
+05/09/2011 09:23:51 READ biblio 1076
+2011/09/05 09:23:51 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:51 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:52 READ biblio 1076
+05/09/2011 09:23:54 READ biblio 409
+2011/09/05 09:23:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:55 READ biblio 409
+2011/09/05 09:23:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:57 READ biblio 1265
+2011/09/05 09:23:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:23:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:23:58 READ biblio 1265
+05/09/2011 09:24:00 READ biblio 130
+05/09/2011 09:24:00 We have 7 records for biblio and 20seconds since first add
+05/09/2011 09:24:00 Indexing
+05/09/2011 09:24:00 Removing records (biblio 458,1398,1425,1076,409,1265,130) from file
+05/09/2011 09:24:00 biblio 458,1398,1425,1076,409,1265,130
+2011/09/05 09:24:00 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:01 READ biblio 130
+2011/09/05 09:24:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:03 READ biblio 1592
+2011/09/05 09:24:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:04 READ biblio 1592
+2011/09/05 09:24:05 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:06 READ biblio 456
+05/09/2011 09:24:07 READ biblio 456
+2011/09/05 09:24:07 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:08 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:09 READ biblio 1305
+2011/09/05 09:24:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:10 READ biblio 1305
+2011/09/05 09:24:10 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:11 READ biblio 680
+05/09/2011 09:24:13 READ biblio 680
+05/09/2011 09:24:14 READ biblio 773
+2011/09/05 09:24:14 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:14 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:15 READ biblio 773
+2011/09/05 09:24:16 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:17 READ biblio 215
+05/09/2011 09:24:18 READ biblio 215
+05/09/2011 09:24:20 READ biblio 1412
+05/09/2011 09:24:21 READ biblio 1412
+05/09/2011 09:24:21 We have 8 records for biblio and 20seconds since first add
+05/09/2011 09:24:21 Removing records (biblio 130,1592,456,1305,680,773,215,1412) from file
+05/09/2011 09:24:21 Indexing
+05/09/2011 09:24:21 biblio 130,1592,456,1305,680,773,215,1412
+2011/09/05 09:24:21 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:21 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:23 READ biblio5
+05/09/2011 09:24:23 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:24:23 READ biblio5
+05/09/2011 09:24:23 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:24:23 READ biblio 1394
+2011/09/05 09:24:23 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:23 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:24 READ biblio 1394
+05/09/2011 09:24:26 READ biblio 89
+2011/09/05 09:24:26 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:27 READ biblio 89
+2011/09/05 09:24:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:29 READ biblio 1263
+2011/09/05 09:24:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:30 READ biblio 1263
+2011/09/05 09:24:31 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:31 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:32 READ biblio 797
+05/09/2011 09:24:33 READ biblio 797
+2011/09/05 09:24:34 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:35 READ biblio 1633
+05/09/2011 09:24:36 READ biblio 1633
+2011/09/05 09:24:38 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:38 READ biblio 652
+2011/09/05 09:24:38 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:39 READ biblio 652
+2011/09/05 09:24:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:41 READ biblio 396
+05/09/2011 09:24:42 READ biblio 396
+05/09/2011 09:24:43 We have 7 records for biblio and 20seconds since first add
+05/09/2011 09:24:43 Removing records (biblio 1394,89,1263,797,1633,652,396) from file
+05/09/2011 09:24:43 Indexing
+05/09/2011 09:24:43 biblio 1394,89,1263,797,1633,652,396
+2011/09/05 09:24:43 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:43 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:44 READ biblio 14
+05/09/2011 09:24:45 READ biblio 14
+2011/09/05 09:24:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:47 READ biblio5
+05/09/2011 09:24:47 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:24:47 READ biblio5
+05/09/2011 09:24:47 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:24:47 READ biblio 14
+2011/09/05 09:24:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:48 READ biblio 14
+2011/09/05 09:24:48 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:49 READ biblio 1568
+2011/09/05 09:24:49 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:50 READ biblio 1568
+2011/09/05 09:24:50 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:51 READ biblio 136
+05/09/2011 09:24:53 READ biblio 136
+05/09/2011 09:24:54 READ biblio 1376
+2011/09/05 09:24:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:55 READ biblio 1376
+2011/09/05 09:24:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:56 READ biblio 1655
+2011/09/05 09:24:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:57 READ biblio 1655
+2011/09/05 09:24:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:24:59 READ biblio 1614
+2011/09/05 09:24:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:24:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:00 READ biblio 1614
+05/09/2011 09:25:01 READ biblio 711
+05/09/2011 09:25:02 READ biblio 711
+2011/09/05 09:25:02 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:04 READ biblio 1542
+05/09/2011 09:25:04 We have 8 records for biblio and 20seconds since first add
+05/09/2011 09:25:04 Indexing
+05/09/2011 09:25:04 Removing records (biblio 14,1568,136,1376,1655,1614,711,1542) from file
+05/09/2011 09:25:04 biblio 14,1568,136,1376,1655,1614,711,1542
+2011/09/05 09:25:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:05 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:05 READ biblio 1542
+05/09/2011 09:25:06 READ biblio 1432
+2011/09/05 09:25:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:07 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:08 READ biblio5
+05/09/2011 09:25:08 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:25:08 READ biblio5
+05/09/2011 09:25:08 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:25:08 READ biblio32
+05/09/2011 09:25:08 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:25:08 READ biblio32
+05/09/2011 09:25:08 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:25:08 READ biblio 1311
+2011/09/05 09:25:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:09 READ biblio 1311
+2011/09/05 09:25:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:10 READ biblio 501
+2011/09/05 09:25:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:12 READ biblio 501
+05/09/2011 09:25:13 READ biblio 1388
+2011/09/05 09:25:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:14 READ biblio 1388
+2011/09/05 09:25:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:16 READ biblio 1223
+05/09/2011 09:25:17 READ biblio 1223
+2011/09/05 09:25:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:18 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:18 READ biblio 363
+05/09/2011 09:25:19 READ biblio 363
+2011/09/05 09:25:19 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:20 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:21 READ biblio 581
+2011/09/05 09:25:21 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:22 READ biblio 581
+2011/09/05 09:25:22 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:23 READ biblio 1555
+2011/09/05 09:25:24 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:24 READ biblio 1555
+2011/09/05 09:25:24 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:25 READ biblio 36
+05/09/2011 09:25:25 We have 10 records for biblio and 20seconds since first add
+05/09/2011 09:25:25 Removing records (biblio 1542,1432,1311,501,1388,1223,363,581,1555,36) from file
+05/09/2011 09:25:25 Indexing
+05/09/2011 09:25:25 biblio 1542,1432,1311,501,1388,1223,363,581,1555,36
+05/09/2011 09:25:27 READ biblio5
+05/09/2011 09:25:27 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:25:27 READ biblio5
+05/09/2011 09:25:27 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:25:27 READ biblio32
+05/09/2011 09:25:27 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:25:27 READ biblio32
+05/09/2011 09:25:27 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:25:27 READ biblio 90
+05/09/2011 09:25:28 READ biblio 90
+2011/09/05 09:25:28 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:29 READ biblio 1139
+2011/09/05 09:25:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:30 READ biblio 1139
+05/09/2011 09:25:32 READ biblio 846
+2011/09/05 09:25:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:33 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:33 READ biblio 846
+05/09/2011 09:25:35 READ biblio 1320
+2011/09/05 09:25:36 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:36 READ biblio 1320
+2011/09/05 09:25:36 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:38 READ biblio 288
+05/09/2011 09:25:39 READ biblio 288
+2011/09/05 09:25:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:45 READ biblio 485
+05/09/2011 09:25:46 READ biblio 485
+2011/09/05 09:25:46 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:47 We have 6 records for biblio and 20seconds since first add
+05/09/2011 09:25:47 Removing records (biblio 90,1139,846,1320,288,485) from file
+05/09/2011 09:25:47 Indexing
+05/09/2011 09:25:47 biblio 90,1139,846,1320,288,485
+2011/09/05 09:25:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:49 READ biblio5
+05/09/2011 09:25:49 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:25:49 READ biblio5
+05/09/2011 09:25:49 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:25:49 READ biblio32
+05/09/2011 09:25:49 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:25:49 READ biblio32
+05/09/2011 09:25:49 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:25:49 READ biblio 1616
+05/09/2011 09:25:50 READ biblio 1616
+2011/09/05 09:25:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:56 READ biblio 143813
+2011/09/05 09:25:56 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:57 READ biblio 143813
+2011/09/05 09:25:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:25:58 READ biblio 143813
+2011/09/05 09:25:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:25:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:00 READ biblio 387810
+05/09/2011 09:26:01 READ biblio 387810
+2011/09/05 09:26:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:02 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:02 READ biblio 387810
+2011/09/05 09:26:02 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:04 READ biblio 222509
+2011/09/05 09:26:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:05 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:05 READ biblio 222509
+05/09/2011 09:26:06 READ biblio 222509
+2011/09/05 09:26:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:07 READ biblio 268206
+2011/09/05 09:26:07 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:08 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:08 READ biblio 268206
+05/09/2011 09:26:09 READ biblio 268206
+05/09/2011 09:26:09 We have 5 records for biblio and 20seconds since first add
+05/09/2011 09:26:09 Removing records (biblio 1616,143813,387810,222509,268206) from file
+05/09/2011 09:26:09 Indexing
+05/09/2011 09:26:09 biblio 1616,143813,387810,222509,268206
+2011/09/05 09:26:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:10 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:11 READ biblio5
+05/09/2011 09:26:11 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:26:11 READ biblio5
+05/09/2011 09:26:11 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:26:11 READ biblio32
+05/09/2011 09:26:11 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:26:11 READ biblio32
+05/09/2011 09:26:11 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:26:11 READ biblio 359575
+2011/09/05 09:26:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:12 READ biblio 359575
+2011/09/05 09:26:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:13 READ biblio 359575
+2011/09/05 09:26:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:14 READ biblio 357527
+05/09/2011 09:26:15 READ biblio 357527
+2011/09/05 09:26:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:16 READ biblio 357527
+05/09/2011 09:26:17 READ biblio 283650
+2011/09/05 09:26:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:18 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:19 READ biblio 283650
+2011/09/05 09:26:20 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:20 READ biblio 283650
+2011/09/05 09:26:20 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:21 READ biblio 344511
+2011/09/05 09:26:22 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:22 READ biblio 344511
+2011/09/05 09:26:22 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:23 READ biblio 344511
+2011/09/05 09:26:24 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:24 READ biblio 143
+2011/09/05 09:26:24 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:25 READ biblio 143
+05/09/2011 09:26:26 READ biblio 321247
+2011/09/05 09:26:26 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:27 READ biblio 321247
+2011/09/05 09:26:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:29 READ biblio 321247
+2011/09/05 09:26:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:30 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:30 READ biblio 1213
+05/09/2011 09:26:31 READ biblio 1213
+05/09/2011 09:26:31 We have 7 records for biblio and 20seconds since first add
+05/09/2011 09:26:31 Removing records (biblio 359575,357527,283650,344511,143,321247,1213) from file
+05/09/2011 09:26:31 Indexing
+05/09/2011 09:26:31 biblio 359575,357527,283650,344511,143,321247,1213
+2011/09/05 09:26:31 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:32 READ biblio 832
+2011/09/05 09:26:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:33 READ biblio 832
+05/09/2011 09:26:34 READ biblio 910
+2011/09/05 09:26:34 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:34 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:35 READ biblio 910
+2011/09/05 09:26:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:36 READ biblio 214956
+2011/09/05 09:26:37 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:37 READ biblio 214956
+2011/09/05 09:26:37 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:37 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:38 READ biblio 214956
+2011/09/05 09:26:39 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:40 READ biblio5
+05/09/2011 09:26:40 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:26:40 READ biblio5
+05/09/2011 09:26:40 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:26:40 READ biblio32
+05/09/2011 09:26:40 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:26:40 READ biblio32
+05/09/2011 09:26:40 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:26:40 READ biblio 832
+2011/09/05 09:26:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:41 READ biblio 832
+2011/09/05 09:26:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:42 READ biblio 910
+2011/09/05 09:26:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:43 READ biblio 910
+05/09/2011 09:26:44 READ biblio 214956
+2011/09/05 09:26:44 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:44 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:45 READ biblio 214956
+2011/09/05 09:26:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:46 READ biblio 214956
+2011/09/05 09:26:46 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:47 READ biblio 294090
+2011/09/05 09:26:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:48 READ biblio 294090
+2011/09/05 09:26:48 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:49 READ biblio 294090
+2011/09/05 09:26:49 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:49 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:50 READ biblio 40037
+05/09/2011 09:26:51 READ biblio 40037
+2011/09/05 09:26:51 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:51 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:52 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:52 READ biblio 40037
+05/09/2011 09:26:52 We have 5 records for biblio and 20seconds since first add
+05/09/2011 09:26:52 Removing records (biblio 832,910,214956,294090,40037) from file
+05/09/2011 09:26:52 Indexing
+05/09/2011 09:26:52 biblio 832,910,214956,294090,40037
+05/09/2011 09:26:53 READ biblio 48011
+2011/09/05 09:26:53 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:54 READ biblio 48011
+2011/09/05 09:26:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:55 READ biblio 48011
+2011/09/05 09:26:56 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:56 READ biblio 126667
+2011/09/05 09:26:56 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:26:57 READ biblio 126667
+05/09/2011 09:26:58 READ biblio 126667
+2011/09/05 09:26:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:26:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:00 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:00 READ 83379
+05/09/2011 09:27:00 ERROR FOR THIS LINE (83379), BAD FORMAT
+05/09/2011 09:27:00 READ biblio 383379
+05/09/2011 09:27:01 READ biblio 346784
+2011/09/05 09:27:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:02 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:02 READ biblio 346784
+05/09/2011 09:27:03 READ biblio 346784
+2011/09/05 09:27:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:04 READ biblio 74814
+2011/09/05 09:27:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:05 READ biblio 74814
+2011/09/05 09:27:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:06 READ biblio 74814
+2011/09/05 09:27:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:07 READ biblio 61246
+05/09/2011 09:27:08 READ biblio 61246
+05/09/2011 09:27:09 READ biblio 61246
+2011/09/05 09:27:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:10 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:11 READ biblio 110312
+05/09/2011 09:27:12 READ biblio 110312
+2011/09/05 09:27:12 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:13 READ biblio 110312
+05/09/2011 09:27:13 We have 7 records for biblio and 20seconds since first add
+05/09/2011 09:27:13 Removing records (biblio 48011,126667,383379,346784,74814,61246,110312) from file
+05/09/2011 09:27:13 Indexing
+05/09/2011 09:27:13 biblio 48011,126667,383379,346784,74814,61246,110312
+2011/09/05 09:27:14 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:14 READ biblio 202
+2011/09/05 09:27:14 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:14 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:15 READ biblio 202
+05/09/2011 09:27:16 READ biblio 260810
+2011/09/05 09:27:16 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:17 READ biblio 260810
+05/09/2011 09:27:18 READ biblio 260810
+2011/09/05 09:27:18 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:19 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:19 READ biblio 490
+2011/09/05 09:27:19 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:20 READ biblio 490
+2011/09/05 09:27:21 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:21 READ biblio 81802
+2011/09/05 09:27:21 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:22 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:23 READ biblio5
+05/09/2011 09:27:23 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:27:23 READ biblio5
+05/09/2011 09:27:23 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:27:23 READ biblio32
+05/09/2011 09:27:23 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:27:23 READ biblio32
+05/09/2011 09:27:23 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:27:23 READ biblio 372879
+2011/09/05 09:27:23 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:24 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:24 READ biblio 372879
+05/09/2011 09:27:25 READ biblio 372879
+2011/09/05 09:27:25 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:26 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:26 READ biblio 67050
+2011/09/05 09:27:26 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:27 READ biblio 67050
+2011/09/05 09:27:28 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:28 READ biblio 67050
+2011/09/05 09:27:28 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:28 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:29 READ biblio 178696
+05/09/2011 09:27:30 READ biblio 178696
+2011/09/05 09:27:30 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:31 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:31 READ biblio 178696
+2011/09/05 09:27:31 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:32 READ biblio 973
+2011/09/05 09:27:33 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:33 READ biblio 973
+2011/09/05 09:27:33 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:33 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:34 READ biblio 202
+05/09/2011 09:27:34 We have 8 records for biblio and 20seconds since first add
+05/09/2011 09:27:34 Indexing
+05/09/2011 09:27:34 Removing records (biblio 202,260810,490,81802,372879,67050,178696,973) from file
+05/09/2011 09:27:34 biblio 202,260810,490,81802,372879,67050,178696,973
+05/09/2011 09:27:35 READ biblio 202
+2011/09/05 09:27:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:36 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:36 READ biblio 260810
+05/09/2011 09:27:37 READ biblio 260810
+2011/09/05 09:27:38 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:38 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:38 READ biblio 260810
+05/09/2011 09:27:39 READ biblio 490
+2011/09/05 09:27:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:40 READ biblio 490
+2011/09/05 09:27:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:41 READ biblio 81802
+05/09/2011 09:27:42 READ biblio 81802
+2011/09/05 09:27:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:43 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:43 READ biblio 81802
+05/09/2011 09:27:44 READ biblio 90221
+2011/09/05 09:27:44 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:45 READ biblio 90221
+05/09/2011 09:27:46 READ biblio 90221
+2011/09/05 09:27:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:47 READ biblio 269
+2011/09/05 09:27:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:48 READ biblio 269
+2011/09/05 09:27:49 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:49 READ biblio 324532
+2011/09/05 09:27:49 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:50 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:50 READ biblio 324532
+05/09/2011 09:27:51 READ biblio 324532
+2011/09/05 09:27:51 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:52 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:52 READ biblio 179366
+2011/09/05 09:27:52 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:53 READ biblio 179366
+2011/09/05 09:27:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:54 READ biblio 179366
+2011/09/05 09:27:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:55 We have 8 records for biblio and 20seconds since first add
+05/09/2011 09:27:55 Removing records (biblio 202,260810,490,81802,90221,269,324532,179366) from file
+05/09/2011 09:27:55 Indexing
+05/09/2011 09:27:55 biblio 202,260810,490,81802,90221,269,324532,179366
+05/09/2011 09:27:56 READ biblio 313445
+2011/09/05 09:27:56 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:27:57 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:57 READ biblio 313445
+05/09/2011 09:27:58 READ biblio 680
+2011/09/05 09:27:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:27:59 READ biblio 680
+2011/09/05 09:27:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:00 READ biblio 383494
+2011/09/05 09:28:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:01 READ biblio 383494
+2011/09/05 09:28:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:02 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:02 READ biblio 383494
+05/09/2011 09:28:03 READ biblio 1100
+2011/09/05 09:28:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:04 READ biblio 1100
+05/09/2011 09:28:05 READ biblio 326591
+05/09/2011 09:28:06 READ biblio 326591
+2011/09/05 09:28:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:07 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:07 READ biblio 326591
+05/09/2011 09:28:08 READ biblio 385812
+2011/09/05 09:28:08 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:09 READ biblio 385812
+05/09/2011 09:28:10 READ biblio 385812
+2011/09/05 09:28:10 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:11 READ biblio 342852
+2011/09/05 09:28:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:12 READ biblio 342852
+2011/09/05 09:28:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:13 READ biblio 342852
+2011/09/05 09:28:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:15 READ 58
+05/09/2011 09:28:15 ERROR FOR THIS LINE (58), BAD FORMAT
+05/09/2011 09:28:15 READ biblio 639
+2011/09/05 09:28:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:16 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:16 READ biblio 639
+05/09/2011 09:28:16 We have 8 records for biblio and 20seconds since first add
+05/09/2011 09:28:16 Removing records (biblio 313445,680,383494,1100,326591,385812,342852,639) from file
+05/09/2011 09:28:16 Indexing
+05/09/2011 09:28:16 biblio 313445,680,383494,1100,326591,385812,342852,639
+05/09/2011 09:28:17 READ biblio 1608
+2011/09/05 09:28:17 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:18 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:18 READ biblio 1608
+05/09/2011 09:28:19 READ biblio 326847
+2011/09/05 09:28:20 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:20 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:20 READ biblio 326847
+2011/09/05 09:28:20 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:21 READ biblio 326847
+2011/09/05 09:28:22 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:22 READ biblio 314
+2011/09/05 09:28:22 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:23 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:23 READ biblio 314
+2011/09/05 09:28:24 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:25 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:25 READ biblio5
+05/09/2011 09:28:25 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:28:25 READ biblio5
+05/09/2011 09:28:25 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:28:25 READ biblio32
+05/09/2011 09:28:25 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:28:25 READ biblio32
+05/09/2011 09:28:25 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:28:25 READ biblio 1574
+2011/09/05 09:28:25 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:26 READ biblio 1574
+2011/09/05 09:28:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:27 READ biblio 356650
+2011/09/05 09:28:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:28 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:28 READ biblio 356650
+05/09/2011 09:28:29 READ biblio 356650
+2011/09/05 09:28:30 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:30 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:30 READ biblio 309841
+05/09/2011 09:28:31 READ biblio 309841
+2011/09/05 09:28:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:32 READ biblio 309841
+2011/09/05 09:28:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:33 READ biblio 333009
+2011/09/05 09:28:34 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:34 READ biblio 333009
+2011/09/05 09:28:34 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:35 READ biblio 333009
+05/09/2011 09:28:36 READ biblio 293377
+2011/09/05 09:28:36 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:37 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:37 READ biblio 293377
+05/09/2011 09:28:37 We have 8 records for biblio and 20seconds since first add
+05/09/2011 09:28:37 Removing records (biblio 1608,326847,314,1574,356650,309841,333009,293377) from file
+05/09/2011 09:28:37 Indexing
+05/09/2011 09:28:37 biblio 1608,326847,314,1574,356650,309841,333009,293377
+2011/09/05 09:28:38 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:38 READ biblio 293377
+05/09/2011 09:28:39 READ biblio 316294
+2011/09/05 09:28:39 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:40 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:40 READ biblio 316294
+05/09/2011 09:28:41 READ biblio 316294
+2011/09/05 09:28:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:42 READ biblio 157
+2011/09/05 09:28:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:43 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:43 READ biblio 157
+05/09/2011 09:28:44 READ biblio 367969
+2011/09/05 09:28:44 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:45 READ biblio 367969
+05/09/2011 09:28:46 READ biblio 367969
+2011/09/05 09:28:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:47 READ biblio 295
+2011/09/05 09:28:47 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:48 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:48 READ biblio 295
+2011/09/05 09:28:49 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:49 READ biblio 367764
+2011/09/05 09:28:50 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:50 READ biblio 367764
+05/09/2011 09:28:51 READ biblio 367764
+2011/09/05 09:28:51 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:52 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:52 READ biblio 359858
+05/09/2011 09:28:53 READ biblio 359858
+2011/09/05 09:28:53 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:54 READ biblio 359858
+05/09/2011 09:28:55 READ biblio 1608
+2011/09/05 09:28:56 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:56 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:56 READ biblio 1608
+2011/09/05 09:28:56 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:57 READ biblio 326847
+05/09/2011 09:28:58 READ biblio 326847
+05/09/2011 09:28:58 We have 9 records for biblio and 20seconds since first add
+05/09/2011 09:28:58 Removing records (biblio 293377,316294,157,367969,295,367764,359858,1608,326847) from file
+05/09/2011 09:28:58 Indexing
+05/09/2011 09:28:58 biblio 293377,316294,157,367969,295,367764,359858,1608,326847
+2011/09/05 09:28:58 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:28:59 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:28:59 READ biblio 326847
+05/09/2011 09:29:00 READ biblio 314
+2011/09/05 09:29:00 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:01 READ biblio 314
+2011/09/05 09:29:01 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:02 READ biblio 310848
+2011/09/05 09:29:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:03 READ biblio 310848
+2011/09/05 09:29:03 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:04 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:04 READ biblio 310848
+05/09/2011 09:29:05 READ biblio 1311
+2011/09/05 09:29:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:06 READ biblio 1311
+2011/09/05 09:29:06 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:07 READ biblio 371671
+2011/09/05 09:29:08 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:08 READ biblio 371671
+2011/09/05 09:29:09 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:09 READ biblio 371671
+05/09/2011 09:29:10 READ biblio 159177
+2011/09/05 09:29:10 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:11 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:11 READ biblio 159177
+05/09/2011 09:29:12 READ biblio 159177
+2011/09/05 09:29:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:13 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:14 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:14 READ 12
+05/09/2011 09:29:14 ERROR FOR THIS LINE (12), BAD FORMAT
+05/09/2011 09:29:14 READ biblio 368712
+05/09/2011 09:29:15 READ biblio 368712
+2011/09/05 09:29:15 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:16 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:16 READ biblio 121
+2011/09/05 09:29:16 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:17 READ biblio 121
+2011/09/05 09:29:18 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:18 READ biblio 327308
+2011/09/05 09:29:18 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:19 READ biblio 327308
+05/09/2011 09:29:19 We have 9 records for biblio and 20seconds since first add
+05/09/2011 09:29:19 Removing records (biblio 326847,314,310848,1311,371671,159177,368712,121,327308) from file
+05/09/2011 09:29:19 Indexing
+05/09/2011 09:29:19 biblio 326847,314,310848,1311,371671,159177,368712,121,327308
+2011/09/05 09:29:20 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:20 READ biblio 327308
+2011/09/05 09:29:21 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:21 READ biblio 317822
+2011/09/05 09:29:22 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:22 READ biblio 317822
+2011/09/05 09:29:23 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:23 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:23 READ biblio 317822
+05/09/2011 09:29:24 READ biblio 142865
+2011/09/05 09:29:25 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:25 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:25 READ biblio 142865
+05/09/2011 09:29:26 READ biblio 142865
+2011/09/05 09:29:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:27 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:27 READ biblio 1386
+2011/09/05 09:29:28 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:28 READ biblio 1386
+05/09/2011 09:29:29 READ biblio 269151
+2011/09/05 09:29:29 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:30 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:30 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:30 READ biblio 269151
+05/09/2011 09:29:31 READ biblio 269151
+2011/09/05 09:29:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:32 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:32 READ biblio 254591
+2011/09/05 09:29:33 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:34 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:34 READ  277750
+05/09/2011 09:29:34 ERROR FOR THIS LINE ( 277750), BAD FORMAT
+05/09/2011 09:29:34 READ biblio 277750
+2011/09/05 09:29:35 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:35 READ biblio 277750
+2011/09/05 09:29:36 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:37 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:38 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:39 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:39 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:40 We have 7 records for biblio and 20seconds since first add
+05/09/2011 09:29:40 Removing records (biblio 327308,317822,142865,1386,269151,254591,277750) from file
+05/09/2011 09:29:40 Indexing
+05/09/2011 09:29:40 biblio 327308,317822,142865,1386,269151,254591,277750
+2011/09/05 09:29:41 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:41 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:41 READ biblio 1158
+2011/09/05 09:29:42 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:42 READ biblio 1158
+05/09/2011 09:29:43 READ biblio 1489
+2011/09/05 09:29:43 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:44 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:44 READ biblio 1489
+05/09/2011 09:29:45 READ biblio 339452
+2011/09/05 09:29:45 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:46 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:46 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:46 READ biblio 339452
+05/09/2011 09:29:47 READ biblio 339452
+2011/09/05 09:29:48 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:48 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:49 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:49 READ biblio5
+05/09/2011 09:29:49 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:29:49 READ biblio5
+05/09/2011 09:29:49 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:29:49 READ biblio32
+05/09/2011 09:29:49 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:29:49 READ biblio32
+05/09/2011 09:29:49 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:29:49 READ biblio 341187
+05/09/2011 09:29:50 READ biblio 341187
+2011/09/05 09:29:50 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:51 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:51 READ biblio 341187
+2011/09/05 09:29:52 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:52 READ biblio 255656
+2011/09/05 09:29:53 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:53 READ biblio 255656
+05/09/2011 09:29:54 READ biblio 255656
+2011/09/05 09:29:54 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+2011/09/05 09:29:55 /tmp/IndexRecordQueue.pid not writable by user www-data
+05/09/2011 09:29:55 READ biblio 26
+05/09/2011 09:29:56 READ biblio 26
+05/09/2011 09:29:57 READ biblio 378682
+05/09/2011 09:29:58 READ biblio 378682
+05/09/2011 09:29:59 READ biblio 378682
+05/09/2011 09:30:00 READ biblio 332619
+05/09/2011 09:30:01 READ biblio 332619
+05/09/2011 09:30:01 We have 8 records for biblio and 20seconds since first add
+05/09/2011 09:30:01 Removing records (biblio 1158,1489,339452,341187,255656,26,378682,332619) from file
+05/09/2011 09:30:01 Indexing
+05/09/2011 09:30:01 biblio 1158,1489,339452,341187,255656,26,378682,332619
+05/09/2011 09:30:02 READ biblio 332619
+05/09/2011 09:30:03 READ biblio 364161
+05/09/2011 09:30:04 READ biblio 364161
+05/09/2011 09:30:05 READ biblio 364161
+05/09/2011 09:30:06 READ biblio 240626
+05/09/2011 09:30:07 READ biblio 240626
+05/09/2011 09:30:08 READ biblio 240626
+05/09/2011 09:30:09 READ biblio 328199
+05/09/2011 09:30:10 READ biblio 328199
+05/09/2011 09:30:11 READ biblio 328199
+05/09/2011 09:30:12 READ biblio 41788
+05/09/2011 09:30:13 READ biblio 41788
+05/09/2011 09:30:14 READ biblio 41788
+05/09/2011 09:30:15 READ biblio 376851
+05/09/2011 09:30:16 READ biblio 376851
+05/09/2011 09:30:17 READ biblio 376851
+05/09/2011 09:30:18 READ biblio 12
+05/09/2011 09:30:19 READ biblio 12
+05/09/2011 09:30:20 READ biblio 1080
+05/09/2011 09:30:21 READ biblio 1080
+05/09/2011 09:30:22 READ biblio 361811
+05/09/2011 09:30:22 We have 9 records for biblio and 20seconds since first add
+05/09/2011 09:30:22 Removing records (biblio 332619,364161,240626,328199,41788,376851,12,1080,361811) from file
+05/09/2011 09:30:22 Indexing
+05/09/2011 09:30:22 biblio 332619,364161,240626,328199,41788,376851,12,1080,361811
+05/09/2011 09:30:23 READ biblio 361811
+05/09/2011 09:30:24 READ biblio 361811
+05/09/2011 09:30:25 READ biblio801
+05/09/2011 09:30:25 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:30:25 READ biblio801
+05/09/2011 09:30:25 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:30:25 READ biblio801
+05/09/2011 09:30:25 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:30:25 READ biblio 830
+05/09/2011 09:30:26 READ biblio 830
+05/09/2011 09:30:27 READ biblio 270
+05/09/2011 09:30:28 READ biblio 270
+05/09/2011 09:30:29 READ biblio 339811
+05/09/2011 09:30:30 READ biblio 339811
+05/09/2011 09:30:31 READ biblio 339811
+05/09/2011 09:30:32 READ biblio 596
+05/09/2011 09:30:33 READ biblio 596
+05/09/2011 09:30:34 READ biblio 343225
+05/09/2011 09:30:35 READ biblio 343225
+05/09/2011 09:30:36 READ biblio 343225
+05/09/2011 09:30:37 READ biblio 207726
+05/09/2011 09:30:38 READ biblio 207726
+05/09/2011 09:30:39 READ biblio 207726
+05/09/2011 09:30:40 READ biblio 1158
+05/09/2011 09:30:41 READ biblio 1158
+05/09/2011 09:30:42 READ biblio 1489
+05/09/2011 09:30:43 READ biblio 1489
+05/09/2011 09:30:43 We have 9 records for biblio and 20seconds since first add
+05/09/2011 09:30:43 Removing records (biblio 361811,830,270,339811,596,343225,207726,1158,1489) from file
+05/09/2011 09:30:43 Indexing
+05/09/2011 09:30:43 biblio 361811,830,270,339811,596,343225,207726,1158,1489
+05/09/2011 09:30:44 READ biblio 339452
+05/09/2011 09:30:45 READ biblio 339452
+05/09/2011 09:30:46 READ biblio 339452
+05/09/2011 09:30:47 READ biblio 358500
+05/09/2011 09:30:48 READ biblio 358500
+05/09/2011 09:30:49 READ biblio 358500
+05/09/2011 09:30:50 READ biblio 325556
+05/09/2011 09:30:51 READ biblio 325556
+05/09/2011 09:30:52 READ biblio 368263
+05/09/2011 09:30:53 READ biblio 368263
+05/09/2011 09:30:54 READ biblio 368263
+05/09/2011 09:30:55 READ biblio 212117
+05/09/2011 09:30:57 READ biblio5
+05/09/2011 09:30:57 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:30:57 READ biblio5
+05/09/2011 09:30:57 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:30:57 READ biblio32
+05/09/2011 09:30:57 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:30:57 READ biblio32
+05/09/2011 09:30:57 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:30:57 READ biblio801
+05/09/2011 09:30:57 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:30:57 READ biblio801
+05/09/2011 09:30:57 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:30:57 READ biblio801
+05/09/2011 09:30:57 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:30:57 READ biblio 358500
+05/09/2011 09:30:58 READ biblio 358500
+05/09/2011 09:30:59 READ biblio 358500
+05/09/2011 09:31:00 READ biblio 325556
+05/09/2011 09:31:01 READ biblio 325556
+05/09/2011 09:31:02 READ biblio 368263
+05/09/2011 09:31:03 READ biblio 368263
+05/09/2011 09:31:04 READ biblio 368263
+05/09/2011 09:31:04 We have 5 records for biblio and 20seconds since first add
+05/09/2011 09:31:04 Removing records (biblio 339452,358500,325556,368263,212117) from file
+05/09/2011 09:31:04 Indexing
+05/09/2011 09:31:04 biblio 339452,358500,325556,368263,212117
+05/09/2011 09:31:05 READ biblio 212117
+05/09/2011 09:31:06 READ biblio 212117
+05/09/2011 09:31:07 READ biblio 212117
+05/09/2011 09:31:09 READ biblio 425
+05/09/2011 09:31:10 READ biblio 425
+05/09/2011 09:31:11 READ biblio 990
+05/09/2011 09:31:12 READ biblio 990
+05/09/2011 09:31:13 READ biblio 360875
+05/09/2011 09:31:14 READ biblio 360875
+05/09/2011 09:31:15 READ biblio 360875
+05/09/2011 09:31:17 READ biblio5
+05/09/2011 09:31:17 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:31:17 READ biblio5
+05/09/2011 09:31:17 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:31:17 READ biblio32
+05/09/2011 09:31:17 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:31:17 READ biblio32
+05/09/2011 09:31:17 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:31:17 READ biblio801
+05/09/2011 09:31:17 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:31:17 READ biblio801
+05/09/2011 09:31:17 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:31:17 READ biblio801
+05/09/2011 09:31:17 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:31:17 READ biblio 425
+05/09/2011 09:31:18 READ biblio 425
+05/09/2011 09:31:19 READ biblio 990
+05/09/2011 09:31:20 READ biblio 990
+05/09/2011 09:31:21 READ biblio 360875
+05/09/2011 09:31:22 READ biblio 360875
+05/09/2011 09:31:23 READ biblio 360875
+05/09/2011 09:31:25 We have 4 records for biblio and 20seconds since first add
+05/09/2011 09:31:25 Removing records (biblio 212117,425,990,360875) from file
+05/09/2011 09:31:25 Indexing
+05/09/2011 09:31:25 biblio 212117,425,990,360875
+05/09/2011 09:31:27 READ biblio5
+05/09/2011 09:31:27 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:31:27 READ biblio5
+05/09/2011 09:31:27 ERROR FOR THIS LINE (biblio5), BAD FORMAT
+05/09/2011 09:31:27 READ biblio32
+05/09/2011 09:31:27 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:31:27 READ biblio32
+05/09/2011 09:31:27 ERROR FOR THIS LINE (biblio32), BAD FORMAT
+05/09/2011 09:31:27 READ biblio801
+05/09/2011 09:31:27 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:31:27 READ biblio801
+05/09/2011 09:31:27 ERROR FOR THIS LINE (biblio801), BAD FORMAT
+05/09/2011 09:31:27 READ biblio801
+05/09/2011 09:31:27 ERROR FOR THIS LINE (biblio801), BAD FORMAT

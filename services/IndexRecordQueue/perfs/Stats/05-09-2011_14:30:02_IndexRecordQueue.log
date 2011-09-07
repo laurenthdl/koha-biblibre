@@ -1,0 +1,213 @@
+
+05/09/2011 14:30:06 START
+05/09/2011 14:30:06 SET OPTS: 
+filepath=/tmp/records1.txt
+max_records=5
+max_delta=20
+05/09/2011 14:30:06 Processing previous records
+05/09/2011 14:30:06 $VAR1 = {};
+
+05/09/2011 14:30:17 READ biblio 4218
+05/09/2011 14:30:18 READ biblio 4997
+05/09/2011 14:30:19 READ biblio 8544
+05/09/2011 14:30:20 READ biblio 2101
+05/09/2011 14:30:21 READ biblio 9004
+05/09/2011 14:30:21 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:30:21 Indexing
+05/09/2011 14:30:21 Removing records (biblio 4218,4997,8544,2101,9004) from file
+05/09/2011 14:30:21 biblio 4218,4997,8544,2101,9004
+05/09/2011 14:30:23 READ biblio 7860
+05/09/2011 14:30:24 READ biblio 2506
+05/09/2011 14:30:25 READ biblio 2572
+05/09/2011 14:30:26 READ biblio 5322
+05/09/2011 14:30:27 READ biblio 6623
+05/09/2011 14:30:27 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:30:27 Indexing
+05/09/2011 14:30:27 Removing records (biblio 7860,2506,2572,5322,6623) from file
+05/09/2011 14:30:27 biblio 7860,2506,2572,5322,6623
+05/09/2011 14:30:28 READ biblio 9165
+05/09/2011 14:30:29 READ biblio 372
+05/09/2011 14:30:30 READ biblio 9748
+05/09/2011 14:30:32 READ blio 3743
+05/09/2011 14:30:33 READ biblio 6988
+05/09/2011 14:30:34 READ biblio 6574
+05/09/2011 14:30:34 We have 5 records for biblio and 6seconds since first add
+05/09/2011 14:30:34 Removing records (biblio 9165,372,9748,6988,6574) from file
+05/09/2011 14:30:34 Indexing
+05/09/2011 14:30:34 biblio 9165,372,9748,6988,6574
+05/09/2011 14:30:35 READ biblio 5124
+05/09/2011 14:30:36 READ biblio 752
+05/09/2011 14:30:37 READ biblio 3371
+05/09/2011 14:30:38 READ biblio 5226
+05/09/2011 14:30:39 READ biblio 2555
+05/09/2011 14:30:39 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:30:39 Removing records (biblio 5124,752,3371,5226,2555) from file
+05/09/2011 14:30:39 Indexing
+05/09/2011 14:30:39 biblio 5124,752,3371,5226,2555
+05/09/2011 14:30:40 READ biblio 6645
+05/09/2011 14:30:41 READ biblio 7677
+05/09/2011 14:30:42 READ biblio 8124
+05/09/2011 14:30:43 READ biblio 5371
+05/09/2011 14:30:44 READ biblio 6327
+05/09/2011 14:30:44 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:30:44 Removing records (biblio 6645,7677,8124,5371,6327) from file
+05/09/2011 14:30:44 Indexing
+05/09/2011 14:30:44 biblio 6645,7677,8124,5371,6327
+05/09/2011 14:30:45 READ biblio 4210
+05/09/2011 14:30:46 READ biblio 4396
+05/09/2011 14:30:47 READ biblio 4194
+05/09/2011 14:30:48 READ biblio 8876
+05/09/2011 14:30:49 READ biblio 3271
+05/09/2011 14:30:49 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:30:49 Removing records (biblio 4210,4396,4194,8876,3271) from file
+05/09/2011 14:30:49 Indexing
+05/09/2011 14:30:49 biblio 4210,4396,4194,8876,3271
+05/09/2011 14:30:50 READ biblio 2189
+05/09/2011 14:30:51 READ biblio 4287
+05/09/2011 14:30:52 READ biblio 9653
+05/09/2011 14:30:52 We have 1 records for blio and 20seconds since first add
+05/09/2011 14:30:53 Removing records (blio 3743) from file
+05/09/2011 14:30:53 Indexing
+05/09/2011 14:30:53 blio 3743
+05/09/2011 14:30:54 READ biblio 9783
+05/09/2011 14:30:55 READ biblio 1172
+05/09/2011 14:30:55 We have 5 records for biblio and 5seconds since first add
+05/09/2011 14:30:55 Removing records (biblio 2189,4287,9653,9783,1172) from file
+05/09/2011 14:30:55 Indexing
+05/09/2011 14:30:55 biblio 2189,4287,9653,9783,1172
+05/09/2011 14:30:56 READ biblio 1460
+05/09/2011 14:30:57 READ biblio 4179
+05/09/2011 14:30:58 READ biblio 8525
+05/09/2011 14:31:00 READ blio 2543
+05/09/2011 14:31:01 READ biblio 9993
+05/09/2011 14:31:02 READ biblio 9293
+05/09/2011 14:31:02 We have 5 records for biblio and 6seconds since first add
+05/09/2011 14:31:02 Removing records (biblio 1460,4179,8525,9993,9293) from file
+05/09/2011 14:31:02 Indexing
+05/09/2011 14:31:02 biblio 1460,4179,8525,9993,9293
+05/09/2011 14:31:03 READ biblio 8522
+05/09/2011 14:31:04 READ biblio 4943
+05/09/2011 14:31:05 READ biblio 9947
+05/09/2011 14:31:06 READ biblio 9822
+05/09/2011 14:31:07 READ biblio 2437
+05/09/2011 14:31:07 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:31:07 Removing records (biblio 8522,4943,9947,9822,2437) from file
+05/09/2011 14:31:07 Indexing
+05/09/2011 14:31:07 biblio 8522,4943,9947,9822,2437
+05/09/2011 14:31:08 READ biblio 2716
+05/09/2011 14:31:09 READ biblio 3160
+05/09/2011 14:31:10 READ biblio 2959
+05/09/2011 14:31:11 READ biblio 8376
+05/09/2011 14:31:12 READ biblio 26
+05/09/2011 14:31:12 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:31:12 Removing records (biblio 2716,3160,2959,8376,26) from file
+05/09/2011 14:31:12 Indexing
+05/09/2011 14:31:12 biblio 2716,3160,2959,8376,26
+05/09/2011 14:31:13 READ biblio 760
+05/09/2011 14:31:14 READ biblio 8827
+05/09/2011 14:31:15 READ biblio 269
+05/09/2011 14:31:16 READ biblio 1039
+05/09/2011 14:31:17 READ biblio 7979
+05/09/2011 14:31:17 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:31:17 Removing records (biblio 760,8827,269,1039,7979) from file
+05/09/2011 14:31:17 Indexing
+05/09/2011 14:31:17 biblio 760,8827,269,1039,7979
+05/09/2011 14:31:18 READ biblio 8566
+05/09/2011 14:31:19 READ biblio 1702
+05/09/2011 14:31:20 READ biblio 331
+05/09/2011 14:31:20 We have 1 records for blio and 20seconds since first add
+05/09/2011 14:31:21 Removing records (blio 2543) from file
+05/09/2011 14:31:21 Indexing
+05/09/2011 14:31:21 blio 2543
+05/09/2011 14:31:22 READ biblio 7290
+05/09/2011 14:31:23 READ biblio 6805
+05/09/2011 14:31:23 We have 5 records for biblio and 5seconds since first add
+05/09/2011 14:31:23 Removing records (biblio 8566,1702,331,7290,6805) from file
+05/09/2011 14:31:23 Indexing
+05/09/2011 14:31:23 biblio 8566,1702,331,7290,6805
+05/09/2011 14:31:24 READ biblio 9797
+05/09/2011 14:31:25 READ biblio 6293
+05/09/2011 14:31:26 READ biblio 9949
+05/09/2011 14:31:28 READ biblio 3004
+05/09/2011 14:31:29 READ biblio 9579
+05/09/2011 14:31:29 We have 5 records for biblio and 5seconds since first add
+05/09/2011 14:31:29 Removing records (biblio 9797,6293,9949,3004,9579) from file
+05/09/2011 14:31:29 Indexing
+05/09/2011 14:31:29 biblio 9797,6293,9949,3004,9579
+05/09/2011 14:31:30 READ biblio 36
+05/09/2011 14:31:31 READ biblio 3845
+05/09/2011 14:31:32 READ biblio 1386
+05/09/2011 14:31:33 READ biblio 4013
+05/09/2011 14:31:34 READ biblio 8084
+05/09/2011 14:31:34 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:31:34 Removing records (biblio 36,3845,1386,4013,8084) from file
+05/09/2011 14:31:34 Indexing
+05/09/2011 14:31:34 biblio 36,3845,1386,4013,8084
+05/09/2011 14:31:35 READ biblio 5828
+05/09/2011 14:31:36 READ biblio24
+05/09/2011 14:31:36 ERROR FOR THIS LINE (biblio24), BAD FORMAT
+05/09/2011 14:31:36 READ biblio 6978
+05/09/2011 14:31:37 READ biblio 3743
+05/09/2011 14:31:38 READ biblio 8899
+05/09/2011 14:31:39 READ biblio 1672
+05/09/2011 14:31:39 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:31:39 Removing records (biblio 5828,6978,3743,8899,1672) from file
+05/09/2011 14:31:39 Indexing
+05/09/2011 14:31:39 biblio 5828,6978,3743,8899,1672
+05/09/2011 14:31:40 READ biblio 1676
+05/09/2011 14:31:41 READ biblio 599
+05/09/2011 14:31:42 READ biblio 9348
+05/09/2011 14:31:43 READ biblio 7723
+05/09/2011 14:31:44 READ biblio 6686
+05/09/2011 14:31:44 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:31:44 Removing records (biblio 1676,599,9348,7723,6686) from file
+05/09/2011 14:31:44 Indexing
+05/09/2011 14:31:44 biblio 1676,599,9348,7723,6686
+05/09/2011 14:31:45 READ biblio 2574
+05/09/2011 14:31:46 READ biblio 299
+05/09/2011 14:31:47 READ biblio 731
+05/09/2011 14:31:48 READ biblio 9668
+05/09/2011 14:31:49 READ biblio 2067
+05/09/2011 14:31:49 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:31:49 Removing records (biblio 2574,299,731,9668,2067) from file
+05/09/2011 14:31:49 Indexing
+05/09/2011 14:31:49 biblio 2574,299,731,9668,2067
+05/09/2011 14:31:50 READ biblio 5643
+05/09/2011 14:31:51 READ biblio 3364
+05/09/2011 14:31:52 READ biblio 5726
+05/09/2011 14:31:53 READ biblio 6332
+05/09/2011 14:31:54 READ biblio 2414
+05/09/2011 14:31:54 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:31:54 Removing records (biblio 5643,3364,5726,6332,2414) from file
+05/09/2011 14:31:54 Indexing
+05/09/2011 14:31:54 biblio 5643,3364,5726,6332,2414
+05/09/2011 14:31:55 READ biblio 9007
+05/09/2011 14:31:56 READ biblio 8590
+05/09/2011 14:31:57 READ biblio 4959
+05/09/2011 14:31:58 READ biblio 137
+05/09/2011 14:31:59 READ biblio 3351
+05/09/2011 14:31:59 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:32:00 Removing records (biblio 9007,8590,4959,137,3351) from file
+05/09/2011 14:32:00 Indexing
+05/09/2011 14:32:00 biblio 9007,8590,4959,137,3351
+05/09/2011 14:32:01 READ biblio 2410
+05/09/2011 14:32:02 READ biblio 7890
+05/09/2011 14:32:03 READ biblio 3568
+05/09/2011 14:32:04 READ biblio 2543
+05/09/2011 14:32:05 READ biblio9
+05/09/2011 14:32:05 ERROR FOR THIS LINE (biblio9), BAD FORMAT
+05/09/2011 14:32:05 READ biblio 9797
+05/09/2011 14:32:05 We have 5 records for biblio and 4seconds since first add
+05/09/2011 14:32:05 Removing records (biblio 2410,7890,3568,2543,9797) from file
+05/09/2011 14:32:05 Indexing
+05/09/2011 14:32:05 biblio 2410,7890,3568,2543,9797
+05/09/2011 14:32:06 READ biblio 6293
+05/09/2011 14:32:07 READ biblio 9949
+05/09/2011 14:32:09 READ biblio24
+05/09/2011 14:32:09 ERROR FOR THIS LINE (biblio24), BAD FORMAT
+05/09/2011 14:32:09 READ biblio9
+05/09/2011 14:32:09 ERROR FOR THIS LINE (biblio9), BAD FORMAT
+05/09/2011 14:32:26 We have 2 records for biblio and 20seconds since first add
+05/09/2011 14:32:26 Removing records (biblio 6293,9949) from file
+05/09/2011 14:32:26 Indexing
+05/09/2011 14:32:26 biblio 6293,9949

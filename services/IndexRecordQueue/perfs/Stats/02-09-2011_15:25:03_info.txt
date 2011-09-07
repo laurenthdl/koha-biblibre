@@ -1,0 +1,5 @@
+my $MAX_BORROWERS = 10;
+my $MAX_ISSUES    = 20;
+my $MAX_RETURNS   = 20;
+my $SQL_LIMIT     = 100;
+Sans Queue !
