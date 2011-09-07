@@ -849,18 +849,26 @@ C<$id> - an id for the BibTex record (might be the biblionumber)
 sub marc2bibtex {
     my ( $record, $id ) = @_;
     my $tex;
-
+    my $i = 0; #modif brisees
     # Authors
     my $marcauthors = GetMarcAuthors( $record, C4::Context->preference("marcflavour") );
     my $author;
     for my $authors (
         map {
-            map { @$_ } values %$_
+#            map { @$_ } values %$_  modif brises
+            map { @$_->[2],@$_->[1] } values %$_ # modif brisees [2] et [1] pour n'avoir que prenom et nom
         } @$marcauthors
       ) {
-        $author .= " and " if ( $author && $$authors{value} );
-        $author .= $$authors{value} if ( $$authors{value} );
+#        $author .= " and " if ( $author && $$authors{value} ); modif brisees
+        $author .= " ".$$authors{value} if ( $$authors{value} ); #modif brisees espace entre prenom et nom
+        # modif brisees pour mettre un and entre les auteurs
+        $i++;
+        $author .= " and " if ( $i%2 == 0  );
     }
+
+    # modif brisees pour supprimer le dernier and
+    my $l = length($author) - 4 ;
+    $author = substr $author, 0, $l ;
 
     # Defining the conversion hash according to the marcflavour
     my %bh;
@@ -874,14 +882,16 @@ sub marc2bibtex {
 
             # Mandatory
             author    => $author,
-            title     => $record->subfield( "200", "a" ) || "",
+            title     => $record->subfield( "200", "a" )." ".$record->subfield( "200", "e" )." ".$record->subfield( "200", "h" )." ".$record->subfield( "200", "i" ) || "", # modif brisees
             editor    => $record->subfield( "210", "g" ) || "",
             publisher => $record->subfield( "210", "c" ) || "",
             year      => $record->subfield( "210", "d" ) || $record->subfield( "210", "h" ) || "",
 
             # Optional
-            volume  => $record->subfield( "200", "v" ) || "",
-            series  => $record->subfield( "225", "a" ) || "",
+            isbn    => $record->subfield( "010", "a" ) || "", # modif brisees
+            pages   => $record->subfield( "215", "a" ) || "", # modif brisees
+#            volume  => $record->subfield( "200", "v" ) || "", modif brisees
+            series  => $record->subfield( "225", "a" )." ".$record->subfield( "225", "i" )." ".$record->subfield( "225", "v" )." ".$record->subfield( "225", "x" ) || "", # modif brisees
             address => $record->subfield( "210", "a" ) || "",
             edition => $record->subfield( "205", "a" ) || "",
             note    => $record->subfield( "300", "a" ) || "",
@@ -910,7 +920,7 @@ sub marc2bibtex {
     }
 
     $tex .= "\@book{";
-    $tex .= join( ",\n", $id, map { $bh{$_} ? qq(\t$_ = "$bh{$_}") : () } keys %bh );
+    $tex .= join( ",\n", "brise-es_".$id, map { $bh{$_} ? qq(\t$_ = "$bh{$_}") : () } keys %bh ); # modif brisees prefix
     $tex .= "\n}\n";
 
     return $tex;
