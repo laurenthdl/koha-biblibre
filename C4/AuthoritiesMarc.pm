@@ -778,13 +778,20 @@ sub BuildSummary {
     #         feature will be enabled only for UNIMARC for backwards
     #         compatibility.
     if ( $summary and C4::Context->preference('marcflavour') eq 'UNIMARC' ) {
-        while($summary =~ m/\[(.*?)(\d{3})([\*a-z0-9])(.*?)\]/) {
-            my $textbefore = $1;
-            my $tag = $2;
-            my $subtag = $3;
-            my $textafter = $4;
+        my @matches = ($summary =~ m/\[(.*?)(\d{3})([\*a-z0-9])(.*?)\]/g);
+        my (@textbefore, @tag, @subtag, @textafter);
+        for(my $i = 0; $i < scalar @matches; $i++){
+            push @textbefore, $matches[$i] if($i%4 == 0);
+            push @tag,        $matches[$i] if($i%4 == 1);
+            push @subtag,     $matches[$i] if($i%4 == 2);
+            push @textafter,  $matches[$i] if($i%4 == 3);
+        }
+        for(my $i = scalar @tag; $i >= 0; $i--){
+            my $textbefore = $textbefore[$i];
+            my $tag = $tag[$i];
+            my $subtag = $subtag[$i];
+            my $textafter = $textafter[$i];
             my $value;
-
             my $field = $record->field($tag);
             next unless $field;
             if($subtag eq '*') {
@@ -801,8 +808,7 @@ sub BuildSummary {
                     $value = '';
                 }
             }
-
-            $summary =~ s/\[\Q$textbefore$tag$subtag$textafter\E\]/$value/g;
+            $summary =~ s/\[\Q$textbefore$tag$subtag$textafter\E\]/$value/;
         }
         $summary =~ s/\\n/<br \/>/g;
     } else {

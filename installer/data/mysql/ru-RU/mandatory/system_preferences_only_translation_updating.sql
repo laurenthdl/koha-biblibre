@@ -211,9 +211,6 @@ UPDATE systempreferences SET explanation='Определение глобаль�
 UPDATE systempreferences SET explanation='Определение МАРК-кода для организации — http://www.loc.gov/marc/organizations/orgshome.html' WHERE variable='MARCOrgCode';
 -- 	Define MARC Organization Code - http://www.loc.gov/marc/organizations/orgshome.html
 
-UPDATE systempreferences SET explanation='Включение функции сокрытия в ЭК, требует дальнейшей настройки, обратитесь к системному администратору для получения более детальной информации' WHERE variable='OpacSuppression';
--- 	Turn ON the OPAC Suppression feature, requires further setup, ask your system administrator for details
-
 UPDATE systempreferences SET explanation='Если включена, действует обработка сериальных изданий' WHERE variable='RoutingSerials';
 -- 	If ON, serials routing is enabled
 

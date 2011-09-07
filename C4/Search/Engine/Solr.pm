@@ -332,8 +332,8 @@ sub SimpleSearch {
     $max_results ||= 999999999;
     $sort        ||= 'score desc';
 
-    # sort is a srt_* field
-    $sort = "srt_$sort" if $sort =~ /^(str|txt|int|date|ste)_/;
+    # sort is done on srt_* fields
+    $sort =~ s/(^|,)\s*(str|txt|int|date|ste)_/$1srt_$2_/g;
 
     my $sc = GetSolrConnection;
 

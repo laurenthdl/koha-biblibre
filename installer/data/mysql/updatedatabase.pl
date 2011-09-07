@@ -6066,7 +6066,6 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-<<<<<<< HEAD
 $DBversion = "3.06.00.035";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     $dbh->do("ALTER TABLE serial
@@ -6247,6 +6246,13 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+
+$DBversion = "3.06.00.049";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SearchOPACHides','','Construct the opac query with this string at the end.','','Free');");
+    print "Upgrade to $DBversion done (Add System Preferences SearchOPACHides)\n";
+    SetVersion($DBversion);
+}
 
 =item DropAllForeignKeys($table)
 

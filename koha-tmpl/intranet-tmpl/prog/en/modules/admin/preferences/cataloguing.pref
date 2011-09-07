@@ -107,12 +107,6 @@ Cataloging:
             - pref: ISBD
               type: textarea
               class: code
-        -
-            - pref: OpacSuppression
-              choices:
-                  yes: Hide
-                  no: "Don't hide"
-            - items marked as suppressed from OPAC search results. Note that you must have the <code>Suppress</code> index set up in Zebra and at least one suppressed item, or your searches will be broken.
         - 
             - Show the
             - pref: StaffSerialIssueDisplayCount
