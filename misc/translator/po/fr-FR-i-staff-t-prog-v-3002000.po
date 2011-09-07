@@ -872,7 +872,7 @@ msgstr "%s numéro(s)"
 #: /home/users/koha/versions/devlimoges/koha-tmpl/intranet-tmpl/prog/en/modules/tools/stage-marc-import.tmpl:59
 #, c-format
 msgid "%s item records found and staged"
-msgstr "%s notice(s) trouvée(s) et importée(s) dans le réservoir"
+msgstr "%s exemplaire(s) trouvé(s) et importé(s) dans le réservoir"
 
 #. For the first occurrence,
 #. %1$s: TMPL_VAR name=count
