@@ -275,7 +275,9 @@ sub redirect_add_subscription {
     my $numberpattern  = $query->param('numbering_pattern');
     my $graceperiod    = $query->param('graceperiod') || 0;
 
-    my ( $numberlength, $weeklength, $monthlength ) = _get_sub_length( $query->param('subtype'), $query->param('sublength') );
+    my $subtype = $query->param('subtype');
+    my $sublength = $query->param('sublength');
+    my ( $numberlength, $weeklength, $monthlength ) = _get_sub_length( $subtype, $sublength );
     my $lastvalue1        = $query->param('lastvalue1');
     my $lastvalue2        = $query->param('lastvalue2');
     my $lastvalue3        = $query->param('lastvalue3');
@@ -300,7 +302,11 @@ sub redirect_add_subscription {
     my $enddate = format_date_in_iso( $query->param('enddate') );
     my $firstacquidate  = format_date_in_iso($query->param('firstacquidate'));
     if(!defined $enddate || $enddate eq '') {
-        $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
+        if($subtype eq "issues") {
+            $enddate = _guess_enddate($firstacquidate, $periodicity, $numberlength, $weeklength, $monthlength);
+        } else {
+            $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
+        }
     }
 
     my $subscriptionid = NewSubscription(
@@ -339,7 +345,9 @@ sub redirect_mod_subscription {
     my $periodicity = $query->param('frequency');
     my $dow         = $query->param('dow');
 
-    my ( $numberlength, $weeklength, $monthlength ) = _get_sub_length( $query->param('subtype'), $query->param('sublength') );
+    my $subtype = $query->param('subtype');
+    my $sublength = $query->param('sublength');
+    my ( $numberlength, $weeklength, $monthlength ) = _get_sub_length( $subtype, $sublength );
     my $numberpattern   = $query->param('numbering_pattern');
     my $lastvalue1        = $query->param('lastvalue1');
     my $lastvalue2        = $query->param('lastvalue2');
@@ -365,7 +373,11 @@ sub redirect_mod_subscription {
 
     # Guess end date
     if(!defined $enddate || $enddate eq '') {
-        $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
+        if($subtype eq "issues") {
+            $enddate = _guess_enddate($firstacquidate, $periodicity, $numberlength, $weeklength, $monthlength);
+        } else {
+            $enddate = _guess_enddate($startdate, $periodicity, $numberlength, $weeklength, $monthlength);
+        }
     }
 
     #  If it's  a mod, we need to check the current 'expected' issue, and mod it in the serials table if necessary.
