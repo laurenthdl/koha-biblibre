@@ -57,6 +57,7 @@ my $multi_hold    = $input->param('multi_hold');
 my $biblionumbers = $multi_hold ? $input->param('biblionumbers') : ( $biblionumber . '/' );
 my $bad_bibs      = $input->param('bad_bibs');
 
+
 my %bibinfos = ();
 my @biblionumbers = split '/', $biblionumbers;
 foreach my $bibnum (@biblionumbers) {
@@ -64,6 +65,7 @@ foreach my $bibnum (@biblionumbers) {
     $bibinfo{title}    = $input->param("title_$bibnum");
     $bibinfo{rank}     = $input->param("rank_$bibnum");
     $bibinfos{$bibnum} = \%bibinfo;
+
 }
 
 my $found;

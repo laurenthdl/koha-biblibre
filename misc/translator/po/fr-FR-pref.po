@@ -350,18 +350,6 @@ msgstr "A l'OPAC, montrer les"
 msgid "cataloguing.pref#OPACSerialIssueDisplayCount# previous issues of a serial on the OPAC."
 msgstr "derniers fascicules des périodiques."
 
-# Cataloging > Display
-msgid "cataloguing.pref#OpacSuppression# Don't hide"
-msgstr "Montrer"
-
-# Cataloging > Display
-msgid "cataloguing.pref#OpacSuppression# Hide"
-msgstr "Cacher"
-
-# Cataloging > Display
-msgid "cataloguing.pref#OpacSuppression# items marked as suppressed from OPAC search results. Note that you must have the <code>Suppress</code> index set up in Zebra and at least one suppressed item, or your searches will be broken."
-msgstr "à l'OPAC les exemplaires marqués comme supprimés. Notez que vous devez avoir configuré l'index <code>Suppress</code> de Zebra et avoir au moins un exemplaire supprimé pour que cela fonctionne."
-
 # Cataloging > Spine Labels
 msgid "cataloguing.pref#SpineLabelAutoPrint# When using the quick spine label printer,"
 msgstr ""

@@ -566,6 +566,8 @@ to another.
 sub ModItemTransfer {
     my ( $itemnumber, $frombranch, $tobranch ) = @_;
 
+    return unless ($tobranch);
+
     my $dbh = C4::Context->dbh;
 
     #new entry in branchtransfers....
