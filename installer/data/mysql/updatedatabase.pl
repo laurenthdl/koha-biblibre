@@ -6264,6 +6264,12 @@ SELECT  IF(branchcode='*','Default',branchcode),
     FROM issuingrules where branchcode='*' or itemtype='*' or categorycode='*';
     });
     print "Upgrade to $DBversion done (Ajout des règles de prêt pour les prêts par défauts)\n";
+}
+
+$DBversion = "3.06.00.049";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SearchOPACHides','','Construct the opac query with this string at the end.','','Free');");
+    print "Upgrade to $DBversion done (Add System Preferences SearchOPACHides)\n";
     SetVersion($DBversion);
 }
 

@@ -50,16 +50,8 @@ my ( $template, $loggedinuser, $cookie, $flags ) = get_template_and_user(
 my $supplierlist = GetSuppliersWithLateIssues();
 my @suploop;
 foreach my $s ( @{$supplierlist} ) {
-    if ( defined $supplierid && $s->{id} == $supplierid ) {
-        $s->{selected} = 1;
-    }
-    my ( @list ) = GetLateOrMissingIssues( $s->{id}, "", $order );
-    push @suploop,
-      { %$s,
-        count    => scalar(@list),
-      };
+    push @suploop, { %$s };
 }
-
 
 my $letters = GetLetters("claimissues");
 my @letters;
@@ -69,28 +61,24 @@ foreach ( keys %{$letters} ) {
 
 my $letter = ( ( scalar(@letters) > 1 ) || ( $letters[0]->{name} || $letters[0]->{code} ) );
 my @missingissues;
-my @supplierinfo;
-if ($supplierid) {
-    @missingissues = GetLateOrMissingIssues( $supplierid, $serialid, $order );
-    @supplierinfo = GetBookSeller($supplierid);
-}
-
-unless( $flags->{'superlibrarian'} == 1
- || $template->{'param_map'}->{'CAN_user_serials_superserials'} ){
-    foreach (@missingissues) {
-        if( $_->{'branchcode'}
-         && $_->{'branchcode'} ne C4::Context->userenv->{'branch'} ) {
-            $_->{'cannot_claim'} = 1;
-        }
-    }
-}
-
-my $branchloop = GetBranchesLoop();
-unshift @$branchloop, {value=> 'all',name=>''};
+my $supplierinfo;
 
 my $preview = 0;
 if ( $op && $op eq 'preview' ) {
     $preview = 1;
+    if ($supplierid) {
+        @missingissues = GetLateOrMissingIssues( $supplierid, $serialid, $order );
+        $supplierinfo = GetBookSellerFromId($supplierid);
+    }
+    unless( $flags->{'superlibrarian'} == 1
+     || $template->{'param_map'}->{'CAN_user_serials_superserials'} ){
+        foreach (@missingissues) {
+            if( $_->{'branchcode'}
+             && $_->{'branchcode'} ne C4::Context->userenv->{'branch'} ) {
+                $_->{'cannot_claim'} = 1;
+            }
+        }
+    }
 } else {
     my @serialnums = $input->param('serialid');
     if (@serialnums) {    # i.e. they have been flagged to generate claims
@@ -108,17 +96,10 @@ if ( $op && $op eq 'preview' ) {
 $template->param( 'letters' => \@letters, 'letter' => $letter );
 $template->param(
     order                    => $order,
-    suploop                  => \@suploop,
-    phone                    => $supplierinfo[0]->{phone},
-    booksellerfax            => $supplierinfo[0]->{booksellerfax},
-    bookselleremail          => $supplierinfo[0]->{bookselleremail},
+    %$supplierinfo,
     preview                  => $preview,
     missingissues            => \@missingissues,
     supplierid               => $supplierid,
-    claimletter              => $claimletter,
-    supplierloop             => \@supplierinfo,
-    branchloop               => $branchloop,
-    dateformat               => C4::Context->preference("dateformat"),
     DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar(),
 );
 output_html_with_http_headers $input, $cookie, $template->output;
