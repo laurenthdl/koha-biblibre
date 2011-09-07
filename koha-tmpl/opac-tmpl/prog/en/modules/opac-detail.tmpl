@@ -465,6 +465,11 @@ GBS_insertPreviewButtonPopup('<!-- TMPL_VAR NAME="normalized_isbn" -->');
 <li<!-- TMPL_IF EXPR="defaulttab eq 'holdings'"  --> class="ui-tabs-selected"<!-- /TMPL_IF -->><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#holdings">Holdings
     ( <!-- TMPL_VAR NAME="count" --> )</a>
    </li>
+<!-- debut modif brisees -->
+<!-- TMPL_IF NAME="ITEM_RESULTS" -->
+<li> <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#qrcode">For smartphone</a></li>
+<!-- /TMPL_IF -->
+<!-- fin modif brisees -->
 <!-- debut modif brisees <li> <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#descriptions">Title Notes</a></li> fin modif brisees -->
 <!-- TMPL_IF NAME="SYNDETICS_TOC" -->
  <li> <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#toc">TOC</a></li>
@@ -527,6 +532,15 @@ GBS_insertPreviewButtonPopup('<!-- TMPL_VAR NAME="normalized_isbn" -->');
     </table>
 </div>
 <!-- /TMPL_IF -->
+<!-- debut modif brisees -->
+<!-- TMPL_IF NAME="ITEM_RESULTS" -->
+<div id="qrcode">
+<img src="http://api.qrserver.com/v1/create-qr-code/?size=153x153&color=a1477e&bgcolor=ffffff&margin=3&data=<!-- TMPL_VAR NAME="title" ESCAPE="html" -->%0D<!-- TMPL_LOOP NAME="ITEM_RESULTS" --><!-- TMPL_VAR NAME="branchname" ESCAPE="html" -->%20<!-- TMPL_VAR NAME="location_description" ESCAPE="html" -->%20<!-- TMPL_VAR NAME="itemcallnumber" ESCAPE="html" -->%0D<!-- /TMPL_LOOP -->https%3A%2F%2Fbrisees-opac.univ-st-etienne.fr%2Fcgi-bin%2Fkoha%2Fopac-detail.pl%3Fbiblionumber%3D<!-- TMPL_VAR NAME="biblionumber" -->" alt="qrcode des cotes des exemplaires" title="<!-- TMPL_LOOP NAME="ITEM_RESULTS" --><!-- TMPL_VAR NAME="branchname" ESCAPE="html" --> <!-- TMPL_VAR NAME="location_description" ESCAPE="html" --> <!-- TMPL_VAR NAME="itemcallnumber" ESCAPE="html" --> | <!-- /TMPL_LOOP -->" style="float:left;padding:5px;"/><span><br /><br />Ce logo est un QR Code, ou flashcode, code barres à 2 dimensions.<br />
+Ce code est lisible à partir de votre smartphone. <a style="font-weight:normal;text-decoration:none;" href="http://www.code-qr.net/lire-un-code-qr.php" target="_blank">Un programme doit-être téléchargé</a> puis installé sur le mobile,  il suffit ensuite de prendre en photo le code pour voir son contenu.<br />
+Les codes utilisés sur ce catalogue vous donneront le titre de l'ouvrage ainsi que les localisations et les cotes des exemplaires associés, de la notice sur laquel vous vous trouvez.<br /><br /><br /><br /><span>
+</div>
+<!-- /TMPL_IF -->
+<!-- fin modif brisees -->
 
 <div id="holdings">
 <!-- TMPL_IF name="count" -->
