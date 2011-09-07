@@ -115,6 +115,8 @@ foreach my $barcode (@barcodes) {
         if ( my ( $reservetype, $reserve ) = C4::Reserves::CheckReserves( undef, $barcode ) ) {
             if ( $reservetype eq "Waiting" || $reservetype eq "Reserved" ) {
                 my $transfer = C4::Context->userenv->{branch} ne $reserve->{branchcode};
+                my $OPACHoldNextInLibrary = C4::Context->preference("OPACHoldNextInLibrary");
+                $transfer = 0 if ($OPACHoldNextInLibrary);
                 ModReserveAffect( $itemnumber, $reserve->{borrowernumber}, $transfer, $reserve->{"reservenumber"} );
                 my ( $message_reserve, $nextreservinfo ) = GetOtherReserves($itemnumber);
 
@@ -122,7 +124,7 @@ foreach my $barcode (@barcodes) {
                 $messages->{reservesdata} = {
                     found          => 1,
                     currentbranch  => $branches->{ C4::Context->userenv->{branch} }->{'branchname'},
-                    destbranchname => $branches->{ $reserve->{'branchcode'} }->{'branchname'},
+                    destbranchname => $OPACHoldNextInLibrary ? $branches->{ C4::Context->userenv->{branch} }->{'branchname'} : $branches->{ $reserve->{'branchcode'} }->{'branchname'},
                     name           => $borr->{'surname'} . ", " . $borr->{'title'} . " " . $borr->{'firstname'},
                     borfirstname   => $borr->{'firstname'},
                     borsurname     => $borr->{'surname'},
