@@ -294,8 +294,9 @@ INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('AdvancedSearchContent','','Use HTML tabs to create your own advanced search menu','70|10','Textarea');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('MeansOfPayment','Undefined|Cash|Cheque|Bank card|Credit transfer|Direct debit','Define means of payment for borrowers payments','Undefined|Cash|Cheque|Bank card|Credit transfer|Direct debit','free');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
-INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadPath','','Sets the upload path for the upload.pl plugin','','');
-INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadPath','','Sets the upload path for the upload.pl plugin (no trailing slash)','','');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadWebPath','','Set the upload path (starting from document root if uploadStoreFullURL is OFF and the full URL if ON) for the upload plugin (no trailing slash)','','');
+INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('uploadStoreFullURL',0,'When using the upload plugin, do we have to store full URLs in the marc record, or just filenames ?','','YesNo');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('BlockRenewWhenOverdue','0','Blocks renewals when overdue','','YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SolrAPI','http://localhost:8080/solr','','Solr web service URL.','Free');
