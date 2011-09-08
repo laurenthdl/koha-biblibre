@@ -94,26 +94,23 @@
 
 <div class="notice">
 <xsl:call-template name="tag_7xx" /><!-- auteurs -->
-<xsl:call-template name="tag_856" /><!-- url -->
 <xsl:call-template name="tag_205" /><!-- édition -->
 <xsl:call-template name="tag_210" /><!-- éditeur -->
-
-<xsl:call-template name="tag_099" /><!-- ccode / type de doc -->
-
-<xsl:if test="marc:datafield[@tag=463]">
-<xsl:call-template name="tag_463" /><!-- lien titre revue si article -->
-</xsl:if>
 
 <xsl:call-template name="tag_225" /><!-- collection -->
 <xsl:call-template name="tag_300" /><!-- note géné -->
 <xsl:call-template name="tag_328" /><!-- note thèse -->
-<xsl:call-template name="tag_330" /><!-- résumé -->
+<xsl:call-template name="tag_099" /><!-- ccode / type de doc -->
+<xsl:if test="marc:datafield[@tag=463]">
+<xsl:call-template name="tag_463" /><!-- lien titre revue si article -->
+</xsl:if>
+<xsl:call-template name="tag_856" /><!-- url -->
 <xsl:call-template name="tag_215" /><!-- description -->
 <xsl:call-template name="tag_010" /><!-- isbn -->
 <xsl:call-template name="tag_011" /><!-- issn -->
-
-<xsl:call-template name="tag_6xx" /><!-- sujets -->
 <xsl:call-template name="tag_930" /><!-- collection perio -->
+<xsl:call-template name="tag_330" /><!-- résumé -->
+<xsl:call-template name="tag_6xx" /><!-- sujets -->
 <xsl:call-template name="tag_940" /><!-- en commande -->
 <xsl:call-template name="tag_992" /><!-- sujet en3s -->
 <xsl:call-template name="tag_993" /><!-- sujet ensase -->
