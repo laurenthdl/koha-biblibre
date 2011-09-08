@@ -1733,18 +1733,21 @@ sub SearchOrder {
 
 =over 4
 
-&DelOrder($biblionumber, $ordernumber);
+$error = &DelOrder($biblionumber, $ordernumber, $delete_biblio);
 
 Cancel the order with the given order and biblio numbers. It does not
 delete any entries in the aqorders table, it merely marks them as
 cancelled.
+If $delete_biblio is true and biblio is no more linked with items,
+delete the biblio
 
 =back
 
 =cut
 
 sub DelOrder {
-    my ( $bibnum, $ordernumber ) = @_;
+    my ( $bibnum, $ordernumber, $delete_biblio ) = @_;
+    my $error;
     my $dbh   = C4::Context->dbh;
     my $query = "
         UPDATE aqorders
@@ -1758,11 +1761,29 @@ sub DelOrder {
     # Removing MARC order field if exists
     DelMarcOrder($bibnum, $ordernumber);
 
+    # We delete all the items related to this order
     my @itemnumbers = GetItemnumbersFromOrder( $ordernumber );
-    C4::Items::DelItem( $dbh, $bibnum, $_ ) for @itemnumbers;
-    DelBiblio(($bibnum)) if C4::Items::GetItemsCount( $bibnum ) == 0;
+    foreach (@itemnumbers) {
+        my $delcheck = DelItemCheck( $dbh, $bibnum, $_ );
 
+        # (should always success, as no issue should exist on item on order)
+        if( $delcheck != 1 ) {
+            $error->{'delitem'} = 1;
+        }
+    }
 
+    if($delete_biblio) {
+        # We get the number of remaining items
+        my $itemcount = C4::Items::GetItemsCount($bibnum);
+
+        # If there are no items left,
+        if ( $itemcount == 0 ) {
+            # We delete the record
+            $error->{'delbiblio'} = DelBiblio($bibnum);
+        }
+    }
+
+    return $error;
 }
 
 sub TransferOrder {
