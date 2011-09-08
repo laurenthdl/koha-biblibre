@@ -87,8 +87,10 @@ if ( C4::Context->preference("RequestOnOpac") ) {
 }
 
 my $uploadWebPath;
+my $uploadFullURL;
 if (C4::Context->preference('uploadWebPath')) {
     $uploadWebPath = C4::Context->preference('uploadWebPath');
+    $uploadFullURL = C4::Context->preference('uploadStoreFullURL');
 }
 
 # fill arrays
@@ -149,7 +151,14 @@ for ( my $tabloop = 0 ; $tabloop <= 10 ; $tabloop++ ) {
                 $subf[$i][1] =~ s/\n/<br\/>/g;
 
                 if ( $sf_def->{isurl} ) {
-                    $subfield_data{marc_value} = "<a href=\"$subf[$i][1]\">$subf[$i][1]</a>";
+                    if ($tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{value_builder} eq "upload.pl" and $uploadWebPath and not $uploadFullURL) {
+			my $file_uri = qq($uploadWebPath/$subf[$i][1]);
+			$subfield_data{marc_value} = qq/<a href="$file_uri">$subf[$i][1]<\/a>/;
+		    } else {
+                        $subfield_data{marc_value} = "<a href=\"$subf[$i][1]\">$subf[$i][1]</a>";
+                    }
+                    $subfield_data{is_url}     = 1;
+
                 } elsif ( defined( $sf_def->{kohafield} ) && $sf_def->{kohafield} eq "biblioitems.isbn" ) {
                     $subfield_data{marc_value} = $subf[$i][1];
                 } else {
@@ -159,9 +168,15 @@ for ( my $tabloop = 0 ; $tabloop <= 10 ; $tabloop++ ) {
 		    
                     $subfield_data{marc_value} = GetAuthorisedValueDesc( $fields[$x_i]->tag(), $subf[$i][0], $subf[$i][1], '', $tagslib, '', 'opac' );
 		    if ($tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{value_builder} eq "upload.pl" and $uploadWebPath) {
-			my $file_uri = qq($uploadWebPath/$subf[$i][1]);
-			$subfield_data{marc_value} = qq/<a href="$file_uri">$subfield_data{marc_value}<\/a>/;
-		    }
+                        if ($uploadFullURL) {
+                            $subfield_data{marc_value} = qq/<a href="$subfield_data{marc_value}">$subfield_data{marc_value}<\/a>/;
+                        } else {
+                            my $file_uri = qq($uploadWebPath/$subf[$i][1]);
+                            $subfield_data{marc_value} = qq/<a href="$file_uri">$subfield_data{marc_value}<\/a>/;
+                        }
+		    } else {
+                        $subfield_data{marc_value} = $subf[$i][1];
+                    }
 
                 }
                 $subfield_data{marc_subfield} = $subf[$i][0];
