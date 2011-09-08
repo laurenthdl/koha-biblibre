@@ -366,7 +366,11 @@ function checkMultiHold() {
                 <!-- TMPL_ELSIF NAME="none_available" -->
                     <input type="submit" disabled="disabled" value="Place Hold" />
                 <!-- TMPL_ELSE -->
-                    <input type="submit" <!-- TMPL_IF NAME="maxreserves" --> disabled="disabled" <!-- /TMPL_IF --> value="Place Hold" />
+                    <!-- TMPL_IF NAME="maxreserves" -->
+                    <input type="submit" disabled="disabled"  value="Place Hold" />
+                    <!-- TMPL_ELSE -->
+                    <input type="submit" value="Place Hold" />
+                    <!-- /TMPL_IF -->
                 <!-- /TMPL_IF -->
             <!-- /TMPL_IF -->
         </fieldset>
@@ -550,7 +554,11 @@ function checkMultiHold() {
             <!-- TMPL_ELSIF NAME="none_available" -->
                 <input type="submit" disabled="disabled" value="Place Hold" />
             <!-- TMPL_ELSE -->
-                <input type="submit" <!-- TMPL_IF NAME="maxreserves" --> disabled="disabled" <!-- /TMPL_IF --> value="Place Hold" />
+                <!-- TMPL_IF NAME="maxreserves" -->
+                <input type="submit" disabled="disabled"  value="Place Hold" />
+                <!-- TMPL_ELSE -->
+                <input type="submit" value="Place Hold" />
+                <!-- /TMPL_IF -->
             <!-- /TMPL_IF -->
         <!-- /TMPL_IF -->
     </fieldset>
