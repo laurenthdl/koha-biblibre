@@ -24,7 +24,7 @@
 <xsl:output method = "xml" indent="yes" omit-xml-declaration = "yes" /> 
 
 <xsl:key name="item-by-status" match="items:item" use="items:status"/>
-<xsl:key name="item-by-status-and-branch" match="items:item" use="concat(items:status, ' ', items:homebranch)"/>
+<xsl:key name="item-by-status-and-branch" match="items:item" use="concat(items:status, ' ', items:homebranch, ' ',items:itemcallnumber)"/>
 
 <!-- 
 <xsl:template match="/">
@@ -151,12 +151,12 @@ select="marc:datafield[@tag=999]/marc:subfield[@code='9']"/>
         <span class="available">
           <b><xsl:text>For loan: </xsl:text></b>
           <xsl:variable name="available_items" select="key('item-by-status', 'available')"/>
-          <xsl:for-each select="$available_items[generate-id() = generate-id(key('item-by-status-and-branch', concat(items:status, ' ', items:homebranch))[1])]">
+          <xsl:for-each select="$available_items[generate-id() = generate-id(key('item-by-status-and-branch', concat(items:status, ' ', items:homebranch, ' ',items:itemcallnumber))[1])]">
             <xsl:value-of select="items:homebranch"/>
   			    <xsl:if test="items:itemcallnumber != '' and items:itemcallnumber"> [<xsl:value-of select="items:itemcallnumber"/>]
   			    </xsl:if>
             <xsl:text> (</xsl:text>
-            <xsl:value-of select="count(key('item-by-status-and-branch', concat(items:status, ' ', items:homebranch)))"/>
+            <xsl:value-of select="count(key('item-by-status-and-branch', concat(items:status, ' ', items:homebranch, ' ',items:itemcallnumber)))"/>
             <xsl:text>)</xsl:text>
             <xsl:choose>
               <xsl:when test="position()=last()">
