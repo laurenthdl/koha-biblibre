@@ -14,7 +14,7 @@
             <div id="results">
                 <!-- TMPL_IF name="total" -->
                     <b><!-- TMPL_VAR NAME="total" --> results</b>
-                    <!-- TMPL_INCLUDE NAME="page-numbers.inc" -->
+<!-- debut modif brisee --><!-- TMPL_INCLUDE NAME="page-numbers_no_center.inc" --><!-- fin modif brisees -->
                 <!-- TMPL_ELSE -->
                     No results found.
                 <!-- /TMPL_IF -->
@@ -28,7 +28,7 @@
                         <!-- TMPL_UNLESS name="isEDITORS" -->
                             <th>Biblio records</th>
                         <!-- /TMPL_UNLESS -->
-                        <th>Full Heading</th>
+<!-- debut modif brisee     <th>Full Heading</th>  fin modif brisees -->
                     </tr>
                     <!-- TMPL_LOOP NAME="result" -->
                         <tr>
@@ -37,12 +37,12 @@
                             <!-- TMPL_UNLESS name="isEDITORS" -->
                             <td><a href="/cgi-bin/koha/opac-search.pl?type=opac&amp;op=do_search&amp;q=*:*&filters=<!-- TMPL_VAR NAME=authid_index_name -->:<!--TMPL_VAR Name="authid" -->"><!-- TMPL_VAR NAME="used" --> biblios</a></td>
                             <!-- /TMPL_UNLESS -->
-                            <td><a href="opac-authoritiesdetail.pl?authid=<!-- TMPL_VAR NAME="authid" -->">View Full Heading</a></td>
+<!-- debut modif brisee     <td><a href="opac-authoritiesdetail.pl?authid=<!-- TMPL_VAR NAME="authid" -->">View Full Heading</a></td>   fin modif brisees -->
                         </tr>
                     <!-- /TMPL_LOOP -->
                 </table>
             </div>
-            <!-- TMPL_INCLUDE NAME="page-numbers.inc" -->
+<!-- debut modif brisee --><!-- TMPL_INCLUDE NAME="page-numbers_no_center.inc" --><!-- fin modif brisees -->
             <!-- /TMPL_IF -->
         </div>
         </div>
