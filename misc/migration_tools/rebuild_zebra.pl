@@ -33,6 +33,7 @@ my $as_xml;
 my $process_zebraqueue;
 my $do_not_clear_zebraqueue;
 my $item_limit;
+my $item_order;
 my $min;
 my $where;
 my $ofset;
@@ -54,7 +55,8 @@ my $result           = GetOptions(
     'y'            => \$do_not_clear_zebraqueue,
     'z'            => \$process_zebraqueue,
     'l:i'          => \$item_limit,
-    'where:s'        => \$where,
+    'itemorder:s'  => \$item_order,
+    'where:s'      => \$where,
     'min:i'        => \$min,
     'ofset:i'      => \$ofset,
     'v'            => \$verbose_logging,
@@ -95,6 +97,13 @@ if ( $process_zebraqueue and $do_not_clear_zebraqueue ) {
     die $msg;
 }
 
+if ($item_order){
+if (($item_order ne "a") and ($item_order ne "d") and ($item_order ne "ua") and ($item_order ne "ud")) {
+    my $msg = "Wrong arg. you must use 'a' or 'd' or 'ua' or 'ud'\n";
+    $msg .= "Please do '$0 --help' to see usage.\n";
+    die $msg;
+}
+}
 if ($noshadow) {
     $noshadow = ' -n ';
 }
@@ -474,11 +483,33 @@ sub fix_biblio_items {
     my $marc = shift;
 
     my ($itemtagfield, $itemtagsubfield) = GetMarcFromKohaField('items.itemnumber','');
+    my ($itemdateaccessionedfield, $itemdateaccessionedsubfield) = GetMarcFromKohaField('items.dateaccessioned','');
+    my ($itemtimestampfield, $itemtimestampsubfield) = GetMarcFromKohaField('items.timestamp','');
 
     my $i = 0;
-    for my $itemfield ( $marc->field($itemtagfield) ) {
-	$marc->delete_field($itemfield) if $i >= $item_limit;
+    if ($item_order eq 'a'){
+        for my $itemfield ( sort {$b->subfield($itemdateaccessionedsubfield) cmp $a->subfield($itemdateaccessionedsubfield)} $marc->field($itemtagfield) ) {
+            $marc->delete_field($itemfield) if $i >= $item_limit;
         $i++;
+        }
+    }
+    elsif ($item_order eq 'd'){
+        for my $itemfield ( sort {$a->subfield($itemdateaccessionedsubfield) cmp $b->subfield($itemdateaccessionedsubfield)} $marc->field($itemtagfield) ) {
+            $marc->delete_field($itemfield) if $i >= $item_limit;
+        $i++;
+        }
+    }
+    elsif($item_order eq 'ua'){
+        for my $itemfield ( sort {$b->subfield($itemtimestampsubfield) cmp $a->subfield($itemtimestampsubfield)} $marc->field($itemtagfield) ) {
+            $marc->delete_field($itemfield) if $i >= $item_limit;
+        $i++;
+        }
+    }
+    elsif($item_order eq 'ud'){
+        for my $itemfield ( sort {$a->subfield($itemtimestampsubfield) cmp $b->subfield($itemtimestampsubfield)} $marc->field($itemtagfield) ) {
+            $marc->delete_field($itemfield) if $i >= $item_limit;
+        $i++;
+        }
     }
 }
 
@@ -625,6 +656,14 @@ Parameters:
 
     -l                      set a maximum number of exported items per biblio.
                             Doesn't work with -nosanitize.
+
+    -itemorder              Choose the sort order when using -l for items.
+                            Values : a=ascending sort based on items.dateaccessioned
+                            d=descendind sort based on items.dateaccessioned
+                            ua=ascending sort based on items.timestamp
+                            ud=descendind sort based on items.timestamp
+                            WARNING ! Be sure that items.dateaccessioned/items.timestamp
+                            are linked in Koha to MARC Mapping.
 
     -v                      increase the amount of logging.  Normally only 
                             warnings and errors from the indexing are shown.
