@@ -409,7 +409,7 @@
         <input type="hidden" name="action" value="cancelorder" />
         <input type="hidden" name="confirm" value="1" />
         <input type="submit" class="approve" value="Yes, Cancel (Y)" accesskey="y" />
-        <input type="submit" class="deny" value="No, Don't Cancel (N)" accesskey="n" onclick="javascript:window.location='/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&op=new&invoice=<!-- TMPL_VAR NAME="invoice" -->&datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->';return false;" />
+        <input type="submit" class="deny" value="No, Don't Cancel (N)" accesskey="n" onclick="javascript:window.location='/cgi-bin/koha/acqui/parcel.pl?supplierid=<!-- TMPL_VAR NAME="supplierid" -->&invoice=<!-- TMPL_VAR NAME="invoice" -->&datereceived=<!-- TMPL_VAR NAME="invoicedatereceived" -->';return false;" />
     </form>
     </div>
 <!-- /TMPL_IF -->
