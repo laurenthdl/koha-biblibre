@@ -1920,8 +1920,8 @@ sub _Findgroupreserve {
     @results = ();
     my $itemdata = C4::Items::GetItem($itemnumber);
     while ( my $data = $sth->fetchrow_hashref ) {
-    warn Data::Dumper::Dumper($data);
-    warn $data->{'firstavailablebranch'} . " -> " .  $itemdata->{'holdingbranch'};
+    $debug and warn Data::Dumper::Dumper($data);
+    $debug and warn $data->{'firstavailablebranch'} . " -> " .  $itemdata->{'holdingbranch'};
         next if ($data->{'firstavailablebranch'} and ($data->{'firstavailablebranch'} ne $itemdata->{'holdingbranch'}));
         push( @results, $data );
     }
