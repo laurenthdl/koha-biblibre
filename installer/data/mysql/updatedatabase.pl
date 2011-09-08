@@ -6264,6 +6264,7 @@ SELECT  IF(branchcode='*','Default',branchcode),
     FROM issuingrules where branchcode='*' or itemtype='*' or categorycode='*';
     });
     print "Upgrade to $DBversion done (Ajout des règles de prêt pour les prêts par défauts)\n";
+    SetVersion($DBversion);
 }
 
 $DBversion = "3.06.00.049";
