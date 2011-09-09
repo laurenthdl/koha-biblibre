@@ -19,6 +19,8 @@ my $input = new CGI;
 
 my $planneddate_to = $input->param('planneddate_to');
 my $planneddate_from = $input->param('planneddate_from');
+my $claimdatefrom = $input->param('claimdatefrom');
+my $claimdateto = $input->param('claimdateto');
 
 # Fetch DataTables parameters
 my %dtparam = dt_get_params( $input );
@@ -44,16 +46,21 @@ my $where = <<EOQ;
 EOQ
 my @bind_params;
 my ( $planneddate_q , $planneddate_f  ) = dt_build_query( 'range_dates', $planneddate_from, $planneddate_to, 'planneddate' );
+my ( $claimdate_q, $claimdate_f ) = dt_build_query('range_dates', $claimdatefrom, $claimdateto, 'claimdate');
 
-$where .= ( $planneddate_q    ? $planneddate_q : '' );
+my $where_filters;
+$where_filters .= ( $planneddate_q    ? $planneddate_q : '' );
 push @bind_params, scalar( @$planneddate_f )    > 0 ? @$planneddate_f : ();
+
+$where_filters .= ( $claimdate_q ? $claimdate_q : '' );
+push @bind_params, scalar( @$claimdate_f ) > 0 ? @$claimdate_f : ();
 
 my ($filters, $filter_params) = dt_build_having(\%dtparam);
 my $having = @$filters ? " HAVING ". join(" AND ", @$filters) : '';
 my $order_by = dt_build_orderby(\%dtparam);
 my $limit .= " LIMIT ?,? ";
 
-my $query = $select . $from . $where . ( $having || '' ) . $order_by . $limit;
+my $query = $select . $from . $where . $where_filters . ( $having || '' ) . $order_by . $limit;
 push @bind_params, @$filter_params, $dtparam{'iDisplayStart'}, $dtparam{'iDisplayLength'};
 my $sth = $dbh->prepare($query);
 $sth->execute(@bind_params);

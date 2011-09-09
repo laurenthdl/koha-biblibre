@@ -285,6 +285,12 @@ for my $filter ( $cgi->param('filters') ) {
 push @{$filters{recordtype}}, 'biblio';
 $template->param('filters' => \@tplfilters );
 
+# Limit groups of Libraries
+if( $cgi->param('multibranchlimit') ) {
+    my $indexname = C4::Search::Query::getIndexName('homebranch');
+    my @branches = @{ GetBranchesInCategory( $cgi->param('multibranchlimit') ) };
+    push @{$filters{$indexname}}, '(' . join( " OR ", @branches ) . ')';
+}
 
 # append year limits if they exist
 my $limit_yr = $cgi->param('limit-yr');
@@ -344,10 +350,14 @@ my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 $query_desc = $q if not $tag;
 
 my $countRSS         = C4::Context->preference('numSearchRSSResults') || 50;
+my $end_query = C4::Context->preference('SearchOPACHides');
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
+my $q_mod = $end_query
+        ? C4::Search::Query->normalSearch( $q . " " . $end_query )
+        : $q;
 
 # perform the search
-$res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
+$res = SimpleSearch( $q_mod, \%filters, $page, $count, $sort_by);
 C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q:";
 
 if (!$res){
@@ -459,6 +469,7 @@ push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
 push @follower_params, { ind => 'sort_by', val => $sort_by };
 push @follower_params, { ind => 'tag', val => $tag } if $tag;
+push @follower_params, { ind => 'multibranchlimit', val => $cgi->param('multibranchlimit') } if $cgi->param('multibranchlimit');
 
 # Pager template params
 $template->param(
@@ -483,7 +494,7 @@ for my $searchresult ( @{ $res->items } ) {
 
     my $display = 1;
     if (C4::Context->preference('hidelostitems') or C4::Context->preference('hidenoitems')) {
-        if (C4::Context->preference('hidelostitems') and $biblio->{itemlostcount} >= $biblio->{items_count}) {
+        if (C4::Context->preference('hidelostitems') and $biblio->{items_count} > 0 and $biblio->{itemlostcount} >= $biblio->{items_count}) {
             $display = 0;
         }
         if (C4::Context->preference('hidenoitems') and $biblio->{available_count} == 0) {
@@ -500,7 +511,7 @@ for my $searchresult ( @{ $res->items } ) {
 my @facets;
 my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
 for my $index ( @$facets_ordered ) {
-    my $facet = %{$res->facets}->{$index};
+    my $facet = $res->facets->{$index};
     if ( @$facet > 1 ) {
         my @values;
         $index =~ m/^([^_]*)_(.*)$/;
@@ -525,10 +536,10 @@ for my $index ( @$facets_ordered ) {
             }
             $lib ||=$value;
             push @values, {
-                'lib'     => $lib,                
+                'lib'     => $lib,
                 'value'   => $value,
                 'count'   => $count,
-                'active'  => $filters{$index} && grep /"\Q$value\E"/, @{ $filters{$index} },
+                'active'  => $filters{$index} && scalar( grep /"\Q$value\E"/, @{ $filters{$index} } ) ? 1 : 0,
                 'filters' => \@tplfilters,
             };
         }

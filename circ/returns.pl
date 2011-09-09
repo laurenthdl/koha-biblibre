@@ -148,6 +148,7 @@ if ( $query->param('resbarcode') ) {
     my $diffBranchSend = ($userenv_branch ne $diffBranchReturned) ? $diffBranchReturned : undef;
 # diffBranchSend tells ModReserveAffect whether document is expected in this library or not,
 # i.e., whether to apply waiting status
+    $diffBranchSend = $diffBranchReturned if (C4::Context->preference('OPACHoldNextInLibrary'));
     ModReserveAffect( $item, $borrowernumber, $diffBranchSend, $reservenumber );
 
 #   check if we have other reserves for this document, if we have a return send the message of transfer

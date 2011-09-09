@@ -109,7 +109,9 @@ function highlightOff() {
 function highlightOn() {
     var x;
     for (x in q_array) {
-        $("p").highlight(q_array[x]);
+        if ( q_array[x].length > 0 ) {
+            $("p").highlight(q_array[x]);
+        }
     }
     $(".highlight_toggle").toggle();
 }

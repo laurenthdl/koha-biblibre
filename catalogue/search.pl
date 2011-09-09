@@ -88,7 +88,7 @@ There are several types of queries needed in the process of search and retrieve:
 
 use strict;
 
-#use warnings; FIXME - Bug 2505
+use warnings;
 
 ## load Koha modules
 use C4::Context;
@@ -113,7 +113,7 @@ my ( $template, $borrowernumber, $cookie );
 
 # decide which template to use
 my $template_name;
-my $template_type;
+my $template_type = 'results';
 if ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) ) {
     $template_name = 'catalogue/results.tmpl';
 } else {
@@ -343,6 +343,12 @@ for my $filter ( $cgi->param('filters') ) {
 push @{$filters{recordtype}}, 'biblio';
 $template->param('filters' => \@tplfilters );
 
+# Limit groups of Libraries
+if( $cgi->param('multibranchlimit') ) {
+    my $indexname = C4::Search::Query::getIndexName('homebranch');
+    my @branches = @{ GetBranchesInCategory( $cgi->param('multibranchlimit') ) };
+    push @{$filters{$indexname}}, '(' . join( " OR ", @branches ) . ')';
+}
 
 # append year limits if they exist
 my $limit_yr = $cgi->param('limit-yr');
@@ -401,6 +407,7 @@ push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
 push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
 push @follower_params, { ind => 'sort_by', val => $sort_by };
+push @follower_params, { ind => 'multibranchlimit', val => $cgi->param('multibranchlimit') } if $cgi->param('multibranchlimit');
 
 # Pager template params
 $template->param(
@@ -430,7 +437,7 @@ for my $searchresult ( @{ $res->items } ) {
 my @facets;
 my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
 for my $index ( @$facets_ordered ) {
-    my $facet = %{$res->facets}->{$index};
+    my $facet = $res->facets->{$index};
     if ( @$facet > 1 ) {
         my @values;
         $index =~ m/^([^_]*)_(.*)$/;
@@ -457,7 +464,7 @@ for my $index ( @$facets_ordered ) {
                 'lib'     => $lib,
                 'value'   => $value,
                 'count'   => $count,
-                'active'  => $filters{$index} && grep /"\Q$value\E"/, @{ $filters{$index} },
+                'active'  => $filters{$index} && scalar( grep /"\Q$value\E"/, @{ $filters{$index} } ) ? 1 : 0,
                 'filters' => \@tplfilters,
             };
         }
@@ -490,8 +497,9 @@ $template->param(
 # Build drop-down list for 'Add To:' menu...
 
 my $row_count = 10;    # FIXME:This probably should be a syspref
-my ( $pubshelves, $total ) = GetRecentShelves( 2, $row_count, undef );
-my ( $barshelves, $total ) = GetRecentShelves( 1, undef,      $borrowernumber );
+my ( $pubshelves, $barshelves, $total );
+( $pubshelves, $total ) = GetRecentShelves( 2, $row_count, undef );
+( $barshelves, $total ) = GetRecentShelves( 1, undef,      $borrowernumber );
 
 my @pubshelves = @{$pubshelves};
 my @barshelves = @{$barshelves};

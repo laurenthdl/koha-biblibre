@@ -6154,6 +6154,14 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.038";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    $dbh->do(q{ALTER TABLE `reserves` ADD COLUMN `firstavailablebranch` VARCHAR(10) DEFAULT NULL;});
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OPACHoldNextInLibrary','','','Allows the borrower to place a hold on the first available item for a given library','YesNo')");
+    print "Upgrade to $DBversion done (Add System Preference OPACHoldNextInLibrary and database column reserves.firstavailablebranch)\n";
+    SetVersion ($DBversion);
+}
+
 $DBversion = "3.06.00.039";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("
@@ -6234,13 +6242,64 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.046";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+        ALTER TABLE `subscription`
+        ADD COLUMN `countissuesperunit` SMALLINT NOT NULL DEFAULT 1
+        AFTER `firstacquidate`
+    ");
+    print "Upgrade to $DBversion done (Add countissuesperunit field in subscription table)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.047";
+if (C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+        ALTER TABLE `subscription`
+        ADD COLUMN `skip_serialseq` tinyint(1) NOT NULL DEFAULT 0
+        AFTER `irregularity`
+    ");
+    print "Upgrade to $DBversion done (Add skip_serialseq field in subscription table)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.048";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+INSERT INTO issuingrules (
+branchcode,categorycode,itemtype,restrictedtype,rentaldiscount,
+reservecharge, fine, finedays, chargeperiod, accountsent, chargename, maxissueqty, issuelength,
+allowonshelfholds, holdrestricted, holdspickupdelay, renewalsallowed, renewalperiod
+)
+SELECT  IF(branchcode='*','Default',branchcode),
+        IF(categorycode='*','Default',categorycode),
+        IF(itemtype='*','Default',itemtype), 
+        restrictedtype,rentaldiscount,
+        reservecharge, fine, finedays, chargeperiod,
+        accountsent, chargename, maxissueqty, issuelength,
+        allowonshelfholds, holdrestricted, holdspickupdelay, 
+        renewalsallowed, renewalperiod
+    FROM issuingrules where branchcode='*' or itemtype='*' or categorycode='*';
+    });
+    print "Upgrade to $DBversion done (Ajout des règles de prêt pour les prêts par défauts)\n";
+    SetVersion($DBversion);
+}
+
+
+$DBversion = "3.06.00.049";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SearchOPACHides','','Construct the opac query with this string at the end.','','Free');");
+    print "Upgrade to $DBversion done (Add System Preferences SearchOPACHides)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.051";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadStoreFullURL',0,'When using the upload plugin, do we have to store full URLs in the marc record, or just filenames ?','','YesNo');");
     print "Upgrade to $DBversion done (Add System Preference uploadStoreFullURL)\n";
     SetVersion($DBversion);
 }
-
 
 =item DropAllForeignKeys($table)
 

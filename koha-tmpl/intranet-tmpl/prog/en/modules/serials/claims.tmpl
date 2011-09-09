@@ -1,8 +1,8 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
     <title>Koha &rsaquo; Serials &rsaquo; Claims</title>
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME='themelang' -->/css/datatables.css" />
     <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
-<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME="themelang" -->/css/datatables.css" />
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/js/datatables.js"></script>
 <script type="text/JavaScript" language="JavaScript">
@@ -11,10 +11,6 @@
         $('#supplierid').change(function() {
             $('#claims').submit();
         });
-
-        $(".replace_me").each( function() {
-            replace_html( this );
-        } );
 
         // Case-insensitive version of jquery's contains function
         jQuery.extend(
@@ -52,7 +48,11 @@
             return false;
         });
 
-        var claimst = $("#claimst").dataTable( {
+        $("span.replace_me").each(function(){
+            replace_html(this);
+        });
+
+        var claimst = $("#claimst").dataTable($.extend(true, {}, dataTablesDefaults, {
             "bAutoWidth": false,
             "bProcessing": true,
             "bServerSide": true,
@@ -66,6 +66,14 @@
                 {
                   'name': 'planneddate_to',
                   'value': $("#planneddateto").val()
+                },
+                {
+                    'name': 'claimdatefrom',
+                    'value': $("#claimdatefrom").val()
+                },
+                {
+                    'name': 'claimdateto',
+                    'value': $("#claimdateto").val()
                 }
               );
               $.ajax({
@@ -93,17 +101,20 @@
                 { "aTargets": [ '_all' ], "bSortable": true }
             ],
             "sPaginationType": "full_numbers",
-        } );
+        }) );
 
-        claimst.fnAddFilteringDelay(750);
+        claimst.fnAddFilters("filter", 750);
 
-        $('#planneddatefrom').change( function() {claimst.fnDraw(); } );
-
-        $('#planneddateto').change( function() { claimst.fnDraw(); } );
 
         $("#status_filter").change(function() {
             claimst.fnFilter($(this).val(), 5);
         });
+
+
+        $('#planneddatefrom').change( function() {claimst.fnDraw(); } );
+        $('#planneddateto').change( function() { claimst.fnDraw(); } );
+        $('#claimdatefrom').change( function() {claimst.fnDraw(); } );
+        $('#claimdateto').change( function() {claimst.fnDraw(); } );
 
     });
 
@@ -112,11 +123,15 @@
         $("#"+nodeid).change();
     }
 
+    function popup(supplierid,serialid){
+        window.open('claims.pl?supplierid='+ supplierid +'&amp;serialid='+ serialid +'&amp;op=preview' ,'popup', 'width=600,height=400,toolbar=no,scrollbars=yes');
+    }
+
     // Checks if the form can be sent (at least one checkbox must be checked)
     function checkForm() {
         if ($("input:checked").length == 0) {
-        alert(_('Please select at least one item.'));
-        return false;
+            alert(_('Please select at least one item.'));
+            return false;
         }
     }
 
@@ -187,9 +202,11 @@
                         <option value="7">Claimed</option>
                       </select>
                     </th>
-                    <th><span class="replace_me" data-id="planneddate" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"/></th>
+                    <th>
+                      <span class="replace_me" data-id="planneddate" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"></span>
+                    </th>
                     <th><input type="text" class="filter" id="claimscount_filter" data-column_num="7" placeholder="Search claims count" /></th>
-                    <th><input type="text" class="filter" id="claimdate_filter" data-column_num="8" placeholder="Search claim date" /></th>
+                    <th><span class="replace_me" data-type="range_dates" data-id="claimdate" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"></span></th>
             </table>
             <div class="spacer"></div>
 	     <p style="display:block;"><span class="exportSelected"></span></p>

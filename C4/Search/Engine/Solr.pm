@@ -332,8 +332,8 @@ sub SimpleSearch {
     $max_results ||= 999999999;
     $sort        ||= 'score desc';
 
-    # sort is a srt_* field
-    $sort = "srt_$sort" if $sort =~ /^(str|txt|int|date|ste)_/;
+    # sort is done on srt_* fields
+    $sort =~ s/(^|,)\s*(str|txt|int|date|ste)_/$1srt_$2_/g;
 
     my $sc = GetSolrConnection;
 
@@ -354,8 +354,8 @@ sub SimpleSearch {
                             ? join ' AND ', @{ $filters->{$_} }
                             : $filters->{$_};
             utf8::decode($filter_str);
+            my $quotes_existed = ( $filter_str =~ m/^".*"$/ );
             $filter_str =~ s/^"(.*)"$/$1/; #remove quote around value if exist
-            my $quotes_existed = defined $1 ? 1 : 0;
             $filter_str =~ s/[^\\]\K"/\\"/g;
             $filter_str = qq{"$filter_str"} # Add quote around value if not exist
                 if not $filter_str =~ /^".*"$/
