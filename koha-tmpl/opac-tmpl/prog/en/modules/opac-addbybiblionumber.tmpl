@@ -50,11 +50,11 @@
 		</label>
 		<input type="text" name="newvirtualshelf" id="newvirtualshelf" size="40" />
 		</li>
-		<li><label for="category">Category:</label>
+<!-- debut modif brisees <li><label for="category">Category:</label>
 		<select name="category" id="category">
 		<option value="1">Private</option>
 		<option value="2">Public</option>
-		</select></li></ol></fieldset>
+		</select></li> fin modif brisees --><!-- debut modif brisees --><input type="hidden" name="category" value="1" /><!-- fin modif brisees --></ol></fieldset>
 		<!-- TMPL_LOOP NAME="biblios" --> <input type="hidden" name="biblionumber" value="<!-- TMPL_VAR NAME="biblionumber" -->" /><!-- /TMPL_LOOP -->
 		<fieldset class="action"><input type="submit" value="Save" class="submit" /> <a class="close cancel" href="#">Cancel</a></fieldset>
 		</form>

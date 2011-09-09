@@ -72,14 +72,14 @@ function tagAdded() {
 }
 
 $(function() {
-    <!-- TMPL_IF NAME="loggedinusername" -->$("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_('Clear All')+"<\/a>|");
-    $("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_('Select All')+"<\/a>");<!-- /TMPL_IF -->
-	$("a.print").show();
-    <!-- TMPL_IF NAME="RequestOnOpac" -->$("#placehold").html("<a href=\"#\" class=\"hold tag_hides\">"+_('Place Hold')+"<\/a>");
-	$("a.hold").click(function(){
-		 holdSelections();
-		 return false;
-	});<!-- /TMPL_IF -->
+#    <!-- TMPL_IF NAME="loggedinusername" -->$("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_('Clear All')+"<\/a>|");
+#    $("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_('Select All')+"<\/a>");<!-- /TMPL_IF -->
+#	$("a.print").show();
+#    <!-- TMPL_IF NAME="RequestOnOpac" -->$("#placehold").html("<a href=\"#\" class=\"hold tag_hides\">"+_('Place Hold')+"<\/a>");
+#	$("a.hold").click(function(){
+#		 holdSelections();
+#		 return false;
+#	});<!-- /TMPL_IF -->
     $("#listcontents").tablesorter({
         widgets : ['zebra'],
         <!-- TMPL_IF NAME="manageshelf" -->
@@ -200,7 +200,7 @@ $(function() {
                     <span class="clearall"></span>
 
 <!-- TMPL_IF NAME="RequestOnOpac" -->
-                      <span id="placehold"></span><!-- TMPL_UNLESS NAME="TagsEnabled" --> |<!-- /TMPL_UNLESS -->
+                      <span id="placehold"></span><!-- TMPL_UNLESS NAME="TagsEnabled" --><!-- debut modif brisees | fin modif brisees --><!-- /TMPL_UNLESS -->
 <!-- /TMPL_IF -->
     <!-- TMPL_IF NAME="TagsEnabled" -->
                     <span id="addtags"></span>               
@@ -219,18 +219,20 @@ $(function() {
 
 
                 <!-- TMPL_IF NAME="manageshelf" --><a class="editshelf tag_hides" href="/cgi-bin/koha/opac-shelves.pl?shelfnumber=<!-- TMPL_VAR NAME="shelfnumber" -->&amp;op=modif">Edit List</a>
-                      <form method="post" action="opac-shelves.pl" class="tag_hides">
+                    <!-- TMPL_VAR NAME="showprivateshelves" --><form method="post" action="opac-shelves.pl" class="tag_hides">
                         <input type="hidden" value="1" name="shelves"/>
                     <!-- TMPL_IF NAME="showprivateshelves" -->
                          <input type="hidden" name="display" value="privateshelves" />
                     <!-- /TMPL_IF -->
                          <input type="hidden" value="1" name="DEL-<!-- TMPL_VAR NAME="shelfnumber" -->"/>
                          <input type="submit" class="deleteshelf" value="Delete List" onclick="return confirmDelete(_('Are you sure you want to remove this List?'));"/>
-                      </form> <!-- /TMPL_IF -->
+                      </form><!-- /TMPL_IF -->
 
 		      <a class="print tag_hides" href="opac-shelves.pl" onclick="print(); return false;">Print List</a>
+<!-- debut modif brisees
 <!-- TMPL_UNLESS NAME="loggedinusername" -->
 				| <span><a class="login" href="/cgi-bin/koha/opac-user.pl">Log in</a> to place holds or add tags</span><!-- /TMPL_UNLESS -->
+ fin modif brisees -->
                   </div>
 
                 <!-- TMPL_IF NAME="manageshelf" -->
@@ -319,6 +321,7 @@ $(function() {
                 <h3><a href="/cgi-bin/koha/opac-shelves.pl">Lists</a> <img src="<!-- TMPL_VAR NAME="themelang" -->/../images/caret.gif" width="16" height="16" alt="&gt;" border="0" /> <a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=<!-- TMPL_VAR NAME="shelfnumber" -->"><em><!-- TMPL_VAR NAME="shelfname" ESCAPE="html" --></em></a> <img src="<!-- TMPL_VAR NAME="themelang" -->/../images/caret.gif" width="16" height="16" alt="&gt;" border="0" /> Editing</h3>
                 <form method="post" action="/cgi-bin/koha/opac-shelves.pl">
                   <input type="hidden" name="op" value="modifsave" />
+<!-- debut modif brisees --><input type="hidden" name="display" value="privateshelves" /><!-- fin modif brisees -->
                   <input type="hidden" name="shelfnumber" value="<!-- TMPL_VAR NAME="shelfnumber" -->" />
                   <fieldset class="rows">
                     <ol>
@@ -331,16 +334,17 @@ $(function() {
                           <!-- TMPL_IF NAME="sort_year" --><option value="year" selected="selected">Year</option><!-- TMPL_ELSE --><option value="year">Year</option><!-- /TMPL_IF -->
                         </select>
                       </li>
-                      <li>
+<!-- debut modif brisees <li>
                         <label for="category">Category: </label>
                         <select name="category" id="category">
                           <option value="1">Private</option>
                           <option value="2">Public</option>
                         </select>
-                      </li>
+                      </li> fin modif brisees -->
+<!-- debut modif brisees --><input type="hidden" name="category" value="1" /><!-- fin modif brisees -->
                     </ol>
                   </fieldset>
-                  <fieldset class="action"><input type="submit" value="Save" class="submit" /> <a class="cancel" href="/cgi-bin/koha/opac-shelves.pl?shelfnumber=<!-- TMPL_VAR NAME="shelfnumber" -->">Cancel</a></fieldset>
+<!-- debut modif brisees --><fieldset class="action"><input type="submit" value="Save" class="submit" /> <a class="cancel" href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves&shelfnumber=<!-- TMPL_VAR NAME="shelfnumber" -->">Cancel</a></fieldset><!-- fin modif brisees -->
                 </form>
             <!-- /TMPL_IF --><!-- /edit -->
 
@@ -353,13 +357,13 @@ $(function() {
                   <!-- TMPL_IF NAME="showprivateshelves" -->
                     <li id="privateshelves_tab" class="on"><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Your Lists</a></li>
                   <!-- TMPL_ELSE -->
-                    <li id="privateshelves_tab" class="off"><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Your Lists</a></li>
+<!-- debut modif brisees --><li id="privateshelves_tab" class="on"><!-- fin modif brisees --><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Your Lists</a></li>
                   <!-- /TMPL_IF -->
-                  <!-- TMPL_IF NAME="showpublicshelves" -->
-                    <li id="publicshelves_tab" class="on"><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves">Public Lists</a></li>
+<!-- debut modif brisees  <!-- TMPL_IF NAME="showpublicshelves" -->
+                  <li id="publicshelves_tab" class="on"><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves">Public Lists</a></li>
                   <!-- TMPL_ELSE -->
                     <li id="publicshelves_tab" class="off"><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves">Public Lists</a></li>
-                  <!-- /TMPL_IF -->
+                  <!-- /TMPL_IF -->  fin modif brisees -->
                   </ul>
                   
                   <!-- TMPL_IF NAME="showprivateshelves" -->
@@ -439,7 +443,7 @@ $(function() {
                  <div id="toolbar"> <a class="newshelf" href="/cgi-bin/koha/opac-shelves.pl?shelves=1">New List</a></div>
                   <!-- TMPL_ELSE -->
                   <div><a href="/cgi-bin/koha/opac-user.pl">Log in</a> to create new Lists.</div>
-                  <!-- /TMPL_IF -->
+                  <!-- /TMPL_IF --> 
                   <!-- TMPL_IF NAME="shelvesloop" -->
                     <!-- TMPL_VAR name='pagination_bar'-->
                       <table>
@@ -519,18 +523,19 @@ $(function() {
                           <!-- TMPL_IF NAME="sort_year" --><option value="year" selected="selected">Year</option><!-- TMPL_ELSE --><option value="year">Year</option><!-- /TMPL_IF -->
                         </select>
                       </li>
-                      <li>
+<!-- debut modif brisees <li>
                         <label for="category">Category:</label>
                         <select name="category" id="category">
                           <option value="1">Private</option>
                           <option value="2">Public</option>
                         </select>
-                      </li>
+                      </li> fin modif brisees -->
+<!-- debut modif brisees --><input type="hidden" name="category" value="1" /><!-- fin modif brisees -->
                     </ol>
                   </fieldset>
                   <fieldset class="action">
                     <input type="submit" onclick="Check(this.form); return false;" value="Save" class="submit" />
-                    <a class="cancel" href="/cgi-bin/koha/opac-shelves.pl">Cancel</a>
+<!-- fin modif brisees --><a class="cancel" href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Cancel</a><!-- fin modif brisees -->
                   </fieldset>
                 </form>
               </div>

@@ -255,7 +255,7 @@ fin modif brisees -->
 			</ul>
 		<!-- /TMPL_IF -->
 		<ul class="second-of-type">
-        <li class="yuimenuitem"><a class="yuimenuitemlabel" href="/cgi-bin/koha/opac-shelves.pl">Manage Lists</a></li>
+<!-- debut modif brisees --><li class="yuimenuitem"><a class="yuimenuitemlabel" href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Manage your Lists</a></li><!-- fin modif brisees -->
         </ul>
     <!-- TMPL_ELSE --><ul class="first-of-type"><li><a href="/cgi-bin/koha/opac-user.pl">Log in to Create Your Own Lists</a></li></ul>
     <!-- /TMPL_IF -->
