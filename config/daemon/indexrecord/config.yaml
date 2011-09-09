@@ -1,0 +1,3 @@
+filename: /tmp/recordqueue.txt
+logfilename: /tmp/recordqueue.log
+pid: /tmp/recordqueue.pid

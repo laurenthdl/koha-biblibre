@@ -51,6 +51,8 @@ use Modern::Perl;
 use App::Daemon qw( daemonize );
 use Data::Dumper;
 use Fcntl qw(:flock SEEK_END);
+use C4::Config::File::YAML;
+use C4::Context;
 use File::Tail;
 use List::MoreUtils qw(uniq);
 use Log::LogLite;
@@ -62,12 +64,13 @@ use threads;
 $| = 1;
 
 # Defaults values
+my $config= C4::Config::File::YAML->new(C4::Context->config("installdir").qq{/config/daemon/indexrecord/});
 our $DEFAULT_MAX_RECORDS = 5;
 our $DEFAULT_MAX_DELTA   = 30;
 our $MAX_INTERVAL        = 1;
-my $filepath = '/tmp/records.txt';
-my $logpath  = '/tmp/IndexRecordQueue.log';
-my $pidpath  = '/tmp/IndexRecordQueue.pid';
+my $filepath = (($config and -s $config->{"filename"}) ?$config->{"filename"}  : '/tmp/records.txt');
+my $filepath = (($config and -s $config->{"logfilename"}) ?$config->{"logfilename"}  : '/tmp/IndexRecordQueue.log');
+my $filepath = (($config and -s $config->{"pid"}) ?$config->{"pid"}  : '/tmp/IndexRecordQueue.pid');
 my $max_records;
 my $max_delta;
 
