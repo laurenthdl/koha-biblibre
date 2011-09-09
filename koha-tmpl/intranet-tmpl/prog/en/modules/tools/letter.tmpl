@@ -234,15 +234,15 @@ $(document).ready(function() {
 		<li>
 			<label for="format">Message format:</label>
 			<select name="format" id="format">
-			<!--TMPL_IF Name="plain"-->
-			<option value="plain" selected="selected">plain</option>
-			<!--TMPL_ELSE-->
-			<option value="plain" >plain</option>
-			<!--/TMPL_IF-->
 			<!--TMPL_IF Name="html"-->
 			<option value="html" selected="selected">html</option>
 			<!--TMPL_ELSE-->
 			<option value="html" >html</option>
+			<!--/TMPL_IF-->
+			<!--TMPL_IF Name="plain"-->
+			<option value="plain" selected="selected">plain</option>
+			<!--TMPL_ELSE-->
+			<option value="plain" >plain</option>
 			<!--/TMPL_IF-->
 			</select>
 		</li>
