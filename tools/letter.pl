@@ -164,16 +164,18 @@ sub add_form {
 
     # if code has been passed we can identify letter and its an update action
     if ($code) {
-        $letter = $dbh->selectrow_hashref( q{SELECT module, code, name, title, content FROM letter WHERE module=? AND code=?}, undef, $module, $code );
+        $letter = $dbh->selectrow_hashref( q{SELECT module, code, name, title, content, format, encoding FROM letter WHERE module=? AND code=?}, undef, $module, $code );
         $template->param( modify => 1 );
         $template->param( code   => $letter->{code} );
     } else {    # initialize the new fields
         $letter = {
-            module  => $module,
-            code    => q{},
-            name    => q{},
-            title   => q{},
-            content => q{},
+            module   => $module,
+            code     => q{},
+            name     => q{},
+            title    => q{},
+            content  => q{},
+            format   => q{},
+            encoding => q{},
         };
         $template->param( adding => 1 );
     }
@@ -215,6 +217,8 @@ sub add_form {
         name         => $letter->{name},
         title        => $letter->{title},
         content      => $letter->{content},
+        $letter->{format} => 1,
+        $letter->{encoding} => 1,
         $module      => 1,
         SQLfieldname => $field_selection,
     );
@@ -222,17 +226,19 @@ sub add_form {
 }
 
 sub add_validate {
-    my $dbh     = C4::Context->dbh;
-    my $module  = $input->param('module');
-    my $code    = $input->param('code');
-    my $name    = $input->param('name');
-    my $title   = $input->param('title');
-    my $content = $input->param('content');
+    my $dbh      = C4::Context->dbh;
+    my $module   = $input->param('module');
+    my $code     = $input->param('code');
+    my $name     = $input->param('name');
+    my $title    = $input->param('title');
+    my $content  = $input->param('content');
+    my $format   = $input->param('format');
+    my $encoding = $input->param('encoding');
     if ( letter_exists( $module, $code ) ) {
-        $dbh->do( q{UPDATE letter SET module = ?, code = ?, name = ?, title = ?, content = ? WHERE module = ? AND code = ?},
-            undef, $module, $code, $name, $title, $content, $module, $code );
+        $dbh->do( q{UPDATE letter SET module = ?, code = ?, name = ?, title = ?, content = ?, format = ?, encoding = ? WHERE module = ? AND code = ?},
+            undef, $module, $code, $name, $title, $content, $format, $encoding, $module, $code );
     } else {
-        $dbh->do( q{INSERT INTO letter (module,code,name,title,content) VALUES (?,?,?,?,?)}, undef, $module, $code, $name, $title, $content );
+        $dbh->do( q{INSERT INTO letter (module,code,name,title,content,format,encoding) VALUES (?,?,?,?,?,?,?)}, undef, $module, $code, $name, $title, $content, $format, $encoding );
     }
 
     # set up default display
