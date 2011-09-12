@@ -90,7 +90,7 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 $template->param( frameworkcode => $frameworkcode, );
 
 if ( $op ne "do_search" ) {
-    my $sth = $dbh->prepare("select id,host,name,checked from z3950servers  order by host");
+    my $sth = $dbh->prepare("select id,host,name,checked from z3950servers order by rank,name");
     $sth->execute();
     my $serverloop = $sth->fetchall_arrayref( {} );
     $template->param(
