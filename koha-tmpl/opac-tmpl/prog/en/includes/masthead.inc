@@ -1,3 +1,6 @@
+<!-- TMPL_IF EXPR="client eq 'smartphone'" -->
+    <!-- TMPL_INCLUDE NAME="masthead_smartphone.inc" -->
+<!-- TMPL_ELSE -->
 <div id="header-wrapper"><div id="members">
   <!-- TMPL_IF NAME="opacuserlogin" -->
 	<ul>
@@ -187,3 +190,4 @@
 </p>
 </div>
 <!-- /TMPL_IF --></p><!-- /TMPL_IF --></div>
+<!-- /TMPL_IF -->

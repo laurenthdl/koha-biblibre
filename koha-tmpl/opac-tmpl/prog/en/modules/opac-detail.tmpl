@@ -529,7 +529,7 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 	    <tr><!-- TMPL_IF NAME="item-level_itypes" --><td><!-- TMPL_IF NAME="imageurl" --><img src="<!-- TMPL_VAR NAME="imageurl" -->" title="<!-- TMPL_VAR NAME="description" -->" alt="<!-- TMPL_VAR NAME="description" -->" /><!-- /TMPL_IF --> <!-- TMPL_VAR NAME="description" --></td><!-- /TMPL_IF -->
 		<td><!-- TMPL_UNLESS NAME="singleBranchMode" --><!-- TMPL_IF name="branchurl" --><a href="<!-- TMPL_VAR NAME="branchurl" -->"><!-- TMPL_VAR NAME="branchname" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branchname" --><!-- /TMPL_IF --><!-- /TMPL_UNLESS --> <!-- TMPL_VAR NAME="location_description" --> </td>
 		<!-- TMPL_IF NAME="itemdata_ccode" --><td><!-- TMPL_VAR NAME="ccode" --></td><!-- /TMPL_IF -->
-		<td><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="OPACShelfBrowser" -->(<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">Browse Shelf</a>)<!-- /TMPL_IF --></td>
+		<td><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --> <!-- TMPL_IF EXPR="client ne 'smartphone'" --><!-- TMPL_IF NAME="OPACShelfBrowser" -->(<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">Browse Shelf</a>)<!-- /TMPL_IF --><!-- /TMPL_IF --></td>
 		<!-- TMPL_IF NAME="itemdata_enumchron" --><td><!-- TMPL_VAR NAME="enumchron" --></td><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_uri" --><td><a href="<!-- TMPL_VAR NAME="uri" -->"><!-- TMPL_VAR NAME="uri" --></a></td><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_copynumber" --><td><!-- TMPL_VAR NAME="copynumber" --></td><!-- /TMPL_IF -->
@@ -598,39 +598,40 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 <br clear="all" />
 </div>
 
+<!-- TMPL_IF EXPR="client ne 'smartphone'" -->
+    <div id="descriptions">
+        <div class="content_set">
+        <!-- TMPL_IF NAME="OPACAmazonEnabled" -->
+        <!-- TMPL_IF NAME="OPACAmazonReviews" -->
+        <!-- TMPL_LOOP NAME="AMAZON_EDITORIAL_REVIEWS" -->
+            <!-- TMPL_IF NAME="Content" -->
+            <h4>From <!-- TMPL_VAR NAME="Source" -->:</h4>
+            <div><!-- TMPL_VAR NAME="Content" --></div>
+            <!-- /TMPL_IF -->
+        <!-- /TMPL_LOOP -->
+        <!-- /TMPL_IF-->
+        <!-- /TMPL_IF-->
+        <!-- TMPL_IF NAME="SyndeticsEnabled" -->
+        <!-- TMPL_IF NAME="SyndeticsSummary" -->
+        <!-- TMPL_IF NAME="SYNDETICS_SUMMARY" -->
+            <h4>Enhanced Descriptions from Syndetics:</h4>
+            <p><!-- TMPL_VAR NAME="SYNDETICS_SUMMARY" --></p>
+        <!-- /TMPL_IF -->
+        <!-- /TMPL_IF -->
+        <!-- /TMPL_IF -->
 
-<div id="descriptions">
-<div class="content_set">
-<!-- TMPL_IF NAME="OPACAmazonEnabled" -->
-<!-- TMPL_IF NAME="OPACAmazonReviews" -->
-<!-- TMPL_LOOP NAME="AMAZON_EDITORIAL_REVIEWS" -->
-    <!-- TMPL_IF NAME="Content" -->
-    <h4>From <!-- TMPL_VAR NAME="Source" -->:</h4>
-    <div><!-- TMPL_VAR NAME="Content" --></div>
-    <!-- /TMPL_IF -->
-<!-- /TMPL_LOOP -->
-<!-- /TMPL_IF-->
-<!-- /TMPL_IF-->
-<!-- TMPL_IF NAME="SyndeticsEnabled" -->
-<!-- TMPL_IF NAME="SyndeticsSummary" -->
-<!-- TMPL_IF NAME="SYNDETICS_SUMMARY" -->
-    <h4>Enhanced Descriptions from Syndetics:</h4>
-    <p><!-- TMPL_VAR NAME="SYNDETICS_SUMMARY" --></p>
+        <!-- TMPL_IF name="MARCNOTES" -->
+            <!-- TMPL_LOOP NAME="MARCNOTES" -->
+            <p><!-- TMPL_VAR NAME="marcnote" --></p>
+            <!-- /TMPL_LOOP -->
+            <!-- TMPL_ELSE -->
+            <!-- TMPL_IF name="notes" -->
+            <p><!-- TMPL_VAR NAME="notes" --></p>
+            <!-- /TMPL_IF -->
+        <!-- /TMPL_IF -->
+        </div>
+    </div>
 <!-- /TMPL_IF -->
-<!-- /TMPL_IF -->
-<!-- /TMPL_IF -->
-
-<!-- TMPL_IF name="MARCNOTES" -->
-    <!-- TMPL_LOOP NAME="MARCNOTES" -->
-    <p><!-- TMPL_VAR NAME="marcnote" --></p>
-    <!-- /TMPL_LOOP -->
-    <!-- TMPL_ELSE -->
-    <!-- TMPL_IF name="notes" -->
-    <p><!-- TMPL_VAR NAME="notes" --></p>
-    <!-- /TMPL_IF -->
-<!-- /TMPL_IF -->
-</div>
-</div>
 
 <!-- TMPL_IF NAME="SyndeticsEnabled" -->
 
@@ -703,9 +704,10 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
     <p>Subscription from: <!--TMPL_VAR NAME="histstartdate"-->  to:<!-- TMPL_IF NAME="histenddate" --> <!--TMPL_VAR NAME="histenddate"--> <!-- TMPL_ELSE --> now (current)<!-- /TMPL_IF --></p>
     <!-- TMPL_IF NAME="missinglist" --><p>Missing issues: <!--TMPL_VAR NAME="missinglist"--> </p><!-- /TMPL_IF -->
     <!-- TMPL_IF name="opacnote" --><p>(<!-- TMPL_VAR NAME="opacnote" -->)</p><!-- /TMPL_IF -->
-<!--TMPL_IF NAME="latestserials"-->
-    <p> The <!-- TMPL_VAR NAME="opacdisplaycount" --> latest issues for this subscription:</p>
-    <table>
+    <!-- TMPL_IF EXPR="client ne 'smartphone'" -->
+        <!--TMPL_IF NAME="latestserials"-->
+        <p> The <!-- TMPL_VAR NAME="opacdisplaycount" --> latest issues for this subscription:</p>
+        <table>
         <tr>
             <th>Issue #</th>
             <th>Date</th>
@@ -739,8 +741,9 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
             <!--/TMPL_LOOP -->
         </table>
         <!-- /TMPL_IF -->
-        <!-- /TMPL_LOOP -->
-        <p><a href="opac-serial-issues.pl?biblionumber=<!-- TMPl_VAR NAME="biblionumber" -->">More 
+    <!-- /TMPL_IF -->
+    <!-- /TMPL_LOOP -->
+    <p><a href="opac-serial-issues.pl?biblionumber=<!-- TMPl_VAR NAME="biblionumber" -->">More 
 details</a></p>
     </div>
     <!-- /TMPL_IF -->
@@ -770,49 +773,52 @@ details</a></p>
 <!-- /Library Thing for Libraries Content -->
 
 
-<!-- TMPL_IF NAME="reviewson" -->
-<div id="comments">
-    <div id="newcomment"></div>
-    <!-- TMPL_IF NAME="reviews" -->
-        <!-- TMPL_LOOP NAME="reviews" -->
-            <!-- TMPL_IF NAME="your_comment" -->
-            <div class="commentline yours" id="c<!-- TMPL_VAR NAME="reviewid" -->">
-            <h5>
-                Your Comment
-            </h5>
-            <small><!-- TMPL_VAR NAME="datereviewed" --></small>
-        <p>
-          <!-- TMPL_VAR NAME="review" ESCAPE=0 -->
-          <a href="#" onclick="Dopop('/cgi-bin/koha/opac-review.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber"-->&amp;reviewid=<!-- TMPL_VAR NAME="reviewid" -->');">Edit</a>
-        </p></div>
-            <!-- TMPL_ELSE -->
-            <div class="commentline">
-            <h5>
-                Comment by
-                <!-- TMPL_VAR NAME="title" -->
-                <!-- TMPL_VAR NAME="firstname" -->
-                <!-- TMPL_VAR NAME="surname" -->
-            </h5>
-            <small><!-- TMPL_VAR NAME="datereviewed" --></small>
-        <p>
-          <!-- TMPL_VAR NAME="review" ESCAPE=0 -->
-        </p></div>
-            <!-- /TMPL_IF -->
-        <!-- /TMPL_LOOP -->
-    <!-- TMPL_ELSE  -->
-        <p>There are no comments for this item.</p>
+<!-- TMPL_IF EXPR="client ne 'smartphone'" -->
+    <!-- TMPL_IF NAME="reviewson" -->
+    <div id="comments">
+        <div id="newcomment"></div>
+        <!-- TMPL_IF NAME="reviews" -->
+            <!-- TMPL_LOOP NAME="reviews" -->
+                <!-- TMPL_IF NAME="your_comment" -->
+                <div class="commentline yours" id="c<!-- TMPL_VAR NAME="reviewid" -->">
+                <h5>
+                    Your Comment
+                </h5>
+                <small><!-- TMPL_VAR NAME="datereviewed" --></small>
+            <p>
+              <!-- TMPL_VAR NAME="review" ESCAPE=0 -->
+              <a href="#" onclick="Dopop('/cgi-bin/koha/opac-review.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber"-->&amp;reviewid=<!-- TMPL_VAR NAME="reviewid" -->');">Edit</a>
+            </p></div>
+                <!-- TMPL_ELSE -->
+                <div class="commentline">
+                <h5>
+                    Comment by
+                    <!-- TMPL_VAR NAME="title" -->
+                    <!-- TMPL_VAR NAME="firstname" -->
+                    <!-- TMPL_VAR NAME="surname" -->
+                </h5>
+                <small><!-- TMPL_VAR NAME="datereviewed" --></small>
+            <p>
+              <!-- TMPL_VAR NAME="review" ESCAPE=0 -->
+            </p></div>
+                <!-- /TMPL_IF -->
+            <!-- /TMPL_LOOP -->
+        <!-- TMPL_ELSE  -->
+            <p>There are no comments for this item.</p>
+        <!-- /TMPL_IF -->
+        <!-- TMPL_IF NAME="loggedinusername" -->
+            <!-- TMPL_UNLESS NAME="loggedincommenter" -->
+           <div id="addcomment"> <a href="#" onclick="Dopop('/cgi-bin/koha/opac-review.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber"-->'); return false;">
+                Post or edit your comments on this item.
+            </a></div>
+            <!-- /TMPL_UNLESS -->
+        <!-- TMPL_ELSE -->
+            <div id="addcomment"><a href="/cgi-bin/koha/opac-user.pl">Log in to your account</a> to post a comment.</div>
+        <!-- /TMPL_IF -->
+    </div>
     <!-- /TMPL_IF -->
-    <!-- TMPL_IF NAME="loggedinusername" -->
-        <!-- TMPL_UNLESS NAME="loggedincommenter" -->
-       <div id="addcomment"> <a href="#" onclick="Dopop('/cgi-bin/koha/opac-review.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber"-->'); return false;">
-            Post or edit your comments on this item.
-        </a></div>
-        <!-- /TMPL_UNLESS -->
-    <!-- TMPL_ELSE -->
-        <div id="addcomment"><a href="/cgi-bin/koha/opac-user.pl">Log in to your account</a> to post a comment.</div>
-    <!-- /TMPL_IF -->
-</div>
 <!-- /TMPL_IF -->
+
 
 <!-- TMPL_IF NAME="Babeltheque" -->
 <div id="babeltheque">

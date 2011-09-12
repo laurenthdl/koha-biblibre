@@ -405,6 +405,16 @@ sub get_template_and_user {
         } elsif ($mylibraryfirst) {
             $opac_name = C4::Branch::GetBranchName($mylibraryfirst);
         }
+
+        my $client = "screen";
+        if (       $ENV{'HTTP_USER_AGENT'} =~ /iPhone/
+                or $ENV{'HTTP_USER_AGENT'} =~ /iPod/
+                or $ENV{'HTTP_USER_AGENT'} =~ /Android/
+                or $ENV{'HTTP_USER_AGENT'} =~ /Opera Mobi/
+        ) {
+            $client = "smartphone";
+        }
+
         $template->param(
             OPACPickupLocation        => "" . C4::Context->preference("OPACPickupLocation"),
             AmazonContent             => "" . C4::Context->preference("AmazonContent"),
@@ -476,6 +486,7 @@ sub get_template_and_user {
             SyndeticsAwards                => C4::Context->preference("SyndeticsAwards"),
             SyndeticsSeries                => C4::Context->preference("SyndeticsSeries"),
             SyndeticsCoverImageSize        => C4::Context->preference("SyndeticsCoverImageSize"),
+            client                         => $client,
         );
     }
     $template->param( listloop => [ { shelfname => "Freelist", shelfnumber => 110 } ] );
