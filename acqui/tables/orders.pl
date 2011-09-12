@@ -32,12 +32,20 @@ $search_filters->{'recordtype'} = "biblio";
 my %dtparam = dt_get_params($input);
 my $sort = dt_build_sort(\%dtparam);
 
-
 $query = C4::Search::Query->normalSearch($query);
 my $res = SimpleSearch($query, $search_filters, $page, $count, $sort);
 
 if($res) {
-    my @results = map { GetBiblioData $_->{'values'}->{'recordid'} } @{ $res->items };
+    my @results;
+    foreach (@{$res->items}) {
+        my $biblionumber = $_->{'values'}->{'recordid'};
+        my $data = GetBiblioData($biblionumber);
+        if(defined $data) {
+            push @results, $data;
+        } else {
+            warn "Biblio $biblionumber is indexed but no more in database";
+        }
+    }
 
     $template->param(
         booksellerid    => $input->param('booksellerid'),
