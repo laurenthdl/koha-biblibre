@@ -1970,3 +1970,7 @@ tr.dragClass td {
     background-color: grey;
     color: yellow;
 }
+
+.underline {
+    text-decoration : underline;
+}

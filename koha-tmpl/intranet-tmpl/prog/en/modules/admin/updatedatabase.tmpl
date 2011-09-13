@@ -1,0 +1,125 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Administration &rsaquo; Update Database</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript">
+ //<![CDATA[
+    function see_details(a){
+        var div = $(a).siblings('div');
+        $(div).slideToggle("fast", function() { 
+            var isVisible = $(div).is(":visible");
+            if ( isVisible ){$(a).text("Hide details");}else{$(a).text("Show details");}
+        });
+
+    }
+//]]>
+</script>
+</head>
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+<!-- TMPL_INCLUDE NAME="cat-search.inc" -->
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/admin/admin-home.pl">Administration</a> &rsaquo; Update Database</div>
+
+<div id="doc3" class="yui-t2">
+
+   <div id="bd">
+    <div id="yui-main">
+    <div class="yui-b">
+
+    <h2>Update Database</h2>
+    <div class="report">
+        <ul>
+        <!-- TMPL_LOOP NAME="report_loop" -->
+            <li><!-- TMPL_VAR NAME="version" --> -- <!-- TMPL_VAR NAME="report" --></li>
+        <!-- /TMPL_LOOP -->
+        </ul>
+    </div>
+    <span class="infos">
+        <!-- TMPL_IF NAME="nb_availables" -->
+            <!-- TMPL_VAR NAME="nb_availables" --> versions are availables [ <a href="/cgi-bin/koha/admin/updatedatabase.pl?op=update<!-- TMPL_LOOP NAME="availables" -->&version=<!-- TMPL_VAR NAME="version" --><!-- /TMPL_LOOP -->">UPDATE</a> ]
+        <!-- TMPL_ELSE -->
+            Your database is up to date
+        <!-- /TMPL_IF-->
+    </span>
+
+    <table id="versionst">
+        <thead>
+            <tr>
+                <th>Version</th>
+                <th>Comments</th>
+                <th>Status</th>
+                <th>Launch</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+        <!-- TMPL_LOOP NAME="versions" -->
+            <tr>
+                <td><!-- TMPL_VAR NAME="version" --></td>
+                <td>
+                    <ul class="comments">
+                    <!-- TMPL_LOOP NAME="comments" -->
+                        <li><!-- TMPL_VAR NAME="comment" --></li>
+                    <!-- /TMPL_LOOP -->
+                    </ul>
+                </td>
+                <td>
+                    <!-- TMPL_IF NAME="available" -->
+                        Unknown
+                    <!-- TMPL_ELSE -->
+                        <!-- TMPL_IF NAME="status" -->
+                            <span style="color:green;">OK</span>
+                        <!-- TMPL_ELSE -->
+                            <span style="color:red;">Failed</span>
+                        <!-- /TMPL_IF -->
+                    <!-- /TMPL_IF -->
+                </td>
+                <td>
+                    <!-- TMPL_IF NAME="available" -->
+                        Available
+                    <!-- TMPL_ELSE -->
+                        Already executed
+                    <!-- /TMPL_IF -->
+                    [<a href="/cgi-bin/koha/admin/updatedatabase.pl?op=update&version=<!-- TMPL_VAR NAME="version" -->">Execute</a>]
+                </td>
+                <td>
+                    <div class="details" style="display:none;">
+                        <!-- TMPL_IF NAME="available" -->
+                            Unknown
+                        <!-- TMPL_ELSE -->
+                            <div class="queries" style="display:block;">
+                                <span class="underline">Queries</span> :
+                                <ul>
+                                <!-- TMPL_LOOP NAME="queries" -->
+                                    <li><!-- TMPL_VAR NAME="query" --></li>
+                                <!-- /TMPL_LOOP -->
+                                </ul>
+                            </div>
+                            <!-- TMPL_IF NAME="status" -->
+                                <div class="status" style="display:block;"><span class="underline">Status</span> : <span style="color:green;">OK</span></div>
+                            <!-- TMPL_ELSE -->
+                                <div class="status" style="display:block;"><span class="underline">Status</span> : <span style="color:red;">Failed</span></div>
+                                <div class="errors" style="display:block;">
+                                    <span class="underline">Errors</span> :
+                                    <ul class="errors">
+                                    <!-- TMPL_LOOP NAME="errors" -->
+                                        <li><!-- TMPL_VAR NAME="error" --></li>
+                                    <!-- /TMPL_LOOP -->
+                                    </ul>
+                                </div>
+                            <!-- /TMPL_IF -->
+                        <!-- /TMPL_IF -->
+                    </div>
+                    <a href="#" onclick="see_details(this);return false;">Show details</a>
+                </td>
+            </tr>
+        <!-- /TMPL_LOOP -->
+        </tbody>
+    </table>
+
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
