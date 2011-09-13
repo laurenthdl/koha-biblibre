@@ -6294,6 +6294,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.050";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{UPDATE `systempreferences` SET options=CONCAT(options,"|SolrIndexOff") WHERE variable ='SearchEngine'});
+    print "Upgrade to $DBversion done (Update System Preferences SearchEngine with SolrIndexOff)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.051";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadStoreFullURL',0,'When using the upload plugin, do we have to store full URLs in the marc record, or just filenames ?','','YesNo');");
