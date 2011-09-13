@@ -177,7 +177,7 @@ if ( $op eq "export" ) {
             }
 
 	    if ($timestamp) {
-                $q .= " AND $itemstable.timestamp >= ? ";
+                $q .= " AND $biblioitemstable.timestamp >= ? ";
                 push @sql_params, $timestamp->output('iso');
             }
 
