@@ -25,7 +25,7 @@ my $solr = Data::SearchEngine::Solr->new(
     url => C4::Context->preference("SolrAPI"),
     sort => "recordid asc",
 );
-$solr->options->{'fl'} = "id,recordid,int_biblionumber";
+$solr->options->{'fl'} = "id,recordid";
 
 # Prepare the SQL query
 my $dbh = C4::Context->dbh;
@@ -51,15 +51,13 @@ while (0 < scalar @{$results->items}) {
         my $recordid = $_->{'values'}->{'recordid'};
         $sth->execute($recordid);
         my $res = $sth->fetchrow_arrayref;
-        print "\rChecking for biblio $recordid...";
         if(not defined $res) {
             $missing += 1;
-            print "\rBiblio $recordid is not in database.";
+            print "\nBiblio $recordid is not in database.";
             if($delete) {
                 $solr->remove("id:biblio_$recordid", []);
                 print " Deleted.";
             }
-            print "\n";
         }
     }
     $query->{'page'} += 1;
