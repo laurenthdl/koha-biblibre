@@ -26,6 +26,7 @@ use C4::Koha;      # GetItemTypes
 use C4::Branch;    # GetBranches
 use C4::Record;
 use C4::Csv;
+use List::MoreUtils qw(uniq);
 
 use Getopt::Long;
 
@@ -125,6 +126,7 @@ if ( $op eq "export" ) {
         my $strip_nonlocal_items = $query->param("strip_nonlocal_items");
         my $dont_export_fields   = $query->param("dont_export_fields");
         my $export_only_borrowed = $query->param("export_only_borrowed");
+        my $borrowernumber       = $query->param("borrowernumber");
         my @biblionumbers        = $query->param("biblionumbers");
         my $biblioitemstable     = ($commandline and $deleted_barcodes) ? 'deletedbiblioitems' : 'biblioitems';
         my $itemstable           = ($commandline and $deleted_barcodes) ? 'deleteditems' : 'items';
@@ -198,7 +200,7 @@ if ( $op eq "export" ) {
 
         }
 
-        for my $biblionumber (@biblionumbers) {
+        for my $biblionumber (uniq @biblionumbers) {
 
 	  if ( $deleted_barcodes ) {
 		my $q = "SELECT DISTINCT barcode from deleteditems where deleteditems.biblionumber = ?";
@@ -232,9 +234,26 @@ if ( $op eq "export" ) {
             }
             if($export_only_borrowed) {
                 # Remove not borrowed items
-                my ($onloanfield, $onloadsubfield) = GetMarcFromKohaField('items.onloan', '');
+                my ($onloanfield, $onloansubfield) = GetMarcFromKohaField('items.onloan', '');
                 for my $itemfield ( $record->field($onloanfield) ) {
-                    $record->delete_field($itemfield) unless ($itemfield->subfield($onloadsubfield));
+                    $record->delete_field($itemfield) unless ($itemfield->subfield($onloansubfield));
+                }
+                if($borrowernumber) {
+                    # Get only borrowed items for this borrower
+                    my ($itemnumberfield, $itemnumbersubfield) = GetMarcFromKohaField('items.itemnumber', '');
+                    my $query = qq{
+                        SELECT COUNT(*)
+                        FROM issues
+                        WHERE borrowernumber = ?
+                          AND itemnumber = ?
+                    };
+                    my $sth = $dbh->prepare($query);
+                    for my $itemfield ( $record->field($itemnumberfield) ) {
+                        my $itemnumber = $itemfield->subfield($itemnumbersubfield);
+                        $sth->execute($borrowernumber, $itemnumber);
+                        my ($count) = $sth->fetchrow_array;
+                        $record->delete_field($itemfield) unless $count;
+                    }
                 }
             }
 
