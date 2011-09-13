@@ -378,6 +378,43 @@ sub SimpleSearch {
     return $result if (ref($result) eq "Data::SearchEngine::Solr::Results");
 }
 
+=head2 AddRecordToIndexRecordQueue
+
+Push recordids list in IndexRecordQueue if it launch
+else call IndexRecord
+
+=cut
+sub AddRecordToIndexRecordQueue {
+    my ( $recordtype, $recordids, $force_reindex ) = @_;
+
+    my $scriptpath = C4::Context->config('intranetdir') . "/misc/solr/IndexRecordQueue.pl";
+
+    my $status;
+
+    if ( -e $scriptpath ) {
+        my $max_itt = 10;
+        while ( not defined $status and $max_itt > 0) {
+            $status = qx#$scriptpath status#;
+            sleep 0.5;
+            $max_itt--;
+        }
+    }
+
+    # Verify IndexRecordQueue.pl is started
+    # Else call IndexRecord directly
+    if ( not defined $status or $status =~ /No pidfile found/ or $status =~ /Running: *no/ ) {
+        return IndexRecord($recordtype, $recordids);
+    }
+
+    # Append recordtype recordids in file
+    my $recordids_str = ref($recordids) eq 'ARRAY'
+                    ? join " ", @$recordids
+                    : $recordids;
+    warn "Add Records To Queue: $recordtype, $recordids_str";
+    system(qq/$scriptpath -a "$recordtype $recordids_str"/) == 0 or die "Could not indexing these biblionumbers : $recordids_str";
+
+}
+
 =head2 IndexRecord
 
 Index all records with id in recordsids and recordtype=$recordtype ('biblio' or 'authority').
@@ -393,6 +430,11 @@ sub IndexRecord {
 
     my @recordpush;
     my $g;
+
+    my $recordids_str = ref($recordids) eq 'ARRAY'
+                    ? join " ", @$recordids
+                    : $recordids;
+    warn "IndexRecord called with $recordtype $recordids_str";
 
     my @list_of_plugins = GetSearchPlugins;
     for my $id ( @$recordids ) {
@@ -416,7 +458,7 @@ sub IndexRecord {
 
         $solrrecord->set_value( 'recordtype', $recordtype );
         $solrrecord->set_value( 'recordid'  , $id );
-        warn $id;
+        warn "Indexing $recordtype $id";
 
         for my $index ( @$indexes ) {
             eval {
