@@ -39,6 +39,7 @@ sub _dirload{
                     : _fileload($dirname."/".$name));
         }
     }
+    close D;
     return $result;
 }
 
@@ -47,7 +48,7 @@ sub new{
     my $config;
     my $self=shift;
     my $name=shift;
-    if (-e $name){
+    if (-f $name){
         $config=_fileload($name);
     }
     if (-d $name){

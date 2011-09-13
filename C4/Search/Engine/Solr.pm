@@ -387,8 +387,7 @@ else call IndexRecord
 sub AddRecordToIndexRecordQueue {
     my ( $recordtype, $recordids, $force_reindex ) = @_;
 
-    # FIXME : Where set this value ???
-    my $scriptpath = "/home/koha/src/services/IndexRecordQueue.pl";
+    my $scriptpath = C4::Context->config('intranetdir') . "services/IndexRecordQueue.pl";
 
     my $status;
 

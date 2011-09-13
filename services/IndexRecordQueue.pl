@@ -53,18 +53,19 @@ use Data::Dumper;
 use Fcntl qw(:flock SEEK_END);
 use Log::LogLite;
 use Pod::Usage;
+use C4::Config::File::YAML;
+use C4::Context;
 
 $| = 1;
 
 # Defaults values
-our $DEFAULT_MAX_RECORDS = 20;
-our $DEFAULT_MAX_DELTA   = 60;
-our $MAX_INTERVAL        = 1;
-my $filepath = '/tmp/records1.txt';
-my $logpath  = '/tmp/IndexRecordQueue.log';
-my $pidpath  = '/tmp/IndexRecordQueue.pid';
-my $max_records;
-my $max_delta;
+my $config= C4::Config::File::YAML->new( C4::Context->config("installdir") . qq{/etc/daemon/indexrecord/config.yaml} );
+our $DEFAULT_MAX_RECORDS = ( $config and -s $config->{"max_records"} ) ? $config->{"max_records"}  : 20;
+our $DEFAULT_MAX_DELTA   = ( $config and -s $config->{"max_delta"} ) ? $config->{"max_delta"}  : 60;
+our $MAX_INTERVAL        = ( $config and -s $config->{"max_interval"} ) ? $config->{"max_interval"}  : 1;
+my $filepath = ( $config and -s $config->{"filename"} ) ? $config->{"filename"}  : '/tmp/records.txt';
+my $logpath = ( $config and -s $config->{"log_filename"} ) ? $config->{"log_filename"}  : '/tmp/IndexRecordQueue.log';
+my $pidpath = ( $config and -s $config->{"pid_filename"} ) ? $config->{"pid_filename"}  : '/tmp/IndexRecordQueue.pid';
 
 # Get options
 my %opts = ();
@@ -76,8 +77,8 @@ for my $opt (qw(-a -f -l -p -mr -ms)) {
 $filepath    = $opts{"-f"} if defined $opts{"-f"};
 $logpath     = $opts{"-l"} if defined $opts{"-l"};
 $pidpath     = $opts{"-p"} if defined $opts{"-p"};
-$max_records = get_opt( $opts{"-mr"} ) || $DEFAULT_MAX_RECORDS;
-$max_delta   = get_opt( $opts{"-ms"} ) || $DEFAULT_MAX_DELTA;
+my $max_records = get_opt( $opts{"-mr"} ) || $DEFAULT_MAX_RECORDS;
+my $max_delta   = get_opt( $opts{"-ms"} ) || $DEFAULT_MAX_DELTA;
 
 $App::Daemon::logfile = $logpath;
 $App::Daemon::pidfile = $pidpath;
@@ -97,6 +98,10 @@ if ( grep /-h/, @ARGV ) {pod2usage(1);} # Display full usage
 
 my $logger;
 if ( grep /start/, @ARGV ) {
+    if ( not -f $logpath ) {
+        open FH, ">", $logpath;
+        close FH;
+    }
     $logger = Log::LogLite->new( $logpath, 7 );
     $logger and $logger->template("<date> <message>\n");
     $logger and $logger->write("START");
