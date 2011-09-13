@@ -37,6 +37,7 @@ my $select = "SELECT SQL_CALC_FOUND_ROWS ".
     "items.itemnotes, items.itemcallnumber, items.itype, itemtypes.imageurl,".
     "itemtypes.description AS itemtype_description, branches.branchname,".
     "biblio.biblionumber, biblio.title AS title, biblio.author, itemtypes.itemtype,".
+    "authorised_values.authorised_value AS location,".
     "authorised_values.lib AS location_description,".
     "( (itemtypes.rentalcharge * (100 - issuingrules.rentaldiscount) ) / 100 ) AS charge,".
     "IF (issues.date_due < DATE(NOW()), 1, NULL ) AS overdue ";
@@ -67,24 +68,25 @@ if($itype) {
 
 my ( $datedue_q   , $datedue_f    ) = dt_build_query( 'range_dates', $dateduefrom, , $datedueto, 'issues.date_due' );
 my ( $issuedate_q , $issuedate_f  ) = dt_build_query( 'range_dates', $issuedatefrom, , $issuedateto, 'issues.issuedate' );
-my ( $location_q  , $location_f   ) = dt_build_query( 'simple', $location, 'location_description' );
 my ( $branchcode_q, $branchcode_f ) = dt_build_query( 'simple', $branchcode, 'issues.branchcode' );
 
 $where_filters .= ( $datedue_q    ? $datedue_q : '' )
                 . ( $issuedate_q  ? $issuedate_q : '' )
-                . ( $location_q   ? $location_q : '' )
                 . ( $branchcode_q ? $branchcode_q : '' );
 
 push @where_filters_params,
           scalar( @$datedue_f )    > 0 ? @$datedue_f : ()
         , scalar( @$issuedate_f )  > 0 ? @$issuedate_f : ()
-        , scalar( @$location_f )   > 0 ? @$location_f : ()
         , scalar( @$branchcode_f ) > 0 ? @$branchcode_f : ();
 
 
 my ($filters, $filter_params) = dt_build_having(\%dtparam);
 
-my $having .= " HAVING " . join(" AND ", @$filters) if (@$filters);
+my $having = " HAVING " . join(" AND ", @$filters) if (@$filters);
+if($location) {
+    $having .= " AND location = ?";
+    push @$filter_params, $location;
+}
 my $order_by = dt_build_orderby(\%dtparam);
 
 my $limit .= $dtparam{'iDisplayLength'} ne '-1' ? ' LIMIT ?,? ' : '';
