@@ -12,6 +12,7 @@
  <intrahtdocs>__INTRANET_TMPL_DIR__</intrahtdocs>
  <includes>__INTRANET_TMPL_DIR__/prog/en/includes/</includes>
  <logdir>__LOG_DIR__</logdir>
+ <installdir>__INSTALL_BASE__</installdir>
  <install_log>__MISC_DIR__/koha-install-log</install_log>
  <useldapserver>0</useldapserver><!-- see C4::Auth_with_ldap for extra configs you must add if you want to turn this on -->
  <memcached_servers>__MEMCACHED_SERVERS__</memcached_servers>
