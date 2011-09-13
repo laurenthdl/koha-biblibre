@@ -332,6 +332,9 @@ function export_submit(format) {
 <!-- TMPL_IF NAME="NEEDSCONFIRMATION" -->
 <div class="yui-g">
 <div id="circ_needsconfirmation" class="dialog alert">
+<!-- TMPL_IF NAME="soundon" -->
+    <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+<!-- /TMPL_IF -->
 <h3>Please Confirm Checkout</h3>
 
 <ul>
