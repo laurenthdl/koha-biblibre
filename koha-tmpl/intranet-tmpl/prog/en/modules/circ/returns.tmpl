@@ -64,6 +64,9 @@ function Dopop(link) {
 <!-- /TMPL_IF -->
 
 <!-- TMPL_IF NAME="wrongbranch" -->
+<!-- TMPL_IF NAME="soundon" -->
+    <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+<!-- /TMPL_IF -->
 <div class="dialog alert"><h3>Cannot Check In</h3><p>This item must be checked in at its home library: <!-- TMPL_VAR Name="rightbranch" -->. <strong>NOT CHECKED IN</strong></p>
 	     <form method="post" action="returns.pl" class="confirm">
 				
@@ -102,6 +105,9 @@ function Dopop(link) {
 <!-- found -->
 <!-- case of a reservation found, and display info -->
     <!-- TMPL_IF Name="waiting" -->
+        <!-- TMPL_IF NAME="soundon" -->
+        <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+        <!-- /TMPL_IF -->
 	<!-- waiting -->
 <div class="dialog message">
         <h3>Hold Found (item is already waiting):  <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="itembiblionumber" -->"><!-- TMPL_VAR Name="title" escape="html" --></a></h3>
@@ -118,6 +124,9 @@ function Dopop(link) {
 <!-- TMPL_IF NAME="debarred" --><li class="error">Patron is RESTRICTED <!-- TMPL_IF Name="debarredcomment" -->(<!-- TMPL_VAR NAME="debarredcomment" -->)<!-- /TMPL_IF --></li><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="gonenoaddress" --><li class="error">Patron's address is in doubt<!-- TMPL_IF Name="gonenoaddresscomment" -->(<!-- TMPL_VAR NAME="gonenoaddresscomment" -->)<!-- /TMPL_IF --></li><!-- /TMPL_IF --></ul>
 		<!-- TMPL_IF name="transfertodo" -->
+            <!-- TMPL_IF NAME="soundon" -->
+                <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+            <!-- /TMPL_IF -->
             <h4><strong>Transfer to:</strong> <!-- TMPL_VAR Name="destbranchname" --></h4>
 		<!-- TMPL_ELSE -->
 		<h4><strong>Hold at</strong> <!-- TMPL_VAR Name="destbranchname" --></h4>
@@ -145,6 +154,9 @@ function Dopop(link) {
 
     <!-- TMPL_IF Name="diffbranch" -->
 		<!-- diffbranch -->
+        <!-- TMPL_IF NAME="soundon" -->
+            <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+        <!-- /TMPL_IF -->
         <div class="dialog message">
 		<h3>Hold needing transfer found: <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="itembiblionumber" -->"><!-- TMPL_VAR Name="title" escape="html" --></a></h3>
                 <h4>Hold for: </h4>
@@ -182,12 +194,18 @@ function Dopop(link) {
     <!-- /TMPL_IF -->
 
     <!-- TMPL_IF Name="transfer" -->
+        <!-- TMPL_IF NAME="soundon" -->
+            <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+        <!-- /TMPL_IF -->
     <!-- transfer: item with no reservation, must be returned to its homebranch -->
 	<div class="dialog message">
 	  <h3>Please return <a href="/cgi-bin/koha/catalogue/detail.pl?type=intra&amp;biblionumber=<!-- TMPL_VAR NAME="itembiblionumber" -->"><!-- TMPL_VAR NAME="title" escape="html" DEFAULT="item" --></a> to <!-- TMPL_VAR NAME="homebranch" DEFAULT="homebranch" --></h3></div><!-- /TMPL_IF -->
     <!-- TMPL_UNLESS Name="reserved" -->
     <!-- TMPL_IF Name="needstransfer" -->
 	<!-- needstransfer -->
+        <!-- TMPL_IF NAME="soundon" -->
+            <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+        <!-- /TMPL_IF -->
 	<div class="dialog message"><h3> This item needs to be transfered to <!-- TMPL_VAR Name="homebranch" --></h3>
 	Transfer Now?<br />
     <form method="post" action="returns.pl" name="mainform" id="mainform">              
@@ -233,6 +251,9 @@ function Dopop(link) {
     <!-- TMPL_IF Name="reserved" -->
 	<!--  reserved  -->
 	<div class="dialog message">
+        <!-- TMPL_IF NAME="soundon" -->
+            <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+        <!-- /TMPL_IF -->
 	  <h3>Hold Found: <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="itembiblionumber" -->"><!-- TMPL_VAR Name="title" escape="html" --></a></h3>
         <!-- TMPL_IF NAME="reservenotes" --><h4>Notes: <!-- TMPL_VAR Name="reservenotes" --></h4><!-- /TMPL_IF -->
         <h5>Hold for:</h5>
@@ -282,6 +303,9 @@ function Dopop(link) {
 <!-- /TMPL_IF -->
 
 <!-- TMPL_IF NAME="errmsgloop" -->
+    <!-- TMPL_IF NAME="soundon" -->
+        <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+    <!-- /TMPL_IF -->
     <div class="dialog message">
         <!-- TMPL_LOOP Name="errmsgloop" -->
                     <!-- TMPL_IF Name="badbarcode" -->
@@ -374,8 +398,11 @@ function Dopop(link) {
     </form>
 </div>
 <!-- TMPL_IF Name="flagloop" -->
-<div class="yui-g dialog message">    
-                
+<div class="yui-g dialog message">
+
+    <!-- TMPL_IF NAME="soundon" -->
+        <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+    <!-- /TMPL_IF -->
                 <a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=<!-- TMPL_VAR Name="riborrowernumber" -->"><!-- TMPL_VAR Name="riborsurname" -->, <!-- TMPL_VAR Name="ribortitle" --> <!-- TMPL_VAR Name="riborfirstname" --></a> (<!-- TMPL_VAR Name="riborcnum" -->)
             <!-- TMPL_IF NAME="flagloop"-->
 		<ul>
@@ -424,6 +451,9 @@ function Dopop(link) {
             <tr>
             <td><!-- TMPL_IF Name="duedate" -->
                     <!-- TMPL_IF Name="return_overdue" -->
+                        <!-- TMPL_IF NAME="soundon" -->
+                            <audio src="/intranet-tmpl/prog/sound/critical.ogg" autoplay="autoplay" autobuffer="autobuffer"></audio>
+                        <!-- /TMPL_IF -->
                         <span class="overdue"><!-- TMPL_VAR NAME="duedate" --> (overdue)</span>
                     <!-- TMPL_ELSE --><!-- TMPL_VAR NAME="duedate" -->
                     <!-- /TMPL_IF -->
