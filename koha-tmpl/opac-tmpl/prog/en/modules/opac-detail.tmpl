@@ -194,7 +194,14 @@ GBS_setLanguage('fr');
 GBS_insertPreviewButtonPopup('<!-- TMPL_VAR NAME="normalized_isbn" -->');
 </script>
 </span>
-
+<span id="sommaire_ok">
+<a href="/sommaires/toc/<!-- TMPL_VAR NAME="normalized_isbn" -->.htm" rel="shadowbox;width=500;height=550" title="en savoir plus"><img src="/opac-tmpl/prog/images/en_savoir_plus.jpg" title="en savoir plus"></a>
+</span>
+<span id="sommaire">
+<script type="text/javascript" src="/opac-tmpl/prog/en/js/toc_koha_ajax.js"> </script>
+<script type="text/javascript">sommaire('<!-- TMPL_VAR NAME="normalized_isbn" -->')</script>
+<br /><img src="/opac-tmpl/prog/images/progress.gif" width="16" height="16" border="0" alt="" />
+</span>
 <!-- /TMPL_IF -->
 <!-- fin ajout brisees -->
     </div>

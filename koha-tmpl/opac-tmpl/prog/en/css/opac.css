@@ -987,7 +987,7 @@ em {
 	padding : 0;
 /* debut ajout brisees */
     width : 160px ;
-    height : 270px ;
+    height : 300px ;
     text-align : center ;
 /* fin ajout brisees */
 
@@ -996,6 +996,16 @@ em {
 #bookcover img {
 	margin : 1.8em 1em 1em 0; /* modif brisees */	
 }
+
+/* debut ajout brisees */
+#__GBS_Button0 img, #sommaire_ok img, #sommaire img {
+        margin-top : 0;
+}
+
+#sommaire_ok {
+    display : none ;
+    }
+/* fin ajout brisees */
 
 fieldset.brief {
 	border : 1px solid #E8E8E8;
