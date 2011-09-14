@@ -75,6 +75,7 @@ This module provides searching functions for Koha's bibliographic databases
   &GetDistinctValues
   &BiblioAddAuthorities
   &IndexRecord
+  &AddToIndexQueue
 );
 
 #FIXME: i had to add BiblioAddAuthorities here because in Biblios.pm it caused circular dependencies (C4::Search uses C4::Biblio, and BiblioAddAuthorities uses SimpleSearch from C4::Search)
@@ -2854,12 +2855,17 @@ sub GetDistinctValues {
 
 sub IndexRecord {
     if (!(C4::Context->preference('SearchEngine')=~/IndexOff/i)){
-	my $search = C4::Search::Engine->new();
-	$search->find_searchengine;
-	return $search->index(@_);
+        my $search = C4::Search::Engine->new();
+        $search->find_searchengine;
+        return $search->index( @_ );
     }
 }
 
+sub AddToIndexQueue {
+    my $search = C4::Search::Engine->new();
+    $search->find_searchengine;
+    return $search->add_to_index_queue( @_ );
+}
 
 
 
