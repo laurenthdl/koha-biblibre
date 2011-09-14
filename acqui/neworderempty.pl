@@ -120,6 +120,11 @@ my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
     }
 );
 
+if(!$basketno) {
+    my $order = GetOrder($ordernumber);
+    $basketno = $order->{'basketno'};
+}
+
 my $basket   = GetBasket($basketno);
 my $contract = &GetContract( $basket->{contractnumber} );
 
@@ -220,7 +225,11 @@ foreach my $thisbranch ( sort { $branches->{$a}->{'branchname'} cmp $branches->{
         value      => $thisbranch,
         branchname => $branches->{$thisbranch}->{'branchname'},
     );
-    $row{'selected'} = 1 if ( $thisbranch && $data->{branchcode} && $thisbranch eq $data->{branchcode} );
+    if($data->{branchcode}) {
+        $row{'selected'} = 1 if ( $thisbranch eq $data->{branchcode} );
+    } elsif ( C4::Context->userenv->{'branch'} ) {
+        $row{'selected'} = 1 if ( $thisbranch eq C4::Context->userenv->{'branch'} );
+    }
     push @branchloop, \%row;
 }
 $template->param( branchloop => \@branchloop );
