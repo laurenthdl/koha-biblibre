@@ -84,10 +84,17 @@ jQuery.fn.dataTableExt.oApi.fnAddFilteringDelay = function ( oSettings, iDelay )
     var filterTimerId = null;
     $("input.filter").keyup(function(event) {
       var $this = this;
-      window.clearTimeout(filterTimerId);
-      filterTimerId = window.setTimeout(function() {
-        table.fnFilter($($this).val(), $($this).attr('data-column_num'));
-      }, iDelay);
+      if (blacklist_keys.indexOf(event.keyCode) != -1) {
+        return this;
+      }else if ( event.keyCode == '13' ) {
+        $.fn.dataTableExt.iApiIndex = i;
+        _that.fnFilter( $(this).val() );
+      } else {
+        window.clearTimeout(filterTimerId);
+        filterTimerId = window.setTimeout(function() {
+          table.fnFilter($($this).val(), $($this).attr('data-column_num'));
+        }, iDelay);
+      }
     });
 }
 

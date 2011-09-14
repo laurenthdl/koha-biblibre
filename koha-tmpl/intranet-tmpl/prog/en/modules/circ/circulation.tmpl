@@ -19,15 +19,44 @@ function Dopop(link) {
 $(document).ready(function() {
     $('#patronlists > ul').tabs();
 
+    $(".replace_me").each( function() {
+        replace_html( this );
+    } );
+
     var dt_issues = $("#issuest").dataTable({
         'bAutoWidth': false,
         'bProcessing': true,
         'bServerSide': true,
+        'aLengthMenu': [[10, 25, 50, 100, 250, 500, 1000, -1], [10, 25, 50, 100, 250, 500, 1000, _("All")]],
         'sAjaxSource': '/cgi-bin/koha/circ/tables/issues.pl',
         'fnServerData': function(sSource, aoData, fnCallback) {
             aoData.push({
               'name':'borrowernumber',
               'value':'<!-- TMPL_VAR NAME="borrowernumber" -->'
+            },{
+              'name' : 'itype',
+              'value': $("#itemtype_filter").val()
+            },{
+              'name' : 'location',
+              'value': $("#location_filter").val()
+            },{
+              'name' : 'branchcode',
+              'value': $("#branch_filter").val()
+            },{
+              'name' : 'dateduefrom',
+              'value': $("#dateduefrom").val()
+            },{
+              'name' : 'datedueto',
+              'value': $("#datedueto").val()
+            },{
+              'name' : 'issuedatefrom',
+              'value': $("#issuedatefrom").val()
+            },{
+              'name' : 'issuedateto',
+              'value': $("#issuedateto").val()
+            },{
+              'name' : 'title_filteron',
+              'value': 'biblio.title biblio.author items.itemnotes items.barcode'
             });
             $.ajax({
                 "dataType": 'json',
@@ -44,35 +73,24 @@ $(document).ready(function() {
             { "mDataProp": "location_description" },
             { "mDataProp": "branchname" },
             { "mDataProp": "issuedate" },
-            { "mDataProp": "charge" },
-            { "mDataProp": "materials" },
+            { "mDataProp": "charge", "bSortable": false, "bSearchable": false },
+            { "mDataProp": "materials", "bSortable": false, "bSearchable": false },
             { "mDataProp": "renewals", "bSortable": false, "bSearchable": false },
             { "mDataProp": "checkin", "bSortable": false, "bSearchable": false },
             { "mDataProp": "export", "bSortable": false, "bSearchable": false }
         ],
+        'aaSorting': [[5, 'desc']],
         'sPaginationType': 'full_numbers'
     });
 
-    // Following lines enables individual column filtering
-    $("input.filter").keyup( function () {
-        dt_issues.fnFilter( this.value, $(this).attr("data-column_num") );
-    } );
-    var asInitVals = new Array();
-    $("input.filter").each( function (i) {
-        asInitVals[$(this).attr("data-column_num")] = this.value;
-    } );
-    $("input.filter").focus( function () {
-        if ( $(this).hasClass("search_init") ) {
-            $(this).removeClass("search_init");
-            this.value = "";
-        }
-    } );
-    $("input.filter").blur( function (i) {
-        if ( this.value == "" ) {
-            $(this).addClass("search_init");
-            this.value = asInitVals[$(this).attr("data-column_num")];
-        }
-    } );
+    dt_issues.fnAddFilteringDelay(750);
+
+    $("#itemtype_filter,#location_filter,#branch_filter").change(function(){
+      dt_issues.fnDraw();
+    });
+    $("#dateduefrom,#datedueto,#issuedatefrom,#issuedateto").change(function(){
+      dt_issues.fnDraw();
+    });
 
     <!-- TMPL_IF EXPR='dateformat eq "metric"' -->
         dt_add_type_uk_date();
@@ -768,14 +786,36 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
       </tbody>
       <tfoot>
         <tr>
-          <td><input type="text" class="filter search_init" value="Search date" data-column_num="0" style="width:99%" /></td>
-          <td><input type="text" class="filter search_init" value="Search title" data-column_num="1" style="width:99%"/></td>
-          <td><input type="text" class="filter search_init" value="Search item type" data-column_num="2" style="width:99%"/></td>
-          <td><input type="text" class="filter search_init" value="Search location" data-column_num="3" style="width:99%" /></td>
-          <td><input type="text" class="filter search_init" value="Search branch" data-column_num="4" style="width:99%" /></td>
-          <td><input type="text" class="filter search_init" value="Search issue date" data-column_num="5" style="width:99%" /></td>
-          <td><input type="text" class="filter search_init" value="Search charge" data-column_num="6" style="width:99%" /></td>
-          <td><input type="text" class="filter search_init" value="Search material" data-column_num="7" style="width:99%" /></td>
+          <td><span class="replace_me" data-id="datedue" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"/></td>
+          <td><input type="text" class="filter" placeholder="Search title" style="width:99%" data-column_num="1" /></td>
+          <td>
+            <select id="itemtype_filter" style="max-width:7em">
+              <option value="">All</option>
+              <!-- TMPL_LOOP NAME='itemtypes_loop' -->
+                <option value="<!-- TMPL_VAR NAME='itemtype' -->"><!-- TMPL_VAR NAME='description' --></option>
+              <!-- /TMPL_LOOP -->
+            </select>
+          </td>
+          <td>
+            <select id="location_filter" style="max-width:7em">
+              <option value="">All</option>
+              <!-- TMPL_LOOP NAME='locations_loop' -->
+                <option value="<!-- TMPL_VAR NAME='authorised_value' -->"><!-- TMPL_VAR NAME='lib' --></option>
+              <!-- /TMPL_LOOP -->
+            </select>
+          </td>
+          <td>
+            <select id="branch_filter" style="max-width:7em">
+              <option value="">All</option>
+              <!-- TMPL_LOOP NAME='branches_loop' -->
+                <option value="<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
+              <!-- /TMPL_LOOP -->
+            </select>
+          </td>
+          <td><span class="replace_me" data-id="issuedate" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->" /></td>
+          <!-- <script type="text/javascript">$("#test_1").html(include_html_tfoot('dates', 'issuedate'));</script></td> -->
+          <td></td>
+          <td></td>
           <td></td>
           <td></td>
           <td></td>

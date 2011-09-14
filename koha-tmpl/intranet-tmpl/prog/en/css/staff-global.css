@@ -291,6 +291,11 @@ td.od {
 	font-weight : bold;
 }
 
+span.od {
+	color : #cc0000;
+	font-weight : bold;
+}
+
 tr.warn td {
 	background-color: #FF9090;
 }

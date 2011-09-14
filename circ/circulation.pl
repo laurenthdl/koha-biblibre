@@ -698,6 +698,34 @@ foreach my $flag ( sort keys %$flags ) {
     }
 }
 
+# Build loops for filtering table
+my @itemtypes_loop;
+my $itemtypes = GetItemTypes;
+foreach (keys %$itemtypes) {
+    push @itemtypes_loop, {
+        itemtype    => $itemtypes->{$_}->{'itemtype'},
+        description => $itemtypes->{$_}->{'description'},
+    };
+}
+
+my @locations_loop;
+my $locations = GetAuthorisedValues('LOC');
+foreach (@$locations) {
+    push @locations_loop, {
+        authorised_value    => $_->{'authorised_value'},
+        lib                 => $_->{'lib'},
+    };
+}
+
+my @branches_loop;
+my $branches = GetBranches;
+foreach (keys %$branches) {
+    push @branches_loop, {
+        value       => $branches->{$_}->{'branchcode'},
+        branchname  => $branches->{$_}->{'branchname'},
+    };
+}
+
 my $amountold = $borrower->{flags}->{'CHARGES'}->{'message'} || 0;
 $amountold =~ s/^.*\$//;    # remove upto the $, if any
 
@@ -790,6 +818,9 @@ $template->param(
     circview                    => 1,
     soundon                     => C4::Context->preference("SoundOn"),
     categoryloop				=> \@categories,
+    itemtypes_loop              => \@itemtypes_loop,
+    locations_loop              => \@locations_loop,
+    branches_loop               => \@branches_loop,
 );
 
 $template->param( newexpiry => format_date($newexpiry) ) if ( defined $newexpiry );
