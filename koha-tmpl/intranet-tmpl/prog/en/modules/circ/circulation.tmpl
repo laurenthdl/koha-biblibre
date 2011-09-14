@@ -57,6 +57,9 @@ $(document).ready(function() {
             },{
               'name' : 'title_filteron',
               'value': 'biblio.title biblio.author items.itemnotes items.barcode'
+            },{
+              'name' : 'branchname_filteron',
+              'value': 'items.itemcallnumber',
             });
             $.ajax({
                 "dataType": 'json',
@@ -787,7 +790,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
       <tfoot>
         <tr>
           <td><span class="replace_me" data-id="datedue" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->"/></td>
-          <td><input type="text" class="filter" placeholder="Search title" style="width:99%" data-column_num="1" /></td>
+          <td><input type="text" class="filter" placeholder="Search title, author, barcode" style="width:99%" data-column_num="1" /></td>
           <td>
             <select id="itemtype_filter" style="max-width:7em">
               <option value="">All</option>
@@ -811,6 +814,7 @@ No patron matched <span class="ex"><!-- TMPL_VAR name="message" --></span>
                 <option value="<!-- TMPL_VAR NAME='value' -->"><!-- TMPL_VAR NAME='branchname' --></option>
               <!-- /TMPL_LOOP -->
             </select>
+            <input type="text" class="filter" placeholder="Search callnumber" style="width:99%" data-column_num="4" />
           </td>
           <td><span class="replace_me" data-id="issuedate" data-type="range_dates" data-format="<!-- TMPL_VAR NAME='DHTMLcalendar_dateformat' -->" /></td>
           <!-- <script type="text/javascript">$("#test_1").html(include_html_tfoot('dates', 'issuedate'));</script></td> -->
