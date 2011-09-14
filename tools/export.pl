@@ -176,11 +176,6 @@ if ( $op eq "export" ) {
                 push @sql_params, $start_accession->output('iso');
             }
 
-	    if ($timestamp) {
-                $q .= " AND $biblioitemstable.timestamp >= ? ";
-                push @sql_params, $timestamp->output('iso');
-            }
-
             if ($end_accession) {
                 $q .= " AND dateaccessioned <= ? ";
                 push @sql_params, $end_accession->output('iso');
@@ -190,6 +185,30 @@ if ( $op eq "export" ) {
                 $q .= ( C4::Context->preference('item-level_itypes') ) ? " AND $itemstable.itype = ? " : " AND $biblioitemstable.itemtype = ?";
                 push @sql_params, $itemtype;
             }
+
+            # Specific query when timestamp is used
+            # Actually it's used only with CLI and so all previous filters
+            # are not used.
+            # If one day timestamp is used via the web interface, this part will
+            # certainly have to be rewrited
+            if ($timestamp) {
+                $q = " (
+                    SELECT biblionumber
+                    FROM $biblioitemstable
+                      JOIN items USING(biblionumber)
+                    WHERE $biblioitemstable.timestamp >= ?
+                      OR items.timestamp >= ?
+                ) UNION (
+                    SELECT biblionumber
+                    FROM $biblioitemstable
+                      JOIN deleteditems USING(biblionumber)
+                    WHERE $biblioitemstable.timestamp >= ?
+                      OR deleteditems.timestamp >= ?
+                ) ";
+                my $ts = $timestamp->output('iso');
+                @sql_params = ($ts, $ts, $ts, $ts);
+            }
+
             warn "$q, @sql_params";
             my $sth = $dbh->prepare($q);
             $sth->execute(@sql_params);
