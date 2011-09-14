@@ -3352,6 +3352,8 @@ sub _koha_delete_biblio {
         # find the fields to save
         my $query = "INSERT INTO deletedbiblio SET ";
         my @bind  = ();
+        # Do not copy timestamp
+        delete $data->{'timestamp'};
         foreach my $temp ( keys %$data ) {
             $query .= "$temp = ?,";
             push( @bind, $data->{$temp} );
@@ -3402,6 +3404,8 @@ sub _koha_delete_biblioitems {
         # find the fields to save
         my $query = "INSERT INTO deletedbiblioitems SET ";
         my @bind  = ();
+        # Do not copy timestamp
+        delete $data->{'timestamp'};
         foreach my $temp ( keys %$data ) {
             $query .= "$temp = ?,";
             push( @bind, $data->{$temp} );

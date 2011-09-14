@@ -2238,6 +2238,8 @@ sub _koha_delete_item {
     my $data  = $sth->fetchrow_hashref();
     my $query = "INSERT INTO deleteditems SET ";
     my @bind  = ();
+    # Do not copy timestamp
+    delete $data->{'timestamp'};
     foreach my $key ( keys %$data ) {
         $query .= "$key = ?,";
         push( @bind, $data->{$key} );
