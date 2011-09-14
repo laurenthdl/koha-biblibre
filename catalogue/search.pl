@@ -430,7 +430,11 @@ for my $searchresult ( @{ $res->items } ) {
     my $biblio = C4::Search::getItemsInfos($biblionumber, $interface,
         $itemtypes, $subfieldstosearch, $itemtag, $b);
 
-    push( @results, $biblio );
+    if(defined $biblio) {
+        push @results, $biblio;
+    } else {
+        warn "Biblio $biblionumber is indexed but no more exists in database";
+    }
 }
 
 # build facets
