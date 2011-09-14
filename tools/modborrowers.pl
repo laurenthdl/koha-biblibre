@@ -65,20 +65,8 @@ if ( $op eq 'show' ) {
 
     my $max_nb_attr = 0;
     for my $cardnumber ( @cardnumbers ) {
-        my $borrower = GetMember( cardnumber => $cardnumber );
+        my $borrower = GetBorrowerInfos( cardnumber => $cardnumber );
         if ( $borrower ) {
-            $$borrower{branchname} = GetBranchName( $$borrower{branchcode} );
-            for ( qw(dateenrolled dateexpiry debarred) ) {
-                my $userdate = $$borrower{$_};
-                unless ($userdate && $userdate ne "0000-00-00" and $userdate ne "9999-12-31") {
-                    $borrower->{$_} = '';
-                    next;
-                }
-                $userdate = C4::Dates->new( $userdate, 'iso' )->output('syspref');
-                $borrower->{$_} = $userdate || '';
-            }
-            my $attr_loop = C4::Members::Attributes::GetBorrowerAttributes( $$borrower{borrowernumber} );
-            $$borrower{patron_attributes} = $attr_loop;
             $max_nb_attr = scalar( @{ $$borrower{patron_attributes} } )
                 if scalar( @{ $$borrower{patron_attributes} } ) > $max_nb_attr;
             push @borrowers, $borrower;
@@ -119,7 +107,8 @@ if ( $op eq 'show' ) {
     }
     $template->param( borrowers => \@borrowers );
     $template->param( attributes_header => \@attributes_header );
-    $template->param( notfoundcardnumbers => map { { cardnumber => $_ } } @notfoundcardnumbers )
+    @notfoundcardnumbers = map { { cardnumber => $_ } } @notfoundcardnumbers;
+    $template->param( notfoundcardnumbers => \@notfoundcardnumbers )
         if @notfoundcardnumbers;
 
     my $branches = GetBranchesLoop;
@@ -267,20 +256,8 @@ if ( $op eq 'action' ) {
     my @borrowers;
     my $max_nb_attr = 0;
     for my $borrowernumber ( @borrowernumbers ) {
-        my $borrower = GetMember( borrowernumber => $borrowernumber );
+        my $borrower = GetBorrowerInfos( borrowernumber => $borrowernumber );
         if ( $borrower ) {
-            $$borrower{branchname} = GetBranchName( $$borrower{branchcode} );
-            for ( qw(dateenrolled dateexpiry debarred) ) {
-                my $userdate = $$borrower{$_};
-                unless ($userdate && $userdate ne "0000-00-00" and $userdate ne "9999-12-31") {
-                    $borrower->{$_} = '';
-                    next;
-                }
-                $userdate = C4::Dates->new( $userdate, 'iso' )->output('syspref');
-                $borrower->{$_} = $userdate || '';
-            }
-            my $attr_loop = C4::Members::Attributes::GetBorrowerAttributes( $$borrower{borrowernumber} );
-            $$borrower{patron_attributes} = $attr_loop;
             $max_nb_attr = scalar( @{ $$borrower{patron_attributes} } )
                 if scalar( @{ $$borrower{patron_attributes} } ) > $max_nb_attr;
             push @borrowers, $borrower;
@@ -310,3 +287,25 @@ $template->param(
 );
 output_html_with_http_headers $input, $cookie, $template->output;
 exit;
+
+sub GetBorrowerInfos {
+    my ( %info ) = @_;
+    my $borrower = GetMember( %info );
+    if ( $borrower ) {
+        $$borrower{branchname} = GetBranchName( $$borrower{branchcode} );
+        for ( qw(dateenrolled dateexpiry debarred) ) {
+            my $userdate = $$borrower{$_};
+            unless ($userdate && $userdate ne "0000-00-00" and $userdate ne "9999-12-31") {
+                $borrower->{$_} = '';
+                next;
+            }
+            $userdate = C4::Dates->new( $userdate, 'iso' )->output('syspref');
+            $borrower->{$_} = $userdate || '';
+        }
+        $$borrower{category_description} = GetBorrowercategory( $$borrower{categorycode} )->{description};
+        my $attr_loop = C4::Members::Attributes::GetBorrowerAttributes( $$borrower{borrowernumber} );
+        $$borrower{patron_attributes} = $attr_loop;
+    }
+    return $borrower;
+}
+
