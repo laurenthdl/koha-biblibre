@@ -3640,10 +3640,19 @@ sub BatchModField {
             my $new_field = MARC::Field->new( $tofield, '', '', @subfields);
             $record->insert_fields_ordered($new_field);
         } else {
-            for my $rf ( $record->field( $tofield ) ) {
+            if ( $field eq $tofield ) {
                 for my $f ($record->field( $field ) ) {
                     for my $val ( $f->subfield( $subfield ) ) {
-                        $rf->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
+                        $f->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
+                    }
+                }
+            }
+            else {
+                for my $rf ( $record->field( $tofield ) ) {
+                    for my $f ($record->field( $field ) ) {
+                        for my $val ( $f->subfield( $subfield ) ) {
+                            $rf->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
+                        }
                     }
                 }
             }
