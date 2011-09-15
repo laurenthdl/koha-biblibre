@@ -2747,15 +2747,15 @@ AND (authtypecode IS NOT NULL AND authtypecode<>\"\")|
             # No authorities id in the tag.
             # Search if there is any authorities to link to.
             my $query = 'at=' . $data->{authtypecode} . ' ';
-            map { $query .= ' and he,ext="' . $_->[1] . '"' if ( $_->[0] =~ /[A-z]/ ) } $field->subfields();
+            map { $query .= ' and he="' . $_->[1] . '"' if ( $_->[0] =~ /[A-z]/ ) } $field->subfields();
             $query = C4::Search::Query->normalSearch($query);
-            my $results = C4::Search::SimpleSearch($query);
+            my $results = C4::Search::SimpleSearch($query, {recordtype => 'authority'});
             my $hits = $results->{'pager'}->{'total_entries'};
 
             # there is only 1 result
             if ( $results && $hits == 1 ) {
                 my $recordid = @{$results->items}[0]->{values}{recordid};
-                my $marcrecord = GetMarcBiblio($recordid);
+                my $marcrecord = GetAuthority($recordid);
                 $field->add_subfields( '9' => $marcrecord->field('001')->data );
                 $countlinked++;
             } elsif ( $hits > 1 ) {
