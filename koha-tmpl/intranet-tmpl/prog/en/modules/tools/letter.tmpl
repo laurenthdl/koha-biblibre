@@ -220,6 +220,11 @@ $(document).ready(function() {
                                     <!--TMPL_ELSE-->
                                     <option value="reserves">Holds</option>
                                     <!--/TMPL_IF-->
+                                    <!--TMPL_IF Name="suggestions"-->
+                                    <option value="suggestions" selected="selected">Suggestions</option>
+                                    <!--TMPL_ELSE-->
+                                    <option value="suggestions">Suggestions</option>
+                                    <!--/TMPL_IF-->
 				</select>
 			</li>
 			<li>

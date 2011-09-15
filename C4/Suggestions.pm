@@ -401,12 +401,17 @@ sub ModSuggestion {
     if ( $$suggestion{STATUS} ) {
         my $letter = C4::Letters::getletter( 'suggestions', $suggestion->{STATUS} );
         if ($letter) {
+            C4::Letters::parseletter($letter, 'branches',    $suggestion->{branchcode});
+            C4::Letters::parseletter($letter, 'borrowers',   $suggestion->{suggestedby});
+            C4::Letters::parseletter($letter, 'suggestions', $suggestion->{suggestionid});
+            C4::Letters::parseletter($letter, 'biblio',      $suggestion->{biblionumber});
+            
             my $enqueued = C4::Letters::EnqueueLetter(
                 {   letter             => $letter,
                     borrowernumber     => $suggestion->{suggestedby},
                     suggestionid       => $suggestion->{suggestionid},
                     LibraryName        => C4::Context->preference("LibraryName"),
-                    msg_transport_type => 'email'
+                    message_transport_type => 'email'
                 }
             );
             if ( !$enqueued ) { warn "can't enqueue letter $letter"; }
