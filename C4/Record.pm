@@ -421,7 +421,7 @@ sub marcrecord2csv {
     my $output;
 
     # Getting the record
-    my $record = GetMarcBiblio($biblio, 1);
+    my $record = GetMarcBiblio($biblio);
     next unless $record;
     # Getting the framework
     my $frameworkcode = GetFrameworkCode($biblio);
