@@ -744,7 +744,8 @@ sub checkauth {
             $sessionID = undef;
             $userid    = undef;
 
-            if ( $cas and $caslogout ) {
+            if ( $cas and $caslogout and $type eq 'opac') {
+            # (Note: $type eq 'opac' condition should be removed when cas authentication for intranet will be implemented)
                 logout_cas($query);
             }
         } elsif ( $lasttime < time() - $timeout ) {
