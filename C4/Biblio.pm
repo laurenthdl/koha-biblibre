@@ -1064,19 +1064,20 @@ sub GetMarcFromKohaField {
 
 =head2 GetMarcBiblio
 
-  my $record = GetMarcBiblio($biblionumber, [$embeditems], [$include_deleted_table]);
+=over 4
+
+my $record = GetMarcBiblio($biblionumber);
+
+=back
 
 Returns MARC::Record representing bib identified by
 C<$biblionumber>.  If no bib exists, returns undef.
-C<$embeditems>.  If set to true, items data are included.
-C<$include_deleted_table>.  If set to true, include deleted table.
-The MARC record contains biblio data, and items data if $embeditems is set to true.
+The MARC record contains both biblio & item data.
 
 =cut
 
 sub GetMarcBiblio {
     my $biblionumber = shift;
-    my $embeditems   = shift || 0;
     my $deletedtable = shift;
     my $dbh          = C4::Context->dbh;
     my $strsth       = qq{SELECT marcxml FROM biblioitems WHERE biblionumber=?};
