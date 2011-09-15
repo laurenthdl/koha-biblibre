@@ -1,3 +1,31 @@
+// These default options are for translation but can be used
+// for any other datatables settings
+// To use it, write:
+//  $("#table_id").dataTable($.extend(true, {}, dataTableDefaults, {
+//      // other settings
+//  } ) );
+var dataTablesDefaults = {
+    "oLanguage": {
+        "oPaginate": {
+            "sFirst"    : _("First"),
+            "sLast"     : _("Last"),
+            "sNext"     : _("Next"),
+            "sPrevious" : _("Previous")
+        },
+        "sEmptyTable"       : _("No data available in table"),
+        "sInfo"             : _("Showing _START_ to _END_ of _TOTAL_ entries"),
+        "sInfoEmpty"        : _("No entries to show"),
+        "sInfoFiltered"     : _("(filtered from _MAX_ total entries)"),
+        "sLengthMenu"       : _("Show _MENU_ entries"),
+        "sLoadingRecords"   : _("Loading..."),
+        "sProcessing"       : _("Processing..."),
+        "sSearch"           : _("Search:"),
+        "sZeroRecords"      : _("No matching records found")
+    }
+};
+
+
+// Return an array of string containing the values of a particular column
 $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
     // check that we have a column id
     if ( typeof iColumn == "undefined" ) return new Array();
@@ -31,7 +59,10 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
 }
 
 // List of unbind keys (Ctrl, Alt, Direction keys, etc.)
+// These keys must not launch filtering
 var blacklist_keys = new Array(0, 16, 17, 18, 37, 38, 39, 40);
+
+// Set a filtering delay for global search field
 jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay ) {
     /*
      * Inputs:      object:oSettings - dataTables settings object - automatically given
@@ -78,27 +109,27 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay )
 }
 
 // Add a filtering delay on general search and on all input (with a class 'filter')
-jQuery.fn.dataTableExt.oApi.fnAddFilteringDelay = function ( oSettings, iDelay ) {
+jQuery.fn.dataTableExt.oApi.fnAddFilters = function ( oSettings, sClass, iDelay ) {
     var table = this;
     this.fnSetFilteringDelay(iDelay);
     var filterTimerId = null;
-    $("input.filter").keyup(function(event) {
-      var $this = this;
+    $("input."+sClass).keyup(function(event) {
       if (blacklist_keys.indexOf(event.keyCode) != -1) {
         return this;
       }else if ( event.keyCode == '13' ) {
-        $.fn.dataTableExt.iApiIndex = i;
-        _that.fnFilter( $(this).val() );
+        table.fnFilter( $(this).val(), $(this).attr('data-column_num') );
       } else {
         window.clearTimeout(filterTimerId);
+        var input = this;
         filterTimerId = window.setTimeout(function() {
-          table.fnFilter($($this).val(), $($this).attr('data-column_num'));
+          table.fnFilter($(input).val(), $(input).attr('data-column_num'));
         }, iDelay);
       }
     });
 }
 
-//Unused ?
+// Useful if you want to filter on dates with 2 inputs (start date and end date)
+// You have to include calendar.inc to use it
 function dt_add_rangedate_filter(begindate_id, enddate_id, dateCol) {
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {

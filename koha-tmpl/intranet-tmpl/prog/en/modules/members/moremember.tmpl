@@ -77,7 +77,7 @@ $(document).ready(function() {
     'sPaginationType': 'full_numbers'
   });
 
-  dt_issues.fnAddFilteringDelay(750);
+  dt_issues.fnAddFilters("filter", 750);
 
   $("#collection_filter,#itemtype_filter").change(function(){
     dt_issues.fnDraw();
@@ -174,28 +174,16 @@ $(document).ready(function() {
 		}
 	});
  });
-function uncheck_sibling(me){
-nodename=me.getAttribute("name");
-if (nodename =="barcodes[]"){
-    var Node=me.parentNode.previousSibling;
-    while (Node.nodeName!="TD"){Node=Node.previousSibling}
-    var Nodes=Node.childNodes;
-    for (var i=0;i<Nodes.length;i++){
-      if (Nodes[i].nodeName=="INPUT" && Nodes[i].getAttribute("type")=="checkbox"){
-        Nodes[i].checked=false;
-      }     
-   }   
 
-}else {
-    var Node=me.parentNode.nextSibling;
-    while (Node.nodeName!="TD"){Node=Node.nextSibling}
-    var Nodes=Node.childNodes;
-    for (var i=0;i<Nodes.length;i++){
-      if (Nodes[i].nodeName=="INPUT" && Nodes[i].getAttribute("type")=="checkbox"){
-        Nodes[i].checked=false;
-      }     
-   }   
-}
+function uncheck_sibling(me){
+    nodename = $(me).attr("name");
+    if (nodename == "barcodes[]"){
+        var node = $(me).parents('td').prev('td').find('input[type="checkbox"]');
+        $(node).attr("checked", false);
+    }else {
+        var node = $(me).parents('td').next('td').find('input[type="checkbox"]');
+        $(node).attr("checked", false);
+    }
 }
 
 //]]>
