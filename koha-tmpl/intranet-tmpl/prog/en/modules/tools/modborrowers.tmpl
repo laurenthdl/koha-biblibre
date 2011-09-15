@@ -206,7 +206,7 @@
                                                     <td><!-- TMPL_VAR NAME="debarred" --></td>
                                                     <!-- TMPL_LOOP NAME = "patron_attributes" -->
                                                         <!-- TMPL_IF NAME="code" -->
-                                                            <td><!-- TMPL_VAR NAME="code" -->=<!-- TMPL_IF NAME="lib" --><!-- TMPL_VAR NAME="lib" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="value" --><!-- /TMPL_IF --></td>
+                                                            <td><!-- TMPL_VAR NAME="code" -->=<!-- TMPL_IF NAME="value_description" --><!-- TMPL_VAR NAME="value_description" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="value" --><!-- /TMPL_IF --></td>
                                                         <!-- TMPL_ELSE -->
                                                             <td></td>
                                                         <!-- /TMPL_IF -->
