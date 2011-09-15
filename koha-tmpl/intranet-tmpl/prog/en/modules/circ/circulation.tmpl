@@ -86,7 +86,7 @@ $(document).ready(function() {
         'sPaginationType': 'full_numbers'
     });
 
-    dt_issues.fnAddFilteringDelay(750);
+    dt_issues.fnAddFilters("filter", 750);
 
     $("#itemtype_filter,#location_filter,#branch_filter").change(function(){
       dt_issues.fnDraw();
