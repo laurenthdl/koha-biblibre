@@ -1,6 +1,8 @@
 @import url("../../en/lib/yui/reset-fonts-grids.css");
 @import url("../../en/lib/yui/skin.css");
 
+#modif inutile
+
 a {
 	font-weight : bold;
 }
@@ -176,7 +178,7 @@ h1#libraryname {
 	float : left !important;
 	margin:0;
 	padding:0;
-	width:120px;
+	width: 75px;
 }
 
 h1#libraryname a {
@@ -186,9 +188,9 @@ h1#libraryname a {
 	height:0px !important;
 	margin:0;
 	overflow:hidden;
-	padding:40px 0 0;
+	padding: 40px 0 0;
 	text-decoration:none;
-	width:120px;
+	width: 75px;
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -690,7 +692,7 @@ body#advsearch #listsmenulink {
 }
 
 #header-wrapper {
-	background-color: #FFF;
+	#background-color: #FFF;
 }
 
 #holds,#opac-auth {
@@ -700,10 +702,10 @@ body#advsearch #listsmenulink {
 }
 
 #members {
-	background-color: #fff;
+	#background-color: #fff;
 	font-size : 85%;
-	margin-left : -10px;
-	margin-right : -10px;
+	#margin-left : -10px;
+	#margin-right : -10px;
 	padding : 4px 0 4px 0;
 	color : #000066;
 }
@@ -741,14 +743,15 @@ body#advsearch #listsmenulink {
 	background-image : url( ../../images/menu-background.gif);
 	background-repeat : repeat-x;
 	background-color : #739ACF;
-	background-position : -10px top;
+	#background-position : -10px top;
 	border-top : 1px solid #335599;
 	border-bottom : 1px solid #335599;
-	margin-left : -10px;
-	margin-right : -10px;
+	margin-left : auto;
+	margin-right : auto;
 	padding : .7em 0 .4em .5em;
 	font-size : 108%;
 	line-height : 116%;
+	width: 1000px;
 }
 
 #opac-main-search form {
@@ -1221,9 +1224,9 @@ width: 120px;
 }
 
 #fluid {
-margin-left: 124px;
+margin-left: 75px;
 margin-top : .4em;
-padding-left : 1em;
+#padding-left : 1em;
 }
 
 #fluid-offset {
@@ -1709,18 +1712,18 @@ span.starMT {
 
 a#listsmenulink, a#listsmenulink:hover {
 	color : #006699;
-	font-size : 105%;
+	font-size : 90%;
 	font-weight : bold;
 	line-height : 185%;
-	margin-left : 1.5em;
+	margin-left : 1em;
 }
 
 a#cartmenulink, a#cartmenulink:hover {
 	color : #336600;
-	font-size : 105%;
+	font-size : 90%;
 	font-weight : bold;
 	line-height : 185%;
-	margin-left : 1.5em;
+	margin-left : 1em;
 }
 * html a#cartmenulink {
 	padding-top: 0;

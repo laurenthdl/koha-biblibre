@@ -1,0 +1,81 @@
+body {
+	background-image: url("../../images/fd.gif");
+	background-repeat: repeat-x;
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#header_opac_bfm {
+	background-image: url("../../images/bandeau.gif");
+	background-repeat: repeat-x;
+	width: 1000px;
+	height: 110px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: -20px;
+	padding-top: 10px;
+	diplay: block;
+	text-align: center;
+	vertical-align: middle;
+	color: #00518e;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+#focus {
+	#border: 1px solid black;
+	width: 100%;
+}
+
+#cadrephoto {
+	#border: 1px solid black;
+	width: 100%;
+	font-size: .9em;
+	text-align: left;
+}
+
+#cadretexte {
+	#border: 1px solid black;
+	width: 100%;
+	font-size: .9em;
+	margin-bottom: 30px;
+}
+
+#titre1 {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 1.1em;
+	font-weight: bold;
+	color: #006666;
+	border-bottom: dashed 2px #006666;
+	#border-left: dashed 1px #006666;
+	padding-bottom: 5px;
+	padding-left: 5px;
+}
+
+#detailstitre1 {
+	font-size: .9em;
+	font-weight: normal;
+}
+
+#titre2 {
+	font-weight: bold;
+	color: #cc6666;
+	padding-bottom: 10px;
+}
+
+.imgcouv {
+	border: 1px solid black;
+	margin: 10px;
+}
+
+#yui-main {
+	width: 1000px;
+}
+
+#transl1 {
+	width: 315px;
+}
+
+
