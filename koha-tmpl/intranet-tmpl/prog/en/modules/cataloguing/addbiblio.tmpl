@@ -652,6 +652,16 @@ function unHideSubfield(index,labelindex) { // FIXME :: is it used ?
 		$("#z3950searchc").empty();
         $("#savebutton").empty();
 	    yuiToolbar();
+        $("#hide_tags").attr("checked", false)
+        $("#hide_tags").change( function(){
+            if ( $(this).is(':checked') ) {
+                $(".tagnum").hide();
+                $(".subfieldcode").hide();
+            } else {
+                $(".tagnum").show();
+                $(".subfieldcode").show();
+            }
+        } );
 	 });
 
     var onOption = function () {
@@ -714,6 +724,7 @@ function unHideSubfield(index,labelindex) { // FIXME :: is it used ?
 					        <!-- /TMPL_LOOP -->
 			<!--/TMPL_IF-->
 			</select> 
+            <label><input id="hide_tags" type="checkbox" class="vertical-align:middle;"/>Hide tags</label>
 <input type="hidden" name="op" value="addbiblio" /></li>
 		</ul>
 </div>
