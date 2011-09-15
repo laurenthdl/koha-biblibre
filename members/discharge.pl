@@ -87,6 +87,7 @@ if ( $input->param('borrowernumber') ) {
         # Creating message
         my $letter = getletter('members', 'DISCHARGE');
         C4::Letters::parseletter( $letter, 'borrowers',  $borrowernumber );
+        C4::Letters::parseletter( $letter, 'branches',  $data->{'branchcode'} );
         my $today = C4::Dates->new()->output();
         $letter->{'title'}   =~ s/<<today>>/$today/g;
         $letter->{'content'} =~ s/<<today>>/$today/g;
@@ -104,10 +105,27 @@ if ( $input->param('borrowernumber') ) {
         mkdir "$dischargePath/$borrowernumber" unless -d "$dischargePath/$borrowernumber";
         my $cssoptions;
         $cssoptions = "-s $dischargePath/discharge.css" if (-e "$dischargePath/discharge.css");
-        qx{../misc/cronjobs/gather_print_notices.pl $cssoptions -f discharge -b $borrowernumber $dischargePath/$borrowernumber};
+        qx{../misc/cronjobs/gather_print_notices.pl $cssoptions -f discharge -l DISCHARGE -b $borrowernumber $dischargePath/$borrowernumber};
         
         # Calling printoverdues.pl in this same user directory
         qx{../misc/cronjobs/printoverdues.sh $dischargePath/$borrowernumber};
+
+        # Error handling:
+        # Check if we really got our discharge as a pdf file
+        my $today    = C4::Dates->new();
+        my $todayiso = $today->output('iso');
+        # If we don't, then
+        unless (-e "$dischargePath/$borrowernumber/discharge-$todayiso.pdf") {
+            # Show an error message to the librarian
+            $template->param(error => 1);
+
+            # Remove the possibly generated html file
+            unlink "$dischargePath/$borrowernumber/discharge-$todayiso.html";
+
+            # Remove the unprocessed message from message_queue
+            removeUnprocessedDischarges($borrowernumber);
+
+        }
 
     }
 

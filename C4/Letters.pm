@@ -623,7 +623,7 @@ sub GetRSSMessages {
 
 =over 4
 
-my $message_list = GetPrintMessages( { borrowernumber => $borrowernumber } )
+my $message_list = GetPrintMessages( { borrowernumber => $borrowernumber [, letter_code => $letter_code] } )
 
 Returns a arrayref of all queued print messages (optionally, for a particular
 person).
@@ -638,6 +638,7 @@ sub GetPrintMessages {
     return _get_unsent_messages(
         {   message_transport_type => 'print',
             borrowernumber         => $params->{'borrowernumber'},
+            letter_code            => $params->{'letter_code'},
         }
     );
 }
@@ -768,6 +769,10 @@ ENDSQL
         if ( $params->{'borrowernumber'} ) {
             $statement .= ' AND borrowernumber = ? ';
             push @query_params, $params->{'borrowernumber'};
+        }
+        if ( $params->{'letter_code'} ) {
+            $statement .= ' AND letter_code = ? ';
+            push @query_params, $params->{'letter_code'};
         }
         if ( $params->{'limit'} ) {
             $statement .= ' limit ? ';
