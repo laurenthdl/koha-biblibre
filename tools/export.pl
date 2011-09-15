@@ -239,6 +239,7 @@ if ( $op eq "export" ) {
             }
 
             next if not defined $record;
+            C4::Biblio::EmbedItemsInMarcBiblio($record, $biblionumber) unless $dont_export_items;
             if ( $dont_export_items || $strip_nonlocal_items || $limit_ind_branch ) {
                 my ( $homebranchfield, $homebranchsubfield ) = GetMarcFromKohaField( 'items.homebranch', '' );
                 for my $itemfield ( $record->field($homebranchfield) ) {

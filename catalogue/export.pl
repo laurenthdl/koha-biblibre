@@ -24,6 +24,8 @@ if ( $op eq "export" ) {
     }
     while ( my ($marc) = $sth->fetchrow ) {
         if ($marc) {
+          if ($biblionumber){
+            my $marc = GetMarcBiblio($biblionumber, 1);
 
             if ( $format =~ /endnote/ ) {
                 $marc   = marc2endnote($marc);
@@ -40,14 +42,15 @@ if ( $op eq "export" ) {
                 $marc = changeEncoding( $marc, "MARC", "MARC21", "MARC-8" );
                 $marc = $marc->as_usmarc();
             } elsif ( $format =~ /utf8/ ) {
-
-                #default
+                C4::Charset::SetUTF8Flag($marc, 1);
+                $marc = $marc->as_usmarc();
             }
             print $query->header(
                 -type       => 'application/octet-stream',
                 -attachment => "bib-$biblionumber.$format"
             );
             print $marc;
+          }
         }
     }
 }

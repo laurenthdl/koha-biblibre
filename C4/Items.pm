@@ -34,6 +34,8 @@ require C4::Reserves;
 use C4::Charset;
 use C4::Acquisition;
 use List::MoreUtils qw/any/;
+use Data::Dumper; # used as part of logging item record changes, not just for
+                  # debugging; so please don't remove this
 
 use vars qw($VERSION @ISA @EXPORT);
 
@@ -280,13 +282,11 @@ sub AddItem {
     my ( $itemnumber, $error ) = _koha_new_item( $item, $item->{barcode} );
     $item->{'itemnumber'} = $itemnumber;
 
-    # create MARC tag representing item and add to bib
-    my $new_item_marc = _marc_from_item_hash( $item, $frameworkcode, $unlinked_item_subfields );
-    _add_item_field_to_biblio( $new_item_marc, $item->{'biblionumber'}, $frameworkcode );
-
-    logaction( "CATALOGUING", "ADD", $itemnumber, "item" ) if C4::Context->preference("CataloguingLog");
-
-    return ( $item->{biblionumber}, $item->{biblioitemnumber}, $itemnumber );
+    ModZebra( $item->{biblionumber}, "specialUpdate", "biblioserver", undef, undef );
+   
+    logaction("CATALOGUING", "ADD", $itemnumber, "item") if C4::Context->preference("CataloguingLog");
+    
+    return ($item->{biblionumber}, $item->{biblioitemnumber}, $itemnumber);
 }
 
 =head2 AddItemBatchFromMarc
@@ -392,7 +392,7 @@ sub AddItemBatchFromMarc {
     }
 
     # update the MARC biblio
-    $biblionumber = ModBiblioMarc( $record, $biblionumber, $frameworkcode );
+ #   $biblionumber = ModBiblioMarc( $record, $biblionumber, $frameworkcode );
 
     return ( \@itemnumbers, \@errors );
 }
@@ -536,18 +536,11 @@ sub ModItem {
     # update items table
     _koha_modify_item($item);
 
-    # update biblio MARC XML
-    my $whole_item = GetItem($itemnumber) or die "FAILED GetItem($itemnumber)";
+    # request that bib be reindexed so that searching on current
+    # item status is possible
+    ModZebra( $biblionumber, "specialUpdate", "biblioserver", undef, undef );
 
-    unless ( defined $unlinked_item_subfields ) {
-        $unlinked_item_subfields = _parse_unlinked_item_subfields_from_xml( $whole_item->{'more_subfields_xml'} );
-    }
-    my $new_item_marc = _marc_from_item_hash( $whole_item, $frameworkcode, $unlinked_item_subfields )
-      or die "FAILED _marc_from_item_hash($whole_item, $frameworkcode)";
-
-    _replace_item_field_in_biblio( $new_item_marc, $biblionumber, $itemnumber, $frameworkcode );
-    ( $new_item_marc eq '0' ) and die "$new_item_marc is '0', not hashref";    # logaction line would crash anyway
-    logaction( "CATALOGUING", "MODIFY", $itemnumber, $new_item_marc->as_formatted ) if C4::Context->preference("CataloguingLog");
+    logaction("CATALOGUING", "MODIFY", $itemnumber, Dumper($item)) if C4::Context->preference("CataloguingLog");
 }
 
 =head2 ModItemTransfer
@@ -620,25 +613,15 @@ sub DelItem {
     _koha_delete_item( $dbh, $itemnumber );
 
     # get the MARC record
-    my $record        = GetMarcBiblio($biblionumber);
-    my $frameworkcode = GetFrameworkCode($biblionumber);
+    my $record = GetMarcBiblio($biblionumber);
+    ModZebra( $biblionumber, "specialUpdate", "biblioserver", undef, undef );
 
     # backup the record
     my $copy2deleted = $dbh->prepare("UPDATE deleteditems SET marc=? WHERE itemnumber=?");
     $copy2deleted->execute( $record->as_usmarc(), $itemnumber );
 
     #search item field code
-    my ( $itemtag, $itemsubfield ) = GetMarcFromKohaField( "items.itemnumber", $frameworkcode );
-    my @fields = $record->field($itemtag);
-
-    # delete the item specified
-    foreach my $field (@fields) {
-        if ( $field->subfield($itemsubfield) eq $itemnumber ) {
-            $record->delete_field($field);
-        }
-    }
-    &ModBiblioMarc( $record, $biblionumber, $frameworkcode );
-    logaction( "CATALOGUING", "DELETE", $itemnumber, "item" ) if C4::Context->preference("CataloguingLog");
+    logaction("CATALOGUING", "DELETE", $itemnumber, "item") if C4::Context->preference("CataloguingLog");
 }
 
 =head2 CheckItemPreSave
@@ -2138,66 +2121,20 @@ sub MoveItemFromBiblio {
     $sth->execute($tobiblio);
     my ($tobiblioitem) = $sth->fetchrow();
     $sth = $dbh->prepare("UPDATE items SET biblioitemnumber = ?, biblionumber = ? WHERE itemnumber = ? AND biblionumber = ?");
-    my $return = $sth->execute( $tobiblioitem, $tobiblio, $itemnumber, $frombiblio );
-    if ( $return == 1 ) {
-
-        # Getting framework
-        my $frameworkcode = GetFrameworkCode($frombiblio);
-
-        # Getting marc field for itemnumber
-        my ( $itemtag, $itemsubfield ) = GetMarcFromKohaField( 'items.itemnumber', $frameworkcode );
-
-        # Getting the record we want to move the item from
-        my $record = GetMarcBiblio($frombiblio);
-
-        # The item we want to move
-        my $item;
-
-        # For each item
-        foreach my $fielditem ( $record->field($itemtag) ) {
-
-            # If it is the item we want to move
-            if ( $fielditem->subfield($itemsubfield) == $itemnumber ) {
-
-                # We save it
-                $item = $fielditem;
-
-                # Then delete it from the record
-                $record->delete_field($fielditem);
-            }
-        }
-
-        # If we found an item (should always true, except in case of database-marcxml inconsistency)
-        if ($item) {
-
-            # Checking if the item we want to move is in an order
-            my $order = GetOrderFromItemnumber($itemnumber);
-            if ($order) {
-
-                # Replacing the biblionumber within the order if necessary
-                $order->{'biblionumber'} = $tobiblio;
-                ModOrder($order);
-            }
-
-            # Saving the modification
-            ModBiblioMarc( $record, $frombiblio, $frameworkcode );
-
-            # Getting the record we want to move the item to
-            $record = GetMarcBiblio($tobiblio);
-
-            # Inserting the previously saved item
-            $record->insert_fields_ordered($item);
-
-            # Saving the modification
-            $frameworkcode = GetFrameworkCode($tobiblio);
-            ModBiblioMarc( $record, $tobiblio, $frameworkcode );
-
-        } else {
-            return undef;
-        }
-    } else {
-        return undef;
-    }
+    my $return = $sth->execute($tobiblioitem, $tobiblio, $itemnumber, $frombiblio);
+    if ($return == 1) {
+        ModZebra( $tobiblio, "specialUpdate", "biblioserver", undef, undef );
+        ModZebra( $frombiblio, "specialUpdate", "biblioserver", undef, undef );
+	    # Checking if the item we want to move is in an order 
+        my $order = GetOrderFromItemnumber($itemnumber);
+	    if ($order) {
+		    # Replacing the biblionumber within the order if necessary
+		    $order->{'biblionumber'} = $tobiblio;
+	        ModOrder($order);
+	    }
+        return $tobiblio;
+	}
+    return;
 }
 
 =head2 DelItemCheck
@@ -2277,7 +2214,7 @@ sub _koha_modify_item {
         $error .= "ERROR in _koha_modify_item $query" . $dbh->errstr;
         warn $error;
     }
-    return ( $item->{'itemnumber'}, $error );
+    return ($item->{'itemnumber'},$error);
 }
 
 =head2 _koha_delete_item
@@ -2367,77 +2304,6 @@ sub _marc_from_item_hash {
     }
 
     return $item_marc;
-}
-
-=head2 _add_item_field_to_biblio
-
-=over 4
-
-_add_item_field_to_biblio($item_marc, $biblionumber, $frameworkcode);
-
-=back
-
-Adds the fields from a MARC record containing the
-representation of a Koha item record to the MARC
-biblio record.  The input C<$item_marc> record
-is expect to contain just one field, the embedded
-item information field.
-
-=cut
-
-sub _add_item_field_to_biblio {
-    my ( $item_marc, $biblionumber, $frameworkcode ) = @_;
-
-    my $biblio_marc = GetMarcBiblio($biblionumber);
-    foreach my $field ( $item_marc->fields() ) {
-        $biblio_marc->append_fields($field);
-    }
-
-    ModBiblioMarc( $biblio_marc, $biblionumber, $frameworkcode );
-}
-
-=head2 _replace_item_field_in_biblio
-
-=over
-
-&_replace_item_field_in_biblio($item_marc, $biblionumber, $itemnumber, $frameworkcode)
-
-=back
-
-Given a MARC::Record C<$item_marc> containing one tag with the MARC 
-representation of the item, examine the biblio MARC
-for the corresponding tag for that item and 
-replace it with the tag from C<$item_marc>.
-
-=cut
-
-sub _replace_item_field_in_biblio {
-    my ( $ItemRecord, $biblionumber, $itemnumber, $frameworkcode ) = @_;
-    my $dbh = C4::Context->dbh;
-
-    # get complete MARC record & replace the item field by the new one
-    my $completeRecord = GetMarcBiblio($biblionumber);
-    my ( $itemtag, $itemsubfield ) = GetMarcFromKohaField( "items.itemnumber", $frameworkcode );
-    my $itemField = $ItemRecord->field($itemtag);
-    my @items     = $completeRecord->field($itemtag);
-    my $found     = 0;
-    foreach (@items) {
-        if ( $_->subfield($itemsubfield) eq $itemnumber ) {
-            $_->replace_with($itemField);
-            $found = 1;
-        }
-    }
-
-    unless ($found) {
-
-        # If we haven't found the matching field,
-        # just add it.  However, this means that
-        # there is likely a bug.
-        $completeRecord->append_fields($itemField);
-    }
-
-    # save the record
-    ModBiblioMarc( $completeRecord, $biblionumber, $frameworkcode );
 }
 
 =head2 _repack_item_errors
