@@ -32,12 +32,13 @@ use C4::Input;
 use C4::Output;
 use C4::ImportBatch;
 use C4::Matcher;
-use C4::Search qw/FindDuplicate BiblioAddAuthorities/;
+use C4::Search qw/FindDuplicate/;
 use C4::Biblio;
 use C4::Items;
 use C4::Koha;
 use C4::Budgets;
 use C4::Bookseller qw/GetBookSellerFromId/;
+use C4::Data::Record::Check qw/BiblioAddAuthorities/;
 
 
 use C4::Dates;
