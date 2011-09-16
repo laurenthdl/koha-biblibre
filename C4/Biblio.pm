@@ -1297,9 +1297,11 @@ sub GetCOinSBiblio {
         $issn      = $record->subfield( '022', 'a' ) || '';
 
     }
+
     my $coins_value =
 "ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3A$mtx$genre$title&amp;rft.isbn=$isbn&amp;rft.issn=$issn&amp;rft.aulast=$aulast&amp;rft.aufirst=$aufirst$oauthors&amp;rft.pub=$publisher&amp;rft.date=$pubyear$place$tpages";
     $coins_value =~ s/(\ |&[^a])/\+/g;
+    $coins_value =~ s/\"/\&quot\;/g;
 
 #<!-- TMPL_VAR NAME="ocoins_format" -->&amp;rft.au=<!-- TMPL_VAR NAME="author" -->&amp;rft.btitle=<!-- TMPL_VAR NAME="title" -->&amp;rft.date=<!-- TMPL_VAR NAME="publicationyear" -->&amp;rft.pages=<!-- TMPL_VAR NAME="pages" -->&amp;rft.isbn=<!-- TMPL_VAR NAME=amazonisbn -->&amp;rft.aucorp=&amp;rft.place=<!-- TMPL_VAR NAME="place" -->&amp;rft.pub=<!-- TMPL_VAR NAME="publishercode" -->&amp;rft.edition=<!-- TMPL_VAR NAME="edition" -->&amp;rft.series=<!-- TMPL_VAR NAME="series" -->&amp;rft.genre="
 
@@ -2437,7 +2439,7 @@ sub PrepareItemrecordDisplay {
                                 $authorised_lib{$branchcode} = $branchname;
                             }
                         }
-                        $defaultvalue = C4::Context->userenv->{branch};
+                        $defaultvalue = C4::Context->userenv->{branch} if C4::Context->userenv;
 
                         #----- itemtypes
                     } elsif ( $tagslib->{$tag}->{$subfield}->{authorised_value} eq "itemtypes" ) {
@@ -2474,11 +2476,11 @@ sub PrepareItemrecordDisplay {
                         my $plugin = C4::Context->intranetdir . "/cataloguing/value_builder/" . $tagslib->{$tag}->{$subfield}->{'value_builder'};
                         if (do $plugin) {
                             my $temp;
+                            my $index_subfield = int(rand(1000000));
+                            $subfield_data{id} = "tag_".$tag."_subfield_".$subfield."_".$index_subfield;
                             my $extended_param = plugin_parameters( $dbh, $temp, $tagslib, $subfield_data{id}, undef );
                             my ( $function_name, $javascript ) = plugin_javascript( $dbh, $temp, $tagslib, $subfield_data{id}, undef );
                             $subfield_data{random}     = int(rand(1000000));    # why do we need 2 different randoms?
-                            my $index_subfield = int(rand(1000000));
-                            $subfield_data{id} = "tag_".$tag."_subfield_".$subfield."_".$index_subfield;
                             $subfield_data{marc_value} = qq[<input tabindex="1" id="$subfield_data{id}" name="field_value" class="input_marceditor" size="67" maxlength="255"
                                 onfocus="Focus$function_name($subfield_data{random}, '$subfield_data{id}');"
                                  onblur=" Blur$function_name($subfield_data{random}, '$subfield_data{id}');" />
@@ -3640,10 +3642,19 @@ sub BatchModField {
             my $new_field = MARC::Field->new( $tofield, '', '', @subfields);
             $record->insert_fields_ordered($new_field);
         } else {
-            for my $rf ( $record->field( $tofield ) ) {
+            if ( $field eq $tofield ) {
                 for my $f ($record->field( $field ) ) {
                     for my $val ( $f->subfield( $subfield ) ) {
-                        $rf->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
+                        $f->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
+                    }
+                }
+            }
+            else {
+                for my $rf ( $record->field( $tofield ) ) {
+                    for my $f ($record->field( $field ) ) {
+                        for my $val ( $f->subfield( $subfield ) ) {
+                            $rf->add_subfields( $tosubfield => NormalizeString( $val ) ) if $val =~ m/$condition/ || $nocond eq "true";
+                        }
                     }
                 }
             }
