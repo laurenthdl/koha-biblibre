@@ -41,6 +41,7 @@ BEGIN {
 
     push @EXPORT, qw(
       &GetDischarges
+      &removeUnprocessedDischarges
     );
 
 
@@ -76,6 +77,29 @@ sub GetDischarges {
     return @return;
 }
 
+=head2 removeUnprocessedDischarges($borrowernumber)
+
+=over 4
+
+    removeUnprocessedDischarges($borrowernumber);
+
+=back
+
+=cut
+
+sub removeUnprocessedDischarges {
+
+    my $borrowernumber = shift;
+    return unless $borrowernumber;
+
+    # Remove all DISCHARGEs with a pending status, because if the process had been complete, the status would be 'sent'
+    my $dbh = C4::Context->dbh;
+    my $query = "DELETE FROM message_queue WHERE borrowernumber=? AND letter_code='DISCHARGE' AND status='pending'";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($borrowernumber);
+
+
+}
 
 1;
 

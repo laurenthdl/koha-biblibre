@@ -19,7 +19,6 @@
 
 use strict;
 use warnings;
-
 BEGIN {
 
     # find Koha's Perl modules
@@ -39,7 +38,7 @@ use Getopt::Long;
 
 sub usage {
     print STDERR <<USAGE;
-Usage: $0 [ -s STYLESHEET ] [ -b borrowernumber ] [ -f filename] OUTPUT_DIRECTORY
+Usage: $0 [ -s STYLESHEET ] [ -b borrowernumber ] [ -l letter_code ] [ -f filename] OUTPUT_DIRECTORY
   Will print all waiting print notices to
   OUTPUT_DIRECTORY/notices-CURRENT_DATE.html .
   If the filename of a CSS stylesheet is specified with -s, the contents of that
@@ -48,11 +47,12 @@ USAGE
     exit $_[0];
 }
 
-my ( $stylesheet, $help, $borrowernumber, $filename );
+my ( $stylesheet, $help, $borrowernumber, $letter_code, $filename );
 
 GetOptions(
     's:s' => \$stylesheet,
     'b:i' => \$borrowernumber,
+    'l:s' => \$letter_code,
     'f:s' => \$filename,
     'h|help' => \$help,
 ) || usage(1);
@@ -65,7 +65,10 @@ if ( !$output_directory || !-d $output_directory ) {
     print STDERR "Error: You must specify a valid directory to dump the print notices in.\n";
     usage(1);
 }
-my $params = ($borrowernumber) ? { 'borrowernumber' => $borrowernumber } : {};
+my $params = {};
+$params->{'borrowernumber'} = $borrowernumber if ($borrowernumber);
+$params->{'letter_code'}    = $letter_code    if ($letter_code);
+
 my $today    = C4::Dates->new();
 my @messages = @{ GetPrintMessages($params) };
 exit unless (@messages);
