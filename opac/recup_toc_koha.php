@@ -94,7 +94,7 @@ $en_tete = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">
 <head>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">
 <title>sommaire</title>
-<link href=\"../sommaires_a.css\" rel=\"stylesheet\" type=\"text/css\" />
+<link href=\"/opac-tmpl/prog/en/css/sommaires_a.css\" rel=\"stylesheet\" type=\"text/css\" />
 </head>
 <body>" ;
 $debut = "<span class=\"sommaire\">" ;
@@ -232,7 +232,6 @@ $sommaire_non = "document.getElementById('sommaire').style.display='none';" ;
 print ($sommaire_non) ;
 exit();
 
-
 $fichier_s = "../koha-tmpl/sommaires/toc/".$isbn_bn.".htm" ;
 if ( file_exists($fichier_s) )
 	{
@@ -259,7 +258,7 @@ $en_tete = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">
 <head>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">
 <title>sommaire</title>
-<link href=\"../sommaires_bn.css\" rel=\"stylesheet\" type=\"text/css\" />
+<link href=\"/opac-tmpl/prog/en/css/sommaires_bn.css\" rel=\"stylesheet\" type=\"text/css\" />
 </head>
 <body>" ;
 $debut = "<span class=\"sommaire\">" ;
