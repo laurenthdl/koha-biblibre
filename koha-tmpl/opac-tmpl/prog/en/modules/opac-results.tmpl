@@ -104,8 +104,8 @@ $(document).ready(function(){
 	<!-- TMPL_IF name="opacbookbag" -->$(".addtocart").show();<!-- /TMPL_IF -->
 
 <!-- TMPL_IF NAME="opacbookbag" -->
-	<!-- TMPL_IF NAME="virtualshelves" -->
-// modif brisees	var param1 = "<label for=\"addto\">"+_("Add to: ")+"<\/label><select name=\"addto\" id=\"addto\"><option value=\"\"><\/option>"; 
+        <!-- TMPL_IF NAME="virtualshelves" -->
+// modif brisees        var param1 = "<label for=\"addto\">"+_("Add to: ")+"<\/label><select name=\"addto\" id=\"addto\"><option value=\"\"><\/option>";
 var param1 = "<input type=\"submit\" class=\"submit\" value=\""+_("Save on")+"\" /> <label for=\"addto\">"+_("")+"<\/label><select name=\"addto\" id=\"addto\">"; // modif brisees
 	<!-- TMPL_IF name="opacbookbag" -->	param1 += "<option value=\"addtocart\">"+_("Cart")+"<\/option>";
 	<!-- /TMPL_IF --><!-- TMPL_IF NAME="virtualshelves" --><!-- TMPL_IF NAME="loggedinusername" --><!-- TMPL_IF NAME="addbarshelves" -->
@@ -142,10 +142,11 @@ var param1 = "<input type=\"submit\" class=\"submit\" value=\""+_("Save on")+"\"
 	$("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_("Select")+"<\/a>");
 <!-- TMPL_IF NAME="opacbookbag" -->$("span.addto").html(param1);<!-- TMPL_ELSE --><!-- TMPL_IF NAME="virtualshelves" --><!-- TMPL_IF NAME="loggedinusername" -->$("span.addto").html(param1);<!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
 
-	<!-- TMPL_IF NAME="virtualshelves" -->
-// debut modif brisees	$("#addto").change(function(){
-//		cartList();
-//	}); fin modif brisees 
+        <!-- TMPL_IF NAME="virtualshelves" -->
+// debut modif brisees  $("#addto").change(function(){
+//              cartList();
+//      }); fin modif brisees
+
 	$(".addto").find("input:submit").click(function(){
 		cartList();
 		return false;
@@ -296,7 +297,7 @@ var param1 = "<input type=\"submit\" class=\"submit\" value=\""+_("Save on")+"\"
                             <!-- TMPL_IF EXPR="opacbookbag || virtualshelves" -->
                                 <span class="addto"></span>
                             <!-- /TMPL_IF -->
-                            <!-- debut modif brisees <span id="placehold"><!-- input class="submit" type="submit" value="Place Hold"/ --></span> fin modif brisees -->
+                            <!-- debut modif brisees <span id="placehold"><!- input class="submit" type="submit" value="Place Hold"/ -></span> fin modif brisees -->
                             <div id="holdDetails"></div>
 
                             <!-- TMPL_IF NAME="TagsEnabled" -->
@@ -491,16 +492,7 @@ var param1 = "<input type=\"submit\" class=\"submit\" value=\""+_("Save on")+"\"
 	<!-- TMPL_IF name="suggestion" -->
 <!-- TMPL_IF NAME="AnonSuggestions" --><div class="suggestion">Not finding what you're looking for?<br />  Make a <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">purchase suggestion</a><!-- debut modif brisees --> or <!-- TMPL_INCLUDE NAME="more_search.inc" --><!-- fin modif brisees --></div><!-- TMPL_ELSE --><!-- TMPL_IF NAME="loggedinusername" --><div class="suggestion">Not finding what you're looking for?<br />  Make a <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">purchase suggestion</a><!-- debut modif brisees --> or <!-- TMPL_INCLUDE NAME="more_search.inc" --></div><!-- TMPL_ELSE --><div class="suggestion">Not finding what you're looking for?<br /><!-- TMPL_INCLUDE NAME="more_search.inc" --></div><!-- fin modif brisees --><!-- /TMPL_IF --><!-- /TMPL_IF -->
 <!-- /TMPL_IF -->
-<!--
-<!-- TMPL_IF name="suggestion" -->
-	<!-- TMPL_IF NAME="AnonSuggestions" --><div class="suggestion">Not finding what you're looking for?<br />  Make a <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">purchase suggestion</a><!-- debut modif brisees --> or <!-- TMPL_INCLUDE NAME="more_search.inc" --><!-- fin modif brisees --></div>
-	<!-- TMPL_ELSE -->
-		<!-- TMPL_IF NAME="loggedinusername" --><div class="suggestion">Not finding what you're looking for?<br />  Make a <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">purchase suggestion</a><!-- debut modif brisees --> or <!-- TMPL_INCLUDE NAME="more_search.inc" --></div>
-		<!-- TMPL_ELSE --><div class="suggestion">Not finding what you're looking for?<br /><!-- TMPL_INCLUDE NAME="more_search.inc" --></div>
-		<!-- /TMPL_IF --><!-- fin modif brisees -->
-	<!-- /TMPL_IF -->
-<!-- /TMPL_IF -->
--->
+
 </div>
 </div>
 </div>
