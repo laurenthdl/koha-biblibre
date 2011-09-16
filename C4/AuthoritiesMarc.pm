@@ -1383,7 +1383,7 @@ sub _process_subfcode_4_merge{
         my $chronological_auth=_test_string('chronologique',$authorityrecord->field('3..'));
         my $subfz_absent= not _test_subfcode_presence($authoritysubfields,'z');
         if (_test_subfcode_presence($bibliosubfields,"a")){
-        if ($authtag == '215'){
+        if ($authtag->{'auth_type_code'} eq '215'){
            return "y";
         }
         elsif ($chronological_auth and $subfz_absent) {
@@ -1392,7 +1392,7 @@ sub _process_subfcode_4_merge{
         else {
          return "x";
             }
-        }   
+        }
         return;
     }
     return;
@@ -1475,8 +1475,8 @@ sub merge {
     foreach my $marcrecord(@reccache){
         foreach my $tagfield (@tags_using_authtype){
             foreach my $field ($marcrecord->field($tagfield)){
-                my $update;           
-                my $tag=$field->tag();          
+                my $update;
+                my $tag=$field->tag();
 		my @newsubfields;
 		my %indexes;
 		#get to next field if no subfield
@@ -1521,7 +1521,7 @@ sub merge {
 
         my @previous_subfields=@localsubfields[0 .. $index_9_auth];
         if (my $changesubfcode = _process_subfcode_4_merge($tag,\@previous_subfields,$MARCto,\@record_to)){
-            $record_to[0]->[0]=$changesubfcode;
+            $record_to[0]->[0]=$changesubfcode if defined ($changesubfcode);
         }
 		#my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
 		#$debug && warn @tags;
