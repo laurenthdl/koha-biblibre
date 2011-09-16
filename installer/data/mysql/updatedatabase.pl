@@ -6153,28 +6153,6 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.06.00.048";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(qq{
-INSERT INTO issuingrules (
-branchcode,categorycode,itemtype,restrictedtype,rentaldiscount,
-reservecharge, fine, finedays, chargeperiod, accountsent, chargename, maxissueqty, issuelength,
-allowonshelfholds, holdrestricted, holdspickupdelay, renewalsallowed, renewalperiod
-)
-SELECT  IF(branchcode='*','Default',branchcode),
-        IF(categorycode='*','Default',categorycode),
-        IF(itemtype='*','Default',itemtype), 
-        restrictedtype,rentaldiscount,
-        reservecharge, fine, finedays, chargeperiod,
-        accountsent, chargename, maxissueqty, issuelength,
-        allowonshelfholds, holdrestricted, holdspickupdelay, 
-        renewalsallowed, renewalperiod
-    FROM issuingrules where branchcode='*' or itemtype='*' or categorycode='*';
-    });
-    print "Upgrade to $DBversion done (Ajout des règles de prêt pour les prêts par défauts)\n";
-    SetVersion($DBversion);
-}
-
 $DBversion = "3.06.00.039";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("
@@ -6267,11 +6245,40 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.048";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+INSERT INTO issuingrules (
+branchcode,categorycode,itemtype,restrictedtype,rentaldiscount,
+reservecharge, fine, finedays, chargeperiod, accountsent, chargename, maxissueqty, issuelength,
+allowonshelfholds, holdrestricted, holdspickupdelay, renewalsallowed, renewalperiod
+)
+SELECT  IF(branchcode='*','Default',branchcode),
+        IF(categorycode='*','Default',categorycode),
+        IF(itemtype='*','Default',itemtype), 
+        restrictedtype,rentaldiscount,
+        reservecharge, fine, finedays, chargeperiod,
+        accountsent, chargename, maxissueqty, issuelength,
+        allowonshelfholds, holdrestricted, holdspickupdelay, 
+        renewalsallowed, renewalperiod
+    FROM issuingrules where branchcode='*' or itemtype='*' or categorycode='*';
+    });
+    print "Upgrade to $DBversion done (Ajout des règles de prêt pour les prêts par défauts)\n";
+    SetVersion($DBversion);
+}
+
 
 $DBversion = "3.06.00.049";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SearchOPACHides','','Construct the opac query with this string at the end.','','Free');");
     print "Upgrade to $DBversion done (Add System Preferences SearchOPACHides)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.050";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{UPDATE `systempreferences` SET options=CONCAT(options,"|SolrIndexOff") WHERE variable ='SearchEngine'});
+    print "Upgrade to $DBversion done (Update System Preferences SearchEngine with SolrIndexOff)\n";
     SetVersion($DBversion);
 }
 
