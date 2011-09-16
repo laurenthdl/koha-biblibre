@@ -220,6 +220,7 @@ Vous pouvez rechercher ce document dans :
 <li><a href="http://www.sudoc.abes.fr">Le catalogue Sudoc</a></li>
 </p>
 <p>
+<p>Besoin d'aide ? Un bibliothécaire vous répond en chat.</p>
 <div id="qpchatwidget" ></div>
 <script id="qp.bootstrap" type="text/javascript" src="http://www.questionpoint.org/crs/js/qwidget/qp.bootstrap.js?langcode=2&instid=13282&skin=gray&size=standard" [^] charset="utf-8">//<noscript>Veuillez activer le javascript pour utiliser le Chat avec les bibliothécaires en ligne></noscript></script>
 </p>
