@@ -2858,9 +2858,11 @@ sub IndexRecord {
 }
 
 sub AddToIndexQueue {
-    my $search = C4::Search::Engine->new();
-    $search->find_searchengine;
-    return $search->add_to_index_queue( @_ );
+    if (!(C4::Context->preference('SearchEngine')=~/IndexOff/i)){
+        my $search = C4::Search::Engine->new();
+        $search->find_searchengine;
+        return $search->add_to_index_queue( @_ );
+    }
 }
 
 
