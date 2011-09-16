@@ -328,10 +328,7 @@ if ( C4::Context->preference('TagsEnabled') ) {
     }
 }
 
-my $total = 0;
-my $res;
 my $query_desc;
-
 my $tag = $cgi->param('tag');
 if ($tag) {
     $query_desc = "tag=$tag";
@@ -357,16 +354,16 @@ my $q_mod = $end_query
         : $q;
 
 # perform the search
-$res = SimpleSearch( $q_mod, \%filters, $page, $count, $sort_by);
-C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q:";
+my $res = SimpleSearch( $q_mod, \%filters, $page, $count, $sort_by);
+C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q_mod:";
 
-if (!$res){
-    $template->param(query_error => "Bad request! help message ?");
+if ($$res{error}){
+    $template->param(query_error => $$res{error});
     output_with_http_headers $cgi, $cookie, $template->output, 'html';
     exit;
 }
 
-$total = $res->{'pager'}->{'total_entries'},
+my $total = $res->{'pager'}->{'total_entries'},
 
 $session->param('currentsearchisoneresult', '0'); # init is only one result
 # href for back to results

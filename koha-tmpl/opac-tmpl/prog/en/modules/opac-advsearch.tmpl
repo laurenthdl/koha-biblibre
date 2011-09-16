@@ -3,17 +3,28 @@
     Catalog &rsaquo; Advanced Search
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 <script type="text/JavaScript" language="JavaScript">
-    $(document).ready(function() {
+
+   $(document).ready(function() {
+        $("input[name=q]:eq(0)").focus();
         advSearchPrepare();
         $(".advsearch").change(); //force update if back button is pushed
         $('select[name="idx"]').attr('disabled', false);
         $('select[name="op"]').attr('disabled', false);
+        set_values();
     });
 
-  function advSearchPrepare () {
+  function set_values() {
+    var ids = $.session("advsearch_checkboxes") || new Array();
+    $("input:checkbox[name='filters']").each( function() {
+        $(this).attr('checked', false);
+        if ( ids.indexOf($(this).attr('id')) > -1 ) {
+            $(this).attr('checked', true);
+        }
+    } );
+  }
 
-//    $(".advsearch").each( function (this) {getAuthorisedValuesList(this)});
-//    $(".advsearch").load( function () {getAuthorisedValuesList($(this))});
+
+  function advSearchPrepare () {
     $(".advsearch").each( function () {getAuthorisedValuesList($(this))});
     <!-- TMPL_LOOP NAME="indexandavlist" -->
     $(".advsearch").find("option").each(function () {
@@ -42,6 +53,20 @@
         $(first_select).attr('disabled', false);
         $(first_select).find('~ input').attr('disabled', false);
     }
+    return saveValues();
+  }
+
+  function saveValues(){
+    var ids = [];
+    var avlist = [];
+    $("input:checkbox[name='filters'][checked]").each( function() {
+        ids.push($(this).attr('id'));
+    } );
+    $("select[name='q']").each( function() {
+        avlist.push($(this).find("option:selected").val());
+    } );
+    $.session("advsearch_checkboxes", ids);
+    $.session("avlist", avlist);
     return true;
   }
 

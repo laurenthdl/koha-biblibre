@@ -204,7 +204,7 @@
 </div>
 <div id="breadcrumbs" class="yui-g">
 <!-- TMPL_IF NAME="searchdesc" --><p><!-- TMPL_IF name="total" --><strong>&ldquo;<!-- TMPL_VAR NAME="query_desc" ESCAPE="HTML"--><!-- TMPL_LOOP NAME="filters" --> <!-- TMPL_VAR NAME="ind" -->:<!-- TMPL_VAR NAME="val" --><!-- /TMPL_LOOP -->&rdquo; </strong>returned <!-- TMPL_VAR NAME="total" ESCAPE="HTML"--> results. <!-- TMPL_IF NAME="related" --> (related searches: <!-- TMPL_LOOP NAME="related" --><!-- TMPL_VAR NAME="related_search" --><!-- /TMPL_LOOP -->). <!-- /TMPL_IF -->
-<a href="<!-- TMPL_VAR NAME="OPACBaseURL" -->/cgi-bin/koha/opac-search.pl?<!-- TMPL_VAR name="query_cgi" ESCAPE="HTML" --><!-- TMPL_VAR NAME="limit_cgi"  ESCAPE="HTML" --><!-- TMPL_IF NAME="sort_by" -->&amp;sort_by=<!-- TMPL_VAR NAME="sort_by" ESCAPE="HTML" --><!-- /TMPL_IF -->&amp;format=rss2"><img src="/opac-tmpl/prog/images/feed-icon-16x16.png" alt="Subscribe to this search" title="Subscribe to this search" border="0" /></a>
+<a href="<!-- TMPL_VAR NAME="OPACBaseURL" -->/cgi-bin/koha/opac-search.pl?<!-- TMPL_LOOP NAME="follower_params" --><!--TMPL_IF EXPR="ind ne 'filters'"--><!-- TMPL_VAR ESCAPE="URL" NAME="ind" -->=<!-- TMPL_VAR ESCAPE="URL" NAME="val" -->&amp;<!-- /TMPL_IF --><!-- /TMPL_LOOP --><!-- TMPL_LOOP NAME="filters" -->&amp;filters=<!--TMPL_VAR ESCAPE="URL" NAME="ind"-->:&quot;<!--TMPL_VAR ESCAPE="URL" NAME="val"-->&quot;<!-- /TMPL_LOOP -->&amp;format=rss2"><img src="/opac-tmpl/prog/images/feed-icon-16x16.png" alt="Subscribe to this search" title="Subscribe to this search" border="0" /></a>
 <!-- TMPL_ELSE -->
 <strong>No Result found!</strong>
 <p>
@@ -220,6 +220,7 @@ Vous pouvez rechercher ce document dans :
 <li><a href="http://www.sudoc.abes.fr">Le catalogue Sudoc</a></li>
 </p>
 <p>
+<p>Besoin d'aide ? Un bibliothécaire vous répond en chat.</p>
 <div id="qpchatwidget" ></div>
 <script id="qp.bootstrap" type="text/javascript" src="http://www.questionpoint.org/crs/js/qwidget/qp.bootstrap.js?langcode=2&instid=13282&skin=gray&size=standard" [^] charset="utf-8">//<noscript>Veuillez activer le javascript pour utiliser le Chat avec les bibliothécaires en ligne></noscript></script>
 </p>

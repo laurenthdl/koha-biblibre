@@ -252,7 +252,7 @@ if ( $op ne "do_search" ) {
                 if ( $numresults > 0 ) {
                     my $first = ( $server_page[$serverid[$k]] - 1 ) * $pagesize;
                     my $last = $first + ( ( $numresults - $first ) < $pagesize ? $numresults - $first : $pagesize );
-                    $oResult[$k]->records($first, $pagesize, 0);
+                    $oResult[$k]->records($first, $last, 0);
                     for ( $i = $first ; $i < $last ; $i++ ) {
                         my $rec = $oResult[$k]->record($i);
                         if ($rec) {

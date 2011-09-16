@@ -110,17 +110,13 @@ if ( $count == 1 ) {
     my $order = $order;
     if ( C4::Context->preference('AcqCreateItem') eq 'receiving' ) {
 
-        # prepare empty item form
-        my $cell = PrepareItemrecordDisplay( '', '', '', 'ACQ' );
-        unless ($cell) {
-            $cell = PrepareItemrecordDisplay( '', '', '', '' );
+        # Check if ACQ framework exists
+        my $marc = GetMarcStructure( 1, 'ACQ' );
+        unless ($marc) {
             $template->param( 'NoACQframework' => 1 );
         }
-        my @itemloop;
-        push @itemloop, $cell;
 
         $template->param(
-            items => \@itemloop,
             AcqCreateItemReceiving => 1
         );
     } elsif ( C4::Context->preference('AcqCreateItem') eq 'ordering' ) {

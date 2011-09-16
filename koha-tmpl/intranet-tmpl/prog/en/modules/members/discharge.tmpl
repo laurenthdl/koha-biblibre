@@ -23,6 +23,7 @@
 	<div class="yui-b">
 <div class="yui-g">
 <h3>Discharge</h3>
+<!-- TMPL_IF NAME="error" --><p class="warning">An error has occured while generating the discharge. Please retry later or contact your administrator.</p><!-- /TMPL_IF -->
 <!-- TMPL_IF NAME="hasissues" --><p>Cannot edit discharge: borrower has issues.</p><!-- TMPL_ELSE -->
     <!-- TMPL_IF NAME="hasreserves" --><p>Borrower has reserves: they will be canceled if the discharge is generated.</p><!-- /TMPL_IF -->
     <form method="post">

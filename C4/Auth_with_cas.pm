@@ -71,7 +71,7 @@ sub logout_cas {
     $uri .= "?cas=" . $casparam if (defined $casparam);
     $casparam = $defaultcasserver if (not defined $casparam);
     my $cas = Authen::CAS::Client->new($casservers->{$casparam});
-    print $query->redirect( $cas->logout_url($uri));
+    print $query->redirect( $cas->logout_url(url => $uri));
 }
 
 # Login to CAS

@@ -30,6 +30,7 @@ use Data::SearchEngine::Solr::Results;
 use Time::Progress;
 use Moose;
 use List::MoreUtils qw(uniq);
+use XML::Simple;
 
 extends 'Data::SearchEngine::Solr';
 
@@ -373,9 +374,22 @@ sub SimpleSearch {
 
     # Get results
     my $result = eval { $sc->search( $sq ) };
-    warn $@ if $@;
 
-    return $result if (ref($result) eq "Data::SearchEngine::Solr::Results");
+    # Get error if exists
+    if ( $@ ) {
+        my $err = $@;
+
+        warn $err;
+
+        $err =~ s#^[^\n]*\n##; # Delete first line
+        if ( not $err =~ 'Connection refused' ) {
+            my $document = XMLin( $err );
+            $err = "$$document{body}{h2} : $$document{body}{pre}";
+        }
+       $$result{error} = $err;
+    }
+
+    return $result; # if (ref($result) eq "Data::SearchEngine::Solr::Results");
 }
 
 =head2 AddRecordToIndexRecordQueue

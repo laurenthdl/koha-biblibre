@@ -384,8 +384,8 @@ my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
 C4::Context->preference("DebugLevel") eq '2' && warn "ProSolrSimpleSearch:q=$q:";
 
-if (!$res){
-    $template->param(query_error => "Bad request! help message ?");
+if ($$res{error}){
+    $template->param(query_error => $$res{error});
     output_with_http_headers $cgi, $cookie, $template->output, 'html';
     exit;
 }
