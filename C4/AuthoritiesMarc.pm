@@ -1126,7 +1126,7 @@ sub _process_subfcode_4_merge{
         my $chronological_auth=_test_string('chronologique',$authorityrecord->field('3..'));
         my $subfz_absent= not _test_subfcode_presence($authoritysubfields,'z');
         if (_test_subfcode_presence($bibliosubfields,"a")){
-        if ($authtag == '215'){
+        if ($authtag->{'auth_type_code'} eq '215'){
            return "y";
         }
         elsif ($chronological_auth and $subfz_absent) {
@@ -1135,7 +1135,7 @@ sub _process_subfcode_4_merge{
         else {
          return "x";
             }
-        }   
+        }
         return;
     }
     return;
@@ -1216,64 +1216,85 @@ sub merge {
 #        $tag_to=$sth->fetchrow;
 #        #warn $tag_to;    
 #    }  
-    foreach my $marcrecord(@reccache){
-        foreach my $tagfield (@tags_using_authtype){
-            foreach my $field ($marcrecord->field($tagfield)){
-                my $update;           
-                my $tag=$field->tag();          
+    foreach my $marcrecord (@reccache) {
+        foreach my $tagfield (@tags_using_authtype) {
+            foreach my $field ( $marcrecord->field($tagfield) ) {
+                my $update;
+                my $tag = $field->tag();
                 my @newsubfields;
                 my %indexes;
+
                 #get to next field if no subfield
                 my @localsubfields = $field->subfields();
-                my $index_9_auth =0;
-                my $found =0;
+                my $index_9_auth   = 0;
+                my $found          = 0;
                 for my $subf (@localsubfields) {
-                #			$debug && warn Data::Dumper::Dumper($subf);
-                    if (($subf->[0] eq "9") and ($subf->[1] == $mergefrom))
-                    {
-                        $found=1;
-                        $debug && warn "found $mergefrom ".$subf->[1];
+
+                    #			$debug && warn Data::Dumper::Dumper($subf);
+                    if (    ( $subf->[0] eq "9" )
+                        and ( $subf->[1] == $mergefrom ) ) {
+                        $found = 1;
+                        $debug && warn "found $mergefrom " . $subf->[1];
                         last;
                     }
                     $index_9_auth++;
                 }
 
                 #$debug && warn "$index_9_auth $#localsubfields $found";
+                next if ( $index_9_auth >= $#localsubfields and !$found );
 
-                next if ($index_9_auth >= $#localsubfields and !$found);
-                #Get the next $9 subfield
-
-                my $index=0;
-                for my $subf (@localsubfields[0 .. $index_9_auth]) {
-                    if (any {$subf->[0] eq $_->[0] and $subf->[1] eq $_->[1]} @record_from )
-                    {
-                        $debug && warn "found $subf->[0] ".$subf->[1];
-                        splice @localsubfields,$index,1;
+                # Removes the data if before the $9
+                my $index = 0;
+                for my $subf ( @localsubfields[ 0 .. $index_9_auth ] ) {
+                    if (any {
+                                    $subf->[0] eq $_->[0]
+                                and $subf->[1] eq $_->[1];
+                        }
+                        @record_from
+                        ) {
+                        $debug && warn "found $subf->[0] " . $subf->[1];
+                        splice @localsubfields, $index, 1;
                         $index_9_auth--;
-                    }
-                    else {
+                    } else {
                         $index++;
                     }
                 }
-        #Get the next $9 subfield
-        my $nextindex_9 = 0;
-        for my $subf (
-            @localsubfields[ $index_9_auth + 1 .. $#localsubfields ] ) {
-            last if ( $subf->[0] =~ /[12456789]/ );
-            $nextindex_9++;
-        }
+
+                #Get the next $9 subfield
+                my $nextindex_9 = 0;
+                for my $subf (
+                    @localsubfields[ $index_9_auth + 1 .. $#localsubfields ] )
+                {
+                    last if ( $subf->[0] =~ /[12456789]/ );
+                    $nextindex_9++;
+                }
 
       #Change the first tag if required
       # That is : change the first tag ($a) to what it is in the biblio record
       # Since some composed authorities will place the $a into $x or $y
 
-        my @previous_subfields = @localsubfields[ 0 .. $index_9_auth ];
-        if (my $changesubfcode = _process_subfcode_4_merge(
-                $tag, \@previous_subfields, $MARCto, \@record_to
-            )
-            ) {
-            $record_to[0]->[0] = $changesubfcode;
-        }
+                my @previous_subfields
+                    = @localsubfields[ 0 .. $index_9_auth ];
+                if (my $changesubfcode = _process_subfcode_4_merge(
+                        $tag, \@previous_subfields, $MARCto, \@record_to
+                    )
+                    ) {
+                    $record_to[0]->[0] = $changesubfcode
+                        if defined($changesubfcode);
+                }
+
+      #Change the first tag if required
+      # That is : change the first tag ($a) to what it is in the biblio record
+      # Since some composed authorities will place the $a into $x or $y
+
+                my @previous_subfields
+                    = @localsubfields[ 0 .. $index_9_auth ];
+                if (my $changesubfcode = _process_subfcode_4_merge(
+                        $tag, \@previous_subfields, $MARCto, \@record_to
+                    )
+                    ) {
+                    $record_to[0]->[0] = $changesubfcode;
+                }
 
 #my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
 #$debug && warn @tags;
@@ -1287,42 +1308,53 @@ sub merge {
 #		}
 #$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
 # Replace in local subfields the subfields related to recordfrom with data from record_to
-        splice(
-            @localsubfields, $index_9_auth,
-            $nextindex_9 + 1,
-            ( [ 9, $mergeto ], @record_to )
-        );
+                splice(
+                    @localsubfields, $index_9_auth,
+                    $nextindex_9 + 1,
+                    ( [ 9, $mergeto ], @record_to )
+                );
 
     #$debug && warn "after splice ".Data::Dumper::Dumper(@localsubfields);
     #very nice api for MARC::Record
     # It seems that some elements localsubfields can be undefined so skip them
-        @newsubfields = map { ( defined $_ ? @$_ : () ) } @localsubfields;
+                @newsubfields
+                    = map { ( defined $_ ? @$_ : () ) } @localsubfields;
 
-        #filter to subfields which are not in the subfield
-                my $field_to=MARC::Field->new(($tag_to?$tag_to:$tag),$field->indicator(1),$field->indicator(2),@newsubfields);
+                #filter to subfields which are not in the subfield
+                my $field_to = MARC::Field->new(
+                    ( $tag_to ? $tag_to : $tag ), $field->indicator(1),
+                    $field->indicator(2), @newsubfields
+                );
                 $marcrecord->delete_field($field);
-                $marcrecord->insert_fields_ordered($field_to);            
+                $marcrecord->insert_fields_ordered($field_to);
             }    #for each tag
         }    #foreach tagfield
-        my ( $bibliotag, $bibliosubf ) = GetMarcFromKohaField( "biblio.biblionumber", "" );
+        my ( $bibliotag, $bibliosubf )
+            = GetMarcFromKohaField( "biblio.biblionumber", "" );
         my $biblionumber;
         if ( $bibliotag < 10 ) {
             $biblionumber = $marcrecord->field($bibliotag)->data;
         } else {
             $biblionumber = $marcrecord->subfield( $bibliotag, $bibliosubf );
         }
-	#    $debug && warn $biblionumber,$marcrecord->as_formatted;
-        unless ($biblionumber){
-            warn "pas de numéro de notice bibliographique dans : ".$marcrecord->as_formatted;
+
+        #    $debug && warn $biblionumber,$marcrecord->as_formatted;
+        unless ($biblionumber) {
+            warn "pas de numéro de notice bibliographique dans : "
+                . $marcrecord->as_formatted;
             next;
         }
+
         #if ( $update == 1 ) {
-            &ModBiblio( $marcrecord, $biblionumber, GetFrameworkCode($biblionumber) );
-            $counteditedbiblio++;
-            warn $counteditedbiblio if ( ( $counteditedbiblio % 10 ) and $ENV{DEBUG} );
+        &ModBiblio( $marcrecord, $biblionumber,
+            GetFrameworkCode($biblionumber) );
+        $counteditedbiblio++;
+        warn $counteditedbiblio
+            if ( ( $counteditedbiblio % 10 ) and $ENV{DEBUG} );
+
         #}
     }    #foreach $marc
-    DelAuthority($mergefrom) if ($mergefrom != $mergeto);
+    DelAuthority($mergefrom) if ( $mergefrom != $mergeto );
     return $counteditedbiblio;
 
     # now, find every other authority linked with this authority
