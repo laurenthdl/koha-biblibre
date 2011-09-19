@@ -228,7 +228,7 @@ if ( $action eq "cancelorder" ) {
             $template->param( success_delorder => 1 );
         }
 
-        print $input->redirect( '/cgi-bin/koha/acqui/parcel.pl?supplierid=' . $input->param('supplierid') . '&op=new&invoice=' . $input->param('invoice') . '&datereceived=' . $input->param('invoicedatereceived'));
+        print $input->redirect( '/cgi-bin/koha/acqui/parcel.pl?supplierid=' . $input->param('supplierid') . '&invoice=' . $input->param('invoice') . '&datereceived=' . $input->param('invoicedatereceived'));
         exit;
     } else {
         $template->param(
