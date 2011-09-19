@@ -117,6 +117,22 @@ unless ( $category_type or !($categorycode) ) {
     $template->param( "categoryname" => $category_name );
 }
 
+# function to designate unwanted fields
+my $borrowerUnwantedField=C4::Context->preference("BorrowerUnwantedField");
+my @list_by_category = split /;/, $borrowerUnwantedField;
+for my $list ( @list_by_category ) {
+    my @values = split /:/, $list;
+    my @fields;
+    if ( @values > 1 ) {
+        next if $values[0] eq $categorycode;
+        @fields = $values[1];
+    }
+    @fields = split /\|/, $list;
+    for ( @fields ) {
+        $template->param( "no$_" => 1 );
+    }
+}
+
 $category_type = "A" unless $category_type;                                              # FIXME we should display a error message instead of a 500 error !
 # if a add or modify is requested => check validity of data.
 %data = %$borrower_data if ($borrower_data);
@@ -151,7 +167,7 @@ if ( $op eq 'insert' || $op eq 'modify' || $op eq 'save' || $op eq 'duplicate' )
     my $dateobject = C4::Dates->new();
     my $syspref    = $dateobject->regexp();         # same syspref format for all 3 dates
     my $iso        = $dateobject->regexp('iso');    #
-    foreach (qw(dateenrolled dateexpiry dateofbirth debarred)) {
+    foreach (qw(dateenrolled dateexpiry dateofbirth debarred endguaranteedate)) {
         next unless exists $newdata{$_};
         my $userdate = $newdata{$_} or next;
         if ( $userdate =~ /$syspref/ ) {
@@ -248,7 +264,7 @@ if ( ( defined $newdata{'userid'} ) && ( $newdata{'userid'} eq '' ) ) {
     $newdata{'userid'} = Generate_Userid( $borrowernumber, $newdata{'firstname'}, $newdata{'surname'} );
 }
 
-$debug and warn join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry);
+$debug and warn join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry endguaranteedate);
 my $extended_patron_attributes = ();
 if ( $op eq 'save' || $op eq 'insert' ) {
     # If cardnumber is not defined generate cardnumber
@@ -312,7 +328,7 @@ if ( ( defined $input->param('SMSnumber') ) && ( $input->param('SMSnumber') ne $
 ###  Error checks should happen before this line.
 $nok = $nok || scalar(@errors);
 if ( ( !$nok ) and $nodouble and ( $op eq 'insert' or $op eq 'save' ) ) {
-    $debug and warn "$op dates: " . join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry);
+    $debug and warn "$op dates: " . join "\t", map { "$_: $newdata{$_}" } qw(dateofbirth dateenrolled dateexpiry endguaranteedate);
     if ( $op eq 'insert' ) {
 
         # we know it's not a duplicate borrowernumber or there would already be an error
@@ -644,7 +660,7 @@ if ( C4::Context->preference('uppercasesurnames') ) {
 
 $data{debarred} = C4::Overdues::CheckBorrowerDebarred($borrowernumber);
 $data{datedebarred} = $data{debarred} if ( $data{debarred} ne "9999-12-31" );
-foreach (qw(dateenrolled dateexpiry dateofbirth debarred)) {
+foreach (qw(dateenrolled dateexpiry dateofbirth debarred endguaranteedate)) {
     my $userdate = $data{$_};
     $debug and printf STDERR "%s : %s", $_, $userdate;
     unless ($userdate && $userdate ne "0000-00-00") {

@@ -286,3 +286,4 @@ INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SubscriptionDuplicateDroppedInput','','','Liste des champs à ne pas dupliquer lors de la duplication d\'un abonnement (séparés par un point-virgule)','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('FinesDependsOnGracePeriod',0,'','Si Oui, les amendes commencent après le délais de grâce. Sinon, elles commencent juste après le retour','YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numFacetsDisplay','100','Correspond au nombre maximum de facettes à afficher pour un index','','Integer')
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BorrowerUnwantedField','','Nom des champs à ne pas afficher et stocker pour un compte lecteur',NULL,'free');
