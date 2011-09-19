@@ -142,12 +142,11 @@ sub get_xisbns {
 
 sub _get_url {
     my ( $url, $service_type ) = @_;
-    my $ua = LWP::UserAgent->new( timeout => 2 );
+    my $ua = LWP::UserAgent->new( timeout => 10 );
 
     my $response = $ua->get($url);
-    if ( $response->is_success ) {
-        warn "WARNING could not retrieve $service_type $url" unless $response;
-        if ($response) {
+    if ($response) {
+        if ( $response->is_success ) {
             my $xmlsimple = XML::Simple->new();
             my $content   = $xmlsimple->XMLin(
                 $response->content,
@@ -155,11 +154,14 @@ sub _get_url {
                 ForceContent => 1,
             );
             return $content;
+        } else {
+            warn "WARNING: URL Request Failed " . $response->status_line . "\n";
         }
     } else {
-        warn "WARNING: URL Request Failed " . $response->status_line . "\n";
+        warn "WARNING could not retrieve $service_type $url";
     }
 
+    return undef;
 }
 
 # Throttle services to the specified amount
