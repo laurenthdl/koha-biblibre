@@ -6247,6 +6247,27 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.054";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE borrowers ADD endguaranteedate DATE DEFAULT NULL");
+    print "Upgrade to $DBversion done (Adds borrowers.endguaranteedate field)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.055";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE borrowers ADD sudoc_login VARCHAR(255) DEFAULT NULL");
+    print "Upgrade to $DBversion done (Adds borrowers.sudoc_login field)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.056";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BorrowerUnwantedField','','Name the fields you don\\'t need to store for a patron\\'s account',NULL,'free');");
+    print "Upgrade to $DBversion done (Add System Preferences BorrowerUnwantedField)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table

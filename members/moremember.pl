@@ -125,8 +125,8 @@ my $category_type = $data->{'category_type'};
 # in template <TMPL_IF name="I"> => instutitional (A for Adult& C for children)
 $template->param( $data->{'categorycode'} => 1 );
 
-$debug and printf STDERR "dates (enrolled,expiry,birthdate) raw: (%s, %s, %s)\n", map { $data->{$_} } qw(dateenrolled dateexpiry dateofbirth);
-foreach (qw(dateenrolled dateexpiry dateofbirth)) {
+$debug and printf STDERR "dates (enrolled,expiry,birthdate) raw: (%s, %s, %s)\n", map { $data->{$_} } qw(dateenrolled dateexpiry dateofbirth endguaranteedate);
+foreach (qw(dateenrolled dateexpiry dateofbirth endguaranteedate)) {
     my $userdate = $data->{$_};
     $debug and printf STDERR "%s : %s", $_, $userdate;
     unless ($userdate && $userdate ne "0000-00-00") {
@@ -247,7 +247,6 @@ my $totalprice     = 0;
 
 my @issuedata = build_issue_data($issue, $issuecount);
 my @relissuedata = build_issue_data($relissue, $relissuecount);
-#warn Data::Dumper::Dumper(@issuedata);
 
 sub build_issue_data {
     my $issue = shift;
