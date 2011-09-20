@@ -91,9 +91,42 @@ $(document).ready(function() {
 
 <p>Query is: <strong><!-- TMPL_VAR NAME='query' --></strong></p>
 
+<div class="searchresults">
+    <table id="orderst" class="display">
+        <thead>
+            <tr>
+               <th>Summary</th>
+               <th>Publisher</th>
+               <th>Copyright</th>
+               <th>&nbsp;</th>
+               <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="spacer"></div>
+</div>
+
+<fieldset id="acqui_basket_add">
+        <legend>Add To Order</legend>
+        <form action="/cgi-bin/koha/acqui/neworderbiblio.pl" method="post">
+            <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME="booksellerid" -->" />
+            <input type="hidden" name="basketno" value="<!-- TMPL_VAR NAME="basketno" -->" />
+            <ul><li><label for="q">From an existing record: </label><input id="q" type="text"  size="25" name="q" />
+            <input type="submit" class="submit" value="Search" /></li>
+            <li><a href="/cgi-bin/koha/acqui/newordersuggestion.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">From a Suggestion</a></li>
+            <li><a href="/cgi-bin/koha/acqui/neworderempty.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">From a new (empty) record</a></li>
+            </ul>
+        </form>
+    </fieldset>
+
+</div>
+</div>
+
+<div class="yui-b">
 <form onsubmit="return filter();">
-    <fieldset class="rows">
-        <legend>Filters</legend>
+    <fieldset class="brief">
+        <h3>Filters</h3>
         <ol>
             <li>
                 <label for="title_filter">Title:</label>
@@ -130,41 +163,6 @@ $(document).ready(function() {
         </fieldset>
     </fieldset>
 </form>
-
-<div class="spacer"></div>
-
-<div class="searchresults">
-    <table id="orderst" class="display">
-        <thead>
-            <tr>
-               <th>Summary</th>
-               <th>Publisher</th>
-               <th>Copyright</th>
-               <th>&nbsp;</th>
-               <th>&nbsp;</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <div class="spacer"></div>
-</div>
-
-<fieldset id="acqui_basket_add">
-        <legend>Add To Order</legend>
-        <form action="/cgi-bin/koha/acqui/neworderbiblio.pl" method="post">
-            <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME="booksellerid" -->" />
-            <input type="hidden" name="basketno" value="<!-- TMPL_VAR NAME="basketno" -->" />
-            <ul><li><label for="q">From an existing record: </label><input id="q" type="text"  size="25" name="q" />
-            <input type="submit" class="submit" value="Search" /></li>
-            <li><a href="/cgi-bin/koha/acqui/newordersuggestion.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">From a Suggestion</a></li>
-            <li><a href="/cgi-bin/koha/acqui/neworderempty.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">From a new (empty) record</a></li>
-            </ul>
-        </form>
-    </fieldset>
-
-</div>
-</div>
-<div class="yui-b">
 <!-- TMPL_INCLUDE NAME="acquisitions-menu.inc" -->
 </div>
 </div>
