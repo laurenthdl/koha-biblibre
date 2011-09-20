@@ -15,6 +15,11 @@
 
 <script type="text/javascript">
 //<![CDATA[
+    $(document).ready(function() {
+        if ( $("#branches option:selected").length < 1 ) {
+            $("#branches option:first").attr("selected", "selected");
+        }
+    } );
 
 function DoCancel(f) {
   f.op.value='';
@@ -148,6 +153,20 @@ this feature on.</div>
             <span>Authorized value category; if one is selected, the patron record input page will only allow values 
                   to be chosen from the authorized value list.  However, an authorized value list is not 
                   enforced during batch patron import.</span>
+        </li>
+        <li><label for="branches">Branches limitation: </label>
+            <select id="branches" name="branches" multiple size="10">
+                <option value="">All branches</option>
+                <!-- TMPL_LOOP NAME="branches_loop" -->
+                  <!-- TMPL_IF NAME="selected" -->
+                    <option selected="selected" value="<!-- TMPL_VAR NAME='branchcode' -->"><!-- TMPL_VAR NAME="branchname" --></option>
+                  <!-- TMPL_ELSE -->
+                    <option value="<!-- TMPL_VAR NAME='branchcode' -->"><!-- TMPL_VAR NAME="branchname" --></option>
+                  <!-- /TMPL_IF -->
+                <!-- /TMPL_LOOP -->
+            </select>
+            <span>Select All if this attribute type must to be displayed all the time. Otherwise select librairies you want to associate with this value.
+            </span>
         </li>
     </ol>
   </fieldset>

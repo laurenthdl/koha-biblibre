@@ -23,6 +23,7 @@ use strict;
 #use warnings; FIXME - Bug 2505
 use CGI;
 use C4::Auth;
+use C4::Branch;
 use C4::Context;
 use C4::Output;
 use C4::Koha;
@@ -153,6 +154,9 @@ sub add_update_attribute_type {
     my $display_checkout = $input->param('display_checkout');
     $attr_type->display_checkout($display_checkout);
 
+    my @branches = $input->param('branches');
+    $attr_type->branches( \@branches );
+
     if ( $op eq 'edit' ) {
         $template->param( edited_attribute_type => $attr_type->code() );
     } else {
@@ -232,6 +236,20 @@ sub edit_attribute_type_form {
     }
     authorised_value_category_list( $template, $attr_type->authorised_value_category() );
 
+    my $branches = GetBranches;
+    my @branches_loop;
+    my $selected_branches = $attr_type->branches;
+
+    foreach my $branch (sort keys %$branches) {
+        my $selected = ( grep {$$_{branchcode} eq $branch} @$selected_branches ) ? 1 : 0;
+        push @branches_loop, {
+            branchcode => $$branches{$branch}{branchcode},
+            branchname => $$branches{$branch}{branchname},
+            selected => $selected,
+        };
+    }
+    $template->param( branches_loop => \@branches_loop );
+
     $template->param(
         attribute_type_form => 1,
         edit_attribute_type => 1,
@@ -243,7 +261,7 @@ sub edit_attribute_type_form {
 sub patron_attribute_type_list {
     my $template = shift;
 
-    my @attr_types = C4::Members::AttributeTypes::GetAttributeTypes();
+    my @attr_types = C4::Members::AttributeTypes::GetAttributeTypes( undef );
     $template->param( available_attribute_types => \@attr_types );
     $template->param( display_list              => 1 );
 }

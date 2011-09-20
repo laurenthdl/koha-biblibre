@@ -79,6 +79,7 @@ marked for OPAC display are returned.
 sub GetBorrowerAttributes {
     my $borrowernumber = shift;
     my $opac_only = @_ ? shift : 0;
+    my $branch_limit = @_ ? shift : 0;
 
     my $dbh   = C4::Context->dbh();
     my $query = "SELECT code, description, attribute, lib, password, display_checkout
@@ -89,7 +90,7 @@ sub GetBorrowerAttributes {
     $query .= "\nAND opac_display = 1" if $opac_only;
     $query .= "\nORDER BY code, attribute";
     my $sth = $dbh->prepare_cached($query);
-    $sth->execute($borrowernumber);
+    $sth->execute( $borrowernumber );
     my @results = ();
     while ( my $row = $sth->fetchrow_hashref() ) {
         push @results,
