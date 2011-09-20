@@ -904,7 +904,7 @@ sub GetNextSeq {
 
     my $pattern = $val->{numberpattern};
     $calculated    = $val->{numberingmethod};
-    my $locale = $val->{locale}||setlocale(LC_TIME);
+    my $locale = $val->{locale};
     $newlastvalue1 = $val->{lastvalue1};
     $newlastvalue2 = $val->{lastvalue2};
     $newlastvalue3 = $val->{lastvalue3};
@@ -978,7 +978,7 @@ the sequence in integer format
 
 sub GetSeq {
     my ($val) = @_;
-    my $locale = $val->{locale}||setlocale(LC_TIME);
+    my $locale = $val->{locale};
 
     my $pattern = $val->{numberpattern};
     my $calculated = $val->{numberingmethod};
@@ -2872,9 +2872,13 @@ numeration_type can take :
 
 sub _numeration {
     my ($value,$num_type, $locale) = @_;
-    $locale=$locale|"en_US.UTF-8";
-    my $initlocale=setlocale(LC_TIME);
-    setlocale(LC_TIME,$locale);
+    my $initlocale;
+    $locale ||= setlocale(LC_TIME);
+    $locale = "" if ($locale eq "C");
+    if($locale) {
+        $initlocale = setlocale(LC_TIME);
+        setlocale(LC_TIME, $locale);
+    }
     my $string;
     $num_type //= '';
     if ($num_type =~/dayname/){
@@ -2892,19 +2896,25 @@ sub _numeration {
           $string="Not Implemented";
     }
     elsif ($num_type =~/season/){
-          my $seasonlocale=substr $locale,0,2;
+          my $seasonlocale = ($locale)
+                           ? (substr $locale,0,2)
+                           : "en";
           my %seasons=(
              "en" =>
-                [qw(Nothing Spring Summer Fall Winter)],
+                [qw(Spring Summer Fall Winter)],
              "fr"=>
-                [qw(Rien Printemps Été Automne Hiver)],
+                [qw(Printemps Été Automne Hiver)],
           );
-          $value=$value % 4;
-          $string=$seasons{$seasonlocale}->[$value];
+          $value = $value % 4;
+          $string = ($seasons{$seasonlocale})
+                  ? $seasons{$seasonlocale}->[$value]
+                  : $seasons{'en'}->[$value];
     } else {
         $string = $value;
     }
-    setlocale(LC_TIME,$initlocale);
+    if($locale) {
+        setlocale(LC_TIME, $initlocale);
+    }
     return $string;
 }
 
