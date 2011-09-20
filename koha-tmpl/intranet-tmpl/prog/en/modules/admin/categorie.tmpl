@@ -12,6 +12,11 @@
 		sortList: [[0,0]],
 		headers: { 10: { sorter: false}}
 	}).tablesorterPager({container: $("#pagertable_categorie"),positionFixed: false,size: 20});
+
+    if ( $("#branches option:selected").length < 1 ) {
+        $("#branches option:first").attr("selected", "selected");
+    }
+
 }); </script>
 <!-- TMPL_INCLUDE NAME="calendar.inc" -->
 <script type="text/javascript">
@@ -158,7 +163,22 @@
 					<!-- TMPL_IF NAME="type_P" --><option value="P" selected="selected">Professional</option><!-- TMPL_ELSE --><option value="P">Professional</option><!-- /TMPL_IF -->
 					<!-- TMPL_IF NXME="type_X" --><option value="X" selected="selected">Statistical</option><!-- TMPL_ELSE --><option value="X">Statistical</option><!-- /TMPL_IF -->
 					</select>
-	</li></ol>
+	</li>
+    <li><label for="branches">Branches limitation: </label>
+        <select id="branches" name="branches" multiple size="10">
+            <option value="">All branches</option>
+            <!-- TMPL_LOOP NAME="branches_loop" -->
+              <!-- TMPL_IF NAME="selected" -->
+                <option selected="selected" value="<!-- TMPL_VAR NAME='branchcode' -->"><!-- TMPL_VAR NAME="branchname" --></option>
+              <!-- TMPL_ELSE -->
+                <option value="<!-- TMPL_VAR NAME='branchcode' -->"><!-- TMPL_VAR NAME="branchname" --></option>
+              <!-- /TMPL_IF -->
+            <!-- /TMPL_LOOP -->
+        </select>
+        <span>Select All if this category type must to be displayed all the time. Otherwise select librairies you want to associate with this value.
+        </span>
+    </li>
+    </ol>
 </fieldset>
 
     <!-- TMPL_IF NAME="EnhancedMessagingPreferences" -->

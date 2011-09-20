@@ -1113,13 +1113,15 @@ C<$opac> If set to a true value, displays OPAC descriptions rather than normal o
 
 sub GetAuthorisedValues {
     my ( $category, $selected, $opac ) = @_;
+    my $branch_limit = C4::Context->userenv ? C4::Context->userenv->{"branch"} : "";
     my @results;
     my $dbh   = C4::Context->dbh;
     my $query = "SELECT * FROM authorised_values";
+    $query .= qq{ JOIN authorised_values_branches ON ( id = av_id AND ( branchcode = ? OR branchcode IS NULL ) )} if $branch_limit;
     $query .= " WHERE category = '" . $category . "'" if $category;
     $query .= " ORDER BY category, lib, lib_opac";
     my $sth = $dbh->prepare($query);
-    $sth->execute;
+    $sth->execute( $branch_limit ? $branch_limit : () );
 
     while ( my $data = $sth->fetchrow_hashref ) {
         if ( $selected && $selected eq $data->{'authorised_value'} ) {
@@ -1135,9 +1137,14 @@ sub GetAuthorisedValues {
 }
 
 sub GetAuthorisedValueLib {
+    my ( $category, $authorised_value ) = @_;
+    my $branch_limit = C4::Context->userenv ? C4::Context->userenv->{"branch"} : "";
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare("SELECT lib FROM authorised_values WHERE category=? AND authorised_value=?;");
-    $sth->execute( shift, shift );
+    my $query = "SELECT lib FROM authorised_values";
+    $query .= qq{ JOIN authorised_values_branches ON ( id = av_id AND ( branchcode = ? OR branchcode IS NULL ) )} if $branch_limit;
+    $query .= " WHERE category=? AND authorised_value=?;";
+    my $sth = $dbh->prepare($query);
+    $sth->execute( $branch_limit ? $branch_limit : (), $category, $authorised_value );
     $sth->fetchrow;
 }
 

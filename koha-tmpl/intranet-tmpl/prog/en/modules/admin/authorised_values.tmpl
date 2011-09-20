@@ -15,6 +15,9 @@
 		headers: { 4: { sorter: false}, 5: { sorter: false}}
 		   		}).tablesorterPager({container: $("#pagertable_authorized_values"),positionFixed: false,size: 50});
 	
+    if ( $("#branches option:selected").length < 1 ) {
+        $("#branches option:first").attr("selected", "selected");
+    }
 }); </script>
 
 <script type="text/JavaScript" language="JavaScript">
@@ -75,6 +78,20 @@
 	<li>
             <label for="lib_opac">Description (OPAC)</label>
             <input type="text" name="lib_opac" id="lib_opac" value="<!-- TMPL_VAR name="lib_opac" -->" />
+        </li>
+        <li><label for="branches">Branches limitation: </label>
+            <select id="branches" name="branches" multiple size="10">
+                <option value="">All branches</option>
+                <!-- TMPL_LOOP NAME="branches_loop" -->
+                  <!-- TMPL_IF NAME="selected" -->
+                    <option selected="selected" value="<!-- TMPL_VAR NAME='branchcode' -->"><!-- TMPL_VAR NAME="branchname" --></option>
+                  <!-- TMPL_ELSE -->
+                    <option value="<!-- TMPL_VAR NAME='branchcode' -->"><!-- TMPL_VAR NAME="branchname" --></option>
+                  <!-- /TMPL_IF -->
+                <!-- /TMPL_LOOP -->
+            </select>
+            <span>Select All if this authorised value must to be displayed all the time. Otherwise select librairies you want to associate with this value.
+            </span>
         </li>
 		</ol>
 		<div id="icons" class="toptabs">

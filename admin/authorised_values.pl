@@ -23,6 +23,7 @@ use warnings;
 use CGI;
 use JSON;
 use C4::Auth;
+use C4::Branch;
 use C4::Context;
 use C4::Koha;
 use C4::Output;
@@ -75,13 +76,33 @@ $template->param(
 # called by default. Used to create form to add or  modify a record
 if ( $op eq 'add_form' ) {
     my $data;
+    my @selected_branches;
     if ($id) {
         my $sth = $dbh->prepare("select id, category, authorised_value, lib, lib_opac, imageurl from authorised_values where id=?");
         $sth->execute($id);
         $data = $sth->fetchrow_hashref;
+
+        $sth = $dbh->prepare("SELECT b.branchcode, b.branchname FROM authorised_values_branches AS avb, branches AS b WHERE avb.branchcode = b.branchcode AND avb.av_id = ?;");
+        $sth->execute( $id );
+        while ( my $branch = $sth->fetchrow_hashref ) {
+            push @selected_branches, $branch;
+        }
     } else {
         $data->{'category'} = $input->param('category');
     }
+
+    my $branches = GetBranches;
+    my @branches_loop;
+
+    foreach my $branch (sort keys %$branches) {
+        my $selected = ( grep {$$_{branchcode} eq $branch} @selected_branches ) ? 1 : 0;
+        push @branches_loop, {
+            branchcode => $$branches{$branch}{branchcode},
+            branchname => $$branches{$branch}{branchname},
+            selected => $selected,
+        };
+    }
+
     if ($id) {
         $template->param( action_modify                       => 1 );
         $template->param( 'heading-modify-authorized-value-p' => 1 );
@@ -101,6 +122,7 @@ if ( $op eq 'add_form' ) {
         id               => $data->{'id'},
         imagesets        => C4::Koha::getImageSets( checked => $data->{'imageurl'} ),
         offset           => $offset,
+        branches_loop => \@branches_loop,
     );
 
 ################## ADD_VALIDATE ##################################
@@ -111,6 +133,7 @@ if ( $op eq 'add_form' ) {
     my $imageurl             = $input->param('imageurl') || '';
     $imageurl = '' if $imageurl =~ /removeImage/;
     my $duplicate_entry = 0;
+    my @branches = $input->param('branches');
 
     if ($id) {    # Update
         my $sth = $dbh->prepare("SELECT category, authorised_value FROM authorised_values WHERE id='$id' ");
@@ -138,6 +161,21 @@ if ( $op eq 'add_form' ) {
             undef $lib      if ( $lib      eq "" );    # to insert NULL instead of a blank string
             undef $lib_opac if ( $lib_opac eq "" );    # to insert NULL instead of a blank string
             $sth->execute( $new_category, $new_authorised_value, $lib, $lib_opac, $imageurl, $id );
+            if ( @branches ) {
+                $sth = $dbh->prepare("DELETE FROM authorised_values_branches WHERE av_id = ?");
+                $sth->execute( $id );
+                for my $branchcode ( @branches ) {
+                    $sth = $dbh->prepare(
+                        "INSERT INTO authorised_values_branches
+                                    ( av_id, branchcode )
+                                    VALUES ( ?, ? )"
+                    );
+                    $sth->bind_param( 1, $id );
+                    $sth->bind_param( 2, $branchcode ) if $branchcode;
+                    $sth->bind_param( 2, undef ) if not $branchcode;
+                    $sth->execute;
+                }
+            }
             print "Content-Type: text/html\n\n<META HTTP-EQUIV=Refresh CONTENT=\"0; URL=authorised_values.pl?searchfield=" . $new_category . "&offset=$offset\"></html>";
             exit;
         }
@@ -148,14 +186,28 @@ if ( $op eq 'add_form' ) {
         unless ($duplicate_entry) {
             my $sth = $dbh->prepare(
                 'INSERT INTO authorised_values
-                                    ( id, category, authorised_value, lib, lib_opac, imageurl )
-                                    values (?, ?, ?, ?, ?, ?)'
+                                    ( category, authorised_value, lib, lib_opac, imageurl )
+                                    values (?, ?, ?, ?, ?)'
             );
             my $lib      = $input->param('lib');
             my $lib_opac = $input->param('lib_opac');
             undef $lib      if ( $lib      eq "" );    # to insert NULL instead of a blank string
             undef $lib_opac if ( $lib_opac eq "" );    # to insert NULL instead of a blank string
-            $sth->execute( $id, $new_category, $new_authorised_value, $lib, $lib_opac, $imageurl );
+            $sth->execute( $new_category, $new_authorised_value, $lib, $lib_opac, $imageurl );
+            $id = $dbh->{'mysql_insertid'};
+            if ( @branches ) {
+                for my $branchcode ( @branches ) {
+                    $sth = $dbh->prepare(
+                        "INSERT INTO authorised_values_branches
+                                    ( av_id, branchcode )
+                                    VALUES ( ?, ? )"
+                    );
+                    $sth->bind_param( 1, $id );
+                    $sth->bind_param( 2, $branchcode ) if $branchcode;
+                    $sth->bind_param( 2, undef ) if not $branchcode;
+                    $sth->execute;
+                }
+            }
             print "Content-Type: text/html\n\n<META HTTP-EQUIV=Refresh CONTENT=\"0; URL=authorised_values.pl?searchfield="
               . $input->param('category')
               . "&offset=$offset\"></html>";

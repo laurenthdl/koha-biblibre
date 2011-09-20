@@ -65,15 +65,20 @@ C<description>.
 =cut
 
 sub all {
-    my ($class) = @_;
+    my ( $class ) = @_;
+    my $branch_limit = C4::Context->userenv ? C4::Context->userenv->{"branch"} : "";
     my $dbh = C4::Context->dbh;
+    # The categories table is small enough for
+    # `SELECT *` to be harmless.
+    my $query = "SELECT * FROM categories";
+    $query .= " JOIN categories_branches ON ( categories_branches.categorycode = categories.categorycode AND ( categories_branches.branchcode = ? OR categories_branches.branchcode IS NULL ) )"
+        if $branch_limit;
+    $query .= " ORDER BY description";
     return map { $class->new($_) } @{
         $dbh->selectall_arrayref(
-
-            # The categories table is small enough for
-            # `SELECT *` to be harmless.
-            "SELECT * FROM categories ORDER BY description",
+            $query,
             { Slice => {} },
+            $branch_limit ? $branch_limit : ()
         )
       };
 }

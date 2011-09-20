@@ -744,12 +744,12 @@ sub patron_attributes_form {
     my $template       = shift;
     my $borrowernumber = shift;
 
-    my @types = C4::Members::AttributeTypes::GetAttributeTypes();
+    my @types = C4::Members::AttributeTypes::GetAttributeTypes( undef );
     if ( scalar(@types) == 0 ) {
         $template->param( no_patron_attribute_types => 1 );
         return;
     }
-    my $attributes = C4::Members::Attributes::GetBorrowerAttributes($borrowernumber);
+    my $attributes = C4::Members::Attributes::GetBorrowerAttributes($borrowernumber, undef );
 
     # map patron's attributes into a more convenient structure
     my %attr_hash = ();

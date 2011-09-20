@@ -6247,6 +6247,23 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.058";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{CREATE TABLE borrower_attribute_types_branches(bat_code VARCHAR(10), b_branchcode VARCHAR(10),FOREIGN KEY (bat_code) REFERENCES borrower_attribute_types(code) ON DELETE CASCADE,FOREIGN KEY (b_branchcode) REFERENCES branches(branchcode) ON DELETE CASCADE ) ENGINE=INNODB DEFAULT CHARSET=utf8;});
+
+    $dbh->do(qq{INSERT INTO borrower_attribute_types_branches SELECT DISTINCT(code), NULL FROM borrower_attribute_types;});
+
+    $dbh->do(qq{CREATE TABLE categories_branches(categorycode VARCHAR(10), branchcode VARCHAR(10), FOREIGN KEY (categorycode) REFERENCES categories(categorycode) ON DELETE CASCADE, FOREIGN KEY (branchcode) REFERENCES branches(branchcode) ON DELETE CASCADE ) ENGINE=INNODB DEFAULT CHARSET=utf8;});
+
+    $dbh->do(qq{INSERT INTO categories_branches SELECT DISTINCT(categorycode), NULL FROM categories;});
+
+    $dbh->do(qq{CREATE TABLE authorised_values_branches(av_id INTEGER, branchcode VARCHAR(10), FOREIGN KEY (av_id) REFERENCES authorised_values(id) ON DELETE CASCADE, FOREIGN KEY  (branchcode) REFERENCES branches(branchcode) ON DELETE CASCADE ) ENGINE=INNODB DEFAULT CHARSET=utf8;});
+
+    $dbh->do(qq{INSERT INTO authorised_values_branches SELECT DISTINCT(id), NULL FROM authorised_values;});
+    print "Upgrade to $DBversion done (Add 3 associations tables with branches)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
