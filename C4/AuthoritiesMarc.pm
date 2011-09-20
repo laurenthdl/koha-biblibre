@@ -1362,6 +1362,7 @@ sub _test_subfcode_presence{
     return grep{$_->[0] eq $subfcode} @$subfields;
 }
 
+# Test if a string exists in  a field
 sub _test_string{
     my ($string,@fields)=@_;
     my $return=0;
@@ -1374,17 +1375,18 @@ sub _test_string{
     return $return;
 }
 
+# _process_subfcode_4_merge sets the correct subfcode 
 sub _process_subfcode_4_merge{
-    my ($tagfield,$bibliosubfields,$authorityrecord, $authoritysubfields)=@_;
+    my ($tagfield,$bibliosubfields,$authorityrecord, $authoritysubfields,$authtypecode)=@_;
     return unless (uc(C4::Context->preference('marcflavour')) eq 'UNIMARC');
     if ($tagfield eq "606"){
-        my $authtypecode = GuessAuthTypeCode($authorityrecord); 
         my $authtag=GetAuthType($authtypecode);
         my $chronological_auth=_test_string('chronologique',$authorityrecord->field('3..'));
         my $subfz_absent= not _test_subfcode_presence($authoritysubfields,'z');
         if (_test_subfcode_presence($bibliosubfields,"a")){
-        if ($authtag->{'auth_type_code'} eq '215'){
+        if ($authtag->{'auth_tag_to_report'} eq '215'){
            return "y";
+
         }
         elsif ($chronological_auth and $subfz_absent) {
            return "z";
@@ -1520,7 +1522,7 @@ sub merge {
 
 
         my @previous_subfields=@localsubfields[0 .. $index_9_auth];
-        if (my $changesubfcode = _process_subfcode_4_merge($tag,\@previous_subfields,$MARCto,\@record_to)){
+        if (my $changesubfcode = _process_subfcode_4_merge($tag,\@previous_subfields,$MARCto,\@record_to,$authtypecodeto)){
             $record_to[0]->[0]=$changesubfcode if defined ($changesubfcode);
         }
 		#my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
