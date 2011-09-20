@@ -161,8 +161,7 @@ while( $i < 1000 ) {
         } elsif($subtype eq "months" && $date_iso && (Delta_Days( split(/-/, $date_iso), Add_Delta_YM( split(/-/, $firstacquidate_iso), 0, $sublength) ) - 1) < 0 ) {
             last;
         }
-    }
-    if($enddate_iso && $date_iso && Delta_Days( split(/-/, $date_iso), split(/-/, $enddate_iso) ) <= 0 ) {
+    } elsif($enddate_iso && $date_iso && Delta_Days( split(/-/, $date_iso), split(/-/, $enddate_iso) ) < 0 ) {
         last;
     }
 
