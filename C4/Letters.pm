@@ -567,6 +567,7 @@ sub EnqueueLetter ($) {
     if( $params->{'letter'}->{'format'} and ($params->{'letter'}->{'format'} eq "html"))
     {
 		$content=~s/\n/<br \/>/g;
+		$content=~s/\r//g;
 	}
     my $content_type;
     if( $params->{'letter'}->{'format'} and $params->{'letter'}->{'encoding'} )
