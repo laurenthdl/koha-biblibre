@@ -1120,20 +1120,20 @@ sub _test_string{
 sub _process_subfcode_4_merge{
     my ($tagfield,$bibliosubfields,$authorityrecord, $authoritysubfields)=@_;
     return unless (uc(C4::Context->preference('marcflavour')) eq 'UNIMARC');
-    if ($tagfield eq "606"){
-        my $authtypecode = GuessAuthTypeCode($authorityrecord); 
-        my $authtag=GetAuthType($authtypecode);
-        my $chronological_auth=_test_string('chronologique',$authorityrecord->field('3..'));
-        my $subfz_absent= not _test_subfcode_presence($authoritysubfields,'z');
-        if (_test_subfcode_presence($bibliosubfields,"a")){
-        if ($authtag->{'auth_type_code'} eq '215'){
-           return "y";
-        }
-        elsif ($chronological_auth and $subfz_absent) {
-           return "z";
-        }
-        else {
-         return "x";
+    if (   $tagfield eq "606"
+        or $tagfield eq "600" ) {
+        my $authtag = GetAuthType($authtypecode);
+        my $chronological_auth
+            = _test_string( 'chronologique', $authorityrecord->field('3..') );
+        my $subfz_absent
+            = not _test_subfcode_presence( $authoritysubfields, 'z' );
+        if ( _test_subfcode_presence( $bibliosubfields, "a" ) ) {
+            if ( $authtag->{'auth_type_code'} eq '215' ) {
+                return "y";
+            } elsif ( $chronological_auth and $subfz_absent ) {
+                return "z";
+            } else {
+                return "x";
             }
         }
         return;
@@ -1162,6 +1162,7 @@ sub merge {
 
     my @record_to;
     @record_to = grep {$_->[0]!~/[0-9]/} $MARCto->field($auth_tag_to_report_to)->subfields() if $MARCto->field($auth_tag_to_report_to);
+    $debug and warn 'champs a fusionner',Data::Dumper::Dumper(@record_to);
     my $field_to;
     $field_to = $MARCto->field($auth_tag_to_report_to) if $MARCto->field($auth_tag_to_report_to);
     my @record_from;
@@ -1257,6 +1258,7 @@ sub merge {
                         $index_9_auth--;
                     } else {
                         $index++;
+<<<<<<< HEAD
                     }
                 }
 
@@ -1325,6 +1327,38 @@ sub merge {
                     ( $tag_to ? $tag_to : $tag ), $field->indicator(1),
                     $field->indicator(2), @newsubfields
                 );
+=======
+                    }    
+                }    
+		#Get the next $9 subfield
+		my $nextindex_9 =0;
+		for my $subf (@localsubfields[$index_9_auth + 1 .. $#localsubfields]){
+			last if ($subf->[0] =~ /[1-9]/);
+			$nextindex_9++;
+		};
+		#Change the first tag if required
+		# That is : change the first tag ($a) to what it is in the biblio record
+		# Since some composed authorities will place the $a into $x or $y
+
+
+        my @previous_subfields=@localsubfields[0 .. $index_9_auth];
+        if (my $changesubfcode = _process_subfcode_4_merge($tag,\@previous_subfields,$MARCto,\@record_to,$authtypecodeto)){
+            $record_to[0]->[0]=$changesubfcode if defined ($changesubfcode);
+        }
+	#$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
+		# Replace in local subfields the subfields related to recordfrom with data from record_to
+
+		my @localrecord_to=@record_to;
+		@localrecord_to=([9,$mergeto], @localrecord_to);
+		#$debug && warn "localrecordto ".Data::Dumper::Dumper(@localrecord_to);
+	        splice(@localsubfields,$index_9_auth,$nextindex_9 + 1,@localrecord_to);
+		#$debug && warn "after splice ".Data::Dumper::Dumper(@localsubfields);
+		#very nice api for MARC::Record
+		# It seems that some elements localsubfields can be undefined so skip them
+          	@newsubfields=map{(defined $_?@$_:())}@localsubfields;
+		#filter to subfields which are not in the subfield
+                my $field_to=MARC::Field->new(($tag_to?$tag_to:$tag),$field->indicator(1),$field->indicator(2),@newsubfields);
+>>>>>>> b37d9a5... AuthoritiesMarc. merge :$3 were munged.
                 $marcrecord->delete_field($field);
                 $marcrecord->insert_fields_ordered($field_to);
             }    #for each tag
