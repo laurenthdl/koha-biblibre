@@ -538,6 +538,7 @@ sub NormalizeDate {
     given( $date ) {
         when( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/ ) {  return $date  }
         when( /^(\d{2}).(\d{2}).(\d{4})$/ ) { return "$3-$2-$1T00:00:00Z" }
+        when( /^(\d{4}).(\d{2}).(\d{2})$/ ) { return "$1-$2-$3T00:00:00Z" }
         when( /^(\d{4}).(\d{2})$/         ) { return "$1-$2-01T00:00:00Z" }
         when( /^(\d{2}).(\d{4})$/         ) { return "$2-$1-01T00:00:00Z" }
         when( /^(\d{4})$/                 ) { return "$1-01-01T00:00:00Z" }
