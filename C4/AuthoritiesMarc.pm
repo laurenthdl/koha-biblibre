@@ -1379,7 +1379,8 @@ sub _test_string{
 sub _process_subfcode_4_merge{
     my ($tagfield,$bibliosubfields,$authorityrecord, $authoritysubfields,$authtypecode)=@_;
     return unless (uc(C4::Context->preference('marcflavour')) eq 'UNIMARC');
-    if ($tagfield eq "606"){
+    if ($tagfield eq "606" 
+    	or $tagfield eq "600"){
         my $authtag=GetAuthType($authtypecode);
         my $chronological_auth=_test_string('chronologique',$authorityrecord->field('3..'));
         my $subfz_absent= not _test_subfcode_presence($authoritysubfields,'z');
@@ -1421,6 +1422,7 @@ sub merge {
 
     my @record_to;
     @record_to = grep {$_->[0]!~/[0-9]/} $MARCto->field($auth_tag_to_report_to)->subfields() if $MARCto->field($auth_tag_to_report_to);
+    $debug and warn 'champs a fusionner',Data::Dumper::Dumper(@record_to);
     my $field_to;
     $field_to = $MARCto->field($auth_tag_to_report_to) if $MARCto->field($auth_tag_to_report_to);
     my @record_from;
@@ -1513,7 +1515,7 @@ sub merge {
 		#Get the next $9 subfield
 		my $nextindex_9 =0;
 		for my $subf (@localsubfields[$index_9_auth + 1 .. $#localsubfields]){
-			last if ($subf->[0] =~ /[12456789]/); 
+			last if ($subf->[0] =~ /[1-9]/);
 			$nextindex_9++;
 		};
 		#Change the first tag if required
@@ -1525,19 +1527,13 @@ sub merge {
         if (my $changesubfcode = _process_subfcode_4_merge($tag,\@previous_subfields,$MARCto,\@record_to,$authtypecodeto)){
             $record_to[0]->[0]=$changesubfcode if defined ($changesubfcode);
         }
-		#my @tags=grep {$_->[0] !~/[0-9]/} @localsubfields[$index_9_auth..$nextindex_9];
-		#$debug && warn @tags;
-#		if (defined $tags[0]->[0] and $tags[0]->[0] ne "a"){
-#		    for my $record (@record_to){
-#		       if ($record->[0] eq "a"){
-#			 $record->[0] =$tags[0]->[0];
-#			 last;
-#		       }
-#		    }
-#		}
-		#$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
+	#$debug && warn "$index_9_auth $nextindex_9 data to add ".Data::Dumper::Dumper(@record_to);
 		# Replace in local subfields the subfields related to recordfrom with data from record_to
-	        splice(@localsubfields,$index_9_auth,$nextindex_9 + 1,([9,$mergeto],@record_to));
+
+		my @localrecord_to=@record_to;
+		@localrecord_to=([9,$mergeto], @localrecord_to);
+		#$debug && warn "localrecordto ".Data::Dumper::Dumper(@localrecord_to);
+	        splice(@localsubfields,$index_9_auth,$nextindex_9 + 1,@localrecord_to);
 		#$debug && warn "after splice ".Data::Dumper::Dumper(@localsubfields);
 		#very nice api for MARC::Record
 		# It seems that some elements localsubfields can be undefined so skip them
