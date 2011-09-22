@@ -326,10 +326,7 @@ if ( C4::Context->preference('TagsEnabled') ) {
     }
 }
 
-my $total = 0;
-my $res;
 my $query_desc;
-
 my $tag = $cgi->param('tag');
 if ($tag) {
     $query_desc = "tag=$tag";
@@ -355,16 +352,16 @@ my $q_mod = $end_query
         : $q;
 
 # perform the search
-$res = SimpleSearch( $q_mod, \%filters, $page, $count, $sort_by);
-C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q:";
+my $res = SimpleSearch( $q_mod, \%filters, $page, $count, $sort_by);
+C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q_mod:";
 
-if (!$res){
-    $template->param(query_error => "Bad request! help message ?");
+if ($$res{error}){
+    $template->param(query_error => $$res{error});
     output_with_http_headers $cgi, $cookie, $template->output, 'html';
     exit;
 }
 
-$total = $res->{'pager'}->{'total_entries'},
+my $total = $res->{'pager'}->{'total_entries'},
 
 # Opac search history
 my $newsearchcookie;
@@ -426,23 +423,6 @@ if ( C4::Context->preference('EnableOpacSearchHistory') ) {
     }
 }
 
-## If there's just one result, redirect to the detail page
-if ( $total == 1
-    && $format ne 'rss2'
-    && $format ne 'opensearchdescription'
-    && $format ne 'atom' ) {
-    my $biblionumber = $res->{'items'}->[0]->{'values'}->{C4::Search::Query::getIndexName('recordid')};
-    if ( C4::Context->preference('BiblioDefaultView') eq 'isbd' ) {
-        print $cgi->redirect("/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=$biblionumber");
-    } elsif ( C4::Context->preference('BiblioDefaultView') eq 'marc' ) {
-        print $cgi->redirect("/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=$biblionumber");
-    } else {
-        print $cgi->redirect("/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber");
-    }
-    exit;
-}
-
-
 my $pager = Data::Pagination->new(
     $total,
     $count,
@@ -499,54 +479,70 @@ for my $searchresult ( @{ $res->items } ) {
     }
 }
 
-# build facets
 my @facets;
-my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
-for my $index ( @$facets_ordered ) {
-    my $facet = $res->facets->{$index};
-    if ( @$facet > 1 ) {
-        my @values;
-        $index =~ m/^([^_]*)_(.*)$/;
-        my ($type, $code) = ($1, $2);
+## If there's just one result, redirect to the detail page
+if ( @results == 1
+    && $format ne 'rss2'
+    && $format ne 'opensearchdescription'
+    && $format ne 'atom' ) {
+    my $biblionumber = $res->{'items'}->[0]->{'values'}->{C4::Search::Query::getIndexName('recordid')};
+    if ( C4::Context->preference('BiblioDefaultView') eq 'isbd' ) {
+        print $cgi->redirect("/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=$biblionumber");
+    } elsif ( C4::Context->preference('BiblioDefaultView') eq 'marc' ) {
+        print $cgi->redirect("/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=$biblionumber");
+    } else {
+        print $cgi->redirect("/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber");
+    }
+    exit;
+} elsif ( @results > 1 ) {
+    # build facets
+    my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
+    for my $index ( @$facets_ordered ) {
+        my $facet = $res->facets->{$index};
+        if ( @$facet > 1 ) {
+            my @values;
+            $index =~ m/^([^_]*)_(.*)$/;
+            my ($type, $code) = ($1, $2);
 
-        for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
-            my $value = $facet->[$i++];
-            my $count = $facet->[$i];
-            utf8::encode($value);
-            my $lib;
-            if ( $code =~/branch/ ) {
-                $lib = GetBranchName $value;
+            for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
+                my $value = $facet->[$i++];
+                my $count = $facet->[$i];
+                utf8::encode($value);
+                my $lib;
+                if ( $code =~/branch/ ) {
+                    $lib = GetBranchName $value;
+                }
+                if ( $code =~/itype/  or $code =~ /ccode/ ) {
+                    $lib = GetSupportName $value;
+                }
+                if ( $code =~ /pubdate/ ) {
+                    $lib = C4::Dates->new($value, 'iso')->output('iso');
+                }
+                if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
+                    $lib = GetAuthorisedValueLib $avlist,$value;
+                }
+                $lib ||=$value;
+                push @values, {
+                    'lib'     => $lib,
+                    'value'   => $value,
+                    'count'   => $count,
+                    'active'  => $filters{$index} && scalar( grep /"\Q$value\E"/, @{ $filters{$index} } ) ? 1 : 0,
+                    'filters' => \@tplfilters,
+                };
             }
-            if ( $code =~/itype/  or $code =~ /ccode/ ) {
-                $lib = GetSupportName $value;
-            }
-            if ( $code =~ /pubdate/ ) {
-                $lib = C4::Dates->new($value, 'iso')->output('iso');
-            }
-            if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
-                $lib = GetAuthorisedValueLib $avlist,$value;
-            }
-            $lib ||=$value;
-            push @values, {
-                'lib'     => $lib,
-                'value'   => $value,
-                'count'   => $count,
-                'active'  => $filters{$index} && scalar( grep /"\Q$value\E"/, @{ $filters{$index} } ) ? 1 : 0,
-                'filters' => \@tplfilters,
+
+            push @facets, {
+                'indexname'  => $index,
+                'label'      => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
+                'values'     => \@values,
+                'size'      => scalar(@values),
             };
         }
-
-        push @facets, {
-            'indexname'  => $index,
-            'label'      => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
-            'values'     => \@values,
-            'size'      => scalar(@values),
-        };
     }
 }
 
 $template->param(
-    'total'          => $total,
+    'total'          => ( @results == 0 ) ? 0 : $total,
     'opacfacets'     => 1,
     'SEARCH_RESULTS' => \@results,
     'facets_loop'    => \@facets,

@@ -6274,6 +6274,20 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.050";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{UPDATE `systempreferences` SET options=CONCAT(options,"|SolrIndexOff") WHERE variable ='SearchEngine'});
+    print "Upgrade to $DBversion done (Update System Preferences SearchEngine with SolrIndexOff)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.053";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('maxItemsInSearchResults',20,'Specify the maximum number of items to display in results',NULL,'Integer')});
+    print "Upgrade to $DBversion done (Add System Preferences MaxItemsInSearchResults)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.057";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     # Change the '2/year' frequency
@@ -6324,7 +6338,6 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     print "Upgrade to $DBversion done (Delete '1/quarter' frequency, change '2/year' frequency and modify 'seasonal' numbering pattern)\n";
     SetVersion($DBversion);
 }
-
 
 =item DropAllForeignKeys($table)
 
