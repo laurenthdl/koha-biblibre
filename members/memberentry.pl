@@ -124,10 +124,11 @@ for my $list ( @list_by_category ) {
     my @values = split /:/, $list;
     my @fields;
     if ( @values > 1 ) {
-        next if $values[0] eq $categorycode;
-        @fields = $values[1];
+        next if $values[0] ne $categorycode;
+        @fields = split /\|/, $values[1];
+    } else {
+        @fields = split /\|/, $list;
     }
-    @fields = split /\|/, $list;
     for ( @fields ) {
         $template->param( "no$_" => 1 );
     }

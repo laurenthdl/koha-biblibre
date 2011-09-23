@@ -486,7 +486,8 @@
       <input type="text" name="zipcode" id="zipcode" size="10" value="<!-- TMPL_VAR NAME="zipcode" -->"<!--TMPL_IF NAME="opduplicate"--> onclick="this.value=''"<!-- /TMPL_IF --> />
 	  <!-- TMPL_IF NAME="mandatoryzipcode" --><span class="required">Required</span><!-- /TMPL_IF -->
     </li>
-    
+    <!-- /TMPL_UNLESS -->
+    <!-- TMPL_UNLESS Name="nocountry"-->
     <li> 
       <!-- TMPL_IF NAME="mandatorycountry" -->
         <label for="country" class="required">
@@ -595,6 +596,8 @@
 				<input type="text" id="B_address" name="B_address" size="40" value="<!-- TMPL_VAR NAME="B_address" -->"<!--TMPL_IF NAME="opduplicate"--> onclick="this.value=''"<!-- /TMPL_IF --> />
 	  <!-- TMPL_IF NAME="mandatoryB_address" --><span class="required">Required</span><!-- /TMPL_IF -->
 			</li>
+            <!-- /TMPL_UNLESS -->
+            <!-- TMPL_UNLESS Name="noB_address2"-->
 			<li>
 				<!-- TMPL_IF NAME="mandatoryB_address2" -->
 					<label for="B_address2" class="required">
