@@ -174,8 +174,10 @@ function check_additem() {
         var values = new Array();
         $("[name='kohafield'][value="+array_fields[field]+"]").each(function(){
             var input = $(this).prevAll("input[name='field_value']")[0];
-            values.push($(input).val());
-            url += "field=" + fieldname + "&value=" + $(input).val() + "&"; // construct url
+            if($(input).val()) {
+                values.push($(input).val());
+                url += "field=" + fieldname + "&value=" + $(input).val() + "&"; // construct url
+            }
         });
 
         var sorted_arr = values.sort();
@@ -200,22 +202,23 @@ function check_additem() {
         xmlhttp.overrideMimeType('text/xml');
     }
 
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var response  =  xmlhttp.responseText;
+            var elts = response.split(';');
+            if ( response.length > 0 && elts.length > 0 ) {
+                for ( var i = 0 ; i < elts.length - 1 ; i += 1 ) {
+                    var fieldname = elts[i].split(':')[0];
+                    var value = elts[i].split(':')[1];
+                    $(".error").append( fieldname + " " + value + " already exist in database<br/>");
+                }
+                success = false;
+            }
+        }
+    };
+
     xmlhttp.open('GET', url, false);
     xmlhttp.send(null);
-
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {} else {}
-    };
-    var response  =  xmlhttp.responseText;
-    var elts = response.split(';');
-    if ( response.length > 0 && elts.length > 0 ) {
-        for ( var i = 0 ; i < elts.length - 1 ; i += 1 ) {
-            var fieldname = elts[i].split(':')[0];
-            var value = elts[i].split(':')[1];
-            $(".error").append( fieldname + " " + value + " already exist in database<br/>");
-        }
-        success = false;
-    }
 
     if ( success == false ) {
         $(".error").show();
