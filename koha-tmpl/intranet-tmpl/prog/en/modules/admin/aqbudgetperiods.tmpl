@@ -316,6 +316,7 @@
 
     <div id="active">
         <h3>Active Budgets</h3>
+    <!-- TMPL_IF NAME="period_active_loop" -->
     <div id="activepager">
         <form>
             <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/first.png" class="first"/>
@@ -362,14 +363,15 @@
 	        </td>
 	        </tr>
 	    <!-- /TMPL_LOOP -->
-	    <!-- TMPL_UNLESS NAME="period_active_loop" -->
-    	<tr><td colspan="7">No budget</td></tr>
-    	<!-- /TMPL_UNLESS -->
     </tbody>
     </table>
+    <!-- TMPL_ELSE -->
+        No budget
+    <!-- /TMPL_IF -->
     </div>
     <div id="inactive">
         <h3>Inactive Budgets</h3>
+    <!-- TMPL_IF NAME="period_inactive_loop" -->
     <div id="inactivepager">
         <form>
             <img src="<!-- TMPL_VAR NAME="interface" -->/prog/img/first.png" class="first"/>
@@ -416,11 +418,11 @@
 	        </td>
 	        </tr>
 	    <!-- /TMPL_LOOP -->
-	    <!-- TMPL_UNLESS NAME="period_inactive_loop" -->
-    	<tr><td colspan="7">No budget</td></tr>
-    	<!-- /TMPL_UNLESS -->
     </tbody>
     </table>
+    <!-- TMPL_ELSE -->
+        No budget
+    <!-- /TMPL_IF -->
 <!-- /TMPL_IF -->
     </div>
 </div>
