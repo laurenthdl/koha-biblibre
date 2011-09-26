@@ -63,7 +63,7 @@ sub import_db {
         for my $dump ( @files ) {
             chomp $dump;
             print "$dump importing...\n";
-            system( qq{gunzip < $dump | mysql -u $user -p$pass $db} ) == 0 or die $?;
+            system( qq{gunzip < $dump | mysql -u $user -p$pass $db} );
         }
     };
     if ($@) {
