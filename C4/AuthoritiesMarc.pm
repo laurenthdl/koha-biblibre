@@ -162,7 +162,7 @@ sub GetAuthTypeCode {
 
 =over 4
 
-my $authtypecode = GuessAuthTypeCode($record);
+my $authtypecode = GuessAuthTypeCode($record, [$headingfields]);
 
 =back
 
@@ -171,9 +171,9 @@ Get the record and tries to guess the adequate authtypecode from its content.
 =cut
 
 sub GuessAuthTypeCode {
-    my ($record) = @_;
+    my ($record, $heading_fields) = @_;
     return unless defined $record;
-    my $heading_fields = {
+    $heading_fields //= {
         "MARC21" => {
             '100' => { authtypecode => 'PERSO_NAME' },
             '110' => { authtypecode => 'CORPO_NAME' },
