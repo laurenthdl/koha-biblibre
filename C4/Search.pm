@@ -102,7 +102,13 @@ sub FindDuplicate {
         $query = "isbn:\"$result->{isbn}\"";
     } else {
         $query  = "title:\"$result->{title}\"";
-        $query .= " and itype:\"$result->{itemtype}\""
+        my $advanced_search_types = C4::Context->preference("AdvancedSearchTypes");
+
+        my $itype_or_ccode = 'ccode';
+        if ( !$advanced_search_types or $advanced_search_types eq 'itemtypes' ) {
+            $itype_or_ccode = 'itype';
+        }
+        $query .= " and $itype_or_ccode:\"$result->{itemtype}\""
           if ( $result->{itemtype} );
         if ( $result->{author} ) {
             $query .= " and author:\"$result->{author}\"";
