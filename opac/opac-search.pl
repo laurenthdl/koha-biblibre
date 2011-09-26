@@ -549,7 +549,6 @@ $template->param(
     'searchdesc'     => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => $count,
-    'countrss'       => $countRSS,
     'tag'            => $tag,
     countRSS         => C4::Context->preference('numSearchRSSResults') || 50,
     RSS_sort_by      => C4::Search::Query::getIndexName('acqdate'),
