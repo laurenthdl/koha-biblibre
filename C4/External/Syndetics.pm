@@ -259,7 +259,7 @@ sub _fetch_syndetics_content {
     my $syndetics_client_code = C4::Context->preference('SyndeticsClientCode');
 
     my $url = "http://www.syndetics.com/index.aspx?isbn=$isbn/$element&client=$syndetics_client_code&type=xw10&upc=$upc&oclc=$oclc";
-    my $ua  = LWP::UserAgent->new;
+    my $ua  = LWP::UserAgent->new(env_proxy=>1);
     $ua->timeout(10);
     $ua->env_proxy;
     my $response = $ua->get($url);

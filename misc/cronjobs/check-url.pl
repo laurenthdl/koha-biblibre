@@ -83,7 +83,7 @@ sub new {
     my $self = {};
     my ( $class, $timeout ) = @_;
 
-    my $uagent = new LWP::UserAgent;
+    my $uagent = LWP::UserAgent->new(env_proxy=>1);
     $uagent->timeout($timeout) if $timeout;
     $self->{user_agent} = $uagent;
     $self->{bad_url}    = {};
