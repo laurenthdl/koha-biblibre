@@ -292,3 +292,4 @@ INSERT INTO  systempreferences  (variable,value,explanation,options,type) VALUES
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numFacetsDisplay','100','Correspond au nombre maximum de facettes à afficher pour un index','','Integer')
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OPACHoldNextInLibrary','','','Permet à un usager de placer une réservation sur le premier exemplaire disponible pour une bibliothèque donnée','YesNo')
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SearchOPACHides','','Construit la requête à l\'opac avec ce filtre.','','Free');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Nombre de résultats à afficher par défaut sur un fil RSS',NULL,'Integer');

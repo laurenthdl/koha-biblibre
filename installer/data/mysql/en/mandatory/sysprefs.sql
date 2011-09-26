@@ -308,3 +308,5 @@ INSERT INTO  systempreferences  (variable,value,explanation,options,type) VALUES
 INSERT INTO  systempreferences  (variable,value,explanation,options,type) VALUES('dischargeWebPath','','Set the upload path starting from document root for the generated discharges','','');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OPACHoldNextInLibrary','','','Allows the borrower to place a hold on the first available item for a given library','YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SearchOPACHides','','Construct the opac query with this string at the end.','','Free');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('maxItemsInSearchResults',20,'Specify the maximum number of items to display in results',NULL,'Integer');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');

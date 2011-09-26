@@ -715,7 +715,7 @@ AND (authtypecode IS NOT NULL AND authtypecode<>\"\")|
             for ( $field->subfields ) { $filters->{$name_index} = $_->[1] if $_->[0] =~ /[A-z]/ };
             my $res = SimpleSearch( $query, $filters );
 
-            if ( $res and $res->{'pager'}->{'total_entries'} == 1 ) {
+            if ( !$$res{error} and $res->{'pager'}->{'total_entries'} == 1 ) {
                 my $item = @{ $res->items }[0];
                 $field->add_subfields( '9' => $item->{'values'}->{'recordid'} );
                 $countlinked++;

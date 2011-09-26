@@ -1297,9 +1297,11 @@ sub GetCOinSBiblio {
         $issn      = $record->subfield( '022', 'a' ) || '';
 
     }
+
     my $coins_value =
 "ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3A$mtx$genre$title&amp;rft.isbn=$isbn&amp;rft.issn=$issn&amp;rft.aulast=$aulast&amp;rft.aufirst=$aufirst$oauthors&amp;rft.pub=$publisher&amp;rft.date=$pubyear$place$tpages";
     $coins_value =~ s/(\ |&[^a])/\+/g;
+    $coins_value =~ s/\"/\&quot\;/g;
 
 #<!-- TMPL_VAR NAME="ocoins_format" -->&amp;rft.au=<!-- TMPL_VAR NAME="author" -->&amp;rft.btitle=<!-- TMPL_VAR NAME="title" -->&amp;rft.date=<!-- TMPL_VAR NAME="publicationyear" -->&amp;rft.pages=<!-- TMPL_VAR NAME="pages" -->&amp;rft.isbn=<!-- TMPL_VAR NAME=amazonisbn -->&amp;rft.aucorp=&amp;rft.place=<!-- TMPL_VAR NAME="place" -->&amp;rft.pub=<!-- TMPL_VAR NAME="publishercode" -->&amp;rft.edition=<!-- TMPL_VAR NAME="edition" -->&amp;rft.series=<!-- TMPL_VAR NAME="series" -->&amp;rft.genre="
 
@@ -3433,7 +3435,7 @@ sub ModBiblioMarc {
     $sth->execute( $record->as_usmarc(), $record->as_xml_record($encoding), $biblionumber );
     $sth->finish;
 
-    C4::Search::IndexRecord( "biblio" , [ $biblionumber ] );
+    C4::Search::AddToIndexQueue( "biblio" , [ $biblionumber ] );
     return $biblionumber;
 }
 
