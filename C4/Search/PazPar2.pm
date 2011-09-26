@@ -46,7 +46,7 @@ sub new {
     my $self = {};
     $self->{'endpoint'} = $endpoint;
     $self->{'session'}  = '';
-    $self->{'ua'}       = LWP::UserAgent->new;
+    $self->{'ua'}       = LWP::UserAgent->new(env_proxy=>1);
     bless $self, $class;
 
     return $self;

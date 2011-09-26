@@ -74,6 +74,7 @@ This module provides searching functions for Koha's bibliographic databases
   &AddSearchHistory
   &GetDistinctValues
   &IndexRecord
+  &AddToIndexQueue
 );
 
 =head2 FindDuplicate
@@ -2747,12 +2748,19 @@ sub GetDistinctValues {
 
 sub IndexRecord {
     if (!(C4::Context->preference('SearchEngine')=~/IndexOff/i)){
-	my $search = C4::Search::Engine->new();
-	$search->find_searchengine;
-	return $search->index(@_);
+        my $search = C4::Search::Engine->new();
+        $search->find_searchengine;
+        return $search->index( @_ );
     }
 }
 
+sub AddToIndexQueue {
+    if (!(C4::Context->preference('SearchEngine')=~/IndexOff/i)){
+        my $search = C4::Search::Engine->new();
+        $search->find_searchengine;
+        return $search->add_to_index_queue( @_ );
+    }
+}
 
 
 
