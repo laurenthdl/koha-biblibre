@@ -257,7 +257,7 @@ if ( $template_type && $template_type eq 'advsearch' ) {
 ### OK, if we're this far, we're performing an actual search
 
 # Params that can only have one value
-my $count            = C4::Context->preference('OPACnumSearchResults') || 20;
+my $count            = $cgi->param('count') || C4::Context->preference('OPACnumSearchResults') || 20;
 my $page             = $cgi->param('page') || 1;
 
 #clean operands array
@@ -342,7 +342,6 @@ if ($tag) {
     }
 }
 
-my $countRSS         = C4::Context->preference('numSearchRSSResults') || 50;
 my $end_query = C4::Context->preference('SearchOPACHides');
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 my $q_mod = $end_query
@@ -547,6 +546,8 @@ $template->param(
     'availability'   => $filters{'int_availability'},
     'count'          => $count,
     'tag'            => $tag,
+    countRSS         => C4::Context->preference('numSearchRSSResults') || 50,
+    RSS_sort_by      => C4::Search::Query::getIndexName('acqdate'),
     author_indexname => C4::Search::Query::getIndexName('author'),
     availability_indexname => C4::Search::Query::getIndexName('availability'),
 
