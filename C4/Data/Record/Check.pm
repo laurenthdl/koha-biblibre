@@ -16,6 +16,10 @@ package C4::Data::Record::Check;
 # Suite 330, Boston, MA  02111-1307 USA
 
 use Modern::Perl;
+use MARC::Field;
+use MARC::Record;
+use C4::AuthoritiesMarc;
+use C4::Charset;
 use C4::Context;
 use C4::Search;
 use C4::Search::Query;
