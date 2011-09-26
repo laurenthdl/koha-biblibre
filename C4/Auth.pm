@@ -992,6 +992,16 @@ sub checkauth {
     my $template_name = ( $type eq 'opac' ) ? 'opac-auth.tmpl' : 'auth.tmpl';
     my $template = gettemplate( $template_name, $type, $query );
     $template->param( branchloop => \@branch_loop, );
+
+    my ( $total, $pubshelves ) = C4::Context->get_shelves_userenv();    # an anonymous user has no 'barshelves'...
+    if ( defined( ($pubshelves) ) ) {
+        $template->param(
+            pubshelves     => scalar(@$pubshelves),
+            pubshelvesloop => $pubshelves,
+        );
+        $template->param( pubtotal => $total->{'pubtotal'}, ) if ( $total->{'pubtotal'} > scalar(@$pubshelves) );
+    }
+
     $template->param(
         login                   => 1,
         INPUTS                  => \@inputs,
@@ -1025,7 +1035,8 @@ sub checkauth {
         TemplateEncoding        => C4::Context->preference("TemplateEncoding"),
         IndependantBranches     => C4::Context->preference("IndependantBranches"),
         AutoLocation            => C4::Context->preference("AutoLocation"),
-        wrongip                 => $info{'wrongip'}
+        wrongip                 => $info{'wrongip'},
+        OpacAddMastheadLibraryPulldown => C4::Context->preference("OpacAddMastheadLibraryPulldown"),
     );
     $template->param( loginprompt => 1 ) unless $info{'nopermission'};
 

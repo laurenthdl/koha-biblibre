@@ -3427,7 +3427,7 @@ sub ModBiblioMarc {
     $sth->execute( $record->as_usmarc(), $record->as_xml_record($encoding), $biblionumber );
     $sth->finish;
 
-    C4::Search::IndexRecord( "biblio" , [ $biblionumber ] );
+    C4::Search::AddToIndexQueue( "biblio" , [ $biblionumber ] );
     return $biblionumber;
 }
 
