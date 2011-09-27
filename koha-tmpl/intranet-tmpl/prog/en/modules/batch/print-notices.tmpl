@@ -6,11 +6,11 @@
     <style type="text/css">
         <!-- 
         .message { page-break-after: always }
-        pre { font-family: monospace }
+        .pre { font-family: monospace }
         pre {white-space: pre-wrap;}
         pre {white-space: -moz-pre-wrap;}
         pre {white-space: -o-pre-wrap;}
-        pre {word-wrap: break-work;}
+        .pre {word-wrap: break-work;}
         -->
     </style>
     <!-- TMPL_IF NAME="stylesheet" -->
@@ -24,7 +24,7 @@
 <body>
     <!-- TMPL_LOOP NAME="messages" -->
     <div class="message">
-        <pre><!-- TMPL_VAR NAME="content" --></pre>
+        <!-- TMPL_IF NAME="pre" --><pre class="pre"><!-- TMPL_ELSE --><span class="pre"><!-- /TMPL_IF --><!-- TMPL_VAR NAME="content" --><!-- TMPL_IF NAME="pre" --></pre><!-- TMPL_ELSE --></span><!-- /TMPL_IF -->
     </div>
     <!--/TMPL_LOOP -->
 </body>
