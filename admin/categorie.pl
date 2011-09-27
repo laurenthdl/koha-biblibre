@@ -41,6 +41,7 @@ use strict;
 use CGI;
 use C4::Context;
 use C4::Auth;
+use C4::Branch;
 use C4::Output;
 use C4::Dates;
 use C4::Form::MessagingPreferences;
@@ -93,6 +94,7 @@ if ( $op eq 'add_form' ) {
 
     #---- if primkey exists, it's a modify action, so read values to modify...
     my $data;
+    my @selected_branches;
     if ($categorycode) {
         my $dbh = C4::Context->dbh;
         my $sth = $dbh->prepare(
@@ -100,10 +102,28 @@ if ( $op eq 'add_form' ) {
         );
         $sth->execute($categorycode);
         $data = $sth->fetchrow_hashref;
-        $sth->finish;
+
+        $sth = $dbh->prepare("SELECT b.branchcode, b.branchname FROM categories_branches AS cb, branches AS b WHERE cb.branchcode = b.branchcode AND cb.categorycode = ?;");
+        $sth->execute( $categorycode );
+        while ( my $branch = $sth->fetchrow_hashref ) {
+            push @selected_branches, $branch;
+        }
+        $sth->finish();
     }
 
     $data->{'enrolmentperioddate'} = undef if ( $data->{'enrolmentperioddate'} eq '0000-00-00' );
+
+    my $branches = GetBranches;
+    my @branches_loop;
+
+    foreach my $branch (sort keys %$branches) {
+        my $selected = ( grep {$$_{branchcode} eq $branch} @selected_branches ) ? 1 : 0;
+        push @branches_loop, {
+            branchcode => $$branches{$branch}{branchcode},
+            branchname => $$branches{$branch}{branchname},
+            selected => $selected,
+        };
+    }
 
     $template->param(
         description                        => $data->{'description'},
@@ -118,6 +138,7 @@ if ( $op eq 'add_form' ) {
         category_type                      => $data->{'category_type'},
         DHTMLcalendar_dateformat           => C4::Dates->DHTMLcalendar(),
         "type_" . $data->{'category_type'} => 1,
+        branches_loop => \@branches_loop,
     );
     if ( C4::Context->preference('EnhancedMessagingPreferences') ) {
         C4::Form::MessagingPreferences::set_form_values( { categorycode => $categorycode }, $template );
@@ -145,6 +166,23 @@ if ( $op eq 'add_form' ) {
             )
         );
         $sth->finish;
+
+        my @branches = $input->param("branches");
+        if ( @branches ) {
+            $sth = $dbh->prepare("DELETE FROM categories_branches WHERE categorycode = ?");
+            $sth->execute( $input->param( "categorycode" ) );
+            for my $branchcode ( @branches ) {
+                $sth = $dbh->prepare(
+                    "INSERT INTO categories_branches
+                                ( categorycode, branchcode )
+                                VALUES ( ?, ? )"
+                );
+                $sth->bind_param( 1, $input->param( "categorycode" ) );
+                $sth->bind_param( 2, $branchcode ) if $branchcode;
+                $sth->bind_param( 2, undef ) if not $branchcode;
+                $sth->execute;
+            }
+        }
     } else {
         my $sth = $dbh->prepare(
 "INSERT INTO categories  (categorycode,description,enrolmentperiod,enrolmentperioddate,upperagelimit,dateofbirthrequired,enrolmentfee,reservefee,overduenoticerequired,category_type) values (?,?,?,?,?,?,?,?,?,?)"

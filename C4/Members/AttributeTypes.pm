@@ -80,10 +80,14 @@ If $all_fields is true, then each hashref also contains the other fields from bo
 
 sub GetAttributeTypes {
     my $all    = @_   ? shift : 0;
+    my $branch_limit = C4::Context->userenv ? C4::Context->userenv->{"branch"} : "";
     my $select = $all ? '*'   : 'code, description';
     my $dbh    = C4::Context->dbh;
-    my $sth    = $dbh->prepare("SELECT $select FROM borrower_attribute_types ORDER by code");
-    $sth->execute();
+    my $query = "SELECT $select FROM borrower_attribute_types";
+    $query .= " JOIN borrower_attribute_types_branches ON ( bat_code = code AND b_branchcode = ? )" if $branch_limit;
+    $query .= " ORDER BY code";
+    my $sth    = $dbh->prepare($query);
+    $sth->execute( $branch_limit ? $branch_limit : () );
     my $results = $sth->fetchall_arrayref( {} );
     return @$results;
 }
@@ -142,7 +146,7 @@ sub fetch {
     my $self  = {};
     my $dbh   = C4::Context->dbh();
 
-    my $sth = $dbh->prepare_cached("SELECT * FROM borrower_attribute_types WHERE code = ?");
+    my $sth = $dbh->prepare("SELECT * FROM borrower_attribute_types WHERE code = ?");
     $sth->execute($code);
     my $row = $sth->fetchrow_hashref;
     $sth->finish();
@@ -157,6 +161,13 @@ sub fetch {
     $self->{'staff_searchable'}          = $row->{'staff_searchable'};
     $self->{'display_checkout'}          = $row->{'display_checkout'};
     $self->{'authorised_value_category'} = $row->{'authorised_value_category'};
+
+    $sth = $dbh->prepare("SELECT branchcode, branchname FROM borrower_attribute_types_branches, branches WHERE b_branchcode = branchcode AND bat_code = ?;");
+    $sth->execute( $code );
+    while ( my $data = $sth->fetchrow_hashref ) {
+        push @{ $self->{branches} }, $data;
+    }
+    $sth->finish();
 
     bless $self, $class;
     return $self;
@@ -183,7 +194,7 @@ sub store {
     my $sth;
     my $existing = __PACKAGE__->fetch( $self->{'code'} );
     if ( defined $existing ) {
-        $sth = $dbh->prepare_cached(
+        $sth = $dbh->prepare(
             "UPDATE borrower_attribute_types
                                      SET description = ?,
                                          repeatable = ?,
@@ -196,7 +207,7 @@ sub store {
                                      WHERE code = ?"
         );
     } else {
-        $sth = $dbh->prepare_cached(
+        $sth = $dbh->prepare(
             "INSERT INTO borrower_attribute_types 
                                         (description, repeatable, unique_id, opac_display, password_allowed,
                                          staff_searchable, authorised_value_category, display_checkout,code)
@@ -215,6 +226,21 @@ sub store {
     $sth->bind_param( 9, $self->{'code'} );
     $sth->execute;
 
+    if ( defined $$self{branches} ) {
+        $sth = $dbh->prepare("DELETE FROM borrower_attribute_types_branches WHERE bat_code = ?");
+        $sth->execute( $$self{code} );
+        for my $branchcode ( @{$$self{branches}} ) {
+            $sth = $dbh->prepare(
+                "INSERT INTO borrower_attribute_types_branches
+                            ( bat_code, b_branchcode )
+                            VALUES ( ?, ? )"
+            );
+            $sth->bind_param( 1, $$self{code} );
+            $sth->bind_param( 2, $branchcode ) if $branchcode;
+            $sth->bind_param( 2, undef ) if not $branchcode;
+            $sth->execute;
+        }
+    }
 }
 
 =head2 code
@@ -252,6 +278,25 @@ Accessor.
 sub description {
     my $self = shift;
     @_ ? $self->{'description'} = shift : $self->{'description'};
+}
+
+
+=head2 branches
+
+=over 4
+
+my $branches = $attr_type->branches();
+$attr_type->branches($branches);
+
+=back
+
+Accessor.
+
+=cut
+
+sub branches {
+    my $self = shift;
+    @_ ? $$self{branches} = shift : $$self{branches};
 }
 
 =head2 repeatable
@@ -410,7 +455,7 @@ sub delete {
     }
 
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare_cached("DELETE FROM borrower_attribute_types WHERE code = ?");
+    my $sth = $dbh->prepare("DELETE FROM borrower_attribute_types WHERE code = ?");
     $sth->execute($code);
 }
 
@@ -431,7 +476,7 @@ sub num_patrons {
     my $self = shift;
 
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare_cached(
+    my $sth = $dbh->prepare(
         "SELECT COUNT(DISTINCT borrowernumber)
                                     FROM borrower_attributes
                                     WHERE code = ?"
@@ -460,7 +505,7 @@ sub get_patrons {
     my $value = shift;
 
     my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare_cached(
+    my $sth = $dbh->prepare(
         "SELECT DISTINCT borrowernumber
                                     FROM borrower_attributes
                                     WHERE code = ?

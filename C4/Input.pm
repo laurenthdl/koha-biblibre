@@ -117,10 +117,13 @@ Returns NULL if no authorised values found
 
 sub buildCGIsort {
     my ( $name, $input_name, $data ) = @_;
+    my $branch_limit = C4::Context->userenv ? C4::Context->userenv->{"branch"} : "";
     my $dbh   = C4::Context->dbh;
-    my $query = qq{SELECT * FROM authorised_values WHERE category=? order by lib};
+    my $query = qq{SELECT * FROM authorised_values};
+    $query .= qq{ JOIN authorised_values_branches ON ( id = av_id AND ( branchcode = ? OR branchcode IS NULL ) )} if $branch_limit;
+    $query .= qq{ WHERE category=? order by lib};
     my $sth   = $dbh->prepare($query);
-    $sth->execute($name);
+    $sth->execute( $branch_limit ? $branch_limit : (), $name );
     my $CGISort;
     if ( $sth->rows > 0 ) {
         my @values;
