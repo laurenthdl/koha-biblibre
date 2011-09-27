@@ -49,6 +49,7 @@ BEGIN {
       &ReNewSubscription  &GetLateIssues      &GetLateOrMissingIssues
       &GetSerialInformation                   &AddItem2Serial
       &PrepareSerialsData &GetNextExpected    &ModNextExpected
+      &GetPreviousSerialid
 
       &UpdateClaimdateIssues
       &GetSuppliersWithLateIssues             &getsupplierbyserialid
@@ -752,6 +753,38 @@ sub GetLatestSerials {
 
     return \@serials;
 }
+
+=head2 GetPreviousSerialid
+
+$serialid = GetPreviousSerialid($subscriptionid, $nth)
+get the $nth's previous serial for the given subscriptionid
+return :
+the serialid
+
+=cut
+
+sub GetPreviousSerialid {
+    my ( $subscriptionid, $nth ) = @_;
+    $nth ||= 1;
+    my $dbh = C4::Context->dbh;
+    my $return = undef;
+
+    my $strsth = "SELECT   serialid
+                        FROM     serial
+                        WHERE    subscriptionid = ?
+                        ORDER BY planneddate DESC, publisheddate DESC, serialseq DESC LIMIT $nth,1 
+                ";
+    my $sth = $dbh->prepare($strsth);
+    $sth->execute($subscriptionid);
+    my @serials;
+    my $line = $sth->fetchrow_hashref;
+    warn Data::Dumper::Dumper($line);
+    $return = $line->{'serialid'} if ($line);
+
+    return $return;
+}
+
+
 
 =head2 GetDistributedTo
 
