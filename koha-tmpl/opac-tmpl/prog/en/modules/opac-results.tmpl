@@ -111,15 +111,6 @@ function updateDetailsLink() {
     }
 }
 
-function onCheckboxChange(cb) {
-    if ( $(cb).attr('checked') == true ) {
-        addBibToContext( $(cb).val() );
-    } else {
-        delBibToContext( $(cb).val() );
-    }
-    updateDetailsLink();
-}
-
 $(document).ready(function(){
 	<!-- TMPL_IF name="opacbookbag" -->$(".addtocart").show();<!-- /TMPL_IF -->
 
@@ -198,13 +189,15 @@ $(document).ready(function(){
 	}
     $("#CheckAll").click(function(){
         $("#bookbag_form").find("input[type='checkbox'][name='biblionumber'][checked!=true]").each(function(){
-            $(this).click();
+            $(this).attr("checked", true);
+            $(this).change();
         } );
         return false;
     });
     $("#CheckNone").click(function(){
         $("#bookbag_form").find("input[type='checkbox'][name='biblionumber'][checked=true]").each(function(){
-            $(this).click();
+            $(this).attr("checked", false);
+            $(this).change();
         } );
         return false;
     });
@@ -281,8 +274,13 @@ $(document).ready(function(){
         updateDetailsLink();
     });
 
-    $("#bookbag_form :checkbox").click(function(){
-        onCheckboxChange(this);
+    $("#bookbag_form :checkbox").change(function(){
+        if ( $(this).attr('checked') == true ) {
+            addBibToContext( $(this).val() );
+        } else {
+            delBibToContext( $(this).val() );
+        }
+        updateDetailsLink();
      } );
 
 });
