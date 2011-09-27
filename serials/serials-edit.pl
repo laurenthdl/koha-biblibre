@@ -88,6 +88,7 @@ if ( scalar(@subscriptionids) == 1 && index( $subscriptionids[0], q|,| ) > 0 ) {
 }
 my @errors;
 my @errseq;
+my $dbh   = C4::Context->dbh;
 
 # If user comes from subscription details
 unless (@serialids) {
@@ -192,6 +193,18 @@ if ( $op and $op eq 'serialchangestatus' ) {
         } elsif ( $serialids[$i] ) {
             ModSerialStatus( $serialids[$i], $serialseqs[$i], format_date_in_iso( $planneddates[$i] ), format_date_in_iso( $publisheddates[$i] ), $status[$i], $notes[$i] );
         }
+        my $makePreviousSerialAvailable = C4::Context->preference('makePreviousSerialAvailable');
+        if ($makePreviousSerialAvailable && $serialids[$i] ne "NEW") {
+            # We already have created the new expected serial at this point, so we get the second previous serial
+            my $previous = GetPreviousSerialid($subscriptionids[$i], 2);
+            if ($previous) {
+                # Setting the status to arrived if status is "not available"
+                my $query = "UPDATE serial SET status=2 WHERE serialid=? AND subscriptionid=? AND status = 5 LIMIT 1";
+                my $sth = $dbh->prepare($query);
+                $sth->execute($previous, $subscriptionids[$i]);
+            }
+        }
+
     }
     my @moditems = $query->param('moditem');
     if ( scalar(@moditems) ) {
