@@ -67,22 +67,6 @@
                 <!-- /TMPL_LOOP -->
                 ]
 
-	            new YAHOO.widget.Button({
-                type: "menu",
-                label: _("Edit"),
-                name: "periods_button",
-                menu: periods_menu,
-                container: "periods_menuc"
-            });
-
-            new YAHOO.widget.Button({
-                type: "menu",
-                label: _("New"),
-                name: "budgets_button",
-                menu: budgets_menu,
-                container: "budgets_menuc"
-            });
-
             new YAHOO.widget.Button({
                 type: "menu",
                 label: _("Planning"),
@@ -92,12 +76,6 @@
             });
 
 <!-- /TMPL_IF  -->
-
-// IF THERE IS NO BUDGETS DEFINED YET, THEN DISPLAY PERIOD BUTTON *ONLY*
-<!-- TMPL_UNLESS NAME="period_button_only" -->
-
-
-<!-- /TMPL_UNLESS -->
 
 	} //yui-toolbar...
 
