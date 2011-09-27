@@ -7876,7 +7876,7 @@ msgstr "Mes listes"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/includes/usermenu.inc:27
 msgid "my messaging"
-msgstr "Mes notifications"
+msgstr "Mes alertes mail"
 
 #: /home/users/koha/versions/devlimoges/koha-tmpl/opac-tmpl/prog/en/includes/usermenu.inc:8
 msgid "my personal details"
