@@ -46,6 +46,22 @@ BEGIN {
     );
 }
 
+eval {
+    my $servers = C4::Context->config('memcached_servers');
+    if ($servers) {
+        require Memoize::Memcached;
+        import Memoize::Memcached qw(memoize_memcached);
+
+        my $memcached = {
+            servers    => [$servers],
+            key_prefix => C4::Context->config('memcached_namespace') || 'koha',
+        };
+        memoize_memcached( 'GetElectreImage',        memcached => $memcached, expire_time => 60000 );    #cache for 1000 minutes
+        memoize_memcached( 'GetElectreQuatriemeXml', memcached => $memcached, expire_time => 60000 );    #cache for 1000 minutes
+        memoize_memcached( 'GetElectreResume',       memcached => $memcached, expire_time => 60000 );    #cache for 1000 minutes
+    }
+};
+
 =head1 NAME
 
 C4::Electre - ws electre functions
@@ -128,6 +144,8 @@ sub GetElectreImage{
 	my $sessionToken=GetElectreSessionToken();
 	my $search=InitElectreSearch();
 	my %result_getImage=$search->getImage($sessionToken, $ean, $boolscaled);
+    # If function returns undef, memcached server will not store it
+    $result_getImage{'getImageResult'} //= '';
 	return encode_base64 $result_getImage{'getImageResult'};
 }
 
@@ -138,6 +156,8 @@ sub GetElectreQuatriemeXml{
 	my $sessionToken=GetElectreSessionToken();
 	my $search=InitElectreSearch();
 	my %result_getQuatriemeXml = $search->getQuatriemeXml($sessionToken, $ean);
+    # If function returns undef, memcached server will not store it
+    $result_getQuatriemeXml{'getQuatriemeXmlResult'} //= '';
 	return encode('utf8', $result_getQuatriemeXml{'getQuatriemeXmlResult'});
 }
 
@@ -148,6 +168,8 @@ sub GetElectreResume{
 	my $sessionToken=GetElectreSessionToken();
 	my $search=InitElectreSearch();
 	my %result_getResume = $search->getResume($sessionToken, $ean);
+    # If function returns undef, memcached server will not store it
+    $result_getResume{'getResumeResult'} //= '';
 	return encode('utf8', $result_getResume{'getResumeResult'});
 }
 
