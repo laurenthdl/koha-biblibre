@@ -259,7 +259,7 @@ if ( $template_type && $template_type eq 'advsearch' ) {
 ### OK, if we're this far, we're performing an actual search
 
 # Params that can only have one value
-my $count            = C4::Context->preference('OPACnumSearchResults') || 20;
+my $count            = $cgi->param('count') || C4::Context->preference('OPACnumSearchResults') || 20;
 my $page             = $cgi->param('page') || 1;
 
 #clean operands array
@@ -343,15 +343,13 @@ if ($tag) {
         $operands[0] = "";
     }
 }
-my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
-$query_desc = $q if not $tag;
 
-my $countRSS         = C4::Context->preference('numSearchRSSResults') || 50;
 my $end_query = C4::Context->preference('SearchOPACHides');
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 my $q_mod = $end_query
         ? C4::Search::Query->normalSearch( $q . " " . $end_query )
         : $q;
+$query_desc = $q if not $tag;
 
 # perform the search
 my $res = SimpleSearch( $q_mod, \%filters, $page, $count, $sort_by);
@@ -447,7 +445,6 @@ if ( $total == 1
     exit;
 }
 
-
 my $pager = Data::Pagination->new(
     $total,
     $count,
@@ -504,54 +501,70 @@ for my $searchresult ( @{ $res->items } ) {
     }
 }
 
-# build facets
 my @facets;
-my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
-for my $index ( @$facets_ordered ) {
-    my $facet = $res->facets->{$index};
-    if ( @$facet > 1 ) {
-        my @values;
-        $index =~ m/^([^_]*)_(.*)$/;
-        my ($type, $code) = ($1, $2);
+## If there's just one result, redirect to the detail page
+if ( @results == 1
+    && $format ne 'rss2'
+    && $format ne 'opensearchdescription'
+    && $format ne 'atom' ) {
+    my $biblionumber = $res->{'items'}->[0]->{'values'}->{C4::Search::Query::getIndexName('recordid')};
+    if ( C4::Context->preference('BiblioDefaultView') eq 'isbd' ) {
+        print $cgi->redirect("/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=$biblionumber");
+    } elsif ( C4::Context->preference('BiblioDefaultView') eq 'marc' ) {
+        print $cgi->redirect("/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=$biblionumber");
+    } else {
+        print $cgi->redirect("/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber");
+    }
+    exit;
+} elsif ( @results > 1 ) {
+    # build facets
+    my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
+    for my $index ( @$facets_ordered ) {
+        my $facet = $res->facets->{$index};
+        if ( @$facet > 1 ) {
+            my @values;
+            $index =~ m/^([^_]*)_(.*)$/;
+            my ($type, $code) = ($1, $2);
 
-        for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
-            my $value = $facet->[$i++];
-            my $count = $facet->[$i];
-            utf8::encode($value);
-            my $lib;
-            if ( $code =~/branch/ ) {
-                $lib = GetBranchName $value;
+            for ( my $i = 0 ; $i < scalar(@$facet) ; $i++ ) {
+                my $value = $facet->[$i++];
+                my $count = $facet->[$i];
+                utf8::encode($value);
+                my $lib;
+                if ( $code =~/branch/ ) {
+                    $lib = GetBranchName $value;
+                }
+                if ( $code =~/itype/  or $code =~ /ccode/ ) {
+                    $lib = GetSupportName $value;
+                }
+                if ( $code =~ /pubdate/ ) {
+                    $lib = C4::Dates->new($value, 'iso')->output('iso');
+                }
+                if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
+                    $lib = GetAuthorisedValueLib $avlist,$value;
+                }
+                $lib ||=$value;
+                push @values, {
+                    'lib'     => $lib,
+                    'value'   => $value,
+                    'count'   => $count,
+                    'active'  => $filters{$index} && scalar( grep /"\Q$value\E"/, @{ $filters{$index} } ) ? 1 : 0,
+                    'filters' => \@tplfilters,
+                };
             }
-            if ( $code =~/itype/  or $code =~ /ccode/ ) {
-                $lib = GetSupportName $value;
-            }
-            if ( $code =~ /pubdate/ ) {
-                $lib = C4::Dates->new($value, 'iso')->output('iso');
-            }
-            if ( my $avlist=C4::Search::Engine::Solr::GetAvlistFromCode($code) ) {
-                $lib = GetAuthorisedValueLib $avlist,$value;
-            }
-            $lib ||=$value;
-            push @values, {
-                'lib'     => $lib,
-                'value'   => $value,
-                'count'   => $count,
-                'active'  => $filters{$index} && scalar( grep /"\Q$value\E"/, @{ $filters{$index} } ) ? 1 : 0,
-                'filters' => \@tplfilters,
+
+            push @facets, {
+                'indexname'  => $index,
+                'label'      => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
+                'values'     => \@values,
+                'size'      => scalar(@values),
             };
         }
-
-        push @facets, {
-            'indexname'  => $index,
-            'label'      => C4::Search::Engine::Solr::GetIndexLabelFromCode($code),
-            'values'     => \@values,
-            'size'      => scalar(@values),
-        };
     }
 }
 
 $template->param(
-    'total'          => $total,
+    'total'          => ( @results == 0 ) ? 0 : $total,
     'opacfacets'     => 1,
     'SEARCH_RESULTS' => \@results,
     'facets_loop'    => \@facets,
@@ -560,8 +573,9 @@ $template->param(
     'searchdesc'     => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => $count,
-    'countrss'       => $countRSS,
     'tag'            => $tag,
+    countRSS         => C4::Context->preference('numSearchRSSResults') || 50,
+    RSS_sort_by      => C4::Search::Query::getIndexName('acqdate'),
     author_indexname => C4::Search::Query::getIndexName('author'),
     availability_indexname => C4::Search::Query::getIndexName('availability'),
 

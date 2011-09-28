@@ -370,7 +370,8 @@ if ( $messages->{'ResFound'} ) {
     my $branchname = $branches->{ $reserve->{'branchcode'} }->{'branchname'};
     my ($borr) = GetMemberDetails( $reserve->{'borrowernumber'}, 0 );
 
-    if ( $reserve->{'ResFound'} eq "Waiting" or $reserve->{'ResFound'} eq "Reserved" ) {
+    if ( ($reserve->{'ResFound'} eq "Waiting" or $reserve->{'ResFound'} eq "Reserved")
+      and CanItemBeReserved($reserve->{'borrowernumber'}, $itemnumber) ) {
         if ( $reserve->{'ResFound'} eq "Waiting" ) {
             $template->param( waiting => ( $userenv_branch eq $reserve->{'branchcode'} ? 1 : 0 ), );
         } elsif ( $reserve->{'ResFound'} eq "Reserved" ) {

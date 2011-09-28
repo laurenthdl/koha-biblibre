@@ -310,7 +310,7 @@ RECORD: while () {
             $id = ${$results->{'items'}}[0]->{'values'}->{'recordid'};
             my $marcrecord = $authorities ? GetAuthority( $id ) : GetMarcBiblio( $id );
             SetUTF8Flag($marcrecord);
-            if ( $authorities && $marcFlavour ) {
+            if ( $marcrecord and $authorities and $marcFlavour ) {
 
                 #Skip if authority in database is the same as the on in database
                 if ( $marcrecord->field('005')->data >= $record->field('005')->data ) {
@@ -538,7 +538,7 @@ sub get_heading_fields{
         $debug && warn YAML::Dump($headingfields);
     }
     unless ($headingfields){
-        $headingfields=$dbh->selectall_hashref("SELECT auth_tag_to_report, authtypecode from auth_types",'auth_tag_to_report',{Slice=>{}});
+        $headingfields=C4::Context->dbh->selectall_hashref("SELECT auth_tag_to_report, authtypecode from auth_types",'auth_tag_to_report',{Slice=>{}});
         $headingfields={C4::Context->preference('marcflavour')=>$headingfields};
     }
     return $headingfields;

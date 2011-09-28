@@ -493,8 +493,6 @@ with this method.
 # FIXME: running this under mod_perl will require a means of
 # flushing the caching mechanism.
 
-my %sysprefs;
-
 sub preference {
     my $self = shift;
     my $var  = shift;    # The system preference to return
@@ -514,9 +512,10 @@ END_SQL
     my $sysprefs_arrayref;
     $sysprefs_arrayref = $dbh->selectcol_arrayref( $sql, { Columns => [ 1, 2 ] } );
     return unless $sysprefs_arrayref;
-    %sysprefs = @$sysprefs_arrayref;
-    $context->{'sysprefs'}=\%sysprefs;
-    return $sysprefs{$var};
+
+    $$context{sysprefs} = { @$sysprefs_arrayref };
+
+    return $$context{sysprefs}{$var};
 }
 
 sub boolean_preference ($) {
@@ -537,7 +536,7 @@ sub boolean_preference ($) {
 =cut
 
 sub clear_syspref_cache {
-    %sysprefs = ();
+    $$context{sysprefs} = ();
 }
 
 =item set_preference
@@ -559,7 +558,8 @@ sub set_preference {
     my $type = $dbh->selectrow_array( "SELECT type FROM systempreferences WHERE variable = ?", {}, $var );
 
     $value = 0 if ( $type && $type eq 'YesNo' && $value eq '' );
-    clear_syspref_cache;
+    my $cachevar = lc($var);
+    $$context{sysprefs}{$cachevar} = $value;
     my $sth = $dbh->prepare( "
       INSERT INTO systempreferences
         ( variable, value )

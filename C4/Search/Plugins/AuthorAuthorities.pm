@@ -76,7 +76,7 @@ sub ComputeValue {
                                 $tempauthor .= $f->[1]." ";
                             }
                         }
-                        push @values, $tempauthor;
+                        push @values, $tempauthor if defined $tempauthor;
                     }
                 }
             }

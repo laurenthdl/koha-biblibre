@@ -17,8 +17,7 @@ package C4::Search::Plugins::Date;
 # with Koha; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-use strict;
-use warnings;
+use Modern::Perl;
 use base 'Exporter';
 
 our @EXPORT = qw/
@@ -38,19 +37,33 @@ sub ComputeValue {
             for my $f ( $record->field($tag) ) {
                 for my $sf ($f->subfield($code)){
                     my @tmp = ();
-                    while ( $sf =~ m/\d{4}-\d{4}/g ) {
-                        my @d = split('-', $&);
-                        for ( my $i = $d[0] ; $i <= $d[1] ; $i++ ) {
-                            push @tmp, C4::Search::Engine::Solr::NormalizeDate($i);
+                    while ( $sf =~ m/\S+/g ) {
+                        my $string = $&;
+                        given ( $string ) {
+                            # YYYY-YYYY (range year)
+                            when ( /\d{4}-\d{4}/ ) {
+                                my @d = split('-', $&);
+                                for ( my $i = $d[0] ; $i <= $d[1] ; $i++ ) {
+                                    push @tmp, C4::Search::Engine::Solr::NormalizeDate($i);
+                                }
+                            }
+                            # YYYY-MM-DD
+                            when ( /\d{4}-\d{2}-\d{2}/ ) {
+                                push @tmp, C4::Search::Engine::Solr::NormalizeDate($&);
+                                my @d = split('-', $&);
+                                push @tmp, C4::Search::Engine::Solr::NormalizeDate($d[0]);
+                            }
+                            # DD-MM-YYYY
+                            when ( /\d{2}-\d{2}-\d{4}/ ) {
+                                push @tmp, C4::Search::Engine::Solr::NormalizeDate($&);
+                                my @d = split('-', $&);
+                                push @tmp, C4::Search::Engine::Solr::NormalizeDate($d[2]);
+                            }
+                            # YYYY
+                            when ( /\d{4}/ ) {
+                                push @tmp, C4::Search::Engine::Solr::NormalizeDate($&);
+                            }
                         }
-                    }
-                    if ( @tmp ) {
-                        push @dates, @tmp;
-                        next;
-                    }
-
-                    while ( $sf =~ m/\d{4}/g ) {
-                        push @tmp, C4::Search::Engine::Solr::NormalizeDate($&);
                     }
                     push @dates, @tmp;
                 }
