@@ -334,7 +334,7 @@ sub redirect_mod_subscription {
     my $nextacquidate =
       $query->param('nextacquidate')
       ? format_date_in_iso( $query->param('nextacquidate') )
-      : format_date_in_iso( $query->param('startdate') );
+      : $firstacquidate;
     my $enddate = format_date_in_iso( $query->param('enddate') );
     my $periodicity = $query->param('frequency');
     my $dow         = $query->param('dow');
