@@ -99,7 +99,7 @@ sub generate_subfield_form {
         if ( ! defined( $value ) || $value eq '')  {
             $value = $subfieldlib->{defaultvalue};
             # get today date & replace YYYY, MM, DD if provided in the default value
-            my ( $year, $month, $day ) = split ',', $today_iso;     # FIXME: iso dates don't have commas!
+            my ( $year, $month, $day ) = split '-', $today_iso;
             $value =~ s/YYYY/$year/g;
             $value =~ s/MM/$month/g;
             $value =~ s/DD/$day/g;

@@ -142,7 +142,7 @@ sub get_xisbns {
 
 sub _get_url {
     my ( $url, $service_type ) = @_;
-    my $ua = LWP::UserAgent->new( timeout => 2, env_proxy=>1 );
+    my $ua = LWP::UserAgent->new( timeout => 5, env_proxy=>1 );
 
     my $response = $ua->get($url);
     if ($response) {
