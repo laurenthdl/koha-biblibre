@@ -1143,7 +1143,7 @@ sub GetAuthorisedValueLib {
     my $query = "SELECT lib FROM authorised_values";
     $query .= qq{ JOIN authorised_values_branches ON ( id = av_id AND ( branchcode = ? OR branchcode IS NULL ) )} if $branch_limit;
     $query .= " WHERE category=? AND authorised_value=?;";
-    my $sth = $dbh->prepare();
+    my $sth = $dbh->prepare($query);
     $sth->execute( $branch_limit ? $branch_limit : (), $category, $authorised_value );
     $sth->fetchrow;
 }
