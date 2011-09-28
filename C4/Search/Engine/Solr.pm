@@ -402,7 +402,7 @@ sub AddRecordToIndexRecordQueue {
 
     # Verify IndexRecordQueue.pl is started
     # Else call IndexRecord directly
-    if ( not defined $status or $status =~ /No pidfile found/ or $status =~ /Running: *no/ ) {
+    if ( not defined $status or not $status =~ /Running: *yes/ ) {
         return IndexRecord($recordtype, $recordids);
     }
 
