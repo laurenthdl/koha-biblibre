@@ -744,7 +744,7 @@ sub patron_attributes_form {
     my $template       = shift;
     my $borrowernumber = shift;
 
-    my @types = C4::Members::AttributeTypes::GetAttributeTypes( undef );
+    my @types = C4::Members::AttributeTypes::GetAttributeTypes;
     if ( scalar(@types) == 0 ) {
         $template->param( no_patron_attribute_types => 1 );
         return;
