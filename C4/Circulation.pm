@@ -350,6 +350,8 @@ sub TooMany {
 
     # Get which branchcode we need
     $exactbranch = _GetCircControlBranch( $item, $borrower );
+    $debug && warn YAML::Dump($item);
+    $debug && warn YAML::Dump($borrower);
     my $itype = ( C4::Context->preference('item-level_itypes') )
       ? $item->{'itype'}        # item-level
       : $item->{'itemtype'};    # biblio-level
@@ -364,7 +366,6 @@ sub TooMany {
     foreach my $branch ( $exactbranch, '*' ) {
         foreach my $type ( $itype, '*' ) {
             my $issuing_rule = GetIssuingRule( $cat_borrower, $type, $branch );
-
             # if a rule is found and has a loan limit set, count
             # how many loans the patron already has that meet that
             # rule
@@ -374,17 +375,18 @@ sub TooMany {
                                    JOIN items USING (itemnumber) ";
 
                 my $rule_itemtype = $issuing_rule->{itemtype};
-                if ( $rule_itemtype eq "*" ) {
+                if ( $rule_itemtype eq "Default" ) {
 
                     # matching rule has the default item type, so count all the items issued for that branch no
                     # those existing loans that don't fall under a more
                     # specific rule Not QUITE
+                    # Is just quite the opposite of default rule: No rule No check out
                     if (C4::Context->preference('item-level_itypes')) {
                         $count_query .= " WHERE items.itype NOT IN (
                                                 SELECT itemtype FROM issuingrules
                                                 WHERE branchcode = ?
                                                 AND   (categorycode = ? OR categorycode = ?)
-                                                AND   itemtype <> '*'
+                                                AND   itemtype NOT IN ( 'Default','*')
                                            )";
                     } else {
                         $count_query .= " JOIN  biblioitems USING (biblionumber)
@@ -392,12 +394,17 @@ sub TooMany {
                                                 SELECT itemtype FROM issuingrules
                                                 WHERE branchcode = ?
                                                 AND   (categorycode = ? OR categorycode = ?)
-                                                AND   itemtype <> '*'
+                                                AND   itemtype NOT IN ('Default','*')
                                            )";
                     }
                     push @bind_params, $issuing_rule->{branchcode};
                     push @bind_params, $issuing_rule->{categorycode};
                     push @bind_params, $cat_borrower;
+                }
+                elsif ( $rule_itemtype eq "*" ) {
+                    # matching rule has the global item type, so count all the items issued for that branch
+                    # and for that user
+                        $count_query .= " WHERE 1 ";
                 } else {
                     # rule has specific item type, so count loans of that
                     # specific item type
@@ -425,9 +432,13 @@ sub TooMany {
                     }
                 }
 
+                $debug and warn $count_query;
                 my $count_sth = $dbh->prepare($count_query);
                 $count_sth->execute(@bind_params);
                 my ($current_loan_count) = $count_sth->fetchrow_array;
+                $debug && warn " Issuingrule : cat type branch max",@$issuing_rule{qw(categorycode itemtype branchcode maxissueqty)};
+                $debug && warn " cat type branch $cat_borrower, $type, $branch";
+                $debug and warn "loan count for $cat_borrower, $type, $branch",$current_loan_count;
 
                 my $max_loans_allowed = $issuing_rule->{'maxissueqty'};
                 if ( $current_loan_count >= $max_loans_allowed ) {
@@ -1357,7 +1368,7 @@ sub AddReturn {
           ) {
             $debug and warn sprintf "about to call ModItemTransfer(%s, %s, %s)", $item->{'itemnumber'}, $branch, $hbr;
             $debug and warn "item: " . Dumper($item);
-            ModItemTransfer( $item->{'itemnumber'}, $branch, $hbr );
+            ModItemTransfer( $item->{'itemnumber'}, $branch, $hbr ) unless (C4::Context->preference('OPACHoldNextInLibrary'));
             $messages->{'WasTransfered'} = 1;
         } else {
             $messages->{'NeedsTransfer'} = 1;    # TODO: instead of 1, specify branchcode that the transfer SHOULD go to, $item->{homebranch}
@@ -2354,7 +2365,7 @@ sub updateWrongTransfer {
     $sth->finish;
 
     # second step create a new line of branchtransfer to the right location .
-    ModItemTransfer( $itemNumber, $FromLibrary, $waitingAtLibrary );
+    ModItemTransfer( $itemNumber, $FromLibrary, $waitingAtLibrary ) unless (C4::Context->preference('OPACHoldNextInLibrary'));
 
     #third step changing holdingbranch of item
     UpdateHoldingbranch( $FromLibrary, $itemNumber );

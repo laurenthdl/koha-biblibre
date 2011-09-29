@@ -373,6 +373,10 @@ if ($barcode) {
 my $resbarcode = $query->param("resbarcode");
 if ($resbarcode) {
         if ( my ( $reservetype, $reserve ) = C4::Reserves::CheckReserves( undef, $resbarcode ) ) {
+            if (C4::Context->preference('OPACHoldNextInLibrary')) {
+                ModReserveLibrary($reserve->{'reservenumber'}, $branch, $branch);
+            }
+
             if ( $reservetype eq "Waiting" || $reservetype eq "Reserved" ) {
                 my $transfer = C4::Context->userenv->{branch} ne $reserve->{branchcode};
                 ModReserveAffect( $reserve->{itemnumber}, $reserve->{borrowernumber}, $transfer, $reserve->{"reservenumber"} );
@@ -564,7 +568,8 @@ if ($borrower) {
 
     # get each issue of the borrower & separate them in todayissues & previous issues
     my ($issueslist) = GetPendingIssues($borrower->{'borrowernumber'});
-    my ($relissueslist) = GetPendingIssues(@relborrowernumbers);
+    my ($relissueslist);
+    ($relissueslist) = GetPendingIssues(@relborrowernumbers) if (@relborrowernumbers);
 
     build_issue_data($issueslist, 0);
     build_issue_data($relissueslist, 1);

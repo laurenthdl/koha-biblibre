@@ -723,7 +723,8 @@ sub checkauth {
             $userid      = $session->param('id');
             $sessiontype = $session->param('sessiontype');
         }
-        if ( ( $query->param('koha_login_context') ) && ( $query->param('userid') ne $session->param('id') ) ) {
+        if ( ( ( $query->param('koha_login_context') ) && ( $query->param('userid') ne $session->param('id') ) )
+          || ( $cas && $query->param('ticket') ) ) {
 
             #if a user enters an id ne to the id in the current session, we need to log them in...
             #first we need to clear the anonymous session...
@@ -743,7 +744,8 @@ sub checkauth {
             $sessionID = undef;
             $userid    = undef;
 
-            if ( $cas and $caslogout ) {
+            if ( $cas and $caslogout and $type eq 'opac') {
+            # (Note: $type eq 'opac' condition should be removed when cas authentication for intranet will be implemented)
                 logout_cas($query);
             }
         } elsif ( $lasttime < time() - $timeout ) {
@@ -787,7 +789,7 @@ sub checkauth {
         C4::Context->_new_userenv($sessionID);
         $cookie = $query->cookie( CGISESSID => $sessionID );
         $userid = $query->param('userid');
-        if ( $cas || $userid ) {
+        if ( ($cas && $query->param('ticket')) || $userid ) {
             my $password = $query->param('password');
             my ( $return, $cardnumber );
             if ( $cas && $query->param('ticket') ) {
@@ -991,6 +993,16 @@ sub checkauth {
     my $template_name = ( $type eq 'opac' ) ? 'opac-auth.tmpl' : 'auth.tmpl';
     my $template = gettemplate( $template_name, $type, $query );
     $template->param( branchloop => \@branch_loop, );
+
+    my ( $total, $pubshelves ) = C4::Context->get_shelves_userenv();    # an anonymous user has no 'barshelves'...
+    if ( defined( ($pubshelves) ) ) {
+        $template->param(
+            pubshelves     => scalar(@$pubshelves),
+            pubshelvesloop => $pubshelves,
+        );
+        $template->param( pubtotal => $total->{'pubtotal'}, ) if ( $total->{'pubtotal'} > scalar(@$pubshelves) );
+    }
+
     $template->param(
         login                   => 1,
         INPUTS                  => \@inputs,
@@ -1024,7 +1036,8 @@ sub checkauth {
         TemplateEncoding        => C4::Context->preference("TemplateEncoding"),
         IndependantBranches     => C4::Context->preference("IndependantBranches"),
         AutoLocation            => C4::Context->preference("AutoLocation"),
-        wrongip                 => $info{'wrongip'}
+        wrongip                 => $info{'wrongip'},
+        OpacAddMastheadLibraryPulldown => C4::Context->preference("OpacAddMastheadLibraryPulldown"),
     );
     $template->param( loginprompt => 1 ) unless $info{'nopermission'};
 
@@ -1141,7 +1154,7 @@ sub check_api_auth {
     unless ( $query->param('userid') ) {
         $sessionID = $query->cookie("CGISESSID");
     }
-    if ( $sessionID && not $cas ) {
+    if ( $sessionID && not ($cas && $query->param('PT')) ) {
         my $session = get_session($sessionID);
         C4::Context->_new_userenv($sessionID);
         if ($session) {

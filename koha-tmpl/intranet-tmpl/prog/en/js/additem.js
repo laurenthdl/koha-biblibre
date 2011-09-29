@@ -95,48 +95,60 @@ function deleteItemBlock(node_a, index) {
         }
     }
     if ( $("#quantity").val() == 0 && $("#outeritemblock > div").length == 0) {
-        var new_form = $("#to_cloned").children('div').clone();
-        $(new_form).attr('id', 'itemblock');
-        $("#outeritemblock").append(new_form);
+        cloneItemBlock();
     }
 }
 
 function cloneItemBlock(index) {
-    var original = $("#" + index); //original <div>
+    var original;
+    if(index) {
+        original = $("#" + index); //original <div>
+    }
+    var dont_copy_fields = ['items.stocknumber', 'items.copynumber', 'items.barcode'];
 
-    var clone = $(original).clone(true);
     var random = Math.floor(Math.random()*100000); // get a random itemid.
-    // set the attribute for the new 'div' subfields
-    $(clone).attr('id', index + random);//set another id.
+    var clone = $("<div id='itemblock"+random+"'></div>")
+    $.ajax({
+        url: "/cgi-bin/koha/services/itemrecorddisplay.pl",
+        dataType: 'html',
+        data: {
+            frameworkcode: 'ACQ'
+        },
+        success: function(data, textStatus, jqXHR) {
+            /* Create the item block */
+            $(clone).append(data);
+            /* Change all itemid fields value */
+            $(clone).find("input[name='itemid']").each(function(){
+                $(this).val(random);
+            });
+            /* Add buttons + and Clear */
+            var buttonPlus = '<a name="buttonPlus" style="cursor:pointer; color:grey; font-size:180%" onclick="addItem(this)">+</a>&nbsp;';
+            var buttonClear = '<a name="buttonClear" style="cursor:pointer; color:grey; font-size:180%" onclick="clearItemBlock(this)">Clear</a>';
+            $(clone).append(buttonPlus).append(buttonClear);
+            /* Copy values from the original block (input) */
+            $(original).find("input[name='field_value']").each(function(){
+                var kohafield = $(this).siblings("input[name='kohafield']").val();
+                if($(this).val() && dont_copy_fields.indexOf(kohafield) == -1) {
+                    $(this).parent("div").attr("id").match(/^(subfield.)/);
+                    var id = RegExp.$1;
+                    var value = $(this).val();
+                    $(clone).find("div[id^='"+id+"'] input[name='field_value']").val(value);
+                }
+            });
+            /* Copy values from the original block (select) */
+            $(original).find("select[name='field_value']").each(function(){
+                var kohafield = $(this).siblings("input[name='kohafield']").val();
+                if($(this).val() && dont_copy_fields.indexOf(kohafield) == -1) {
+                    $(this).parent("div").attr("id").match(/^(subfield.)/);
+                    var id = RegExp.$1;
+                    var value = $(this).val();
+                    $(clone).find("div[id^='"+id+"'] select[name='field_value']").val(value);
+                }
+            });
 
-    // change itemids of the clone
-    var elems = $(clone).find('input');
-    for( i = 0 ; elems[i] ; i++ ) {
-        if(elems[i].name.match(/^itemid/)) {
-            elems[i].value = random;
+            $("#outeritemblock").append(clone);
         }
-    }
-
-    // Insert block in items block
-    $("#outeritemblock").append($(clone));
-
-    // Don't copy value if must be uniq
-    // stocknumber copynumber barcode
-    var array_fields = ['items.stocknumber', 'items.copynumber', 'items.barcode'];
-    for ( field in array_fields ) {
-        var input = $(clone).find("[name='kohafield'][value="+array_fields[field]+"]").prevAll("input[name='field_value']")[0];
-        $(input).val("");
-    }
-
-    // Set select value from original node
-    $(original).find("select").each(function(){
-        var parent_id = $(this).parent('div').attr('id');
-        var select_cloned = $(clone).find('div[id='+parent_id+']').find('select[name=field_value]');
-        var select_original = $(original).find('div[id='+parent_id+']').find('select[name=field_value]');
-        var option_value = $(select_original).find('option[selected=true]').val();
-        select_cloned.find('option[value='+option_value+']').attr('selected', true);
     });
-
 }
 
 function clearItemBlock(node) {
@@ -162,8 +174,10 @@ function check_additem() {
         var values = new Array();
         $("[name='kohafield'][value="+array_fields[field]+"]").each(function(){
             var input = $(this).prevAll("input[name='field_value']")[0];
-            values.push($(input).val());
-            url += "field=" + fieldname + "&value=" + $(input).val() + "&"; // construct url
+            if($(input).val()) {
+                values.push($(input).val());
+                url += "field=" + fieldname + "&value=" + $(input).val() + "&"; // construct url
+            }
         });
 
         var sorted_arr = values.sort();
@@ -188,22 +202,23 @@ function check_additem() {
         xmlhttp.overrideMimeType('text/xml');
     }
 
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var response  =  xmlhttp.responseText;
+            var elts = response.split(';');
+            if ( response.length > 0 && elts.length > 0 ) {
+                for ( var i = 0 ; i < elts.length - 1 ; i += 1 ) {
+                    var fieldname = elts[i].split(':')[0];
+                    var value = elts[i].split(':')[1];
+                    $(".error").append( fieldname + " " + value + " already exist in database<br/>");
+                }
+                success = false;
+            }
+        }
+    };
+
     xmlhttp.open('GET', url, false);
     xmlhttp.send(null);
-
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {} else {}
-    };
-    var response  =  xmlhttp.responseText;
-    var elts = response.split(';');
-    if ( response.length > 0 && elts.length > 0 ) {
-        for ( var i = 0 ; i < elts.length - 1 ; i += 1 ) {
-            var fieldname = elts[i].split(':')[0];
-            var value = elts[i].split(':')[1];
-            $(".error").append( fieldname + " " + value + " already exist in database<br/>");
-        }
-        success = false;
-    }
 
     if ( success == false ) {
         $(".error").show();

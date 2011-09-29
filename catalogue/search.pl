@@ -88,7 +88,7 @@ There are several types of queries needed in the process of search and retrieve:
 
 use strict;
 
-#use warnings; FIXME - Bug 2505
+use warnings;
 
 ## load Koha modules
 use C4::Context;
@@ -113,7 +113,7 @@ my ( $template, $borrowernumber, $cookie );
 
 # decide which template to use
 my $template_name;
-my $template_type;
+my $template_type = 'results';
 if ( ($cgi->param("filters")) || ( $cgi->param("idx") ) || ( $cgi->param("q") ) || ( $cgi->param('multibranchlimit') ) || ( $cgi->param('limit-yr') ) ) {
     $template_name = 'catalogue/results.tmpl';
 } else {
@@ -329,9 +329,11 @@ my %filters;
 my @tplfilters;
 for my $filter ( $cgi->param('filters') ) {
     next if not $filter;
-    my ($k, $v) = split /:/, $filter; #FIXME If ':' exists in value
+    #my ($k, $v) = split /[^\\]\K:/, $filter; #FIXME If ':' exists in value
+    my ($k, @v) = $filter =~ /(?: \\. | [^:] )+/xg;
+    my $v = join ':', @v;
     push @{$filters{$k}}, $v;
-    $v =~ s/"//g;
+    $v =~ s/^"(.*)"$/$1/;
     push @tplfilters, {
         'ind' => $k,
         'val' => $v,
@@ -341,6 +343,12 @@ for my $filter ( $cgi->param('filters') ) {
 push @{$filters{recordtype}}, 'biblio';
 $template->param('filters' => \@tplfilters );
 
+# Limit groups of Libraries
+if( $cgi->param('multibranchlimit') ) {
+    my $indexname = C4::Search::Query::getIndexName('homebranch');
+    my @branches = @{ GetBranchesInCategory( $cgi->param('multibranchlimit') ) };
+    push @{$filters{$indexname}}, '(' . join( " OR ", @branches ) . ')';
+}
 
 # append year limits if they exist
 my $limit_yr = $cgi->param('limit-yr');
@@ -376,8 +384,8 @@ my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
 C4::Context->preference("DebugLevel") eq '2' && warn "ProSolrSimpleSearch:q=$q:";
 
-if (!$res){
-    $template->param(query_error => "Bad request! help message ?");
+if ($$res{error}){
+    $template->param(query_error => $$res{error});
     output_with_http_headers $cgi, $cookie, $template->output, 'html';
     exit;
 }
@@ -399,6 +407,7 @@ push @follower_params, map { { ind => 'q'      , val => $_ } } @operands;
 push @follower_params, map { { ind => 'idx'    , val => $_ } } @indexes;
 push @follower_params, map { { ind => 'op'     , val => $_ } } @operators;
 push @follower_params, { ind => 'sort_by', val => $sort_by };
+push @follower_params, { ind => 'multibranchlimit', val => $cgi->param('multibranchlimit') } if $cgi->param('multibranchlimit');
 
 # Pager template params
 $template->param(
@@ -421,12 +430,18 @@ for my $searchresult ( @{ $res->items } ) {
     my $biblio = C4::Search::getItemsInfos($biblionumber, $interface,
         $itemtypes, $subfieldstosearch, $itemtag, $b);
 
-    push( @results, $biblio );
+    if(defined $biblio) {
+        push @results, $biblio;
+    } else {
+        warn "Biblio $biblionumber is indexed but no more exists in database";
+    }
 }
 
 # build facets
 my @facets;
-while ( my ($index,$facet) = each %{$res->facets} ) {
+my $facets_ordered = C4::Search::Engine::Solr::GetFacetedIndexes("biblio");
+for my $index ( @$facets_ordered ) {
+    my $facet = $res->facets->{$index};
     if ( @$facet > 1 ) {
         my @values;
         $index =~ m/^([^_]*)_(.*)$/;
@@ -453,7 +468,7 @@ while ( my ($index,$facet) = each %{$res->facets} ) {
                 'lib'     => $lib,
                 'value'   => $value,
                 'count'   => $count,
-                'active'  => $filters{$index} && grep /"\Q$value\E"/, @{ $filters{$index} },
+                'active'  => $filters{$index} && scalar( grep /"\Q$value\E"/, @{ $filters{$index} } ) ? 1 : 0,
                 'filters' => \@tplfilters,
             };
         }
@@ -486,8 +501,9 @@ $template->param(
 # Build drop-down list for 'Add To:' menu...
 
 my $row_count = 10;    # FIXME:This probably should be a syspref
-my ( $pubshelves, $total ) = GetRecentShelves( 2, $row_count, undef );
-my ( $barshelves, $total ) = GetRecentShelves( 1, undef,      $borrowernumber );
+my ( $pubshelves, $barshelves, $total );
+( $pubshelves, $total ) = GetRecentShelves( 2, $row_count, undef );
+( $barshelves, $total ) = GetRecentShelves( 1, undef,      $borrowernumber );
 
 my @pubshelves = @{$pubshelves};
 my @barshelves = @{$barshelves};

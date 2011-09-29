@@ -124,3 +124,9 @@ biblioitems.place	Place of Publication
 biblioitems.lccn	LCCN
 biblioitems.marc	MARC Blob
 biblioitems.url	URL
+subscription.startdate	Start date
+subscription.enddate	End Date
+subscription.periodicity	Periodicity
+subscription.callnumber	Call Number
+subscription.location	Location
+subscription.branchcode	Branch Code

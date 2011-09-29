@@ -1,5 +1,5 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
-<title>Koha &rsaquo; Tools &rsaquo; Batch Deletion of Items</title>
+<title>Koha &rsaquo; Tools &rsaquo; Batch Record Modification</title>
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
 
 <!-- TMPL_UNLESS NAME="modsuccess" -->
@@ -240,7 +240,7 @@
     <a href="/cgi-bin/koha/tools/batchedit.pl">Create another batch record modification</a>
 <!-- TMPL_ELSE -->
 
-<fieldset>
+<fieldset class="rows">
 <h2>Modification rules:</h2>
 <div class="warning" style="display:none;">
     You must select a file or specify records numbers
@@ -279,7 +279,8 @@
             </td>
             <td id="condvaltd">
                 <input type="text" name="condvalchoice" id="condvalchoice" disabled="disabled" />
-                <input type="checkbox" id="nocond" name="nocond" value="nocond" onClick="$('#condvalchoice').attr('disabled', ! $('#condvalchoice').attr('disabled') ) " checked="checked" >All</input> 
+                <input type="checkbox" id="nocond" name="nocond" value="nocond" onClick="$('#condvalchoice').attr('disabled', ! $('#condvalchoice').attr('disabled') ) " checked="checked" />
+                <label for="nocond">All</label>
             </td>
             <td>
                 <select name="fieldchoice" id="tofieldchoice" class='field' disabled='disabled'>
@@ -297,10 +298,6 @@
             <td><input type="button" value="Add" onclick="addRule();" /></td>
         </tr>
     </thead>
-    
-<!-- TMPL_LOOP NAME="marcfields" -->
-    
-<!-- /TMPL_LOOP -->
 </table>
 <input type="submit" value="Submit" onclick="return check(this.form);"/>
 </fieldset>

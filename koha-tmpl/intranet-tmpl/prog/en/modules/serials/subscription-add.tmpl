@@ -88,8 +88,12 @@ function Check_page2(){
         alert(_("You must choose a start date"));
         return false;
     }
-    if(($("#sublength").val().length == 0 && $("#enddate").val().length == 0)){
+    if($("#sublength").val().length == 0 && $("#enddate").val().length == 0){
         alert(_("You must choose a subscription length or an end date."));
+        return false;
+    }
+    if($("#numberpattern").val().length == 0){
+        alert(_("You must choose a numbering pattern"));
         return false;
     }
     if(advancedpatternlocked == 0){
@@ -283,17 +287,16 @@ function testPredictionPattern() {
         error_msg += _("- Frequency is not defined\n");
         error ++;
     }
+    acquidate = $("#acqui_date").val();
+    if(acquidate == undefined || acquidate == ""){
+        error_msg += _("- First publication date is not defined\n");
+        error ++;
+    }
     <!-- TMPL_IF NAME='more_than_one_serial' -->
-      acquidate = $("#nextacquidate").val();
-      if(acquidate == undefined || acquidate == ""){
+      var nextacquidate = $("#nextacquidate").val();
+      if(nextacquidate == undefined || nextacquidate == ""){
         error_msg += _("- Next issue publication date is not defined\n");
         error ++;
-      }
-    <!-- TMPL_ELSE -->
-      acquidate = $("#acqui_date").val();
-      if(acquidate == undefined || acquidate == ""){
-          error_msg += _("- First publication date is not defined\n");
-          error ++;
       }
     <!-- /TMPL_IF -->
 
@@ -314,6 +317,9 @@ function testPredictionPattern() {
             'custompattern' : custompattern,
             <!-- TMPL_IF NAME='mod' -->
               'subscriptionid': $("input[name='subscriptionid']").val(),
+            <!-- /TMPL_IF -->
+            <!-- TMPL_IF NAME='more_than_one_serial' -->
+              'nextacquidate': nextacquidate,
             <!-- /TMPL_IF -->
             'firstacquidate': acquidate,
             'enddate'       : $("#enddate").val(),
@@ -418,11 +424,18 @@ function show_page_2() {
 $(document).ready(function() {
     $("select#frequency").change(function(){
         patternneedtobetested = 1;
+        $("#enddate").val('');
         frequencyload();
     });
     $("select#numberpattern").change(function(){
         patternneedtobetested = 1;
         numberpatternload();
+    });
+    $("#subtype").change(function(){
+        $("#enddate").val('');
+    });
+    $("#sublength").change(function(){
+        $("#enddate").val('');
     });
     $("#lastvaluetemp1").keyup(function(){
         $("#lastvalue1").val($(this).val());
@@ -522,6 +535,27 @@ $(document).ready(function() {
                                         <p><input type="radio" id="serialsadditems-no" name="serialsadditems" value="0" checked="checked" /><label for="serialsadditems-no">do not create an item record when receiving this serial</label></p>
                                     <!-- /TMPL_IF -->
                                 </li>
+                                <li class="radio">
+                                  <p>When there is an irregular issue:</p>
+                                  <!-- TMPL_IF NAME='skip_serialseq' -->
+                                    <p>
+                                      <input type="radio" id="skip_serialseq_yes" name="skip_serialseq" value="1" checked="checked" />
+                                      <label for="skip_serialseq_yes">Skip issue number</label>
+                                    </p>
+                                    <p>
+                                      <input type="radio" id="skip_serialseq_no" name="skip_serialseq" value="0" />
+                                      <label for="skip_serialseq_no">Keep issue number</label>
+                                    </p>
+                                  <!-- TMPL_ELSE -->
+                                    <p>
+                                      <input type="radio" id="skip_serialseq_yes" name="skip_serialseq" value="1" />
+                                      <label for="skip_serialseq_yes">Skip issue number</label>
+                                    </p>
+                                    <p>
+                                      <input type="radio" id="skip_serialseq_no" name="skip_serialseq" value="0" checked="checked" />
+                                      <label for="skip_serialseq_no">Keep issue number</label>
+                                    </p>
+                                  <!-- /TMPL_IF -->
                                 <li>
                                     <label for="callnumber">Call Number</label>
                                     <input type="text" name="callnumber" id="callnumber" value="<!-- TMPL_VAR name="callnumber" -->" size="20" />

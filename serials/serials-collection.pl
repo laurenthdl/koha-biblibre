@@ -74,10 +74,12 @@ if ( $op eq 'gennext' && @subscriptionid ) {
         ModSerialStatus( $issue->{serialid}, $issue->{serialseq}, $issue->{planneddate}, $issue->{publisheddate}, $issue->{'publisheddatetext'}, 3, "" );
     } else {
         my $expected = GetNextExpected($subscriptionid);
-        my ( $newserialseq, $newlastvalue1, $newlastvalue2, $newlastvalue3, $newinnerloop1, $newinnerloop2, $newinnerloop3 ) = GetNextSeq($subscription);
+        my ( $newserialseq, $newlastvalue1, $newlastvalue2, $newlastvalue3,
+             $newinnerloop1, $newinnerloop2, $newinnerloop3
+           ) = GetNextSeq($subscription, $expected->{'publisheddate'});
 
         ## We generate the next publication date
-        my $nextpublisheddate = GetNextDate( $expected->{planneddate}->output('iso'), $subscription );
+        my $nextpublisheddate = GetNextDate($subscription, $expected->{'publisheddate'}, 1);
         ## Creating the new issue
         NewIssue( $newserialseq, $subscriptionid, $subscription->{'biblionumber'}, 1, $nextpublisheddate, $nextpublisheddate );
 
