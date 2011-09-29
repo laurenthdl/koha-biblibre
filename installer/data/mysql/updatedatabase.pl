@@ -4918,21 +4918,28 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.061";
+$DBversion = "3.02.00.059";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE overduerules ALTER delay1 SET DEFAULT NULL, ALTER delay2 SET DEFAULT NULL, ALTER delay3 SET DEFAULT NULL");
+    print "Upgrade to $DBversion done (Setting NULL default value for delayn columns in table overduerules)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.060";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
-    	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BlockRenewWhenOverdue','0','If Set, when item is overdue, renewals are blocked','','YesNo');
     });
     print "Upgrade to $DBversion done (Adds New System preference BlockRenewWhenOverdue)\n";
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.062";
+$DBversion = "3.02.00.061";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
-    INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');
+    	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
     });
-    print "Upgrade to $DBversion done (Adds New System preference numSearchRSSResults)\n";
+    print "Upgrade to $DBversion done (Adds Column statisticvalue in table deleteditems)\n";
     SetVersion($DBversion);
 }
 
