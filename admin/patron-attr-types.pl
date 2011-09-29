@@ -80,9 +80,18 @@ exit 0;
 sub add_attribute_type_form {
     my $template = shift;
 
+    my $branches = GetBranches;
+    my @branches_loop;
+    foreach my $branch (sort keys %$branches) {
+        push @branches_loop, {
+            branchcode => $$branches{$branch}{branchcode},
+            branchname => $$branches{$branch}{branchname},
+        };
+    }
     $template->param(
         attribute_type_form => 1,
         confirm_op          => 'add_attribute_type_confirmed',
+        branches_loop => \@branches_loop,
     );
     authorised_value_category_list($template);
 }
