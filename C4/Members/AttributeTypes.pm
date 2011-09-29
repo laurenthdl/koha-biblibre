@@ -84,7 +84,7 @@ sub GetAttributeTypes {
     my $select = $all ? '*'   : 'code, description';
     my $dbh    = C4::Context->dbh;
     my $query = "SELECT $select FROM borrower_attribute_types";
-    $query .= " JOIN borrower_attribute_types_branches ON ( bat_code = code AND b_branchcode = ? )" if $branch_limit;
+    $query .= " JOIN borrower_attribute_types_branches ON ( bat_code = code AND ( b_branchcode = ? OR b_branchcode IS NULL ) )" if $branch_limit;
     $query .= " ORDER BY code";
     my $sth    = $dbh->prepare($query);
     $sth->execute( $branch_limit ? $branch_limit : () );
