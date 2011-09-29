@@ -68,7 +68,8 @@ my $today    = C4::Dates->new();
 my @messages = @{ GetPrintMessages() };
 exit unless (@messages);
 foreach my $message (@messages) {
-    $message->{'content'} =~ s#\n#<br/>#g;
+    $message->{'content'} =~ s#\n#<br/>#g unless $message->{'content_type'} =~ /html/;
+    $message->{'pre'} = 1 unless $message->{'content_type'} =~ /html/;
 #    print STDOUT $message->{'content'};
 }
 

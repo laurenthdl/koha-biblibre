@@ -6348,6 +6348,14 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.062";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `letter` ADD COLUMN `format` VARCHAR(200)  DEFAULT NULL AFTER `content`;");
+    $dbh->do("ALTER TABLE `letter` ADD COLUMN `encoding` VARCHAR(200)  DEFAULT NULL AFTER `format`;");
+    print "Upgrade to $DBversion done (add format and encoding fields on letter)\n";
+    SetVersion($DBversion);
+}
+
 =item DropAllForeignKeys($table)
 
   Drop all foreign keys of the table $table
