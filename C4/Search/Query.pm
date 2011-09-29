@@ -252,7 +252,7 @@ sub buildQuery {
             my $idx;
 
             # 'Normal' search
-            if ( not @$indexes ) {
+            if ( not @$indexes or not grep { length $_ } @$indexes ) {
                 return C4::Search::Query::Solr->normalSearch(@$operands[0]);
             }
 
