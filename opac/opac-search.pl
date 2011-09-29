@@ -428,23 +428,6 @@ if ( C4::Context->preference('EnableOpacSearchHistory') ) {
     }
 }
 
-## If there's just one result, redirect to the detail page
-if ( $total == 1
-    && $format ne 'rss2'
-    && $format ne 'opensearchdescription'
-    && $format ne 'atom' ) {
-    my $biblionumber = $res->{'items'}->[0]->{'values'}->{C4::Search::Query::getIndexName('recordid')};
-    if ( C4::Context->preference('BiblioDefaultView') eq 'isbd' ) {
-        print $cgi->redirect("/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=$biblionumber");
-    } elsif ( C4::Context->preference('BiblioDefaultView') eq 'marc' ) {
-        print $cgi->redirect("/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=$biblionumber");
-    } else {
-        print $cgi->redirect("/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber");
-    }
-    $session->param('currentsearchisoneresult', '1');
-    exit;
-}
-
 my $pager = Data::Pagination->new(
     $total,
     $count,
@@ -515,6 +498,7 @@ if ( @results == 1
     } else {
         print $cgi->redirect("/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber");
     }
+    $session->param('currentsearchisoneresult', '1');
     exit;
 } elsif ( @results > 1 ) {
     # build facets
