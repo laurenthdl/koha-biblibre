@@ -198,10 +198,17 @@ if ( $op and $op eq 'serialchangestatus' ) {
             # We already have created the new expected serial at this point, so we get the second previous serial
             my $previous = GetPreviousSerialid($subscriptionids[$i], 2);
             if ($previous) {
-                # Setting the status to arrived if status is "not available"
-                my $query = "UPDATE serial SET status=2 WHERE serialid=? AND subscriptionid=? AND status = 5 LIMIT 1";
+
+                # Getting the itemnumber matching the serialid
+                my $query = "SELECT itemnumber FROM serialitems WHERE serialid=?";
                 my $sth = $dbh->prepare($query);
-                $sth->execute($previous, $subscriptionids[$i]);
+                $sth->execute($previous);
+                my @row = $sth->fetchrow_array;
+                if ($row[0]) {
+                    my $itemnumber = $row[0];
+                    # Changing the status to "available"
+                    ModItem({notforloan => 0 }, undef, $itemnumber);
+                }
             }
         }
 
