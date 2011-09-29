@@ -270,7 +270,7 @@ sub edit_attribute_type_form {
 sub patron_attribute_type_list {
     my $template = shift;
 
-    my @attr_types = C4::Members::AttributeTypes::GetAttributeTypes( undef );
+    my @attr_types = C4::Members::AttributeTypes::GetAttributeTypes( undef, 1 );
     $template->param( available_attribute_types => \@attr_types );
     $template->param( display_list              => 1 );
 }

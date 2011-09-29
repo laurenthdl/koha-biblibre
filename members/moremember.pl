@@ -523,7 +523,7 @@ if ( C4::Context->preference('ExtendedPatronAttributes') ) {
     my $attributes = C4::Members::Attributes::GetBorrowerAttributes($borrowernumber);
     $template->param( patron_attributes        => $attributes  ) if (scalar(@$attributes) > 0);
 
-    my @types = C4::Members::AttributeTypes::GetAttributeTypes();
+    my @types = C4::Members::AttributeTypes::GetAttributeTypes;
     if ( scalar(@types) == 0 ) {
         $template->param( no_patron_attribute_types => 1 );
     }

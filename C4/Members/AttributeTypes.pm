@@ -80,8 +80,11 @@ If $all_fields is true, then each hashref also contains the other fields from bo
 
 sub GetAttributeTypes {
     my $all    = @_   ? shift : 0;
-    my $branch_limit = C4::Context->userenv ? C4::Context->userenv->{"branch"} : "";
-    my $select = $all ? '*'   : 'code, description';
+    my $no_branch_limit = @_ ? shift : 0;
+    my $branch_limit = $no_branch_limit
+        ? 0
+        : C4::Context->userenv ? C4::Context->userenv->{"branch"} : "";
+    my $select = $all ? '*'   : 'DISTINCT(code), description';
     my $dbh    = C4::Context->dbh;
     my $query = "SELECT $select FROM borrower_attribute_types";
     $query .= " JOIN borrower_attribute_types_branches ON ( bat_code = code AND ( b_branchcode = ? OR b_branchcode IS NULL ) )" if $branch_limit;
