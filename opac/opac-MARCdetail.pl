@@ -87,10 +87,8 @@ if ( C4::Context->preference("RequestOnOpac") ) {
 }
 
 my $uploadWebPath;
-my $uploadFullURL;
 if (C4::Context->preference('uploadWebPath')) {
     $uploadWebPath = C4::Context->preference('uploadWebPath');
-    $uploadFullURL = C4::Context->preference('uploadStoreFullURL');
 }
 
 # fill arrays
@@ -150,8 +148,9 @@ for ( my $tabloop = 0 ; $tabloop <= 10 ; $tabloop++ ) {
                 $subfield_data{link}     = $sf_def->{link};
                 $subf[$i][1] =~ s/\n/<br\/>/g;
 
+                # URL Tags
                 if ( $sf_def->{isurl} ) {
-                    if ($tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{value_builder} eq "upload.pl" and $uploadWebPath and not $uploadFullURL) {
+                    if ($uploadWebPath and not $subf[$i][1] =~ /http:/ ) {
 			my $file_uri = qq($uploadWebPath/$subf[$i][1]);
 			$subfield_data{marc_value} = qq/<a href="$file_uri">$subf[$i][1]<\/a>/;
 		    } else {
@@ -162,13 +161,14 @@ for ( my $tabloop = 0 ; $tabloop <= 10 ; $tabloop++ ) {
                 } elsif ( defined( $sf_def->{kohafield} ) && $sf_def->{kohafield} eq "biblioitems.isbn" ) {
                     $subfield_data{marc_value} = $subf[$i][1];
                 } else {
+                    # Other tags
                     if ( $sf_def->{authtypecode} ) {
                         $subfield_data{authority} = $fields[$x_i]->subfield(9);
                     }
 		    
                     $subfield_data{marc_value} = GetAuthorisedValueDesc( $fields[$x_i]->tag(), $subf[$i][0], $subf[$i][1], '', $tagslib, '', 'opac' );
 		    if ($tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{value_builder} eq "upload.pl" and $uploadWebPath) {
-                        if ($uploadFullURL) {
+                        if ($subfield_data{marc_value} =~ /http:/) {
                             $subfield_data{marc_value} = qq/<a href="$subfield_data{marc_value}">$subfield_data{marc_value}<\/a>/;
                         } else {
                             my $file_uri = qq($uploadWebPath/$subf[$i][1]);
