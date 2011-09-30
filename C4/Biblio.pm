@@ -1264,7 +1264,7 @@ sub GetBiblioSummary {
         $str="<b>".$marc->subfield('245',"a")."</b>" if $marc->subfield('245','a');
         $str.= " <i>".$marc->subfield('245',"b")."</i> " if $marc->subfield('245','b');
         
-        if ($marc->field('245')){
+        if ($marc->field('100')){
             $str.=" / ";
             foreach ($marc->field('100')->subfield("a")) {
                 $str.=$_." ; ";
