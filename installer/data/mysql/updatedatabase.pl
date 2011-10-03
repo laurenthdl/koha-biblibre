@@ -4870,7 +4870,80 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.02.00.055";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
+	");
+	$dbh->do("
+	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
+	");
+    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.056";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
+	");
+    print "Upgrade to $DBversion done (Adding PrefillItem syspref)\n";
+    SetVersion($DBversion);
+}
+
+
+$DBversion = "3.02.00.057";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
+	");
+
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
+	");
+    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.058";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
+	");
+
+    $dbh->do("
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
+	");
+    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.02.00.059";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE overduerules ALTER delay1 SET DEFAULT NULL, ALTER delay2 SET DEFAULT NULL, ALTER delay3 SET DEFAULT NULL");
+    print "Upgrade to $DBversion done (Setting NULL default value for delayn columns in table overduerules)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.060";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BlockRenewWhenOverdue','0','If Set, when item is overdue, renewals are blocked','','YesNo');
+    });
+    print "Upgrade to $DBversion done (Adds New System preference BlockRenewWhenOverdue)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.061";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+    	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
+    });
+    print "Upgrade to $DBversion done (Adds Column statisticvalue in table deleteditems)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.001";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
     DROP TABLE IF EXISTS `indexes`;
@@ -5179,88 +5252,6 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
     SetVersion ($DBversion);
 }
 
-$DBversion = "3.02.00.055";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	ALTER TABLE `items` DROP INDEX `itemsstocknumberidx`;
-	");
-	$dbh->do("
-	ALTER TABLE items ADD INDEX itemsstocknumberidx (stocknumber);
-	");
-    print "Upgrade to $DBversion done (remove unicity from index itemsstocknumberidx)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.056";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('PrefillItem','0','When a new item is added, should it be prefilled with last created item values?','','YesNo');
-	");
-    print "Upgrade to $DBversion done (Adding PrefillItem syspref)\n";
-    SetVersion($DBversion);
-}
-
-
-$DBversion = "3.02.00.057";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
-	");
-
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
-	");
-    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.058";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadPath','','Sets the upload path for the upload.pl plugin','','');
-	");
-
-    $dbh->do("
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('uploadWebPath','','Set the upload path starting from document root for the upload.pl plugin','','');
-	");
-    print "Upgrade to $DBversion done (Adding upload plugin sysprefs)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.059";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("ALTER TABLE overduerules ALTER delay1 SET DEFAULT NULL, ALTER delay2 SET DEFAULT NULL, ALTER delay3 SET DEFAULT NULL");
-    print "Upgrade to $DBversion done (Setting NULL default value for delayn columns in table overduerules)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.060";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(qq{
-	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BlockRenewWhenOverdue','0','If Set, when item is overdue, renewals are blocked','','YesNo');
-    });
-    print "Upgrade to $DBversion done (Adds New System preference BlockRenewWhenOverdue)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.061";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(qq{
-    	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
-    });
-    print "Upgrade to $DBversion done (Adds New System preference BlockRenewWhenOverdue)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.062";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(qq{
-        UPDATE `indexes` SET plugin='C4::Search::Plugins::Date' WHERE plugin='C4::Search::Plugins::PubDate'
-    });
-    print "Upgrade to $DBversion done (PubDate plugin name changed)\n";
-    SetVersion($DBversion);
-}
-
 $DBversion = "3.06.00.013";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("UPDATE `systempreferences` SET options='acqdate|author|callnumber|ccode|dewey|location|pubdate|score|title' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
@@ -5324,6 +5315,15 @@ $DBversion = "3.06.00.053";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('maxItemsInSearchResults',20,'Specify the maximum number of items to display in results',NULL,'Integer')});
     print "Upgrade to $DBversion done (Add System Preferences MaxItemsInSearchResults)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.059";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        UPDATE `indexes` SET plugin='C4::Search::Plugins::Date' WHERE plugin='C4::Search::Plugins::PubDate'
+    });
+    print "Upgrade to $DBversion done (PubDate plugin name changed)\n";
     SetVersion($DBversion);
 }
 
