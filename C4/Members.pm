@@ -714,7 +714,7 @@ sub GetMemberIssuesAndFines {
     $debug and warn $query . "\n";
     my $sth = $dbh->prepare($query);
     $sth->execute($borrowernumber);
-    my $issue_count = $sth->fetchrow_arrayref->[0];
+    my ($issue_count) = $sth->fetchrow_array;
 
     $sth = $dbh->prepare(
         "SELECT COUNT(*) FROM issues 
@@ -722,11 +722,11 @@ sub GetMemberIssuesAndFines {
          AND date_due < curdate()"
     );
     $sth->execute($borrowernumber);
-    my $overdue_count = $sth->fetchrow_arrayref->[0];
+    my ($overdue_count) = $sth->fetchrow_array;
 
     $sth = $dbh->prepare("SELECT SUM(amountoutstanding) FROM accountlines WHERE borrowernumber = ?");
     $sth->execute($borrowernumber);
-    my $total_fines = $sth->fetchrow_arrayref->[0];
+    my ($total_fines) = $sth->fetchrow_array;
 
     return ( $overdue_count, $issue_count, $total_fines );
 }
