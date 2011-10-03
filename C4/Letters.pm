@@ -535,9 +535,10 @@ sub EnqueueLetter ($) {
     my $content=$params->{'letter'}->{'content'};
     if( $params->{'letter'}->{'format'} and ($params->{'letter'}->{'format'} eq "html"))
     {
-		$content=~s/\n/<br \/>/g;
-		$content=~s/\r//g;
-	}
+        $content =~ s/\n/<br \/>/g;
+        $content =~ s/\r//g;
+        $content = "<pre>$content</pre>";
+    }
     my $content_type;
     if( $params->{'letter'}->{'format'} and $params->{'letter'}->{'encoding'} )
     {

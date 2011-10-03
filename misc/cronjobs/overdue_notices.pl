@@ -486,7 +486,6 @@ END_SQL
                 $verbose and warn "borrower $firstname, $lastname ($borrowernumber) has $itemcount items triggering level $i.";
 
                 my $letter = C4::Letters::getletter( 'circulation', $overdue_rules->{"letter$i"} );
-
                 unless ($letter) {
                     $verbose and warn "Message '$overdue_rules->{letter$i}' content not found";
 
@@ -623,9 +622,21 @@ END_SQL
         my $content = join(";", qw(title name surname address1 address2 zipcode city email itemcount itemsinfo due_date issue_date)) . "\n";
         $content .= join( "\n", map { m/(.+)/ } @output_chunks );
 
+        my $attachment_filename = ($csvfilename)
+            ? 'attachment.csv'
+            : ($htmlfilename)
+                ? 'attachment.html'
+                : 'attachment.txt';
+        my $attachment_type = ($csvfilename)
+            ? 'text/csv'
+            : ($htmlfilename)
+                ? 'text/html'
+                : 'text/plain';
+        $attachment_type .= qq/; charset="UTF-8"/;
+
         my $attachment = {
-            filename => defined $csvfilename ? 'attachment.csv' : 'attachment.txt',
-            type => 'text/plain',
+            filename => $attachment_filename,
+            type => $attachment_type,
             content => join( "\n", @output_chunks )
         };
 
@@ -763,10 +774,11 @@ sub prepare_letter_for_printing {
             $verbose and warn 'combine failed on argument: ' . $csv->error_input;
         }
     } elsif ( exists $params->{'outputformat'} && $params->{'outputformat'} eq 'html' ) {
+        $params->{'letter'}->{'content'} =~ s/\n/<br \/>/g;
+        $params->{'letter'}->{'content'} =~ s/\r//g;
         $return = "<pre>\n";
-        $params->{'letter'}->{'content'} =~ s##<br/>#g;
         $return .= "$params->{'letter'}->{'content'}\n";
-        $return .= "\n</pre>\n";
+        $return .= "</pre>\n";
     } else {
         $return .= "$params->{'letter'}->{'content'}\n";
 
