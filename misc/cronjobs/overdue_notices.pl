@@ -544,7 +544,7 @@ END_SQL
                 $letter->{'content'} =~ s/<<today>>/$today/g;
 
                 if ($exceededPrintNoticesMaxLines) {
-                    $letter->{'content'} .= "List too long for form; please check your account online for a complete list of your overdue items.";
+                    $letter->{'content'} .= "Liste trop longue ; merci de consulter votre compte en ligne pour obtenir la liste complète de vos documents en retard.";
                 }
 
                 my @misses = grep { /./ } map { /^([^>]*)[>]{2,}/; ( $1 || '' ); } split /\<\</, $letter->{'content'};
