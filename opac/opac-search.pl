@@ -120,10 +120,12 @@ unless ($mybranch){
         $_->{'selected'}=0;
     }
 }
+my $holdingbranch_indexname = C4::Search::Query::getIndexName('holdingbranch');
+
 $template->param(
     branchloop       => $branchloop,
     searchdomainloop => GetBranchCategories( undef, 'searchdomain' ),
-    holdingbranch_indexname => C4::Search::Query::getIndexName('holdingbranch'),
+    holdingbranch_indexname => $holdingbranch_indexname,
 );
 
 # load the language limits (for search)
@@ -283,6 +285,11 @@ for my $filter ( $cgi->param('filters') ) {
 }
 
 push @{$filters{recordtype}}, 'biblio';
+if($ENV{'OPAC_SEARCH_LIMIT'} and $ENV{'OPAC_SEARCH_LIMIT'} ne "")
+{
+    my @branchcode = map {$_->{branchcode}} @$branchloop;
+    push @{$filters{$holdingbranch_indexname}}, '(' . join ( ' OR ', @branchcode ) . ')';
+}
 $template->param('filters' => \@tplfilters );
 
 # Limit groups of Libraries
