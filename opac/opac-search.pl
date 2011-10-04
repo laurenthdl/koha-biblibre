@@ -498,6 +498,7 @@ if ( @results == 1
     } else {
         print $cgi->redirect("/cgi-bin/koha/opac-detail.pl?biblionumber=$biblionumber");
     }
+    $session->param('currentsearchisoneresult', '1');
     exit;
 } elsif ( @results > 1 ) {
     # build facets
@@ -556,7 +557,6 @@ $template->param(
     'searchdesc'     => $q,
     'availability'   => $filters{'int_availability'},
     'count'          => $count,
-    'countrss'       => $countRSS,
     'tag'            => $tag,
     countRSS         => C4::Context->preference('numSearchRSSResults') || 50,
     RSS_sort_by      => C4::Search::Query::getIndexName('acqdate'),

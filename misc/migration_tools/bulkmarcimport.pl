@@ -538,7 +538,7 @@ sub get_heading_fields{
         $debug && warn YAML::Dump($headingfields);
     }
     unless ($headingfields){
-        $headingfields=$dbh->selectall_hashref("SELECT auth_tag_to_report, authtypecode from auth_types",'auth_tag_to_report',{Slice=>{}});
+        $headingfields=C4::Context->dbh->selectall_hashref("SELECT auth_tag_to_report, authtypecode from auth_types",'auth_tag_to_report',{Slice=>{}});
         $headingfields={C4::Context->preference('marcflavour')=>$headingfields};
     }
     return $headingfields;

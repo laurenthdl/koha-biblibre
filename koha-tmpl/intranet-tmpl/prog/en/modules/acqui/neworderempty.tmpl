@@ -62,10 +62,7 @@ function Check(ff) {
 $(document).ready(function() 
     {
     <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
-        var clone = $('#itemblock').clone();
-        var random = Math.floor(Math.random()*100000);
-        $(clone).attr('id', 'itemblock' + random);
-        $('#to_cloned').append(clone);
+        cloneItemBlock();
     <!-- /TMPL_IF -->
         //We apply the fonction only for modify option
         <!--TMPL_IF NAME="quantityrec"-->
@@ -189,15 +186,14 @@ $(document).ready(function()
                 <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR name="booksellerid" -->" />
             </li>
 		<fieldset class="action"><input type="submit" value="Change basketgroup" /></fieldset>
-        </form>
         <!-- /TMPL_IF -->
+        </form>
         <!-- /TMPL_IF -->
 			</ol>
 </fieldset>
     </div>
 <!-- /TMPL_IF -->
 
-<div id="to_cloned" style="display:none"></div>
 <form action="/cgi-bin/koha/acqui/addorder.pl" method="post" id="Aform" onsubmit="return Check(this);">
 
 <fieldset class="rows">
@@ -294,7 +290,11 @@ $(document).ready(function()
           <select name="branchcode" id="branchcode">
             <option value=""></option>
             <!-- TMPL_LOOP name="branchloop" -->
-              <option value="<!-- TMPL_VAR name="value" -->" <!-- TMPL_IF name="selected" -->selected<!-- /TMPL_IF -->><!-- TMPL_VAR name="branchname" --></option>
+              <!-- TMPL_IF NAME='selected' -->
+                <option value="<!-- TMPL_VAR name="value" -->" selected="selected"><!-- TMPL_VAR name="branchname" --></option>
+              <!-- TMPL_ELSE -->
+                <option value="<!-- TMPL_VAR name="value" -->"><!-- TMPL_VAR name="branchname" --></option>
+              <!-- /TMPL_IF -->
             <!-- /TMPL_LOOP -->
           </select>
         </li>
@@ -326,7 +326,7 @@ $(document).ready(function()
 
     <!-- From a suggestion, we have not items -->
     <!-- TMPL_UNLESS NAME="subscriptionid" -->
-    <!-- TMPL_IF name="items" -->
+    <!-- TMPL_IF name="AcqCreateItemOrdering" -->
     <fieldset class="rows">
         <legend>Item</legend>
         <!-- TMPL_IF name="NoACQframework" -->
@@ -350,35 +350,11 @@ $(document).ready(function()
             </tbody>
           </table>
         </div>
+        <div id="outeritemblock"></div>
 
-        <!-- TMPL_LOOP NAME="items" -->
-        <div id="outeritemblock">
-        <div id="itemblock">
-            <ol><!-- TMPL_LOOP NAME="iteminformation" --><li>
-                <div class="subfield_line" style="<!-- TMPL_VAR NAME='hidden' -->;" id="subfield<!-- TMPL_VAR NAME='serialid' --><!-- TMPL_VAR NAME='countitems' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->">
-
-                    <label><!-- TMPL_VAR NAME="subfield" --> - <!-- TMPL_IF name="mandatory" --><b><!-- /TMPL_IF --><!-- TMPL_VAR NAME="marc_lib" --><!-- TMPL_IF name="mandatory" --> *</b><!-- /TMPL_IF --></label>
-                    <!-- TMPL_VAR NAME="marc_value" -->
-                    <input type="hidden" name="itemid" value="1" />
-                    <input type="hidden" name="kohafield" value="<!-- TMPL_VAR NAME="kohafield" -->" />
-                    <input type="hidden" name="tag" value="<!-- TMPL_VAR NAME="tag" -->" />
-                    <input type="hidden" name="subfield" value="<!-- TMPL_VAR NAME="subfield" -->" />
-                    <input type="hidden" name="mandatory" value="<!-- TMPL_VAR NAME="mandatory" -->" />
-                    <!-- TMPL_IF NAME="ITEM_SUBFIELDS_ARE_NOT_REPEATABLE" -->
-                        <span class="buttonPlus" onclick="CloneSubfield('subfield<!-- TMPL_VAR NAME='serialid' --><!-- TMPL_VAR NAME='countitems' --><!-- TMPL_VAR NAME='subfield' --><!-- TMPL_VAR name="random" -->')">+</span>
-                    <!-- /TMPL_IF -->
-
-                </div></li>
-            <!-- /TMPL_LOOP-->
-            </ol>
-            <a name="buttonPlus" style="cursor: pointer; color: grey; font-size: 180%;" onclick="addItem(this)">+</a>
-        </div><!-- /iteminformation -->
-        </div>
-
-        <!--/TMPL_LOOP--> <!-- /items -->
     </fieldset>
+    <!-- /TMPL_IF --> <!-- AcqCreateItemOrdering -->
     <!-- /TMPL_UNLESS -->
-    <!-- /TMPL_IF --> <!-- items -->
     <fieldset class="rows">
         <legend>Accounting Details</legend>
         <ol>
@@ -388,7 +364,7 @@ $(document).ready(function()
                     <input type="hidden" size="20" name="quantity" value="<!-- TMPL_VAR NAME="quantity" -->" /><!-- TMPL_VAR NAME="quantity" -->
                 <!-- TMPL_ELSE -->
                     <label class="required" for="quantity">Quantity: </label>
-                    <!-- TMPL_IF name="items" -->
+                    <!-- TMPL_IF name="AcqCreateItemOrdering" -->
                         <input type="text" readonly="readonly" size="20" id="quantity" name="quantity" <!-- TMPL_IF NAME="subscriptionid" -->value="1"<!-- TMPL_ELSE -->value="0"<!-- /TMPL_IF --> onchange="updateCosts();" />
                     <!-- TMPL_ELSE -->
                         <input type="text" size="20" id="quantity" name="quantity" <!-- TMPL_IF NAME="subscriptionid" -->value="1" READONLY<!-- TMPL_ELSE -->value="<!-- TMPL_VAR name="quantityrec" -->"<!-- /TMPL_IF  --> onchange="updateCosts();" />

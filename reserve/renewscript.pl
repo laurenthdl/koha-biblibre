@@ -113,7 +113,8 @@ foreach my $barcode (@barcodes) {
     my $itemnumber = GetItemnumberFromBarcode($barcode);
     if ($returned) {
         if ( my ( $reservetype, $reserve ) = C4::Reserves::CheckReserves( undef, $barcode ) ) {
-            if ( $reservetype eq "Waiting" || $reservetype eq "Reserved" ) {
+            if ( ($reservetype eq "Waiting" || $reservetype eq "Reserved")
+             && CanItemBeReserved($reserve->{'borrowernumber'}, $itemnumber) ) {
                 my $transfer = C4::Context->userenv->{branch} ne $reserve->{branchcode};
                 my $OPACHoldNextInLibrary = C4::Context->preference("OPACHoldNextInLibrary");
                 $transfer = 0 if ($OPACHoldNextInLibrary);
