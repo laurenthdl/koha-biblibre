@@ -17,7 +17,7 @@
 
 use strict;
 
-#use warnings; FIXME - Bug 2505
+use warnings;
 require Exporter;
 use CGI;
 use C4::Auth;    # get_template_and_user
@@ -73,12 +73,12 @@ my $input           = CGI->new;
 my $suggestedbyme   = ( defined $input->param('suggestedbyme') ? $input->param('suggestedbyme') : 1 );
 my $op              = $input->param('op') || 'else';
 my @editsuggestions = $input->param('edit_field');
-my $branchfilter    = $input->param('branchcode');
 my $suggestedby     = $input->param('suggestedby');
 my $returnsuggestedby = $input->param('returnsuggestedby');
 my $returnsuggested = $input->param('returnsuggested');
 my $managedby       = $input->param('managedby');
 my $displayby       = $input->param('displayby');
+my $branchfilter    = ($displayby ne "branchcode") ? $input->param('branchcode') : '';
 my $tabcode         = $input->param('tabcode');
 
 # filter informations which are not suggestion related.
@@ -171,23 +171,25 @@ if ( $op =~ /else/ ) {
     $op = 'else';
 
     $displayby ||= "STATUS";
+    delete $$suggestion_ref{'branchcode'} if($displayby eq "branchcode");
     my $criteria_list = GetDistinctValues( "suggestions." . $displayby );
     my @allsuggestions;
     my $reasonsloop = GetAuthorisedValues("SUGGEST");
     foreach my $criteriumvalue ( map { $$_{'value'} } @$criteria_list ) {
+        # By default, display suggestions from current working branch
+        if(not defined $branchfilter) {
+            $$suggestion_ref{'branchcode'} = C4::Context->userenv->{'branch'};
+        }
         my $definedvalue = defined $$suggestion_ref{$displayby} && $$suggestion_ref{$displayby} ne "";
 
         next if ( $definedvalue && $$suggestion_ref{$displayby} ne $criteriumvalue );
         $$suggestion_ref{$displayby} = $criteriumvalue;
 
-        #        warn $$suggestion_ref{$displayby}."=$criteriumvalue; $displayby";
-        #warn "===========================================";
-        #warn Data::Dumper::Dumper($suggestion_ref);
         my $suggestions = &SearchSuggestion($suggestion_ref);
         foreach my $suggestion (@$suggestions) {
             $suggestion->{budget_name} = GetBudget( $suggestion->{budgetid} )->{budget_name} if $suggestion->{budgetid};
             foreach my $date qw(suggesteddate manageddate accepteddate) {
-                if ( $suggestion->{$date} ne "0000-00-00" && $suggestion->{$date} ne "" ) {
+                if ($suggestion->{$date} and $suggestion->{$date} ne "0000-00-00" && $suggestion->{$date} ne "" ) {
                     $suggestion->{$date} = format_date( $suggestion->{$date} );
                 } else {
                     $suggestion->{$date} = "";
@@ -255,7 +257,7 @@ foreach my $thisbranch ( sort { $branches->{$a}->{'branchname'} cmp $branches->{
     my %row = (
         value      => $thisbranch,
         branchname => $branches->{$thisbranch}->{'branchname'},
-        selected   => ( $branches->{$thisbranch}->{'branchcode'} eq $branchfilter ) || ( $branches->{$thisbranch}->{'branchcode'} eq $$suggestion_ref{'branchcode'} )
+        selected   => ($branchfilter and $branches->{$thisbranch}->{'branchcode'} eq $branchfilter ) || ( $$suggestion_ref{'branchcode'} and $branches->{$thisbranch}->{'branchcode'} eq $$suggestion_ref{'branchcode'} )
     );
     push @branchloop, \%row;
 }
@@ -270,7 +272,9 @@ $template->param(
 my $supportlist = GetSupportList();
 
 foreach my $support (@$supportlist) {
-    $$support{'selected'} = $$support{'itemtype'} eq $$suggestion_ref{'itemtype'};
+    $$support{'selected'} = (defined $$suggestion_ref{'itemtype'})
+        ? $$support{'itemtype'} eq $$suggestion_ref{'itemtype'}
+        : 0;
     if ( $$support{'imageurl'} ) {
         $$support{'imageurl'} = getitemtypeimagelocation( 'intranet', $$support{'imageurl'} );
     } else {
@@ -293,12 +297,17 @@ my $susubbud = GetBudgetSecondChild();
 $template->param( budgetsloop => $bud );
 $template->param( sub_budgetsloop => $subbud );
 $template->param( su_sub_budgetsloop => $susubbud );
-$template->param( "statusselected_$$suggestion_ref{'STATUS'}" =>1);
+$template->param( "statusselected_$$suggestion_ref{'STATUS'}" =>1) if ($$suggestion_ref{'STATUS'});
 my %hashlists;
 foreach my $field qw(managedby acceptedby suggestedby budgetid) {
     my $values_list;
     $values_list = GetDistinctValues( "suggestions." . $field );
-    my @codes_list = map { { 'code' => $$_{'value'}, 'desc' => GetCriteriumDesc( $$_{'value'}, $field ), 'selected' => $$_{'value'} eq $$suggestion_ref{$field} } } @$values_list;
+    my @codes_list = map {
+        {   'code' => $$_{'value'},
+            'desc' => GetCriteriumDesc( $$_{'value'}, $field ),
+            'selected' => ($$suggestion_ref{$field}) ? $$_{'value'} eq $$suggestion_ref{$field} : 0,
+        }
+    } @$values_list;
     $hashlists{ lc($field) . "_loop" } = \@codes_list;
 }
 $template->param(%hashlists);
