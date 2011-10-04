@@ -440,10 +440,9 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 
 <div id="bibliodescriptions" class="toptabs">
 
-<ul>   
-<li<!-- TMPL_IF EXPR="defaulttab eq 'holdings'"  --> class="ui-tabs-selected"<!-- /TMPL_IF -->><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#holdings">Holdings
-    ( <!-- TMPL_VAR NAME="count" --> )</a>
-   </li>
+<ul><!-- TMPL_IF NAME="boolmyitems" -->
+<li<!-- TMPL_IF EXPR="defaulttab eq 'holdings'"  --> class="ui-tabs-selected"<!-- /TMPL_IF -->><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#myholdings">My Holdings ( <!-- TMPL_VAR NAME="myholdingscount" --> )</a></li><!-- /TMPL_IF -->
+<li><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#otherholdings"><!-- TMPL_IF NAME="boolmyitems" -->Other Holdings<!-- TMPL_ELSE -->Holdings<!-- /TMPL_IF --> ( <!-- TMPL_VAR NAME="otherholdingscount" --> )</a></li>
  <li> <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#descriptions">Title Notes</a></li>
 <!-- TMPL_IF NAME="SYNDETICS_TOC" -->
  <li> <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->#toc">TOC</a></li>
@@ -506,13 +505,13 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
     </table>
 </div>
 <!-- /TMPL_IF -->
-
-<div id="holdings">
-<!-- TMPL_IF name="count" -->
+<!-- TMPL_IF NAME="boolmyitems" -->
+<div id="myholdings">
+<!-- TMPL_IF name="myholdingscount" -->
     <!-- TMPL_IF name="lotsofitems" -->
 	<p>This record has many physical items. <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;viewallitems=1">Click here to view them all.</a></p>
     <!-- TMPL_ELSE -->
-	<table id="holdingst">
+	<table id="myholdingst">
 	    <thead><tr>
 		<!-- TMPL_IF NAME="item-level_itypes" --><th>Item type</th><!-- /TMPL_IF -->
 		<th>Location</th>
@@ -527,7 +526,97 @@ YAHOO.util.Event.onContentReady("furtherm", function () {
 		<!-- TMPL_IF NAME="itemdata_serialseq" --><th>Serial number</th><!-- /TMPL_IF -->
 		<!-- TMPL_IF NAME="itemdata_publisheddate" --><th>Publication date</th><!-- /TMPL_IF -->
 	    </tr></thead>
-	    <tbody><!-- TMPL_LOOP NAME="ITEM_RESULTS" -->
+	    <tbody><!-- TMPL_LOOP NAME="MYITEM_RESULTS" -->
+	    <tr><!-- TMPL_IF NAME="item-level_itypes" --><td><!-- TMPL_IF NAME="imageurl" --><img src="<!-- TMPL_VAR NAME="imageurl" -->" title="<!-- TMPL_VAR NAME="description" -->" alt="<!-- TMPL_VAR NAME="description" -->" /><!-- /TMPL_IF --> <!-- TMPL_VAR NAME="description" --></td><!-- /TMPL_IF -->
+		<td><!-- TMPL_UNLESS NAME="singleBranchMode" --><!-- TMPL_IF name="branchurl" --><a href="<!-- TMPL_VAR NAME="branchurl" -->"><!-- TMPL_VAR NAME="branchname" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branchname" --><!-- /TMPL_IF --><!-- /TMPL_UNLESS --> <!-- TMPL_VAR NAME="location_description" --> </td>
+		<!-- TMPL_IF NAME="itemdata_ccode" --><td><!-- TMPL_VAR NAME="ccode" --></td><!-- /TMPL_IF -->
+		<td><!-- TMPL_IF NAME="itemcallnumber" --> <!-- TMPL_VAR NAME="itemcallnumber" --><!-- /TMPL_IF --> <!-- TMPL_IF NAME="OPACShelfBrowser" -->(<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">Browse Shelf</a>)<!-- /TMPL_IF --></td>
+		<!-- TMPL_IF NAME="itemdata_enumchron" --><td><!-- TMPL_VAR NAME="enumchron" --></td><!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="itemdata_uri" --><td><a href="<!-- TMPL_VAR NAME="uri" -->"><!-- TMPL_VAR NAME="uri" --></a></td><!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="itemdata_copynumber" --><td><!-- TMPL_VAR NAME="copynumber" --></td><!-- /TMPL_IF -->
+		<td><!-- TMPL_INCLUDE NAME="item-status.inc" --></td>
+		<!-- TMPL_IF NAME="itemdata_itemnotes" --><td><!-- TMPL_VAR NAME="itemnotes" --></td><!-- /TMPL_IF -->
+		<td><!-- TMPL_VAR NAME="datedue" --></td>
+		<!-- TMPL_IF NAME="itemdata_serialseq" --><td><!-- TMPL_VAR Name="serialseq"--></td><!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="itemdata_publisheddate" --><td><!-- TMPL_VAR Name="publisheddate"--></td><!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="type" -->
+		<td><a href="/cgi-bin/koha/maint/catmaintain.pl?type=fixitemtype&amp;bi=<!-- TMPL_VAR NAME="biblioitemnumber" -->&amp;item=<!-- TMPL_VAR NAME="itemtype" -->">Fix Itemtype</a></td>
+		<!-- /TMPL_IF -->
+	    </tr>
+	    <!-- /TMPL_LOOP --></tbody>
+	</table>
+    <!-- /TMPL_IF -->
+<!-- TMPL_ELSE -->
+<p>No physical items for this record</p>
+<!-- /TMPL_IF -->
+
+<!-- TMPL_IF NAME="OpenOPACShelfBrowser" -->
+<div id="shelfbrowser">
+<h5 style="text-align: center;"><!-- TMPL_IF NAME="starting_homebranch" -->Browsing <!-- TMPL_VAR NAME="starting_homebranch" --> Shelves<!-- /TMPL_IF --><!-- TMPL_IF NAME="starting_location" -->, Shelving Location:</span><!-- TMPL_VAR NAME="starting_location" --> <!-- /TMPL_IF --> <a style="font-size: 75%;" href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->">Close Shelf Browser</a></h5>
+
+        <table><tr>
+        <td rowspan="2" style="width:20px;"><a style="height: 10em;" href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_IF NAME="shelfbrowser_prev_biblionumber" --><!-- TMPL_VAR NAME="shelfbrowser_prev_biblionumber" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="biblionumber" --><!-- /TMPL_IF -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="shelfbrowser_prev_itemnumber" -->#shelfbrowser"><img src="/opac-tmpl/prog/images/browse-prev.gif" alt="Previous" border="0" /></a></td>
+<!-- TMPL_LOOP NAME="PREVIOUS_SHELF_BROWSE" -->
+        <td><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">
+    <!-- TMPL_IF NAME="OPACAmazonEnabled" --><!-- TMPL_IF NAME="OPACAmazonCoverImages" --><!-- TMPL_IF NAME="browser_normalized_isbn" --><img border="0" src="http://images.amazon.com/images/P/<!-- TMPL_VAR NAME="browser_normalized_isbn"-->.01._AA75_PU_PU-5_.jpg" alt="" /><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
+	<!-- TMPL_IF NAME="SyndeticsEnabled" --><!-- TMPL_IF NAME="SyndeticsCoverImages" --><!-- TMPL_IF NAME="content_identifier_exists" --><!-- TMPL_IF NAME="using_https" --><img border="0" src="https://secure.syndetics.com/index.aspx?isbn=<!-- TMPL_ELSE --><img border="0" src="http://www.syndetics.com/index.aspx?isbn=<!-- /TMPL_IF --><!-- TMPL_VAR NAME="browser_normalized_isbn" -->/SC.GIF&amp;client=<!-- TMPL_VAR NAME="SyndeticsClientCode" --><!-- TMPL_IF NAME="browser_normalized_upc" -->&amp;upc=<!-- TMPL_VAR NAME="browser_normalized_upc" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="browser_normalized_oclc" -->&amp;oclc=<!-- TMPL_VAR NAME="browser_normalized_oclc" --><!-- /TMPL_IF -->&amp;type=xw10" alt="" /><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="GoogleJackets" --><!-- TMPL_IF NAME="browser_normalized_isbn" --><div style="block" title="<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->" class="<!-- TMPL_VAR name="browser_normalized_isbn" -->" id="gbs-thumbnail-preview<!--TMPL_VAR NAME="__counter__"-->"></div><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="BakerTaylorEnabled" --><!-- TMPL_IF NAME="browser_normalized_isbn" -->
+    <img alt="See Baker &amp; Taylor" src="<!-- TMPL_VAR NAME="BakerTaylorImageURL" ESCAPE="HTML" --><!-- TMPL_VAR NAME="browser_normalized_isbn" -->" /><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF -->
+
+</a></td>
+<!-- /TMPL_LOOP -->
+
+<!-- TMPL_LOOP NAME="NEXT_SHELF_BROWSE" -->
+       <td><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser">
+
+    <!-- TMPL_IF NAME="OPACAmazonEnabled" --><!-- TMPL_IF NAME="OPACAmazonCoverImages" --><!-- TMPL_IF NAME="browser_normalized_isbn" -->
+    <img border="0" src="http://images.amazon.com/images/P/<!-- TMPL_VAR NAME="browser_normalized_isbn"-->.01._AA75_PU_PU-5_.jpg" alt="" /><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
+	<!-- TMPL_IF NAME="SyndeticsEnabled" --><!-- TMPL_IF NAME="SyndeticsCoverImages" --><!-- TMPL_IF NAME="content_identifier_exists" --><!-- TMPL_IF NAME="using_https" --><img border="0" src="https://secure.syndetics.com/index.aspx?isbn=<!-- TMPL_ELSE --><img border="0" src="http://www.syndetics.com/index.aspx?isbn=<!-- /TMPL_IF --><!-- TMPL_VAR NAME="browser_normalized_isbn" -->/SC.GIF&amp;client=<!-- TMPL_VAR NAME="SyndeticsClientCode" --><!-- TMPL_IF NAME="browser_normalized_upc" -->&amp;upc=<!-- TMPL_VAR NAME="browser_normalized_upc" --><!-- /TMPL_IF --><!-- TMPL_IF NAME="browser_normalized_oclc" -->&amp;oclc=<!-- TMPL_VAR NAME="browser_normalized_oclc" --><!-- /TMPL_IF -->&amp;type=xw10" alt="" /><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF --><!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="GoogleJackets" --><!-- TMPL_IF NAME="browser_normalized_isbn" --><div style="block" title="<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->" class="<!-- TMPL_VAR name="browser_normalized_isbn" -->" id="gbs-thumbnail-preview<!--TMPL_VAR NAME="__counter__"-->"></div><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="BakerTaylorEnabled" --><!-- TMPL_IF NAME="browser_normalized_isbn" -->
+    <img alt="See Baker &amp; Taylor" src="<!-- TMPL_VAR NAME="BakerTaylorImageURL" ESCAPE="HTML" --><!-- TMPL_VAR NAME="browser_normalized_isbn" -->" /><!-- TMPL_ELSE --><span class="no-image">No cover image available</span><!-- /TMPL_IF --><!-- /TMPL_IF -->
+
+</a></td>
+<!-- /TMPL_LOOP -->
+<td rowspan="2" style="width:20px;"><a style="height: 10em;" href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_IF NAME="shelfbrowser_next_biblionumber" --><!-- TMPL_VAR NAME="shelfbrowser_next_biblionumber" --><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="biblionumber" --><!-- /TMPL_IF -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="shelfbrowser_next_itemnumber" -->#shelfbrowser"><img src="/opac-tmpl/prog/images/browse-next.gif" alt="Next" border="0" /></a></td>
+</tr>
+
+<tr>
+<!-- TMPL_LOOP NAME="PREVIOUS_SHELF_BROWSE" -->
+<td class="top"><!-- TMPL_VAR NAME="itemcallnumber" --><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser"><!-- TMPL_VAR NAME="title" escape="html" --></a></td>
+<!-- /TMPL_LOOP -->
+
+<!-- TMPL_LOOP NAME="NEXT_SHELF_BROWSE" -->
+       <td class="top"><!-- TMPL_VAR NAME="itemcallnumber" --><a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;shelfbrowse_itemnumber=<!-- TMPL_VAR NAME="itemnumber" -->#shelfbrowser"><!-- TMPL_VAR NAME="title" escape="html" --></a></td>
+<!-- /TMPL_LOOP -->
+</tr>
+</table>
+</div>
+<!-- /TMPL_IF -->
+<br clear="all" />
+</div><!-- /TMPL_IF -->
+<div id="otherholdings">
+<!-- TMPL_IF name="otherholdingscount" -->
+    <!-- TMPL_IF name="lotsofitems" -->
+	<p>This record has many physical items. <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->&amp;viewallitems=1">Click here to view them all.</a></p>
+    <!-- TMPL_ELSE -->
+	<table id="otherholdingst">
+	    <thead><tr>
+		<!-- TMPL_IF NAME="item-level_itypes" --><th>Item type</th><!-- /TMPL_IF -->
+		<th>Location</th>
+	    <!-- TMPL_IF NAME="itemdata_ccode" --><th>Collection</th><!-- /TMPL_IF -->
+	    <th>Call Number</th>
+	    <!-- TMPL_IF NAME="itemdata_enumchron" --><th>Vol Info</th><!-- /TMPL_IF -->
+	    <!-- TMPL_IF NAME="itemdata_uri" --><th>URL</th><!-- /TMPL_IF -->
+	    <!-- TMPL_IF NAME="itemdata_copynumber" --><th>Copy</th><!-- /TMPL_IF -->
+		<th>Status</th>
+		<!-- TMPL_IF NAME="itemdata_itemnotes" --><th>Notes</th><!-- /TMPL_IF -->
+		<th>Date Due</th>
+		<!-- TMPL_IF NAME="itemdata_serialseq" --><th>Serial number</th><!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="itemdata_publisheddate" --><th>Publication date</th><!-- /TMPL_IF -->
+	    </tr></thead>
+	    <tbody><!-- TMPL_LOOP NAME="OTHERITEM_RESULTS" -->
 	    <tr><!-- TMPL_IF NAME="item-level_itypes" --><td><!-- TMPL_IF NAME="imageurl" --><img src="<!-- TMPL_VAR NAME="imageurl" -->" title="<!-- TMPL_VAR NAME="description" -->" alt="<!-- TMPL_VAR NAME="description" -->" /><!-- /TMPL_IF --> <!-- TMPL_VAR NAME="description" --></td><!-- /TMPL_IF -->
 		<td><!-- TMPL_UNLESS NAME="singleBranchMode" --><!-- TMPL_IF name="branchurl" --><a href="<!-- TMPL_VAR NAME="branchurl" -->"><!-- TMPL_VAR NAME="branchname" --></a><!-- TMPL_ELSE --><!-- TMPL_VAR NAME="branchname" --><!-- /TMPL_IF --><!-- /TMPL_UNLESS --> <!-- TMPL_VAR NAME="location_description" --> </td>
 		<!-- TMPL_IF NAME="itemdata_ccode" --><td><!-- TMPL_VAR NAME="ccode" --></td><!-- /TMPL_IF -->

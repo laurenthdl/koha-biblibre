@@ -80,10 +80,28 @@ if ( C4::Context->preference("OPACXSLTDetailsDisplay") ) {
 }
 
 $template->param( 'OPACShowCheckoutName' => C4::Context->preference("OPACShowCheckoutName") );
+my $currentbranch="";
+
+if ($ENV{'OPAC_SEARCH_LIMIT'} and $ENV{'OPAC_SEARCH_LIMIT'} ne "")
+{
+	my $filtre=$ENV{'OPAC_SEARCH_LIMIT'};
+	if ($filtre=~/branch:/ and $filtre!~/^\(/ and $filtre!~/\)$/ and $filtre!~/ or /)
+	{
+		$filtre=~s/ //g;
+		$filtre=~s/branch://g;
+		$currentbranch=$filtre;
+	}
+}
+if (C4::Context->userenv()->{'branch'})
+{
+	$currentbranch = C4::Context->userenv()->{'branch'};
+}
 
 # change back when ive fixed request.pl
 my @all_items = &GetItemsInfo( $biblionumber, 'opac' );
-my @items;
+my @myitems;
+my $boolmyitems=0;
+my @otheritems;
 
 # Getting items to be hidden
 my @hiddenitems = GetHiddenItemnumbers(@all_items);
@@ -95,14 +113,31 @@ my $hideitems = 1 if C4::Context->preference('hidelostitems') or scalar(@hiddeni
 if ($hideitems) {
     for my $itm (@all_items) {
 	if  ( C4::Context->preference('hidelostitems') ) {
-	    push @items, $itm unless $itm->{itemlost} or any { $itm->{'itemnumber'} eq $_ } @hiddenitems;
+		if ($itm->{'holdingbranch'} eq $currentbranch) {
+			push @myitems, $itm unless $itm->{itemlost} or any { $itm->{'itemnumber'} eq $_ } @hiddenitems;
+			$boolmyitems=1;
+		} else {
+			push @otheritems, $itm unless $itm->{itemlost} or any { $itm->{'itemnumber'} eq $_ } @hiddenitems;
+		}
 	} else {
-	    push @items, $itm unless any { $itm->{'itemnumber'} eq $_ } @hiddenitems;
+	    if ($itm->{'holdingbranch'} eq $currentbranch) {
+			push @myitems, $itm unless any { $itm->{'itemnumber'} eq $_ } @hiddenitems;
+			$boolmyitems=1;
+		} else {
+			push @otheritems, $itm unless any { $itm->{'itemnumber'} eq $_ } @hiddenitems;
+		}
 	}
     }
 } else {
-    # Or not
-    @items = @all_items;
+	for my $itm (@all_items) {
+		if ($itm->{'holdingbranch'} eq $currentbranch) {
+			push @myitems, $itm;
+			$boolmyitems=1;
+		} else {
+			push @otheritems, $itm;
+		}
+	}
+    #@items = @all_items;
 }
 my $dat = &GetBiblioData($biblionumber);
 
@@ -209,8 +244,9 @@ if ( $dat->{'serial'} ) {
     $template->param( 'defaulttab' => $defaulttab );
 
 }
-
-$dat->{'count'} = scalar(@items);
+#$dat->{'count'} = scalar(@items);
+$dat->{'myholdingscount'} = scalar @myitems;
+$dat->{'otherholdingscount'} = scalar @otheritems;
 
 # If there is a lot of items, and the user has not decided
 # to view them all yet, we first warn him
@@ -225,7 +261,62 @@ my $biblio_authorised_value_images = C4::Items::get_authorised_value_images( C4:
 my $norequests = 1;
 my $branches   = GetBranches();
 my %itemfields;
-for my $itm (@items) {
+for my $itm (@myitems) {
+    $norequests = 0
+      if ( ( not $itm->{'wthdrawn'} )
+        && ( not $itm->{'itemlost'} )
+        && ( $itm->{'itemnotforloan'} < 0 || not $itm->{'itemnotforloan'} )
+        && ( not defined $itm->{'itype'} or not $itemtypes->{ $itm->{'itype'} }->{notforloan} )
+        && ( $itm->{'itemnumber'} ) );
+
+    if ( defined $itm->{'publictype'} ) {
+
+        # I can't actually find any case in which this is defined. --amoore 2008-12-09
+        $itm->{ $itm->{'publictype'} } = 1;
+    }
+    $itm->{datedue}      = format_date( $itm->{datedue} );
+    $itm->{datelastseen} = format_date( $itm->{datelastseen} );
+
+    # get collection code description, too
+    if ( my $ccode = $itm->{'ccode'} ) {
+        $itm->{'ccode'} = $collections->{$ccode} if ( defined($collections) && exists( $collections->{$ccode} ) );
+    }
+    if ( defined $itm->{'location'} ) {
+        $itm->{'location_description'} = $shelflocations->{ $itm->{'location'} };
+    }
+    if ( exists $itm->{itype} && defined( $itm->{itype} ) && exists $itemtypes->{ $itm->{itype} } ) {
+        $itm->{'imageurl'} = getitemtypeimagelocation( 'opac', $itemtypes->{ $itm->{itype} }->{'imageurl'} );
+        $itm->{'description'} = $itemtypes->{ $itm->{itype} }->{'description'};
+    }
+    foreach (qw(ccode enumchron copynumber itemnotes uri serialseq publisheddate)) {
+        $itemfields{$_} = 1 if ( $itm->{$_} );
+    }
+
+    # walk through the item-level authorised values and populate some images
+    my $item_authorised_value_images = C4::Items::get_authorised_value_images( C4::Items::get_item_authorised_values( $itm->{'itemnumber'} ) );
+
+    # warn( Data::Dumper->Dump( [ $item_authorised_value_images ], [ 'item_authorised_value_images' ] ) );
+
+    if ( $itm->{'itemlost'} ) {
+        my $lostimageinfo = List::Util::first { $_->{'category'} eq 'LOST' } @$item_authorised_value_images;
+        $itm->{'lostimageurl'}   = $lostimageinfo->{'imageurl'};
+        $itm->{'lostimagelabel'} = $lostimageinfo->{'label'};
+    }
+
+    if ( $itm->{'count_reserves'} ) {
+        if ( $itm->{'count_reserves'} eq "Waiting" )  { $itm->{'waiting'} = 1; }
+        if ( $itm->{'count_reserves'} eq "Reserved" ) { $itm->{'onhold'}  = 1; }
+    }
+
+    my ( $transfertwhen, $transfertfrom, $transfertto ) = GetTransfers( $itm->{itemnumber} );
+    if ( defined($transfertwhen) && $transfertwhen ne '' ) {
+        $itm->{transfertwhen} = format_date($transfertwhen);
+        $itm->{transfertfrom} = $branches->{$transfertfrom}{branchname};
+        $itm->{transfertto}   = $branches->{$transfertto}{branchname};
+    }
+    $itm->{publisheddate}=format_date($itm->{publisheddate});
+}
+for my $itm (@otheritems) {
     $norequests = 0
       if ( ( not $itm->{'wthdrawn'} )
         && ( not $itm->{'itemlost'} )
@@ -387,7 +478,9 @@ if ( C4::Context->preference("OPACISBD") ) {
 }
 
 $template->param(
-    ITEM_RESULTS      => \@items,
+    boolmyitems       => $boolmyitems,
+    MYITEM_RESULTS    => \@myitems,
+    OTHERITEM_RESULTS => \@otheritems,
     biblionumber      => $biblionumber,
     reviews           => $reviews,
     loggedincommenter => $loggedincommenter
