@@ -266,8 +266,8 @@ sub buildQuery {
             my $idx;
 
             # 'Normal' search
-            if ( not @$indexes or not grep { length $_ } @$indexes ) {
-                return C4::Search::Query::Solr->normalSearch(@$operands[0]);
+            if ( not @$indexes or not grep { $_ and length $_ } @$indexes ) {
+                return C4::Search::Query::Solr->normalSearch( join " AND ", @$operands );
             }
 
             # Advanced search

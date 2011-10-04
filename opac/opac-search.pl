@@ -343,15 +343,35 @@ if ($tag) {
 }
 
 my $end_query = C4::Context->preference('SearchOPACHides');
+
+if ( $end_query ) {
+    my $err = 0;
+    if ( $end_query =~ /^([^ ]*) (.*)$/ ) {
+        my $op = $1;
+        my $token = $2;
+        if ( $token =~ /^([^:]*):(.*)$/ ) {
+            my $idx = $1;
+            my $val = $2;
+            push @indexes, $idx;
+            push @operands, $val;
+            push @operators, $op;
+        } else {
+            $err = 1;
+        }
+    } else {
+        $err = 1;
+    }
+    if ( $err ) {
+        warn "Bad format for SearchOPACHides syspref";
+    }
+}
+
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
-my $q_mod = $end_query
-        ? C4::Search::Query->normalSearch( $q . " " . $end_query )
-        : $q;
 $query_desc = $q if not $tag;
 
 # perform the search
-my $res = SimpleSearch( $q_mod, \%filters, $page, $count, $sort_by);
-C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q_mod:";
+my $res = SimpleSearch( $q, \%filters, $page, $count, $sort_by);
+C4::Context->preference("DebugLevel") eq '2' && warn "OpacSolrSimpleSearch:q=$q:";
 
 if ($$res{error}){
     $template->param(query_error => $$res{error});
