@@ -154,7 +154,7 @@ sub getIndexName {
     my $search_engine = C4::Context->preference("SearchEngine");
 
     given ( $search_engine ) {
-        when ( 'Solr' ) {
+        when ( /Solr/ ) {
             return getSolrIndex($code);
         }
 
@@ -246,13 +246,13 @@ sub buildQuery {
             return C4::Search::Query::Zebra->buildQuery($indexes, $operands, $operators);
         }
 
-        when( 'Solr' ) {
+        when( /Solr/ ) {
             my $new_indexes;
             my $new_operands;
             my $idx;
 
             # 'Normal' search
-            if ( not @$indexes ) {
+            if ( not @$indexes or not grep { length $_ } @$indexes ) {
                 return C4::Search::Query::Solr->normalSearch(@$operands[0]);
             }
 
@@ -277,7 +277,7 @@ sub normalSearch {
             return C4::Search::Query::Zebra->normalSearch($query);
         }
 
-        when( 'Solr' ) {
+        when( /Solr/ ) {
             return C4::Search::Query::Solr->normalSearch($query);
         }
     }

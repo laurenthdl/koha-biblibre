@@ -1,7 +1,79 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
 <title>Koha &rsaquo; Acquisitions &rsaquo; Search Existing Records</title>
 <!-- TMPL_INCLUDE NAME="greybox.inc" -->
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR NAME='themelang' -->/css/datatables.css" />
 <!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/lib/jquery/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR NAME='themelang' -->/js/datatables.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+var dt_orders;
+
+function filter() {
+    dt_orders.fnDraw();
+    return false;
+}
+
+function clearFilters() {
+    $("input.filter").val('');
+    dt_orders.fnDraw();
+}
+
+$(document).ready(function() {
+    dt_orders = $("#orderst").dataTable($.extend(true, {}, dataTablesDefaults, {
+        'bAutoWidth': false,
+        'bProcessing': true,
+        'bServerSide': true,
+        'sAjaxSource': '/cgi-bin/koha/acqui/tables/orders.pl',
+        'fnServerData': function(sSource, aoData, fnCallback) {
+            $("input.filter").each(function() {
+                if($(this).val() && $(this).attr('data-indexname')) {
+                    aoData.push({
+                        'name' : 'filters',
+                        'value': $(this).attr('data-indexname')
+                    },{
+                        'name' : 'filters_values',
+                        'value': $(this).val()
+                    });
+                }
+            });
+
+            aoData.push({
+                'name' : 'booksellerid',
+                'value': '<!-- TMPL_VAR NAME="booksellerid" -->'
+            },{
+                'name' : 'basketno',
+                'value': '<!-- TMPL_VAR NAME="basketno" -->'
+            },{
+                'name' : 'query',
+                'value': '<!-- TMPL_VAR NAME="query" -->',
+            },{
+                'name' : 'summary_sorton',
+                'value': 'title author'
+            });
+            $.ajax({
+                "dataType": 'json',
+                "type": "POST",
+                "url": sSource,
+                "data": aoData,
+                "success": fnCallback
+            });
+        },
+        'aoColumns': [
+            { "mDataProp": "summary" },
+            { "mDataProp": "publisher", "bSortable": false },
+            { "mDataProp": "copyright", "bSortable": false, "bSearchable": false },
+            { "mDataProp": "view_marc", "bSortable": false, "bSearchable": false },
+            { "mDataProp": "order", "bSortable": false, "bSearchable": false }
+        ],
+        'aaSorting': [],
+        'bFilter': false,
+        'sPaginationType': 'full_numbers'
+    }));
+
+} );
+//]]>
+</script>
 </head>
 <body>
 <!-- TMPL_INCLUDE NAME="header.inc" -->
@@ -14,82 +86,32 @@
    <div id="bd">
 	<div id="yui-main">
 	<div class="yui-b">
-    <div class='neworder_filter'>
-        <form action="/cgi-bin/koha/acqui/neworderbiblio.pl" method="get">
-            <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME='booksellerid' -->" />
-            <input type="hidden" name="basketno" value="<!-- TMPL_VAR NAME='basketno' -->" />
-            Filter: <input type="text" name="q" value="" />
-            in      <select name="idx">
-                        <option value="kw">Library Catalog</option>
-                        <option value="ti">Title</option>
-                        <option value="pb">Publisher</option>
-                        <option value="au">Author</option>
-                        <option value="su">Subject</option>
-                        <option value="nb">ISBN</option>
-                        <option value="se">Series</option>
-                        <option value="callnum">Call Number</option>
-                    </select>
-            <input type="submit" value="Submit" class="submit">
-        </form>
-    </div>
 
 <h1>Search Existing Records</h1>
 
-<!-- TMPL_IF NAME="total" -->
-    <b><!-- TMPL_VAR NAME="total" --> results found </b>
-    <!-- TMPL_INCLUDE NAME="page-numbers.inc" -->
-<!-- TMPL_ELSE -->
-    <h3> No results found</h3>
-    <p>No results match your search for <span style="font-weight: bold;">&ldquo;<!-- TMPL_VAR NAME="query" -->&rdquo;</span> in <!-- TMPL_VAR NAME="LibraryName" --></p>
-<!-- /TMPL_IF -->
+<p>Query is: <strong><!-- TMPL_VAR NAME='query' --></strong></p>
 
-<!-- TMPL_IF NAME="total"-->
 <div class="searchresults">
-    <table>
-    <tr>
-       <th>Summary</th>
-       <th>Publisher</th>
-       <th>Copyright</th>
-       <th colspan="2">&nbsp;</th>
-    </tr>
-    <!-- TMPL_LOOP NAME="resultsloop" -->
-        <tr>
-            <td>
-                <p><span class="title"><!-- TMPL_VAR NAME="title" escape="html" --></span>
-                <!-- TMPL_IF name="author" -->  by <span class="author"><!-- TMPL_VAR NAME="author" --></span>,<!-- /TMPL_IF --></p>
-                <p><!-- TMPL_IF name="isbn" --> <!-- TMPL_VAR name="isbn" --><!-- /TMPL_IF -->
-                <!-- TMPL_IF name="pages" --> - <!-- TMPL_VAR name="pages" --><!-- /TMPL_IF -->
-                <!-- TMPL_IF name="notes" --> : <!-- TMPL_VAR name="notes" --><!-- /TMPL_IF -->
-                <!-- TMPL_IF name="size" --> ; <!-- TMPL_VAR name="size" --><!-- /TMPL_IF -->
-                </p>
-            </td>
-            <td>
-                <!-- TMPL_VAR name="publishercode" -->
-                <!-- TMPL_IF name="place" --> ; <!-- TMPL_VAR name="place" --><!-- /TMPL_IF -->
-            </td>
-            <td>
-                <!-- TMPL_VAR NAME="copyrightdate" -->
-            </td>
-        <td>
-        <a href="/cgi-bin/koha/catalogue/showmarc.pl?id=<!-- TMPL_VAR NAME="biblionumber" -->" title="MARC" rel="gb_page_center[600,500]">View MARC</a>
-        </td>
-            <td>
-            <a href="/cgi-bin/koha/acqui/neworderempty.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->&amp;biblionumber=<!-- TMPL_VAR NAME="biblionumber" -->" title="Order this one">
-                Order
-            </a>
-            </td>
-        </tr>
-    <!-- /TMPL_LOOP -->
+    <table id="orderst" class="display">
+        <thead>
+            <tr>
+               <th>Summary</th>
+               <th>Publisher</th>
+               <th>Copyright</th>
+               <th>&nbsp;</th>
+               <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
     </table>
+    <div class="spacer"></div>
 </div>
-<!-- /TMPL_IF -->
 
 <fieldset id="acqui_basket_add">
         <legend>Add To Order</legend>
         <form action="/cgi-bin/koha/acqui/neworderbiblio.pl" method="post">
             <input type="hidden" name="booksellerid" value="<!-- TMPL_VAR NAME="booksellerid" -->" />
             <input type="hidden" name="basketno" value="<!-- TMPL_VAR NAME="basketno" -->" />
-            <input type="hidden" name="idx" value="all_fields" />            
             <ul><li><label for="q">From an existing record: </label><input id="q" type="text"  size="25" name="q" />
             <input type="submit" class="submit" value="Search" /></li>
             <li><a href="/cgi-bin/koha/acqui/newordersuggestion.pl?booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">From a Suggestion</a></li>
@@ -100,7 +122,47 @@
 
 </div>
 </div>
+
 <div class="yui-b">
+<form onsubmit="return filter();">
+    <fieldset class="brief">
+        <h3>Filters</h3>
+        <ol>
+            <li>
+                <label for="title_filter">Title:</label>
+                <input type="text" id="title_filter" class="filter" data-indexname="title" />
+            </li>
+            <li>
+                <label for="author_filter">Author:</label>
+                <input type="text" id="author_filter" class="filter" data-indexname="author" />
+            </li>
+            <li>
+                <label for="publisher_filter">Publisher:</label>
+                <input type="text" id="publisher_filter" class="filter" data-indexname="publisher" />
+            </li>
+            <li>
+                <label for="subject_filter">Subject:</label>
+                <input type="text" id="subject_filter" class="filter" data-indexname="subject" />
+            </li>
+            <li>
+                <label for="isbn_filter">ISBN:</label>
+                <input type="text" id="isbn_filter" class="filter" data-indexname="isbn" />
+            </li>
+            <li>
+                <label for="series_filter">Series:</label>
+                <input type="text" id="series_filter" class="filter" data-indexname="title-series" />
+            </li>
+            <li>
+                <label for="callnumber_filter">Call number:</label>
+                <input type="text" id="callnumber_filter" class="filter" data-indexname="callnumber" />
+            </li>
+        </ol>
+        <fieldset class="action">
+            <input type="submit" value="Filter" />
+            <input type="button" value="Clear" onclick="clearFilters();" />
+        </fieldset>
+    </fieldset>
+</form>
 <!-- TMPL_INCLUDE NAME="acquisitions-menu.inc" -->
 </div>
 </div>

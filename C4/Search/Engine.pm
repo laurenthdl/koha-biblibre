@@ -43,7 +43,7 @@ sub find_searchengine {
 
     my ($self) = @_; 
 
-    if (C4::Context->preference("SearchEngine") eq "Solr") {
+    if (C4::Context->preference("SearchEngine") =~ /Solr/) {
         $self->searchengine("Solr");
     } elsif (C4::Context->preference("SearchEngine") eq "Zebra") {
         $self->searchengine("Zebra");
@@ -73,11 +73,26 @@ sub index {
 
     if ($self->searchengine eq "Solr") {
         # SimpleSearch( $q, $filters, $page, $max_results, $sort)
-        return C4::Search::Engine::Solr::IndexRecord(@_);
+	if (C4::Context->preference("SearchEngine") ne "SolrIndexOff") {
+	    return C4::Search::Engine::Solr::IndexRecord(@_);
+	}
     } elsif ($self->searchengine eq "Zebra") {
         # SimpleSearch( $query, $offset, $max_results, $servers ) 
         warn "Unsupported yet";
         #return C4::Search::Engine::Zebra->IndexRecord(@_);
+    } else {
+        warn "System preference 'SearchEngine' not equal 'Solr' or 'Zebra'.";
+        warn "We can not indexing";
+    }
+}
+
+sub add_to_index_queue {
+    my $self = shift(@_);
+
+    if ($self->searchengine eq "Solr") {
+        return C4::Search::Engine::Solr::AddRecordToIndexRecordQueue(@_);
+    } elsif ($self->searchengine eq "Zebra") {
+        warn "Unsupported yet";
     } else {
         warn "System preference 'SearchEngine' not equal 'Solr' or 'Zebra'.";
         warn "We can not indexing";

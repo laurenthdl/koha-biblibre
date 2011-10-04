@@ -51,6 +51,7 @@ function searchauthority() {
 <div id="authorities_searchresultlist_results">
   <table>
     <tr>
+      <th>Authority type</th>
       <th colspan="2">Summary</th>
 <!-- TMPL_UNLESS name="isEDITORS" -->
       <th>Used in</th>
@@ -63,6 +64,7 @@ function searchauthority() {
     <!-- TMPL_ELSE -->
     <tr>
     <!-- /TMPL_UNLESS -->
+      <td><!-- TMPL_VAR NAME='authtype' --></td>
       <td><!-- TMPL_VAR NAME="summary" --></td>
       <td><a href="detail.pl?authid=<!-- TMPL_VAR NAME="authid" -->">Details</a></td>
   <!-- TMPL_UNLESS name="isEDITORS" -->

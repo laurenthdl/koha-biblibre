@@ -371,12 +371,12 @@ sub GetBudgetPermDropbox {
     my %labels;
     $labels{'0'} = 'None';
     $labels{'1'} = 'Owner';
-    $labels{'2'} = 'Library';
+    $labels{'2'} = 'Owner + Users + Library';
     $labels{'3'} = 'Owner + Users';
     my $radio = CGI::scrolling_list(
         -id      => 'budget_permission',
         -name    => 'budget_permission',
-        -values  => [ '0', '1', '2', '3' ],
+        -values  => [ '0', '1', '3', '2' ],
         -default => $perm,
         -labels  => \%labels,
         -size    => 1,
@@ -395,8 +395,8 @@ sub GetBudgetAuthCats {
     $sth->execute($budget_period_id);
     my %authcats;
     while ( my ( $sort1_authcat, $sort2_authcat ) = $sth->fetchrow ) {
-        $authcats{$sort1_authcat} = 1;
-        $authcats{$sort2_authcat} = 1;
+        $authcats{$sort1_authcat} = 1 if($sort1_authcat);
+        $authcats{$sort2_authcat} = 1 if($sort2_authcat);
     }
     my @auth_cats_loop;
     foreach ( sort keys %authcats ) {

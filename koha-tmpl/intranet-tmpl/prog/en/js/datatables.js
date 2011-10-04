@@ -1,3 +1,31 @@
+// These default options are for translation but can be used
+// for any other datatables settings
+// To use it, write:
+//  $("#table_id").dataTable($.extend(true, {}, dataTableDefaults, {
+//      // other settings
+//  } ) );
+var dataTablesDefaults = {
+    "oLanguage": {
+        "oPaginate": {
+            "sFirst"    : _("First"),
+            "sLast"     : _("Last"),
+            "sNext"     : _("Next"),
+            "sPrevious" : _("Previous")
+        },
+        "sEmptyTable"       : _("No data available in table"),
+        "sInfo"             : _("Showing _START_ to _END_ of _TOTAL_ entries"),
+        "sInfoEmpty"        : _("No entries to show"),
+        "sInfoFiltered"     : _("(filtered from _MAX_ total entries)"),
+        "sLengthMenu"       : _("Show _MENU_ entries"),
+        "sLoadingRecords"   : _("Loading..."),
+        "sProcessing"       : _("Processing..."),
+        "sSearch"           : _("Search:"),
+        "sZeroRecords"      : _("No matching records found")
+    }
+};
+
+
+// Return an array of string containing the values of a particular column
 $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
     // check that we have a column id
     if ( typeof iColumn == "undefined" ) return new Array();
@@ -10,11 +38,11 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
     // list of rows which we're going to loop through
     var aiRows;
     // use only filtered rows
-    if (bFiltered == true) aiRows = oSettings.aiDisplay; 
+    if (bFiltered == true) aiRows = oSettings.aiDisplay;
     // use all rows
     else aiRows = oSettings.aiDisplayMaster; // all row numbers
 
-    // set up data array    
+    // set up data array
     var asResultData = new Array();
     for (var i=0,c=aiRows.length; i<c; i++) {
         iRow = aiRows[i];
@@ -30,6 +58,78 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
     return asResultData;
 }
 
+// List of unbind keys (Ctrl, Alt, Direction keys, etc.)
+// These keys must not launch filtering
+var blacklist_keys = new Array(0, 16, 17, 18, 37, 38, 39, 40);
+
+// Set a filtering delay for global search field
+jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay ) {
+    /*
+     * Inputs:      object:oSettings - dataTables settings object - automatically given
+     *              integer:iDelay - delay in milliseconds
+     * Usage:       $('#example').dataTable().fnSetFilteringDelay(250);
+     * Author:      Zygimantas Berziunas (www.zygimantas.com) and Allan Jardine
+     * License:     GPL v2 or BSD 3 point style
+     * Contact:     zygimantas.berziunas /AT\ hotmail.com
+     */
+    var
+        _that = this,
+        iDelay = (typeof iDelay == 'undefined') ? 250 : iDelay;
+
+    this.each( function ( i ) {
+        $.fn.dataTableExt.iApiIndex = i;
+        var
+            $this = this,
+            oTimerId = null,
+            sPreviousSearch = null,
+            anControl = $( 'input', _that.fnSettings().aanFeatures.f );
+
+        anControl.unbind( 'keyup.DT' ).bind( 'keyup.DT', function(event) {
+            var $$this = $this;
+            if (blacklist_keys.indexOf(event.keyCode) != -1) {
+                return this;
+            }else if ( event.keyCode == '13' ) {
+                $.fn.dataTableExt.iApiIndex = i;
+                _that.fnFilter( $(this).val() );
+            } else {
+                if (sPreviousSearch === null || sPreviousSearch != anControl.val()) {
+                    window.clearTimeout(oTimerId);
+                    sPreviousSearch = anControl.val();
+                    oTimerId = window.setTimeout(function() {
+                        $.fn.dataTableExt.iApiIndex = i;
+                        _that.fnFilter( anControl.val() );
+                    }, iDelay);
+                }
+            }
+        });
+
+        return this;
+    } );
+    return this;
+}
+
+// Add a filtering delay on general search and on all input (with a class 'filter')
+jQuery.fn.dataTableExt.oApi.fnAddFilters = function ( oSettings, sClass, iDelay ) {
+    var table = this;
+    this.fnSetFilteringDelay(iDelay);
+    var filterTimerId = null;
+    $("input."+sClass).keyup(function(event) {
+      if (blacklist_keys.indexOf(event.keyCode) != -1) {
+        return this;
+      }else if ( event.keyCode == '13' ) {
+        table.fnFilter( $(this).val(), $(this).attr('data-column_num') );
+      } else {
+        window.clearTimeout(filterTimerId);
+        var input = this;
+        filterTimerId = window.setTimeout(function() {
+          table.fnFilter($(input).val(), $(input).attr('data-column_num'));
+        }, iDelay);
+      }
+    });
+}
+
+// Useful if you want to filter on dates with 2 inputs (start date and end date)
+// You have to include calendar.inc to use it
 function dt_add_rangedate_filter(begindate_id, enddate_id, dateCol) {
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {
@@ -54,4 +154,200 @@ function dt_add_rangedate_filter(begindate_id, enddate_id, dateCol) {
             return false;
         }
     );
+}
+
+//Sorting for dates (uk format)
+function dt_add_type_uk_date() {
+  jQuery.fn.dataTableExt.aTypes.unshift(
+    function ( sData )
+    {
+      if (sData.match(/(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20|21)\d\d/))
+      {
+        return 'uk_date';
+      }
+      return null;
+    }
+  );
+
+  jQuery.fn.dataTableExt.oSort['uk_date-asc']  = function(a,b) {
+    var re = /(\d{2}\/\d{2}\/\d{4})/;
+    a.match(re);
+    var ukDatea = RegExp.$1.split("/");
+    b.match(re);
+    var ukDateb = RegExp.$1.split("/");
+
+    var x = (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
+    var y = (ukDateb[2] + ukDateb[1] + ukDateb[0]) * 1;
+
+    return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+  };
+
+  jQuery.fn.dataTableExt.oSort['uk_date-desc'] = function(a,b) {
+    var re = /(\d{2}\/\d{2}\/\d{4})/;
+    a.match(re);
+    var ukDatea = RegExp.$1.split("/");
+    b.match(re);
+    var ukDateb = RegExp.$1.split("/");
+
+    var x = (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
+    var y = (ukDateb[2] + ukDateb[1] + ukDateb[0]) * 1;
+
+    return ((x < y) ? 1 : ((x > y) ?  -1 : 0));
+  };
+}
+
+// Sorting on html contains
+// <a href="foo.pl">bar</a> sort on 'bar'
+function dt_overwrite_html_sorting_localeCompare() {
+    jQuery.fn.dataTableExt.oSort['html-asc']  = function(a,b) {
+        a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        if (typeof(a.localeCompare == "function")) {
+           return a.localeCompare(b);
+        } else {
+           return (a > b) ? 1 : ((a < b) ? -1 : 0);
+        }
+    };
+
+    jQuery.fn.dataTableExt.oSort['html-desc'] = function(a,b) {
+        a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        if(typeof(b.localeCompare == "function")) {
+            return b.localeCompare(a);
+        } else {
+            return (b > a) ? 1 : ((b < a) ? -1 : 0);
+        }
+    };
+}
+
+// Sorting on string without accentued characters
+function dt_overwrite_string_sorting_localeCompare() {
+    jQuery.fn.dataTableExt.oSort['string-asc']  = function(a,b) {
+        a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        if (typeof(a.localeCompare == "function")) {
+           return a.localeCompare(b);
+        } else {
+           return (a > b) ? 1 : ((a < b) ? -1 : 0);
+        }
+    };
+
+    jQuery.fn.dataTableExt.oSort['string-desc'] = function(a,b) {
+        a = a.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        b = b.replace(/<.*?>/g, "").replace(/\s+/g, " ");
+        if(typeof(b.localeCompare == "function")) {
+            return b.localeCompare(a);
+        } else {
+            return (b > a) ? 1 : ((b < a) ? -1 : 0);
+        }
+    };
+}
+
+function dt_add_type_totalcost() {
+  function totalcost_sort(a,b) {
+    a = a.replace(/\s+/g, " ");
+    b = b.replace(/\s+/g, " ");
+    var re = /(\d+\.\d+)x(\d+) = (\d+\.\d+) <p.*>(.*)<\/p>/;
+    a.match(re);
+    var a_ecost = RegExp.$1 * 1;
+    var a_qty = RegExp.$2 * 1;
+    var a_total = RegExp.$3 * 1;
+    var a_budget = RegExp.$4;
+    b.match(re);
+    var b_ecost = RegExp.$1 * 1;
+    var b_qty = RegExp.$2 * 1;
+    var b_total = RegExp.$3 * 1;
+    var b_budget = RegExp.$4;
+
+    var r = (a_total > b_total) ? 1 : ((a_total < b_total) ? -1 : 0);
+
+    if(r == 0){
+      if(typeof(a_budget.localeCompare == "function")){
+        r = a_budget.localeCompare(b_budget);
+      }else{
+        r = (a_budget > b_budget) ? 1 : ((a_budget < b_budget) ? -1 : 0);
+      }
+    }
+
+    return r;
+  }
+
+  jQuery.fn.dataTableExt.oSort['totalcost-asc'] = function(a,b) {
+    return totalcost_sort(a,b);
+  };
+
+  jQuery.fn.dataTableExt.oSort['totalcost-desc'] = function(a,b) {
+    return totalcost_sort(b,a);
+  };
+}
+
+function dt_add_type_htmlbasketno() {
+  function htmlbasketno_sort(a, b) {
+    a = a.replace(/\s+/g, " ");
+    b = b.replace(/\s+/g, " ");
+
+    var re = /<.*?basketno=.*?>(\d+)<.*?> (.*)/;
+    a.match(re);
+    var a_basketno = RegExp.$1 * 1;
+    var a_string = RegExp.$2.replace(/<.*?>/g, "");
+    b.match(re);
+    var b_basketno = RegExp.$1 * 1;
+    var b_string = RegExp.$2.replace(/<.*?>/g, "");
+
+    var r = (a_basketno > b_basketno) ? 1 : ((a_basketno < b_basketno) ? -1 : 0);
+
+    if(r == 0) {
+      if(typeof(a_string.localeCompare == "function")){
+        r = a_string.localeCompare(b_string);
+      }else{
+        r = (a_string > b_string) ? 1 : ((a_string < b_string) ? -1 : 0);
+      }
+    }
+
+    return r;
+  }
+
+  jQuery.fn.dataTableExt.oSort['htmlbasketno-asc'] = function(a,b) {
+      return htmlbasketno_sort(a,b);
+  };
+
+  jQuery.fn.dataTableExt.oSort['htmlbasketno-desc'] = function(a,b) {
+      return htmlbasketno_sort(b,a);
+  };
+}
+
+// Replace a node with a html and js contain.
+function replace_html( original_node, type ) {
+    switch ( $(original_node).attr('data-type') ) {
+        case "range_dates":
+            var id = $(original_node).attr("data-id");
+            var format = $(original_node).attr("data-format");
+            replace_html_date( original_node, id, format );
+            break;
+        default:
+            alert("_(This node can't be replaced)");
+    }
+}
+
+// Replace a node with a "From [date] To [date]" element
+// Used on tfoot > td
+function replace_html_date( original_node, id, format ) {
+    var node = $('<span style="white-space:nowrap">' + _("From") + '<input type="text" id="' + id + 'from" readonly="readonly" placeholder=\'' + _("Pick date") + '\' size="7" /><a title="Delete this filter" style="cursor:pointer" onclick=\'$("#' + id + 'from").val("").change();\' >&times;</a></span><br/><span style="white-space:nowrap">' + _("To") + '<input type="text" id="' + id + 'to" readonly="readonly" placeholder=\'' + _("Pick date") + '\' size="7" /><a title="Delete this filter" style="cursor:pointer" onclick=\'$("#' + id + 'to").val("").change();\' >&times;</a></span>');
+    $(original_node).replaceWith(node);
+    var script = document.createElement( 'script' );
+    script.type = 'text/javascript';
+    var script_content = "Calendar.setup({";
+    script_content += "    inputField: \"" + id + "from\",";
+    script_content += "    ifFormat: \"" + format + "\",";
+    script_content += "    button: \"" + id + "from\",";
+    script_content += "    onClose: function(){ $(\"#" + id + "from\").change(); this.hide();}";
+    script_content += "  });";
+    script_content += "  Calendar.setup({";
+    script_content += "    inputField: \"" + id + "to\",";
+    script_content += "    ifFormat: \"" + format + "\",";
+    script_content += "    button: \"" + id + "to\",";
+    script_content += "    onClose: function(){ $(\"#" + id + "to\").change(); this.hide();}";
+    script_content += "  });";
+    script.text = script_content;
+    $(original_node).append( script );
 }

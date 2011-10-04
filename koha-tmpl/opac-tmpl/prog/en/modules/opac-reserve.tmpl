@@ -18,7 +18,19 @@
     var copiesRowId = null;
     var wasSpecific = false;
     var lastCopiesRowId = null;
+    
 	$(".checkitem").parent().click(function(e){
+
+            <!-- TMPL_IF NAME="onlynextat" -->
+                
+                var itemnum = suffixOf($(this).attr("id"), "_");
+                var biblioNum = suffixOf($(this).find('input').attr("id"), "_");
+                console.log("bla " + biblioNum);
+                console.log($("#checkitemhomebranch_"  + itemnum + " span").attr("name"));
+                $("#branch_" + biblioNum).val($("#checkitemhomebranch_"  + itemnum + " span").attr("name"));
+            <!-- /TMPL_IF -->
+
+
 		if(e.target.tagName.toLowerCase() == 'td'){
            $(this).find("input.checkitem").each( function() {
                $(this).attr('checked', !$(this).attr('checked'));
@@ -47,7 +59,7 @@
         $(this).html(html);
     });
 
-    // Make sure a specific item was selected where specified
+       // Make sure a specific item was selected where specified
     // before moving on to a new item.
     function changeSelection (newCopiesRowId, isSpecific) {
         if (copiesRowId && ((copiesRowId != newCopiesRowId) || (wasSpecific != isSpecific))) {
@@ -71,6 +83,7 @@
     // When 'specific copy' radio button is clicked
     $(".selectspecific").click(function() {
 
+
         // Make sure all other specific copy table rows are hidden
         biblioNum = suffixOf($(this).attr("id"), "_");
         newCopiesRowId = "#copiesrow_" + biblioNum;
@@ -84,12 +97,49 @@
         $(newCopiesRowId).show();
     });
 
+    // When 'specific copy at' radio button is clicked
+    $(".selectanyat").click(function() {
+        // Make sure all other specific copy table rows are hidden
+        biblioNum = suffixOf($(this).attr("id"), "_");
+        newCopiesRowId = "#copiesrow_" + biblioNum;
+
+        // Hide the copies table row
+        $(".copiesrow").hide();
+
+        // Disabling pickup library
+       $("#branch_" + biblioNum).attr('disabled', 'disabled'); 
+
+       // Enabling reserve location
+       $("#nextatbranch_" + biblioNum).removeAttr('disabled'); 
+
+        // We set the pickup library (even if it is disabled) to the selected value,
+        // so the user understand there will be no transfer
+        $("#branch_" + biblioNum).val($("#nextatbranch_"  + biblioNum + " option:selected").val());
+
+        if (!changeSelection(newCopiesRowId, false)) {
+            return false;
+        }
+
+
+    });
+
+    // When 'specific copy at' dropdown list is modified
+    $(".nextatbranchselect").change(function() {
+        biblioNum = suffixOf($(this).attr("id"), "_");
+        // We set the pickup library (even if it is disabled) to the selected value,
+        // so the user understand there will be no transfer
+        $("#branch_" + biblioNum).val($("#" + $(this).attr("id") + " option:selected").val());
+    });
 
     // When 'first available' radion button is clicked
     $(".selectany").click(function() {
         // Make sure all other specific copy table rows are hidden
         biblioNum = suffixOf($(this).attr("id"), "_");
         newCopiesRowId = "#copiesrow_" + biblioNum;
+        // Disabling location
+       $("#nextatbranch_" + biblioNum).attr('disabled', 'disabled'); 
+
+
 
         if (!changeSelection(newCopiesRowId, false)) {
             return false;
@@ -123,6 +173,19 @@
                  branch = $(branchSel).val();
             }
 
+            // Add the first available location
+            var availBranchSel = $("#nextatbranch_" + biblioNum);
+            var availBranch = "";
+            if (availBranchSel.size() > 0) {
+                 availBranch = $(availBranchSel).val();
+            }
+
+            // If the 'next available copy at' radio button is checked
+            if ($("#reqat_" + biblioNum + ":checked").size() > 0) {
+                // pickup library is the location where the item will be available
+                branch = $(availBranchSel).val();
+            }
+
             // If the 'specific copy' radio button is checked
             if ($("#reqspecific_" + biblioNum + ":checked").size() > 0) {
                 // Find the selected copy
@@ -132,14 +195,22 @@
                     return false;
                 } else {
                   $(items).each( function(idx,item){
-                    selections+=biblioNum+separator+item.value+separator+branch+separator;
+                    selections+=biblioNum+separator+item.value+separator+branch+separator+availBranch;
                   });
                 }
             }
             else {
-                selections=biblioNum+separator+separator+branch+separator;
-            }
+                // If the request is for any item in a specific location
+                if ($("#reqat_" + biblioNum + ":checked").size() > 0) {
+                    selections=biblioNum+separator+separator+branch+separator+availBranch;
+                } else {
+                    // If the request is for any item in any location,
+                    // we do not set firstavailablebranch.
+                    // Branch will be set later, when we know which one it is
+                    selections=biblioNum+separator+separator+branch+separator;
+                }
 
+            }
             return true;
         });
 
@@ -147,12 +218,17 @@
             alert(MSG_NO_COPY_SELECTED);
             return false;
         }
-
         $("#selections").val(selections);
         $("#biblionumbers").val(biblionumbers);
 
         return true;
     });
+ <!-- TMPL_IF NAME="onlynextat" -->
+    // Disabling pickup library
+   $(".branchselect").attr('disabled', 'disabled'); 
+   $(".selectanyat").click();
+   <!-- /TMPL_IF -->
+
 
  });
 // ]]>
@@ -250,9 +326,7 @@
 		  <th>Hold Starts on Date</th>
 		  <!-- /TMPL_IF -->
 		  <th>Hold Not Needed After</th>
-                  <!-- TMPL_IF NAME="OPACItemHolds" -->
-                    <th id="place_on_hdr" style="display:none">Place On</th>
-                  <!-- /TMPL_IF -->
+                  <th id="place_on_hdr" style="display:none">Place On</th>
                   <!-- TMPL_UNLESS NAME="singleBranchMode" -->
                     <th>Pickup Location</th>
                   <!-- /TMPL_UNLESS -->
@@ -384,11 +458,12 @@
 		<a href="#" style="font-size:85%;text-decoration:none;" onclick="document.getElementById('expiration_date_<!-- TMPL_VAR NAME="biblionumber" -->').value='';return false;">Clear Date</a></p>
 	</td>
 
-                    <!-- TMPL_IF NAME="OPACItemHolds" -->
                       <td class="place_on_type" style="display:none">
                         <table>
                           <tr>
                             <td>
+
+                            <!-- TMPL_UNLESS NAME="onlynextat" -->
                               <!-- TMPL_UNLESS NAME="holdable" -->
                                 <input type="radio" name="reqtype_<!-- TMPL_VAR NAME="biblionumber" -->"
                                        id="reqany_<!-- TMPL_VAR NAME="biblionumber" -->"
@@ -405,8 +480,43 @@
                                 />
                               <!-- /TMPL_UNLESS -->
                               <label for="reqany_<!-- TMPL_VAR NAME="biblionumber" -->">Next available copy</label>
+                              <!-- /TMPL_UNLESS -->
                             </td>
                           </tr>
+                          <!-- TMPL_IF NAME="onlynextat" -->
+                          <tr>
+                            <td>
+                              <!-- TMPL_UNLESS NAME="holdable" -->
+                                <input type="radio" name="reqtype_<!-- TMPL_VAR NAME="biblionumber" -->"
+                                       id="reqat_<!-- TMPL_VAR NAME="biblionumber" -->"
+                                       class="selectanyat"
+                                       value="Any"
+                                       disabled="disabled"
+                                />
+                              <!-- TMPL_ELSE -->
+                                <input type="radio" name="reqtype_<!-- TMPL_VAR NAME="biblionumber" -->"
+                                       id="reqat_<!-- TMPL_VAR NAME="biblionumber" -->"
+                                       class="selectanyat"
+                                       value="Any"
+                                       checked="checked"
+                                />
+                              <!-- /TMPL_UNLESS -->
+                              <label for="reqat_<!-- TMPL_VAR NAME="biblionumber" -->">Next available copy at:</label>
+                                <select name="nextatbranch" class="nextatbranchselect" id="nextatbranch_<!-- TMPL_VAR NAME="biblionumber" -->"
+                                  <!-- TMPL_UNLESS NAME="holdable" -->disabled="disabled"<!-- /TMPL_UNLESS --> >
+                                      <!-- TMPL_LOOP NAME="availBranchChoicesLoop" -->
+                                      <!-- TMPL_IF name="selected" -->
+                                          <option value="<!-- TMPL_VAR NAME="value" -->" selected="selected"><!-- TMPL_VAR NAME="branchname" --></option>
+                                      <!-- TMPL_ELSE -->
+                                          <option value="<!-- TMPL_VAR NAME="value" -->"><!-- TMPL_VAR NAME="branchname" --></option>
+                                      <!-- /TMPL_IF -->
+                          <!-- /TMPL_LOOP -->
+                        </select>
+
+                            </td>
+                          </tr>
+                    <!-- /TMPL_IF -->
+                    <!-- TMPL_IF NAME="OPACItemHolds" -->
                           <tr>
                             <td>
                               <!-- TMPL_UNLESS NAME="holdable" -->
@@ -426,14 +536,14 @@
                               <label for="reqspecific_<!-- TMPL_VAR NAME="biblionumber"-->">A specific copy</label>
                             </td>
                           </tr>
+                        <!-- /TMPL_IF -->
                         </table>
                       </td>
-                    <!-- /TMPL_IF -->
 
                     <!-- TMPL_UNLESS NAME="singleBranchMode" -->
                       <td>
                     <!-- TMPL_IF NAME="OPACPickupLocation" -->
-                        <select name="branch" id="branch_<!-- TMPL_VAR NAME="biblionumber" -->"
+                        <select name="branch" class="branchselect" id="branch_<!-- TMPL_VAR NAME="biblionumber" -->"
                           <!-- TMPL_UNLESS NAME="holdable" -->disabled="disabled"<!-- /TMPL_UNLESS --> >
                           <!-- TMPL_LOOP NAME="branchChoicesLoop" -->
                             <!-- TMPL_IF name="selected" -->
@@ -444,6 +554,7 @@
                           <!-- /TMPL_LOOP -->
                         </select>
                     <!-- TMPL_ELSE -->
+                        <!-- <input type="hidden" name="branch" id="branch_<!-- TMPL_VAR NAME="biblionumber" -->" value="" /> -->
                         <input type="hidden" name="branch" id="branch_<!-- TMPL_VAR NAME="biblionumber" -->" value="<!--TMPL_VAR Name="branch"-->" /> <!-- TMPL_VAR NAME="branchname" -->
                     <!-- /TMPL_IF -->
                       </td>
@@ -477,14 +588,15 @@
 
                           <!-- TMPL_LOOP name="itemLoop" -->
                             <tr class="<!-- TMPL_VAR NAME="backgroundcolor" -->">
-                              <td>
+                              <td id="checkitemtd_<!-- TMPL_VAR NAME="itemnumber" -->">
                                 <!-- TMPL_IF NAME="available" -->
 				  <!-- TMPL_UNLESS NAME="ReservedForThisBorrower" -->
                                       <!-- TMPL_IF Name="canholdmultiple"-->
-	                                  <input type="checkbox" class="checkitem checkitem_<!-- TMPL_VAR NAME="biblionumber" -->" name="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
+	                                  <input type="checkbox" class="checkitem checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"  id="checkitem_<!-- TMPL_VAR NAME="itemnumber" -->" name="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
         	                                 value="<!-- TMPL_VAR NAME="itemnumber" -->" />
                                       <!--TMPL_ELSE-->
-	                                  <input type="radio" class="checkitem checkitem_<!-- TMPL_VAR NAME="biblionumber" -->" name="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
+	                                  <input type="radio" class="checkitem checkitem_<!-- TMPL_VAR NAME="biblionumber" -->" id="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
+ name="checkitem_<!-- TMPL_VAR NAME="biblionumber" -->"
         	                                 value="<!-- TMPL_VAR NAME="itemnumber" -->" />
                                       <!-- /TMPL_IF -->
 				  <!-- /TMPL_UNLESS -->
@@ -501,7 +613,7 @@
                               <!-- /TMPL_IF -->
                               <td><!-- TMPL_VAR NAME="barcode" --></td>
                               <!-- TMPL_UNLESS NAME="singleBranchMode" -->
-                                <td><!-- TMPL_VAR NAME="homeBranchName" --></td>
+                                <td id="checkitemhomebranch_<!-- TMPL_VAR NAME="itemnumber" -->"><span name="<!-- TMPL_VAR NAME="homeBranchcode" -->"><!-- TMPL_VAR NAME="homeBranchName" --></span></td>
                                 <td><!-- TMPL_VAR NAME="holdingBranchName" --></td>
                               <!-- /TMPL_UNLESS -->
                               <td><!-- TMPL_VAR NAME="callNumber" --></td>

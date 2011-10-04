@@ -120,6 +120,11 @@ my ( $template, $loggedinuser, $cookie, $staff_flags ) = get_template_and_user(
     }
 );
 
+if(!$basketno) {
+    my $order = GetOrder($ordernumber);
+    $basketno = $order->{'basketno'};
+}
+
 my $basket   = GetBasket($basketno);
 my $contract = &GetContract( $basket->{contractnumber} );
 
@@ -220,7 +225,11 @@ foreach my $thisbranch ( sort { $branches->{$a}->{'branchname'} cmp $branches->{
         value      => $thisbranch,
         branchname => $branches->{$thisbranch}->{'branchname'},
     );
-    $row{'selected'} = 1 if ( $thisbranch && $data->{branchcode} && $thisbranch eq $data->{branchcode} );
+    if($data->{branchcode}) {
+        $row{'selected'} = 1 if ( $thisbranch eq $data->{branchcode} );
+    } elsif ( C4::Context->userenv->{'branch'} ) {
+        $row{'selected'} = 1 if ( $thisbranch eq C4::Context->userenv->{'branch'} );
+    }
     push @branchloop, \%row;
 }
 $template->param( branchloop => \@branchloop );
@@ -239,13 +248,27 @@ foreach my $r ( @{$budgets} ) {
     unless($staff_flags->{'superlibrarian'} % 2 == 1 || $template->{param_map}->{'CAN_user_acquisition_budget_manage_all'} ) {
         if ( !defined $r->{budget_amount} || $r->{budget_amount} == 0 ) {
             next;
-        } elsif ( $r->{budget_permission} == 1 && $r->{budget_owner_id} != $borrower->{borrowernumber} ) {
+        # Restricted to owner
+        } elsif ( $r->{budget_permission} == 1
+          && $r->{budget_owner_id} != $loggedinuser )
+        {
             next;
-        } elsif ( $r->{budget_permission} == 2 && defined $r->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode} ) {
-            next;
-        } elsif ( $r->{budget_permission} == 3 ) {
+        # Restricted to library + owner + users
+        } elsif ( $r->{budget_permission} == 2
+          && defined $r->{budget_branchcode}
+          && C4::Context->userenv->{'branch'} ne $r->{budget_branchcode}
+          && $r->{'budget_owner_id'} != $loggedinuser )
+        {
+            my $budgetusers = GetUsersFromBudget($r->{'budget_id'});
+            if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}){
+                next;
+            }
+        # Restricted to owner + users
+        } elsif ( $r->{budget_permission} == 3
+          && $r->{'budget_owner_id'} != $loggedinuser )
+        {
             my $budgetusers = GetUsersFromBudget( $r->{budget_id} );
-            if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}) {
+            if(!defined $budgetusers || !defined $budgetusers->{$loggedinuser}){
                 next;
             }
         }
@@ -255,6 +278,8 @@ foreach my $r ( @{$budgets} ) {
       { b_id  => $r->{budget_id},
         b_txt => $r->{budget_name},
         b_active => $r->{budget_period_active},
+        b_sort1_authcat => $r->{'sort1_authcat'},
+        b_sort2_authcat => $r->{'sort2_authcat'},
         b_sel => ( $r->{budget_id} == $budget_id ) ? 1 : 0,
       };
 }
@@ -303,18 +328,14 @@ if ($CGIsort2) {
 
 if ( C4::Context->preference('AcqCreateItem') eq 'ordering' && !$ordernumber ) {
 
-    # prepare empty item form
-    my $cell = PrepareItemrecordDisplay( '', '', '', 'ACQ' );
+    # Check if ACQ framework exists
+    my $marc = GetMarcStructure( 1, 'ACQ' );
 
-    unless ($cell) {
-        $cell = PrepareItemrecordDisplay( '', '', '', '' );
+    unless ($marc) {
         $template->param( 'NoACQframework' => 1 );
     }
-    my @itemloop;
-    push @itemloop, $cell;
 
     $template->param(
-        items => \@itemloop,
         AcqCreateItemOrdering => 1,
     );
 }

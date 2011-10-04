@@ -217,40 +217,18 @@ my $biblionumber = $input->param('biblionumber');
 if ( $action eq "cancelorder" ) {
     my $confirm = $input->param('confirm');
     if ( $confirm ) {
-        my $error_delitem;
-        my $error_delbiblio;
 
         # We delete the order
-        DelOrder( $biblionumber, $ordernumber );
+        my $error = DelOrder( $biblionumber, $ordernumber, $input->param('del_biblio') ? 1 : 0 );
 
-        # We delete all the items related to this order
-        my @itemnumbers = GetItemnumbersFromOrder($ordernumber);
-        foreach (@itemnumbers) {
-            my $delcheck = DelItemCheck( C4::Context->dbh, $biblionumber, $_ );
-
-            # (should always success, as no issue should exist on item on order)
-            if ( $delcheck != 1 ) { $error_delitem = 1; }
-        }
-
-        # We get the number of remaining items
-        my $itemcount = GetItemsCount($biblionumber);
-
-        # If there are no items left,
-        if ( $itemcount eq 0 and $input->param('del_biblio')) {
-            # We delete the record
-            $error_delbiblio = DelBiblio($biblionumber);
-        }
-
-        if ( $error_delitem || $error_delbiblio ) {
-            warn $error_delitem;
-            warn $error_delbiblio;
-            if ($error_delitem)   { $template->param( error_delitem   => 1 ); }
-            if ($error_delbiblio) { $template->param( error_delbiblio => 1 ); }
+        if ( $error ) {
+            if ($error->{'delitem'})   { $template->param( error_delitem   => 1 ); }
+            if ($error->{'delbiblio'}) { $template->param( error_delbiblio => 1 ); }
         } else {
             $template->param( success_delorder => 1 );
         }
 
-        print $input->redirect( '/cgi-bin/koha/acqui/parcel.pl?supplierid=' . $input->param('supplierid') . '&op=new&invoice=' . $input->param('invoice') . '&datereceived=' . $input->param('invoicedatereceived'));
+        print $input->redirect( '/cgi-bin/koha/acqui/parcel.pl?supplierid=' . $input->param('supplierid') . '&invoice=' . $input->param('invoice') . '&datereceived=' . $input->param('invoicedatereceived'));
         exit;
     } else {
         $template->param(

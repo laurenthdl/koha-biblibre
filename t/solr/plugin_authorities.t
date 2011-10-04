@@ -31,7 +31,7 @@ my $mapping;
 
 $mapping = KohaTest::Search::MocksForSearch::MockMappingAuthor;
 @got = ComputeValue($rec, $mapping);
-@expected = ('Gary', 'Romain', 'Gaa', 'Rom', 'Ajar', 'Emilie');
+@expected = ('Gary', 'Romain', 'Gaa', 'Rom', 'Gaa410', 'Rom410', '42410', 'Ajar', 'Emilie', 'Ajar710', 'Emilie710', '43710');
 is_deeply (\@got, \@expected, 'Authority plugin in Author authority case');
 
 $mapping = KohaTest::Search::MocksForSearch::MockMappingSubject;

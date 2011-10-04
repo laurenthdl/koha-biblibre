@@ -112,17 +112,6 @@ $template->param(
 # retrieve branches
 my ( $budget, );
 
-my $branches = GetBranches(!$show_all);
-my @branchloop2;
-foreach my $thisbranch ( keys %$branches ) {
-    my %row = (
-        value      => $thisbranch,
-        branchname => $branches->{$thisbranch}->{'branchname'},
-    );
-    $row{selected} = 1 if $thisbranch eq $filter_budgetbranch;
-    push @branchloop2, \%row;
-}
-
 $template->param( auth_cats_loop => GetBudgetAuthCats( $$period{budget_period_id} ) );
 
 # Used to create form to add or  modify a record
@@ -139,7 +128,7 @@ if ( $op eq 'add_form' ) {
         $dropbox_disabled = BudgetHasChildren($budget_id);
         my $borrower = &GetMember( borrowernumber => $budget->{budget_owner_id} );
         $budget->{budget_owner_name} = $borrower->{'firstname'} . ' ' . $borrower->{'surname'};
-        $$budget{$_} = sprintf( "%.2f", $budget->{$_} ) for grep { /amount/ } keys %$budget;
+        $$budget{$_} = sprintf( "%.2f", $budget->{$_} ) for grep { /amount|encumb|expend/ } keys %$budget;
     }
 
     # build budget hierarchy
@@ -252,6 +241,7 @@ if ( $op eq 'add_form' ) {
             $status = ModBudget($budget_hash);
         } else {
             $status = AddBudget($budget_hash);
+            $$budget_hash{'budget_id'} = $status;
         }
         $sql_error = "This fund name (or code) already exists" unless $status;
         if (defined $$budget_hash{'budgetusersid'}){
@@ -280,6 +270,7 @@ if ( $op eq 'add_form' ) {
 
     #This Looks WEIRD to me : should budgets be filtered in such a way ppl who donot own it would not see the amount spent on the budget by others ?
 
+    my @branchcodes;
     foreach my $budget (@budgets) {
 
         #Level and sublevels total spent
@@ -297,6 +288,7 @@ if ( $op eq 'add_form' ) {
             if ( $$period{budget_period_locked} == 1 ) {
                 $budget->{'budget_lock'} = 1;
 
+            # Restricted to owner
             } elsif ( $budget->{budget_permission} == 1 ) {
 
                 if ( $borrower_id != $budget->{'budget_owner_id'} ) {
@@ -310,19 +302,34 @@ if ( $op eq 'add_form' ) {
                     $parents_perm = CheckBudgetParentPerm( $budget, $borrower_id );
                     delete $budget->{'budget_lock'} if $parents_perm == '1';
                 }
+            # Restricted to library + owner + users
             } elsif ( $budget->{budget_permission} == 2 ) {
-                if( defined $budget->{budget_branchcode} && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode} ){
+                my $budgetusers = GetUsersFromBudget($budget->{'budget_id'});
+                if( defined $budget->{budget_branchcode}
+                  && C4::Context->userenv->{'branch'} ne $budget->{budget_branchcode}
+                  && $budget->{'budget_owner_id'} != $borrower_id
+                  && (!defined $budgetusers || !defined $budgetusers->{$borrower_id}) )
+                {
                     next if(!$show_all);
                     $budget->{'budget_lock'} = 1;
                 }
+            # Restricted to owner + users
             } elsif ( $budget->{budget_permission} == 3 ) {
                 my $budgetusers = GetUsersFromBudget( $budget->{budget_id} );
-                if(!defined $budgetusers || !defined $budgetusers->{$borrower_id}){
+                if($budget->{'budget_owner_id'} != $borrower_id
+                  && (!defined $budgetusers || !defined $budgetusers->{$borrower_id}) )
+                {
                     next if(!$show_all);
                     $budget->{'budget_lock'} = 1;
                 }
              }
         }    # ...SUPER_LIB END
+
+        if( $budget->{'budget_branchcode'}
+          && (grep { /^$budget->{'budget_branchcode'}$/ } @branchcodes) == 0)
+        {
+            push @branchcodes, $budget->{'budget_branchcode'};
+        }
 
         # if a budget search doesnt match, next
         if ($filter_budgetname) {
@@ -376,6 +383,19 @@ if ( $op eq 'add_form' ) {
                 budget_hierarchy => \@budget_hierarchy,
             }
         );
+    }
+
+    # Only branches which have an associated fund displayable are pushed
+    # in the branch filter dropdown list
+    my @branchloop2;
+    foreach (@branchcodes) {
+        my $branch = GetBranchDetail($_);
+        my %row = (
+            value       => $_,
+            branchname  => $branch->{'branchname'},
+        );
+        $row{'selected'} = 1 if $_ eq $filter_budgetbranch;
+        push @branchloop2, \%row;
     }
 
     my $budget_period_total = $num->format_price( $$period{budget_period_total} ) if $$period{budget_period_total};

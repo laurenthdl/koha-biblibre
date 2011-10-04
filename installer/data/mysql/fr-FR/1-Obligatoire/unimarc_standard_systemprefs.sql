@@ -204,7 +204,6 @@ INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AdvancedSearchTypes','itemtypes','itemtypes|ccode','Définit quel champ est utilisé pour la limitation par type de document dans la recherche avancée','Choice');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AllowOnShelfHolds', '0', '', 'Autorise les réservations de documents en rayon.', 'YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('AllowHoldsOnDamagedItems', '1', '', 'Autorise les réservations de documents déclarés endommagés', 'YesNo');
-INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OpacSuppression', '0', '', 'Active la fonction de suppression à l''OPAC. Elle demande plus de paramétrage, demandez à votre administrateur', 'YesNo');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES ('SMSSendDriver','','','Détermine le pilote utilisé par SMS::Send pour envoyer des SMS.','free');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES('MergeAuthoritiesOnUpdate', '0', 'Si Activé, met à jour toutes les notices bibliographiques afférentes dès la modification d''une autorité',NULL,'YesNo');
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES('AllowNotForLoanOverride', '0', 'Si activé, permet au bibliothécaire de choisir de prêter tout de même un exemplaire normalement exclu du prêt',NULL,'YesNo');
@@ -282,8 +281,11 @@ INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES (
 INSERT INTO systempreferences (variable,value,explanation,options,type) VALUES ('BlockRenewWhenOverdue','0','Bloque les renouvellement quand en retard','','YesNo');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Nombre de résultats à afficher par défaut sur un fil RSS',NULL,'Integer');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SolrAPI','http://localhost:8080/solr','','URL du service web Solr.','Free');
-INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Moteur de recherche','Choice');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SubscriptionDuplicateDroppedInput','','','Liste des champs à ne pas dupliquer lors de la duplication d\'un abonnement (séparés par un point-virgule)','Free');
 INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('FinesDependsOnGracePeriod',0,'','Si Oui, les amendes commencent après le délais de grâce. Sinon, elles commencent juste après le retour','YesNo');
+INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra|SolrIndexOff','Moteur de recherche','Choice');
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numFacetsDisplay','100','Correspond au nombre maximum de facettes à afficher pour un index','','Integer')
 INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BorrowerUnwantedField','','Nom des champs à ne pas afficher et stocker pour un compte lecteur',NULL,'free');
+INSERT INTO `systempreferences` (variable,value,options,explanation,type) VALUES('OPACHoldNextInLibrary','','','Permet à un usager de placer une réservation sur le premier exemplaire disponible pour une bibliothèque donnée','YesNo')
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SearchOPACHides','','Construit la requête à l\'opac avec ce filtre.','','Free');
+INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Nombre de résultats à afficher par défaut sur un fil RSS',NULL,'Integer');

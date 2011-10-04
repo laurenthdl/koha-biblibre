@@ -126,7 +126,6 @@ $tabsysprefs{ReceiveBackIssues}           = "Cataloging";
 $tabsysprefs{DefaultClassificationSource} = "Cataloging";
 $tabsysprefs{RoutingSerials}              = "Cataloging";
 $tabsysprefs{'item-level_itypes'}         = "Cataloging";
-$tabsysprefs{OpacSuppression}             = "Cataloging";
 $tabsysprefs{SpineLabelFormat}            = "Cataloging";
 $tabsysprefs{SpineLabelAutoPrint}         = "Cataloging";
 

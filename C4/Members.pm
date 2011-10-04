@@ -209,7 +209,7 @@ sub SearchMember {
 
     if ( $type eq "simple" )    # simple search for one letter only
     {
-        $query .= ( $category_type ? " AND category_type = " . $dbh->quote($category_type) : "" );
+        $query .= ( $category_type ? " AND ( category_type = " . $dbh->quote($category_type) . " OR borrowers.categorycode = " . $dbh->quote($category_type) . " ) " : "" );
         $query .= " WHERE (surname LIKE ? OR cardnumber like ?) ";
         if ( C4::Context->preference("IndependentBranchPatron") && !$showallbranches ) {
             if ( C4::Context->userenv && ( C4::Context->userenv->{flags} % 2 ) != 1 && C4::Context->userenv->{'branch'} ) {
@@ -231,7 +231,7 @@ sub SearchMember {
         $query .= "((surname LIKE ? OR surname LIKE ?
                 OR firstname  LIKE ? OR firstname LIKE ?
                 OR othernames LIKE ? OR othernames LIKE ?)
-        " . ( $category_type ? " AND category_type = " . $dbh->quote($category_type) : "" );
+        " . ( $category_type ? " AND ( category_type = " . $dbh->quote($category_type) . " OR borrowers.categorycode = " . $dbh->quote($category_type) . " ) " : "" );
         @bind = ( "$data[0]%", "% $data[0]%", "$data[0]%", "% $data[0]%", "$data[0]%", "% $data[0]%" );
         for ( my $i = 1 ; $i < $count ; $i++ ) {
             $query = $query . " AND (" . " surname LIKE ? OR surname LIKE ?
@@ -315,7 +315,7 @@ sub Search {
 		}
     }
     $searchtype ||= "start_with";
-	push @finalfilter, \@filters;
+	push @finalfilter, @filters;
 	my $data = SearchInTable( "borrowers", \@finalfilter, $orderby, $limit, $columns_out, $search_on_fields, $searchtype );
     return ($data);
 }
@@ -1036,6 +1036,7 @@ sub GetPendingIssues {
     my (@borrowernumbers) = @_;
 
     # Borrowers part of the query
+    return unless (@borrowernumbers>0);
     my $bquery = '';
     for (my $i = 0; $i < @borrowernumbers; $i++) {
         $bquery .= " borrowernumber = ?";
