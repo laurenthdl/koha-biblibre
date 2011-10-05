@@ -39,6 +39,7 @@ my $where;
 my $ofset;
 my $verbose_logging;
 my $zebraidx_log_opt = " -v none,fatal ";
+my $table = "biblioitems";
 my $result           = GetOptions(
     'd:s'          => \$directory,
     'reset'        => \$reset,
@@ -59,6 +60,7 @@ my $result           = GetOptions(
     'min:i'        => \$min,
     'ofset:i'      => \$ofset,
     'v'            => \$verbose_logging,
+    'table:s'      => \$table,
 );
 
 if ( not $result or $want_help ) {
@@ -288,10 +290,11 @@ sub select_all_authorities {
 }
 
 sub select_all_biblios {
-    my $strsth = qq{ SELECT biblionumber FROM biblioitems };
-    $strsth.=qq{ WHERE $where } if ($where);
-    $strsth.=qq{ LIMIT $min } if ($min && !$ofset);
-    $strsth.=qq{ LIMIT $min,$ofset } if ($ofset);
+    my $t = $table || "biblioitems";
+    my $strsth = qq{ SELECT biblionumber FROM $t };
+    $strsth .= qq{ WHERE $where } if ($where);
+    $strsth .= qq{ LIMIT $min } if ($min && !$ofset);
+    $strsth .= qq{ LIMIT $min,$ofset } if ($ofset);
     my $sth = $dbh->prepare($strsth);
     $sth->execute();
     return $sth;
