@@ -4939,7 +4939,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-
 $DBversion = "3.02.00.057";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("
@@ -4987,7 +4986,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
     	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
     });
-    print "Upgrade to $DBversion done (Adds New System preference BlockRenewWhenOverdue)\n";
+    print "Upgrade to $DBversion done (Adds column statisticvalue in table deleteditems)\n";
     SetVersion($DBversion);
 }
 
@@ -5002,6 +5001,13 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 
 $DBversion = "3.02.00.063";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE `opac_news` ADD `servername` text default NULL;");
+    print "Upgrade to $DBversion done (add servername field on opac_news)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.074";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
     ALTER TABLE borrower_attribute_types ADD COLUMN category_type VARCHAR(1)  NOT NULL DEFAULT '' AFTER `display_checkout`;
     });
@@ -5009,7 +5015,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.064";
+$DBversion = "3.02.00.075";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
     ALTER TABLE borrower_attribute_types ADD COLUMN class VARCHAR(255)  NOT NULL DEFAULT '' AFTER `category_type`;
@@ -5018,7 +5024,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.065";
+$DBversion = "3.02.00.076";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
 	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('DontExportFields','','List of fields for non export in circulation.pl (separated by a space)','','');
@@ -5028,7 +5034,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
 }
 
 
-$DBversion = "3.02.00.066";
+$DBversion = "3.02.00.077";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
         INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('StatisticsFields','location|itype|ccode','Define Fields used for statistics members (5 max !)','location|itype|ccode','free')
@@ -5037,7 +5043,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.067";
+$DBversion = "3.02.00.078";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
         INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('CsvProfileForExport','0','Set a profile name for CSV export','','');
@@ -5046,7 +5052,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.068";
+$DBversion = "3.02.00.079";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
         INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('LibraryType','Public','Set a type for the library','Academic|Public|Special','Choice');
@@ -5055,8 +5061,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion)
 }
 
-
-$DBversion = "3.02.00.069";
+$DBversion = "3.02.00.080";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
     INSERT INTO `permissions` (`module_bit`, `code`, `description`) VALUES ('13', 'kss', 'Allows to use the Koha Synchronize System');
@@ -5066,12 +5071,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.070";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do("ALTER TABLE `opac_news` ADD `servername` text default NULL;");
-    print "Upgrade to $DBversion done (add servername field on opac_news)\n";
-    SetVersion($DBversion);
-}
 
 =item DropAllForeignKeys($table)
 
