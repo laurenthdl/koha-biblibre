@@ -46,3 +46,11 @@ done
 #lp $optprinter  $1/*.pdf
 #tar cvfz $directory`date "+%Y%m%d"`.tar.gz  $directory
 #rm -rf $directory
+
+#Impression des relances et des reservations sur imprimante du standard
+lpr -p10.80.80.9 /home/koha/src/koha-tmpl/relances/notices-`date +%F`.pdf
+lpr -p10.80.80.9 /home/koha/src/koha-tmpl/relances/holdnotices-`date +%F`.pdf
+
+#Debut de suppression des fichiers de plus de 15 jours
+rm -f `find /home/koha/src/koha-tmpl/relances/* -type f -mtime +15`
+
