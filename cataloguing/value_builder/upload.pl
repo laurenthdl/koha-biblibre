@@ -1,19 +1,25 @@
 #!/usr/bin/perl
 
-
 use strict;
 use warnings;
 
 use C4::Auth;
-use CGI;
+use CGI qw/-utf8/;
 use C4::Context;
+use C4::Debug;
 
 use C4::AuthoritiesMarc;
 use C4::Output;
 use File::Basename;
+use Text::Undiacritic qw/undiacritic/;
+use Encode;
 
-my $upload_path = C4::Context->preference('uploadPath');
-warn $upload_path;
+#use open qw(:std :utf8);
+
+
+my $upload_path   = C4::Context->preference('uploadPath');
+my $fullurl       = C4::Context->preference('uploadStoreFullURL');
+my $uploadWebPath = C4::Context->preference('uploadWebPath');
 
 =head1
 
@@ -56,6 +62,7 @@ sub plugin {
     my $result       = $input->param('result');
     my $delete       = $input->param('delete');
     my $uploaded_file = $input->param('uploaded_file');
+    my $choosedir    = $input->param('choosedir');
 
     my $template_name = $result || $delete ? "upload_delete_file.tmpl" : "upload.tmpl";
 
@@ -75,18 +82,24 @@ sub plugin {
      -size=>50,
      -maxlength=>80);
 
+
+    my $dirchooser = findrep($upload_path);
+
     $template->param(
         index      => $index,
 	result     => $result,
-	filefield  => $filefield
+	filefield  => $filefield,
+        dirchooser => $dirchooser
     );
 
 
     # If there's already a file uploaded for this field,
     # We handle is deletion
     if ($delete) {
-	warn "deletion of $upload_path/$result";
-	my $success = unlink("$upload_path/$result");
+        $result = stripbase($result, $uploadWebPath) if ($fullurl);
+        my $filename = $result;
+	warn "deletion of $upload_path/$filename";
+	my $success = unlink("$upload_path/$filename");
 	if ($success) {
 	    $template->param(success => $success);
 	} else {
@@ -103,8 +116,19 @@ sub plugin {
 	my $success;
 
 	if (defined $fh) {
-	
+
+            # Dealing with directories:
+            # If the user specified a directory to upload to:
+            $upload_path .= $choosedir if ($choosedir);
+
+            # If the path contains .. : discard! This prevents from going outside the upload directory
+            die("Security issue") if ($choosedir =~ /\.\./);
+
 	    # Dealing with filenames:
+
+	    # Normalizing filename:
+	    $uploaded_file = normalize_string($uploaded_file);
+	    $uploaded_file = undiacritic($uploaded_file);
 
 	    # Checking for an existing filename in destination directory
 	    if (-f "$upload_path/$uploaded_file") {
@@ -116,6 +140,7 @@ sub plugin {
 
 	    # Copying the temp file to the destination directory
 	    my $io_fh = $fh->handle;
+            warn "$upload_path/$uploaded_file";
 	    open (OUTFILE, '>', "$upload_path/$uploaded_file") or $error = $!;
 	    if (!$error) {
 		my $buffer;
@@ -133,6 +158,9 @@ sub plugin {
 	$template->param(success       => $success)        if ($success);
 	$template->param(error         => $error)          if ($error);
 	$template->param(uploaded_file => $uploaded_file);
+        $uploadWebPath =~ s/\/+$//; # Removes ending slash(es)
+        my $fileurl = ($fullurl) ? "$uploadWebPath$choosedir/$uploaded_file" : substr "$choosedir/$uploaded_file", 1 ;
+        $template->param(fileurl    => $fileurl);
     }
 
     output_html_with_http_headers $input, $cookie, $template->output;
@@ -156,4 +184,52 @@ sub findname {
 
     return "$file-$count$ext";
 }
+
+=head2 normalize_string
+        Given 
+            a string
+        Returns a utf8 NFC normalized string
+        
+        Sample code :
+=cut
+
+sub normalize_string{
+        my ($string)=@_;
+    $debug and warn " string in normalize before normalize :",$string;
+    $string=decode_utf8($string,1);
+    $debug and warn " string in normalize :",$string;
+    $string=~s/\<|\>|\^|\;|\?|,|\-|\(|\)|\[|\]|\{|\}|\$|\%|\!|\*|\:|\\|\/|\&|\"|\'|\s/_/g;
+    $string=~s/\s+$//g;
+    $string=~s/^\s+//g;
+    return $string; 
+}
+
+# Displays an html chooser for directories
+sub findrep {
+    my $base = shift || $upload_path;
+    my $return;
+    my $found = 0;
+    my @files = <$base/*>;
+    foreach (@files) {
+        if (-d $_ and -w $_) {
+            my $lastdirname = basename($_);
+            my $dirname = stripbase($_);
+            $return .= qq(<li><input type="radio" name="choosedir" value="$dirname" /> $lastdirname</li>\n);
+            $found = 1;
+            $return .= findrep($_);
+        };
+    }
+    $return = "<ul>\n$return</ul>\n" if ($found);
+   return $return; 
+}
+
+# Strips the upload base from the path
+sub stripbase {
+    my $dir = shift;
+    my $toremove = shift || $upload_path;
+    my $length = length($toremove);
+    my $pattern = qr|^$toremove|;
+    return ($dir =~ $pattern) ? substr $dir, $length : $dir; 
+}
+
 1;

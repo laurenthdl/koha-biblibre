@@ -62,7 +62,7 @@ foreach my $biblionumber (@bibs) {
     my $marcauthorsarray = GetMarcAuthors( $record, $marcflavour );
     my $marcsubjctsarray = GetMarcSubjects( $record, $marcflavour );
     my $marcseriesarray  = GetMarcSeries( $record, $marcflavour );
-    my $marcurlsarray    = GetMarcUrls( $record, $marcflavour );
+    my $marcurlsarray    = GetMarcUrls( $record, $marcflavour, GetFrameworkCode($biblionumber) );
     my @items            = &GetItemsInfo( $biblionumber, 'opac' );
 
     my $hasauthors = 0;

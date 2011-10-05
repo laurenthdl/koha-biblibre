@@ -1550,7 +1550,7 @@ sub GetMarcAuthors {
 
 =over 4
 
-$marcurls = GetMarcUrls($record,$marcflavour);
+$marcurls = GetMarcUrls($record,$marcflavour, $frameworkcode);
 Returns arrayref of URLs from MARC data, suitable to pass to tmpl loop.
 Assumes web resources (not uncommon in MARC21 to omit resource type ind) 
 
@@ -1559,15 +1559,19 @@ Assumes web resources (not uncommon in MARC21 to omit resource type ind)
 =cut
 
 sub GetMarcUrls {
-    my ( $record, $marcflavour ) = @_;
+    my ( $record, $marcflavour, $frameworkcode ) = @_;
+
+    my $tagslib = &GetMarcStructure(1, $frameworkcode);
+    my $urltag = '856';
+    my $urlsubtag = 'u';
 
     my @marcurls;
-    for my $field ( $record->field('856') ) {
+    for my $field ( $record->field($urltag) ) {
         my @notes;
         for my $note ( $field->subfield('z') ) {
             push @notes, { note => $note };
         }
-        my @urls = $field->subfield('u');
+        my @urls = $field->subfield($urlsubtag);
         foreach my $url (@urls) {
             my $marcurl;
             if ( $marcflavour eq 'MARC21' ) {
@@ -1596,7 +1600,11 @@ sub GetMarcUrls {
                 $marcurl->{'toc'} = 1 if ( defined($s3) && $s3 =~ /^[Tt]able/ );
             } else {
                 $marcurl->{'linktext'} = $field->subfield('2') || C4::Context->preference('URLLinkText') || $url;
-                $marcurl->{'MARCURL'} = $url;
+                if (not $url =~ /http:/ ) {
+                    $marcurl->{'MARCURL'} = C4::Context->preference('uploadWebPath') . "/" . $url;
+                } else {
+                    $marcurl->{'MARCURL'} = $url;
+                }
             }
             push @marcurls, $marcurl;
         }

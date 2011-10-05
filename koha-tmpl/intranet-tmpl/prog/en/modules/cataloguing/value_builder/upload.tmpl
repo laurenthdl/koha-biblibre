@@ -12,18 +12,16 @@
 <!-- TMPL_IF NAME="success" -->
 
     <script type="text/javascript">
-        function report() {
-            var doc   = opener.document; 
-            var field = doc.getElementById("<!-- TMPL_VAR NAME="index" -->");
-            field.value =  "<!-- TMPL_VAR NAME="uploaded_file" -->";
-            window.close();
-            return false;
-        }
+        //<![CDATA[
+        var doc = opener.document;
+        var field = doc.getElementById("<!-- TMPL_VAR NAME='index' -->");
+        field.value = "<!-- TMPL_VAR NAME='fileurl' -->";
+        //]]>
     </script>
 
 
     The file <!-- TMPL_VAR NAME="uploaded_file" --> has been successfully added.
-    <p><input type="button" value="close" onclick="javascript:report();" /></p>
+    <p><input type="button" value="close" onclick="javascript:window.close();" /></p>
 
 <!-- TMPL_ELSE -->
 
@@ -35,8 +33,16 @@
 	<!-- TMPL_IF NAME="uploaded_file" -->
 	uploaded file: <!-- TMPL_VAR NAME="uploaded_file" -->
 	<!-- TMPL_ELSE -->
-	    <h2>Please select the file to upload : </h2>
+	    <h2>File upload</h2>
 	    <form method="post" enctype="multipart/form-data" action="/cgi-bin/koha/cataloguing/plugin_launcher.pl">
+                <!-- TMPL_IF NAME="dirchooser" -->
+                    <h3>Please select the directory to upload to:</h3>
+                    <ul>
+                      <li><input type="radio" name="choosedir" value="" />/ (root)</li>
+                    <!-- TMPL_VAR NAME="dirchooser" --><br />
+                    </ul>
+                <!-- /TMPL_IF -->
+                <h3>Please select the file to upload:</h3>
 		<!-- TMPL_VAR NAME="filefield" -->
 		<input type="hidden" name="plugin_name" value="upload.pl" />
 		<input type="hidden" name="index" value="<!-- TMPL_VAR NAME="index" -->" />

@@ -85,8 +85,10 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 );
 
 my $uploadWebPath;
+my $uploadFullURL;
 if (C4::Context->preference('uploadWebPath')) {
     $uploadWebPath = C4::Context->preference('uploadWebPath');
+    $uploadFullURL = C4::Context->preference('uploadStoreFullURL');
 }
 
 
@@ -185,9 +187,16 @@ for ( my $tabloop = 0 ; $tabloop <= 10 ; $tabloop++ ) {
                 $subfield_data{link}       = $tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{link};
 
               #                 warn "tag : ".$tagslib->{$fields[$x_i]->tag()}." subfield :".$tagslib->{$fields[$x_i]->tag()}->{$subf[$i][0]}."lien koha? : "$subfield_data{link};
+                # URL Tags
                 if ( $tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{isurl} ) {
-                    $subfield_data{marc_value} = $subf[$i][1];
+                    if ($uploadWebPath and not $subf[$i][1] =~ /http:/ ) {
+			my $file_uri = qq($uploadWebPath/$subf[$i][1]);
+			$subfield_data{marc_value} = qq/$file_uri/;
+		    } else {
+                        $subfield_data{marc_value} = $subf[$i][1];
+                    }
                     $subfield_data{is_url}     = 1;
+
                 } elsif ( $tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{kohafield} eq "biblioitems.isbn" ) {
 
 #                    warn " tag : ".$tagslib->{$fields[$x_i]->tag()}." subfield :".$tagslib->{$fields[$x_i]->tag()}->{$subf[$i][0]}. "ISBN : ".$subf[$i][1]."PosttraitementISBN :".DisplayISBN($subf[$i][1]);
@@ -199,11 +208,16 @@ for ( my $tabloop = 0 ; $tabloop <= 10 ; $tabloop++ ) {
 		    
 		    $subfield_data{marc_value} = GetAuthorisedValueDesc( $fields[$x_i]->tag(), $subf[$i][0], $subf[$i][1], '', $tagslib ) || $subf[$i][1];
 
-		if ($tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{value_builder} eq "upload.pl" and $uploadWebPath) {
-			my $file_uri = qq($uploadWebPath/$subf[$i][1]);
-			$subfield_data{marc_value} = qq/<a href="$file_uri">$subfield_data{marc_value}<\/a>/;
-			$subfield_data{is_file} = 1;
-		    } 
+                    # Other tags (not url)
+                    if ($tagslib->{ $fields[$x_i]->tag() }->{ $subf[$i][0] }->{value_builder} eq "upload.pl" and $uploadWebPath) {
+                        if (not $subf[$i][1] =~ /http:/) {
+                            my $file_uri = qq($uploadWebPath/$subf[$i][1]);
+                            $subfield_data{marc_value} = qq/<a href="$file_uri">$subfield_data{marc_value}<\/a>/;
+                            $subfield_data{is_file} = 1;
+                        } else {
+                            $subfield_data{is_url} = 1;
+                        }
+                    }
 
                 }
                 $subfield_data{marc_subfield} = $subf[$i][0];
