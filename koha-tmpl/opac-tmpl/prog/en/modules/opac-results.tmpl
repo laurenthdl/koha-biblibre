@@ -103,36 +103,13 @@ function highlightOn() {
 // Hide or show details link
 // Update with first biblionumber in queue
 function updateDetailsLink() {
-    var bibnums = getContextAllBiblioNumbers();
+    var bibnums = getContextBiblioNumbers();
     if ( bibnums.length > 0 ) {
         $(".details_link :a").attr("href", "/cgi-bin/koha/opac-detail.pl?biblionumber=" + bibnums[0]);
         $(".details_link").show();
     } else {
         $(".details_link").hide();
     }
-}
-
-// Store all checked in current page
-function storeCheckedBibNums() {
-    var checkedBoxes = $("#bookbag_form :checkbox:checked");
-    var bibnums = [];
-    for (var i = 0; i < $(checkedBoxes).size(); i++) {
-        var box = $(checkedBoxes).get(i);
-        bibnums[i] = $(box).attr('id').substr(3);
-    }
-    setContextBiblioNumbers(bibnums);
-};
-
-// Store all bibnums (previous + current)
-function storeAllBibNums() {
-    var allbibnums = getContextAllBiblioNumbers();
-    setContextBiblioNumbers( allbibnums );
-    return true;
-}
-
-function onCheckboxChange() {
-    storeCheckedBibNums();
-    updateDetailsLink();
 }
 
 $(document).ready(function(){
@@ -212,13 +189,17 @@ $(document).ready(function(){
 		 }
 	}
     $("#CheckAll").click(function(){
-        $("#bookbag_form").checkCheckboxes();
-        onCheckboxChange();
+        $("#bookbag_form").find("input[type='checkbox'][name='biblionumber'][checked!=true]").each(function(){
+            $(this).attr("checked", true);
+            $(this).change();
+        } );
         return false;
     });
     $("#CheckNone").click(function(){
-        $("#bookbag_form").unCheckCheckboxes();
-        onCheckboxChange();
+        $("#bookbag_form").find("input[type='checkbox'][name='biblionumber'][checked=true]").each(function(){
+            $(this).attr("checked", false);
+            $(this).change();
+        } );
         return false;
     });
 <!-- TMPL_IF NAME="RequestOnOpac" -->
@@ -282,7 +263,7 @@ $(document).ready(function(){
 
     $("#bookbag_form").ready(function(){
         $("#bookbag_form").unCheckCheckboxes();
-        var bibnums = getContextAllBiblioNumbers();
+        var bibnums = getContextBiblioNumbers();
         if (bibnums) {
             for (var i=0; i < bibnums.length; i++) {
                 var id = ('#bib' + bibnums[i]);
@@ -294,16 +275,14 @@ $(document).ready(function(){
         updateDetailsLink();
     });
 
-    $("#bookbag_form :checkbox").click(onCheckboxChange);
-
-    // On click, we store selected bib on current page and previous
-    $("a.nav").click( function() {
-        storeAllBibNums()
-    } );
-
-    // rotate context
-    setContextPreviousBiblioNumbers( getContextBiblioNumbers() );
-    setContextBiblioNumbers( [] );
+    $("#bookbag_form :checkbox").change(function(){
+        if ( $(this).attr('checked') == true ) {
+            addBibToContext( $(this).val() );
+        } else {
+            delBibToContext( $(this).val() );
+        }
+        updateDetailsLink();
+     } );
 
 });
 
