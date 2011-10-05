@@ -351,17 +351,24 @@ sub SimpleSearch {
     # Construct filters
     $sc->options->{'fq'} = [
         map {
-            my $filter_str = ref($filters->{$_}) eq 'ARRAY'
-                            ? join ' AND ', @{ $filters->{$_} }
-                            : $filters->{$_};
-            utf8::decode($filter_str);
-            my $quotes_existed = ( $filter_str =~ m/^".*"$/ );
-            $filter_str =~ s/^"(.*)"$/$1/; #remove quote around value if exist
-            $filter_str =~ s/[^\\]\K"/\\"/g;
-            $filter_str = qq{"$filter_str"} # Add quote around value if not exist
-                if not $filter_str =~ /^".*"$/
-                    and $quotes_existed;
-            qq{$_:$filter_str};
+            my $idx = $_;
+            ref($filters->{$idx}) eq 'ARRAY'
+                ?
+                    '('
+                    . join( ' AND ',
+                        map {
+                            my $filter_str = $_;
+                            utf8::decode($filter_str);
+                            my $quotes_existed = ( $filter_str =~ m/^".*"$/ );
+                            $filter_str =~ s/^"(.*)"$/$1/; #remove quote around value if exist
+                            $filter_str =~ s/[^\\]\K"/\\"/g;
+                            $filter_str = qq{"$filter_str"} # Add quote around value if not exist
+                                if not $filter_str =~ /^".*"$/
+                                    and $quotes_existed;
+                            qq{$idx:$filter_str};
+                        } @{ $filters->{$idx} } )
+                    . ')'
+                : $filters->{$idx};
         } keys %$filters
     ];
 

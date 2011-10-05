@@ -532,6 +532,20 @@ sub EnqueueLetter ($) {
             }
         );
     }
+    my $content=$params->{'letter'}->{'content'};
+    if( $params->{'letter'}->{'format'} and ($params->{'letter'}->{'format'} eq "html"))
+    {
+        $content = "<pre>$content</pre>";
+    }
+    my $content_type;
+    if( $params->{'letter'}->{'format'} and $params->{'letter'}->{'encoding'} )
+    {
+		$content_type='text/'.$params->{'letter'}->{'format'}.'; charset="'.$params->{'letter'}->{'encoding'}.'"';
+	}
+	elsif($params->{'letter'}->{'content-type'})
+	{
+		$content_type=$params->{'letter'}->{'content-type'};
+	}
 
     my $dbh       = C4::Context->dbh();
     my $statement = << 'ENDSQL';
@@ -545,14 +559,14 @@ ENDSQL
     my $result = $sth->execute(
         $params->{'borrowernumber'},         # borrowernumber
         $params->{'letter'}->{'title'},      # subject
-        $params->{'letter'}->{'content'},    # content
+        $content,    # content
         $params->{'letter'}->{'metadata'} || '',    # metadata
         $params->{'letter'}->{'code'}     || '',    # letter_code
         $params->{'message_transport_type'},        # message_transport_type
         'pending',                                  # status
         $params->{'to_address'},                    # to_address
         $params->{'from_address'},                  # from_address
-        $params->{'letter'}->{'content-type'},      # content_type
+        $content_type,      # content_type
     );
     return $result;
 }

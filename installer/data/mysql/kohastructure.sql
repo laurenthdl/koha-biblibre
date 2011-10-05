@@ -1140,6 +1140,8 @@ CREATE TABLE `letter` (
   `name` varchar(100) NOT NULL default '',
   `title` varchar(200) NOT NULL default '',
   `content` text,
+  `format` varchar(200) DEFAULT NULL,
+  `encoding` varchar(200) DEFAULT NULL,
   PRIMARY KEY  (`module`,`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
