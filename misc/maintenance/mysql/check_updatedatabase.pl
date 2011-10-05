@@ -14,10 +14,6 @@
 
 use Modern::Perl;
 use Getopt::Long;
-use DBI;
-use Data::Dumper;
-
-my $debug = $ENV{'DEBUG'};
 
 my $usage = <<EOF;
 check_updatedatabase.pl
@@ -25,19 +21,29 @@ check_updatedatabase.pl
     -u|--user           Database username
     -p|--pass           Database password
     -d|--dbname         Database name
+    -c|--context        Use C4::Context to handle database connection. In this
+                        case, --user, --pass and --dbname options are ignored.
+    -v|--verbose        Print some debug informations
+    -s|--show-sql       Show SQL query when an inconsistency is found.
     -f|--file           updatedatabase.pl path
     -m|--minversion     Version where to start checking
 EOF
 
-my $help;
-my $db_user = "koha";
-my $db_pass = "koha";
+my $help = 0;
+my $use_context = 0;
+my $verbose = 0;
+my $show_sql = 0;
+my $db_user = "";
+my $db_pass = "";
 my $db_name = "";
 my $minversion = "";
 
 my $updatedbfile = "installer/data/mysql/updatedatabase.pl";
 
 GetOptions( "help" => \$help,
+            "context" => \$use_context,
+            "verbose" => \$verbose,
+            "show-sql" => \$show_sql,
             "user=s" => \$db_user,
             "pass=s" => \$db_pass,
             "dbname=s" => \$db_name,
@@ -50,11 +56,19 @@ if($help) {
     exit 0;
 }
 
-$db_name or die "No database specified";
-
 open FH, "<$updatedbfile" or die "Can't open file $updatedbfile: $!";
 
-my $dbh = DBI->connect("dbi:mysql:$db_name", $db_user, $db_pass);
+my $dbh;
+if($use_context) {
+    require C4::Context;
+    import C4::Context;
+    $dbh = C4::Context->dbh;
+} else {
+    $db_name or die "No database specified";
+    require DBI;
+    import DBI;
+    $dbh = DBI->connect("dbi:mysql:$db_name", $db_user, $db_pass);
+}
 $dbh or die "Can't connect to database";
 
 my $sth = $dbh->prepare("SHOW TABLES");
@@ -84,7 +98,7 @@ while (my $line = <FH>) {
         # Retrieve version number
         if($line =~ /DBversion = "(.*?)"/) {
             $version = $1;
-            $debug and say "VERSION: $version";
+            $verbose and say "VERSION: $version";
         }
         # Retrieve SQL query
         elsif($line =~ /dbh->do\("(.*?)[;"]/) {
@@ -93,7 +107,7 @@ while (my $line = <FH>) {
         elsif($line =~ /dbh->do\(q?q\{(.*?)[;\}]/) {
             $sql = $1;
         }
-        $debug and say "SQL: $sql" if $sql;
+        $verbose and say "SQL: $sql" if $sql;
 
         # Parse SQL query and check consistency with database
         if($sql) {
@@ -101,6 +115,7 @@ while (my $line = <FH>) {
                 my $table_name = $1;
                 if(!grep {/$table_name/} @tables) {
                     say "$version: Table $table_name does not exist";
+                    say "SQL: $sql\n" if $show_sql;
                     $exit_code = 1;
                 }
             }
@@ -110,6 +125,7 @@ while (my $line = <FH>) {
                 next if $column_name =~ /(UNIQUE|CONSTRAINT|INDEX|KEY|FOREIGN)/;
                 if(not grep {/$table_name/} @tables) {
                     say "$version: Table $table_name does not exist";
+                    say "SQL: $sql\n" if $show_sql;
                     $exit_code = 1;
                 }
                 else {
@@ -117,6 +133,7 @@ while (my $line = <FH>) {
                     my $rv = $sth->execute();
                     if($rv == 0) {
                         say "$version: Field $table_name.$column_name does not exist";
+                        say "SQL: $sql\n" if $show_sql;
                         $exit_code = 1;
                     }
                 }
@@ -133,6 +150,7 @@ while (my $line = <FH>) {
                     $sth->execute($syspref);
                     if( (my $count = $sth->fetchrow_array) == 0) {
                         say "$version: Syspref $syspref does not exist";
+                        say "SQL: $sql\n" if $show_sql;
                         $exit_code = 1;
                     }
                 }
@@ -143,6 +161,7 @@ while (my $line = <FH>) {
                     $sth->execute($module_bit, $code);
                     if( (my $count = $sth->fetchrow_array) == 0) {
                         say "$version: Permission $code does not exist";
+                        say "SQL: $sql\n" if $show_sql;
                         $exit_code = 1;
                     }
                 }
