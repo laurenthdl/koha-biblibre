@@ -232,6 +232,36 @@ $(document).ready(function() {
 			<label for="title">Message Subject:</label><input type="text" id="title" name="title" size="60" value="<!-- TMPL_VAR NAME="title" -->" />
 		</li>
 		<li>
+			<label for="format">Message format:</label>
+			<select name="format" id="format">
+			<!--TMPL_IF Name="html"-->
+			<option value="html" selected="selected">html</option>
+			<!--TMPL_ELSE-->
+			<option value="html" >html</option>
+			<!--/TMPL_IF-->
+			<!--TMPL_IF Name="plain"-->
+			<option value="plain" selected="selected">plain text</option>
+			<!--TMPL_ELSE-->
+			<option value="plain" >plain text</option>
+			<!--/TMPL_IF-->
+			</select>
+		</li>
+		<li>
+			<label for="encoding">Message encoding:</label>
+			<select name="encoding" id="encoding">
+			<!--TMPL_IF Name="UTF-8"-->
+			<option value="UTF-8" selected="selected">UTF-8</option>
+			<!--TMPL_ELSE-->
+			<option value="UTF-8" >UTF-8</option>
+			<!--/TMPL_IF-->
+			<!--TMPL_IF Name="ISO-8859-1"-->
+			<option value="ISO-8859-1" selected="selected">ISO-8859-1</option>
+			<!--TMPL_ELSE-->
+			<option value="ISO-8859-1" >ISO-8859-1</option>
+			<!--/TMPL_IF-->
+			</select>
+		</li>
+		<li>
 			<label for="SQLfieldname">Message Body:</label>
 		</li>
 		<li>
