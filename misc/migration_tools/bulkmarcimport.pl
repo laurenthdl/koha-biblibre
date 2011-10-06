@@ -304,10 +304,10 @@ RECORD: while () {
         }
 
         my $results = C4::Search::SimpleSearch( '*:*', $filters );
-        my $totalhits = $results->{'pager'}->{'total_entries'};
+        my $totalhits = (defined $results?$results->{'pager'}->{'total_entries'}:0);
         $debug && warn "query :",Dump($filters)," $recordtype : $totalhits";
         if ( $results && $totalhits == 1 ) {
-            $id = $results->{'items'}->{'values'}->{'recordid'};
+            $id = ${$results->{'items'}}[0]->{'values'}->{'recordid'};
             my $marcrecord = $authorities ? GetAuthority( $id ) : GetMarcBiblio( $id );
             SetUTF8Flag($marcrecord);
             if ( $marcrecord and $authorities and $marcFlavour ) {

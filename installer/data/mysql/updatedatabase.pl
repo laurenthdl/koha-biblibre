@@ -4870,315 +4870,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.059";
-if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
-	$dbh->do(q{
-    DROP TABLE IF EXISTS `indexes`;
-    });
-	$dbh->do(q{
-    CREATE TABLE `indexes` (
-      `id` bigint unsigned NOT NULL auto_increment,
-      `code` varchar(255) NOT NULL DEFAULT '',
-      `label` varchar(255) DEFAULT NULL,
-      `type` varchar(20) DEFAULT NULL,
-      `faceted` tinyint(4) DEFAULT NULL,
-      `ressource_type` varchar(255) DEFAULT NULL,
-      `mandatory` tinyint(4) DEFAULT NULL,
-      `sortable` tinyint(4) DEFAULT NULL,
-      `plugin` varchar(255) DEFAULT NULL,
-      `avlist` varchar(255) DEFAULT NULL,
-      `rpn_index` INT  NOT NULL,
-      `ccl_index_name` VARCHAR(255)  NOT NULL,
-      PRIMARY KEY (`id`),
-      UNIQUE (`code`,`type`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    });
-	$dbh->do(q{
-    DROP TABLE IF EXISTS `indexmappings`;
-    });
-	$dbh->do(q{
-    CREATE TABLE `indexmappings` (
-      `field` char(3) DEFAULT NULL,
-      `subfield` char(1) DEFAULT NULL,
-      `index` varchar(255) DEFAULT NULL,
-      `ressource_type` varchar(20) DEFAULT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    });
-
-    if ( C4::Context->preference("marcflavour") eq 'UNIMARC' ) {
-        $dbh->do(q{
-        LOCK TABLES `indexes` WRITE;
-        });
-        $dbh->do(q{
-        INSERT INTO `indexes` (`code`,`label`,`type`,`faceted`,`ressource_type`,`mandatory`,`sortable`,`plugin`,`ccl_index_name`, `rpn_index`, `avlist`) VALUES 
-                ('upc','UPC','str',0,'biblio',0,0,'','','',''),
-                ('onloan','En prêt','int',0,'biblio',0,0,'','','',''),
-                ('name','Auteur personne','ste',0,'biblio',0,0,'','','',''),
-                ('music-source','Source éditoriale','str',0,'biblio',0,0,'','','',''),
-                ('music-number','Référence éditoriale','int',0,'biblio',0,0,'','','',''),
-                ('video-mt','video-mt','str',0,'biblio',0,0,'','','',''),
-                ('graphics-types','graphics-types','str',0,'biblio',0,0,'','','',''),
-                ('type-of-serial','Type de périodique','str',0,'biblio',0,0,'','','',''),
-                ('illustration-code','Code d\'illustration','str',0,'biblio',0,0,'C4::Search::Plugins::Illustration','','',''),
-                ('second-author-firstname','Prénom du second auteur','ste',0,'biblio',0,0,'','','',''),
-                ('second-author-name','Nom du second auteur','ste',0,'biblio',0,0,'','','',''),
-                ('author-name-personal','Nom de l\'auteur','ste',0,'biblio',0,0,'','','',''),
-                ('author-firstname','Prénom de l\'auteur','ste',0,'biblio',0,0,'','','',''),
-                ('rflag','Indicateur de vendange','int',0,'biblio',0,0,'','','',''),
-                ('harvestdate','Date de dernière vendange','date',0,'biblio',0,0,'','harvestdate','',''),
-                ('identifier','Identifiant notice','str',0,'biblio',0,0,'','','',''),
-                ('status','Statut','str',0,'biblio',0,0,'','','','ETAT'),
-                ('serialnote','Note sur le numéro','ste',0,'biblio',0,0,'','','',''),
-                ('location','Localisation','str',0,'biblio',0,1,'','mc-loc','8013','LOC'),
-                ('acqdate','Date d\'acquisition','date',0,'biblio',0,1,'','','',''),
-                ('item','Exemplaire','str',0,'biblio',0,0,'','item','9520',''),
-                ('lost','Exemplaire perdu','int',0,'biblio',0,0,'','','','LOST'),
-                ('subject','Sujet','ste',1,'biblio',0,0,'','su','21',''),
-                ('callnumber','Cote','ste',0,'biblio',0,1,'','cn','',''),
-                ('availability','Disponibilité','int',0,'biblio',0,0,'C4::Search::Plugins::Availability','','',''),
-                ('barcode','Code barre','str',0,'biblio',0,0,'','bc','8023',''),
-                ('holdingbranch','Dépositaire','str',1,'biblio',0,0,'','','',''),
-                ('abstract','Résumé','txt',0,'biblio',0,0,'','ab','62',''),
-                ('dewey','Cote dewey','ste',0,'biblio',0,1,'','','',''),
-                ('itype','Type de document','str',0,'biblio',0,0,'','mc-itype','8031',''),
-                ('ccode','Code de collection','str',1,'biblio',0,1,'','mc-ccode','8009',''),
-                ('authorities','Formes Rejetées','txt',0,'biblio',0,0,'C4::Search::Plugins::Authorities','','',''),
-                ('lastmodified','Date de modification','date',0,'biblio',0,0,'','','',''),
-                ('genre','Genre','str',0,'biblio',0,0,'','','',''),
-                ('audience','Public','str',0,'biblio',0,0,'C4::Search::Plugins::Audience','','',''),
-                ('authid','AuthId','int',0,'biblio',0,0,'','an','',''),
-                ('title','Titre','ste',0,'biblio',1,1,'','ti','4',''),
-                ('title-series','Collection','ste',1,'biblio',0,0,'','se','5',''),
-                ('title-cover','Titre de couverture','ste',0,'biblio',0,0,'','','',''),
-                ('author','Auteur','ste',1,'biblio',0,1,'C4::Search::Plugins::Author','au','1003',''),
-                ('title-uniform','Titre uniforme','ste',0,'biblio',0,0,'','ut','6',''),
-                ('isbn','ISBN','str',0,'biblio',0,0,'C4::Search::Plugins::DeleteDash','nb','7',''),
-                ('entereddate','Date de saisie','date',0,'biblio',0,0,'','','',''),
-                ('title-host','Document hôte','ste',0,'biblio',0,0,'','','',''),
-                ('biblionumber','Biblionumber','int',0,'biblio',0,0,'','','',''),
-                ('name-geographic','Sujet géographique','ste',0,'biblio',0,0,'','','',''),
-                ('pubplace','Lieu de publication','ste',0,'biblio',0,0,'','','',''),
-                ('lang','Langue','str',0,'biblio',0,0,'','','','LANG'),
-                ('ppn','PPN','str',0,'biblio',0,0,'','','',''),
-                ('personnal-name','Sujet nom de personne','ste',0,'biblio',0,0,'','','',''),
-                ('note','Note','txt',0,'biblio',0,0,'','nt','63',''),
-                ('issn','ISSN','str',0,'biblio',0,0,'C4::Search::Plugins::DeleteDash','ns','8',''),
-                ('corporate-name','Auteur collectivité','ste',0,'biblio',0,0,'','cpn','2',''),
-                ('size','Taille','str',0,'biblio',0,0,'','','',''),
-                ('ean','EAN','str',0,'biblio',1,0,'','','',''),
-                ('publisher','Éditeur','ste',0,'biblio',0,0,'','pb','1018',''),
-                ('itemcallnumber','Cote exemplaire','ste',0,'biblio',0,0,'','','',''),
-                ('pubdate','Date de publication','date',0,'biblio',0,1,'C4::Search::Plugins::Date','','',''),
-                ('homebranch','Propriétaire','str',0,'biblio',0,0,'','branch','8011',''),
-                ('serials','Ressources continues','ste',0,'biblio',0,0,'','','',''),
-                ('printed-music','Musique imprimée','ste',0,'biblio',0,0,'','','',''),
-                ('electronic-ressource','Ressource électronique','ste',0,'biblio',0,0,'','','',''),
-                ('country-heading','Pays d\'édition','str',0,'biblio',0,0,'','','',''),
-                ('auth-heading','heading','ste',0,'authority',1,1,'','he','',''),
-                ('auth-heading-main','heading-main','ste',0,'authority',1,1,'','','',''),
-                ('auth-local-number','local-number','str',0,'authority',0,0,'','','',''),
-                ('auth-note','note','txt',0,'authority',0,0,'','','',''),
-                ('auth-parallel','parallel','ste',0,'authority',0,0,'','','',''),
-                ('auth-ppn','ppn','str',0,'authority',0,0,'','','',''),
-                ('auth-see','see','ste',0,'authority',0,0,'','','',''),
-                ('auth-see-also','see-also','ste',0,'authority',0,0,'','','',''),
-                ('auth-type','type','str',0,'authority',0,0,'','at','',''),
-                ('auth-summary','summary','ste',0,'authority',1,1,'C4::Search::Plugins::Summary','','',''),
-                ('usedinxbiblios','Used in X biblios','int',0,'authority',1,1,'C4::Search::Plugins::UsedInXBiblios','','','');
-        });
-        $dbh->do(q{
-        UNLOCK TABLES;
-        });
-        $dbh->do(q{
-        LOCK TABLES `indexmappings` WRITE;
-        });
-        $dbh->do(q{
-        INSERT INTO `indexmappings` VALUES 
-        ('711','*','corporate-name','biblio'),
-        ('710','*','corporate-name','biblio'),
-        ('702','b','second-author-firstname','biblio'),
-        ('702','a','second-author-name','biblio'),
-        ('702','*','name','biblio'),
-        ('701','*','name','biblio'),
-        ('700','b','author-firstname','biblio'),
-        ('700','a','author-name-personal','biblio'),
-        ('700','*','name','biblio'),
-        ('7..','9','authid','biblio'),
-        ('7..','*','author','biblio'),
-        ('225','g','author','biblio'),
-        ('686','a','callnumber','biblio'),
-        ('676','a','dewey','biblio'),
-        ('676','a','callnumber','biblio'),
-        ('610','*','subject','biblio'),
-        ('608','a','genre','biblio'),
-        ('607','*','name-geographic','biblio'),
-        ('606','*','subject','biblio'),
-        ('605','*','subject','biblio'),
-        ('604','*','subject','biblio'),
-        ('603','*','subject','biblio'),
-        ('602','*','personnal-name','biblio'),
-        ('602','*','subject','biblio'),
-        ('601','*','subject','biblio'),
-        ('600','*','subject','biblio'),
-        ('600','*','personnal-name','biblio'),
-        ('6..','9','authid','biblio'),
-        ('5..','9','authid','biblio'),
-        ('5..','*','title','biblio'),
-        ('464','t','title-host','biblio'),
-        ('461','t','title-host','biblio'),
-        ('410','t','title-series','biblio'),
-        ('403','t','title-uniform','biblio'),
-        ('4..','t','title','biblio'),
-        ('4..','d','pubdate','biblio'),
-        ('4..','9','authid','biblio'),
-        ('330','a','abstract','biblio'),
-        ('3..','9','authid','biblio'),
-        ('3..','*','note','biblio'),
-        ('230','a','electronic-ressource','biblio'),
-        ('225','x','issn','biblio'),
-        ('225','v','title-series','biblio'),
-        ('225','i','title-series','biblio'),
-        ('225','h','title-series','biblio'),
-        ('225','e','title-series','biblio'),
-        ('225','d','title-series','biblio'),
-        ('225','a','title-series','biblio'),
-        ('210','d','pubdate','biblio'),
-        ('210','c','publisher','biblio'),
-        ('210','a','pubplace','biblio'),
-        ('208','*','printed-music','biblio'),
-        ('207','*','serials','biblio'),
-        ('205','*','title','biblio'),
-        ('202','a','country-heading','biblio'),
-        ('200','i','title-cover','biblio'),
-        ('200','i','title','biblio'),
-        ('200','f','author','biblio'),
-        ('200','g','author','biblio'),
-        ('200','e','title','biblio'),
-        ('200','e','title-cover','biblio'),
-        ('200','d','title','biblio'),
-        ('200','c','title','biblio'),
-        ('200','b','itype','biblio'),
-        ('200','a','title','biblio'),
-        ('200','a','title-cover','biblio'),
-        ('2..','9','authid','biblio'),
-        ('116','a','graphics-types','biblio'),
-        ('115','a','video-mt','biblio'),
-        ('110','a','type-of-serial','biblio'),
-        ('105','a','illustration-code','biblio'),
-        ('101','a','lang','biblio'),
-        ('1..','9','authid','biblio'),
-        ('099','t','ccode','biblio'),
-        ('099','d','lastmodified','biblio'),
-        ('099','c','entereddate','biblio'),
-        ('099','c','acqdate','biblio'),
-        ('091','b','harvestdate','biblio'),
-        ('091','a','rflag','biblio'),
-        ('090','9','biblionumber','biblio'),
-        ('073','a','ean','biblio'),
-        ('073','*','identifier','biblio'),
-        ('072','a','upc','biblio'),
-        ('072','*','identifier','biblio'),
-        ('071','b','music-source','biblio'),
-        ('071','a','music-number','biblio'),
-        ('071','*','identifier','biblio'),
-        ('035','*','identifier','biblio'),
-        ('011','a','issn','biblio'),
-        ('011','*','identifier','biblio'),
-        ('010','a','isbn','biblio'),
-        ('010','*','identifier','biblio'),
-        ('009','@','identifier','biblio'),
-        ('009','@','ppn','biblio'),
-        ('001','@','biblionumber','biblio'),
-        ('001','@','identifier','biblio'),
-        ('712','*','corporate-name','biblio'),
-        ('8..','9','authid','biblio'),
-        ('995','*','item','biblio'),
-        ('995','2','lost','biblio'),
-        ('995','6','acqdate','biblio'),
-        ('995','a','homebranch','biblio'),
-        ('995','b','homebranch','biblio'),
-        ('995','c','holdingbranch','biblio'),
-        ('995','d','holdingbranch','biblio'),
-        ('995','e','location','biblio'),
-        ('995','f','barcode','biblio'),
-        ('995','h','ccode','biblio'),
-        ('995','k','callnumber','biblio'),
-        ('995','k','itemcallnumber','biblio'),
-        ('995','n','onloan','biblio'),
-        ('995','o','status','biblio'),
-        ('995','r','itype','biblio'),
-        ('995','u','note','biblio'),
-        ('995','v','serialnote','biblio'),
-        ('200','*','auth-heading','authority'),
-        ('210','*','auth-heading','authority'),
-        ('215','*','auth-heading','authority'),
-        ('216','*','auth-heading','authority'),
-        ('220','*','auth-heading','authority'),
-        ('230','*','auth-heading','authority'),
-        ('240','*','auth-heading','authority'),
-        ('250','*','auth-heading','authority'),
-        ('260','*','auth-heading','authority'),
-        ('280','*','auth-heading','authority'),
-        ('200','a','auth-heading-main','authority'),
-        ('210','a','auth-heading-main','authority'),
-        ('215','a','auth-heading-main','authority'),
-        ('216','a','auth-heading-main','authority'),
-        ('220','a','auth-heading-main','authority'),
-        ('230','a','auth-heading-main','authority'),
-        ('240','a','auth-heading-main','authority'),
-        ('250','a','auth-heading-main','authority'),
-        ('260','a','auth-heading-main','authority'),
-        ('280','a','auth-heading-main','authority'),
-        ('001','@','auth-local-number','authority'),
-        ('3..','a','auth-note','authority'),
-        ('700','*','auth-parallel','authority'),
-        ('710','*','auth-parallel','authority'),
-        ('715','*','auth-parallel','authority'),
-        ('716','*','auth-parallel','authority'),
-        ('720','*','auth-parallel','authority'),
-        ('730','*','auth-parallel','authority'),
-        ('740','*','auth-parallel','authority'),
-        ('750','*','auth-parallel','authority'),
-        ('760','*','auth-parallel','authority'),
-        ('780','*','auth-parallel','authority'),
-        ('009','@','auth-ppn','authority'),
-        ('400','*','auth-see','authority'),
-        ('410','*','auth-see','authority'),
-        ('415','*','auth-see','authority'),
-        ('416','*','auth-see','authority'),
-        ('420','*','auth-see','authority'),
-        ('430','*','auth-see','authority'),
-        ('440','*','auth-see','authority'),
-        ('450','*','auth-see','authority'),
-        ('460','*','auth-see','authority'),
-        ('480','*','auth-see','authority'),
-        ('500','*','auth-see-also','authority'),
-        ('510','*','auth-see-also','authority'),
-        ('515','*','auth-see-also','authority'),
-        ('516','*','auth-see-also','authority'),
-        ('520','*','auth-see-also','authority'),
-        ('530','*','auth-see-also','authority'),
-        ('540','*','auth-see-also','authority'),
-        ('550','*','auth-see-also','authority'),
-        ('560','*','auth-see-also','authority'),
-        ('580','*','auth-see-also','authority'),
-        ('942','*','auth-type','authority'),
-        ('152','b','auth-type','authority');
-        });
-        $dbh->do(q{
-        UNLOCK TABLES;
-        });
-    }
-    $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('SolrAPI','http://localhost:8080/solr','Solr web service URL.','','Free');");
-    $dbh->do("UPDATE `systempreferences` SET options='score|str_callnumber|date_pubdate|date_acqdate|txt_title|str_author' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
-    $dbh->do("UPDATE `systempreferences` SET options='asc|desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder')");
-    $dbh->do("UPDATE `systempreferences` SET value='score' WHERE variable IN ('defaultSortField', 'OPACdefaultSortField')");
-    $dbh->do("UPDATE `systempreferences` SET value='desc' WHERE variable IN ('defaultSortOrder', 'OPACdefaultSortOrder')");
-    $dbh->do("INSERT IGNORE INTO `systempreferences` (variable,value,options,explanation,type) VALUES('SearchEngine','Solr','Solr|Zebra','Search Engine','Choice')");
-    print "Upgrade to $DBversion done (Solr tables)\n";
-    SetVersion ($DBversion);
-}
-
 $DBversion = "3.02.00.055";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("
@@ -5227,21 +4918,28 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.061";
+$DBversion = "3.02.00.059";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do("ALTER TABLE overduerules ALTER delay1 SET DEFAULT NULL, ALTER delay2 SET DEFAULT NULL, ALTER delay3 SET DEFAULT NULL");
+    print "Upgrade to $DBversion done (Setting NULL default value for delayn columns in table overduerules)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.02.00.060";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
-    	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
+	INSERT IGNORE INTO `systempreferences` (variable,value,explanation,options,type) VALUES('BlockRenewWhenOverdue','0','If Set, when item is overdue, renewals are blocked','','YesNo');
     });
     print "Upgrade to $DBversion done (Adds New System preference BlockRenewWhenOverdue)\n";
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.062";
+$DBversion = "3.02.00.061";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do(qq{
-    INSERT INTO `systempreferences` (variable,value,explanation,options,type) VALUES('numSearchRSSResults',50,'Specify the maximum number of results to display on a RSS page of results',NULL,'Integer');
+    	ALTER TABLE `deleteditems` ADD `statisticvalue` varchar(80) DEFAULT NULL
     });
-    print "Upgrade to $DBversion done (Adds New System preference numSearchRSSResults)\n";
+    print "Upgrade to $DBversion done (Adds Column statisticvalue in table deleteditems)\n";
     SetVersion($DBversion);
 }
 
@@ -5671,7 +5369,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-
 $DBversion = "3.06.00.004";
 if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
 	$dbh->do(q{
@@ -5772,15 +5469,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
       ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
     print "Upgrade to $DBversion done (Adding association table aqbudgetborrowers)\n";
-    SetVersion($DBversion);
-}
-
-$DBversion = "3.02.00.062";
-if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
-    $dbh->do(qq{
-        UPDATE `indexes` SET plugin='C4::Search::Plugins::Date' WHERE plugin='C4::Search::Plugins::PubDate'
-    });
-    print "Upgrade to $DBversion done (PubDate plugin name changed)\n";
     SetVersion($DBversion);
 }
 
@@ -6263,7 +5951,7 @@ SELECT  IF(branchcode='*','Default',branchcode),
         renewalsallowed, renewalperiod
     FROM issuingrules where branchcode='*' or itemtype='*' or categorycode='*';
     });
-    print "Upgrade to $DBversion done (Ajout des règles de prêt pour les prêts par défauts)\n";
+    print "Upgrade to $DBversion done (Add issuing rules for issues by default)\n";
     SetVersion($DBversion);
 }
 
@@ -6345,6 +6033,15 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
         ");
     }
     print "Upgrade to $DBversion done (Delete '1/quarter' frequency, change '2/year' frequency and modify 'seasonal' numbering pattern)\n";
+    SetVersion($DBversion);
+}
+
+$DBversion = "3.06.00.059";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        UPDATE `indexes` SET plugin='C4::Search::Plugins::Date' WHERE plugin='C4::Search::Plugins::PubDate'
+    });
+    print "Upgrade to $DBversion done (PubDate plugin name changed)\n";
     SetVersion($DBversion);
 }
 
