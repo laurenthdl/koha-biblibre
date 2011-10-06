@@ -5017,7 +5017,7 @@ if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
                 ('ean','EAN','str',0,'biblio',1,0,'','','',''),
                 ('publisher','Éditeur','ste',0,'biblio',0,0,'','pb','1018',''),
                 ('itemcallnumber','Cote exemplaire','ste',0,'biblio',0,0,'','','',''),
-                ('pubdate','Date de publication','date',0,'biblio',0,1,'','C4::Search::Plugins::PubDate','',''),
+                ('pubdate','Date de publication','date',0,'biblio',0,1,'','C4::Search::Plugins::Date','',''),
                 ('homebranch','Propriétaire','str',0,'biblio',0,0,'','branch','8011',''),
                 ('serials','Ressources continues','ste',0,'biblio',0,0,'','','',''),
                 ('printed-music','Musique imprimée','ste',0,'biblio',0,0,'','','',''),
@@ -5382,6 +5382,16 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     print "Upgrade to $DBversion done (add format and encoding fields on letter)\n";
     SetVersion($DBversion);
 }
+
+$DBversion = "3.02.00.075";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        UPDATE `indexes` SET plugin='C4::Search::Plugins::Date' WHERE plugin='C4::Search::Plugins::PubDate'
+    });
+    print "Upgrade to $DBversion done (PubDate plugin name changed)\n";
+    SetVersion($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 
