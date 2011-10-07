@@ -1,11 +1,20 @@
 <!-- TMPL_INCLUDE NAME="doc-head-open.inc" --><title>Koha &rsaquo; Tools &rsaquo; Koha Synchronize System</title><!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+<link rel="stylesheet" type="text/css" href="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar-system.css" />
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar-en.js"></script>
+<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar-setup.js"></script>
+
 <script type="text/javascript">
 //<![CDATA[
      $(document).ready(function() {
 	<!-- TMPL_IF NAME="display_actions" -->
 	    $('#ksstabs > ul').tabs({selected:2});
 	<!-- TMPL_ELSE -->
-	    $('#ksstabs > ul').tabs();
+            <!-- TMPL_IF NAME="display_infos" -->
+                $('#ksstabs > ul').tabs({selected:1});
+            <!-- TMPL_ELSE -->
+                $('#ksstabs > ul').tabs();
+            <!-- /TMPL_IF -->
 	<!-- /TMPL_IF -->
 
         $('#manualexeclink').click(function() {
@@ -67,12 +76,32 @@
 	    <h3>Master informations</h3>
             <h3>Log file</h3>
             <a href="/cgi-bin/koha/tools/kss-logs.pl" onclick="javascript:window.open('/cgi-bin/koha/tools/kss-logs.pl', 'ksslogs'); return false;">See full log file</a>
-	    <h3>Last synchronisation details:</h3>
+	    <h3>Synchronisation details:</h3>
+            <form method="post">
+                <label for="statsdate">
+                Date:
+                </label>
+                <input type="text" size="10" id="statsdate" name="statsdate" value="<!-- TMPL_VAR NAME="statsdate" -->" />
+                <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif"  border="0" id="openCalendarFrom" style="cursor: pointer;" alt="" />
+                <script language="JavaScript" type="text/javascript">
+                    Calendar.setup(
+                    {
+                    inputField : "statsdate",
+                    ifFormat : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                    button : "openCalendarFrom"
+                    }
+                );
+                </script>
+                <input type="hidden" name="display_infos" value="display_infos" />
+                <input type="submit" />
+                </form>
+
 	    <!-- TMPL_IF NAME="stats_loop" -->
 		<!-- TMPL_LOOP NAME="stats_loop" -->
 		<br />
 		<h4>Client "<!-- TMPL_VAR NAME="client" -->":</h4>
 		    <ul>
+                      <li>Execution id: <!-- TMPL_VAR NAME="id" --></li>
 		      <li>Execution time: <!-- TMPL_VAR NAME="log_start" --> => <!-- TMPL_VAR NAME="log_end" --></li>
 		      <li>Status: <!-- TMPL_VAR NAME="log_status" --></li>
 		    </ul>
@@ -185,7 +214,7 @@
 			<caption>SQL Error log:</caption>
 			<thead>
 			    <tr>
-				<!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
+				<!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
 				<th>error</th>
 				<th>message</th>
 			    </tr>
@@ -193,6 +222,7 @@
 			<tbody>
 			<!-- TMPL_LOOP NAME="sql_errors" -->
 			    <tr>
+                                <!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
 				<td><!-- TMPL_VAR NAME="error" --></td>
 				<td><!-- TMPL_VAR NAME="query" --></td>
 			    </tr>
@@ -233,132 +263,161 @@
             <h3>Log file</h3>
             <a href="/cgi-bin/koha/tools/kss-logs.pl" onclick="javascript:window.open('/cgi-bin/koha/tools/kss-logs.pl', 'ksslogs'); return false;">See full log file</a>
 	    <h3>Last synchronisation details for <!-- TMPL_VAR NAME="hostname" -->:</h3>
-		    <ul>
-		      <li>Execution time: <!-- TMPL_VAR NAME="last_log_start_time" --> => <!-- TMPL_VAR NAME="last_log_end_time" --></li>
-		      <li>Status: <!-- TMPL_VAR NAME="last_log_status" --></li>
-		    </ul>
-		<table>
-		    <caption>Statistics:</caption>
-		    <thead>
-			<tr>
-			    <th>Issues</th>
-			    <th>Reserves</th>
-			    <th>Returns</th>
-			</tr>
-		    </thead>
-		    <tbody>
-			<tr>
-			    <td><!-- TMPL_VAR NAME="last_stats_issue" --></td>
-			    <td><!-- TMPL_VAR NAME="last_stats_reserve" --></td>
-			    <td><!-- TMPL_VAR NAME="last_stats_return" --></td>
-			</tr>
-		    </tbody>
-		</table>
-		<!-- TMPL_IF NAME="stats_doctype" -->
-		<table>
-		    <caption>Statistics per document type:</caption>
-		    <thead>
-			<tr>
-			    <th>Document type</th>
-			    <th>Number of issues</th>
-			</tr>
-		    </thead>
-		    <tbody>
-		    <!-- TMPL_LOOP NAME="stats_doctype" -->
-			<tr>
-			    <td><!-- TMPL_VAR NAME="doctype" --></td>
-			    <td><!-- TMPL_VAR NAME="value" --></td>
-			</tr>
-		    <!-- /TMPL_LOOP -->
-		    </tbody>
-		</table>
-		<!-- /TMPL_IF -->
-		<!-- TMPL_IF NAME="stats_location" -->
-		<table>
-		    <caption>Statistics per location:</caption>
-		    <thead>
-			<tr>
-			    <th>Location</th>
-			    <th>Number of issues</th>
-			</tr>
-		    </thead>
-		    <tbody>
-		    <!-- TMPL_LOOP NAME="stats_location" -->
-			<tr>
-			    <td><!-- TMPL_VAR NAME="location" --></td>
-			    <td><!-- TMPL_VAR NAME="value" --></td>
-			</tr>
-		    <!-- /TMPL_LOOP -->
-		    </tbody>
-		</table>
-		<!-- /TMPL_IF -->
-    
-		<!-- TMPL_IF NAME="last_status_loop" -->
-		<table>
-		    <caption>Status log:</caption>
-		    <thead>
-			<tr>
-			    <!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
-			    <th>status</th>
-			    <th>start time</th>
-			    <th>end time</th>
-			</tr>
-		    </thead>
-		    <tbody>
-		    <!-- TMPL_LOOP NAME="last_status_loop" -->
-			<tr>
-			    <!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
-			    <td><!-- TMPL_VAR NAME="status" --></td>
-			    <td><!-- TMPL_VAR NAME="start_time" --></td>
-			    <td><!-- TMPL_VAR NAME="end_time" --></td>
-			</tr>
-		    <!-- /TMPL_LOOP -->
-		    </tbody>
-		</table>
-	    <!-- /TMPL_IF -->
-	    <!-- TMPL_IF NAME="last_errors_loop" -->
-		<table>
-		    <caption>Error log:</caption>
-		    <thead>
-			<tr>
-			    <!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
-			    <th>error</th>
-			    <th>message</th>
-			</tr>
-		    </thead>
-		    <tbody>
-		    <!-- TMPL_LOOP NAME="last_errors_loop" -->
-			<tr>
-			    <!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
-			    <td><!-- TMPL_VAR NAME="error" --></td>
-			    <td><!-- TMPL_VAR NAME="message" --></td>
-			</tr>
-		    <!-- /TMPL_LOOP -->
-		    </tbody>
-		</table>
-	    <!-- /TMPL_IF -->
-	    <!-- TMPL_IF NAME="last_sql_errors_loop" -->
-		<table>
-		    <caption>SQL Error log:</caption>
-		    <thead>
-			<tr>
-			    <!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
-			    <th>error</th>
-			    <th>message</th>
-			</tr>
-		    </thead>
-		    <tbody>
-		    <!-- TMPL_LOOP NAME="last_sql_errors_loop" -->
-			<tr>
-			    <!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
-			    <td><!-- TMPL_VAR NAME="error" --></td>
-			    <td><!-- TMPL_VAR NAME="query" --></td>
-			</tr>
-		    <!-- /TMPL_LOOP -->
-		    </tbody>
-		</table>
-	    <!-- /TMPL_IF -->
+            <form method="post">
+                <label for="statsdate">
+                Date:
+                </label>
+                <input type="text" size="10" id="statsdate" name="statsdate" value="<!-- TMPL_VAR NAME="statsdate" -->" />
+                <img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif"  border="0" id="openCalendarFrom" style="cursor: pointer;" alt="" />
+                <script language="JavaScript" type="text/javascript">
+                    Calendar.setup(
+                    {
+                    inputField : "statsdate",
+                    ifFormat : "<!-- TMPL_VAR NAME="DHTMLcalendar_dateformat" -->",
+                    button : "openCalendarFrom"
+                    }
+                );
+                </script>
+                <input type="hidden" name="display_infos" value="display_infos" />
+                <input type="submit" />
+                </form>
 
+	    <!-- TMPL_IF NAME="stats_loop" -->
+		<!-- TMPL_LOOP NAME="stats_loop" -->
+		<br />
+		<h4>Client "<!-- TMPL_VAR NAME="client" -->":</h4>
+		    <ul>
+                      <li>Execution id: <!-- TMPL_VAR NAME="id" --></li>
+		      <li>Execution time: <!-- TMPL_VAR NAME="log_start" --> => <!-- TMPL_VAR NAME="log_end" --></li>
+		      <li>Status: <!-- TMPL_VAR NAME="log_status" --></li>
+		    </ul>
+		    <!-- TMPL_IF NAME="stats" -->
+			<table>
+			    <caption>Statistics:</caption>
+			    <thead>
+				<tr>
+				    <th>Issues</th>
+				    <th>Reserves</th>
+				    <th>Returns</th>
+				</tr>
+			    </thead>
+			    <tbody>
+			    <!-- TMPL_LOOP NAME="stats" -->
+				<tr>
+				    <td><!-- TMPL_VAR NAME="issue" --></td>
+				    <td><!-- TMPL_VAR NAME="reserve" --></td>
+				    <td><!-- TMPL_VAR NAME="return" --></td>
+				</tr>
+			    <!-- /TMPL_LOOP -->
+			    </tbody>
+			</table>
+		    <!-- /TMPL_IF -->
+		    <!-- TMPL_IF NAME="stats_doctype" -->
+			<table>
+			    <caption>Statistics per document type:</caption>
+			    <thead>
+				<tr>
+				    <th>Document type</th>
+				    <th>Number of issues</th>
+				</tr>
+			    </thead>
+			    <tbody>
+			    <!-- TMPL_LOOP NAME="stats_doctype" -->
+				<tr>
+				    <td><!-- TMPL_VAR NAME="doctype" --></td>
+				    <td><!-- TMPL_VAR NAME="value" --></td>
+				</tr>
+			    <!-- /TMPL_LOOP -->
+			    </tbody>
+			</table>
+		    <!-- /TMPL_IF -->
+		    <!-- TMPL_IF NAME="stats_location" -->
+			<table>
+			    <caption>Statistics per location:</caption>
+			    <thead>
+				<tr>
+				    <th>Location</th>
+				    <th>Number of issues</th>
+				</tr>
+			    </thead>
+			    <tbody>
+			    <!-- TMPL_LOOP NAME="stats_location" -->
+				<tr>
+				    <td><!-- TMPL_VAR NAME="location" --></td>
+				    <td><!-- TMPL_VAR NAME="value" --></td>
+				</tr>
+			    <!-- /TMPL_LOOP -->
+			    </tbody>
+			</table>
+		    <!-- /TMPL_IF -->
+	
+		    <!-- TMPL_IF NAME="status" -->
+		    <table>
+			<caption>Status log:</caption>
+			<thead>
+			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
+				<th>status</th>
+				<th>start time</th>
+				<th>end time</th>
+			    </tr>
+			</thead>
+			<tbody>
+			<!-- TMPL_LOOP NAME="status" -->
+			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
+				<td><!-- TMPL_VAR NAME="status" --></td>
+				<td><!-- TMPL_VAR NAME="start_time" --></td>
+				<td><!-- TMPL_VAR NAME="end_time" --></td>
+			    </tr>
+			<!-- /TMPL_LOOP -->
+			</tbody>
+		    </table>
+		<!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="errors" -->
+		    <table>
+			<caption>Error log:</caption>
+			<thead>
+			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
+				<th>error</th>
+				<th>message</th>
+			    </tr>
+			</thead>
+			<tbody>
+			<!-- TMPL_LOOP NAME="errors" -->
+			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
+				<td><!-- TMPL_VAR NAME="error" --></td>
+				<td><!-- TMPL_VAR NAME="message" --></td>
+			    </tr>
+			<!-- /TMPL_LOOP -->
+			</tbody>
+		    </table>
+		<!-- /TMPL_IF -->
+		<!-- TMPL_IF NAME="sql_errors" -->
+		    <table>
+			<caption>SQL Error log:</caption>
+			<thead>
+			    <tr>
+				<!-- TMPL_IF NAME="Debug" --><th>kss id</th><!-- /TMPL_IF -->
+				<th>error</th>
+				<th>message</th>
+			    </tr>
+			</thead>
+			<tbody>
+			<!-- TMPL_LOOP NAME="sql_errors" -->
+			    <tr>
+                                <!-- TMPL_IF NAME="Debug" --><td><!-- TMPL_VAR NAME="kss_id" --></td><!-- /TMPL_IF -->
+				<td><!-- TMPL_VAR NAME="error" --></td>
+				<td><!-- TMPL_VAR NAME="query" --></td>
+			    </tr>
+			<!-- /TMPL_LOOP -->
+			</tbody>
+		    </table>
+		<!-- /TMPL_IF -->
+		<!-- /TMPL_LOOP --> <!-- END CLIENT LOOP (stats_loop) -->
+	    <!-- /TMPL_IF -->
 
 
 

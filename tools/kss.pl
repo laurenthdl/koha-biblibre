@@ -55,6 +55,7 @@ my $input       = new CGI;
 my $dbh         = C4::Context->dbh;
 my $CONFIG_NAME = $ENV{'KOHA_CONF'};
 my $manual      = $input->param('manual');
+my $statsdate   = $input->param('statsdate') || C4::Dates->new()->output();
 
 # Getting conf
 my $conf = Koha_Synchronize_System::tools::kss::get_conf();
@@ -81,6 +82,8 @@ my ( $template, $loggedinuser, $cookie ) = get_template_and_user(
 # Are we a master or a slave?
 my $master = $$conf{cron}{master};
 $template->param('master' => $master);
+
+$template->param('display_infos' => 1) if ($input->param('display_infos'));
 
 # Parse kss.pl --status to tell if kss is running
 sub is_kss_running {
@@ -115,31 +118,34 @@ if ($master) {
     $template->param("KSS_already_running" => 1) if ($kssalreadyrunning);
     $template->param("KSS_already_running_unknown" => 1) if ($kssalreadyrunning == -1);
 
-   my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh);
+   my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh, $statsdate);
    # Preparing loop
    my @stats_loop;
    foreach my $hostname (keys %{$stats}) {
-	my @innerloop;
-	push @innerloop, $stats->{$hostname};
+        foreach my $process (keys %{$stats->{$hostname}}) {
+            my @innerloop;
+            push @innerloop, $stats->{$hostname}->{$process};
 
-	my $last_status     = Koha_Synchronize_System::tools::kss::get_last_status($dbh, $hostname);
-	my $last_errors     = Koha_Synchronize_System::tools::kss::get_last_errors($dbh, $hostname);
-	my $last_sql_errors = Koha_Synchronize_System::tools::kss::get_last_sql_errors($dbh, $hostname);
-	my $last_log        = Koha_Synchronize_System::tools::kss::get_last_log($dbh, $hostname);
-	my ($stats_doctype,$stats_location) = Koha_Synchronize_System::tools::kss::get_stats_details($dbh, $hostname);
+            my $last_status     = Koha_Synchronize_System::tools::kss::get_status($dbh, $process);
+            my $last_errors     = Koha_Synchronize_System::tools::kss::get_errors($dbh, $process);
+            my $last_sql_errors = Koha_Synchronize_System::tools::kss::get_sql_errors($dbh, $process);
+            my $last_log        = Koha_Synchronize_System::tools::kss::get_log($dbh, $process);
+            my ($stats_doctype,$stats_location) = Koha_Synchronize_System::tools::kss::get_stats_details($dbh, $hostname, $process);
 
-	push @stats_loop, { 
-	    client         => $hostname, 
-	    stats          => \@innerloop, 
-	    status         => $last_status, 
-	    errors         => $last_errors, 
-	    stats_doctype  => $stats_doctype,
-	    stats_location => $stats_location,
-	    sql_errors     => $last_sql_errors,
-	    log_status     => $last_log->{'status'},
-	    log_start      => $last_log->{'start_time'},
-	    log_end        => $last_log->{'end_time'}
-        };	
+            push @stats_loop, { 
+                client         => $hostname, 
+                id             => $process,
+                stats          => \@innerloop, 
+                status         => $last_status, 
+                errors         => $last_errors, 
+                stats_doctype  => $stats_doctype,
+                stats_location => $stats_location,
+                sql_errors     => $last_sql_errors,
+                log_status     => $last_log->{'status'},
+                log_start      => $last_log->{'start_time'},
+                log_end        => $last_log->{'end_time'}
+            };
+        }
    }
    $template->param(stats_loop => \@stats_loop);
 
@@ -205,34 +211,35 @@ if ($master) {
     $hostname =~ s/\s$//;
     $template->param("hostname" => $hostname);
 
+   my $stats = Koha_Synchronize_System::tools::kss::get_stats($dbh, $statsdate);
 
-    # Getting stats
-    my $last_stats_result = Koha_Synchronize_System::tools::kss::get_stats_by_host($dbh, $hostname);
-    foreach (keys %$last_stats_result) {
-	$template->param('last_stats_' . $_ => $last_stats_result->{$_});
+   # Preparing loop
+   my @stats_loop;
+    foreach my $process (keys %{$stats->{$hostname}}) {
+        my @innerloop;
+        push @innerloop, $stats->{$hostname}->{$process};
+
+        my $last_status     = Koha_Synchronize_System::tools::kss::get_status($dbh, $process);
+        my $last_errors     = Koha_Synchronize_System::tools::kss::get_errors($dbh, $process);
+        my $last_sql_errors = Koha_Synchronize_System::tools::kss::get_sql_errors($dbh, $process);
+        my $last_log        = Koha_Synchronize_System::tools::kss::get_log($dbh, $process);
+        my ($stats_doctype,$stats_location) = Koha_Synchronize_System::tools::kss::get_stats_details($dbh, $hostname, $process);
+
+        push @stats_loop, { 
+            client         => $hostname, 
+            id             => $process,
+            stats          => \@innerloop, 
+            status         => $last_status, 
+            errors         => $last_errors, 
+            stats_doctype  => $stats_doctype,
+            stats_location => $stats_location,
+            sql_errors     => $last_sql_errors,
+            log_status     => $last_log->{'status'},
+            log_start      => $last_log->{'start_time'},
+            log_end        => $last_log->{'end_time'}
+        };
     }
-
-    # Getting detailled stats
-    my ($stats_doctype,$stats_location) = Koha_Synchronize_System::tools::kss::get_stats_details($dbh, $hostname);
-    $template->param(stats_doctype => $stats_doctype, stats_location => $stats_location);
-
-    # Getting last execution log
-    my $last_log_result = Koha_Synchronize_System::tools::kss::get_last_log($dbh, $hostname);
-    foreach (keys %$last_log_result) {
-	$template->param('last_log_' . $_ => $last_log_result->{$_});
-    }
-
-    # Getting last execution status
-    my $last_status_result = Koha_Synchronize_System::tools::kss::get_last_status($dbh, $hostname);
-    $template->param(last_status_loop => $last_status_result);
-
-    # Getting last execution errors
-    my $last_errors_result = Koha_Synchronize_System::tools::kss::get_last_errors($dbh, $hostname);
-    $template->param(last_errors_loop => $last_errors_result);
-
-    # Getting last sql errors
-    my $last_sql_errors_result = Koha_Synchronize_System::tools::kss::get_last_sql_errors($dbh, $hostname);
-    $template->param(last_sql_errors_loop => $last_sql_errors_result);
+   $template->param(stats_loop => \@stats_loop);
 
 
     # Actions
@@ -297,5 +304,9 @@ if ($master) {
 
 }
 
-$template->param("Debug" => $debug);
+$template->param(
+    "Debug" => $debug,
+    "statsdate" => $statsdate,
+    DHTMLcalendar_dateformat => C4::Dates->DHTMLcalendar()
+    );
 output_html_with_http_headers $input, $cookie, $template->output  unless ($input->param("save"));

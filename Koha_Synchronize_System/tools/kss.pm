@@ -737,12 +737,48 @@ sub get_last_log {
     return $sth->fetchrow_hashref;
 }
 
-# Return last execution ids for each client
+=head2 get_log
+
+Return log 
+
+Example:
+
+=over
+
+$VAR1 = {
+          'end_time' => '2011-04-01 15:52:10',
+          'status' => 'End !',
+          'progress' => '0',
+          'start_time' => '2011-04-01 15:52:02',
+          'hostname' => 'ns39793.ovh.net',
+          'id' => '9'
+        };
+
+=cut
+sub get_log {
+    my $dbh = shift;
+    my $id = shift;
+
+    return unless $id;
+
+    my $query = "SELECT * from $kss_logs_table";
+    $query .= " WHERE id =?" if ($id); 
+    $query .= " ORDER BY id DESC LIMIT 1";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($id);
+    return $sth->fetchrow_hashref;
+}
+
+
+# Return execution ids for each client for a given date
 sub get_last_ids {
     my $dbh = shift;
-    my $query = "SELECT MAX(id), hostname from $kss_logs_table GROUP BY hostname ORDER BY hostname";
+    my $date = shift || C4::Dates->new()->output("iso");
+    $date = (defined $date) ? C4::Dates->new($date)->output("iso") : C4::Dates->new()->output("iso");
+
+    my $query = "SELECT id, hostname from $kss_logs_table WHERE TO_DAYS(start_time) = TO_DAYS(?)";
     my $sth = $dbh->prepare($query);
-    $sth->execute;
+    $sth->execute($date);
     return $sth->fetchall_arrayref();
 }
 
@@ -765,6 +801,13 @@ sub get_last_errors {
     my $hostname = shift;
     return _get_last_table($dbh, $kss_errors_table, $hostname);
 }
+
+sub get_errors {
+    my $dbh = shift;
+    my $id = shift;
+    return _get_table($dbh, $kss_errors_table, $id);
+}
+
 
 
 =head2 get_last_status
@@ -803,6 +846,20 @@ sub get_last_sql_errors {
     return _get_last_table($dbh, $kss_sql_errors_table, $hostname);
 }
 
+sub get_status {
+    my $dbh = shift;
+    my $id = shift;
+    return _get_table($dbh, $kss_status_table, $id);
+}
+
+# Return last errors (optionally for a given hostname)
+sub get_sql_errors {
+    my $dbh = shift;
+    my $id = shift;
+    return _get_table($dbh, $kss_sql_errors_table, $id);
+}
+
+
 
 =head2 _get_last_table
 
@@ -823,6 +880,25 @@ sub _get_last_table {
     $sth->execute($last);
     return $sth->fetchall_arrayref({});
 }
+
+=head2 _get_table
+
+Return all data from a given table
+
+=cut
+sub _get_table {
+    my $dbh = shift;
+    my $table = shift;
+    my $id = shift;
+
+    my $query = "SELECT * from $table WHERE kss_id=? ORDER BY id DESC";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($id);
+    return $sth->fetchall_arrayref({});
+}
+
+
+
 
 # Returns last statistics for a given host : number of issues, returns and reserves 
 sub get_stats_by_host {
@@ -845,16 +921,35 @@ sub get_stats_by_host {
     return $results;
 }
 
-# Returns detailled statistics for a given host : number of issues by itemtype and section
+# Returns statistics for a given id : number of issues, returns and reserves 
+sub get_stats_by_id {
+    my $dbh = shift;
+    my $id = shift;
+
+    my $results;
+
+    for (qw(issue return reserve)) {
+	my $query = "SELECT COUNT(*) from $kss_statistics_table WHERE variable=? and kss_id=?";
+	my $sth = $dbh->prepare($query);
+	$sth->execute($_, $id);
+	my $count = $sth->fetchrow_arrayref;
+	$results->{$_} = $count->[0];
+    }
+    return $results;
+}
+
+
+# Returns detailled statistics for a given host and optionally a given kss_id : number of issues by itemtype and section
 sub get_stats_details {
     my $dbh = shift;
     my $hostname = shift;
+    my $last = shift;
     my $doctyperesults;
     my $locationresults;
 
     # Getting last id for a given hostname
     my $tmpres = get_last_log($dbh, $hostname);
-    my $last = $tmpres->{'id'};
+    $last = $tmpres->{'id'} unless $last;
 
     # Getting itemnumbers from the last execution
     my $query = "SELECT itemnumber from $kss_statistics_table WHERE variable=? AND kss_id=?";
@@ -886,7 +981,6 @@ sub get_stats_details {
     foreach (@$sections) {
 	my $section = $_->{'authorised_value'};
 	my $query = "SELECT location, count(itemnumber) AS value from items where location=? AND itemnumber IN ($items_str) HAVING COUNT(itemnumber) > 0";
-	warn $query;
 	my $sth = $dbh->prepare($query);
 	$sth->execute($section);
 	my $result = $sth->fetchrow_hashref();
@@ -899,13 +993,13 @@ sub get_stats_details {
 # Return last statistics for all hosts
 sub get_stats {
     my $dbh = shift;
-
+    my $date = shift;
     my $results;
 
     # Getting last ids for each client
-    my $ids = get_last_ids($dbh);
+    my $ids = get_last_ids($dbh, $date);
     foreach (@{$ids}) {
-        $results->{$_->[1]} = get_stats_by_host($dbh, $_->[1]);
+        $results->{$_->[1]}->{$_->[0]} = get_stats_by_id($dbh, $_->[0]);
     }
     return $results;
 
