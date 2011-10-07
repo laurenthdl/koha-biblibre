@@ -6030,7 +6030,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-$DBversion = "3.02.00.063";
+$DBversion = "3.06.00.063";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     my $installer = C4::Installer->new();
     my $full_path = $installer->get_file_path_from_name("atomicupdate/maduvil_indexes.sql");
