@@ -83,13 +83,16 @@ if ($batch) {
         $cgidir = C4::Context->intranetdir;
         opendir( DIR, "$cgidir/tmp/modified_authorities" ) || die "can't opendir $cgidir/tmp/modified_authorities: $!";
     }
-    while ( my $authid = readdir(DIR) ) {
-        if ( $authid =~ /\.authid$/ ) {
+    while ( my $authid_filename = readdir(DIR) ) {
+        if ( $authid_filename =~ /\.authid$/ ) {
+            my $authid = $authid_filename;
             $authid =~ s/\.authid$//;
             print "managing $authid\n" if $verbose;
-            my $MARCauth = GetAuthority($authid);
-            next unless ($MARCauth);
-            merge( $authid, $MARCauth, $authid, $MARCauth ) if ($MARCauth);
+            my $MARCfrom = retrieve $authid_filename;
+            next unless ($MARCfrom);
+            my $MARCto=GetAuthority($authid);
+            next unless ($MARCto);
+            merge( $authid, $MARCfrom, $authid, $MARCto ) ;
             unlink $cgidir . '/tmp/modified_authorities/' . $authid . '.authid';
         }
     }
