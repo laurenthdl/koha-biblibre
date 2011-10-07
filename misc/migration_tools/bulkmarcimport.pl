@@ -313,7 +313,7 @@ RECORD: while () {
             if ( $marcrecord and $authorities and $marcFlavour ) {
 
                 #Skip if authority in database is the same as the on in database
-                if ( $marcrecord->field('005')->data >= $record->field('005')->data ) {
+                if ( $marcrecord->field('005') and $record->field('005') and $marcrecord->field('005')->data >= $record->field('005')->data ) {
                     if ($yamlfile) {
                         $yamlhash->{$originalid}->{'authid'} = $id;
 
