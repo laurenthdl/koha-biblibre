@@ -31,6 +31,8 @@ use CGI;
 use C4::Auth;
 use C4::Dates qw/format_date format_date_in_iso/;
 use C4::Debug;
+use C4::Koha;
+use C4::Branch;
 use Date::Calc qw/Today Add_Delta_YMD/;
 
 my $input       = new CGI;
@@ -274,6 +276,35 @@ if ($run_report) {
     #$sth->finish;
 }
 
+my $itemtypes = GetItemTypes;
+my @itemtypes_loop;
+foreach (sort {$a <=> $b} keys %$itemtypes) {
+    my $itype = $itemtypes->{$_};
+    push @itemtypes_loop, {
+        itemtype => $itype->{'itemtype'},
+        description => $itype->{'description'},
+    };
+}
+
+my $branches = GetBranches;
+my @branches_loop;
+foreach (sort keys %$branches) {
+    my $branch = $branches->{$_};
+    push @branches_loop, {
+        branchcode => $branch->{'branchcode'},
+        branchname => $branch->{'branchname'},
+    };
+}
+
+my $locations = GetAuthorisedValues('LOC');
+my @locations_loop;
+foreach (@$locations) {
+    push @locations_loop, {
+        value => $_->{'authorised_value'},
+        description => $_->{'lib'},
+    };
+}
+
 $template->param(
     todaysdate                                                         => format_date($todaysdate),
     from                                                               => $startdate,
@@ -287,6 +318,9 @@ $template->param(
     "BiblioDefaultView" . C4::Context->preference("BiblioDefaultView") => 1,
     DHTMLcalendar_dateformat                                           => C4::Dates->DHTMLcalendar(),
     dateformat                                                         => C4::Context->preference("dateformat"),
+    itemtypes_loop      => \@itemtypes_loop,
+    branches_loop       => \@branches_loop,
+    locations_loop      => \@locations_loop,
 );
 
 output_html_with_http_headers $input, $cookie, $template->output;

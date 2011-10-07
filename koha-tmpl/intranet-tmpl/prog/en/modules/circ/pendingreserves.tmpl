@@ -11,20 +11,25 @@
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar-en.js"></script>
 <script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/calendar/calendar-setup.js"></script>
 <!-- End of additions -->
-<script type="text/javascript" src="<!-- TMPL_VAR name="themelang" -->/lib/jquery/plugins/picnet.table.filter.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
 //<![CDATA[
-	 $(document).ready(function() {
-		$('#holdst').dataTable({"bFilter": false});
-	 	$("th a").hide();
-		// Initialise Plugin
-            var options1 = {
-                additionalFilterTriggers: [$('#quickfind')],
-                clearFiltersControls: [$('#cleanfilters')],
-                selectOptionLabel: [_('Select..')],
-        };
-		$('#holdst').tableFilter(options1);
-     });
+    $(document).ready(function() {
+        <!-- TMPL_iF EXPR="dateformat eq 'metric'" -->
+            dt_add_type_uk_date();
+        <!-- /TMPL_IF -->
+        dt_overwrite_html_sorting_localeCompare();
+        var holdst = $('#holdst').dataTable($.extend(true, {}, dataTablesDefaults, {
+            "sPaginationType": "full_numbers"
+        }));
+        holdst.fnAddFilters("filter", 500);
+        $("select.filter").change(function(){
+            var filter = $(this).val();
+            if(filter && isNaN(filter) == false) {
+                filter = "^" + filter + "$";
+            }
+            holdst.fnFilter(filter, $(this).attr('data-column_num'), true);
+        });
+    });
 //]]>
 </script>
 </head>
@@ -47,88 +52,101 @@
 <p>The following holds have not been filled. Please retrieve them and check them in.</p>
 <div class="searchresults">
     <!-- TMPL_IF NAME="reserveloop" -->
-<div><label for="filter">Quick Find: </label><input type="text" id="quickfind"/></div><div style="height:10px;display:block;"></div>
-<a id="cleanfilters" href="#">Clear Filters</a><div style="height:20px;display:block;"></div>
     <table id="holdst">
-    <thead>
-    <tr>
-        <th>
-				Pull This Many Items
-        </th>        
-        <th>
-				Items Available
-        </th>
-        <th>
-				Patrons with Holds
-        </th>
-        <th>Title
-        <a href="/cgi-bin/koha/circ/pendingreserves.pl?order=biblio&amp;from=<!-- TMPL_VAR NAME="from" -->&amp;to=<!-- TMPL_VAR NAME="to" -->">Sort</a>
-        </th>
-        <th filter-type='ddl'>
-            Available Itypes
-				<a href="/cgi-bin/koha/circ/pendingreserves.pl?order=itype&amp;from=<!-- TMPL_VAR NAME="from" -->&amp;to=<!-- TMPL_VAR NAME="to" -->">Sort</a>
-        </th>
-        <th>
-            Libraries
-				<a href="/cgi-bin/koha/circ/pendingreserves.pl?order=library&amp;from=<!-- TMPL_VAR NAME="from" -->&amp;to=<!-- TMPL_VAR NAME="to" -->">Sort</a>
-        </th>
-        <th>
-            Available Locations
-				<a href="/cgi-bin/koha/circ/pendingreserves.pl?order=location&amp;from=<!-- TMPL_VAR NAME="from" -->&amp;to=<!-- TMPL_VAR NAME="to" -->">Sort</a>
-        </th>
-        <th>
-            Available Call Numbers
-				<a href="/cgi-bin/koha/circ/pendingreserves.pl?order=call&amp;from=<!-- TMPL_VAR NAME="from" -->&amp;to=<!-- TMPL_VAR NAME="to" -->">Sort</a>
-        </th>
-        <th >Earliest Hold Date
-            <a href="/cgi-bin/koha/circ/pendingreserves.pl?order=date&amp;from=<!-- TMPL_VAR NAME="from" -->&amp;to=<!-- TMPL_VAR NAME="to" -->">Sort</a>
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-        <!-- TMPL_LOOP NAME="reserveloop" -->
-        <tr>
-            <!-- TMPL_IF name="borrowernumber" -->
-                <td><p><b><!-- TMPL_VAR NAME="pullcount" --></b></p></td>
-                <td><!-- TMPL_VAR NAME="count" --></td>  
-                <td><!-- TMPL_VAR NAME="rcount" --></td> 
+        <thead>
+            <tr>
+                <td colspan="3"></td>
                 <td>
-                    <p>
-                    <!-- TMPL_IF name="BiblioDefaultViewmarc" -->
-                    <a href="/cgi-bin/koha/catalogue/MARCdetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->">
-                        <!-- TMPL_VAR NAME="title" escape="html" --> <!-- TMPL_VAR NAME="subtitle" -->
-                    </a>
-                    <!-- TMPL_ELSE -->
-                        <!-- TMPL_IF name="BiblioDefaultViewisbd" -->
-                        <a href="/cgi-bin/koha/catalogue/ISBDdetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->">
+                    <input type="text" placeholder="Search title" class="filter" data-column_num="3" style="width:99%"/>
+                </td>
+                <td>
+                    <select class="filter" data-column_num="4" style="width:10em">
+                        <option value="">All</option>
+                        <!-- TMPL_LOOP NAME='itemtypes_loop' -->
+                            <option value="<!-- TMPL_VAR NAME='itemtype' -->">
+                                <!-- TMPL_VAR NAME='description' -->
+                            </option>
+                        <!-- /TMPL_LOOP -->
+                    </select>
+                </td>
+                <td>
+                    <select class="filter" data-column_num="5" style="width:10em">
+                        <option value="">All</option>
+                        <!-- TMPL_LOOP NAME='branches_loop' -->
+                            <option value="<!-- TMPL_VAR NAME='branchcode' -->">
+                                <!-- TMPL_VAR NAME='branchname' -->
+                            </option>
+                        <!-- /TMPL_LOOP -->
+                    </select>
+                </td>
+                <td>
+                    <select class="filter" data-column_num="6" style="width:10em">
+                        <option value="">All</option>
+                        <!-- TMPL_LOOP NAME='locations_loop' -->
+                            <option value="<!-- TMPL_VAR NAME='value' -->">
+                                <!-- TMPL_VAR NAME='description' -->
+                            </option>
+                        <!-- /TMPL_LOOP -->
+                    </select>
+                </td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <th>Pull This Many Items</th>
+                <th>Items Available</th>
+                <th>Patrons with Holds</th>
+                <th>Title</th>
+                <th>Available Itypes</th>
+                <th>Libraries</th>
+                <th>Available Locations</th>
+                <th>Available Call Numbers</th>
+                <th>Earliest Hold Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- TMPL_LOOP NAME="reserveloop" -->
+            <tr>
+                <!-- TMPL_IF name="borrowernumber" -->
+                    <td><p><b><!-- TMPL_VAR NAME="pullcount" --></b></p></td>
+                    <td><!-- TMPL_VAR NAME="count" --></td>
+                    <td><!-- TMPL_VAR NAME="rcount" --></td>
+                    <td>
+                        <p>
+                        <!-- TMPL_IF name="BiblioDefaultViewmarc" -->
+                        <a href="/cgi-bin/koha/catalogue/MARCdetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->">
                             <!-- TMPL_VAR NAME="title" escape="html" --> <!-- TMPL_VAR NAME="subtitle" -->
                         </a>
                         <!-- TMPL_ELSE -->
-                            <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->">
+                            <!-- TMPL_IF name="BiblioDefaultViewisbd" -->
+                            <a href="/cgi-bin/koha/catalogue/ISBDdetail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->">
                                 <!-- TMPL_VAR NAME="title" escape="html" --> <!-- TMPL_VAR NAME="subtitle" -->
                             </a>
+                            <!-- TMPL_ELSE -->
+                                <a href="/cgi-bin/koha/catalogue/detail.pl?biblionumber=<!-- TMPL_VAR NAME="biblionumber" ESCAPE="URL" -->">
+                                    <!-- TMPL_VAR NAME="title" escape="html" --> <!-- TMPL_VAR NAME="subtitle" -->
+                                </a>
+                            <!-- /TMPL_IF -->
                         <!-- /TMPL_IF -->
-                    <!-- /TMPL_IF -->
-                    </p>
+                        </p>
+                    </td>
+                <!-- TMPL_ELSE -->
+                    <td>"</td>
+                    <td>"</td>
+                    <td>"</td>
+                    <td>"</td>
+                <!-- /TMPL_IF -->
+                <td><p><!-- TMPL_VAR NAME="itype" --></p></td>
+                <td><p><!-- TMPL_VAR NAME="holdingbranch" --></p></td>
+                <td><p><!-- TMPL_VAR NAME="location" --></p></td>
+                <td><p><!-- TMPL_VAR NAME="itemcallnumber" --></p></td>
+                <td width="15%">
+                    <p><!-- TMPL_VAR NAME="reservedate" --></p>
+                    <p>in <!-- TMPL_VAR NAME="branch" --></p>
+                    <!-- TMPL_IF NAME="statusw" --><p>Waiting</p><!-- /TMPL_IF --><!-- TMPL_IF NAME="statusf" --><p>Fullfilled</p><!-- /TMPL_IF -->
                 </td>
-            <!-- TMPL_ELSE -->
-                <td>"</td>
-                <td>"</td>
-                <td>"</td>
-                <td>"</td>
-            <!-- /TMPL_IF -->
-            <td><p><!-- TMPL_VAR NAME="itype" --></p></td>
-            <td><p><!-- TMPL_VAR NAME="holdingbranch" --></p></td>
-            <td><p><!-- TMPL_VAR NAME="location" --></p></td>
-            <td><p><!-- TMPL_VAR NAME="itemcallnumber" --></p></td>
-			<td width="15%">
-                <p><!-- TMPL_VAR NAME="reservedate" --></p>
-                <p>in <!-- TMPL_VAR NAME="branch" --></p>
-                <!-- TMPL_IF NAME="statusw" --><p>Waiting</p><!-- /TMPL_IF --><!-- TMPL_IF NAME="statusf" --><p>Fullfilled</p><!-- /TMPL_IF -->
-            </td>
-        </tr>
-        <!-- /TMPL_LOOP -->
-    </tbody>
+            </tr>
+            <!-- /TMPL_LOOP -->
+        </tbody>
     </table>
     <div class="spacer"></div>
   <p style="display:block;"><span class="exportSelected"></span></p>
