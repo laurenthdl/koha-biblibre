@@ -1121,7 +1121,15 @@ sub _process_subfcode_4_merge{
     my ($tagfield,$bibliosubfields,$authorityrecord, $authoritysubfields)=@_;
     return unless (uc(C4::Context->preference('marcflavour')) eq 'UNIMARC');
     if (   $tagfield eq "606"
-        or $tagfield eq "600" ) {
+        or $tagfield eq "600"
+        or $tagfield eq "607"
+        or $tagfield eq "700"
+        or $tagfield eq "701"
+        or $tagfield eq "702"
+        or $tagfield eq "710"
+        or $tagfield eq "711"
+        or $tagfield eq "712"
+        ) {
         my $authtypecode = GuessAuthTypeCode($authorityrecord); 
         my $authtag = GetAuthType($authtypecode);
         my $chronological_auth
@@ -1129,7 +1137,7 @@ sub _process_subfcode_4_merge{
         my $subfz_absent
             = not _test_subfcode_presence( $authoritysubfields, 'z' );
         if ( _test_subfcode_presence( $bibliosubfields, "a" ) ) {
-            if ( $authtag->{'auth_type_code'} eq '215' ) {
+            if ( $authtag->{'auth_type_code'} eq '215' and $tagfield ne "607") {
                 return "y";
             } elsif ( $chronological_auth and $subfz_absent ) {
                 return "z";
