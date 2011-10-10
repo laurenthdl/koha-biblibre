@@ -839,20 +839,22 @@ sub get_last_status {
     return _get_last_table($dbh, $kss_status_table, $hostname);
 }
 
-# Return last errors (optionally for a given hostname)
-sub get_last_sql_errors {
-    my $dbh = shift;
-    my $hostname = shift;
-    return _get_last_table($dbh, $kss_sql_errors_table, $hostname);
-}
-
+# Returns status by id
 sub get_status {
     my $dbh = shift;
     my $id = shift;
     return _get_table($dbh, $kss_status_table, $id);
 }
 
-# Return last errors (optionally for a given hostname)
+
+# Return last sql errors (optionally for a given hostname)
+sub get_last_sql_errors {
+    my $dbh = shift;
+    my $hostname = shift;
+    return _get_last_table($dbh, $kss_sql_errors_table, $hostname);
+}
+
+# Return sql errors by id
 sub get_sql_errors {
     my $dbh = shift;
     my $id = shift;
@@ -899,27 +901,6 @@ sub _get_table {
 
 
 
-
-# Returns last statistics for a given host : number of issues, returns and reserves 
-sub get_stats_by_host {
-    my $dbh = shift;
-    my $host = shift;
-
-    my $results;
-
-    # Getting last id for a given hostname
-    my $tmpres = get_last_log($dbh, $host);
-    my $last = $tmpres->{'id'};
-
-    for (qw(issue return reserve)) {
-	my $query = "SELECT COUNT(*) from $kss_statistics_table WHERE variable=? and kss_id=?";
-	my $sth = $dbh->prepare($query);
-	$sth->execute($_, $last);
-	my $count = $sth->fetchrow_arrayref;
-	$results->{$_} = $count->[0];
-    }
-    return $results;
-}
 
 # Returns statistics for a given id : number of issues, returns and reserves 
 sub get_stats_by_id {
