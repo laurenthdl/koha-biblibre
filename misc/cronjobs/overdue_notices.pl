@@ -370,9 +370,9 @@ if ( defined $htmlfilename ) {
 <head>
   <style type='text/css'>
     pre {page-break-after: always;}
-    pre {white-space: pre-wrap;}
-    pre {white-space: -moz-pre-wrap;}
-    pre {white-space: -o-pre-wrap;}
+    pre table {white-space: pre-wrap;}
+    pre table {white-space: -moz-pre-wrap;}
+    pre table {white-space: -o-pre-wrap;}
     pre {word-wrap: break-work;}
   </style>
 </head>
