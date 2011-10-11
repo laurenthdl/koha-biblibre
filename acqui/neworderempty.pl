@@ -85,7 +85,8 @@ use C4::Input;
 use C4::Koha;
 use C4::Branch;         # GetBranches
 use C4::Members;
-use C4::Search qw/FindDuplicate BiblioAddAuthorities/;
+use C4::Search qw/FindDuplicate/;
+use C4::Data::Record::Check qw/BiblioAddAuthorities/;
 
 #needed for z3950 import:
 use C4::ImportBatch qw/GetImportRecordMarc SetImportRecordStatus/;
