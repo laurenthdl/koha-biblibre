@@ -27,9 +27,17 @@ if ( $help || ! (@ARGV || $all)) {
 }
 
 my $dbh=C4::Context->dbh;
+if (C4::Context->preference('SearchEngine') =~/Solr/gi){
+   C4::Context->set_preference('SearchEngine', 'SolrIndexOff');
+}
+else {
+   die "This Script has only been tested on Solr";
+}
 my $merge;
 my $authtypes_ref=$dbh->selectcol_arrayref( qq{SELECT authtypecode, auth_tag_to_report FROM auth_types }, { Columns=>[1,2] });
 my %authtypes=@$authtypes_ref;
+my %biblios;
+my %authorities;
 my @authtypecodes= @ARGV ;
 @authtypecodes = keys %authtypes unless(@authtypecodes);
 unless (@matchstrings){
@@ -41,91 +49,72 @@ unless (@matchstrings){
 
 my @attempts=prepare_matchstrings(@matchstrings);
 
-for my $authtypecode (@authtypecodes){
+for my $authtypecode (@authtypecodes) {
     $debug and warn $authtypecode;
     my @sqlparams;
-    my $strselect= qq{SELECT authid, NULL FROM auth_header where authtypecode=?};
-    push @sqlparams,$authtypecode;
-    if ($wherestring){
-        $strselect.=" and $wherestring";
+    my $strselect
+        = qq{SELECT authid, NULL FROM auth_header where authtypecode=?};
+    push @sqlparams, $authtypecode;
+    if ($wherestring) {
+        $strselect .= " and $wherestring";
     }
-    my $auth_ref=$dbh->selectcol_arrayref( $strselect, { Columns=>[1,2] },@sqlparams);
-    my $auth_tag=$authtypes{$authtypecode};
-    my %authorities=@$auth_ref if ($auth_ref);
-AUTH:    foreach my $authid (keys %authorities){
+    my $auth_ref
+        = $dbh->selectcol_arrayref( $strselect, { Columns => [ 1, 2 ] },
+        @sqlparams );
+    my $auth_tag = $authtypes{$authtypecode};
+    my %hash_authorities_authtypecode;
+    if ($auth_ref){
+        %hash_authorities_authtypecode=@$auth_ref;
+        @authorities{keys %hash_authorities_authtypecode} = values %hash_authorities_authtypecode;
+    }
+AUTH: foreach my $authid ( keys %hash_authorities_authtypecode ) {
+
         #authority was marked as duplicate
         next if $authorities{$authid};
-        my $authrecord=GetAuthority($authid);
+        my $authrecord = GetAuthority($authid);
+
         # next if cannot take authority
-	    next unless $authrecord;
+        next unless $authrecord;
         SetUTF8Flag($authrecord);
         my $success;
-ATTEMPT:        for my $attempt (@attempts) {
-	    my $query=_build_query($authrecord,$attempt);
-            warn _build_query($authrecord,$attempt);
-	    next ATTEMPT unless $query=~/(he|ppn)=/;
-            my $results=eval{SimpleSearch(C4::Search::Query->normalSearch($query))};
-            if ($@ || !$results){
-                warn $auth_tag;
-                warn $@;
+    ATTEMPT: for my $attempt (@attempts) {
+            my $query = _build_query( $authrecord, $attempt );
+            $debug and warn _build_query( $authrecord, $attempt );
+            next ATTEMPT unless $query =~ /(he|ppn)=/;
+            my $stringquery = eval {
+                C4::Search::Query->normalSearch($query);
+            };
+            $debug and warn $stringquery;
+            my $results = SimpleSearch( $stringquery );
+            if ( $@ || !$results ) {
+                $debug and warn $@;
+                $debug and warn YAML::Dump(C4::Search::Query->normalSearch($query));
+                $debug and warn $auth_tag;
                 next;
             }
             $debug and warn YAML::Dump($results);
-            next if (!$results or scalar(@{$results->{items}})<1);
-RECORD:     foreach my $rawrecord (@{$results->{items}}){
-    		next if $authid eq $rawrecord->{values}->{recordid};
-                my $marc=GetAuthority($rawrecord->{values}->{recordid}); 
-                $debug and warn YAML::Dump($rawrecord);
-                if ($marc->field('001') and ($marc->field('001')->data ne $authid)){ #This Part should always be true
-                    SetUTF8Flag($marc);
-                    my $localauthid=$marc->field('001')->data;
-                    my $certainty=1;
-                    my $choice=undef;
-                    my $next=0;
-                    if ($marc->field($auth_tag) and ! ($authrecord->field($auth_tag))){
-                            $debug && warn "certainty 0 ",$marc->field($auth_tag)->as_string," ",$authrecord->field($auth_tag)->as_string;
-                            $certainty=0;
-                            $next=1;
+            next if ( !$results or scalar( @{ $results->{items} } ) < 1 );
+            my ( $recordid_to_keep, @recordids_to_merge )
+                = _choose_records( $authid,
+                map { $_->{values}->{recordid} } @{ $results->{items} } );
+            unless ($test) {
+                for my $localauthid (@recordids_to_merge) {
+                    my @editedbiblios=merge( $localauthid, undef, $recordid_to_keep, undef );
+                    for my $biblio (@editedbiblios){
+                        $biblios{$biblio}=1;
                     }
-                    elsif ($authrecord->field($auth_tag) && ! ($marc->field($auth_tag))){
-                            $debug && warn "certainty 0 ",$marc->field($auth_tag)->as_string," ",$authrecord->field($auth_tag)->as_string;
-                            $certainty=0;
-                            $next=1;
-                    }
-                    for my $subfield qw(a b c d e f g i h x y z t){
-                        if (compare_arrays([ trim($marc->subfield($auth_tag,$subfield))],[trim($authrecord->subfield($auth_tag,$subfield))])){
-                            $debug && warn "certainty 1 ",$marc->subfield($auth_tag,$subfield)," ",$authrecord->subfield($auth_tag,$subfield);
-                            $certainty=(1 and $certainty);
-                        }
-                        else {
-                            $debug && warn "certainty 0 ",$marc->subfield($auth_tag,$subfield)," ",$authrecord->subfield($auth_tag,$subfield);
-                            $certainty=0;
-                            $next=1;
-                        }
-                        $next and next RECORD;
-                    }
-                    $choice=(CountUsage($authid)>CountUsage($localauthid));
-                    $debug and warn $certainty;
-                    if ($certainty){
-                            $authorities{$localauthid}=1;
-                            $merge++;
-                            $verbose and print "$authid;".$authrecord->as_usmarc.";$localauthid;".$marc->as_usmarc.";$choice;merged\n";
-			    unless ($test){
-				if ($choice){
-				    merge($authid,$authrecord,$localauthid,$marc);
-				}
-				else {
-				    merge($localauthid,$marc,$authid,$authrecord);
-				}
-			    }
-                     }
+                    $authorities{$recordid_to_keep} = 1;
+                    $authorities{$localauthid}      = 1;
                 }
             }
         }
-        $authorities{$authid}=1;
     }
 }
-$verbose and print "$merge autorités fusionnées";
+$verbose and print scalar(grep {$authorities{$_}>0} keys %authorities), " autorités fusionnées";
+C4::Context->set_preference('SearchEngine', 'Solr');
+##Reindex
+C4::Search::IndexRecord("biblio",keys %biblios);
+C4::Search::IndexRecord("authority",grep {$authorities{$_}>0} keys %authorities);
 exit 1;
 
 sub compare_arrays{
@@ -133,7 +122,7 @@ sub compare_arrays{
     return 0 if scalar(@$arrayref1)!=scalar(@$arrayref2);
     my $compare=1;
     for (my $i=0;$i<scalar(@$arrayref1);$i++){
-        $compare = $compare and ($arrayref1->[$i] eq $arrayref2->[$i]); 
+        $compare = ($compare and ($arrayref1->[$i] eq $arrayref2->[$i])); 
     }
     return $compare;
 }
@@ -207,6 +196,76 @@ sub _build_query{
     }
 }
 
+=head2 _choose_records
+    this function takes input of candidate record ids to merging
+    and returns
+        first the record to merge to
+        and list of records to merge from
+=cut
+sub _choose_records {
+    my @recordids = @_;
+
+    my @candidate_authids= grep {_is_duplicate($recordids[0],$_)} (@recordids[1..$#recordids]);
+    #See http://www.sysarch.com/Perl/sort_paper.html Schwartzian transform
+    @candidate_authids= map $_->[0] => sort {$a->[1] <=> $b->[1]} map {[$_,CountUsage($_)]} ($recordids[0],@candidate_authids);
+    return @candidate_authids;
+}
+
+sub _is_duplicate {
+    my ( $authid1, $authid2 ) = @_;
+    return 0 if ( $authid1 == $authid2 );
+    my $authrecord = GetAuthority($authid1);
+    my $marc       = GetAuthority($authid2);
+    my $at1        = GetAuthTypeCode($authid1);
+    my $auth_tag   = $authtypes{$at1} if (exists $authtypes{$at1});
+    my $at2        = GetAuthTypeCode($authid2);
+    my $auth_tag2  = $authtypes{$at2} if (exists $authtypes{$at2});
+    $debug and warn YAML::Dump($authrecord);
+    $debug and warn YAML::Dump($marc);
+    SetUTF8Flag($authrecord);
+    SetUTF8Flag($marc);
+    my $certainty = 1;
+
+    $debug and warn "_is_duplicate ($authid1, $authid2)";
+    if ( $marc->field($auth_tag)
+        and !( $authrecord->field($auth_tag2) ) )
+    {
+        $debug && warn "certainty 0 ",
+            $marc->field($auth_tag)->as_string, " ",
+            $authrecord->field($auth_tag2)->as_string;
+        return 0;
+    }
+    elsif ( $authrecord->field($auth_tag)
+        && !( $marc->field($auth_tag2) ) )
+    {
+        $debug && warn "certainty 0 ",
+            $marc->field($auth_tag)->as_string, " ",
+            $authrecord->field($auth_tag2)->as_string;
+        return 0;
+    }
+    for my $subfield qw(a b c d e f g i h x y z t) {
+        $debug && warn "Compare subfield $subfield";
+        if (compare_arrays(
+                [ trim( $marc->subfield( $auth_tag, $subfield ) ) ],
+                [ trim( $authrecord->subfield( $auth_tag2, $subfield ) ) ]
+            )
+            )
+        {
+            $debug && warn "certainty 1 ",
+                $marc->subfield( $auth_tag, $subfield ), " ",
+                $authrecord->subfield( $auth_tag2, $subfield );
+            $certainty = ( 1 and $certainty );
+        }
+        else {
+            $debug && warn "certainty 0 ",
+                $marc->subfield( $auth_tag, $subfield ), " ",
+                $authrecord->subfield( $auth_tag2, $subfield );
+            $certainty=0;
+            return 0;
+        }
+    }
+    return $certainty;
+}
 #=head2 SimpleSearch
 #
 #( $error, $results, $total_hits ) = SimpleSearch( $query, $offset, $max_results, [@servers] );

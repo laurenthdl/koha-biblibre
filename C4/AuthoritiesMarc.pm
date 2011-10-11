@@ -1156,6 +1156,8 @@ sub merge {
     my $dbh              = C4::Context->dbh;
     my $authtypecodefrom = GetAuthTypeCode($mergefrom);
     my $authtypecodeto   = GetAuthTypeCode($mergeto);
+    $MARCfrom ||=GetAuthority($mergefrom);
+    $MARCto   ||=GetAuthority($mergeto);
 
     #     warn "mergefrom : $authtypecodefrom $mergefrom mergeto : $authtypecodeto $mergeto ";
     # return if authority does not exist
@@ -1179,6 +1181,7 @@ sub merge {
 
 
     my @reccache;
+    my @edited_biblios;
 
     # search all biblio tags using this authority.
     #Getting marcbiblios impacted by the change.
@@ -1328,14 +1331,12 @@ sub merge {
         #if ( $update == 1 ) {
         &ModBiblio( $marcrecord, $biblionumber,
             GetFrameworkCode($biblionumber) );
-        $counteditedbiblio++;
-        warn $counteditedbiblio
-            if ( ( $counteditedbiblio % 10 ) and $ENV{DEBUG} );
+        push @edited_biblios, $biblionumber;
 
         #}
     }    #foreach $marc
     DelAuthority($mergefrom) if ( $mergefrom != $mergeto );
-    return $counteditedbiblio;
+    return @edited_biblios;
 
     # now, find every other authority linked with this authority
     # now, find every other authority linked with this authority
