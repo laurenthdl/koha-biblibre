@@ -368,7 +368,7 @@ sub SimpleSearch {
                             qq{$idx:$filter_str};
                         } @{ $filters->{$idx} } )
                     . ')'
-                : $filters->{$idx};
+                : "$idx:$filters->{$idx}";
         } keys %$filters
     ];
 
