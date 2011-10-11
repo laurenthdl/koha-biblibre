@@ -8,6 +8,8 @@
 //<![CDATA[
 actTotal = "";
 
+var inputBackgroundColor;
+
 function Check(ff) {
     <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
         // Remove last itemblock if it is not in items_list
@@ -21,6 +23,25 @@ function Check(ff) {
         });
         if(tobedeleted){
             $(lastitemblock).remove();
+        }
+
+        $(".error").empty();
+        // Check mandatory fields
+        var missing_mandatory = 0;
+        $("#outeritemblock input[name='mandatory'][value='1']")
+            .siblings("input[name='field_value']")
+            .each(function() {
+                $(this).css('background-color', inputBackgroundColor);
+                if($(this).val() == "") {
+                    $(this).css('background-color', 'yellow');
+                    missing_mandatory = 1;
+                }
+            }
+        );
+        if(missing_mandatory) {
+            $(".error").append("<p>Some mandatory fields are empty</p>");
+            $(".error").show();
+            return false;
         }
     <!-- /TMPL_IF -->
 
@@ -63,6 +84,7 @@ $(document).ready(function()
     {
     <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
         cloneItemBlock();
+        inputBackgroundColor = $("input").css("background-color");
     <!-- /TMPL_IF -->
         //We apply the fonction only for modify option
         <!--TMPL_IF NAME="quantityrec"-->
@@ -146,6 +168,8 @@ $(document).ready(function()
 <div id="bd">
     <div id="yui-main">
     <div class="yui-b">
+
+    <div class="error" style="display:none"></div>
 
 <h2>
     <!-- TMPL_IF name="ordernumber" -->
