@@ -71,6 +71,10 @@ if ( !$biblionumbers ) {
     $biblionumbers = $query->param('biblionumber');
 }
 
+if ( $$borr{"flags"}{"EXPIRED"} ) {
+    $template->param( message => 1, borrexpired => 1 );
+    &get_out( $query, $cookie, $template->output );
+}
 if ( ( !$biblionumbers ) && ( !$query->param('place_reserve') ) ) {
     $template->param( message => 1, no_biblionumber => 1 );
     &get_out( $query, $cookie, $template->output );

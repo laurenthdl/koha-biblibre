@@ -174,6 +174,11 @@
               <div class="dialog alert">Please contact your librarian, or use the <a href="/cgi-bin/koha/opac-userupdate.pl">online update form</a> to submit current information (<em>Please note:</em> there may be a delay in restoring your account if you submit online)
               </div>
             <!-- /TMPL_IF -->
+            <!-- TMPL_IF NAME="borrexpired" -->
+              <div class="dialog alert">
+                <strong>Sorry</strong>, you cannot place holds because your account is expired.
+              </div>
+            <!-- /TMPL_IF -->
             <!-- TMPL_IF NAME="lost" -->
               <div class="dialog alert">
                 <strong>Sorry</strong>, you cannot place holds because your library card has been marked as lost or stolen.
