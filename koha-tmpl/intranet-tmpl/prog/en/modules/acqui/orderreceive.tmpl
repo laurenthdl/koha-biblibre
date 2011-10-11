@@ -9,6 +9,8 @@ function UpdateQty(form) {
     $(form).find("input[name='quantityrec']")[0].value = count;
 }
 
+var inputBackgroundColor;
+
 function Check(form) {
     <!-- TMPL_IF NAME="AcqCreateItemOrdering" -->
         var qty = $(form).find("input[name='quantityrec']")[0].value;
@@ -36,6 +38,24 @@ function Check(form) {
             alert(_('Duplicate values detected. Please correct the errors and resubmit.') );
             return false;
         };
+
+        // Check mandatory fields
+        var missing_mandatory = 0;
+        $("#outeritemblock input[name='mandatory'][value='1']")
+            .siblings("input[name='field_value']")
+            .each(function() {
+                $(this).css('background-color', inputBackgroundColor);
+                if($(this).val() == "") {
+                    $(this).css('background-color', 'yellow');
+                    missing_mandatory = 1;
+                }
+            }
+        );
+        if(missing_mandatory) {
+            $(".error").append("<p>Some mandatory fields are empty</p>");
+            $(".error").show();
+            return false;
+        }
     <!-- /TMPL_IF -->
 
     return true;
@@ -52,6 +72,8 @@ $(document).ready(function() {
     <!-- TMPL_ELSE -->
       cloneItemBlock();
     <!-- /TMPL_IF -->
+
+    inputBackgroundColor = $("input").css("background-color");
 });
 //]]>
 </script>
