@@ -441,11 +441,11 @@ function Dopop(link) {
             <td><!-- TMPL_VAR NAME="holdingbranch" --></td>
             <td><!-- TMPL_VAR NAME="itemlocation" --></td>
             <td><!-- TMPL_VAR NAME="itemcallnumber" --></td>
-			<td><!-- TMPL_IF Name="duedate" -->
+			<td><!-- TMPL_IF Name="duedate" --><!-- TMPL_IF Name="borrowernumber" -->
                 <a href="/cgi-bin/koha/circ/circulation.pl?borrowernumber=<!-- TMPL_VAR Name="borrowernumber" -->">
                     <!-- TMPL_VAR Name="borsurname" -->, <!-- TMPL_VAR Name="borfirstname" --> (<!-- TMPL_VAR name="borcategorycode" -->)
                 </a>
-            <!-- TMPL_ELSE -->Not checked out<!-- /TMPL_IF --></td>
+            <!-- TMPL_ELSE -->Not checked out<!-- /TMPL_IF --><!-- TMPL_ELSE -->Not checked out<!-- /TMPL_IF --></td>
             <td><!-- TMPL_IF name="bornote" --><span class="circ-hlt"><!-- TMPL_VAR name="bornote" --><br /></span><!-- /TMPL_IF -->
             <!-- TMPL_IF name="itemnote" --><span class="circ-hlt"><!-- TMPL_VAR name="itemnote" --></span><!-- /TMPL_IF -->
             </td>
