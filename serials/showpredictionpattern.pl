@@ -63,7 +63,7 @@ if($custompattern){
 }
 
 my %val = (
-    locale      => "en-GB",
+    locale      => "",
     numberingmethod => $input->param('numberingmethod') // '',
     numbering1      => $input->param('numbering1') // '',
     numbering2      => $input->param('numbering2') // '',
