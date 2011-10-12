@@ -773,6 +773,8 @@ sub prepare_letter_for_printing {
             $verbose and warn 'combine failed on argument: ' . $csv->error_input;
         }
     } elsif ( exists $params->{'outputformat'} && $params->{'outputformat'} eq 'html' ) {
+        $params->{'letter'}->{'content'} =~ s/\n/<br \/>/g;
+        $params->{'letter'}->{'content'} =~ s/\r//g;
         $return = "<pre>\n";
         $return .= "$params->{'letter'}->{'content'}\n";
         $return .= "</pre>\n";
