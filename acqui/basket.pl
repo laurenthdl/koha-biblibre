@@ -442,8 +442,7 @@ sub get_infos {
         $line{'title'} = "Deleted bibliographic notice, can't find title.";
     }
 
-    my $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
-    $line{suggestionid}         = $$suggestion{suggestionid};
+    my $suggestion   = GetSuggestionInfo($line{suggestionid});
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
     $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
 
