@@ -289,7 +289,7 @@ sub create_input {
     }
 
     # if there is no value provided but a default value in parameters, get it
-    unless ( defined $value) {
+    if ($value eq '' ) {
         $value = $tagslib->{$tag}->{$subfield}->{defaultvalue};
 
         # get today date & replace YYYY, MM, DD if provided in the default value
@@ -672,7 +672,6 @@ sub build_tabs ($$$$$) {
     }
     $template->param( BIG_LOOP => \@BIG_LOOP );
 }
-
 
 # ========================
 #          MAIN

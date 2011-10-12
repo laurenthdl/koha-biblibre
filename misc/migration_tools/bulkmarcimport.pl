@@ -304,16 +304,16 @@ RECORD: while () {
         }
 
         my $results = C4::Search::SimpleSearch( '*:*', $filters );
-        my $totalhits = $results->{'pager'}->{'total_entries'};
+        my $totalhits = (defined $results?$results->{'pager'}->{'total_entries'}:0);
         $debug && warn "query :",Dump($filters)," $recordtype : $totalhits";
         if ( $results && $totalhits == 1 ) {
-            $id = $results->{'items'}->{'values'}->{'recordid'};
+            $id = ${$results->{'items'}}[0]->{'values'}->{'recordid'};
             my $marcrecord = $authorities ? GetAuthority( $id ) : GetMarcBiblio( $id );
             SetUTF8Flag($marcrecord);
             if ( $marcrecord and $authorities and $marcFlavour ) {
 
                 #Skip if authority in database is the same as the on in database
-                if ( $marcrecord->field('005')->data >= $record->field('005')->data ) {
+                if ( $marcrecord->field('005') and $record->field('005') and $marcrecord->field('005')->data >= $record->field('005')->data ) {
                     if ($yamlfile) {
                         $yamlhash->{$originalid}->{'authid'} = $id;
 
