@@ -61,7 +61,8 @@ if ( not defined $loggedinuser ) {
         );
 
         # Redirecting to this same url with the cookie in the headers so it's deleted immediately
-        my $uri = $cgi->url();
+        my $uri = C4::Context->preference('OPACBaseURL');
+        $uri .= $cgi->url(-absolute => 1);
         print $cgi->redirect(
             -uri    => $uri,
             -cookie => $recentSearchesCookie
@@ -109,7 +110,8 @@ if ( not defined $loggedinuser ) {
         $sth->execute($loggedinuser);
 
         # Redirecting to this same url so the user won't see the search history link in the header
-        my $uri = $cgi->url();
+        my $uri = C4::Context->preference('OPACBaseURL');
+        $uri .= $cgi->url(-absolute => 1);
         print $cgi->redirect($uri);
 
         # Showing search history
