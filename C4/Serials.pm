@@ -2906,8 +2906,10 @@ sub _numeration {
              "fr"=>
                 [qw(Printemps Été Automne Hiver)],
           );
-          $value=$value % 4;
-          $string=$seasons{$seasonlocale}->[$value];
+          $value = $value % 4;
+          $string = ($seasons{$seasonlocale})
+                  ? $seasons{$seasonlocale}->[$value]
+                  : $seasons{'en'}->[$value];
     } else {
         $string = $value;
     }

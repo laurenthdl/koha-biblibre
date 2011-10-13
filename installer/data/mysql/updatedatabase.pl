@@ -6045,6 +6045,57 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
+$DBversion = "3.06.00.057";
+if (C4::Context->preference("Version") < TransformToNum($DBversion)) {
+    # Change the '2/year' frequency
+    $dbh->do("
+        UPDATE `subscription_frequencies`
+        SET `unit` = 'month',
+            `unitsperissue` = 6,
+            `issuesperunit` = 1
+        WHERE `unit` = 'year'
+          AND `unitsperissue` = 1
+          AND `issuesperunit` = 2
+    ");
+    # Fix the 'Seasonal' numbering pattern
+    $dbh->do("
+        UPDATE `subscription_numberpatterns`
+        SET `whenmorethan1` = 3,
+            `setto1` = 0
+        WHERE `label` = 'Seasonal'
+    ");
+    # Delete '1/quarter' frequency
+    my ($quarterfreqid) = $dbh->selectrow_array("
+        SELECT `id`
+        FROM `subscription_frequencies`
+        WHERE `unit` = 'year'
+          AND `unitsperissue` = 1
+          AND `issuesperunit` = 4
+    ");
+    if($quarterfreqid) {
+        my ($monthfreqid) = $dbh->selectrow_array("
+            SELECT `id`
+            FROM `subscription_frequencies`
+            WHERE `unit` = 'month'
+              AND `unitsperissue` = 3
+              AND `issuesperunit` = 1
+        ");
+        if($monthfreqid) {
+            $dbh->do("
+                UPDATE `subscription`
+                SET `periodicity` = $monthfreqid
+                WHERE `periodicity` = $quarterfreqid
+            ");
+        }
+        $dbh->do("
+            DELETE FROM `subscription_frequencies`
+            WHERE `id` = $quarterfreqid
+        ");
+    }
+    print "Upgrade to $DBversion done (Delete '1/quarter' frequency, change '2/year' frequency and modify 'seasonal' numbering pattern)\n";
+    SetVersion($DBversion);
+}
+
 $DBversion = "3.06.00.062";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `letter` ADD COLUMN `format` VARCHAR(200)  DEFAULT NULL AFTER `content`;");
@@ -6052,6 +6103,7 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     print "Upgrade to $DBversion done (add format and encoding fields on letter)\n";
     SetVersion($DBversion);
 }
+
 
 =item DropAllForeignKeys($table)
 
