@@ -209,30 +209,6 @@ if ( $op eq 'delete_confirm' ) {
     print $query->redirect( '/cgi-bin/koha/acqui/basket.pl?basketno=' . $basket->{'basketno'} );
 } else {
 
-    if ( $op eq 'cancelorder' ) {
-        my $ordernumber = $query->param('ordernumber');
-        my $biblionumber = $query->param('biblionumber');
-        if($query->param('confirm')) {
-            my $del_biblio = $query->param('del_biblio') ? 1 : 0;
-            my $error = DelOrder($biblionumber, $ordernumber, $del_biblio);
-
-            if($error) {
-                $template->param(error_delitem => 1) if $error->{'delitem'};
-                $template->param(error_delbiblio => 1) if $error->{'delbiblio'};
-            } else {
-                $template->param(success_cancelorder => 1);
-            }
-        } else {
-            $template->param(
-                cancelorder => 1,
-                ordernumber => $ordernumber,
-                biblionumber => $biblionumber,
-                basketno => $basketno,
-                booksellerid => $bookseller->{'id'},
-                name => $bookseller->{'name'},
-            );
-        }
-    }
     # get librarian branch...
     if ( C4::Context->preference("IndependantBranches") ) {
         my $userenv = C4::Context->userenv;
@@ -442,8 +418,7 @@ sub get_infos {
         $line{'title'} = "Deleted bibliographic notice, can't find title.";
     }
 
-    my $suggestion   = GetSuggestionInfoFromBiblionumber($line{biblionumber});
-    $line{suggestionid}         = $$suggestion{suggestionid};
+    my $suggestion   = GetSuggestionInfo($line{suggestionid});
     $line{surnamesuggestedby}   = $$suggestion{surnamesuggestedby};
     $line{firstnamesuggestedby} = $$suggestion{firstnamesuggestedby};
 

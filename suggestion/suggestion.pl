@@ -77,7 +77,7 @@ my $suggestedby     = $input->param('suggestedby');
 my $returnsuggestedby = $input->param('returnsuggestedby');
 my $returnsuggested = $input->param('returnsuggested');
 my $managedby       = $input->param('managedby');
-my $displayby       = $input->param('displayby');
+my $displayby       = $input->param('displayby') || '';
 my $branchfilter    = ($displayby ne "branchcode") ? $input->param('branchcode') : '';
 my $tabcode         = $input->param('tabcode');
 

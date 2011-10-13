@@ -1253,6 +1253,7 @@ sub NewOrder {
     if ( !$orderinfo->{quantityreceived} ) {
         $orderinfo->{quantityreceived} = 0;
     }
+    $orderinfo->{'suggestionid'} ||= undef;
 
     $orderinfo->{parent_ordernumber} = $parent_ordernumber if $parent_ordernumber;
     my $ordernumber = InsertInTable( "aqorders", $orderinfo );
@@ -1321,6 +1322,7 @@ sub ModOrder {
     my @params;
     # update uncertainprice to an integer, just in case (under FF, checked boxes have the value "ON" by default)
     $orderinfo->{uncertainprice}=1 if $orderinfo->{uncertainprice};
+    $orderinfo->{'suggestionid'} ||= undef;
 
     #    delete($orderinfo->{'branchcode'});
     # the hash contains a lot of entries not in aqorders, so get the columns ...
@@ -1746,16 +1748,30 @@ delete the biblio
 =cut
 
 sub DelOrder {
-    my ( $bibnum, $ordernumber, $delete_biblio ) = @_;
+    my ( $bibnum, $ordernumber, $delete_biblio, $reason ) = @_;
     my $error;
     my $dbh   = C4::Context->dbh;
     my $query = "
         UPDATE aqorders
-        SET    datecancellationprinted=now(), orderstatus=4
+        SET datecancellationprinted=now(), orderstatus=4
+    ";
+    if($reason) {
+        $query .= "
+            , internalnotes = IF(internalnotes IS NULL,
+                CONCAT('Cancellation reason: ', ?),
+                CONCAT(internalnotes, ' - Cancellation reason: ', ?)
+            )
+        ";
+    }
+    $query .= "
         WHERE  biblionumber=? AND ordernumber=?
     ";
     my $sth = $dbh->prepare($query);
-    $sth->execute( $bibnum, $ordernumber );
+    if($reason) {
+        $sth->execute($reason, $reason, $bibnum, $ordernumber);
+    } else {
+        $sth->execute( $bibnum, $ordernumber );
+    }
     $sth->finish;
 
     # Removing MARC order field if exists
@@ -1764,7 +1780,7 @@ sub DelOrder {
     # We delete all the items related to this order
     my @itemnumbers = GetItemnumbersFromOrder( $ordernumber );
     foreach (@itemnumbers) {
-        my $delcheck = DelItemCheck( $dbh, $bibnum, $_ );
+        my $delcheck = C4::Items::DelItemCheck( $dbh, $bibnum, $_ );
 
         # (should always success, as no issue should exist on item on order)
         if( $delcheck != 1 ) {
@@ -2531,9 +2547,13 @@ sub GetLateOrders {
 
 =over 4
 
-(\@order_loop, $total_qty, $total_price, $total_qtyreceived) = GetHistory( $title, $author, $name, $from_placed_on, $to_placed_on );
+(\@order_loop, $total_qty, $total_price, $total_qtyreceived) = GetHistory( $title, $author, $name, $from_placed_on, $to_placed_on, $from_suggestion );
 
 Retreives some acquisition history information
+
+Possible values for $from_suggestion
+  $from_suggestion eq "1" returns orders which come from a suggestion
+  $from_suggestion eq "0" returns orders which do not come from a suggestion
 
 returns:
     $order_loop is a list of hashrefs that each look like this:
@@ -2562,14 +2582,14 @@ returns:
 =cut
 
 sub GetHistory {
-    my ( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $orderstatus, $from_placed_on, $to_placed_on ) = @_;
+    my ( $title, $author, $name, $ean, $isbn, $budget, $invoicenumber, $branchcode, $orderstatus, $from_placed_on, $to_placed_on, $from_suggestion ) = @_;
     my @order_loop;
     my $total_qty         = 0;
     my $total_qtyreceived = 0;
     my $total_price       = 0;
 
     # don't run the query if there are no parameters (list would be too long for sure !)
-    if ( $title || $author || $name || $ean || $isbn || $budget || $invoicenumber || $branchcode || $orderstatus || $from_placed_on || $to_placed_on ) {
+    if ( $title || $author || $name || $ean || $isbn || $budget || $invoicenumber || $branchcode || $orderstatus || $from_placed_on || $to_placed_on || (defined $from_suggestion && $from_suggestion ne "") ) {
         my @query_params = ();
         my $dbh   = C4::Context->dbh;
         my $query = "
@@ -2671,6 +2691,12 @@ sub GetHistory {
             push @query_params, $to_placed_on;
         }
 
+        if(defined $from_suggestion and $from_suggestion eq "1") {
+            $query .= " AND suggestionid IS NOT NULL ";
+        } elsif (defined $from_suggestion and $from_suggestion eq "0") {
+            $query .= " AND suggestionid IS NULL ";
+        }
+
         if ( C4::Context->preference("IndependantBranches") ) {
             my $userenv = C4::Context->userenv;
             if ( ($userenv) && ( $userenv->{flags} != 1 ) ) {
@@ -2682,7 +2708,7 @@ sub GetHistory {
             push @query_params, $branchcode;
         }
         $query .= " ORDER BY id";
-        warn $query;
+        $debug and warn $query;
         my $sth = $dbh->prepare($query);
         $sth->execute(@query_params);
         my $cnt = 1;

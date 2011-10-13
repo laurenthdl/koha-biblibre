@@ -121,6 +121,16 @@
             </select>
         </li>
 
+        <li>
+            <label>Come from a suggestion:</label>
+            <input type="radio" name="from_suggestion" value="" style="vertical-align:middle" checked="checked" />
+            All&nbsp;
+            <input type="radio" name="from_suggestion" value="1" style="vertical-align:middle" />
+            Yes&nbsp;
+            <input type="radio" name="from_suggestion" value="0" style="vertical-align:middle" />
+            No
+        </li>
+
 		<li><label for="from">From: </label> 
 			<input type="text" size="10" id="from" name="from" value="<!-- TMPL_VAR name="from_placed_on" -->" />
 			<img src="<!-- TMPL_VAR Name="themelang" -->/lib/calendar/cal.gif" id="openCalendarFrom" style="cursor: pointer;" alt="Show Calendar" />

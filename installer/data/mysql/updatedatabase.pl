@@ -6072,7 +6072,6 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     SetVersion($DBversion);
 }
 
-
 $DBversion = "3.06.00.062";
 if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     $dbh->do("ALTER TABLE `letter` ADD COLUMN `format` VARCHAR(200)  DEFAULT NULL AFTER `content`;");
@@ -6090,6 +6089,19 @@ if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
     print "Upgrade to $DBversion done (Adds maduvil indexes in index for solr)\n";
     SetVersion($DBversion);
 }
+
+$DBversion = "3.06.00.072";
+if ( C4::Context->preference("Version") < TransformToNum($DBversion) ) {
+    $dbh->do(qq{
+        ALTER TABLE `aqorders`
+            ADD COLUMN `suggestionid` int(8) NULL DEFAULT NULL,
+            ADD KEY `aqorders_suggestionid` (`suggestionid`),
+            ADD CONSTRAINT `aqorders_ibfk_suggestionid` FOREIGN KEY (`suggestionid`) REFERENCES `suggestions` (`suggestionid`) ON DELETE RESTRICT
+    });
+    print "Upgrade to $DBversion done (Add aqorders.suggestionid)\n";
+    SetVersion($DBversion);
+}
+
 
 =item DropAllForeignKeys($table)
 

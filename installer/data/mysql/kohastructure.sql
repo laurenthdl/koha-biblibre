@@ -2635,14 +2635,17 @@ CREATE TABLE `aqorders` (
   `claimed_date` date default NULL,
   `subscriptionid` int(11) default NULL,
   `branchcode` varchar(10) default NULL,
+  `suggestionid` int(8) NULL default NULL,
   PRIMARY KEY  (`ordernumber`),
   KEY `basketno` (`basketno`),
   KEY `biblionumber` (`biblionumber`),
   KEY `budget_id` (`budget_id`),
   KEY `aqorders_subscriptionid` (`subscriptionid`),
+  KEY `aqorders_suggestionid` (`suggestionid`),
   CONSTRAINT `aqorders_ibfk_1` FOREIGN KEY (`basketno`) REFERENCES `aqbasket` (`basketno`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `aqorders_ibfk_2` FOREIGN KEY (`biblionumber`) REFERENCES `biblio` (`biblionumber`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `aqorders_subscriptionid` FOREIGN KEY (`subscriptionid`) REFERENCES `subscription` (`subscriptionid`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `aqorders_subscriptionid` FOREIGN KEY (`subscriptionid`) REFERENCES `subscription` (`subscriptionid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `aqorders_ibfk_suggestionid` FOREIGN KEY (`suggestionid`) REFERENCES `suggestions` (`suggestionid`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
