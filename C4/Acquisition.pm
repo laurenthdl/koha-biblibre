@@ -1764,7 +1764,7 @@ sub DelOrder {
     # We delete all the items related to this order
     my @itemnumbers = GetItemnumbersFromOrder( $ordernumber );
     foreach (@itemnumbers) {
-        my $delcheck = DelItemCheck( $dbh, $bibnum, $_ );
+        my $delcheck = C4::Items::DelItemCheck( $dbh, $bibnum, $_ );
 
         # (should always success, as no issue should exist on item on order)
         if( $delcheck != 1 ) {
