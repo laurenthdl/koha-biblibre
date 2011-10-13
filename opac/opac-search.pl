@@ -347,7 +347,7 @@ if ($tag) {
 my $end_query = C4::Context->preference('SearchOPACHides');
 my $q = C4::Search::Query->buildQuery(\@indexes, \@operands, \@operators);
 my $q_mod = $end_query
-        ? C4::Search::Query->normalSearch( $q . " " . $end_query )
+        ? $q . " " . C4::Search::Query->normalSearch( $end_query )
         : $q;
 $query_desc = $q if not $tag;
 
@@ -532,7 +532,7 @@ if ( @results == 1
                     'lib'     => $lib,
                     'value'   => $value,
                     'count'   => $count,
-                    'active'  => $filters{$index} && scalar( grep /"\Q$value\E"/, @{ $filters{$index} } ) ? 1 : 0,
+                    'active'  => ( $filters{$index} and scalar( grep /"?\Q$value\E"?/, @{ $filters{$index} } ) ) ? 1 : 0,
                     'filters' => \@tplfilters,
                 };
             }

@@ -73,7 +73,8 @@ my $today    = C4::Dates->new();
 my @messages = @{ GetPrintMessages($params) };
 exit unless (@messages);
 foreach my $message (@messages) {
-    $message->{'content'} =~ s#\n#<br/>#g;
+    $message->{'content'} =~ s#\n#<br/>#g unless $message->{'content_type'} =~ /html/;
+    $message->{'pre'} = 1 unless $message->{'content_type'} =~ /html/;
 #    print STDOUT $message->{'content'};
 }
 my $fn = $filename || "holdnotices";

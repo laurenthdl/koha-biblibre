@@ -6,6 +6,8 @@ use Data::SearchEngine::Solr;
 use Getopt::Long;
 use C4::Context;
 
+my $debug = $ENV{'DEBUG'};
+
 my $delete = 0;
 my $help = 0;
 GetOptions(
@@ -23,9 +25,11 @@ my $count = 100;
 # Get Solr connection
 my $solr = Data::SearchEngine::Solr->new(
     url => C4::Context->preference("SolrAPI"),
-    sort => "recordid asc",
+    options => {
+        fl      => "id,recordid",
+        sort    => "recordid asc",
+    },
 );
-$solr->options->{'fl'} = "id,recordid";
 
 # Prepare the SQL query
 my $dbh = C4::Context->dbh;
@@ -49,6 +53,7 @@ while (0 < scalar @{$results->items}) {
     foreach(@{$results->items}) {
         # Check if this biblionumber exist in database
         my $recordid = $_->{'values'}->{'recordid'};
+        $debug && say "Checking record $recordid";
         $sth->execute($recordid);
         my $res = $sth->fetchrow_arrayref;
         if(not defined $res) {
@@ -71,7 +76,7 @@ if($missing) {
         print "$missing records refers to inexistant entry in database";
     }
 } else {
-    print "No inconsitencies found";
+    print "No inconsistencies found";
 }
 print "\n";
 
