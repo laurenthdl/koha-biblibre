@@ -213,35 +213,6 @@ my $action       = $input->param('action');
 my $ordernumber  = $input->param('ordernumber');
 my $biblionumber = $input->param('biblionumber');
 
-# If canceling an order
-if ( $action eq "cancelorder" ) {
-    my $confirm = $input->param('confirm');
-    if ( $confirm ) {
-
-        # We delete the order
-        my $error = DelOrder( $biblionumber, $ordernumber, $input->param('del_biblio') ? 1 : 0 );
-
-        if ( $error ) {
-            if ($error->{'delitem'})   { $template->param( error_delitem   => 1 ); }
-            if ($error->{'delbiblio'}) { $template->param( error_delbiblio => 1 ); }
-        } else {
-            $template->param( success_delorder => 1 );
-        }
-
-        print $input->redirect( '/cgi-bin/koha/acqui/parcel.pl?supplierid=' . $input->param('supplierid') . '&invoice=' . $input->param('invoice') . '&datereceived=' . $input->param('invoicedatereceived'));
-        exit;
-    } else {
-        $template->param(
-            confirm_cancel => "1",
-            biblionumber   => $biblionumber,
-            ordernumber    => $ordernumber,
-            supplierid     => $input->param('supplierid'),
-            invoice        => $input->param('invoice'),
-            datereceived   => $input->param('invoicedatereceived'),
-        );
-    }
-}
-
 # If receiving error, report the error (coming from finishrecieve.pl(sic)).
 if ( scalar(@rcv_err) ) {
     my $cnt = 0;

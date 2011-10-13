@@ -130,7 +130,6 @@
 <div id="bd">
     <div id="yui-main">
     <div class="yui-b">
-      <!-- TMPL_UNLESS NAME='cancelorder' -->
         <!-- TMPL_UNLESS name="confirm_close" -->
         <!-- TMPL_UNLESS name="selectbasketg" -->
             <!-- TMPL_UNLESS name="closedate" -->
@@ -410,7 +409,7 @@
                                 <a href="neworderempty.pl?ordernumber=<!-- TMPL_VAR NAME="ordernumber" -->&amp;booksellerid=<!-- TMPL_VAR NAME="booksellerid" -->&amp;basketno=<!-- TMPL_VAR NAME="basketno" -->">Modify</a>
                             </td>
                             <td>
-                            <a href="/cgi-bin/koha/acqui/basket.pl?op=cancelorder&basketno=<!-- TMPL_VAR NAME='basketno' -->&supplierid=<!-- TMPL_VAR NAME='booksellerid' -->&biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->&ordernumber=<!-- TMPL_VAR NAME='ordernumber' -->" class="button">Delete</a>
+                            <a href="/cgi-bin/koha/acqui/cancelorder.pl?basketno=<!-- TMPL_VAR NAME='basketno' -->&supplierid=<!-- TMPL_VAR NAME='booksellerid' -->&biblionumber=<!-- TMPL_VAR NAME='biblionumber' -->&ordernumber=<!-- TMPL_VAR NAME='ordernumber' -->&referrer=/cgi-bin/koha/acqui/basket.pl" class="button">Delete</a>
                             </td>
                             <!-- /TMPL_UNLESS -->
                         <!-- /TMPL_IF -->
@@ -525,26 +524,6 @@
         </form>
         </div>
     <!-- /TMPL_IF -->
-  <!-- /TMPL_UNLESS --> <!-- /cancelorder -->
-  <!-- TMPL_IF NAME='cancelorder' -->
-    <div id="cancelorder_confirmation" class="dialog alert">
-        <form action="/cgi-bin/koha/acqui/basket.pl" class="confirm">
-            <h1>Are you sure you want to cancel order <!-- TMPL_VAR NAME='ordernumber' -->?</h1>
-            <p>
-                <label for="del_biblio">Do you want to delete biblio if there are no items?</label>
-                <input type="checkbox" id="del_biblio" name="del_biblio" />
-            </p>
-            <input type="hidden" value="<!-- TMPL_VAR name="ordernumber" -->" name="ordernumber" />
-            <input type="hidden" value="<!-- TMPL_VAR name="biblionumber" -->" name="biblionumber" />
-            <input type="hidden" value="<!-- TMPL_VAR name="booksellerid" -->" name="supplierid" />
-            <input type="hidden" value="<!-- TMPL_VAR name="basketno" -->" name="basketno" />
-            <input type="hidden" name="op" value="cancelorder" />
-            <input type="hidden" name="confirm" value="1" />
-            <input type="submit" class="approve" value="Yes, Cancel (Y)" accesskey="y" />
-            <input type="submit" class="deny" value="No, Don't Cancel (N)" accesskey="n" onclick="javascript:window.location='/cgi-bin/koha/acqui/basket.pl?basketno=<!-- TMPL_VAR NAME="basketno" -->';return false;" />
-        </form>
-    </div>
-  <!-- /TMPL_IF -->
 
 </div>
 </div>

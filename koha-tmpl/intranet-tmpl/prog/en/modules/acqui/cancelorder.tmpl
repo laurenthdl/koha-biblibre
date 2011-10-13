@@ -1,0 +1,59 @@
+<!-- TMPL_INCLUDE NAME="doc-head-open.inc" -->
+<title>Koha &rsaquo; Acquisition &rsaquo; Cancel order</title>
+<!-- TMPL_INCLUDE NAME="doc-head-close.inc" -->
+</head>
+
+<body>
+<!-- TMPL_INCLUDE NAME="header.inc" -->
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/acqui/acqui-home.pl">Acquisition</a> &rsaquo; Cancel order</div>
+
+<div id="doc3" class="yui-t2">
+
+<div id="bd">
+  <div id="yui-main">
+    <div class="yui-b">
+      <!-- TMPL_UNLESS NAME='confirmcancel' -->
+      <form method="post" action="">
+        <div class="dialog alert">
+          <h3>Are you sure you want to cancel this order (<!-- TMPL_VAR NAME='ordernumber' -->)</h3>
+          <p>
+            <label for="del_biblio">Do you want to delete biblio if there are no items ?</label>
+            <input type="checkbox" id="del_biblio" name="del_biblio"/>
+          </p>
+          <p>
+            <textarea name="reason" placeholder="Reason of cancellation"></textarea>
+          </p>
+          <input type="hidden" name="action" value="confirmcancel" />
+          <input type="hidden" value="<!-- TMPL_VAR name="ordernumber" -->" name="ordernumber" />
+          <input type="hidden" value="<!-- TMPL_VAR name="biblionumber" -->" name="biblionumber" />
+          <input type="hidden" value="<!-- TMPL_VAR name="referrer" -->" name="referrer" />
+          <!-- TMPL_LOOP NAME='vars_loop' -->
+            <input type="hidden" value="<!-- TMPL_VAR NAME='value' -->" name="<!-- TMPL_VAR NAME='variable' -->" />
+          <!-- /TMPL_LOOP -->
+          <input type="submit" class="approve" value="Yes, Cancel (Y)" accesskey="y" />
+          <input type="submit" class="deny" value="No, Don't Cancel (N)" accesskey="n" onclick="window.location='<!-- TMPL_VAR NAME='referrer_url' -->';return false;" />
+        </div>
+      </form>
+      <!-- TMPL_ELSE -->
+        <!-- TMPL_IF NAME="success_cancelorder" -->
+            <div class="dialog message">
+                The order has been successfully canceled
+        <!-- TMPL_ELSE -->
+            <div class="dialog alert">
+                An error has occured.
+                <!-- TMPL_IF NAME="error_delitem" -->
+                    <p>The order has been canceled, although one or more items could not have been deleted.</p>
+                <!-- /TMPL_IF -->
+                <!-- TMPL_IF NAME="error_delbiblio" -->
+                <p>The order has been canceled, although the record has not been deleted.</p>
+                <!-- /TMPL_IF -->
+        <!-- /TMPL_IF -->
+                <p>Click <a href="<!-- TMPL_VAR NAME='referrer_url' -->">here</a> to return to previous page</p>
+            </div>
+      <!-- /TMPL_UNLESS -->
+
+    </div>
+  </div>
+</div>
+<!-- TMPL_INCLUDE NAME="intranet-bottom.inc" -->

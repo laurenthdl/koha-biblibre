@@ -1748,16 +1748,30 @@ delete the biblio
 =cut
 
 sub DelOrder {
-    my ( $bibnum, $ordernumber, $delete_biblio ) = @_;
+    my ( $bibnum, $ordernumber, $delete_biblio, $reason ) = @_;
     my $error;
     my $dbh   = C4::Context->dbh;
     my $query = "
         UPDATE aqorders
-        SET    datecancellationprinted=now(), orderstatus=4
+        SET datecancellationprinted=now(), orderstatus=4
+    ";
+    if($reason) {
+        $query .= "
+            , internalnotes = IF(internalnotes IS NULL,
+                CONCAT('Cancellation reason: ', ?),
+                CONCAT(internalnotes, ' - Cancellation reason: ', ?)
+            )
+        ";
+    }
+    $query .= "
         WHERE  biblionumber=? AND ordernumber=?
     ";
     my $sth = $dbh->prepare($query);
-    $sth->execute( $bibnum, $ordernumber );
+    if($reason) {
+        $sth->execute($reason, $reason, $bibnum, $ordernumber);
+    } else {
+        $sth->execute( $bibnum, $ordernumber );
+    }
     $sth->finish;
 
     # Removing MARC order field if exists
