@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-use strict;
-use warnings;
+
 use Modern::Perl;
 use Getopt::Long;
 
@@ -60,20 +59,15 @@ unless($use_context or $db_name) {
         next unless $dbname =~ /^koha/;
         $verbose and say "Database $dbname";
         $dbh->do("use $dbname");
-        my $tablequery = $dbh->prepare(qq{show tables});
-        $tablequery->execute;
-        while (my $tablename = $tablequery->fetchrow){
-           $verbose and say "\t$tablename";
-           if ($tablename =~ /sessions|zebraqueue|temp_upg_biblioitems|pending_offline_operations/)
-           {
-                $dbh->do(qq{ALTER TABLE $tablename engine=myisam});
-           }
-           else {
-                $dbh->do(qq{ALTER TABLE $tablename engine=innodb});
-           }
-        }
+        change_tables_engine($dbh);
     }
 } else {
+    change_tables_engine($dbh);
+}
+
+sub change_tables_engine {
+    my ($dbh) = shift;
+
     my $tablequery = $dbh->prepare(qq{show tables});
     $tablequery->execute;
     while (my $tablename = $tablequery->fetchrow){
